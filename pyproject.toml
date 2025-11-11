@@ -63,7 +63,8 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
-addopts = "-v --cov=pyobfus --cov-report=term-missing --cov-report=html"
+# Exclude Pro features tests (requires pyobfus_pro which is not in public repo)
+addopts = "-v --cov=pyobfus --cov-report=term-missing --cov-report=html --ignore=tests/test_pro_features.py"
 
 [tool.black]
 line-length = 100
