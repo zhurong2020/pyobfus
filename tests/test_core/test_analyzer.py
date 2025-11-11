@@ -2,10 +2,6 @@
 Unit tests for symbol analyzer.
 """
 
-import ast
-
-import pytest
-
 from pyobfus.config import ObfuscationConfig
 from pyobfus.core.analyzer import SymbolAnalyzer
 from pyobfus.core.parser import ASTParser

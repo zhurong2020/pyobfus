@@ -100,9 +100,7 @@ class ASTParser:
             raise ValueError(f"Invalid AST: {e}") from e
 
     @staticmethod
-    def get_source_segment(
-        source_code: str, node: ast.AST, padded: bool = True
-    ) -> str:
+    def get_source_segment(source_code: str, node: ast.AST, padded: bool = True) -> str:
         """
         Extract source code segment for an AST node.
 

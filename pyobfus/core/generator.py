@@ -7,7 +7,7 @@ Uses ast.unparse (Python 3.9+) or fallback for older versions.
 import ast
 import sys
 from pathlib import Path
-from typing import Union
+from typing import Union, cast
 
 from pyobfus.exceptions import GenerationError
 
@@ -63,11 +63,9 @@ class CodeGenerator:
         try:
             import astunparse  # type: ignore
 
-            return astunparse.unparse(tree)
+            return cast(str, astunparse.unparse(tree))
         except ImportError:
-            # If astunparse not available, use compile + exec
-            # This won't preserve formatting but will work
-            code_obj = compile(tree, "<generated>", "exec")
+            # If astunparse not available, raise error
             # This is a limitation - we can't perfectly reconstruct source
             # Recommend upgrading to Python 3.9+ or installing astunparse
             raise GenerationError(

@@ -7,9 +7,7 @@ Tests the complete pipeline: parse -> analyze -> transform -> generate
 import ast
 import subprocess
 import sys
-from pathlib import Path
 
-import pytest
 
 from pyobfus.config import ObfuscationConfig
 from pyobfus.core.analyzer import SymbolAnalyzer
