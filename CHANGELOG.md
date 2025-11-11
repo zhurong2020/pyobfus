@@ -14,12 +14,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Runtime decryption infrastructure
 - Infrastructure name preservation in obfuscation
 - Docstring preservation for module/function/class definitions
+- Conditional dependency on `astunparse` for Python 3.8 support
 
 ### Fixed
 - Infrastructure function names now properly excluded from obfuscation
 - F-strings properly handled (skipped from string encryption)
 - Module-level string encryption execution errors resolved
 - Type checking errors in pyobfus_pro (anti_debug.py, string_aes.py) - added explicit type casts
+- Pylance type checking issues (parser.py, utils.py) - improved type inference with getattr()
+- Python 3.8 CI/CD test failures - added astunparse as conditional dependency
 
 ## [0.1.0] - 2025-11-11
 
