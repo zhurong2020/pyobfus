@@ -17,6 +17,7 @@ from pyobfus.core.generator import CodeGenerator
 from pyobfus.core.parser import ASTParser
 from pyobfus.exceptions import LimitExceededError, PyObfusError
 from pyobfus.transformers.name_mangler import NameMangler
+from pyobfus.utils import filter_python_files
 
 
 @click.command()
@@ -201,12 +202,15 @@ def _obfuscate_directory(
         config: Obfuscation configuration
         verbose: Verbose output
     """
-    # Find all Python files
-    python_files = list(input_dir.rglob("*.py"))
+    # Find all Python files, excluding patterns from config
+    python_files = filter_python_files(input_dir, config.exclude_patterns)
 
     if not python_files:
         click.echo(f"No Python files found in {input_dir}")
         return
+
+    if verbose and config.exclude_patterns:
+        click.echo(f"Excluding patterns: {', '.join(config.exclude_patterns)}")
 
     # Check Community Edition file limit
     if config.max_files and len(python_files) > config.max_files:

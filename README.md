@@ -28,6 +28,9 @@ PyArmor trial version fails unpredictably on AI/ML code (tested with cardiac ima
 - **Comment Removal**: Strip all comments and docstrings
 - **Simple String Encoding**: Basic obfuscation for string literals
 - **Multi-file Support**: Obfuscate entire projects (up to 5 files or 1000 LOC)
+- **File Filtering**: Exclude files using glob patterns (test files, config, etc.)
+- **Configuration Files**: YAML-based configuration for repeatable builds
+- **Selective Obfuscation**: Preserve specific names (logger, config, main)
 
 ### Pro Edition ($49-149)
 
@@ -109,6 +112,17 @@ obfuscation:
   remove_comments: true
   string_encoding: false  # Pro feature
 ```
+
+### File Filtering Examples
+
+Exclude patterns support glob syntax:
+
+- `test_*.py` - Exclude files starting with "test_"
+- `**/tests/**` - Exclude all files in "tests" directories
+- `**/__init__.py` - Exclude all `__init__.py` files
+- `setup.py` - Exclude specific files
+
+See [`pyobfus.yaml.example`](pyobfus.yaml.example) for more configuration examples.
 
 ## Community Edition Limits
 

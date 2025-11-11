@@ -77,7 +77,14 @@ class ObfuscationConfig:
         with open(config_path, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
 
-        return cls(**data.get("obfuscation", {}))
+        # Get obfuscation config
+        obf_config = data.get("obfuscation", {})
+
+        # Convert exclude_names list to set if present
+        if "exclude_names" in obf_config and isinstance(obf_config["exclude_names"], list):
+            obf_config["exclude_names"] = set(obf_config["exclude_names"])
+
+        return cls(**obf_config)
 
     @classmethod
     def community_edition(cls) -> "ObfuscationConfig":

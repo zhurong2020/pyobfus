@@ -1,0 +1,24 @@
+# Configuration for multifile example obfuscation
+
+obfuscation:
+  level: community
+
+  # Exclude test files
+  exclude_patterns:
+    - "test_*.py"
+    - "__init__.py"  # Keep imports readable
+
+  # Preserve some names for clarity
+  exclude_names:
+    - "main"
+    - "run_demo"
+
+  # Obfuscation settings
+  name_prefix: "I"
+  remove_docstrings: true
+  remove_comments: true
+  string_encoding: false
+
+  # Community Edition limits
+  max_files: 5
+  max_total_loc: 1000
