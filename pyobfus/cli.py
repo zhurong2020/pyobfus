@@ -170,12 +170,49 @@ def _obfuscate_file(
         click.echo(f"  Obfuscatable names: {stats['obfuscatable_names']}")
         click.echo(f"  Excluded names: {stats['excluded_names']}")
 
-    # Transform
+    # Transform - Apply transformations in sequence
+    transformed_tree = tree
+
+    # 1. Name mangling (always applied)
     mangler = NameMangler(config, analyzer)
-    transformed_tree = mangler.transform(tree)
+    transformed_tree = mangler.transform(transformed_tree)
 
     if verbose:
-        click.echo(f"  Transformations: {mangler.get_transformation_count()}")
+        click.echo(f"  Name transformations: {mangler.get_transformation_count()}")
+
+    # 2. Pro features (if enabled)
+    if config.level == "pro":
+        try:
+            # String encryption (AES-256)
+            if config.string_encryption:
+                from pyobfus_pro.string_aes import StringAESEncryptor
+
+                string_encryptor = StringAESEncryptor(config, analyzer)
+                transformed_tree = string_encryptor.transform(transformed_tree)
+
+                if verbose:
+                    stats = string_encryptor.get_statistics()
+                    click.echo(f"  Encrypted strings: {stats['encrypted_strings']}")
+
+            # Anti-debugging checks
+            if config.anti_debug:
+                from pyobfus_pro.anti_debug import AntiDebugInjector
+
+                anti_debug = AntiDebugInjector(config, analyzer)
+                transformed_tree = anti_debug.transform(transformed_tree)
+
+                if verbose:
+                    stats = anti_debug.get_statistics()
+                    click.echo(f"  Anti-debug checks: {stats['injected_functions'] + 1}")
+
+        except ImportError as e:
+            click.echo(f"\n⚠️  Pro features not available: {e}", err=True)
+            click.echo("Please ensure pyobfus Pro is properly installed.", err=True)
+            if verbose:
+                click.echo(
+                    "Pro features require additional modules in pyobfus_pro/", err=True
+                )
+            # Continue with Community Edition features only
 
     # Generate code
     obfuscated_code = CodeGenerator.generate(transformed_tree)
