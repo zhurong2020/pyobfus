@@ -64,6 +64,11 @@ class ObfuscationConfig:
     remove_comments: bool = True
     string_encoding: bool = False
 
+    # Pro Edition features
+    string_encryption: bool = False  # AES-256 encryption (Pro only)
+    anti_debug: bool = False  # Anti-debugging checks (Pro only)
+    control_flow_flattening: bool = False  # Control flow flattening (Pro only, Phase 2)
+
     # Community Edition limits
     max_files: Optional[int] = None  # None = unlimited for Pro
     max_total_loc: Optional[int] = None  # None = unlimited for Pro
@@ -102,7 +107,9 @@ class ObfuscationConfig:
             level="pro",
             max_files=None,  # Pro: unlimited
             max_total_loc=None,  # Pro: unlimited
-            string_encoding=True,  # Pro feature
+            string_encoding=True,  # Pro: simple encoding
+            string_encryption=True,  # Pro: AES-256 encryption
+            anti_debug=True,  # Pro: anti-debugging
         )
 
     def add_exclude_pattern(self, pattern: str) -> None:

@@ -40,6 +40,9 @@ dev = [
     "mypy>=1.0",
     "ruff>=0.1.0",
 ]
+pro = [
+    "cryptography>=41.0",  # Required for AES-256 string encryption
+]
 
 [project.urls]
 Homepage = "https://github.com/zhurong2020/pyobfus"
