@@ -6,7 +6,7 @@ Provides the foundation for all obfuscation transformers.
 
 import ast
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import List, Optional
 
 from pyobfus.config import ObfuscationConfig
 from pyobfus.core.analyzer import SymbolAnalyzer
@@ -110,7 +110,7 @@ class CompositeTransformer(BaseTransformer):
     def __init__(
         self,
         config: ObfuscationConfig,
-        transformers: list[BaseTransformer],
+        transformers: List[BaseTransformer],
         analyzer: Optional[SymbolAnalyzer] = None,
     ):
         """
