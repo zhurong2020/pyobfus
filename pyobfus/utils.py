@@ -10,14 +10,16 @@ import fnmatch
 
 
 def should_exclude_file(
-    file_path: Path, exclude_patterns: List[str], base_path: Optional[Path] = None
+    file_path: Path,
+    exclude_patterns: Optional[List[str]] = None,
+    base_path: Optional[Path] = None,
 ) -> bool:
     """
     Check if a file should be excluded based on glob patterns.
 
     Args:
         file_path: File path to check
-        exclude_patterns: List of glob patterns (e.g., "test_*.py", "**/tests/**")
+        exclude_patterns: List of glob patterns (e.g., "test_*.py", "**/tests/**"), or None
         base_path: Base path for relative pattern matching
 
     Returns:

@@ -132,8 +132,11 @@ class ASTParser:
         """
         max_lineno = 0
         for node in ast.walk(tree):
-            if hasattr(node, "lineno"):
-                max_lineno = max(max_lineno, node.lineno)
-            if hasattr(node, "end_lineno") and node.end_lineno:
-                max_lineno = max(max_lineno, node.end_lineno)
+            # Use getattr with default to satisfy type checker
+            lineno = getattr(node, "lineno", 0)
+            if lineno:
+                max_lineno = max(max_lineno, lineno)
+            end_lineno = getattr(node, "end_lineno", None)
+            if end_lineno:
+                max_lineno = max(max_lineno, end_lineno)
         return max_lineno
