@@ -11,19 +11,29 @@ A Python code obfuscator built with AST-based transformations for Python 3.8+. P
 
 ## Features
 
-- **Name Obfuscation**: Rename variables, functions, and classes
+- **Name Obfuscation**: Rename variables, functions, and classes to I0, I1, I2...
 - **Comment Removal**: Strip comments and docstrings
 - **String Encoding**: Protect string literals with encoding
 - **Multi-file Support**: Obfuscate entire projects
 - **YAML Configuration**: Flexible configuration system
 
-## Quick Start
+## Installation
 
-Install via pip:
+**From source** (recommended until PyPI release):
+
+```bash
+git clone https://github.com/zhurong2020/pyobfus.git
+cd pyobfus
+pip install -e .
+```
+
+**From PyPI** (coming soon):
 
 ```bash
 pip install pyobfus
 ```
+
+## Quick Start
 
 Obfuscate a single file:
 
@@ -37,27 +47,10 @@ Obfuscate a directory:
 pyobfus src/ -o obfuscated/
 ```
 
-## Documentation
-
-- [README](https://github.com/zhurong2020/pyobfus#readme)
-- [Project Structure](./PROJECT_STRUCTURE.md)
-- [Roadmap](../ROADMAP.md)
-- [Security Policy](../SECURITY.md)
-
-## Installation
-
-### From PyPI (Recommended)
+With configuration:
 
 ```bash
-pip install pyobfus
-```
-
-### From Source
-
-```bash
-git clone https://github.com/zhurong2020/pyobfus.git
-cd pyobfus
-pip install -e .
+pyobfus src/ -o obfuscated/ --config pyobfus.yaml
 ```
 
 ## Example
@@ -83,18 +76,24 @@ def I0(I1, I2):
     return I4 + I5
 ```
 
+*Note: Variable names may vary slightly, but functionality is preserved.*
+
+## Documentation
+
+- [README](https://github.com/zhurong2020/pyobfus#readme) - Full documentation
+- [Roadmap](https://github.com/zhurong2020/pyobfus/blob/main/ROADMAP.md) - Future features
+- [Changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md) - Version history
+- [Security Policy](https://github.com/zhurong2020/pyobfus/blob/main/SECURITY.md) - Report vulnerabilities
+
+## Community & Support
+
+- [GitHub Issues](https://github.com/zhurong2020/pyobfus/issues) - Bug reports and feature requests
+- [GitHub Discussions](https://github.com/zhurong2020/pyobfus/discussions) - Questions and ideas
+- [Contributing](https://github.com/zhurong2020/pyobfus/blob/main/CONTRIBUTING.md) - How to contribute
+
 ## License
 
 Apache License 2.0 - See [LICENSE](https://github.com/zhurong2020/pyobfus/blob/main/LICENSE)
-
-## Support
-
-- **GitHub Issues**: [Report bugs or request features](https://github.com/zhurong2020/pyobfus/issues)
-- **GitHub Discussions**: [Ask questions or share ideas](https://github.com/zhurong2020/pyobfus/discussions)
-
-## Contributing
-
-Contributions are welcome! Please see our [Contributing Guidelines](https://github.com/zhurong2020/pyobfus/blob/main/CONTRIBUTING.md).
 
 ---
 
