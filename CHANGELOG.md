@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Infrastructure function names now properly excluded from obfuscation
 - F-strings properly handled (skipped from string encryption)
 - Module-level string encryption execution errors resolved
+- Type checking errors in pyobfus_pro (anti_debug.py, string_aes.py) - added explicit type casts
 
 ## [0.1.0] - 2025-11-11
 
