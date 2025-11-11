@@ -57,6 +57,10 @@ class ObfuscationConfig:
             "main",
             "logger",
             "config",
+            # Pro infrastructure (must not be renamed)
+            "_ENCRYPTION_KEY",
+            "_decrypt_str",
+            "_check_debugger",
         }
     )
     name_prefix: str = "I"
@@ -129,5 +133,18 @@ class ObfuscationConfig:
         # Check explicit exclusions
         if name in self.exclude_names:
             return True
+
+        # Exclude infrastructure names (Pro feature support functions/variables)
+        # Pattern: _decrypt_*, _encrypt_*, _check_*, _ENCRYPTION_*, etc.
+        if name.startswith("_"):
+            infrastructure_patterns = [
+                "_decrypt",
+                "_encrypt",
+                "_check",
+                "_ENCRYPTION",
+                "_KEY",
+            ]
+            if any(pattern in name for pattern in infrastructure_patterns):
+                return True
 
         return False

@@ -242,9 +242,3 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 - Inspired by [Opy](https://github.com/QQuick/Opy) (ideas only, clean room implementation)
 - Market research validated by PyArmor trial limitations
 - Born from real-world needs in medical AI research
-
----
-
-**Generated with**: [Claude Code](https://claude.com/claude-code)
-
-**Co-Authored-By**: Claude <noreply@anthropic.com>
