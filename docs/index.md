@@ -19,18 +19,18 @@ A Python code obfuscator built with AST-based transformations for Python 3.8+. P
 
 ## Installation
 
-**From source** (recommended until PyPI release):
+**From PyPI** (recommended):
+
+```bash
+pip install pyobfus
+```
+
+**From source** (for development):
 
 ```bash
 git clone https://github.com/zhurong2020/pyobfus.git
 cd pyobfus
 pip install -e .
-```
-
-**From PyPI** (coming soon):
-
-```bash
-pip install pyobfus
 ```
 
 ## Quick Start
