@@ -39,7 +39,9 @@ def test_pro_features():
     config = ObfuscationConfig.pro_edition()
     config.string_encryption = True  # Fixed: infrastructure names now excluded
     config.anti_debug = True  # Fixed: infrastructure names now excluded
-    print(f"[OK] Config: level={config.level}, string_encryption={config.string_encryption}, anti_debug={config.anti_debug}")
+    print(
+        f"[OK] Config: level={config.level}, string_encryption={config.string_encryption}, anti_debug={config.anti_debug}"
+    )
 
     # Analyze
     analyzer = SymbolAnalyzer(config)
@@ -57,8 +59,10 @@ def test_pro_features():
         encryptor = StringAESEncryptor(config, analyzer)
         tree = encryptor.transform(tree)
         enc_stats = encryptor.get_statistics()
-        print(f"[OK] String encryption: {enc_stats['encrypted_strings']} strings encrypted ({enc_stats['total_bytes']} bytes)")
-        assert enc_stats['encrypted_strings'] > 0
+        print(
+            f"[OK] String encryption: {enc_stats['encrypted_strings']} strings encrypted ({enc_stats['total_bytes']} bytes)"
+        )
+        assert enc_stats["encrypted_strings"] > 0
     else:
         print("[SKIP] String encryption disabled")
 
@@ -68,7 +72,7 @@ def test_pro_features():
         tree = anti_debug.transform(tree)
         debug_stats = anti_debug.get_statistics()
         print(f"[OK] Anti-debugging: {debug_stats['injected_functions']} function checks")
-        assert debug_stats['injected_functions'] > 0
+        assert debug_stats["injected_functions"] > 0
     else:
         print("[SKIP] Anti-debugging disabled")
 
@@ -93,5 +97,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n[ERROR] Error: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
