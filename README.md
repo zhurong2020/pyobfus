@@ -194,23 +194,26 @@ Add an additional layer of protection for commercial Python software.
 - **Architecture**: Modular transformer pipeline
 - **Testing**: 32 tests, 51% coverage, multi-OS CI/CD
 
-## Roadmap
+## Documentation
 
-See [ROADMAP.md](ROADMAP.md) for planned features and improvements.
+### User Documentation
+- **Quick Start** - See sections above for installation and basic usage
+- **[Examples](examples/)** - Working code examples demonstrating features
+- **Configuration** - See YAML configuration section above
 
-## Contributing
+### Developer Documentation
+- **[Contributing Guidelines](CONTRIBUTING.md)** - How to contribute to the project
+- **[Project Structure](docs/PROJECT_STRUCTURE.md)** - Codebase architecture and development guide
+- **[Changelog](CHANGELOG.md)** - Version history and release notes
+- **[Roadmap](ROADMAP.md)** - Planned features and development timeline
 
-We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+### Legal
+- **[License](LICENSE)** - Apache 2.0 license terms
 
-## License
-
-Apache License 2.0 - see [LICENSE](LICENSE) for details.
-
-## Support
-
-- **Documentation**: [GitHub Wiki](https://github.com/zhurong2020/pyobfus/wiki)
-- **Issues**: [GitHub Issues](https://github.com/zhurong2020/pyobfus/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/zhurong2020/pyobfus/discussions)
+### Community & Support
+- **Issues**: [GitHub Issues](https://github.com/zhurong2020/pyobfus/issues) - Bug reports and feature requests
+- **Discussions**: [GitHub Discussions](https://github.com/zhurong2020/pyobfus/discussions) - Questions and ideas
+- **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get involved
 
 ## Acknowledgments
 
