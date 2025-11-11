@@ -1,0 +1,75 @@
+# pyobfus Configuration File Example
+# Save as pyobfus.yaml and use with: pyobfus src/ -o dist/ --config pyobfus.yaml
+
+obfuscation:
+  # Obfuscation level: community or pro
+  level: community
+
+  # File patterns to exclude (glob syntax)
+  exclude_patterns:
+    - "test_*.py"           # Exclude test files
+    - "**/tests/**"         # Exclude test directories
+    - "**/test/**"          # Alternative test directory
+    - "__init__.py"         # Keep __init__ files readable
+    - "setup.py"            # Exclude setup/build files
+    - "conftest.py"         # Exclude pytest config
+
+  # Names to preserve (not obfuscate)
+  exclude_names:
+    - "logger"              # Common logger variable
+    - "config"              # Configuration objects
+    - "main"                # Entry point functions
+    - "app"                 # Application instances
+    - "db"                  # Database instances
+
+  # Name prefix for obfuscated identifiers
+  name_prefix: "I"          # Default: I0, I1, I2, ...
+  # Alternatives: "O", "l", "_", "VAR"
+
+  # Remove docstrings from functions/classes
+  remove_docstrings: true
+
+  # Remove comments from code
+  remove_comments: true
+
+  # Simple string encoding (Pro feature)
+  string_encoding: false
+
+  # Community Edition limits (set to null for Pro)
+  max_files: 5              # Maximum files to obfuscate
+  max_total_loc: 1000       # Maximum total lines of code
+
+# Example configurations for different use cases:
+
+# Minimal obfuscation (keep readable structure):
+# obfuscation:
+#   level: community
+#   remove_docstrings: false
+#   remove_comments: false
+#   exclude_patterns:
+#     - "**/__init__.py"
+#     - "**/config.py"
+
+# Maximum obfuscation (Pro):
+# obfuscation:
+#   level: pro
+#   remove_docstrings: true
+#   remove_comments: true
+#   string_encoding: true
+#   max_files: null
+#   max_total_loc: null
+
+# Medical AI / Research project:
+# obfuscation:
+#   level: pro
+#   exclude_patterns:
+#     - "test_*.py"
+#     - "**/tests/**"
+#     - "**/__init__.py"
+#   exclude_names:
+#     - "logger"
+#     - "config"
+#     - "main"
+#     - "inference_model"  # Keep model references clear
+#   remove_docstrings: true
+#   string_encryption: true
