@@ -6,13 +6,16 @@ build-backend = "setuptools.build_meta"
 name = "pyobfus"
 version = "0.1.0"
 description = "Modern Python Code Obfuscator with AST-based Transformations"
-readme = "README.md"
+readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.8"
 license = {text = "Apache-2.0"}
 authors = [
     {name = "Rong Zhu", email = "zhurong2020@users.noreply.github.com"}
 ]
-keywords = ["obfuscation", "code-protection", "security", "python", "ast"]
+maintainers = [
+    {name = "Rong Zhu", email = "zhurong2020@users.noreply.github.com"}
+]
+keywords = ["obfuscation", "code-protection", "security", "python", "ast", "code-obfuscator", "name-mangling"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -47,9 +50,13 @@ pro = [
 
 [project.urls]
 Homepage = "https://github.com/zhurong2020/pyobfus"
-Documentation = "https://github.com/zhurong2020/pyobfus#readme"
+Documentation = "https://zhurong2020.github.io/pyobfus/"
 Repository = "https://github.com/zhurong2020/pyobfus"
-Issues = "https://github.com/zhurong2020/pyobfus/issues"
+"Source Code" = "https://github.com/zhurong2020/pyobfus"
+"Bug Tracker" = "https://github.com/zhurong2020/pyobfus/issues"
+"Changelog" = "https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md"
+"Discussions" = "https://github.com/zhurong2020/pyobfus/discussions"
+"Funding" = "https://www.buymeacoffee.com/zhurong052Q"
 
 [project.scripts]
 pyobfus = "pyobfus.cli:main"
