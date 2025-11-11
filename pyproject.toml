@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pyobfus"
 version = "0.1.0"
-description = "Modern Python Code Obfuscator - Enterprise-Grade Protection at 50% Lower Cost"
+description = "Modern Python Code Obfuscator with AST-based Transformations"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "Apache-2.0"}

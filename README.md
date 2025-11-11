@@ -1,44 +1,29 @@
 # pyobfus
 
-**Modern Python Code Obfuscator - Enterprise-Grade Protection at 50% Lower Cost**
+**Modern Python Code Obfuscator**
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-Born from medical AI research, **pyobfus** provides robust, transparent, and community-driven code obfuscation for Python 3.8+. Protect your intellectual property without breaking the bank.
-
-## Why pyobfus?
-
-- **Transparent**: Open-core model with clear Community Edition limits (no vague "big script" errors)
-- **Affordable**: $49-149 vs PyArmor $99-199+ (50% cost savings)
-- **Reliable**: Predictable behavior, comprehensive error messages
-- **Modern**: Built for Python 3.8+, leveraging AST-based transformation
-- **AI/ML Optimized**: Works reliably with PyTorch, TensorFlow, and medical imaging code
-
-### Real-World Problem We Solve
-
-PyArmor trial version fails unpredictably on AI/ML code (tested with cardiac imaging projects). pyobfus Community Edition has clear, documented limits - and actually works within those limits.
+A Python code obfuscator built with AST-based transformations for Python 3.8+. Provides reliable name mangling, string encoding, and code protection features.
 
 ## Features
 
-### Community Edition (Free)
+### Core Features
 
-- **Name Mangling**: Variable/function/class names → `I0`, `I1`, `I2`, ...
-- **Comment Removal**: Strip all comments and docstrings
-- **Simple String Encoding**: Basic obfuscation for string literals
-- **Multi-file Support**: Obfuscate entire projects (up to 5 files or 1000 LOC)
-- **File Filtering**: Exclude files using glob patterns (test files, config, etc.)
+- **Name Mangling**: Rename variables, functions, and classes to obfuscated names (I0, I1, I2...)
+- **Comment Removal**: Strip comments and docstrings
+- **Multi-file Support**: Obfuscate entire projects with preserved import relationships
+- **File Filtering**: Exclude files using glob patterns (test files, config files, etc.)
 - **Configuration Files**: YAML-based configuration for repeatable builds
-- **Selective Obfuscation**: Preserve specific names (logger, config, main)
+- **Selective Obfuscation**: Preserve specific names (builtins, magic methods, custom exclusions)
 
-### Pro Edition ($49-149)
+### Advanced Features (Experimental)
 
-- **Unlimited Files/LOC**: No restrictions on project size
-- **AES-256 String Encryption**: Military-grade string protection
-- **Control Flow Flattening**: Advanced logic obfuscation
-- **Anti-Debugging**: Detect and prevent debugger attachment
-- **Priority Support**: Direct assistance for integration issues
+- **String Encryption**: AES-256 encryption for string literals
+- **Anti-Debugging**: Runtime debugger detection
+- **Control Flow Obfuscation**: Additional protection layers (planned)
 
 ## Quick Start
 
@@ -52,7 +37,7 @@ pip install pyobfus
 
 ```bash
 # Obfuscate a single file
-pyobfus examples/simple.py -o examples/simple_obf.py
+pyobfus input.py -o output.py
 
 # Obfuscate a directory
 pyobfus src/ -o dist/
@@ -63,23 +48,23 @@ pyobfus src/ -o dist/ --config pyobfus.yaml
 
 ### Example
 
-**Before obfuscation** (`examples/simple.py`):
+**Before obfuscation**:
 
 ```python
-def calculate_risk(age, calcium_score):
-    """Calculate cardiovascular risk."""
+def calculate_risk(age, score):
+    """Calculate risk factor."""
     risk_factor = 0.1
-    if calcium_score > 100:
+    if score > 100:
         risk_factor = 0.5
     return age * risk_factor
 
 patient_age = 55
-patient_calcium = 150
-risk = calculate_risk(patient_age, patient_calcium)
+patient_score = 150
+risk = calculate_risk(patient_age, patient_score)
 print(f"Risk score: {risk}")
 ```
 
-**After obfuscation** (Community Edition):
+**After obfuscation**:
 
 ```python
 def I0(I1, I2):
@@ -99,7 +84,7 @@ Create `pyobfus.yaml`:
 
 ```yaml
 obfuscation:
-  level: community  # or 'pro'
+  level: community
   exclude_patterns:
     - "test_*.py"
     - "**/tests/**"
@@ -110,10 +95,9 @@ obfuscation:
     - "main"
   remove_docstrings: true
   remove_comments: true
-  string_encoding: false  # Pro feature
 ```
 
-### File Filtering Examples
+### File Filtering
 
 Exclude patterns support glob syntax:
 
@@ -122,48 +106,21 @@ Exclude patterns support glob syntax:
 - `**/__init__.py` - Exclude all `__init__.py` files
 - `setup.py` - Exclude specific files
 
-See [`pyobfus.yaml.example`](pyobfus.yaml.example) for more configuration examples.
+See `pyobfus.yaml.example` for more configuration examples.
 
-## Community Edition Limits
+## Architecture
 
-To maintain a sustainable open-core model:
+pyobfus uses Python's `ast` module for syntax-aware transformations:
 
-- **Max 5 files** OR **Max 1000 total lines of code**
-- Clear error messages when limits exceeded
-- Upgrade path to Pro Edition
+1. **Parser**: Parse Python source to AST
+2. **Analyzer**: Build symbol table with scope analysis
+3. **Transformers**: Apply obfuscation techniques (name mangling, string encoding, etc.)
+4. **Generator**: Generate obfuscated Python code
 
-Unlike PyArmor trial's vague "Can't obfuscate big script" errors, pyobfus tells you exactly what the limit is:
-
-```
-Community Edition limit exceeded: file_count
-  Current: 8
-  Limit: 5
-
-Upgrade to pyobfus Pro for unlimited files:
-  https://github.com/zhurong2020/pyobfus#pricing
-```
-
-## Pricing
-
-| Edition | Price | Use Case | Limits |
-|---------|-------|----------|--------|
-| **Community** | **Free** | Students, hobbyists, open-source | 5 files OR 1000 LOC |
-| **Starter** | **$49/product** | Indie developers | Unlimited |
-| **Professional** | **$149/product** | Small teams | + Pro features |
-| **Enterprise** | **$399/product** | Corporations | + Priority support |
-
-**Fair Use Policy**: If your product generates revenue < 100x the license fee, the Pro license is free. Example: $149 license → Free if revenue < $14,900.
-
-## Comparison
-
-| Feature | pyobfus | PyArmor | Nuitka | Opy |
-|---------|---------|---------|--------|-----|
-| **Open Source** | ✅ Core | ❌ | ✅ | ✅ |
-| **Active Development** | ✅ | ✅ | ✅ | ❌ 2017 |
-| **AI/ML Compatible** | ✅ | ⚠️ Hit-or-miss | ✅ | ❌ |
-| **Predictable Free Tier** | ✅ | ❌ | N/A | ✅ |
-| **Price** | $49-149 | $99-199 | €250/year | Free |
-| **Python 3.12+** | ✅ | ✅ | ✅ | ❌ 3.5 |
+This approach ensures:
+- Syntactically correct output
+- Proper handling of Python scoping rules
+- Support for modern Python features (f-strings, walrus operator, etc.)
 
 ## Development
 
@@ -180,56 +137,74 @@ pip install -e ".[dev]"
 ### Testing
 
 ```bash
-pytest tests/ -v --cov=pyobfus
+# Run tests
+pytest tests/ -v
+
+# With coverage
+pytest tests/ -v --cov=pyobfus --cov-report=html
 ```
 
 ### Code Quality
 
 ```bash
+# Format code
 black pyobfus/
+
+# Type checking
 mypy pyobfus/
+
+# Linting
 ruff check pyobfus/
 ```
 
 ## Use Cases
 
-### Medical AI Protection
+### Protecting Proprietary Algorithms
 
-pyobfus was born from [cardiac-ml-research](https://github.com/zhurong2020/cardiac-ml-research), a medical imaging AI project requiring code protection for commercial distribution.
+Obfuscate sensitive business logic before distributing Python applications.
 
-```bash
-# Obfuscate medical AI modules
-pyobfus applications/periaortic_adipose/ \
-    --output dist/applications/periaortic_adipose/ \
-    --config cardiac_obfus.yaml
-```
+### Educational Purposes
 
-### SaaS Distribution
+Demonstrate code protection concepts and obfuscation techniques.
 
-Protect proprietary algorithms before distributing Python apps to clients.
+### Intellectual Property Protection
 
-### Educational Institutions
+Add an additional layer of protection for commercial Python software.
 
-Use Community Edition for teaching code protection concepts.
+## Limitations
+
+### Current Limitations
+
+- **Cross-file imports**: Name mapping across files is basic (improvements planned)
+- **Dynamic code**: `eval()`, `exec()` with obfuscated code may require adjustments
+- **Debugging**: Obfuscated code is harder to debug (by design)
+- **Performance**: Some obfuscation techniques may impact runtime performance
+
+### Recommendations
+
+- Test obfuscated code thoroughly
+- Keep original source in version control
+- Use configuration files for reproducible builds
+- Consider combining with other protection methods (compilation, etc.)
+
+## Technical Details
+
+- **Python Support**: 3.8, 3.9, 3.10, 3.11, 3.12
+- **Naming Scheme**: Index-based (I0, I1, I2...) - simple and effective
+- **Architecture**: Modular transformer pipeline
+- **Testing**: 32 tests, 51% coverage, multi-OS CI/CD
 
 ## Roadmap
 
-- [x] **Phase 1** (Week 1-6): MVP with name mangling
-- [ ] **Phase 2** (Week 7-12): Pro features (AES encryption, control flow)
-- [ ] **Phase 3** (Week 13-24): VSCode extension, CI/CD plugins
+See [ROADMAP.md](ROADMAP.md) for planned features and improvements.
 
 ## Contributing
 
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-### Contributors
-
-- Rong Zhu ([@zhurong2020](https://github.com/zhurong2020)) - Creator & Maintainer
-
 ## License
 
-- **Community Edition**: Apache License 2.0 (see [LICENSE](LICENSE))
-- **Pro Edition**: Proprietary license (contact for details)
+Apache License 2.0 - see [LICENSE](LICENSE) for details.
 
 ## Support
 
@@ -239,6 +214,5 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## Acknowledgments
 
-- Inspired by [Opy](https://github.com/QQuick/Opy) (ideas only, clean room implementation)
-- Market research validated by PyArmor trial limitations
-- Born from real-world needs in medical AI research
+- Inspired by [Opy](https://github.com/QQuick/Opy)'s AST-based approach
+- Clean room implementation - no code copying
