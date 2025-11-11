@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 GitHub Discussions
+    url: https://github.com/zhurong2020/pyobfus/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: 📖 Documentation
+    url: https://github.com/zhurong2020/pyobfus#readme
+    about: Read the documentation for usage guides and examples
+  - name: 🐛 Security Vulnerability
+    url: https://github.com/zhurong2020/pyobfus/security/advisories/new
+    about: Report security vulnerabilities privately

@@ -139,6 +139,9 @@ Thumbs.db
 pyobfus_pro/
 *_pro.py
 
+# Internal documentation (business strategy, pricing, etc.)
+docs/internal/
+
 # Obfuscated output (for testing)
 *_obf.py
 *_obfuscated.py

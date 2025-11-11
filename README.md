@@ -215,6 +215,16 @@ Add an additional layer of protection for commercial Python software.
 - **Discussions**: [GitHub Discussions](https://github.com/zhurong2020/pyobfus/discussions) - Questions and ideas
 - **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get involved
 
+## Support the Project
+
+If you find pyobfus helpful, consider supporting its development:
+
+[Buy Me A Coffee](https://www.buymeacoffee.com/zhurong052Q)
+
+<a href="https://www.buymeacoffee.com/zhurong052Q" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
+Your support helps maintain and improve pyobfus. Thank you!
+
 ## Acknowledgments
 
 - Inspired by [Opy](https://github.com/QQuick/Opy)'s AST-based approach

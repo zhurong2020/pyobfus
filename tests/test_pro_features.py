@@ -1,5 +1,11 @@
 """
 Direct test of Pro features without CLI.
+
+NOTE: This test is EXCLUDED from CI via pyproject.toml because it requires
+pyobfus_pro module which is not in the public repository.
+
+To run locally (with pyobfus_pro available):
+    python -m pytest tests/test_pro_features.py -v
 """
 
 import sys
