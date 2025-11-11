@@ -209,9 +209,7 @@ def _obfuscate_file(
             click.echo(f"\n⚠️  Pro features not available: {e}", err=True)
             click.echo("Please ensure pyobfus Pro is properly installed.", err=True)
             if verbose:
-                click.echo(
-                    "Pro features require additional modules in pyobfus_pro/", err=True
-                )
+                click.echo("Pro features require additional modules in pyobfus_pro/", err=True)
             # Continue with Community Edition features only
 
     # Generate code
