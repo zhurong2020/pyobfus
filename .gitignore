@@ -150,3 +150,7 @@ docs/internal/
 *_obfuscated.py
 output/
 obfuscated/
+
+# Local testing documentation (author's personal use)
+.local-testing/
+local-testing/
