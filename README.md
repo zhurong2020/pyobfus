@@ -211,22 +211,22 @@ Add an additional layer of protection for commercial Python software.
 ### For Users
 - **[Installation & Quick Start](#installation)** - Get started in minutes
 - **[Configuration Guide](#configuration)** - YAML configuration and file filtering
-- **[Examples](examples/)** - Working code examples demonstrating features
+- **[Examples](https://github.com/zhurong2020/pyobfus/tree/main/examples)** - Working code examples demonstrating features
 - **[Use Cases](#use-cases)** - Real-world application scenarios
 
 ### For Developers
-- **[Project Structure](docs/PROJECT_STRUCTURE.md)** - Codebase architecture and development workflow
-- **[Contributing Guide](CONTRIBUTING.md)** - How to contribute code and documentation
-- **[Development Roadmap](ROADMAP.md)** - Planned features and timeline
-- **[Changelog](CHANGELOG.md)** - Version history and release notes
+- **[Project Structure](https://github.com/zhurong2020/pyobfus/blob/main/docs/PROJECT_STRUCTURE.md)** - Codebase architecture and development workflow
+- **[Contributing Guide](https://github.com/zhurong2020/pyobfus/blob/main/CONTRIBUTING.md)** - How to contribute code and documentation
+- **[Development Roadmap](https://github.com/zhurong2020/pyobfus/blob/main/ROADMAP.md)** - Planned features and timeline
+- **[Changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md)** - Version history and release notes
 
 ### Community & Support
 - **[GitHub Issues](https://github.com/zhurong2020/pyobfus/issues)** - Bug reports and feature requests
 - **[GitHub Discussions](https://github.com/zhurong2020/pyobfus/discussions)** - Questions, ideas, and community help
-- **[Security Policy](SECURITY.md)** - How to report security vulnerabilities
+- **[Security Policy](https://github.com/zhurong2020/pyobfus/blob/main/SECURITY.md)** - How to report security vulnerabilities
 
 ### Legal & License
-- **[Apache 2.0 License](LICENSE)** - Open source license terms
+- **[Apache 2.0 License](https://github.com/zhurong2020/pyobfus/blob/main/LICENSE)** - Open source license terms
 
 ## Support the Project
 
