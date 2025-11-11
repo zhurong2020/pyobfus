@@ -29,6 +29,16 @@ A Python code obfuscator built with AST-based transformations for Python 3.8+. P
 
 ### Installation
 
+**From source** (recommended until PyPI release):
+
+```bash
+git clone https://github.com/zhurong2020/pyobfus.git
+cd pyobfus
+pip install -e .
+```
+
+**From PyPI** (coming soon):
+
 ```bash
 pip install pyobfus
 ```
@@ -77,6 +87,8 @@ I5 = 150
 I6 = I0(I4, I5)
 print(f'Risk score: {I6}')
 ```
+
+*Note: Variable names (I0, I1, etc.) may vary slightly depending on code structure, but functionality is preserved.*
 
 ## Configuration
 
