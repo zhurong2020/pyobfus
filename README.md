@@ -210,22 +210,21 @@ Add an additional layer of protection for commercial Python software.
 
 ### User Documentation
 - **Quick Start** - See sections above for installation and basic usage
-- **[Examples](examples/)** - Working code examples demonstrating features
+- **[Examples](https://github.com/zhurong2020/pyobfus/tree/main/examples)** - Working code examples demonstrating features
 - **Configuration** - See YAML configuration section above
 
 ### Developer Documentation
-- **[Contributing Guidelines](CONTRIBUTING.md)** - How to contribute to the project
-- **[Project Structure](docs/PROJECT_STRUCTURE.md)** - Codebase architecture and development guide
-- **[Changelog](CHANGELOG.md)** - Version history and release notes
-- **[Roadmap](ROADMAP.md)** - Planned features and development timeline
+- **[Project Structure](https://github.com/zhurong2020/pyobfus/blob/main/docs/PROJECT_STRUCTURE.md)** - Codebase architecture and development guide
+- **[Changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md)** - Version history and release notes
+- **[Roadmap](https://github.com/zhurong2020/pyobfus/blob/main/ROADMAP.md)** - Planned features and development timeline
 
 ### Legal
-- **[License](LICENSE)** - Apache 2.0 license terms
+- **[License](https://github.com/zhurong2020/pyobfus/blob/main/LICENSE)** - Apache 2.0 license terms
 
 ### Community & Support
-- **Issues**: [GitHub Issues](https://github.com/zhurong2020/pyobfus/issues) - Bug reports and feature requests
-- **Discussions**: [GitHub Discussions](https://github.com/zhurong2020/pyobfus/discussions) - Questions and ideas
-- **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md) for how to get involved
+- **[GitHub Issues](https://github.com/zhurong2020/pyobfus/issues)** - Bug reports and feature requests
+- **[GitHub Discussions](https://github.com/zhurong2020/pyobfus/discussions)** - Questions and ideas
+- **[Contributing Guidelines](https://github.com/zhurong2020/pyobfus/blob/main/CONTRIBUTING.md)** - How to contribute to the project
 
 ## Support the Project
 
