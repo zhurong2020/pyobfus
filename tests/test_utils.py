@@ -3,7 +3,6 @@ Unit tests for utility functions.
 """
 
 from pathlib import Path
-import pytest
 
 from pyobfus.utils import should_exclude_file, filter_python_files, count_total_lines
 

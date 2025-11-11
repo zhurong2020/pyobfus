@@ -5,12 +5,12 @@ Provides helper functions for file filtering, path matching, etc.
 """
 
 from pathlib import Path
-from typing import List, Union
+from typing import List, Optional
 import fnmatch
 
 
 def should_exclude_file(
-    file_path: Path, exclude_patterns: List[str], base_path: Path = None
+    file_path: Path, exclude_patterns: List[str], base_path: Optional[Path] = None
 ) -> bool:
     """
     Check if a file should be excluded based on glob patterns.
@@ -65,7 +65,7 @@ def should_exclude_file(
 
 
 def filter_python_files(
-    directory: Path, exclude_patterns: List[str] = None
+    directory: Path, exclude_patterns: Optional[List[str]] = None
 ) -> List[Path]:
     """
     Find all Python files in a directory, excluding specified patterns.
@@ -84,9 +84,7 @@ def filter_python_files(
 
     # Filter out excluded files
     filtered_files = [
-        f
-        for f in all_py_files
-        if not should_exclude_file(f, exclude_patterns, directory)
+        f for f in all_py_files if not should_exclude_file(f, exclude_patterns, directory)
     ]
 
     return filtered_files

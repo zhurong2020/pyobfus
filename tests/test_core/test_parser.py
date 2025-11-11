@@ -3,7 +3,6 @@ Unit tests for AST parser.
 """
 
 import ast
-from pathlib import Path
 
 import pytest
 

@@ -2,10 +2,6 @@
 Unit tests for name mangling transformer.
 """
 
-import ast
-
-import pytest
-
 from pyobfus.config import ObfuscationConfig
 from pyobfus.core.analyzer import SymbolAnalyzer
 from pyobfus.core.generator import CodeGenerator
@@ -116,7 +112,7 @@ b = func(2)
     analyzer.analyze(tree)
 
     mangler = NameMangler(config, analyzer)
-    transformed = mangler.transform(tree)
+    mangler.transform(tree)
 
     # Get name mapping
     name_map = mangler.get_name_mapping()

@@ -6,7 +6,7 @@ like I0, I1, I2, etc.
 """
 
 import ast
-from typing import Dict, Optional
+from typing import Dict, Optional, cast
 
 from pyobfus.config import ObfuscationConfig
 from pyobfus.core.analyzer import SymbolAnalyzer
@@ -53,7 +53,7 @@ class NameMangler(BaseTransformer):
                 self._name_map[name] = self._generate_obfuscated_name()
 
         # Transform the tree
-        transformed = self.visit(tree)
+        transformed = cast(ast.Module, self.visit(tree))
 
         # Fix missing locations
         ast.fix_missing_locations(transformed)
