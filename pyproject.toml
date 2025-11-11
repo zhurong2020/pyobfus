@@ -1,0 +1,78 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyobfus"
+version = "0.1.0"
+description = "Modern Python Code Obfuscator - Enterprise-Grade Protection at 50% Lower Cost"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Rong Zhu", email = "zhurong2020@users.noreply.github.com"}
+]
+keywords = ["obfuscation", "code-protection", "security", "python", "ast"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Security",
+]
+
+dependencies = [
+    "click>=8.0",
+    "pyyaml>=5.4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=22.0",
+    "mypy>=1.0",
+    "ruff>=0.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/zhurong2020/pyobfus"
+Documentation = "https://github.com/zhurong2020/pyobfus#readme"
+Repository = "https://github.com/zhurong2020/pyobfus"
+Issues = "https://github.com/zhurong2020/pyobfus/issues"
+
+[project.scripts]
+pyobfus = "pyobfus.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pyobfus*"]
+exclude = ["tests*", "docs*", "examples*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --cov=pyobfus --cov-report=term-missing --cov-report=html"
+
+[tool.black]
+line-length = 100
+target-version = ["py38", "py39", "py310", "py311", "py312"]
+include = '\.pyi?$'
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py38"
