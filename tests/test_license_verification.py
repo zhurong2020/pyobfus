@@ -7,7 +7,6 @@ These tests verify the license verification, caching, and management functionali
 import json
 import tempfile
 from datetime import datetime, timedelta
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -16,7 +15,6 @@ import pytest
 try:
     from pyobfus_pro.license import (
         CACHE_FILE,
-        LicenseError,
         LicenseExpiredError,
         LicenseRevokedError,
         LicenseVerificationError,
