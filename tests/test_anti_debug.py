@@ -8,6 +8,7 @@ and work correctly to detect debuggers.
 import ast
 import sys
 import pytest
+from typing import TYPE_CHECKING
 
 from pyobfus.core.parser import ASTParser
 from pyobfus.core.generator import CodeGenerator
@@ -15,12 +16,15 @@ from pyobfus.core.analyzer import SymbolAnalyzer
 from pyobfus.config import ObfuscationConfig
 
 # Pro features require pyobfus_pro to be installed
-try:
+PRO_AVAILABLE = False
+if TYPE_CHECKING:
     from pyobfus_pro.anti_debug import AntiDebugInjector
-
-    PRO_AVAILABLE = True
-except ImportError:
-    PRO_AVAILABLE = False
+else:
+    try:
+        from pyobfus_pro.anti_debug import AntiDebugInjector
+        PRO_AVAILABLE = True
+    except ImportError:
+        pass
 
 
 @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not installed")
