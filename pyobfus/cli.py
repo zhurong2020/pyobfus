@@ -19,6 +19,15 @@ from pyobfus.exceptions import LimitExceededError, PyObfusError
 from pyobfus.transformers.name_mangler import NameMangler
 from pyobfus.utils import filter_python_files
 
+# Check if Pro edition is available
+try:
+    import pyobfus_pro  # type: ignore[import]
+
+    PRO_AVAILABLE = True
+except ImportError:
+    pyobfus_pro = None  # type: ignore[assignment]
+    PRO_AVAILABLE = False
+
 
 @click.command()
 @click.argument("input_path", type=click.Path(exists=True))
@@ -95,6 +104,68 @@ def main(
         else:
             # Use default based on level
             if level == "pro":
+                # Pro edition requires license verification
+                if not PRO_AVAILABLE:
+                    click.echo(
+                        "Error: Pro edition features not installed.",
+                        err=True,
+                    )
+                    click.echo(
+                        "Install with: pip install pyobfus-pro",
+                        err=True,
+                    )
+                    sys.exit(1)
+
+                # Verify license (imports are guaranteed to exist when PRO_AVAILABLE is True)
+                assert PRO_AVAILABLE, "Pro features should be available"
+                assert pyobfus_pro is not None, "pyobfus_pro module should be loaded"
+
+                try:
+                    # Get cached license status (unmasked to get full key)
+                    cached_status = pyobfus_pro.get_license_status(masked=False)
+                    if not cached_status:
+                        click.echo(
+                            "Error: No license key found. Please register your license first.",
+                            err=True,
+                        )
+                        click.echo(
+                            "\nTo register your license key, run:",
+                            err=True,
+                        )
+                        click.echo(
+                            "  pyobfus-license register YOUR-LICENSE-KEY",
+                            err=True,
+                        )
+                        click.echo(
+                            "\nPurchase a license at: https://github.com/zhurong2020/pyobfus",
+                            err=True,
+                        )
+                        sys.exit(1)
+
+                    # Verify the cached license (use unmasked key)
+                    full_license_key = cached_status["key"]
+                    license_result = pyobfus_pro.verify_license(full_license_key)
+
+                    if verbose:
+                        click.echo(
+                            f"License verified: {license_result['message']}"
+                        )
+
+                except pyobfus_pro.LicenseError as e:
+                    click.echo(
+                        f"Error: License verification failed - {e}",
+                        err=True,
+                    )
+                    click.echo(
+                        "\nPlease check your license status with: pyobfus-license status",
+                        err=True,
+                    )
+                    click.echo(
+                        "Or register a new license: pyobfus-license register YOUR-LICENSE-KEY",
+                        err=True,
+                    )
+                    sys.exit(1)
+
                 config = ObfuscationConfig.pro_edition()
             else:
                 config = ObfuscationConfig.community_edition()
