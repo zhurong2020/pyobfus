@@ -147,9 +147,7 @@ def main(
                     license_result = pyobfus_pro.verify_license(full_license_key)
 
                     if verbose:
-                        click.echo(
-                            f"License verified: {license_result['message']}"
-                        )
+                        click.echo(f"License verified: {license_result['message']}")
 
                 except pyobfus_pro.LicenseError as e:
                     click.echo(

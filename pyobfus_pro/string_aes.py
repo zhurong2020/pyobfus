@@ -88,7 +88,7 @@ class StringAESEncryptor(BaseTransformer):
         if node.body and isinstance(node.body[0], ast.Expr):
             if isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str):
                 # Don't transform the docstring
-                first_stmt = node.body[0]
+                node.body[0]
                 rest = node.body[1:]
                 # Visit the rest
                 for i, child in enumerate(rest):
@@ -113,7 +113,7 @@ class StringAESEncryptor(BaseTransformer):
         if node.body and isinstance(node.body[0], ast.Expr):
             if isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str):
                 # Don't transform the docstring
-                first_stmt = node.body[0]
+                node.body[0]
                 rest = node.body[1:]
                 # Visit the rest
                 for i, child in enumerate(rest):
@@ -138,7 +138,7 @@ class StringAESEncryptor(BaseTransformer):
         if node.body and isinstance(node.body[0], ast.Expr):
             if isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str):
                 # Don't transform the docstring
-                first_stmt = node.body[0]
+                node.body[0]
                 rest = node.body[1:]
                 # Visit the rest
                 for i, child in enumerate(rest):
@@ -163,7 +163,7 @@ class StringAESEncryptor(BaseTransformer):
         if node.body and isinstance(node.body[0], ast.Expr):
             if isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str):
                 # Don't transform the docstring
-                first_stmt = node.body[0]
+                node.body[0]
                 rest = node.body[1:]
                 # Visit the rest
                 for i, child in enumerate(rest):
