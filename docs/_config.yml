@@ -1,3 +1,14 @@
 title: pyobfus
-description: Modern Python Code Obfuscator
+description: Modern Python Code Obfuscator - Professional Python Code Obfuscation
 theme: jekyll-theme-cayman
+
+# GitHub Pages configuration
+baseurl: ""
+url: "https://zhurong2020.github.io"
+
+# Logo/favicon
+logo: assets/logo.jpeg
+
+# Exclude internal documentation
+exclude:
+  - internal/
