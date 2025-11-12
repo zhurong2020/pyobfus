@@ -5,7 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.1.6] - 2025-11-12
+
+### Added
+- **Pro Features - Complete Test Suite**:
+  - 28 comprehensive unit tests for Pro features (AES-256 + Anti-debugging)
+  - `tests/test_string_aes.py`: 14 tests for AES-256 string encryption
+  - `tests/test_anti_debug.py`: 14 tests for anti-debugging injection
+  - `scripts/test_pro_features.py`: Integration testing tool for Pro features
+  - Integration testing: 10/10 real-world files pass (100% success rate)
+  - Test coverage improved to 59%
+
+- **Pro Feature: AES-256 String Encryption** (Fully Tested):
+  - Enterprise-grade string encryption using AES-256-CBC with HMAC authentication
+  - Per-file unique encryption key generation
+  - Runtime decryption function injection
+  - F-string preservation (skips encryption to maintain AST structure)
+  - Docstring preservation support
+  - Unicode/UTF-8 string support
+  - Comprehensive testing on real-world code (616 strings encrypted, ~75KB)
+
+- **Pro Feature: Anti-Debugging Checks** (Fully Tested):
+  - Automatic debugger detection using sys.gettrace()
+  - Injection into function entry points
+  - Smart filtering (skips small functions and infrastructure functions)
+  - Async function support
+  - Comprehensive testing (35 functions injected in real-world code)
 
 ### Added
 - **String Encoding (Base64)** - Community Edition feature (Issue #9):
