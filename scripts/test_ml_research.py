@@ -18,7 +18,13 @@ Usage:
 
 import argparse
 import sys
+import io
 from pathlib import Path
+
+# Fix Windows console encoding issues
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
 # Add parent directory to path to import pyobfus
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -32,7 +38,7 @@ from pyobfus.core.generator import CodeGenerator
 
 
 # Configure ml-research path
-ML_RESEARCH_PATH = Path(r"c:\onedrive\msft\OneDrive - MSFT\rong\ml-research")
+ML_RESEARCH_PATH = Path(r"c:\onedrive\msft\OneDrive - MSFT\rong\3-job\program\cardiac-ml-research")
 
 
 def obfuscate_file(file_path: Path, config: ObfuscationConfig, verbose: bool = False):
