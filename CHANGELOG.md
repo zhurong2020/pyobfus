@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.4] - 2025-11-12
+
+### Security
+- **[HIGH]** Added HMAC-SHA256 signature to license cache to prevent tampering
+- **[HIGH]** Implemented device fingerprinting to limit license sharing across devices
+- **[MEDIUM]** Reduced cache duration from 30 days to 3 days to minimize offline abuse window
+
+### Added
+- `pyobfus_pro.fingerprint` module for device identification
+  - `get_device_fingerprint()` - Generate 16-character device fingerprint based on MAC, hostname, and OS
+  - `get_device_name()` - Get human-readable device name
+  - `get_device_info()` - Get detailed device information
+- Cache schema v2 with signature and device_id fields
+- Device information display in `pyobfus-license status` command
+- 6 new tests for device fingerprinting and cache signing validation
+
+### Changed
+- License cache now includes HMAC-SHA256 signature (prevents direct editing)
+- License cache now tied to device fingerprint (prevents cross-device use of cached license)
+- Cache validity reduced from 30 days to 3 days (reduces offline abuse window)
+- `pyobfus_pro.__init__` now exports `get_device_fingerprint` and `get_device_info`
+
+### Fixed
+- Legacy cache (v1) from v0.1.2-0.1.3 is still accepted for backward compatibility
+- Tampered cache files are automatically detected and deleted
+- Cross-device cache usage is properly rejected
+
+### Technical Details
+- Cache format upgraded from v1 to v2 with backward compatibility
+- Device fingerprint based on SHA-256 hash of MAC address + hostname + OS info
+- HMAC secret can be configured via `PYOBFUS_LICENSE_SECRET` environment variable
+- Graceful fallback for legacy v1 cache files (will be upgraded on next verification)
+
+### Migration Notes
+- Existing users: Run `pyobfus-license status` to automatically upgrade cache to v2
+- Device changes (e.g., hostname change, OS reinstall) will require license re-verification
+- Cache files from v0.1.3 will work but won't be signed until next online verification
+
 ## [0.1.3] - 2025-11-11
 
 ### Fixed

@@ -96,6 +96,17 @@ def status(verify: bool) -> None:
       pyobfus-license status --verify
     """
     try:
+        from pyobfus_pro.fingerprint import get_device_info
+
+        # Get device info
+        device = get_device_info()
+
+        click.echo("Device Information:")
+        click.echo(f"  ID: {device['fingerprint']}")
+        click.echo(f"  Name: {device['name']}")
+        click.echo(f"  OS: {device['system']} {device['release']}")
+        click.echo()
+
         license_info = get_license_status(masked=True)
 
         if not license_info:
@@ -118,8 +129,12 @@ def status(verify: bool) -> None:
 
         click.echo(f"  Last verified: {license_info['verified_ago_days']} days ago")
 
+        # Update cache duration display to 3 days (changed in v0.1.4)
+        cache_ttl_days = 3
         if license_info["cache_valid"]:
-            click.echo(f"  Cache: Valid (expires in {30 - license_info['verified_ago_days']} days)")
+            click.echo(
+                f"  Cache: Valid (expires in {cache_ttl_days - license_info['verified_ago_days']} days)"
+            )
         else:
             click.echo(
                 "  Cache: Expired (verification required)",

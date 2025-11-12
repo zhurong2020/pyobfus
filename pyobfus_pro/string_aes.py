@@ -86,7 +86,9 @@ class StringAESEncryptor(BaseTransformer):
         """
         # Skip encrypting module-level docstring (first statement if Expr with string)
         if node.body and isinstance(node.body[0], ast.Expr):
-            if isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str):
+            if isinstance(node.body[0].value, ast.Constant) and isinstance(
+                node.body[0].value.value, str
+            ):
                 # Don't transform the docstring
                 node.body[0]
                 rest = node.body[1:]
@@ -111,7 +113,9 @@ class StringAESEncryptor(BaseTransformer):
         """
         # Skip encrypting function docstring (first statement if Expr with string)
         if node.body and isinstance(node.body[0], ast.Expr):
-            if isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str):
+            if isinstance(node.body[0].value, ast.Constant) and isinstance(
+                node.body[0].value.value, str
+            ):
                 # Don't transform the docstring
                 node.body[0]
                 rest = node.body[1:]
@@ -136,7 +140,9 @@ class StringAESEncryptor(BaseTransformer):
         """
         # Skip encrypting function docstring (first statement if Expr with string)
         if node.body and isinstance(node.body[0], ast.Expr):
-            if isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str):
+            if isinstance(node.body[0].value, ast.Constant) and isinstance(
+                node.body[0].value.value, str
+            ):
                 # Don't transform the docstring
                 node.body[0]
                 rest = node.body[1:]
@@ -161,7 +167,9 @@ class StringAESEncryptor(BaseTransformer):
         """
         # Skip encrypting class docstring (first statement if Expr with string)
         if node.body and isinstance(node.body[0], ast.Expr):
-            if isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str):
+            if isinstance(node.body[0].value, ast.Constant) and isinstance(
+                node.body[0].value.value, str
+            ):
                 # Don't transform the docstring
                 node.body[0]
                 rest = node.body[1:]

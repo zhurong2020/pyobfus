@@ -4,6 +4,7 @@ Tests for license verification system (pyobfus Pro).
 These tests verify the license verification, caching, and management functionality.
 """
 
+import hashlib
 import json
 import tempfile
 from datetime import datetime, timedelta
@@ -25,6 +26,7 @@ try:
         remove_cached_license,
         verify_license,
     )
+    from pyobfus_pro.fingerprint import get_device_fingerprint
 
     PRO_AVAILABLE = True
 except ImportError:
@@ -340,3 +342,148 @@ class TestLicenseVerification:
         assert result["valid"] is True
         assert "cached" in result["message"].lower()
         assert "failed" in result["message"].lower()
+
+
+class TestDeviceFingerprint:
+    """Test device fingerprinting (v0.1.4)."""
+
+    @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
+    def test_get_fingerprint(self):
+        """Test fingerprint generation."""
+        fp = get_device_fingerprint()
+        assert isinstance(fp, str)
+        assert len(fp) == 16
+        assert fp.isalnum()
+
+    @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
+    def test_fingerprint_consistency(self):
+        """Test fingerprint consistency."""
+        fp1 = get_device_fingerprint()
+        fp2 = get_device_fingerprint()
+        assert fp1 == fp2
+
+
+class TestCacheSigning:
+    """Test cache file signing (v0.1.4)."""
+
+    def teardown_method(self):
+        """Clean up test fixtures."""
+        if PRO_AVAILABLE:
+            remove_cached_license()
+
+    @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
+    def test_cache_has_signature(self):
+        """Test that cached license includes signature."""
+        # Cache a license
+        license_data = {
+            "key": "PYOB-TEST-TEST-TEST-TEST",
+            "type": "pro",
+            "expires": "2026-01-01",
+            "verified": datetime.now().isoformat(),
+        }
+        cache_license(license_data)
+
+        # Load raw cache file to inspect structure
+        import pyobfus_pro.license as lic
+
+        with open(lic.CACHE_FILE) as f:
+            cached = json.load(f)
+
+        # Verify v2 structure
+        assert "v" in cached
+        assert cached["v"] == 2
+        assert "data" in cached
+        assert "sig" in cached
+        assert "ts" in cached
+        assert "device_id" in cached["data"]
+
+    @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
+    def test_tampered_cache_rejected(self):
+        """Test that tampered cache is rejected."""
+        # Cache a license
+        license_data = {
+            "key": "PYOB-TEST-TEST-TEST-TEST",
+            "type": "pro",
+            "expires": "2026-01-01",
+            "verified": datetime.now().isoformat(),
+        }
+        cache_license(license_data)
+
+        # Tamper with cache - modify expires date
+        import pyobfus_pro.license as lic
+
+        with open(lic.CACHE_FILE) as f:
+            cached = json.load(f)
+
+        cached["data"]["expires"] = "2099-12-31"  # Extend expiration
+
+        with open(lic.CACHE_FILE, "w") as f:
+            json.dump(cached, f)
+
+        # Try to load - should return None due to signature mismatch
+        result = load_cached_license()
+        assert result is None
+
+        # Cache file should be deleted
+        assert not lic.CACHE_FILE.exists()
+
+    @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
+    def test_device_mismatch_rejected(self):
+        """Test that cache from different device is rejected."""
+        # Cache a license
+        license_data = {
+            "key": "PYOB-TEST-TEST-TEST-TEST",
+            "type": "pro",
+            "expires": "2026-01-01",
+            "verified": datetime.now().isoformat(),
+        }
+        cache_license(license_data)
+
+        # Modify device_id in cache (simulate different device)
+        import pyobfus_pro.license as lic
+        import hmac
+
+        with open(lic.CACHE_FILE) as f:
+            cached = json.load(f)
+
+        # Change device_id to simulate different device
+        cached["data"]["device_id"] = "different_device_fp"
+
+        # Recalculate signature for the tampered data (to bypass signature check)
+        data_str = json.dumps(cached["data"], sort_keys=True)
+        cached["sig"] = hmac.new(
+            lic.LICENSE_SECRET.encode(), data_str.encode(), hashlib.sha256
+        ).hexdigest()
+
+        with open(lic.CACHE_FILE, "w") as f:
+            json.dump(cached, f)
+
+        # Try to load - should return None due to device mismatch
+        result = load_cached_license()
+        assert result is None
+
+        # Cache file should NOT be deleted (might be network drive)
+        assert lic.CACHE_FILE.exists()
+
+    @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
+    def test_legacy_cache_v1_accepted(self):
+        """Test that legacy v1 cache (v0.1.2-0.1.3) is still accepted."""
+        # Create a v1 cache structure (old format without signature)
+        import pyobfus_pro.license as lic
+
+        legacy_cache = {
+            "key": "PYOB-TEST-TEST-TEST-TEST",
+            "type": "pro",
+            "expires": "2026-01-01",
+            "verified": datetime.now().isoformat(),
+            # No "v", "sig", "ts", or "device_id" - this is v1 format
+        }
+
+        lic.CACHE_DIR.mkdir(parents=True, exist_ok=True)
+        with open(lic.CACHE_FILE, "w") as f:
+            json.dump(legacy_cache, f, indent=2)
+
+        # Load should succeed (backward compatibility)
+        result = load_cached_license()
+        assert result is not None
+        assert result["key"] == "PYOB-TEST-TEST-TEST-TEST"

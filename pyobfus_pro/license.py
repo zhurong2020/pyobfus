@@ -10,12 +10,16 @@ Copyright 2025 Rong Zhu
 
 import json
 import hashlib
+import hmac
+import os
 import secrets
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Optional, cast
 import urllib.request
 import urllib.error
+
+from .fingerprint import get_device_fingerprint
 
 
 # GitHub repository for license data
@@ -24,10 +28,16 @@ LICENSE_REPO_URL = "https://raw.githubusercontent.com/zhurong2020/pyobfus-licens
 # Local cache configuration
 CACHE_DIR = Path.home() / ".pyobfus"
 CACHE_FILE = CACHE_DIR / "license.json"
-CACHE_DURATION = timedelta(days=30)
+CACHE_DURATION = timedelta(days=3)  # Reduced from 30 days to 3 days in v0.1.4
 
 # Timeout for network requests
 REQUEST_TIMEOUT = 5  # seconds
+
+# License secret for HMAC signing
+LICENSE_SECRET = os.getenv(
+    "PYOBFUS_LICENSE_SECRET",
+    "pyobfus-v0.1.4-default-secret-change-in-production",
+)
 
 
 class LicenseError(Exception):
@@ -109,9 +119,7 @@ def verify_license(license_key: str) -> Dict[str, Any]:
             # Check expiration
             expires_date = datetime.fromisoformat(license_data["expires"])
             if datetime.now() > expires_date:
-                raise LicenseExpiredError(
-                    f"License expired on {license_data['expires']}"
-                )
+                raise LicenseExpiredError(f"License expired on {license_data['expires']}")
 
             # Cache the result
             cache_license(
@@ -133,9 +141,7 @@ def verify_license(license_key: str) -> Dict[str, Any]:
         elif license_data["status"] == "revoked":
             raise LicenseRevokedError("License has been revoked")
         else:
-            raise LicenseVerificationError(
-                f"License status: {license_data['status']}"
-            )
+            raise LicenseVerificationError(f"License status: {license_data['status']}")
 
     except (LicenseExpiredError, LicenseRevokedError):
         # Re-raise specific license errors
@@ -245,31 +251,107 @@ def _validate_license_format(license_key: str) -> bool:
 
 def load_cached_license() -> Optional[Dict[str, Any]]:
     """
-    Load cached license from disk.
+    Load and verify cached license from disk.
 
     Returns:
-        dict: Cached license data or None if no cache exists
+        dict: Cached license data or None if invalid/not found
+
+    Verification checks:
+    1. File exists and is readable
+    2. Schema version is supported (v1 or v2)
+    3. HMAC signature is valid (v2 only)
+    4. Device fingerprint matches (v2 only)
     """
-    if CACHE_FILE.exists():
-        try:
-            with open(CACHE_FILE, "r", encoding="utf-8") as f:
-                return cast(Optional[Dict[str, Any]], json.load(f))
-        except (json.JSONDecodeError, IOError):
-            # Corrupted cache file
+    if not CACHE_FILE.exists():
+        return None
+
+    try:
+        with open(CACHE_FILE, "r", encoding="utf-8") as f:
+            cached = json.load(f)
+
+        # Check schema version
+        version = cached.get("v", 1)
+
+        if version == 1:
+            # Legacy cache (v0.1.2-0.1.3) - no signature
+            # Accept but mark for upgrade
+            return cast(Dict[str, Any], cached)
+
+        elif version == 2:
+            # Current cache (v0.1.4+) - has signature and device_id
+
+            # Verify signature
+            data_str = json.dumps(cached["data"], sort_keys=True)
+            expected_sig = hmac.new(
+                LICENSE_SECRET.encode(), data_str.encode(), hashlib.sha256
+            ).hexdigest()
+
+            if not hmac.compare_digest(cached["sig"], expected_sig):
+                # Signature mismatch - cache tampered
+                CACHE_FILE.unlink()  # Delete corrupted cache
+                return None
+
+            # Verify device fingerprint
+            current_device = get_device_fingerprint()
+            cached_device = cached["data"].get("device_id")
+
+            if cached_device != current_device:
+                # Different device - cache not valid here
+                # Don't delete (might be network drive), just return None
+                return None
+
+            return cast(Dict[str, Any], cached["data"])
+
+        else:
+            # Unknown version - ignore
             return None
-    return None
+
+    except (json.JSONDecodeError, KeyError, IOError):
+        # Corrupted cache file
+        return None
 
 
 def cache_license(license_data: Dict[str, str]) -> None:
     """
-    Cache license data to disk.
+    Cache license data to disk with HMAC signature.
 
     Args:
-        license_data: License data to cache
+        license_data: License data to cache (must include 'key', 'type', 'expires')
+
+    The cache format is:
+    {
+        "v": 2,  # Schema version (v2 includes signature and device_id)
+        "data": {
+            "key": "PYOB-...",
+            "type": "pro",
+            "expires": "2026-01-01",
+            "verified": "2025-11-11T10:00:00",
+            "device_id": "a1b2c3d4e5f6g7h8"
+        },
+        "sig": "abc123...",  # HMAC-SHA256 signature
+        "ts": "2025-11-11T10:00:00"  # Timestamp when cached
+    }
     """
+    # Add device_id to license data
+    device_id = get_device_fingerprint()
+    license_data_with_device = {**license_data, "device_id": device_id}
+
+    # Create signature
+    data_str = json.dumps(license_data_with_device, sort_keys=True)
+    signature = hmac.new(LICENSE_SECRET.encode(), data_str.encode(), hashlib.sha256).hexdigest()
+
+    # Create cache structure
+    cached = {
+        "v": 2,  # Schema version
+        "data": license_data_with_device,
+        "sig": signature,
+        "ts": datetime.now().isoformat(),
+    }
+
+    # Write to disk
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     with open(CACHE_FILE, "w", encoding="utf-8") as f:
-        json.dump(license_data, f, indent=2)
+        json.dump(cached, f, indent=2)
 
 
 def remove_cached_license() -> bool:
@@ -309,7 +391,7 @@ def get_license_status(masked: bool = True) -> Optional[Dict[str, Any]]:
     if masked:
         license_key = license_key[:15] + "..." + license_key[-4:]
 
-    return {
+    result = {
         "key": license_key,
         "type": cached["type"],
         "expires": cached["expires"],
@@ -317,6 +399,12 @@ def get_license_status(masked: bool = True) -> Optional[Dict[str, Any]]:
         "verified_ago_days": cache_age.days,
         "cache_valid": cache_age < CACHE_DURATION,
     }
+
+    # Add device_id if present (v2 cache)
+    if "device_id" in cached:
+        result["device_id"] = cached["device_id"]
+
+    return result
 
 
 def generate_license_key() -> str:
