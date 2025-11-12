@@ -21,11 +21,11 @@ The following features are **fully implemented and available** in the current ve
 - **Configuration Files**: YAML-based configuration for repeatable builds
 - **Selective Obfuscation**: Preserve specific names (builtins, magic methods, custom exclusions)
 
-### 🔒 Pro Edition (Planned for v0.2.0+)
+### 🔒 Pro Edition (Planned for v0.1.6+)
 
 The following advanced features are **planned but not yet implemented**:
 
-- **String Encoding** (Coming in v0.2.0)
+- **String Encoding** (Coming in v0.1.6)
   - Base64 encoding
   - XOR encryption
   - Custom encoding schemes
@@ -226,7 +226,7 @@ Add an additional layer of protection for commercial Python software.
 
   **Workaround**: Use positional arguments, or exclude public API functions from obfuscation using `exclude_names` in your configuration.
 
-  **Future Plan**: This limitation will be addressed in v0.2.0 with `--preserve-param-names` option. See [ROADMAP.md](ROADMAP.md#recent-issues-addressed) for details.
+  **Future Plan**: This limitation will be addressed in v0.1.6 with `--preserve-param-names` option. See [ROADMAP.md](ROADMAP.md#recent-issues-addressed) for details.
 
 - **Cross-file imports**: Name mapping across files is basic (improvements planned)
 - **Dynamic code**: `eval()`, `exec()` with obfuscated code may require adjustments
