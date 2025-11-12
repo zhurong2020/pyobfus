@@ -175,12 +175,18 @@ pip install -e ".[dev]"
 ### Testing
 
 ```bash
-# Run tests
+# Run unit tests
 pytest tests/ -v
 
 # With coverage
 pytest tests/ -v --cov=pyobfus --cov-report=html
+
+# Run integration tests (requires external project)
+python scripts/test_ml_research.py --all --max-files 10
+pytest integration_tests/ -v
 ```
+
+**Integration Testing Framework** (v0.1.6+): Test pyobfus on real-world code without uploading to PyPI. See [`INTEGRATION_TESTING.md`](INTEGRATION_TESTING.md) for details.
 
 ### Code Quality
 
