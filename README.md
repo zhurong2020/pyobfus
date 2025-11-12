@@ -16,6 +16,8 @@ The following features are **fully implemented and available** in the current ve
 
 - **Name Mangling**: Rename variables, functions, classes, and class attributes to obfuscated names (I0, I1, I2...)
 - **Comment Removal**: Strip comments and docstrings
+- **String Encoding**: Base64 encoding for string literals with automatic decoder injection
+- **Parameter Preservation**: Preserve function parameter names for keyword argument compatibility (`--preserve-param-names`)
 - **Multi-file Support**: Obfuscate entire projects with preserved import relationships
 - **File Filtering**: Exclude files using glob patterns (test files, config files, etc.)
 - **Configuration Files**: YAML-based configuration for repeatable builds
@@ -25,10 +27,10 @@ The following features are **fully implemented and available** in the current ve
 
 The following advanced features are **planned but not yet implemented**:
 
-- **String Encoding** (Coming in v0.1.6)
-  - Base64 encoding
-  - XOR encryption
-  - Custom encoding schemes
+- **String Encryption** (Coming in v0.1.6)
+  - AES-256 encryption for strings
+  - Runtime decryption
+  - Custom encryption schemes
 
 - **Control Flow Obfuscation** (Coming in v0.3.0)
   - If-to-while conversion
@@ -44,7 +46,7 @@ The following advanced features are **planned but not yet implemented**:
   - Always-true/false conditions that are hard to detect
   - Control flow obscuring
 
-**Note**: Configuration options for Pro features (e.g., `string_encode: true`) are accepted for future compatibility but currently have **no effect**. They will be enabled in future releases. See [ROADMAP.md](ROADMAP.md#v020---core-functionality--initial-pro-features-6-8-weeks) for detailed implementation timeline.
+**Note**: Configuration options for Pro features (e.g., `string_encryption: true`, `anti_debug: true`) are accepted for future compatibility but currently have **no effect**. They will be enabled in future releases. See [ROADMAP.md](ROADMAP.md#v020---core-functionality--initial-pro-features-6-8-weeks) for detailed implementation timeline.
 
 ## Quick Start
 
