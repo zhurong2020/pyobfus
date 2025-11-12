@@ -138,6 +138,7 @@ dmypy.json
 # OS
 .DS_Store
 Thumbs.db
+nul
 
 # Project-specific
 # Internal documentation (business strategy, pricing, etc.)
