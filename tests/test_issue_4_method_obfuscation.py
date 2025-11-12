@@ -6,7 +6,6 @@ This test verifies that method definitions AND all their call sites
 """
 
 import ast
-import pytest
 
 from pyobfus.config import ObfuscationConfig
 from pyobfus.core.analyzer import SymbolAnalyzer

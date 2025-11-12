@@ -8,7 +8,6 @@ This test suite covers:
 """
 
 import ast
-import pytest
 
 from pyobfus.config import ObfuscationConfig
 from pyobfus.core.analyzer import SymbolAnalyzer
@@ -45,7 +44,7 @@ class TestConfigurationPresets:
 
     def test_preset_comparison(self):
         """Compare exclusion sizes across presets."""
-        safe = ObfuscationConfig.preset_safe()
+        ObfuscationConfig.preset_safe()
         balanced = ObfuscationConfig.preset_balanced()
         aggressive = ObfuscationConfig.preset_aggressive()
 
