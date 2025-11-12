@@ -138,10 +138,6 @@ dmypy.json
 Thumbs.db
 
 # Project-specific
-# Pro features (do not commit to public repository)
-pyobfus_pro/
-*_pro.py
-
 # Internal documentation (business strategy, pricing, etc.)
 docs/internal/
 

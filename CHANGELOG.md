@@ -7,7 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2025-11-11
+
 ### Added
+- **License Verification System** (Pro Edition):
+  - GitHub-based online license verification with 30-day local caching
+  - License management CLI tool (`pyobfus-license`) with commands: register, status, remove, generate
+  - Automatic license validation when using `--level pro`
+  - Graceful fallback to cached license when offline
+  - License key format: PYOB-XXXX-XXXX-XXXX-XXXX (SHA-256 based generation)
+  - Support for license expiration and revocation
+  - Comprehensive test suite (14 tests) with mock-based online verification testing
 - Pro Edition features (Experimental):
   - AES-256 string encryption with Fernet
   - Anti-debugging checks using sys.gettrace()
@@ -23,6 +33,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Type checking errors in pyobfus_pro (anti_debug.py, string_aes.py) - added explicit type casts
 - Pylance type checking issues (parser.py, utils.py) - improved type inference with getattr()
 - Python 3.8 CI/CD test failures - added astunparse as conditional dependency
+
+### Security
+- **[CRITICAL]** Pro edition features now require valid license verification
+  - Closes business model vulnerability where `--level pro` was accessible without payment
+  - License verification required before enabling unlimited file/LOC limits
+  - Pro features (AES-256 encryption, anti-debugging) gated behind license check
+  - Community edition limits (5 files, 1000 LOC) properly enforced for unlicensed users
+
+### Breaking Changes
+- **Pro edition now requires license registration**: Users must run `pyobfus-license register YOUR-KEY` before using `--level pro`
+- v0.1.1 users with `--level pro` workflows must obtain a license key (see https://github.com/zhurong2020/pyobfus for pricing)
 
 ## [0.1.1] - 2025-11-11
 
