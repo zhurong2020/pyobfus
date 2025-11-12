@@ -277,15 +277,24 @@ For detailed competitive analysis and feature comparison, see [docs/internal/FEA
 - 10 comprehensive tests covering all parameter types and edge cases
 - Documentation updated with usage examples and recommendations
 
+**Issue #9 - Pro Features Not Implemented**: ⏳ **PARTIAL IMPLEMENTATION**
+- ✅ String Encoding (Base64) - **COMPLETED** (Community Edition)
+  - Base64 encoding for all string literals
+  - Automatic decoder function injection
+  - F-string expression preservation
+  - Unicode string support (UTF-8)
+  - 15 comprehensive tests covering all string types
+  - Example file demonstrating feature
+- 🔲 String Encryption (AES-256) - Planned for future Pro release
+- 🔲 Control Flow Obfuscation - Planned for v0.3.0
+- 🔲 Dead Code Injection - Planned for v0.3.0
+- 🔲 Opaque Predicates - Planned for v0.3.0
+
 ### v0.1.5 (November 12, 2025)
 
 **Issue #7 - Class Attribute Renaming (CRITICAL)**: ✅ **FIXED**
 - Class attributes now consistently renamed across all references
 - Added comprehensive test coverage
-
-**Issue #9 - Pro Features Not Implemented**: ✅ **ROADMAP CLARIFIED** → 🔲 **IMPLEMENTATION PLANNED**
-- v0.2.0: String encoding (basic)
-- v0.3.0: Control flow, dead code, opaque predicates (complete Pro features)
 
 ---
 

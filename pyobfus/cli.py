@@ -256,7 +256,20 @@ def _obfuscate_file(
     if verbose:
         click.echo(f"  Name transformations: {mangler.get_transformation_count()}")
 
-    # 2. Pro features (if enabled)
+    # 2. String encoding (Community Edition - if enabled)
+    if config.string_encoding and config.level == "community":
+        from pyobfus.transformers.string_encoder import StringEncoder
+
+        string_encoder = StringEncoder(config, analyzer)
+        transformed_tree = string_encoder.transform(transformed_tree)
+
+        if verbose:
+            stats = string_encoder.get_statistics()
+            click.echo(f"  Encoded strings: {stats['encoded_strings']}")
+            if stats['skipped_fstrings'] > 0:
+                click.echo(f"  Skipped f-strings: {stats['skipped_fstrings']}")
+
+    # 3. Pro features (if enabled)
     if config.level == "pro":
         try:
             # String encryption (AES-256)

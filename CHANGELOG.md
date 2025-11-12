@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **String Encoding (Base64)** - Community Edition feature (Issue #9):
+  - Base64 encoding for all string literals in obfuscated code
+  - Automatic decoder function injection at module level
+  - F-string expression preservation (only static parts encoded)
+  - Docstring preservation when `remove_docstrings = False`
+  - Unicode string support (UTF-8 encoding/decoding)
+  - Statistics reporting (encoded strings, skipped f-strings)
+  - New `StringEncoder` transformer in `pyobfus/transformers/string_encoder.py`
+  - 15 comprehensive tests covering all string types and edge cases
+  - Example demonstration file: `examples/string_encoding.py`
+
 ### Fixed
 - **[RESOLVED]** Keyword argument limitation (Issue #8)
   - Added `--preserve-param-names` CLI option to preserve parameter names during obfuscation
