@@ -1,0 +1,14 @@
+# Wrangler
+.wrangler/
+.dev.vars
+.mf/
+
+# Node modules
+node_modules/
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.*
