@@ -197,6 +197,11 @@ def main(
 
         click.echo("\nObfuscation completed successfully!")
 
+        # Subtle Pro feature hint (only for Community users)
+        if level == "community" and not PRO_AVAILABLE:
+            click.echo("\nTip: Upgrade to Pro for AES-256 encryption & anti-debugging")
+            click.echo("     Learn more: https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400")
+
     except LimitExceededError as e:
         click.echo(f"\nError: {e}", err=True)
         click.echo("\nConsider upgrading to pyobfus Pro for unlimited obfuscation.")
