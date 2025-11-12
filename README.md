@@ -204,7 +204,7 @@ Add an additional layer of protection for commercial Python software.
 - **Python Support**: 3.8, 3.9, 3.10, 3.11, 3.12
 - **Naming Scheme**: Index-based (I0, I1, I2...) - simple and effective
 - **Architecture**: Modular transformer pipeline
-- **Testing**: 32 tests, 51% coverage, multi-OS CI/CD
+- **Testing**: 57 tests, 54% coverage, multi-OS CI/CD
 
 ## Documentation
 

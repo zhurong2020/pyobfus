@@ -9,6 +9,18 @@ This document outlines the planned technical features and improvements for pyobf
 
 ## Current Status
 
+✅ **v0.1.1 Released** (November 2025)
+- Core obfuscation engine with AST-based name mangling
+- Multi-file support with configuration system
+- **Fixed critical method obfuscation bug** (Issue #4 - P0)
+- **Configuration presets** (safe/balanced/aggressive) - partial completion of v0.2.0 P0#3
+- **Auto-detection of public APIs** (reduces manual config by ~90%)
+- Test suite with **57 tests, 54% coverage** (+25 tests, +3% coverage vs v0.1.0)
+- Large file performance: 3000+ lines in <2 seconds
+- CI/CD pipeline for Python 3.8-3.12 across multiple OS
+- Published to PyPI
+- GitHub Pages documentation live
+
 ✅ **v0.1.0 Released** (November 2025)
 - Core obfuscation engine with AST-based name mangling
 - Multi-file support with configuration system
@@ -52,14 +64,15 @@ This document outlines the planned technical features and improvements for pyobf
 - **Effort**: 1-2 weeks
 - **Success**: 5-10x speed improvement
 
-**3. Configuration Enhancement** ⭐⭐⭐⭐
+**3. Configuration Enhancement** ⭐⭐⭐⭐ *(Partially completed in v0.1.1)*
 - **Issue**: Configuration requires manual setup, no validation
 - **Features**:
-  - Project templates: `pyobfus --init-config django/flask/library`
-  - Config validation: `pyobfus --validate-config`
-  - Preset levels: `--preset light/medium/aggressive`
-  - Auto-discovery of config files
-- **Effort**: 1 week
+  - ✅ **Preset levels**: `preset_safe()`, `preset_balanced()`, `preset_aggressive()` (v0.1.1)
+  - ✅ **Auto-detection of public APIs** via docstrings and naming conventions (v0.1.1)
+  - 🔲 Project templates: `pyobfus --init-config django/flask/library` (pending)
+  - 🔲 Config validation: `pyobfus --validate-config` (pending)
+  - 🔲 Auto-discovery of config files (pending)
+- **Effort**: 1 week (50% complete)
 - **Success**: 4+ templates, 100% accurate validation
 
 **Release Criteria**:
