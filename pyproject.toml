@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyobfus"
-version = "0.1.2"
+version = "0.1.3"
 description = "Modern Python Code Obfuscator with AST-based Transformations"
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.8"
@@ -34,6 +34,7 @@ dependencies = [
     "click>=8.0",
     "pyyaml>=5.4",
     'astunparse>=1.6.3; python_version<"3.9"',  # Required for Python 3.8 code generation
+    "cryptography>=41.0",  # Required for Pro features (AES-256 encryption) and license management
 ]
 
 [project.optional-dependencies]
@@ -43,9 +44,6 @@ dev = [
     "black>=22.0",
     "mypy>=1.0",
     "ruff>=0.1.0",
-]
-pro = [
-    "cryptography>=41.0",  # Required for AES-256 string encryption
 ]
 
 [project.urls]
