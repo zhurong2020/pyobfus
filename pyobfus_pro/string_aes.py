@@ -214,12 +214,8 @@ class StringAESEncryptor(BaseTransformer):
         if not isinstance(node.value, str):
             return node
 
-        # Skip very short strings (likely syntax elements)
-        if len(node.value) < 3:
-            return node
-
-        # Skip strings that look like module/attribute names
-        if node.value.isidentifier():
+        # Skip empty strings (not worth encrypting)
+        if not node.value:
             return node
 
         # Encrypt the string
