@@ -37,6 +37,7 @@ def calculate_total(price, quantity):
 
         # Check that parameter names are preserved
         func_def = obfuscated_tree.body[0]
+        assert isinstance(func_def, ast.FunctionDef)
         assert func_def.args.args[0].arg == "price"
         assert func_def.args.args[1].arg == "quantity"
 
@@ -92,6 +93,7 @@ def calculate_total(price, quantity):
         obfuscated_tree = mangler.transform(tree)
 
         func_def = obfuscated_tree.body[0]
+        assert isinstance(func_def, ast.FunctionDef)
         # Parameters should be renamed to I-prefixed names
         assert func_def.args.args[0].arg != "price"
         assert func_def.args.args[1].arg != "quantity"
@@ -115,6 +117,7 @@ def func(a, b, *, kwonly1, kwonly2):
         obfuscated_tree = mangler.transform(tree)
 
         func_def = obfuscated_tree.body[0]
+        assert isinstance(func_def, ast.FunctionDef)
         assert func_def.args.args[0].arg == "a"
         assert func_def.args.args[1].arg == "b"
         assert func_def.args.kwonlyargs[0].arg == "kwonly1"
@@ -137,8 +140,11 @@ def func(a, *args, **kwargs):
         obfuscated_tree = mangler.transform(tree)
 
         func_def = obfuscated_tree.body[0]
+        assert isinstance(func_def, ast.FunctionDef)
         assert func_def.args.args[0].arg == "a"
+        assert func_def.args.vararg is not None
         assert func_def.args.vararg.arg == "args"
+        assert func_def.args.kwarg is not None
         assert func_def.args.kwarg.arg == "kwargs"
 
     def test_local_variables_still_obfuscated(self):
@@ -185,6 +191,7 @@ async def fetch_data(url, timeout):
         obfuscated_tree = mangler.transform(tree)
 
         func_def = obfuscated_tree.body[0]
+        assert isinstance(func_def, ast.AsyncFunctionDef)
         assert func_def.args.args[0].arg == "url"
         assert func_def.args.args[1].arg == "timeout"
 
