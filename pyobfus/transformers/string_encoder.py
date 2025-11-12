@@ -154,10 +154,11 @@ class StringEncoder(BaseTransformer):
 
     def visit_JoinedStr(self, node: ast.JoinedStr) -> ast.JoinedStr:
         """
-        Visit f-string node and mark that we're inside one.
+        Visit f-string node and skip encoding entirely.
 
         F-strings cannot be encoded because they contain expressions
-        that are evaluated at runtime.
+        that are evaluated at runtime. We return the node unchanged
+        without visiting its children to preserve the f-string structure.
 
         Args:
             node: JoinedStr (f-string) node
@@ -165,10 +166,11 @@ class StringEncoder(BaseTransformer):
         Returns:
             ast.JoinedStr: Unchanged node
         """
-        # Mark that we're in an f-string to skip encoding its parts
-        self._in_fstring = True
-        self.generic_visit(node)
-        self._in_fstring = False
+        # Count the f-string as skipped
+        self._skipped_fstring_count += 1
+
+        # Return the node AS-IS without visiting children
+        # This prevents any modifications to the f-string structure
         return node
 
     def _encode_string(self, text: str) -> str:
