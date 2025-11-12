@@ -198,8 +198,14 @@ async function handleStripeWebhook(request, env, corsHeaders) {
 
     await env.LICENSES.put(licenseKey, JSON.stringify(licenseData));
 
-    // TODO: Send email to customer with license key
-    console.log('License created:', licenseKey, 'for', licenseData.email);
+    // Send email to customer with license key
+    const emailSent = await sendLicenseEmail(
+      env.RESEND_API_KEY,
+      licenseData.email,
+      licenseKey
+    );
+
+    console.log('License created:', licenseKey, 'for', licenseData.email, 'Email sent:', emailSent);
   }
 
   return new Response(JSON.stringify({ received: true }), {
@@ -226,4 +232,84 @@ function generateLicenseKey() {
   }
 
   return key;
+}
+
+/**
+ * Send license key email to customer using Resend
+ * @param {string} apiKey - Resend API key
+ * @param {string} toEmail - Customer email address
+ * @param {string} licenseKey - Generated license key
+ * @returns {boolean} - True if email sent successfully
+ */
+async function sendLicenseEmail(apiKey, toEmail, licenseKey) {
+  if (!apiKey) {
+    console.error('Resend API key not configured');
+    return false;
+  }
+
+  if (!toEmail) {
+    console.error('No recipient email address');
+    return false;
+  }
+
+  const emailBody = `Hello,
+
+Thank you for purchasing pyobfus Professional Edition!
+
+Your license key is:
+${licenseKey}
+
+To activate your license:
+
+1. Install pyobfus:
+   pip install --upgrade pyobfus
+
+2. Register your license:
+   pyobfus-license register ${licenseKey}
+
+3. Verify activation:
+   pyobfus-license status
+
+Documentation: https://github.com/zhurong2020/pyobfus
+Support: zhurong0525@gmail.com
+
+Your license includes:
+- AES-256 String Encryption
+- Anti-Debugging Checks
+- Lifetime Updates
+- Up to 3 devices
+
+Thank you for supporting pyobfus!
+
+Best regards,
+The pyobfus Team`;
+
+  try {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: 'pyobfus <onboarding@resend.dev>',
+        to: [toEmail],
+        subject: 'Your pyobfus Professional License Key',
+        text: emailBody
+      })
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Email sent successfully:', data.id);
+      return true;
+    } else {
+      const error = await response.text();
+      console.error('Failed to send email:', response.status, error);
+      return false;
+    }
+  } catch (error) {
+    console.error('Error sending email:', error);
+    return false;
+  }
 }
