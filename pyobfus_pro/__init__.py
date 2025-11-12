@@ -8,7 +8,7 @@ License: Proprietary - Commercial Use Only
 Copyright 2025 Rong Zhu
 """
 
-__version__ = "0.1.3"
+__version__ = "0.1.4"
 __license__ = "Proprietary"
 
 from .string_aes import StringAESEncryptor
@@ -22,6 +22,7 @@ from .license import (
     LicenseExpiredError,
     LicenseRevokedError,
 )
+from .fingerprint import get_device_fingerprint, get_device_info
 
 __all__ = [
     "StringAESEncryptor",
@@ -29,6 +30,8 @@ __all__ = [
     "verify_license",
     "get_license_status",
     "remove_cached_license",
+    "get_device_fingerprint",
+    "get_device_info",
     "LicenseError",
     "LicenseVerificationError",
     "LicenseExpiredError",
