@@ -49,15 +49,18 @@ result = calc.add(1, 2)
         print(obfuscated_code)
 
         # Verify: should NOT contain 'add' method name anywhere
-        assert "add" not in obfuscated_code, \
-            "Method name 'add' should be obfuscated in all locations"
+        assert (
+            "add" not in obfuscated_code
+        ), "Method name 'add' should be obfuscated in all locations"
 
         # Execute to verify correctness
         namespace = {}
         exec(obfuscated_code, namespace)
         # Find the obfuscated 'result' variable (should be one of the I* variables with value 3)
         result_values = [v for v in namespace.values() if isinstance(v, int) and v == 3]
-        assert len(result_values) > 0, "Obfuscated code should execute correctly and produce result 3"
+        assert (
+            len(result_values) > 0
+        ), "Obfuscated code should execute correctly and produce result 3"
 
     def test_internal_self_call_obfuscation(self):
         """Test that internal self.method calls are obfuscated."""
@@ -102,7 +105,9 @@ result = calc.square(5)
         exec(obfuscated_code, namespace)
         # Find the obfuscated 'result' variable (should be 25)
         result_values = [v for v in namespace.values() if isinstance(v, int) and v == 25]
-        assert len(result_values) > 0, "Obfuscated code should execute correctly and produce result 25"
+        assert (
+            len(result_values) > 0
+        ), "Obfuscated code should execute correctly and produce result 25"
 
     def test_getattr_method_call(self):
         """Test that getattr() string references to methods are handled."""

@@ -82,7 +82,7 @@ def verify_license(license_key: str) -> Dict[str, Any]:
     # Validate license key format
     if not _validate_license_format(license_key):
         raise LicenseVerificationError(
-            f"Invalid license key format. Expected: PYOB-XXXX-XXXX-XXXX-XXXX"
+            "Invalid license key format. Expected: PYOB-XXXX-XXXX-XXXX-XXXX"
         )
 
     # Check cache first

@@ -50,11 +50,11 @@ def register(license_key: str, verify: bool) -> None:
             result = verify_license(license_key)
 
             if result["valid"]:
-                click.echo(f"✓ License verified successfully!")
+                click.echo("✓ License verified successfully!")
                 click.echo(f"  Type: {result['type']}")
                 click.echo(f"  Expires: {result['expires']}")
-                click.echo(f"\nYou can now use pyobfus Pro edition with:")
-                click.echo(f"  pyobfus input.py -o output.py --level pro")
+                click.echo("\nYou can now use pyobfus Pro edition with:")
+                click.echo("  pyobfus input.py -o output.py --level pro")
             else:
                 click.echo(f"✗ License verification failed: {result['message']}", err=True)
                 sys.exit(1)
@@ -112,9 +112,9 @@ def status(verify: bool) -> None:
         click.echo(f"  Expires: {license_info['expires']}")
 
         if license_info["expired"]:
-            click.echo(f"  Status: ✗ EXPIRED", err=True)
+            click.echo("  Status: ✗ EXPIRED", err=True)
         else:
-            click.echo(f"  Status: ✓ Active")
+            click.echo("  Status: ✓ Active")
 
         click.echo(f"  Last verified: {license_info['verified_ago_days']} days ago")
 
@@ -122,7 +122,7 @@ def status(verify: bool) -> None:
             click.echo(f"  Cache: Valid (expires in {30 - license_info['verified_ago_days']} days)")
         else:
             click.echo(
-                f"  Cache: Expired (verification required)",
+                "  Cache: Expired (verification required)",
                 err=True,
             )
 
@@ -133,7 +133,7 @@ def status(verify: bool) -> None:
             if full_license_info:
                 result = verify_license(full_license_info["key"])
                 if result["valid"]:
-                    click.echo(f"✓ License verified successfully!")
+                    click.echo("✓ License verified successfully!")
                     click.echo(f"  {result['message']}")
                 else:
                     click.echo(f"✗ Verification failed: {result['message']}", err=True)

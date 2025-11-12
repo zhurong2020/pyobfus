@@ -137,7 +137,9 @@ result2 = MathUtils.multiply(4, 2)
         assert 8 in values  # result1
         assert 8 in values  # result2
 
-    @pytest.mark.xfail(reason="Known limitation: class attributes accessed via cls.attribute not fully obfuscated")
+    @pytest.mark.xfail(
+        reason="Known limitation: class attributes accessed via cls.attribute not fully obfuscated"
+    )
     def test_class_method_obfuscation(self):
         """Test class method obfuscation."""
         # Note: This test demonstrates a current limitation - class attributes accessed
@@ -227,7 +229,9 @@ output = db.run_query("SELECT * FROM users")
         string_values = [v for v in namespace.values() if isinstance(v, str) and v == expected]
         assert len(string_values) > 0
 
-    @pytest.mark.xfail(reason="Known limitation: nested class access via Outer.Inner not fully obfuscated")
+    @pytest.mark.xfail(
+        reason="Known limitation: nested class access via Outer.Inner not fully obfuscated"
+    )
     def test_nested_class_methods(self):
         """Test obfuscation of nested class methods."""
         # Note: This test demonstrates a current limitation with nested class access
