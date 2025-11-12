@@ -147,6 +147,82 @@ def obfuscate_name(original_name: str, prefix: str = "I") -> str:
     pass
 ```
 
+### Type Annotation Best Practices
+
+Follow these guidelines to ensure code passes Pylance type checking:
+
+#### 1. Optional Parameters Must Use Union Types
+
+❌ **Incorrect** - Will fail type checking:
+```python
+def process_file(path: Path, output: Path = None):
+    pass
+```
+
+✅ **Correct** - Use `| None` for optional parameters:
+```python
+def process_file(path: Path, output: Path | None = None):
+    pass
+```
+
+#### 2. AST Node Type Assertions
+
+When accessing specific AST node attributes, add type assertions:
+
+❌ **Incorrect** - Will fail with "Attribute is unknown":
+```python
+func_def = tree.body[0]
+param_name = func_def.args.args[0].arg  # Error: stmt has no args
+```
+
+✅ **Correct** - Use isinstance() for type narrowing:
+```python
+func_def = tree.body[0]
+assert isinstance(func_def, ast.FunctionDef)
+param_name = func_def.args.args[0].arg  # OK: type is narrowed
+```
+
+For async functions:
+```python
+func_def = tree.body[0]
+assert isinstance(func_def, ast.AsyncFunctionDef)
+param_name = func_def.args.args[0].arg
+```
+
+#### 3. Optional AST Attributes
+
+Some AST attributes can be None. Add explicit checks:
+
+❌ **Incorrect** - Will fail if attribute is None:
+```python
+assert func_def.args.vararg.arg == "args"  # Error: vararg can be None
+```
+
+✅ **Correct** - Check for None first:
+```python
+assert func_def.args.vararg is not None
+assert func_def.args.vararg.arg == "args"
+```
+
+#### 4. General Type Annotation Rules
+
+- Use `|` for union types (Python 3.10+): `str | int | None`
+- For older Python, import from typing: `from typing import Union, Optional`
+- Prefer specific types over `Any` whenever possible
+- Use `list[Type]` and `dict[Key, Value]` over `List`, `Dict` (Python 3.9+)
+- Always annotate function parameters and return types
+
+#### Common Pylance Error Resolutions
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `reportArgumentType` | Type mismatch in arguments | Use union types for optional params |
+| `reportAttributeAccessIssue` | Accessing attribute on base class | Add isinstance() type assertion |
+| `"arg" is not a known attribute of "None"` | Optional attribute not checked | Add `is not None` check before access |
+| `reportOptionalMemberAccess` | Accessing member on Optional type | Check for None first |
+
+These practices improve both type safety and code clarity while eliminating false positives from static analysis tools.
+
 ### Testing Standards
 
 - **Framework**: pytest
