@@ -8,7 +8,7 @@ determines which names can be safely obfuscated.
 
 import ast
 from collections import defaultdict
-from typing import Dict, Set
+from typing import Dict, Set, Optional
 
 from pyobfus.config import ObfuscationConfig
 
@@ -36,6 +36,8 @@ class SymbolAnalyzer(ast.NodeVisitor):
         self.imported_names: Set[str] = set()  # Imported modules/functions
         self.builtin_names: Set[str] = set()  # Python builtins
         self.method_names: Set[str] = set()  # Class method names
+        self.class_attributes: Dict[str, Set[str]] = defaultdict(set)  # Class -> {attributes}
+        self.all_class_attributes: Set[str] = set()  # All class attribute names
 
         # Public API detection
         self.public_api_names: Set[str] = set()  # Auto-detected public APIs
@@ -50,6 +52,7 @@ class SymbolAnalyzer(ast.NodeVisitor):
 
         # Track if we're currently inside a class definition
         self._in_class = False
+        self._current_class_name: Optional[str] = None  # Track current class being analyzed
         self._auto_detect_public = False  # Enable auto-detection
 
     def enable_auto_detection(self, enabled: bool = True) -> None:
@@ -139,9 +142,31 @@ class SymbolAnalyzer(ast.NodeVisitor):
 
         # Set flag to track that we're inside a class
         old_in_class = self._in_class
+        old_class_name = self._current_class_name
         self._in_class = True
+        self._current_class_name = node.name
+
+        # Analyze class body for class-level attributes
+        for item in node.body:
+            if isinstance(item, ast.Assign):
+                # Class-level assignment
+                for target in item.targets:
+                    if isinstance(target, ast.Name):
+                        attr_name = target.id
+                        if not self.config.should_exclude_name(attr_name):
+                            self.class_attributes[node.name].add(attr_name)
+                            self.all_class_attributes.add(attr_name)
+            elif isinstance(item, ast.AnnAssign):
+                # Annotated class-level assignment
+                if isinstance(item.target, ast.Name):
+                    attr_name = item.target.id
+                    if not self.config.should_exclude_name(attr_name):
+                        self.class_attributes[node.name].add(attr_name)
+                        self.all_class_attributes.add(attr_name)
+
         self.generic_visit(node)
         self._in_class = old_in_class
+        self._current_class_name = old_class_name
 
     def visit_Name(self, node: ast.Name) -> None:
         """Visit name reference."""

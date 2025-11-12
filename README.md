@@ -10,20 +10,40 @@ A Python code obfuscator built with AST-based transformations for Python 3.8+. P
 
 ## Features
 
-### Core Features
+### ✅ Free Edition (Current Version)
 
-- **Name Mangling**: Rename variables, functions, and classes to obfuscated names (I0, I1, I2...)
+The following features are **fully implemented and available** in the current version:
+
+- **Name Mangling**: Rename variables, functions, classes, and class attributes to obfuscated names (I0, I1, I2...)
 - **Comment Removal**: Strip comments and docstrings
 - **Multi-file Support**: Obfuscate entire projects with preserved import relationships
 - **File Filtering**: Exclude files using glob patterns (test files, config files, etc.)
 - **Configuration Files**: YAML-based configuration for repeatable builds
 - **Selective Obfuscation**: Preserve specific names (builtins, magic methods, custom exclusions)
 
-### Advanced Features (Experimental)
+### 🔒 Pro Edition (Planned for v0.2.0+)
 
-- **String Encryption**: AES-256 encryption for string literals
-- **Anti-Debugging**: Runtime debugger detection
-- **Control Flow Obfuscation**: Additional protection layers (planned)
+The following advanced features are **planned but not yet implemented**:
+
+- **String Encoding** (Coming in v0.2.0)
+  - Base64 encoding
+  - XOR encryption
+  - Custom encoding schemes
+
+- **Control Flow Obfuscation** (Coming in v0.2.0)
+  - If-to-while conversion
+  - Loop unrolling
+  - Jump tables
+
+- **Dead Code Injection** (Coming in v0.3.0)
+  - Insertion of unreachable code paths
+  - Complexity increase
+
+- **Opaque Predicates** (Coming in v0.3.0)
+  - Always-true/false conditions that are hard to detect
+  - Control flow obscuring
+
+**Note**: Configuration options for Pro features (e.g., `string_encode: true`) are accepted for future compatibility but currently have **no effect**. They will be enabled in future releases.
 
 ## Quick Start
 
@@ -187,6 +207,24 @@ Add an additional layer of protection for commercial Python software.
 
 ### Current Limitations
 
+- **Keyword Arguments**: ⚠️ **IMPORTANT**: Obfuscated code cannot be called with keyword arguments because parameter names are renamed. Use positional arguments only when calling obfuscated functions.
+
+  Example:
+  ```python
+  # Before obfuscation
+  def process(data_path, output_dir):
+      pass
+  process(data_path='./data', output_dir='./output')  # ✅ Works
+
+  # After obfuscation
+  def I0(I1, I2):
+      pass
+  process(data_path='./data', output_dir='./output')  # ❌ TypeError!
+  process('./data', './output')  # ✅ Works
+  ```
+
+  **Workaround**: Use positional arguments, or exclude public API functions from obfuscation using `exclude_names` in your configuration.
+
 - **Cross-file imports**: Name mapping across files is basic (improvements planned)
 - **Dynamic code**: `eval()`, `exec()` with obfuscated code may require adjustments
 - **Debugging**: Obfuscated code is harder to debug (by design)
@@ -194,9 +232,10 @@ Add an additional layer of protection for commercial Python software.
 
 ### Recommendations
 
-- Test obfuscated code thoroughly
+- **Test obfuscated code thoroughly** - especially if using keyword arguments
 - Keep original source in version control
 - Use configuration files for reproducible builds
+- For public APIs, either use positional arguments only or exclude function names from obfuscation
 - Consider combining with other protection methods (compilation, etc.)
 
 ## Technical Details
