@@ -15,11 +15,23 @@ A Python code obfuscator built with AST-based transformations for Python 3.8+. P
 
 ## Features
 
+### Community Edition (Free)
 - **Name Obfuscation**: Rename variables, functions, and classes to I0, I1, I2...
 - **Comment Removal**: Strip comments and docstrings
-- **String Encoding**: Protect string literals with encoding
+- **String Encoding**: Base64 encoding for string literals
 - **Multi-file Support**: Obfuscate entire projects
 - **YAML Configuration**: Flexible configuration system
+- **Parameter Preservation**: Keep function parameter names for keyword arguments
+
+### Professional Edition ($45 USD)
+- **All Community Features** +
+- **AES-256 String Encryption**: Military-grade encryption for strings
+- **Anti-Debugging Checks**: Detect and prevent debugging attempts
+- **Lifetime Updates**: All future Pro features included
+- **Up to 3 Devices**: Use on multiple machines
+- **Priority Email Support**
+
+[**Purchase Professional Edition →**](#purchase-professional-edition)
 
 ## Installation
 
@@ -94,6 +106,39 @@ def I0(I1, I2):
 - [GitHub Issues](https://github.com/zhurong2020/pyobfus/issues) - Bug reports and feature requests
 - [GitHub Discussions](https://github.com/zhurong2020/pyobfus/discussions) - Questions and ideas
 - [Contributing](https://github.com/zhurong2020/pyobfus/blob/main/CONTRIBUTING.md) - How to contribute
+
+## Purchase Professional Edition
+
+**Price**: $45.00 USD (one-time payment)
+
+### What's Included
+- ✅ AES-256 String Encryption
+- ✅ Anti-Debugging Checks
+- ✅ Lifetime Updates
+- ✅ Up to 3 Devices
+- ✅ Email Support (zhurong0525@gmail.com)
+
+### How to Purchase
+
+**Step 1**: Email us your purchase request
+- **To**: zhurong0525@gmail.com
+- **Subject**: "pyobfus Professional License Request"
+- **Include**: Your email address for license delivery
+
+**Step 2**: We'll send you a secure payment link (Stripe)
+
+**Step 3**: Complete payment and receive your license key via email within minutes
+
+**Step 4**: Activate your license
+```bash
+pip install --upgrade pyobfus
+pyobfus-license register PYOBFUS-XXXX-XXXX-XXXX-XXXX
+```
+
+### Activation Guide
+Full activation instructions: [License Activation Guide](https://github.com/zhurong2020/pyobfus/blob/main/docs/LICENSE_ACTIVATION_GUIDE.md)
+
+---
 
 ## License
 
