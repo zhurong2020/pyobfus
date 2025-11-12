@@ -8,29 +8,77 @@ import hashlib
 import json
 import tempfile
 from datetime import datetime, timedelta
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
 
 # Import Pro license module
+# Pylance/mypy may show type conflicts between real and stub implementations - this is expected
 try:
-    from pyobfus_pro.license import (
-        CACHE_FILE,
-        LicenseExpiredError,
-        LicenseRevokedError,
-        LicenseVerificationError,
-        cache_license,
-        generate_license_key,
-        get_license_status,
-        load_cached_license,
-        remove_cached_license,
-        verify_license,
+    from pyobfus_pro.license import (  # type: ignore[import-not-found,import-untyped]
+        CACHE_FILE,  # type: ignore[no-redef]
+        LicenseExpiredError,  # type: ignore[no-redef]
+        LicenseRevokedError,  # type: ignore[no-redef]
+        LicenseVerificationError,  # type: ignore[no-redef]
+        cache_license,  # type: ignore[no-redef]
+        generate_license_key,  # type: ignore[no-redef]
+        get_license_status,  # type: ignore[no-redef]
+        load_cached_license,  # type: ignore[no-redef]
+        remove_cached_license,  # type: ignore[no-redef]
+        verify_license,  # type: ignore[no-redef]
     )
-    from pyobfus_pro.fingerprint import get_device_fingerprint
+    from pyobfus_pro.fingerprint import get_device_fingerprint  # type: ignore[import-not-found,import-untyped,no-redef]
 
     PRO_AVAILABLE = True
 except ImportError:
+    # Define stub implementations for type checking when Pro features not available
     PRO_AVAILABLE = False
+
+    # Stub constants
+    CACHE_FILE: Any = ""  # type: ignore[no-redef]
+
+    # Stub exception classes
+    class LicenseExpiredError(Exception):  # type: ignore[no-redef]
+        """Stub for LicenseExpiredError."""
+        pass
+
+    class LicenseRevokedError(Exception):  # type: ignore[no-redef]
+        """Stub for LicenseRevokedError."""
+        pass
+
+    class LicenseVerificationError(Exception):  # type: ignore[no-redef]
+        """Stub for LicenseVerificationError."""
+        pass
+
+    # Stub functions - marked with type: ignore to avoid conflicts with real implementations
+    def cache_license(*args: Any, **kwargs: Any) -> None:  # type: ignore[no-redef]
+        """Stub for cache_license."""
+        pass
+
+    def generate_license_key(*args: Any, **kwargs: Any) -> str:  # type: ignore[no-redef]
+        """Stub for generate_license_key."""
+        return "PYOB-0000-0000-0000-0000"
+
+    def get_license_status(*args: Any, **kwargs: Any) -> dict[str, Any]:  # type: ignore[no-redef]
+        """Stub for get_license_status."""
+        return {}
+
+    def load_cached_license(*args: Any, **kwargs: Any) -> dict[str, Any] | None:  # type: ignore[no-redef]
+        """Stub for load_cached_license."""
+        return None
+
+    def remove_cached_license(*args: Any, **kwargs: Any) -> None:  # type: ignore[no-redef]
+        """Stub for remove_cached_license."""
+        pass
+
+    def verify_license(*args: Any, **kwargs: Any) -> dict[str, Any]:  # type: ignore[no-redef]
+        """Stub for verify_license."""
+        return {}
+
+    def get_device_fingerprint(*args: Any, **kwargs: Any) -> str:  # type: ignore[no-redef]
+        """Stub for get_device_fingerprint."""
+        return "stub-fingerprint"
 
 
 class TestLicenseKeyGeneration:
