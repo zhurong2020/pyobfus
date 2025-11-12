@@ -151,3 +151,8 @@ obfuscated/
 .local-testing/
 local-testing/
 .test_env/
+
+# Temporary scripts and utilities
+scripts/upload_pypi.py
+scripts/temp_*.py
+test_*.py
