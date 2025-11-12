@@ -116,6 +116,58 @@ class ObfuscationConfig:
             anti_debug=True,  # Pro: anti-debugging
         )
 
+    @classmethod
+    def preset_safe(cls) -> "ObfuscationConfig":
+        """
+        Safe preset: Production-ready obfuscation.
+
+        - Preserves docstrings for documentation
+        - Only obfuscates private methods and variables (starting with _)
+        - Keeps all public APIs intact
+        - Ideal for libraries and production code
+        """
+        config = cls()
+        config.remove_docstrings = False  # Keep docstrings
+        # Will use auto-detection to preserve public APIs
+        return config
+
+    @classmethod
+    def preset_balanced(cls) -> "ObfuscationConfig":
+        """
+        Balanced preset: Default obfuscation (current behavior).
+
+        - Removes docstrings
+        - Obfuscates private methods and variables
+        - Good balance between security and compatibility
+        - Recommended for most use cases
+        """
+        return cls()  # Default configuration
+
+    @classmethod
+    def preset_aggressive(cls) -> "ObfuscationConfig":
+        """
+        Aggressive preset: Maximum obfuscation.
+
+        - Obfuscates everything possible
+        - Removes all docstrings and comments
+        - May require manual exclusion lists
+        - Use with caution - may break code
+        """
+        config = cls()
+        config.exclude_names = {
+            # Only preserve absolute essentials
+            "__init__",
+            "__str__",
+            "__repr__",
+            "__call__",
+            "__enter__",
+            "__exit__",
+            "__main__",
+        }
+        config.remove_docstrings = True
+        config.remove_comments = True
+        return config
+
     def add_exclude_pattern(self, pattern: str) -> None:
         """Add a file pattern to exclude."""
         self.exclude_patterns.append(pattern)
