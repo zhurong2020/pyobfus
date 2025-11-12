@@ -138,6 +138,13 @@ pyobfus-license register PYOBFUS-XXXX-XXXX-XXXX-XXXX
 ### Activation Guide
 Full activation instructions: [License Activation Guide](https://github.com/zhurong2020/pyobfus/blob/main/docs/LICENSE_ACTIVATION_GUIDE.md)
 
+### Legal & Policies
+
+By purchasing pyobfus Professional Edition, you agree to our:
+- [Terms of Service & EULA](https://github.com/zhurong2020/pyobfus/blob/main/TERMS_OF_SERVICE.md)
+- [Refund Policy](https://github.com/zhurong2020/pyobfus/blob/main/REFUND_POLICY.md) - 30-day money-back guarantee
+- [Privacy Policy](https://github.com/zhurong2020/pyobfus/blob/main/PRIVACY_POLICY.md) - GDPR compliant
+
 ---
 
 ## License
