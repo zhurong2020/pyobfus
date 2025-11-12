@@ -174,17 +174,27 @@ class NameMangler(BaseTransformer):
         """
         Transform attribute access.
 
-        Transforms both the object and the attribute name if it's a method.
-        (e.g., obj.method -> I0.I1 if method is obfuscatable)
+        Transforms both the object and the attribute name if it's a method or class attribute.
+        Examples:
+        - obj.method -> I0.I1 (if method is obfuscatable)
+        - ClassName.attr -> I2.I3 (if class attribute)
+        - cls.attr -> I4.I5 (in classmethods)
+        - self.__class__.attr -> self.__class__.I6
         """
         # Visit the value (object) first
         self.visit(node.value)
 
-        # Transform attribute name if it's a method that should be obfuscated
-        if self.analyzer and node.attr in self.analyzer.method_names:
-            if self._should_transform_name(node.attr):
-                node.attr = self._get_mangled_name(node.attr)
-                self._increment_transform_count()
+        if self.analyzer:
+            # Check if this is a method call
+            if node.attr in self.analyzer.method_names:
+                if self._should_transform_name(node.attr):
+                    node.attr = self._get_mangled_name(node.attr)
+                    self._increment_transform_count()
+            # Check if this is a class attribute access
+            elif node.attr in self.analyzer.all_class_attributes:
+                if self._should_transform_name(node.attr):
+                    node.attr = self._get_mangled_name(node.attr)
+                    self._increment_transform_count()
 
         return node
 

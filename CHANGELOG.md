@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5] - 2025-11-12
+
+### Fixed
+- **[CRITICAL]** Class attribute renaming inconsistency causing AttributeError (Issue #7)
+  - Class attributes are now tracked and renamed consistently across all references
+  - Fixed `ClassName.attribute` references to use renamed attribute names
+  - Fixed `cls.attribute` references in classmethods to use renamed names
+  - Fixed `self.__class__.attribute` references to use renamed names
+  - Added comprehensive test suite with 8 tests covering all class attribute patterns
+
+### Added
+- Class attribute tracking in `SymbolAnalyzer`
+  - New `class_attributes` dictionary mapping class names to their attributes
+  - New `all_class_attributes` set for quick attribute lookup
+- Enhanced `visit_Attribute` in `NameMangler` to handle class attributes
+- 8 new tests for class attribute obfuscation patterns
+
+### Documentation
+- **[IMPORTANT]** Added clear documentation for keyword argument limitation (Issue #8)
+  - Keyword arguments cannot be used with obfuscated code (parameter names are renamed)
+  - Added examples and workarounds in README
+  - Recommended use of positional arguments or `exclude_names` for public APIs
+- Clarified Pro features status and roadmap (Issue #9)
+  - Clearly marked Free Edition features as "fully implemented"
+  - Clearly marked Pro features as "planned for v0.2.0+"
+  - Added note that Pro config options are accepted but have no effect currently
+
+### Technical Details
+- Analyzer now tracks class-level assignments during AST traversal
+- Class attributes are distinguished from instance attributes
+- All attribute references (direct, cls, __class__) properly transformed
+- Test coverage improved from 38% to 53%
+
+### Migration Notes
+- No breaking changes
+- Existing code will benefit from automatic class attribute renaming fix
+- Users relying on keyword arguments should review README limitations section
+
 ## [0.1.4] - 2025-11-12
 
 ### Security
