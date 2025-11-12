@@ -48,6 +48,54 @@ The following advanced features are **planned but not yet implemented**:
 
 **Note**: Configuration options for Pro features (e.g., `string_encryption: true`, `anti_debug: true`) are accepted for future compatibility but currently have **no effect**. They will be enabled in future releases. See [ROADMAP.md](ROADMAP.md#v020---core-functionality--initial-pro-features-6-8-weeks) for detailed implementation timeline.
 
+## Purchase Professional Edition
+
+**Pro Edition Features (v0.1.6)**:
+- AES-256 String Encryption
+- Anti-Debugging Checks
+- Lifetime Updates
+- Up to 3 devices per license
+- Email Support
+
+**Price**: $45.00 USD (one-time payment)
+
+### How to Purchase
+
+1. **Contact for Purchase Link**
+   - Email: zhurong0525@gmail.com
+   - Subject: "pyobfus Professional License Request"
+   - We'll send you a secure payment link
+
+2. **Complete Payment**
+   - Click the payment link
+   - Enter your email address (for license delivery)
+   - Complete checkout with credit card (Stripe secure payment)
+
+3. **Receive License Key**
+   - License key sent to your email within minutes
+   - Format: `PYOBFUS-XXXX-XXXX-XXXX-XXXX`
+
+4. **Activate License**
+   ```bash
+   pip install --upgrade pyobfus
+   pyobfus-license register PYOBFUS-XXXX-XXXX-XXXX-XXXX
+   pyobfus-license status
+   ```
+
+5. **Start Using Pro Features**
+   ```bash
+   # Enable AES-256 encryption
+   pyobfus input.py -o output.py --string-encryption
+
+   # Enable anti-debugging
+   pyobfus input.py -o output.py --anti-debug
+
+   # Both features
+   pyobfus input.py -o output.py --string-encryption --anti-debug
+   ```
+
+**Support**: If you encounter any issues, contact zhurong0525@gmail.com with your license key.
+
 ## Quick Start
 
 ### Installation
