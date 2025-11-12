@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Documentation
+- Updated ROADMAP.md with detailed plans for addressing Issue #8 and #9
+  - Issue #8 (Keyword Arguments): Solution planned for v0.2.0 with `--preserve-param-names` option
+  - Issue #9 (Pro Features): Implementation roadmap - v0.2.0 for string encoding, v0.3.0 for control flow/dead code/opaque predicates
+- Added future plan references in README.md for known limitations
+- Reorganized internal documentation structure with version-specific archives
+
 ## [0.1.5] - 2025-11-12
 
 ### Fixed
