@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2025-11-11
+
+### Fixed
+- **[CRITICAL]** Added `cryptography` to required dependencies (was optional, causing `pyobfus-license` CLI to fail)
+- Fixed `__version__` attribute in `pyobfus/__init__.py` (was 0.1.0, now correctly shows 0.1.3)
+
+### Notes
+- v0.1.2 had two critical issues that prevented Pro features and license management from working correctly. All users should upgrade to v0.1.3.
+
 ## [0.1.2] - 2025-11-11
 
 ### Added

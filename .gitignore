@@ -150,3 +150,4 @@ obfuscated/
 # Local testing documentation (author's personal use)
 .local-testing/
 local-testing/
+.test_env/
