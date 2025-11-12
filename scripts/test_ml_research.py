@@ -117,7 +117,7 @@ def obfuscate_file(file_path: Path, config: ObfuscationConfig, verbose: bool = F
         return None
 
 
-def test_single_file(file_path: Path, output_path: Path = None, verbose: bool = False):
+def test_single_file(file_path: Path, output_path: Path | None = None, verbose: bool = False):
     """Test obfuscation on a single file."""
     if not file_path.exists():
         # Try relative to ml-research
