@@ -3,6 +3,10 @@ layout: default
 title: pyobfus - Modern Python Code Obfuscator
 ---
 
+<div style="text-align: center; margin: 2em 0;">
+  <img src="assets/logo.jpeg" alt="pyobfus Logo" style="max-width: 600px; width: 100%; height: auto; border-radius: 8px;">
+</div>
+
 # pyobfus
 
 **Modern Python Code Obfuscator**
