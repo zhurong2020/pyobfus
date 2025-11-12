@@ -49,7 +49,12 @@ class NameMangler(BaseTransformer):
         """
         # Build name mapping
         if self.analyzer:
-            for name in sorted(self.analyzer.obfuscatable_names):
+            # Filter out parameter names if preserve_param_names is enabled
+            names_to_obfuscate = self.analyzer.obfuscatable_names
+            if self.config.preserve_param_names:
+                names_to_obfuscate = names_to_obfuscate - self.analyzer.parameter_names
+
+            for name in sorted(names_to_obfuscate):
                 self._name_map[name] = self._generate_obfuscated_name()
 
         # Transform the tree
@@ -70,33 +75,6 @@ class NameMangler(BaseTransformer):
             node.name = self._get_mangled_name(node.name)
             self._increment_transform_count()
 
-        # Transform arguments
-        for arg in node.args.args:
-            if self._should_transform_name(arg.arg):
-                arg.arg = self._get_mangled_name(arg.arg)
-                self._increment_transform_count()
-
-        # Transform kwonlyargs
-        for arg in node.args.kwonlyargs:
-            if self._should_transform_name(arg.arg):
-                arg.arg = self._get_mangled_name(arg.arg)
-                self._increment_transform_count()
-
-        # Transform posonlyargs (Python 3.8+)
-        for arg in node.args.posonlyargs:
-            if self._should_transform_name(arg.arg):
-                arg.arg = self._get_mangled_name(arg.arg)
-                self._increment_transform_count()
-
-        # Transform vararg and kwarg
-        if node.args.vararg and self._should_transform_name(node.args.vararg.arg):
-            node.args.vararg.arg = self._get_mangled_name(node.args.vararg.arg)
-            self._increment_transform_count()
-
-        if node.args.kwarg and self._should_transform_name(node.args.kwarg.arg):
-            node.args.kwarg.arg = self._get_mangled_name(node.args.kwarg.arg)
-            self._increment_transform_count()
-
         # Remove docstring if configured
         if self.config.remove_docstrings and node.body:
             if isinstance(node.body[0], ast.Expr) and isinstance(node.body[0].value, ast.Constant):
@@ -104,45 +82,24 @@ class NameMangler(BaseTransformer):
                     # Remove docstring
                     node.body = node.body[1:] if len(node.body) > 1 else [ast.Pass()]
 
-        # Visit children
+        # Visit children (including args, which will be handled by visit_arg)
         self.generic_visit(node)
         return node
 
     def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> ast.AsyncFunctionDef:
         """Transform async function definition."""
-        # Same logic as regular function
+        # Transform function name
         if self._should_transform_name(node.name):
             node.name = self._get_mangled_name(node.name)
             self._increment_transform_count()
 
-        for arg in node.args.args:
-            if self._should_transform_name(arg.arg):
-                arg.arg = self._get_mangled_name(arg.arg)
-                self._increment_transform_count()
-
-        for arg in node.args.kwonlyargs:
-            if self._should_transform_name(arg.arg):
-                arg.arg = self._get_mangled_name(arg.arg)
-                self._increment_transform_count()
-
-        for arg in node.args.posonlyargs:
-            if self._should_transform_name(arg.arg):
-                arg.arg = self._get_mangled_name(arg.arg)
-                self._increment_transform_count()
-
-        if node.args.vararg and self._should_transform_name(node.args.vararg.arg):
-            node.args.vararg.arg = self._get_mangled_name(node.args.vararg.arg)
-            self._increment_transform_count()
-
-        if node.args.kwarg and self._should_transform_name(node.args.kwarg.arg):
-            node.args.kwarg.arg = self._get_mangled_name(node.args.kwarg.arg)
-            self._increment_transform_count()
-
+        # Remove docstring if configured
         if self.config.remove_docstrings and node.body:
             if isinstance(node.body[0], ast.Expr) and isinstance(node.body[0].value, ast.Constant):
                 if isinstance(node.body[0].value.value, str):
                     node.body = node.body[1:] if len(node.body) > 1 else [ast.Pass()]
 
+        # Visit children (including args, which will be handled by visit_arg)
         self.generic_visit(node)
         return node
 
@@ -199,10 +156,11 @@ class NameMangler(BaseTransformer):
         return node
 
     def visit_arg(self, node: ast.arg) -> ast.arg:
-        """Transform function argument."""
-        if self._should_transform_name(node.arg):
-            node.arg = self._get_mangled_name(node.arg)
-            self._increment_transform_count()
+        """Transform function argument (skip if preserve_param_names is enabled)."""
+        if not self.config.preserve_param_names:
+            if self._should_transform_name(node.arg):
+                node.arg = self._get_mangled_name(node.arg)
+                self._increment_transform_count()
 
         self.generic_visit(node)
         return node
@@ -226,8 +184,16 @@ class NameMangler(BaseTransformer):
             original_name: Original identifier name
 
         Returns:
-            str: Mangled name
+            str: Mangled name or original name if it's a preserved parameter
         """
+        # If preserve_param_names is enabled and this is a parameter, return original name
+        if (
+            self.config.preserve_param_names
+            and self.analyzer
+            and original_name in self.analyzer.parameter_names
+        ):
+            return original_name
+
         if original_name not in self._name_map:
             self._name_map[original_name] = self._generate_obfuscated_name()
         return self._name_map[original_name]

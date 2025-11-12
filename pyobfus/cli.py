@@ -68,6 +68,11 @@ except ImportError:
     help="Prefix for obfuscated names (default: I)",
 )
 @click.option(
+    "--preserve-param-names",
+    is_flag=True,
+    help="Preserve parameter names to allow keyword arguments after obfuscation",
+)
+@click.option(
     "--verbose",
     "-v",
     is_flag=True,
@@ -82,6 +87,7 @@ def main(
     remove_docstrings: bool,
     remove_comments: bool,
     name_prefix: str,
+    preserve_param_names: bool,
     verbose: bool,
 ) -> None:
     """
@@ -173,6 +179,7 @@ def main(
         config.remove_docstrings = remove_docstrings
         config.remove_comments = remove_comments
         config.name_prefix = name_prefix
+        config.preserve_param_names = preserve_param_names
 
         # Determine if input is file or directory
         input_path_obj = Path(input_path)

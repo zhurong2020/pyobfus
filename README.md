@@ -75,6 +75,9 @@ pyobfus src/ -o dist/
 
 # With configuration file
 pyobfus src/ -o dist/ --config pyobfus.yaml
+
+# Preserve parameter names for keyword arguments (v0.1.6+)
+pyobfus src/ -o dist/ --preserve-param-names
 ```
 
 ### Example
@@ -208,25 +211,38 @@ Add an additional layer of protection for commercial Python software.
 
 ### Current Limitations
 
-- **Keyword Arguments**: ⚠️ **IMPORTANT**: Obfuscated code cannot be called with keyword arguments because parameter names are renamed. Use positional arguments only when calling obfuscated functions.
+- **Keyword Arguments** (✅ Resolved in v0.1.6): By default, parameter names are obfuscated, which breaks keyword arguments. **Solution**: Use the `--preserve-param-names` flag to preserve parameter names while still obfuscating function bodies.
 
   Example:
   ```python
   # Before obfuscation
   def process(data_path, output_dir):
-      pass
-  process(data_path='./data', output_dir='./output')  # ✅ Works
+      temp_file = data_path + ".tmp"
+      return temp_file
 
-  # After obfuscation
+  result = process(data_path='./data', output_dir='./output')  # ✅ Works
+
+  # After obfuscation (default behavior)
   def I0(I1, I2):
-      pass
-  process(data_path='./data', output_dir='./output')  # ❌ TypeError!
-  process('./data', './output')  # ✅ Works
+      I3 = I1 + ".tmp"
+      return I3
+
+  result = process(data_path='./data', output_dir='./output')  # ❌ TypeError!
+
+  # After obfuscation (with --preserve-param-names)
+  def I0(data_path, output_dir):
+      I3 = data_path + ".tmp"
+      return I3
+
+  result = I0(data_path='./data', output_dir='./output')  # ✅ Works!
   ```
 
-  **Workaround**: Use positional arguments, or exclude public API functions from obfuscation using `exclude_names` in your configuration.
+  **When to use `--preserve-param-names`**:
+  - Public API functions/libraries where keyword arguments are used by clients
+  - Functions with many parameters where keyword arguments improve readability
+  - Code that relies heavily on keyword-only arguments (`def func(*, kwonly)`)
 
-  **Future Plan**: This limitation will be addressed in v0.1.6 with `--preserve-param-names` option. See [ROADMAP.md](ROADMAP.md#recent-issues-addressed) for details.
+  **Trade-off**: Parameter names reveal some information about the function's interface, but function bodies and local variables are still fully obfuscated.
 
 - **Cross-file imports**: Name mapping across files is basic (improvements planned)
 - **Dynamic code**: `eval()`, `exec()` with obfuscated code may require adjustments
@@ -235,10 +251,10 @@ Add an additional layer of protection for commercial Python software.
 
 ### Recommendations
 
-- **Test obfuscated code thoroughly** - especially if using keyword arguments
+- **Test obfuscated code thoroughly** before deployment
 - Keep original source in version control
 - Use configuration files for reproducible builds
-- For public APIs, either use positional arguments only or exclude function names from obfuscation
+- For public APIs, use `--preserve-param-names` to maintain keyword argument compatibility
 - Consider combining with other protection methods (compilation, etc.)
 
 ## Technical Details
