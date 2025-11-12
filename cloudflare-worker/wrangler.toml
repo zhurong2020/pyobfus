@@ -1,0 +1,8 @@
+name = "pyobfus-license-server"
+main = "src/index.js"
+compatibility_date = "2025-11-12"
+
+# KV Namespace Binding
+[[kv_namespaces]]
+binding = "LICENSES"
+id = "61072fc72c35405c850427da381ccdbf"
