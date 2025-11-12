@@ -38,6 +38,7 @@ class SymbolAnalyzer(ast.NodeVisitor):
         self.method_names: Set[str] = set()  # Class method names
         self.class_attributes: Dict[str, Set[str]] = defaultdict(set)  # Class -> {attributes}
         self.all_class_attributes: Set[str] = set()  # All class attribute names
+        self.parameter_names: Set[str] = set()  # Function parameter names
 
         # Public API detection
         self.public_api_names: Set[str] = set()  # Auto-detected public APIs
@@ -108,11 +109,34 @@ class SymbolAnalyzer(ast.NodeVisitor):
                 if is_public or has_docstring:
                     self.public_api_names.add(node.name)
 
-        # Visit arguments
+        # Visit arguments - track all parameter types
         for arg in node.args.args:
             if not self.config.should_exclude_name(arg.arg):
                 self.local_names.add(arg.arg)
+                self.parameter_names.add(arg.arg)
                 self.name_usage[arg.arg] += 1
+
+        for arg in node.args.kwonlyargs:
+            if not self.config.should_exclude_name(arg.arg):
+                self.local_names.add(arg.arg)
+                self.parameter_names.add(arg.arg)
+                self.name_usage[arg.arg] += 1
+
+        for arg in node.args.posonlyargs:
+            if not self.config.should_exclude_name(arg.arg):
+                self.local_names.add(arg.arg)
+                self.parameter_names.add(arg.arg)
+                self.name_usage[arg.arg] += 1
+
+        if node.args.vararg and not self.config.should_exclude_name(node.args.vararg.arg):
+            self.local_names.add(node.args.vararg.arg)
+            self.parameter_names.add(node.args.vararg.arg)
+            self.name_usage[node.args.vararg.arg] += 1
+
+        if node.args.kwarg and not self.config.should_exclude_name(node.args.kwarg.arg):
+            self.local_names.add(node.args.kwarg.arg)
+            self.parameter_names.add(node.args.kwarg.arg)
+            self.name_usage[node.args.kwarg.arg] += 1
 
         # Visit defaults, decorator, body
         self.generic_visit(node)
@@ -127,10 +151,34 @@ class SymbolAnalyzer(ast.NodeVisitor):
             if self._in_class:
                 self.method_names.add(node.name)
 
+        # Visit arguments - track all parameter types
         for arg in node.args.args:
             if not self.config.should_exclude_name(arg.arg):
                 self.local_names.add(arg.arg)
+                self.parameter_names.add(arg.arg)
                 self.name_usage[arg.arg] += 1
+
+        for arg in node.args.kwonlyargs:
+            if not self.config.should_exclude_name(arg.arg):
+                self.local_names.add(arg.arg)
+                self.parameter_names.add(arg.arg)
+                self.name_usage[arg.arg] += 1
+
+        for arg in node.args.posonlyargs:
+            if not self.config.should_exclude_name(arg.arg):
+                self.local_names.add(arg.arg)
+                self.parameter_names.add(arg.arg)
+                self.name_usage[arg.arg] += 1
+
+        if node.args.vararg and not self.config.should_exclude_name(node.args.vararg.arg):
+            self.local_names.add(node.args.vararg.arg)
+            self.parameter_names.add(node.args.vararg.arg)
+            self.name_usage[node.args.vararg.arg] += 1
+
+        if node.args.kwarg and not self.config.should_exclude_name(node.args.kwarg.arg):
+            self.local_names.add(node.args.kwarg.arg)
+            self.parameter_names.add(node.args.kwarg.arg)
+            self.name_usage[node.args.kwarg.arg] += 1
 
         self.generic_visit(node)
 

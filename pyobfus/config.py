@@ -67,6 +67,7 @@ class ObfuscationConfig:
     remove_docstrings: bool = True
     remove_comments: bool = True
     string_encoding: bool = False
+    preserve_param_names: bool = False  # Preserve parameter names for keyword arguments
 
     # Pro Edition features
     string_encryption: bool = False  # AES-256 encryption (Pro only)

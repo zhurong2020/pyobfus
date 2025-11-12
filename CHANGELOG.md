@@ -7,12 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **[RESOLVED]** Keyword argument limitation (Issue #8)
+  - Added `--preserve-param-names` CLI option to preserve parameter names during obfuscation
+  - Function parameter names can now be preserved while still obfuscating function bodies
+  - Enables keyword arguments to work correctly in obfuscated code
+  - Supports all parameter types: regular args, keyword-only args, *args, **kwargs, positional-only args
+  - Works with async functions and functions with default argument values
+
+### Added
+- **Parameter Preservation System** (Issue #8):
+  - New `preserve_param_names` configuration option (default: False)
+  - `--preserve-param-names` CLI flag for easy activation
+  - Parameter name tracking in `SymbolAnalyzer` with new `parameter_names` set
+  - Smart name filtering in `NameMangler` to exclude parameters from obfuscation
+  - 10 comprehensive tests covering all parameter types and edge cases
+- Enhanced `SymbolAnalyzer` to track all function parameter types separately
+- Modified `NameMangler.transform()` to filter parameter names when flag is enabled
+- Updated `visit_arg()` to skip parameter renaming when preservation is active
+
 ### Documentation
 - Updated ROADMAP.md with detailed plans for addressing Issue #8 and #9
-  - Issue #8 (Keyword Arguments): Solution planned for v0.1.6 with `--preserve-param-names` option
+  - Issue #8 (Keyword Arguments): ✅ **COMPLETED** in v0.1.6
   - Issue #9 (Pro Features): Implementation roadmap - v0.1.6 for string encoding, v0.3.0 for control flow/dead code/opaque predicates
 - Added future plan references in README.md for known limitations
 - Reorganized internal documentation structure with version-specific archives
+
+### Technical Details
+- Parameter names now tracked in dedicated `parameter_names` set in analyzer
+- All parameter types handled: args, kwonlyargs, posonlyargs, vararg, kwarg
+- Parameter name preservation applies to both function signatures and body references
+- Local variables within functions still obfuscated as expected
+- Test coverage improved with 10 new tests for keyword argument scenarios
 
 ### Infrastructure
 - Stripe payment system setup completed (Test Mode)

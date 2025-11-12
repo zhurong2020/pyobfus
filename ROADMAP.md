@@ -268,15 +268,20 @@ For detailed competitive analysis and feature comparison, see [docs/internal/FEA
 
 ## Recent Issues Addressed
 
+### v0.1.6 (November 12, 2025)
+
+**Issue #8 - Keyword Argument Limitation**: ✅ **RESOLVED**
+- Added `--preserve-param-names` CLI option to preserve parameter names during obfuscation
+- Function parameter names can now be preserved while still obfuscating function bodies
+- Supports all parameter types: regular args, keyword-only args, *args, **kwargs, positional-only args
+- 10 comprehensive tests covering all parameter types and edge cases
+- Documentation updated with usage examples and recommendations
+
 ### v0.1.5 (November 12, 2025)
 
 **Issue #7 - Class Attribute Renaming (CRITICAL)**: ✅ **FIXED**
 - Class attributes now consistently renamed across all references
 - Added comprehensive test coverage
-
-**Issue #8 - Keyword Argument Limitation**: ✅ **DOCUMENTED** → 🔲 **FIX PLANNED for v0.2.0**
-- Current: Documented limitation with workarounds
-- Future: Add `--preserve-param-names` option in v0.2.0
 
 **Issue #9 - Pro Features Not Implemented**: ✅ **ROADMAP CLARIFIED** → 🔲 **IMPLEMENTATION PLANNED**
 - v0.2.0: String encoding (basic)
