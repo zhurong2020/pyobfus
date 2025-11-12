@@ -19,7 +19,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 15 comprehensive tests covering all string types and edge cases
   - Example demonstration file: `examples/string_encoding.py`
 
+- **Integration Testing Framework** (2025-11-12):
+  - Complete framework for testing pyobfus on external projects without PyPI upload
+  - New `integration_tests/` directory with pytest test suite
+  - Convenient CLI script `scripts/test_ml_research.py` for quick testing
+  - Jupyter notebook for interactive testing and debugging
+  - Comprehensive documentation: `INTEGRATION_TESTING.md` and `integration_tests/README.md`
+  - Successfully tested on 20/20 real-world files from cardiac-ml-research project
+  - Immediate bug discovery: Found and fixed Issue #10 in first test run
+
 ### Fixed
+- **[CRITICAL]** StringEncoder F-string bug causing code generation failure (Issue #10)
+  - F-strings with function calls inside were causing `ValueError: Unexpected node inside JoinedStr`
+  - Fixed by properly skipping f-string node traversal to preserve AST structure
+  - Success rate improved from 50% to 100% on real-world testing (10/10 → 20/20 files)
+  - Added comprehensive f-string tests to prevent regression
+
+- **Type Annotation Issues** - Fixed 19 Pylance type checking errors (2025-11-12):
+  - Fixed `reportAttributeAccessIssue` in test_issue_8.py (17 errors)
+    - Added isinstance() assertions for AST node type narrowing
+    - Added None checks for optional AST attributes (vararg, kwarg)
+  - Fixed `reportArgumentType` in test_ml_research.py (2 errors)
+    - Changed `Path = None` to `Path | None = None` for optional parameters
+
 - **[RESOLVED]** Keyword argument limitation (Issue #8)
   - Added `--preserve-param-names` CLI option to preserve parameter names during obfuscation
   - Function parameter names can now be preserved while still obfuscating function bodies
@@ -39,11 +61,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated `visit_arg()` to skip parameter renaming when preservation is active
 
 ### Documentation
+- **Type Annotation Best Practices** added to CONTRIBUTING.md (2025-11-12):
+  - Guidelines for optional parameters (`Type | None` instead of `Type = None`)
+  - AST node type assertions with isinstance()
+  - Optional attribute None checks
+  - Common Pylance error resolutions table with solutions
+
+- **Project Structure Cleanup** (2025-11-12):
+  - Removed redundant `.local-testing/` directory (50KB+ of personal testing notes)
+  - Replaced by formal `integration_tests/` framework with official documentation
+  - Archived completed implementation guides to `docs/internal/archive/v0.1.6/`
+    - Issue #8 implementation guide (feature completed)
+    - Session summaries (2025-11-12, Parts 1 & 2)
+  - Established clear documentation lifecycle: Active → In-Progress → Archive
+  - Created `PROJECT_CLEANUP_PLAN.md` with cleanup strategy and future guidelines
+
 - Updated ROADMAP.md with detailed plans for addressing Issue #8 and #9
   - Issue #8 (Keyword Arguments): ✅ **COMPLETED** in v0.1.6
   - Issue #9 (Pro Features): Implementation roadmap - v0.1.6 for string encoding, v0.3.0 for control flow/dead code/opaque predicates
 - Added future plan references in README.md for known limitations
 - Reorganized internal documentation structure with version-specific archives
+- Updated PROJECT_STATUS.md with code quality improvements and project structure cleanup
 
 ### Technical Details
 - Parameter names now tracked in dedicated `parameter_names` set in analyzer
