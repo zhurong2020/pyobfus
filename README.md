@@ -30,10 +30,11 @@ The following advanced features are **planned but not yet implemented**:
   - XOR encryption
   - Custom encoding schemes
 
-- **Control Flow Obfuscation** (Coming in v0.2.0)
+- **Control Flow Obfuscation** (Coming in v0.3.0)
   - If-to-while conversion
   - Loop unrolling
   - Jump tables
+  - False branch injection
 
 - **Dead Code Injection** (Coming in v0.3.0)
   - Insertion of unreachable code paths
@@ -43,7 +44,7 @@ The following advanced features are **planned but not yet implemented**:
   - Always-true/false conditions that are hard to detect
   - Control flow obscuring
 
-**Note**: Configuration options for Pro features (e.g., `string_encode: true`) are accepted for future compatibility but currently have **no effect**. They will be enabled in future releases.
+**Note**: Configuration options for Pro features (e.g., `string_encode: true`) are accepted for future compatibility but currently have **no effect**. They will be enabled in future releases. See [ROADMAP.md](ROADMAP.md#v020---core-functionality--initial-pro-features-6-8-weeks) for detailed implementation timeline.
 
 ## Quick Start
 
@@ -224,6 +225,8 @@ Add an additional layer of protection for commercial Python software.
   ```
 
   **Workaround**: Use positional arguments, or exclude public API functions from obfuscation using `exclude_names` in your configuration.
+
+  **Future Plan**: This limitation will be addressed in v0.2.0 with `--preserve-param-names` option. See [ROADMAP.md](ROADMAP.md#recent-issues-addressed) for details.
 
 - **Cross-file imports**: Name mapping across files is basic (improvements planned)
 - **Dynamic code**: `eval()`, `exec()` with obfuscated code may require adjustments
