@@ -9,10 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Documentation
 - Updated ROADMAP.md with detailed plans for addressing Issue #8 and #9
-  - Issue #8 (Keyword Arguments): Solution planned for v0.2.0 with `--preserve-param-names` option
-  - Issue #9 (Pro Features): Implementation roadmap - v0.2.0 for string encoding, v0.3.0 for control flow/dead code/opaque predicates
+  - Issue #8 (Keyword Arguments): Solution planned for v0.1.6 with `--preserve-param-names` option
+  - Issue #9 (Pro Features): Implementation roadmap - v0.1.6 for string encoding, v0.3.0 for control flow/dead code/opaque predicates
 - Added future plan references in README.md for known limitations
 - Reorganized internal documentation structure with version-specific archives
+
+### Infrastructure
+- Stripe payment system setup completed (Test Mode)
+  - Product created: pyobfus Professional Edition ($45 USD)
+  - Test Mode API keys obtained and configured
+  - Product logo created and uploaded
+  - Configuration files added (.env.stripe.example)
+  - Awaiting KYC verification for Live Mode activation
 
 ## [0.1.5] - 2025-11-12
 
@@ -38,7 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Recommended use of positional arguments or `exclude_names` for public APIs
 - Clarified Pro features status and roadmap (Issue #9)
   - Clearly marked Free Edition features as "fully implemented"
-  - Clearly marked Pro features as "planned for v0.2.0+"
+  - Clearly marked Pro features as "planned for v0.1.6+"
   - Added note that Pro config options are accepted but have no effect currently
 
 ### Technical Details
