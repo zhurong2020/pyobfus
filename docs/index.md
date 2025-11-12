@@ -31,7 +31,11 @@ A Python code obfuscator built with AST-based transformations for Python 3.8+. P
 - **Up to 3 Devices**: Use on multiple machines
 - **Priority Email Support**
 
-[**Purchase Professional Edition →**](#purchase-professional-edition)
+<div style="text-align: center; margin: 2em 0;">
+  <a href="https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400" style="display: inline-block; background: #635BFF; color: white; padding: 12px 32px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px;">Buy Now - $45 USD</a>
+</div>
+
+[More purchase details ↓](#purchase-professional-edition)
 
 ## Installation
 
@@ -120,16 +124,16 @@ def I0(I1, I2):
 
 ### How to Purchase
 
-**Step 1**: Email us your purchase request
-- **To**: zhurong0525@gmail.com
-- **Subject**: "pyobfus Professional License Request"
-- **Include**: Your email address for license delivery
+<div style="text-align: center; margin: 2em 0;">
+  <a href="https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400" style="display: inline-block; background: #635BFF; color: white; padding: 16px 48px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">🚀 Buy Now - $45 USD</a>
+  <p style="margin-top: 0.5em; color: #666; font-size: 14px;">Instant delivery • 30-day money-back guarantee</p>
+</div>
 
-**Step 2**: We'll send you a secure payment link (Stripe)
+**Step 1**: Click "Buy Now" and complete secure checkout (Stripe)
 
-**Step 3**: Complete payment and receive your license key via email within minutes
+**Step 2**: Receive your license key via email within minutes
 
-**Step 4**: Activate your license
+**Step 3**: Activate your license
 ```bash
 pip install --upgrade pyobfus
 pyobfus-license register PYOBFUS-XXXX-XXXX-XXXX-XXXX

@@ -61,28 +61,25 @@ The following advanced features are **planned but not yet implemented**:
 
 ### How to Purchase
 
-1. **Contact for Purchase Link**
-   - Email: zhurong0525@gmail.com
-   - Subject: "pyobfus Professional License Request"
-   - We'll send you a secure payment link
+**[🚀 Buy Now - Click Here](https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400)** (Instant delivery • 30-day money-back guarantee)
 
-2. **Complete Payment**
-   - Click the payment link
-   - Enter your email address (for license delivery)
-   - Complete checkout with credit card (Stripe secure payment)
+1. **Complete Secure Checkout** (Stripe)
+   - Click the buy link above
+   - Enter your email (for license delivery)
+   - Complete payment securely
 
-3. **Receive License Key**
+2. **Receive License Key**
    - License key sent to your email within minutes
    - Format: `PYOBFUS-XXXX-XXXX-XXXX-XXXX`
 
-4. **Activate License**
+3. **Activate License**
    ```bash
    pip install --upgrade pyobfus
    pyobfus-license register PYOBFUS-XXXX-XXXX-XXXX-XXXX
    pyobfus-license status
    ```
 
-5. **Start Using Pro Features**
+4. **Start Using Pro Features**
    ```bash
    # Enable AES-256 encryption
    pyobfus input.py -o output.py --string-encryption
