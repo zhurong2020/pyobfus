@@ -9,6 +9,14 @@ This document outlines the planned technical features and improvements for pyobf
 
 ## Current Status
 
+✅ **v0.1.5 Released** (November 2025)
+- **Fixed critical class attribute renaming bug** (Issue #7)
+- **Documented keyword argument limitation** (Issue #8)
+- **Clarified Pro features status** (Issue #9)
+- Test suite with **87 tests, 53% coverage**
+- Class attribute tracking and consistent renaming
+- Enhanced documentation with clear limitations and feature roadmap
+
 ✅ **v0.1.1 Released** (November 2025)
 - Core obfuscation engine with AST-based name mangling
 - Multi-file support with configuration system
@@ -35,9 +43,9 @@ This document outlines the planned technical features and improvements for pyobf
 
 ## Version Roadmap
 
-### v0.2.0 - Core Functionality (6-8 weeks)
+### v0.2.0 - Core Functionality & Initial Pro Features (6-8 weeks)
 
-**Goal**: Fix critical issues, ensure reliable multi-file support
+**Goal**: Fix critical issues, ensure reliable multi-file support, implement basic Pro features
 
 #### P0 - Must Have
 
@@ -75,6 +83,28 @@ This document outlines the planned technical features and improvements for pyobf
 - **Effort**: 1 week (50% complete)
 - **Success**: 4+ templates, 100% accurate validation
 
+**4. Keyword Argument Support** ⭐⭐⭐ *(Addresses Issue #8)*
+- **Issue**: Obfuscated functions cannot be called with keyword arguments
+- **Impact**: Breaking change for public APIs, library code
+- **Features**:
+  - Option 1: `--preserve-param-names` flag to preserve all parameter names
+  - Option 2: Extend `preserve_patterns` to include parameter names
+  - Option 3: Decorator-based control (`@preserve_signature`)
+  - Detection and warning for keyword-only arguments
+- **Effort**: 1-2 weeks
+- **Success**: Public APIs can use keyword arguments, backward compatible
+
+**5. String Encoding (Basic)** ⭐⭐⭐ *(Partial implementation of Issue #9)*
+- **Issue**: Pro feature `string_encode` currently has no effect
+- **Impact**: Users expect Pro config to work
+- **Features**:
+  - Base64 encoding for string literals
+  - Optional XOR encryption with configurable key
+  - Runtime decryption infrastructure
+  - License check for Pro features
+- **Effort**: 1-2 weeks
+- **Success**: String literals are encoded, configurable algorithms
+
 **Release Criteria**:
 - ✅ All multi-file import patterns work
 - ✅ Performance > 1000 LOC/sec
@@ -85,21 +115,43 @@ This document outlines the planned technical features and improvements for pyobf
 
 ### v0.3.0 - Enhanced Protection (6-8 weeks)
 
-**Goal**: Increase obfuscation strength, align with PyArmor Basic features
+**Goal**: Increase obfuscation strength, complete Pro features (Issue #9)
 
 #### P1 - Should Have
 
-**4. Control Flow Obfuscation** ⭐⭐⭐
+**6. Control Flow Obfuscation** ⭐⭐⭐ *(Completes Issue #9 - Pro feature)*
 - **Purpose**: Make code harder to analyze manually
+- **Issue**: Pro feature `control_flow` currently has no effect
 - **Features**:
   - If/else flattening
   - False branch injection
   - Loop transformation
+  - While-loop conversion for simple if statements
 - **Tradeoff**: 10-30% performance overhead
 - **Effort**: 2-3 weeks
 - **Success**: 100% correctness, < 30% slowdown
 
-**5. String Encryption Enhancement** ⭐⭐⭐
+**7. Dead Code Injection** ⭐⭐⭐ *(Completes Issue #9 - Pro feature)*
+- **Purpose**: Increase code complexity, hinder manual analysis
+- **Issue**: Pro feature `dead_code` currently has no effect
+- **Features**:
+  - Insert unreachable code blocks
+  - Realistic-looking but non-functional code
+  - Configurable complexity level
+- **Effort**: 1-2 weeks
+- **Success**: Code runs correctly, analysis time increased
+
+**8. Opaque Predicates** ⭐⭐⭐ *(Completes Issue #9 - Pro feature)*
+- **Purpose**: Obscure control flow with always-true/false conditions
+- **Issue**: Pro feature `opaque_predicates` currently has no effect
+- **Features**:
+  - Mathematical invariants (e.g., x*x >= 0)
+  - Complex boolean expressions
+  - Hard to detect statically
+- **Effort**: 1-2 weeks
+- **Success**: Predicates are opaque, no false positives
+
+**9. String Encryption Enhancement** ⭐⭐⭐
 - **Purpose**: Protect sensitive strings (API keys, passwords)
 - **Features**:
   - Auto-detect sensitive patterns
@@ -108,7 +160,7 @@ This document outlines the planned technical features and improvements for pyobf
 - **Effort**: 1-2 weeks
 - **Success**: 3+ algorithms, > 90% auto-detection accuracy
 
-**6. License Management (Lightweight)** ⭐⭐⭐
+**10. License Management (Lightweight)** ⭐⭐⭐
 - **Purpose**: Support commercial distribution
 - **Features**:
   - Expiration date: `--expire 2026-12-31`
@@ -131,22 +183,22 @@ This document outlines the planned technical features and improvements for pyobf
 
 #### P2 - Nice to Have
 
-**7. Junk Code Injection** ⭐⭐
+**11. Junk Code Injection** ⭐⭐
 - Insert harmless but realistic-looking code
 - Increase manual analysis difficulty
 - Effort: 1 week
 
-**8. VSCode Extension** ⭐⭐
+**12. VSCode Extension** ⭐⭐
 - Right-click obfuscation
 - Config file intellisense
 - Effort: 2-3 weeks
 
-**9. Incremental Obfuscation** ⭐⭐
+**13. Incremental Obfuscation** ⭐⭐
 - Only process changed files
 - Result caching
 - Effort: 1-2 weeks
 
-**10. Code Compression** ⭐⭐
+**14. Code Compression** ⭐⭐
 - Minify whitespace
 - Reduce file size
 - Effort: 1 week
@@ -214,5 +266,23 @@ For detailed competitive analysis and feature comparison, see [docs/internal/FEA
 
 ---
 
-**Last Updated**: November 11, 2025
+## Recent Issues Addressed
+
+### v0.1.5 (November 12, 2025)
+
+**Issue #7 - Class Attribute Renaming (CRITICAL)**: ✅ **FIXED**
+- Class attributes now consistently renamed across all references
+- Added comprehensive test coverage
+
+**Issue #8 - Keyword Argument Limitation**: ✅ **DOCUMENTED** → 🔲 **FIX PLANNED for v0.2.0**
+- Current: Documented limitation with workarounds
+- Future: Add `--preserve-param-names` option in v0.2.0
+
+**Issue #9 - Pro Features Not Implemented**: ✅ **ROADMAP CLARIFIED** → 🔲 **IMPLEMENTATION PLANNED**
+- v0.2.0: String encoding (basic)
+- v0.3.0: Control flow, dead code, opaque predicates (complete Pro features)
+
+---
+
+**Last Updated**: November 12, 2025
 **Next Review**: After v0.2.0 release
