@@ -73,7 +73,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - New `integration_tests/` directory with pytest test suite
   - Convenient CLI script `scripts/test_ml_research.py` for quick testing
   - Jupyter notebook for interactive testing and debugging
-  - Comprehensive documentation: `INTEGRATION_TESTING.md` and `integration_tests/README.md`
+  - Comprehensive documentation: `docs/INTEGRATION_TESTING.md` and `integration_tests/README.md`
   - Successfully tested on 20/20 real-world files from cardiac-ml-research project
   - Immediate bug discovery: Found and fixed Issue #10 in first test run
 
@@ -125,7 +125,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Established clear documentation lifecycle: Active → In-Progress → Archive
   - Created `PROJECT_CLEANUP_PLAN.md` with cleanup strategy and future guidelines
 
-- Updated ROADMAP.md with detailed plans for addressing Issue #8 and #9
+- Updated docs/ROADMAP.md with detailed plans for addressing Issue #8 and #9
   - Issue #8 (Keyword Arguments): ✅ **COMPLETED** in v0.1.6
   - Issue #9 (Pro Features): Implementation roadmap - v0.1.6 for string encoding, v0.3.0 for control flow/dead code/opaque predicates
 - Added future plan references in README.md for known limitations
