@@ -271,7 +271,7 @@ def _obfuscate_file(
         if verbose:
             stats = string_encoder.get_statistics()
             click.echo(f"  Encoded strings: {stats['encoded_strings']}")
-            if stats['skipped_fstrings'] > 0:
+            if stats["skipped_fstrings"] > 0:
                 click.echo(f"  Skipped f-strings: {stats['skipped_fstrings']}")
 
     # 3. Pro features (if enabled)

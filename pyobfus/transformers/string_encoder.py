@@ -33,9 +33,7 @@ class StringEncoder(BaseTransformer):
     - No external dependencies required
     """
 
-    def __init__(
-        self, config: ObfuscationConfig, analyzer: Optional[SymbolAnalyzer] = None
-    ):
+    def __init__(self, config: ObfuscationConfig, analyzer: Optional[SymbolAnalyzer] = None):
         """
         Initialize string encoder.
 
