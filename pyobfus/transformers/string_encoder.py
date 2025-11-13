@@ -221,8 +221,10 @@ class StringEncoder(BaseTransformer):
             args=ast.arguments(
                 posonlyargs=[],
                 args=[ast.arg(arg="s", annotation=None)],
+                vararg=None,
                 kwonlyargs=[],
                 kw_defaults=[],
+                kwarg=None,
                 defaults=[],
             ),
             body=[

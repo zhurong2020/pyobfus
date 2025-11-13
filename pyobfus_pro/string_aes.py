@@ -328,8 +328,10 @@ class StringAESEncryptor(BaseTransformer):
             args=ast.arguments(
                 posonlyargs=[],
                 args=[ast.arg(arg="encrypted_b64", annotation=None)],
+                vararg=None,
                 kwonlyargs=[],
                 kw_defaults=[],
+                kwarg=None,
                 defaults=[],
             ),
             body=function_body,

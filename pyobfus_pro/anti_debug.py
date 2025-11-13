@@ -182,8 +182,10 @@ class AntiDebugInjector(BaseTransformer):
             args=ast.arguments(
                 posonlyargs=[],
                 args=[],
+                vararg=None,
                 kwonlyargs=[],
                 kw_defaults=[],
+                kwarg=None,
                 defaults=[],
             ),
             body=function_body,
