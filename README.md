@@ -96,9 +96,9 @@ The following advanced features are **planned but not yet implemented**:
 ### Legal & Policies
 
 By purchasing pyobfus Professional Edition, you agree to our:
-- **[Terms of Service & EULA](TERMS_OF_SERVICE.md)** - License agreement and usage terms
-- **[Refund Policy](REFUND_POLICY.md)** - 30-day money-back guarantee, no questions asked
-- **[Privacy Policy](PRIVACY_POLICY.md)** - GDPR compliant, we protect your data
+- **[Terms of Service & EULA](docs/legal/TERMS_OF_SERVICE.md)** - License agreement and usage terms
+- **[Refund Policy](docs/legal/REFUND_POLICY.md)** - 30-day money-back guarantee, no questions asked
+- **[Privacy Policy](docs/legal/PRIVACY_POLICY.md)** - GDPR compliant, we protect your data
 
 ## Quick Start
 
