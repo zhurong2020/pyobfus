@@ -7,8 +7,14 @@ license key generation.
 """
 
 import json
+import sys
 import time
-import requests
+
+try:
+    import requests  # type: ignore[import]
+except ImportError:
+    print("[ERROR] requests module not found. Install with: pip install -r scripts/requirements.txt")
+    sys.exit(1)
 
 
 # Worker URL

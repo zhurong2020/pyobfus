@@ -7,7 +7,12 @@ This script configures Stripe webhook endpoints using the Stripe API.
 
 import os
 import sys
-import stripe
+
+try:
+    import stripe  # type: ignore[import]
+except ImportError:
+    print("[ERROR] stripe module not found. Install with: pip install -r scripts/requirements.txt")
+    sys.exit(1)
 
 
 # Cloudflare Worker URL
