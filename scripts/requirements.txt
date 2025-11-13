@@ -1,0 +1,12 @@
+# Requirements for pyobfus development and deployment scripts
+# Install with: pip install -r scripts/requirements.txt
+
+# Payment and checkout scripts
+stripe>=8.0.0
+python-dotenv>=1.0.0
+
+# License server testing
+requests>=2.31.0
+
+# Package management
+twine>=4.0.0

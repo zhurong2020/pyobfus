@@ -8,7 +8,13 @@ Tests license verification and device tracking functionality.
 import json
 import sys
 import uuid
-import requests
+from typing import Optional
+
+try:
+    import requests  # type: ignore[import]
+except ImportError:
+    print("Error: requests module not found. Install with: pip install -r scripts/requirements.txt")
+    sys.exit(1)
 
 
 # Worker URL
@@ -29,7 +35,7 @@ def test_health():
         return False
 
 
-def test_license_verification(license_key: str, device_id: str = None):
+def test_license_verification(license_key: str, device_id: Optional[str] = None):
     """Test license verification endpoint."""
     if device_id is None:
         device_id = str(uuid.uuid4())
