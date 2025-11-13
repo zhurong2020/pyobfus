@@ -51,25 +51,29 @@ The following advanced features are **planned but not yet implemented**:
 ## Purchase Professional Edition
 
 **Pro Edition Features (v0.1.6)**:
-- AES-256 String Encryption
-- Anti-Debugging Checks
-- Lifetime Updates
-- Up to 3 devices per license
-- Email Support
+- 🔐 AES-256 String Encryption
+- 🛡️ Anti-Debugging Checks
+- 🔄 Lifetime Updates
+- 💻 Up to 3 devices per license
+- 📧 Priority Email Support
 
 **Price**: $45.00 USD (one-time payment)
 
 ### How to Purchase
 
-**[🚀 Buy Now - Click Here](https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400)** (Instant delivery • 30-day money-back guarantee)
+**Visit our purchase page**: **[pyobfus.github.io/purchase](https://zhurong2020.github.io/pyobfus/#purchase-professional-edition)** for detailed information and secure checkout.
+
+**Quick purchase**: **[🚀 Buy Now](https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400)** - Direct checkout link (Instant delivery • 30-day money-back guarantee)
+
+**3-Step Purchase Process**:
 
 1. **Complete Secure Checkout** (Stripe)
-   - Click the buy link above
+   - Click the buy link above or visit the purchase page
    - Enter your email (for license delivery)
-   - Complete payment securely
+   - Complete payment securely via Stripe
 
 2. **Receive License Key**
-   - License key sent to your email within minutes
+   - License key delivered to your email within minutes
    - Format: `PYOBFUS-XXXX-XXXX-XXXX-XXXX`
 
 3. **Activate License**
