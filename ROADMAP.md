@@ -9,6 +9,15 @@ This document outlines the planned technical features and improvements for pyobf
 
 ## Current Status
 
+✅ **v0.1.6 Released** (November 2025)
+- **Pro Features Production Ready**: AES-256 encryption and anti-debugging fully tested
+- **Self-Service Purchase Flow**: Automated Stripe payment with instant license delivery
+- **Legal Compliance**: Terms of Service, Refund Policy, Privacy Policy (GDPR compliant)
+- **Integration Testing Framework**: Test on real-world projects without PyPI upload
+- **String Encoding (Base64)**: Community edition feature with comprehensive testing
+- **Test suite**: 112 tests (15 xfailed, 1 xpassed), 59% coverage
+- **Pro Edition Support**: License management system with 3-device limit
+
 ✅ **v0.1.5 Released** (November 2025)
 - **Fixed critical class attribute renaming bug** (Issue #7)
 - **Documented keyword argument limitation** (Issue #8)

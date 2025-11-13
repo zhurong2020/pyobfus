@@ -8,6 +8,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.6] - 2025-11-12
 
 ### Added
+- **Self-Service Purchase Flow**:
+  - Permanent Stripe Payment Link for instant purchases
+  - "Buy Now" buttons integrated in documentation
+  - Automated license delivery via Resend email service
+  - No manual email requests required
+  - Purchase link: https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400
+
+- **Legal & Compliance Documents**:
+  - Terms of Service & EULA with comprehensive license terms
+  - Refund Policy with 30-day money-back guarantee
+  - Privacy Policy with GDPR compliance
+  - All policies linked from purchase documentation
+
+- **Pro Feature Promotion**:
+  - Non-intrusive Pro feature hints in CLI
+  - Shows upgrade information after successful Community edition obfuscation
+  - Direct purchase link in CLI output
+
+### Changed
+- **Purchase Process**: Simplified from 5 steps to 3 steps
+- **GitHub Pages**: Fixed configuration to use /docs directory
+- **Documentation**: Updated README.md and docs/index.md with direct purchase links
+
+### Added
 - **Pro Features - Complete Test Suite**:
   - 28 comprehensive unit tests for Pro features (AES-256 + Anti-debugging)
   - `tests/test_string_aes.py`: 14 tests for AES-256 string encryption
