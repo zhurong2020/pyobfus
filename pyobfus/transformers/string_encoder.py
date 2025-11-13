@@ -143,7 +143,7 @@ class StringEncoder(BaseTransformer):
         # Create function call: _decode_str("encoded_value")
         decode_call = ast.Call(
             func=ast.Name(id=self.decode_function_name, ctx=ast.Load()),
-            args=[ast.Constant(value=encoded)],
+            args=[ast.Constant(value=encoded, kind=None)],
             keywords=[],
         )
 
@@ -246,7 +246,7 @@ class StringEncoder(BaseTransformer):
                             attr="decode",
                             ctx=ast.Load(),
                         ),
-                        args=[ast.Constant(value="utf-8")],
+                        args=[ast.Constant(value="utf-8", kind=None)],
                         keywords=[],
                     )
                 ),

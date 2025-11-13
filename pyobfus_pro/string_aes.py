@@ -228,7 +228,7 @@ class StringAESEncryptor(BaseTransformer):
         # Replace with decryption call: _decrypt_str(b'...')
         return ast.Call(
             func=ast.Name(id=self.decrypt_function_name, ctx=ast.Load()),
-            args=[ast.Constant(value=encrypted_b64)],
+            args=[ast.Constant(value=encrypted_b64, kind=None)],
             keywords=[],
         )
 
@@ -245,7 +245,7 @@ class StringAESEncryptor(BaseTransformer):
         # Encryption key as bytes literal
         key_node = ast.Assign(
             targets=[ast.Name(id=self.key_variable_name, ctx=ast.Store())],
-            value=ast.Constant(value=self.encryption_key),
+            value=ast.Constant(value=self.encryption_key, kind=None),
         )
 
         # Decryption function
@@ -317,7 +317,7 @@ class StringAESEncryptor(BaseTransformer):
                         attr="decode",
                         ctx=ast.Load(),
                     ),
-                    args=[ast.Constant(value="utf-8")],
+                    args=[ast.Constant(value="utf-8", kind=None)],
                     keywords=[],
                 ),
             ),
