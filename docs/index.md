@@ -3,39 +3,50 @@ layout: default
 title: pyobfus - Modern Python Code Obfuscator
 ---
 
-<div style="text-align: center; margin: 2em 0;">
-  <img src="assets/logo.jpeg" alt="pyobfus Logo" style="max-width: 600px; width: 100%; height: auto; border-radius: 8px;">
+<div style="text-align: center; margin: 2em 0 1.5em 0;">
+  <img src="assets/logo.jpeg" alt="pyobfus Logo" style="max-width: 300px; width: 100%; height: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
 </div>
 
-# pyobfus
-
-**Modern Python Code Obfuscator**
-
-A Python code obfuscator built with AST-based transformations for Python 3.8+. Provides reliable name mangling, string encoding, and code protection features.
+<div style="text-align: center; margin-bottom: 2em;">
+  <h1 style="font-size: 2.5em; margin-bottom: 0.2em; color: #2c3e50;">pyobfus</h1>
+  <p style="font-size: 1.3em; color: #34495e; margin-top: 0;">Modern Python Code Obfuscator</p>
+  <p style="font-size: 1em; color: #7f8c8d; max-width: 600px; margin: 1em auto;">A Python code obfuscator built with AST-based transformations for Python 3.8+. Provides reliable name mangling, string encoding, and code protection features.</p>
+</div>
 
 ## Features
 
-### Community Edition (Free)
-- **Name Obfuscation**: Rename variables, functions, and classes to I0, I1, I2...
-- **Comment Removal**: Strip comments and docstrings
-- **String Encoding**: Base64 encoding for string literals
-- **Multi-file Support**: Obfuscate entire projects
-- **YAML Configuration**: Flexible configuration system
-- **Parameter Preservation**: Keep function parameter names for keyword arguments
+<div style="display: grid; gap: 1.5em; margin: 1.5em 0;">
 
-### Professional Edition ($45 USD)
-- **All Community Features** +
-- **AES-256 String Encryption**: Military-grade encryption for strings
-- **Anti-Debugging Checks**: Detect and prevent debugging attempts
-- **Lifetime Updates**: All future Pro features included
-- **Up to 3 Devices**: Use on multiple machines
-- **Priority Email Support**
-
-<div style="text-align: center; margin: 2em 0;">
-  <a href="https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400" style="display: inline-block; background: #635BFF; color: white; padding: 12px 32px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px;">Buy Now - $45 USD</a>
+<div style="background: #f8f9fa; padding: 1.5em; border-radius: 8px; border-left: 4px solid #27ae60;">
+  <h3 style="margin-top: 0; color: #27ae60;">🆓 Community Edition (Free)</h3>
+  <ul style="color: #555; line-height: 1.8; margin-bottom: 0;">
+    <li><strong>Name Obfuscation</strong>: Rename variables, functions, and classes to I0, I1, I2...</li>
+    <li><strong>Comment Removal</strong>: Strip comments and docstrings</li>
+    <li><strong>String Encoding</strong>: Base64 encoding for string literals</li>
+    <li><strong>Multi-file Support</strong>: Obfuscate entire projects</li>
+    <li><strong>YAML Configuration</strong>: Flexible configuration system</li>
+    <li><strong>Parameter Preservation</strong>: Keep function parameter names for keyword arguments</li>
+  </ul>
 </div>
 
-[More purchase details ↓](#purchase-professional-edition)
+<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.5em; border-radius: 8px; color: white;">
+  <h3 style="margin-top: 0; color: white;">💎 Professional Edition - $45 USD</h3>
+  <ul style="list-style: none; padding-left: 0; margin: 0.5em 0;">
+    <li style="margin: 0.5em 0;">✨ <strong>All Community Features</strong> +</li>
+    <li style="margin: 0.5em 0;">🔐 <strong>AES-256 String Encryption</strong>: Military-grade encryption for strings</li>
+    <li style="margin: 0.5em 0;">🛡️ <strong>Anti-Debugging Checks</strong>: Detect and prevent debugging attempts</li>
+    <li style="margin: 0.5em 0;">🔄 <strong>Lifetime Updates</strong>: All future Pro features included</li>
+    <li style="margin: 0.5em 0;">💻 <strong>Up to 3 Devices</strong>: Use on multiple machines</li>
+    <li style="margin: 0.5em 0;">📧 <strong>Priority Email Support</strong></li>
+  </ul>
+  <div style="text-align: center; margin-top: 1.5em;">
+    <a href="https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400" style="display: inline-block; background: white; color: #667eea; padding: 12px 32px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">Buy Now - $45 USD →</a>
+  </div>
+</div>
+
+</div>
+
+<p style="text-align: center; font-size: 0.9em; color: #7f8c8d; margin-top: 1em;"><a href="#purchase-professional-edition" style="color: #3498db; text-decoration: none;">📄 More purchase details ↓</a></p>
 
 ## Installation
 
@@ -113,21 +124,26 @@ def I0(I1, I2):
 
 ## Purchase Professional Edition
 
-**Price**: $45.00 USD (one-time payment)
+<div style="background: #f8f9fa; padding: 2em; border-radius: 8px; border-left: 4px solid #667eea; margin: 1.5em 0;">
+  <h3 style="margin-top: 0; color: #2c3e50;">💎 Professional Edition - $45 USD</h3>
+  <p style="color: #7f8c8d; font-size: 0.95em;">One-time payment • Lifetime access</p>
 
-### What's Included
-- ✅ AES-256 String Encryption
-- ✅ Anti-Debugging Checks
-- ✅ Lifetime Updates
-- ✅ Up to 3 Devices
-- ✅ Email Support (zhurong0525@gmail.com)
+  <h4 style="color: #34495e; margin-top: 1.5em;">What's Included:</h4>
+  <ul style="color: #555; line-height: 1.8;">
+    <li>✅ <strong>AES-256 String Encryption</strong></li>
+    <li>✅ <strong>Anti-Debugging Checks</strong></li>
+    <li>✅ <strong>Lifetime Updates</strong></li>
+    <li>✅ <strong>Up to 3 Devices</strong></li>
+    <li>✅ <strong>Email Support</strong> (zhurong0525@gmail.com)</li>
+  </ul>
+
+  <div style="text-align: center; margin: 1.5em 0;">
+    <a href="https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 40px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 17px; box-shadow: 0 3px 6px rgba(102, 126, 234, 0.3); transition: all 0.3s;">🚀 Buy Now - $45 USD</a>
+    <p style="margin-top: 1em; color: #7f8c8d; font-size: 0.9em;">⚡ Instant delivery • 🔒 Secure checkout • 💯 30-day money-back guarantee</p>
+  </div>
+</div>
 
 ### How to Purchase
-
-<div style="text-align: center; margin: 2em 0;">
-  <a href="https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400" style="display: inline-block; background: #635BFF; color: white; padding: 16px 48px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 18px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">🚀 Buy Now - $45 USD</a>
-  <p style="margin-top: 0.5em; color: #666; font-size: 14px;">Instant delivery • 30-day money-back guarantee</p>
-</div>
 
 **Step 1**: Click "Buy Now" and complete secure checkout (Stripe)
 
