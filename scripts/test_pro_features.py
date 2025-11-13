@@ -25,7 +25,7 @@ import argparse
 import ast
 import sys
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import TYPE_CHECKING, Optional, Dict, Any
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -37,14 +37,18 @@ from pyobfus.config import ObfuscationConfig
 from pyobfus.exceptions import PyObfusError
 
 # Pro features
-try:
+PRO_AVAILABLE = False
+if TYPE_CHECKING:
     from pyobfus_pro.string_aes import StringAESEncryptor
     from pyobfus_pro.anti_debug import AntiDebugInjector
-
-    PRO_AVAILABLE = True
-except ImportError:
-    PRO_AVAILABLE = False
-    print("⚠️  Warning: Pro features not available. Install pyobfus_pro to test Pro features.")
+else:
+    try:
+        from pyobfus_pro.string_aes import StringAESEncryptor
+        from pyobfus_pro.anti_debug import AntiDebugInjector
+        PRO_AVAILABLE = True
+    except ImportError:
+        PRO_AVAILABLE = False
+        print("⚠️  Warning: Pro features not available. Install pyobfus_pro to test Pro features.")
 
 
 class UTF8Writer:

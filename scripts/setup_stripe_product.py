@@ -5,7 +5,13 @@ Creates product and price in live mode if they don't exist.
 """
 
 import os
-import stripe
+import sys
+
+try:
+    import stripe  # type: ignore[import]
+except ImportError:
+    print("[ERROR] stripe module not found. Install with: pip install -r scripts/requirements.txt")
+    sys.exit(1)
 
 def load_env_file():
     """Load .env.stripe file."""
