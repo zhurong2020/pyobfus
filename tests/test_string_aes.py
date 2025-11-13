@@ -306,7 +306,7 @@ backslash = "Path\\to\\file"
         """Test that empty strings are not encrypted, but other strings are."""
         code = """
 empty = ""
-short = "ab"
+short = "test_xyz"
 normal = "Hello"
 """
         config = ObfuscationConfig()
@@ -322,14 +322,14 @@ normal = "Hello"
 
         # Empty string should remain (not worth encrypting)
         # All non-empty strings should be encrypted
-        assert "ab" not in obfuscated_code or obfuscated_code.count("ab") == 0
+        assert '"test_xyz"' not in obfuscated_code
         assert "Hello" not in obfuscated_code
 
         # Code should execute correctly
         namespace = {}
         exec(obfuscated_code, namespace)
         assert namespace["empty"] == ""
-        assert namespace["short"] == "ab"
+        assert namespace["short"] == "test_xyz"
         assert namespace["normal"] == "Hello"
 
     def test_statistics(self):

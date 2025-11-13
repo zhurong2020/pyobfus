@@ -13,6 +13,7 @@ import pytest
 
 from pyobfus.config import ObfuscationConfig
 from pyobfus.core.analyzer import SymbolAnalyzer
+from pyobfus.core.generator import CodeGenerator
 from pyobfus.transformers.name_mangler import NameMangler
 
 
@@ -27,7 +28,7 @@ def run_obfuscated_code(code: str) -> dict:
     transformed = mangler.transform(tree)
 
     # Get obfuscated code for debugging
-    obfuscated_code = ast.unparse(transformed)
+    obfuscated_code = CodeGenerator.generate(transformed)
 
     # Compile and execute
     try:
