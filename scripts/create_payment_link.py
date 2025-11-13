@@ -7,8 +7,18 @@ This link can be used for self-service purchases without email requests.
 import os
 import sys
 from pathlib import Path
-import stripe
-from dotenv import load_dotenv
+
+try:
+    import stripe  # type: ignore[import]
+except ImportError:
+    print("[ERROR] stripe module not found. Install with: pip install -r scripts/requirements.txt")
+    sys.exit(1)
+
+try:
+    from dotenv import load_dotenv  # type: ignore[import]
+except ImportError:
+    print("[ERROR] dotenv module not found. Install with: pip install -r scripts/requirements.txt")
+    sys.exit(1)
 
 # Load environment variables
 env_file = Path(__file__).parent.parent / ".env.stripe"

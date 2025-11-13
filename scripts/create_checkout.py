@@ -8,7 +8,12 @@ This script generates a payment link for customers to purchase licenses.
 import os
 import sys
 import argparse
-import stripe
+
+try:
+    import stripe  # type: ignore[import]
+except ImportError:
+    print("[ERROR] stripe module not found. Install with: pip install -r scripts/requirements.txt")
+    sys.exit(1)
 
 
 def load_stripe_config():
