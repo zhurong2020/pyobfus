@@ -46,7 +46,7 @@ The following advanced features are **planned but not yet implemented**:
   - Always-true/false conditions that are hard to detect
   - Control flow obscuring
 
-**Note**: Configuration options for Pro features (e.g., `string_encryption: true`, `anti_debug: true`) are accepted for future compatibility but currently have **no effect**. They will be enabled in future releases. See [ROADMAP.md](ROADMAP.md#v020---core-functionality--initial-pro-features-6-8-weeks) for detailed implementation timeline.
+**Note**: Configuration options for Pro features (e.g., `string_encryption: true`, `anti_debug: true`) are accepted for future compatibility but currently have **no effect**. They will be enabled in future releases. See [ROADMAP.md](docs/ROADMAP.md#v020---core-functionality--initial-pro-features-6-8-weeks) for detailed implementation timeline.
 
 ## Purchase Professional Edition
 
@@ -238,7 +238,7 @@ python scripts/test_ml_research.py --all --max-files 10
 pytest integration_tests/ -v
 ```
 
-**Integration Testing Framework** (v0.1.6+): Test pyobfus on real-world code without uploading to PyPI. See [`INTEGRATION_TESTING.md`](INTEGRATION_TESTING.md) for details.
+**Integration Testing Framework** (v0.1.6+): Test pyobfus on real-world code without uploading to PyPI. See [`INTEGRATION_TESTING.md`](docs/INTEGRATION_TESTING.md) for details.
 
 ### Code Quality
 
@@ -335,7 +335,7 @@ Add an additional layer of protection for commercial Python software.
 ### For Developers
 - **[Project Structure](https://github.com/zhurong2020/pyobfus/blob/main/docs/PROJECT_STRUCTURE.md)** - Codebase architecture and development workflow
 - **[Contributing Guide](https://github.com/zhurong2020/pyobfus/blob/main/CONTRIBUTING.md)** - How to contribute code and documentation
-- **[Development Roadmap](https://github.com/zhurong2020/pyobfus/blob/main/ROADMAP.md)** - Planned features and timeline
+- **[Development Roadmap](https://github.com/zhurong2020/pyobfus/blob/main/docs/ROADMAP.md)** - Planned features and timeline
 - **[Changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md)** - Version history and release notes
 
 ### Community & Support

@@ -53,11 +53,18 @@ pyobfus/
 ├── pyproject.toml        # Project configuration and dependencies
 ├── README.md             # Project documentation
 ├── CHANGELOG.md          # Version history
-├── ROADMAP.md            # Development roadmap
 ├── CONTRIBUTING.md       # Contribution guidelines
+├── SECURITY.md           # Security policy
 ├── LICENSE               # Apache 2.0 license
 ├── .gitignore            # Git ignore patterns
-└── .editorconfig         # Editor configuration
+├── .editorconfig         # Editor configuration
+└── docs/                 # Documentation
+    ├── ROADMAP.md        # Development roadmap
+    ├── INTEGRATION_TESTING.md  # Integration testing guide
+    └── legal/            # Legal documents
+        ├── TERMS_OF_SERVICE.md
+        ├── REFUND_POLICY.md
+        └── PRIVACY_POLICY.md
 
 ```
 
