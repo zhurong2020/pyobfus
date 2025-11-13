@@ -157,7 +157,7 @@ class AntiDebugInjector(BaseTransformer):
                         keywords=[],
                     ),
                     ops=[ast.IsNot()],
-                    comparators=[ast.Constant(value=None)],
+                    comparators=[ast.Constant(value=None, kind=None)],
                 ),
                 # sys.exit(1)
                 body=[
@@ -168,7 +168,7 @@ class AntiDebugInjector(BaseTransformer):
                                 attr="exit",
                                 ctx=ast.Load(),
                             ),
-                            args=[ast.Constant(value=1)],
+                            args=[ast.Constant(value=1, kind=None)],
                             keywords=[],
                         )
                     )
