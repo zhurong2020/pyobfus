@@ -15,6 +15,7 @@ from pyobfus.config import ObfuscationConfig
 from pyobfus.core.analyzer import SymbolAnalyzer
 from pyobfus.core.generator import CodeGenerator
 from pyobfus.core.parser import ASTParser
+from pyobfus.core.orchestrator import CrossFileOrchestrator
 from pyobfus.exceptions import LimitExceededError, PyObfusError
 from pyobfus.transformers.name_mangler import NameMangler
 from pyobfus.utils import filter_python_files
@@ -78,6 +79,16 @@ except ImportError:
     is_flag=True,
     help="Verbose output",
 )
+@click.option(
+    "--dry-run",
+    is_flag=True,
+    help="Preview obfuscation without writing output",
+)
+@click.option(
+    "--cross-file/--no-cross-file",
+    default=True,
+    help="Enable cross-file import mapping (default: enabled)",
+)
 @click.version_option(version=__version__, prog_name="pyobfus")
 def main(
     input_path: str,
@@ -89,6 +100,8 @@ def main(
     name_prefix: str,
     preserve_param_names: bool,
     verbose: bool,
+    dry_run: bool,
+    cross_file: bool,
 ) -> None:
     """
     Obfuscate Python source code.
@@ -185,17 +198,31 @@ def main(
         input_path_obj = Path(input_path)
         output_path_obj = Path(output_path)
 
+        if dry_run:
+            click.echo("\n[DRY RUN MODE] - No files will be written")
+
         if input_path_obj.is_file():
             # Single file obfuscation
-            _obfuscate_file(input_path_obj, output_path_obj, config, verbose)
+            _obfuscate_file(input_path_obj, output_path_obj, config, verbose, dry_run)
         elif input_path_obj.is_dir():
-            # Directory obfuscation
-            _obfuscate_directory(input_path_obj, output_path_obj, config, verbose)
+            # Directory obfuscation - use CrossFileOrchestrator if enabled
+            if cross_file:
+                _obfuscate_directory_crossfile(
+                    input_path_obj, output_path_obj, config, verbose, dry_run
+                )
+            else:
+                # Legacy single-file mode
+                _obfuscate_directory(
+                    input_path_obj, output_path_obj, config, verbose, dry_run
+                )
         else:
             click.echo(f"Error: {input_path} is neither a file nor a directory", err=True)
             sys.exit(1)
 
-        click.echo("\nObfuscation completed successfully!")
+        if not dry_run:
+            click.echo("\nObfuscation completed successfully!")
+        else:
+            click.echo("\n[DRY RUN] Preview completed. Use without --dry-run to write files.")
 
         # Subtle Pro feature hint (only for Community users)
         if level == "community" and not PRO_AVAILABLE:
@@ -219,7 +246,7 @@ def main(
 
 
 def _obfuscate_file(
-    input_file: Path, output_file: Path, config: ObfuscationConfig, verbose: bool
+    input_file: Path, output_file: Path, config: ObfuscationConfig, verbose: bool, dry_run: bool = False
 ) -> None:
     """
     Obfuscate a single Python file.
@@ -229,6 +256,7 @@ def _obfuscate_file(
         output_file: Output file path
         config: Obfuscation configuration
         verbose: Verbose output
+        dry_run: Preview mode without writing files
     """
     if verbose:
         click.echo(f"\nObfuscating: {input_file}")
@@ -313,23 +341,31 @@ def _obfuscate_file(
     obfuscated_code = CodeGenerator.add_header_comment(obfuscated_code, str(input_file))
 
     # Write output
-    CodeGenerator.generate_to_file(transformed_tree, output_file)
-
-    if verbose:
-        click.echo(f"  Output: {output_file}")
+    if not dry_run:
+        CodeGenerator.generate_to_file(transformed_tree, output_file)
+        if verbose:
+            click.echo(f"  Output: {output_file}")
+    else:
+        if verbose:
+            click.echo(f"  Would write to: {output_file}")
+            click.echo(f"  Preview (first 10 lines):")
+            lines = obfuscated_code.split('\n')[:10]
+            for line in lines:
+                click.echo(f"    {line}")
 
 
 def _obfuscate_directory(
-    input_dir: Path, output_dir: Path, config: ObfuscationConfig, verbose: bool
+    input_dir: Path, output_dir: Path, config: ObfuscationConfig, verbose: bool, dry_run: bool = False
 ) -> None:
     """
-    Obfuscate all Python files in a directory.
+    Obfuscate all Python files in a directory (legacy single-file mode).
 
     Args:
         input_dir: Input directory
         output_dir: Output directory
         config: Obfuscation configuration
         verbose: Verbose output
+        dry_run: Preview mode without writing files
     """
     # Find all Python files, excluding patterns from config
     python_files = filter_python_files(input_dir, config.exclude_patterns)
@@ -367,10 +403,84 @@ def _obfuscate_directory(
         output_file = output_dir / rel_path
 
         try:
-            _obfuscate_file(python_file, output_file, config, verbose)
+            _obfuscate_file(python_file, output_file, config, verbose, dry_run)
         except PyObfusError as e:
             click.echo(f"  Warning: Failed to obfuscate {python_file}: {e}", err=True)
             # Continue with other files
+
+
+def _obfuscate_directory_crossfile(
+    input_dir: Path, output_dir: Path, config: ObfuscationConfig, verbose: bool, dry_run: bool = False
+) -> None:
+    """
+    Obfuscate directory with cross-file import mapping using CrossFileOrchestrator.
+
+    Args:
+        input_dir: Input directory
+        output_dir: Output directory
+        config: Obfuscation configuration
+        verbose: Verbose output
+        dry_run: Preview mode without writing files
+    """
+    if verbose:
+        click.echo(f"\nUsing cross-file obfuscation mode")
+        click.echo(f"Input:  {input_dir}")
+        click.echo(f"Output: {output_dir}")
+
+    # Create orchestrator
+    orchestrator = CrossFileOrchestrator(config)
+
+    try:
+        # Phase 1: Scan
+        if verbose:
+            click.echo("\n[Phase 1] Scanning project...")
+
+        global_table = orchestrator.phase1_scan(input_dir)
+
+        stats = orchestrator.get_statistics()
+        click.echo(f"\nDiscovered {stats['files_discovered']} Python file(s)")
+        click.echo(f"  Modules: {stats['total_modules']}")
+        click.echo(f"  Exports: {stats['total_exports']}")
+
+        # Validate
+        is_valid, errors = global_table.validate()
+        if not is_valid:
+            click.echo("\nWarning: Some imports cannot be resolved:", err=True)
+            for error in errors[:5]:  # Show first 5 errors
+                click.echo(f"  - {error}", err=True)
+            if len(errors) > 5:
+                click.echo(f"  ... and {len(errors) - 5} more", err=True)
+            click.echo("\nThese may be standard library or external imports (OK to continue)")
+
+        if dry_run:
+            click.echo("\n[DRY RUN] Would transform files with these mappings:")
+            for module in sorted(global_table.get_all_modules())[:5]:
+                exports = global_table.get_module_exports(module)
+                if exports:
+                    click.echo(f"\n  Module: {module}")
+                    for orig, obf in list(exports.items())[:3]:
+                        click.echo(f"    {orig} -> {obf}")
+            if stats['total_modules'] > 5:
+                click.echo(f"\n  ... and {stats['total_modules'] - 5} more modules")
+            return
+
+        # Phase 2: Transform
+        if verbose:
+            click.echo("\n[Phase 2] Transforming files...")
+
+        orchestrator.phase2_transform(input_dir, output_dir)
+
+        click.echo(f"\nSuccessfully obfuscated {stats['files_discovered']} file(s)")
+
+        if verbose:
+            click.echo(f"\nOutput written to: {output_dir}")
+
+    except Exception as e:
+        click.echo(f"\nError during cross-file obfuscation: {e}", err=True)
+        if verbose:
+            import traceback
+            traceback.print_exc()
+        sys.exit(1)
 
 
 if __name__ == "__main__":
