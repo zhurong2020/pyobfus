@@ -5,6 +5,99 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] - 2025-11-19
+
+### Added
+- **Cross-File Obfuscation System** - Major architecture upgrade enabling consistent name obfuscation across multiple files:
+  - **GlobalSymbolTable**: Centralized symbol tracking with collision detection and validation
+  - **ExportDetector**: Automatic detection of exported names (functions, classes, variables) and `__all__` lists
+  - **CrossFileOrchestrator**: Two-phase obfuscation pipeline coordinator
+    - Phase 1: Project-wide scanning and symbol table construction
+    - Phase 2: Coordinated transformation with import rewriting
+  - **ImportRewriter**: Rewrites import statements with obfuscated names (`from calc import Calculator` → `from calc import I0`)
+  - **AllListUpdater**: Updates `__all__` lists with obfuscated names
+  - **ExportedNameTransformer**: Renames exported definitions in their source files
+  - **ImportedNameTransformer**: Updates references to imported names
+  - **LocalNameTransformer**: Updates references to locally-defined exported names (NEW)
+
+- **Enhanced CLI Integration**:
+  - `--cross-file/--no-cross-file` flag: Enable/disable cross-file obfuscation (default: enabled)
+  - `--dry-run` flag: Preview obfuscation results without writing files
+  - Phase-based progress indicators (Phase 1: Scan, Phase 2: Transform)
+  - Statistics display: files discovered, modules, exports
+  - Validation warnings for unresolved imports (non-blocking)
+  - Legacy single-file mode preserved for backward compatibility
+
+### Fixed
+- **[CRITICAL]** Local name references not updated after export renaming
+  - Problem: After renaming `run_demo` → `I2`, local calls like `run_demo()` in `if __name__ == '__main__'` remained unchanged
+  - Solution: New `LocalNameTransformer` with proper scope tracking
+  - Correctly handles parameter scoping (doesn't rename function parameters)
+  - Correctly handles local variable shadowing
+  - Obfuscated code now executes correctly without NameError
+
+### Technical Details
+- **Architecture**: Two-phase obfuscation pipeline (Scan → Transform)
+- **Import Resolution**: Handles relative imports, aliased imports, and `__all__` lists
+- **Name Mapping**: Global deduplication ensures unique obfuscated names across entire project
+- **Scope Handling**: LocalNameTransformer uses scope stack to avoid renaming shadowed names
+- **Test Coverage**: 300 tests passing (100%), coverage improved from 16% → 69%
+- **New Modules**: 8 new core modules (1,200+ lines of code)
+  - `pyobfus/core/global_table.py` (240 lines)
+  - `pyobfus/core/export_detector.py` (295 lines)
+  - `pyobfus/core/orchestrator.py` (415 lines)
+  - `pyobfus/transformers/import_rewriter.py` (279 lines)
+  - `pyobfus/transformers/all_list_updater.py` (287 lines)
+  - `pyobfus/transformers/exported_name_transformer.py` (363 lines)
+  - `pyobfus/transformers/imported_name_transformer.py` (336 lines)
+  - `pyobfus/transformers/local_name_transformer.py` (298 lines)
+
+### Testing
+- **Test Suite**: 300 tests passing, 1 xfailed, 1 xpassed
+- **Coverage**: 69% (up from 16%)
+- **New Test Files**:
+  - `tests/core/test_global_table.py`: 24 tests
+  - `tests/core/test_export_detector.py`: 31 tests
+  - `tests/core/test_orchestrator.py`: 29 tests
+  - `tests/transformers/test_import_rewriter.py`: 26 tests
+  - `tests/transformers/test_all_list_updater.py`: 14 tests
+  - `tests/transformers/test_exported_name_transformer.py`: 20 tests
+  - `tests/transformers/test_local_name_transformer.py`: 19 tests
+- **Integration Testing**: Successfully tested on `examples/multifile` project
+- **Execution Verification**: Obfuscated code runs without errors
+
+### Performance
+- Multi-file obfuscation: 4 files processed in <1 second
+- Phase 1 scan: Instantaneous for small projects (<100ms)
+- Phase 2 transform: Linear scaling with file count
+
+### Breaking Changes
+- **Cross-file mode now default**: Use `--no-cross-file` to revert to legacy behavior
+- **Import statements modified**: Obfuscated imports may break external tools that parse import statements
+- **Name collision detection**: Builds may fail if duplicate exported names detected (by design)
+
+### Migration Guide
+- **From v0.1.x**: Existing single-file workflows work unchanged
+- **Multi-file projects**: Automatic upgrade, no configuration needed
+- **Legacy mode**: Add `--no-cross-file` flag to maintain v0.1.x behavior
+- **Dry-run testing**: Use `--dry-run` to preview changes before applying
+
+### Known Limitations Resolved
+- ✅ Cross-file import name mapping (Issue from v0.1.0) - **FIXED**
+- ✅ Local function calls after renaming - **FIXED**
+
+### Example Usage
+```bash
+# Cross-file obfuscation (default)
+pyobfus src/ -o dist/ --verbose
+
+# Dry-run preview
+pyobfus src/ -o dist/ --dry-run
+
+# Legacy single-file mode
+pyobfus src/ -o dist/ --no-cross-file
+```
+
 ## [0.1.6] - 2025-11-12
 
 ### Added

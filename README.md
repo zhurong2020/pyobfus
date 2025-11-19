@@ -10,9 +10,16 @@ A Python code obfuscator built with AST-based transformations for Python 3.8+. P
 
 ## Features
 
-### ✅ Free Edition (Current Version)
+### ✅ Free Edition (Current Version: v0.2.0)
 
 The following features are **fully implemented and available** in the current version:
+
+- **🆕 Cross-File Obfuscation** (v0.2.0): Consistent name obfuscation across multiple files
+  - Automatic import statement rewriting
+  - `__all__` list updates with obfuscated names
+  - Global symbol table with collision detection
+  - Two-phase obfuscation pipeline (Scan → Transform)
+  - Preview mode with `--dry-run` flag
 
 - **Name Mangling**: Rename variables, functions, classes, and class attributes to obfuscated names (I0, I1, I2...)
 - **Comment Removal**: Strip comments and docstrings
@@ -128,14 +135,23 @@ pip install -e .
 # Obfuscate a single file
 pyobfus input.py -o output.py
 
-# Obfuscate a directory
+# Obfuscate a directory (cross-file mode - default in v0.2.0+)
 pyobfus src/ -o dist/
+
+# Preview obfuscation without writing files (v0.2.0+)
+pyobfus src/ -o dist/ --dry-run
+
+# Legacy single-file mode (v0.2.0+)
+pyobfus src/ -o dist/ --no-cross-file
 
 # With configuration file
 pyobfus src/ -o dist/ --config pyobfus.yaml
 
 # Preserve parameter names for keyword arguments (v0.1.6+)
 pyobfus src/ -o dist/ --preserve-param-names
+
+# Verbose output with progress indicators (v0.2.0+)
+pyobfus src/ -o dist/ --verbose
 ```
 
 ### Example
