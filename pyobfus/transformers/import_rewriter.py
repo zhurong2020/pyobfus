@@ -6,7 +6,7 @@ to use obfuscated names from the GlobalSymbolTable.
 """
 
 import ast
-from typing import Optional, Set
+from typing import Optional, Set, Tuple
 from pathlib import Path
 
 from pyobfus.core.global_table import GlobalSymbolTable
@@ -101,9 +101,7 @@ class ImportRewriter(ast.NodeTransformer):
             asname = alias.asname
 
             # Look up obfuscated name in global table
-            obfuscated_name = self.global_table.get_obfuscated_import(
-                module, original_name
-            )
+            obfuscated_name = self.global_table.get_obfuscated_import(module, original_name)
 
             if obfuscated_name:
                 # Found mapping - use obfuscated name
@@ -146,9 +144,7 @@ class ImportRewriter(ast.NodeTransformer):
         self.imports_unchanged += 1
         return node
 
-    def _resolve_relative_import(
-        self, module: Optional[str], level: int
-    ) -> Optional[str]:
+    def _resolve_relative_import(self, module: Optional[str], level: int) -> Optional[str]:
         """
         Resolve relative import to absolute module name.
 
@@ -220,7 +216,7 @@ def rewrite_imports(
     global_table: GlobalSymbolTable,
     current_module: str,
     current_file: Optional[Path] = None,
-) -> tuple[str, dict]:
+) -> Tuple[str, dict]:
     """
     Convenience function to rewrite imports in source code.
 
@@ -261,7 +257,7 @@ def rewrite_imports_from_file(
     file_path: Path,
     global_table: GlobalSymbolTable,
     current_module: str,
-) -> tuple[str, dict]:
+) -> Tuple[str, dict]:
     """
     Convenience function to rewrite imports in a file.
 
