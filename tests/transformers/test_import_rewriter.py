@@ -16,6 +16,7 @@ import ast
 import pytest
 from pathlib import Path
 
+from pyobfus.core.generator import CodeGenerator
 from pyobfus.core.global_table import GlobalSymbolTable
 from pyobfus.transformers.import_rewriter import (
     ImportRewriter,
@@ -50,7 +51,7 @@ class TestImportRewriter:
         new_tree = rewriter.visit(tree)
 
         # Unparse to check result
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "from calculator import I0" in new_source
         assert rewriter.imports_rewritten == 1
         assert rewriter.imports_unchanged == 0
@@ -68,7 +69,7 @@ class TestImportRewriter:
         rewriter = ImportRewriter(table, "main")
         new_tree = rewriter.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "from utils import I0, I1, I2" in new_source
         assert rewriter.imports_rewritten == 3
 
@@ -83,7 +84,7 @@ class TestImportRewriter:
         rewriter = ImportRewriter(table, "main")
         new_tree = rewriter.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "from calculator import I0 as Calc" in new_source
         assert rewriter.imports_rewritten == 1
 
@@ -99,7 +100,7 @@ class TestImportRewriter:
         rewriter = ImportRewriter(table, "main")
         new_tree = rewriter.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "I0 as fmt" in new_source
         assert "I1 as validate" in new_source
 
@@ -114,7 +115,7 @@ class TestImportRewriter:
         rewriter = ImportRewriter(table, "main")
         new_tree = rewriter.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "from utils import *" in new_source
         assert rewriter.imports_rewritten == 0
         assert rewriter.imports_unchanged == 1
@@ -129,7 +130,7 @@ class TestImportRewriter:
         rewriter = ImportRewriter(table, "main")
         new_tree = rewriter.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "from os import path" in new_source
         assert rewriter.imports_unchanged == 1
         assert "os.path" in rewriter.imports_not_found
@@ -144,7 +145,7 @@ class TestImportRewriter:
         rewriter = ImportRewriter(table, "main")
         new_tree = rewriter.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "import os" in new_source
         assert "import sys" in new_source
         assert rewriter.imports_unchanged == 2
@@ -160,7 +161,7 @@ class TestImportRewriter:
         rewriter = ImportRewriter(table, "main")
         new_tree = rewriter.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "I0" in new_source
         assert "NonExistent" in new_source
         assert rewriter.imports_rewritten == 1
@@ -178,7 +179,7 @@ class TestImportRewriter:
         rewriter = ImportRewriter(table, "pkg.main")
         new_tree = rewriter.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "from .utils import I0" in new_source
         assert rewriter.imports_rewritten == 1
 
@@ -193,7 +194,7 @@ class TestImportRewriter:
         rewriter = ImportRewriter(table, "pkg.subpkg.main")
         new_tree = rewriter.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "from ..utils import I0" in new_source
         assert rewriter.imports_rewritten == 1
 
@@ -208,7 +209,7 @@ class TestImportRewriter:
         rewriter = ImportRewriter(table, "pkg.subpkg.main")
         new_tree = rewriter.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "from . import I0" in new_source
         assert rewriter.imports_rewritten == 1
 
@@ -223,7 +224,7 @@ class TestImportRewriter:
         rewriter = ImportRewriter(table, "pkg.main")
         new_tree = rewriter.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "from ...utils import helper" in new_source
         assert rewriter.imports_unchanged == 1
 
@@ -243,7 +244,7 @@ import os
         rewriter = ImportRewriter(table, "main")
         new_tree = rewriter.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "from calculator import I0" in new_source
         assert "from utils import I1" in new_source
         assert "import os" in new_source
@@ -264,7 +265,7 @@ class MyClass:
         rewriter = ImportRewriter(table, "main")
         new_tree = rewriter.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "from calculator import I0" in new_source
 
     def test_import_in_function(self):
@@ -282,7 +283,7 @@ def my_function():
         rewriter = ImportRewriter(table, "main")
         new_tree = rewriter.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "from calculator import I0" in new_source
 
     def test_get_statistics(self):
@@ -341,7 +342,7 @@ from pkg.utils import helper
         rewriter = ImportRewriter(table, "pkg.main")
         new_tree = rewriter.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "from pkg.subpkg.calculator import I0" in new_source
         assert "from pkg.utils import I1" in new_source
 
@@ -365,7 +366,7 @@ class Main:
         rewriter = ImportRewriter(table, "main")
         new_tree = rewriter.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "class Main:" in new_source
         assert "def __init__" in new_source
         assert "def run" in new_source
@@ -427,7 +428,7 @@ def my_function():
         rewriter = ImportRewriter(table, "")
         new_tree = rewriter.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         # Should be unchanged since we can't resolve relative import
         assert "from .utils import helper" in new_source
         assert rewriter.imports_unchanged == 1
