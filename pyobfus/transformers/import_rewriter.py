@@ -9,6 +9,7 @@ import ast
 from typing import Optional, Set, Tuple
 from pathlib import Path
 
+from pyobfus.core.generator import CodeGenerator
 from pyobfus.core.global_table import GlobalSymbolTable
 
 
@@ -245,10 +246,8 @@ def rewrite_imports(
     # Fix missing locations
     ast.fix_missing_locations(new_tree)
 
-    # Convert back to source
-    import ast as ast_module
-
-    new_source = ast_module.unparse(new_tree)
+    # Convert back to source (use CodeGenerator for Python 3.8 compatibility)
+    new_source = CodeGenerator.generate(new_tree)
 
     return new_source, rewriter.get_statistics()
 
