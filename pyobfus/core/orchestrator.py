@@ -107,9 +107,7 @@ class CrossFileOrchestrator:
         self._name_counter: int = 0
         self._name_prefix: str = config.name_prefix
 
-    def obfuscate(
-        self, input_dir: Path, output_dir: Path
-    ) -> ObfuscationResult:
+    def obfuscate(self, input_dir: Path, output_dir: Path) -> ObfuscationResult:
         """
         Obfuscate entire project with cross-file coordination.
 

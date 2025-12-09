@@ -62,9 +62,7 @@ class GlobalSymbolTable:
         # Used for debugging and validation
         self._reverse_mapping: Dict[str, Tuple[str, str]] = {}
 
-    def register_export(
-        self, module: str, original_name: str, obfuscated_name: str
-    ) -> None:
+    def register_export(self, module: str, original_name: str, obfuscated_name: str) -> None:
         """
         Register a name exported by a module.
 

@@ -212,9 +212,7 @@ def main(
                 )
             else:
                 # Legacy single-file mode
-                _obfuscate_directory(
-                    input_path_obj, output_path_obj, config, verbose, dry_run
-                )
+                _obfuscate_directory(input_path_obj, output_path_obj, config, verbose, dry_run)
         else:
             click.echo(f"Error: {input_path} is neither a file nor a directory", err=True)
             sys.exit(1)
@@ -246,7 +244,11 @@ def main(
 
 
 def _obfuscate_file(
-    input_file: Path, output_file: Path, config: ObfuscationConfig, verbose: bool, dry_run: bool = False
+    input_file: Path,
+    output_file: Path,
+    config: ObfuscationConfig,
+    verbose: bool,
+    dry_run: bool = False,
 ) -> None:
     """
     Obfuscate a single Python file.
@@ -349,13 +351,17 @@ def _obfuscate_file(
         if verbose:
             click.echo(f"  Would write to: {output_file}")
             click.echo(f"  Preview (first 10 lines):")
-            lines = obfuscated_code.split('\n')[:10]
+            lines = obfuscated_code.split("\n")[:10]
             for line in lines:
                 click.echo(f"    {line}")
 
 
 def _obfuscate_directory(
-    input_dir: Path, output_dir: Path, config: ObfuscationConfig, verbose: bool, dry_run: bool = False
+    input_dir: Path,
+    output_dir: Path,
+    config: ObfuscationConfig,
+    verbose: bool,
+    dry_run: bool = False,
 ) -> None:
     """
     Obfuscate all Python files in a directory (legacy single-file mode).
@@ -410,7 +416,11 @@ def _obfuscate_directory(
 
 
 def _obfuscate_directory_crossfile(
-    input_dir: Path, output_dir: Path, config: ObfuscationConfig, verbose: bool, dry_run: bool = False
+    input_dir: Path,
+    output_dir: Path,
+    config: ObfuscationConfig,
+    verbose: bool,
+    dry_run: bool = False,
 ) -> None:
     """
     Obfuscate directory with cross-file import mapping using CrossFileOrchestrator.
@@ -460,7 +470,7 @@ def _obfuscate_directory_crossfile(
                     click.echo(f"\n  Module: {module}")
                     for orig, obf in list(exports.items())[:3]:
                         click.echo(f"    {orig} -> {obf}")
-            if stats['total_modules'] > 5:
+            if stats["total_modules"] > 5:
                 click.echo(f"\n  ... and {stats['total_modules'] - 5} more modules")
             return
 
@@ -479,6 +489,7 @@ def _obfuscate_directory_crossfile(
         click.echo(f"\nError during cross-file obfuscation: {e}", err=True)
         if verbose:
             import traceback
+
             traceback.print_exc()
         sys.exit(1)
 
