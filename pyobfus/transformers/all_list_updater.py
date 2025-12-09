@@ -9,6 +9,7 @@ import ast
 from typing import Optional, Set
 from pathlib import Path
 
+from pyobfus.core.generator import CodeGenerator
 from pyobfus.core.global_table import GlobalSymbolTable
 
 
@@ -259,8 +260,8 @@ def update_all_list(
     # Fix missing locations
     ast.fix_missing_locations(new_tree)
 
-    # Convert back to source
-    new_source = ast.unparse(new_tree)
+    # Convert back to source (use CodeGenerator for Python 3.8 compatibility)
+    new_source = CodeGenerator.generate(new_tree)
 
     return new_source, updater.get_statistics()
 
