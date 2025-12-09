@@ -367,7 +367,8 @@ class Main:
         new_tree = rewriter.visit(tree)
 
         new_source = CodeGenerator.generate(new_tree)
-        assert "class Main:" in new_source
+        # astunparse produces "class Main():" while ast.unparse produces "class Main:"
+        assert "class Main" in new_source
         assert "def __init__" in new_source
         assert "def run" in new_source
         assert "from calculator import I0" in new_source

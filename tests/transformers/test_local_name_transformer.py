@@ -15,6 +15,7 @@ import ast
 import pytest
 from pathlib import Path
 
+from pyobfus.core.generator import CodeGenerator
 from pyobfus.core.global_table import GlobalSymbolTable
 from pyobfus.transformers.local_name_transformer import (
     LocalNameTransformer,
@@ -55,7 +56,7 @@ if __name__ == "__main__":
         transformer = LocalNameTransformer(table, "main")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "I2()" in new_source
         assert "run_demo()" not in new_source
         assert transformer.names_renamed == 1
@@ -77,7 +78,7 @@ def create():
         transformer = LocalNameTransformer(table, "calculator")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "I0()" in new_source
         assert "Calculator()" not in new_source
         assert transformer.names_renamed == 1
@@ -98,7 +99,7 @@ def get_key():
         transformer = LocalNameTransformer(table, "config")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "return I0" in new_source
         assert "return API_KEY" not in new_source
         assert transformer.names_renamed == 1
@@ -123,7 +124,7 @@ def I2():
         transformer = LocalNameTransformer(table, "main", imported_names)
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         # Calculator should NOT be renamed (it's imported)
         assert "Calculator()" in new_source
         # But the import statement still has the old name (ImportRewriter handles that)
@@ -143,7 +144,7 @@ def format_value(result):
         transformer = LocalNameTransformer(table, "utils")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         # Parameter name should not be renamed
         assert "def format_value(result):" in new_source
         # Reference to parameter should not be renamed either
@@ -168,7 +169,7 @@ def wrapper():
         transformer = LocalNameTransformer(table, "main")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         # Count "I2()" appears in function calls (2 calls + 1 definition = 3 total)
         assert new_source.count("I2()") >= 2  # At least 2 calls
         assert "return I2" in new_source
@@ -197,7 +198,7 @@ def process(x):
         transformer = LocalNameTransformer(table, "utils")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "I1(x)" in new_source
         assert "I0(x)" in new_source
         assert "validate_number" not in new_source
@@ -223,7 +224,7 @@ def outer():
         transformer = LocalNameTransformer(table, "utils")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         # Reference inside nested function should be renamed
         assert "I0()" in new_source
         assert "helper()" not in new_source
@@ -246,7 +247,7 @@ class MyClass:
         transformer = LocalNameTransformer(table, "utils")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "I0()" in new_source
         assert "helper()" not in new_source
 
@@ -267,7 +268,7 @@ def func():
         transformer = LocalNameTransformer(table, "module")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         # Local assignment should not be renamed
         assert "value = 100" in new_source
 
@@ -287,7 +288,7 @@ def func(obj):
         transformer = LocalNameTransformer(table, "module")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         # Attribute should not be renamed
         assert "obj.value" in new_source
 
@@ -370,7 +371,7 @@ def wrapper():
         transformer = LocalNameTransformer(table, "module")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         # Nothing should be renamed
         assert "helper()" in new_source
         assert transformer.names_renamed == 0
@@ -409,7 +410,7 @@ def test():
         transformer = LocalNameTransformer(table, "utils")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         # All references should be renamed
         assert "calculate()" not in new_source
         assert new_source.count("I0()") >= 5
@@ -437,7 +438,7 @@ if __name__ == '__main__':
         transformer = LocalNameTransformer(table, "main")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "I0()" in new_source
         assert "I1()" in new_source
         assert "main()" not in new_source

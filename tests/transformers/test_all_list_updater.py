@@ -213,7 +213,8 @@ class Calculator:
 
         new_source = CodeGenerator.generate(new_tree)
         assert "I0" in new_source
-        assert "class Calculator:" in new_source
+        # astunparse produces "class Calculator():" while ast.unparse produces "class Calculator:"
+        assert "class Calculator" in new_source
         assert "def add" in new_source
 
     def test_module_without_all(self):
