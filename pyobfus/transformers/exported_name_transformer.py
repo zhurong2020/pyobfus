@@ -6,7 +6,7 @@ exported definitions (classes, functions, variables) to their obfuscated names.
 """
 
 import ast
-from typing import Optional, Set, Dict
+from typing import Optional, Set, Dict, Tuple
 from pathlib import Path
 
 from pyobfus.core.generator import CodeGenerator
@@ -151,9 +151,7 @@ class ExportedNameTransformer(ast.NodeTransformer):
 
         return node
 
-    def visit_AsyncFunctionDef(
-        self, node: ast.AsyncFunctionDef
-    ) -> ast.AsyncFunctionDef:
+    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> ast.AsyncFunctionDef:
         """
         Visit async function definition and rename if exported.
 
@@ -307,7 +305,7 @@ def transform_exported_names(
     global_table: GlobalSymbolTable,
     current_module: str,
     current_file: Optional[Path] = None,
-) -> tuple[str, dict]:
+) -> Tuple[str, dict]:
     """
     Convenience function to transform exported names in source code.
 
@@ -346,7 +344,7 @@ def transform_exported_names_from_file(
     file_path: Path,
     global_table: GlobalSymbolTable,
     current_module: str,
-) -> tuple[str, dict]:
+) -> Tuple[str, dict]:
     """
     Convenience function to transform exported names in a file.
 

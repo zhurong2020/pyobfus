@@ -6,7 +6,7 @@ references to imported names throughout the file body.
 """
 
 import ast
-from typing import Optional, Set, Dict
+from typing import Optional, Set, Dict, Tuple, List
 from pathlib import Path
 
 from pyobfus.core.generator import CodeGenerator
@@ -60,9 +60,7 @@ class ImportCollector(ast.NodeVisitor):
             local_name = alias.asname if alias.asname else original_name
 
             # Look up obfuscated name
-            obfuscated_name = self.global_table.get_obfuscated_import(
-                module, original_name
-            )
+            obfuscated_name = self.global_table.get_obfuscated_import(module, original_name)
 
             if obfuscated_name:
                 # Map: local_name -> obfuscated_name
@@ -70,9 +68,7 @@ class ImportCollector(ast.NodeVisitor):
 
         self.generic_visit(node)
 
-    def _resolve_relative_import(
-        self, module: Optional[str], level: int
-    ) -> Optional[str]:
+    def _resolve_relative_import(self, module: Optional[str], level: int) -> Optional[str]:
         """
         Resolve relative import to absolute module name.
 
@@ -168,7 +164,7 @@ class ImportedNameTransformer(ast.NodeTransformer):
 
         # Track scope (don't rename function parameters, local variables, etc.)
         self._local_names: Set[str] = set()
-        self._scope_stack: list[Set[str]] = []
+        self._scope_stack: List[Set[str]] = []
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> ast.FunctionDef:
         """
@@ -200,9 +196,7 @@ class ImportedNameTransformer(ast.NodeTransformer):
 
         return node
 
-    def visit_AsyncFunctionDef(
-        self, node: ast.AsyncFunctionDef
-    ) -> ast.AsyncFunctionDef:
+    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> ast.AsyncFunctionDef:
         """Visit async function definition."""
         # Same logic as FunctionDef
         param_names = set()
@@ -295,7 +289,7 @@ def transform_imported_names(
     global_table: GlobalSymbolTable,
     current_module: str,
     current_file: Optional[Path] = None,
-) -> tuple[str, dict]:
+) -> Tuple[str, dict]:
     """
     Convenience function to transform imported name references in source code.
 
@@ -323,9 +317,7 @@ def transform_imported_names(
     tree = ast.parse(source)
 
     # Transform
-    transformer = ImportedNameTransformer(
-        original_tree, global_table, current_module, current_file
-    )
+    transformer = ImportedNameTransformer(original_tree, global_table, current_module, current_file)
     new_tree = transformer.visit(tree)
 
     # Fix missing locations

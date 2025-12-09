@@ -6,7 +6,7 @@ to use obfuscated names from the GlobalSymbolTable.
 """
 
 import ast
-from typing import Optional, Set
+from typing import Optional, Set, Tuple
 from pathlib import Path
 
 from pyobfus.core.generator import CodeGenerator
@@ -232,7 +232,7 @@ def update_all_list(
     global_table: GlobalSymbolTable,
     current_module: str,
     current_file: Optional[Path] = None,
-) -> tuple[str, dict]:
+) -> Tuple[str, dict]:
     """
     Convenience function to update __all__ list in source code.
 
@@ -270,7 +270,7 @@ def update_all_list_from_file(
     file_path: Path,
     global_table: GlobalSymbolTable,
     current_module: str,
-) -> tuple[str, dict]:
+) -> Tuple[str, dict]:
     """
     Convenience function to update __all__ list in a file.
 

@@ -9,7 +9,7 @@ calls to `run_demo()` within the same file must be updated to `I2()`.
 """
 
 import ast
-from typing import Optional, Set, Dict
+from typing import Optional, Set, Dict, Tuple, List
 from pathlib import Path
 
 from pyobfus.core.generator import CodeGenerator
@@ -75,7 +75,7 @@ class LocalNameTransformer(ast.NodeTransformer):
         self.names_unchanged: int = 0
 
         # Track local scopes (stack of sets of locally-bound names)
-        self._local_scopes: list[Set[str]] = []
+        self._local_scopes: List[Set[str]] = []
 
     def visit_Name(self, node: ast.Name) -> ast.Name:
         """
@@ -164,9 +164,7 @@ class LocalNameTransformer(ast.NodeTransformer):
 
         return node
 
-    def visit_AsyncFunctionDef(
-        self, node: ast.AsyncFunctionDef
-    ) -> ast.AsyncFunctionDef:
+    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> ast.AsyncFunctionDef:
         """
         Visit async function definition.
 
@@ -259,7 +257,7 @@ def transform_local_names(
     current_module: str,
     imported_names: Optional[Set[str]] = None,
     current_file: Optional[Path] = None,
-) -> tuple[str, dict]:
+) -> Tuple[str, dict]:
     """
     Convenience function to transform local name references in source code.
 
@@ -285,9 +283,7 @@ def transform_local_names(
             I2()
     """
     tree = ast.parse(source)
-    transformer = LocalNameTransformer(
-        global_table, current_module, imported_names, current_file
-    )
+    transformer = LocalNameTransformer(global_table, current_module, imported_names, current_file)
     new_tree = transformer.visit(tree)
 
     # Fix missing locations
