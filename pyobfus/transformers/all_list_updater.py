@@ -196,7 +196,7 @@ class AllListUpdater(ast.NodeTransformer):
         if obfuscated_name:
             # Found mapping - create new string constant
             self.names_updated += 1
-            return ast.Constant(value=obfuscated_name)
+            return ast.Constant(value=obfuscated_name, kind=None)
         else:
             # Not found - keep original (might be intentional)
             self.names_not_found.add(original_name)
