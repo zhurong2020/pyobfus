@@ -1,7 +1,7 @@
 # Python 3.8 兼容性指南
 
 **创建日期**: 2025-11-12
-**最后更新**: 2025-11-12
+**最后更新**: 2025-12-09
 
 ## 概述
 
@@ -150,6 +150,122 @@ obfuscated_code = CodeGenerator.generate(transformed)
 
 ---
 
+### 问题5: 类型提示语法不兼容 (v0.2.0)
+
+**发现时间**: 2025-12-09
+**影响范围**: 多个源文件在Python 3.8 CI失败
+
+#### 错误信息
+```
+TypeError: 'type' object is not subscriptable
+```
+
+#### 根本原因
+Python 3.9+ 支持直接使用 `tuple[str, dict]` 和 `list[Set[str]]` 语法。但在Python 3.8中，必须从 `typing` 模块导入 `Tuple` 和 `List`。
+
+**错误代码**:
+```python
+def some_function() -> tuple[str, dict]:  # Python 3.9+ only
+    pass
+
+self._scope_stack: list[Set[str]] = []  # Python 3.9+ only
+```
+
+#### 解决方案
+使用 `typing` 模块中的类型：
+
+```python
+from typing import Tuple, List, Set
+
+def some_function() -> Tuple[str, dict]:  # 兼容 Python 3.8+
+    pass
+
+self._scope_stack: List[Set[str]] = []  # 兼容 Python 3.8+
+```
+
+#### 修复提交
+- Commit: e72efc9
+- 文件:
+  - `pyobfus/transformers/exported_name_transformer.py`
+  - `pyobfus/transformers/imported_name_transformer.py`
+  - `pyobfus/transformers/local_name_transformer.py`
+  - `pyobfus/transformers/import_rewriter.py`
+  - `pyobfus/transformers/all_list_updater.py`
+
+---
+
+### 问题6: astunparse 输出格式差异 (v0.2.0)
+
+**发现时间**: 2025-12-09
+**影响范围**: 测试断言失败
+
+#### 错误信息
+```
+AssertionError: 'class I0:' not in 'class I0():'
+```
+
+#### 根本原因
+`astunparse` 库（Python 3.8）和 `ast.unparse()`（Python 3.9+）生成的代码格式略有不同：
+
+| 代码结构 | ast.unparse (3.9+) | astunparse (3.8) |
+|---------|-------------------|-----------------|
+| 空基类 | `class Foo:` | `class Foo():` |
+
+#### 解决方案
+测试断言需要同时处理两种格式：
+
+```python
+# 错误做法：精确匹配
+assert "class I0:" in new_source  # Python 3.8 失败！
+
+# 正确做法：兼容两种格式
+assert "class I0" in new_source and (
+    "class I0:" in new_source or "class I0():" in new_source
+)
+```
+
+#### 修复提交
+- Commits: b40d5cc, 9963bdb
+- 文件:
+  - `tests/transformers/test_exported_name_transformer.py`
+  - `tests/transformers/test_all_list_updater.py`
+  - `tests/transformers/test_import_rewriter.py`
+
+---
+
+### 问题7: 便利函数中使用 ast.unparse (v0.2.0)
+
+**发现时间**: 2025-12-09
+**影响范围**: 便利函数调用在Python 3.8失败
+
+#### 错误信息
+```
+AttributeError: module 'ast' has no attribute 'unparse'
+```
+
+#### 根本原因
+不仅测试文件，源代码中的便利函数（如 `rewrite_imports()`）也直接使用了 `ast.unparse()`。
+
+**错误代码** (pyobfus/transformers/import_rewriter.py):
+```python
+import ast as ast_module
+new_source = ast_module.unparse(new_tree)  # Python 3.8 失败！
+```
+
+#### 解决方案
+在所有源代码中也使用 `CodeGenerator`：
+
+```python
+from pyobfus.core.generator import CodeGenerator
+new_source = CodeGenerator.generate(new_tree)
+```
+
+#### 修复提交
+- Commit: d4d44ae
+- 文件: `pyobfus/transformers/import_rewriter.py`
+
+---
+
 ## 最佳实践
 
 ### 1. 创建 AST 节点时
@@ -202,7 +318,45 @@ code = CodeGenerator.generate(tree)
 code = ast.unparse(tree)
 ```
 
-### 3. 测试策略
+### 3. 类型提示
+
+✅ **正确做法**:
+```python
+from typing import Tuple, List, Set, Dict
+
+# 使用 typing 模块中的类型
+def func() -> Tuple[str, dict]:
+    pass
+
+self._items: List[Set[str]] = []
+```
+
+❌ **错误做法**:
+```python
+# Python 3.9+ 语法 - Python 3.8 不支持！
+def func() -> tuple[str, dict]:
+    pass
+
+self._items: list[Set[str]] = []
+```
+
+### 4. 测试断言
+
+✅ **正确做法**:
+```python
+# 处理 astunparse 和 ast.unparse 输出差异
+assert "class Foo" in new_source and (
+    "class Foo:" in new_source or "class Foo():" in new_source
+)
+```
+
+❌ **错误做法**:
+```python
+# 精确匹配 - astunparse 输出 "class Foo():"！
+assert "class Foo:" in new_source
+```
+
+### 5. 测试策略
 
 ✅ **正确做法**:
 ```python
@@ -230,8 +384,11 @@ assert "ab" not in output  # 太宽泛
 - [ ] 所有 `ast.arguments()` 调用都包含 `vararg=None, kwarg=None`
 - [ ] 所有 `ast.Constant()` 调用都包含 `kind=None`
 - [ ] 使用 `CodeGenerator.generate()` 而非 `ast.unparse()`
+- [ ] 类型提示使用 `Tuple`, `List` 而非 `tuple`, `list` (从 typing 导入)
+- [ ] 测试断言处理 astunparse 输出格式差异 (`class X():` vs `class X:`)
 - [ ] 测试使用独特的测试数据，不依赖随机性
 - [ ] 本地运行完整测试套件: `pytest tests/ -v`
+- [ ] 运行 ruff 检查: `ruff check pyobfus/ tests/`
 - [ ] 检查CI在所有Python版本上通过
 
 ---
@@ -247,6 +404,11 @@ assert "ab" not in output  # 太宽泛
 - `62e39f3`: fix: Add Python 3.8 compatibility for AST node creation
 - `a0d7a9d`: fix: Add kind=None to ast.Constant for Python 3.8 astunparse compatibility
 - `b3bc1b7`: fix: Use CodeGenerator in tests for Python 3.8 compatibility
+- `e72efc9`: fix: Use typing.Tuple and typing.List for Python 3.8 compatibility
+- `b40d5cc`: test: Fix test_exported_name_transformer.py for Python 3.8 compatibility
+- `c720875`: fix: Remove unused imports and fix f-string lint errors
+- `9963bdb`: test: Fix remaining Python 3.8 compatibility issues in tests
+- `d4d44ae`: fix: Use CodeGenerator in import_rewriter.py convenience function
 
 ### 依赖配置
 `pyproject.toml`:
