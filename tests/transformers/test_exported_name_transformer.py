@@ -19,6 +19,7 @@ from pyobfus.transformers.exported_name_transformer import (
     transform_exported_names,
     transform_exported_names_from_file,
 )
+from pyobfus.core.generator import CodeGenerator
 
 
 class TestExportedNameTransformer:
@@ -51,9 +52,12 @@ class Calculator:
         transformer = ExportedNameTransformer(table, "calculator")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
-        assert "class I0:" in new_source
-        assert "class Calculator:" not in new_source
+        new_source = CodeGenerator.generate(new_tree)
+        # astunparse produces "class I0():" while ast.unparse produces "class I0:"
+        assert "class I0" in new_source and (
+            "class I0:" in new_source or "class I0():" in new_source
+        )
+        assert "class Calculator" not in new_source
         assert transformer.definitions_renamed == 1
 
     def test_rename_class_with_methods(self):
@@ -71,8 +75,11 @@ class Calculator:
         transformer = ExportedNameTransformer(table, "calculator")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
-        assert "class I0:" in new_source
+        new_source = CodeGenerator.generate(new_tree)
+        # astunparse produces "class I0():" while ast.unparse produces "class I0:"
+        assert "class I0" in new_source and (
+            "class I0:" in new_source or "class I0():" in new_source
+        )
         assert "def add" in new_source  # Method names not renamed
 
     def test_rename_function(self):
@@ -89,7 +96,7 @@ def format_result(value):
         transformer = ExportedNameTransformer(table, "utils")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "def I0(value):" in new_source
         assert "def format_result" not in new_source
         assert transformer.definitions_renamed == 1
@@ -108,7 +115,7 @@ async def async_helper():
         transformer = ExportedNameTransformer(table, "utils")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "async def I0():" in new_source
         assert transformer.definitions_renamed == 1
 
@@ -125,7 +132,7 @@ API_KEY = "secret123"
         transformer = ExportedNameTransformer(table, "config")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "I0 = 'secret123'" in new_source
         assert transformer.definitions_renamed == 1
 
@@ -142,7 +149,7 @@ API_KEY: str = "secret123"
         transformer = ExportedNameTransformer(table, "config")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "I0: str = 'secret123'" in new_source
         assert transformer.definitions_renamed == 1
 
@@ -164,7 +171,7 @@ def validate_number(value):
         transformer = ExportedNameTransformer(table, "utils")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "def I0(value):" in new_source
         assert "def I1(value):" in new_source
         assert transformer.definitions_renamed == 2
@@ -186,7 +193,7 @@ def private_func():
         transformer = ExportedNameTransformer(table, "utils")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "def I0():" in new_source
         assert "def private_func():" in new_source  # Not renamed
         assert transformer.definitions_renamed == 1
@@ -207,9 +214,12 @@ class Calculator:
         transformer = ExportedNameTransformer(table, "calculator")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
-        assert "class I0:" in new_source
-        assert "class Inner:" in new_source  # Nested class not renamed
+        new_source = CodeGenerator.generate(new_tree)
+        # astunparse produces "class X():" while ast.unparse produces "class X:"
+        assert "class I0" in new_source and (
+            "class I0:" in new_source or "class I0():" in new_source
+        )
+        assert "class Inner" in new_source  # Nested class not renamed
 
     def test_dont_rename_nested_functions(self):
         """Test that nested functions are not renamed."""
@@ -227,7 +237,7 @@ def outer():
         transformer = ExportedNameTransformer(table, "utils")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "def I0():" in new_source
         assert "def inner():" in new_source  # Nested function not renamed
 
@@ -246,7 +256,7 @@ def my_func():
         transformer = ExportedNameTransformer(table, "utils")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "@decorator" in new_source
         assert "def I0():" in new_source
 
@@ -289,7 +299,10 @@ def func2():
         source = "class Calculator:\n    pass"
         new_source, stats = transform_exported_names(source, table, "calculator")
 
-        assert "class I0:" in new_source
+        # astunparse produces "class I0():" while ast.unparse produces "class I0:"
+        assert "class I0" in new_source and (
+            "class I0:" in new_source or "class I0():" in new_source
+        )
         assert stats["definitions_renamed"] == 1
 
     def test_empty_module(self):
@@ -318,7 +331,7 @@ def helper():
         transformer = ExportedNameTransformer(table, "calculator")
         new_tree = transformer.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "def helper():" in new_source  # Not renamed
         assert transformer.definitions_unchanged == 1
 
@@ -331,9 +344,10 @@ def helper():
         test_file = tmp_path / "test_module.py"
         test_file.write_text("class Calculator:\n    pass\n")
 
-        new_source, stats = transform_exported_names_from_file(
-            test_file, table, "calculator"
-        )
+        new_source, stats = transform_exported_names_from_file(test_file, table, "calculator")
 
-        assert "class I0:" in new_source
+        # astunparse produces "class I0():" while ast.unparse produces "class I0:"
+        assert "class I0" in new_source and (
+            "class I0:" in new_source or "class I0():" in new_source
+        )
         assert stats["definitions_renamed"] == 1
