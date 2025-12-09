@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from pyobfus.config import ObfuscationConfig
 from pyobfus.core.global_table import GlobalSymbolTable
 from pyobfus.core.export_detector import ExportDetector
+from pyobfus.core.generator import CodeGenerator
 from pyobfus.core.parser import ASTParser
 from pyobfus.transformers.import_rewriter import ImportRewriter
 from pyobfus.transformers.all_list_updater import AllListUpdater
@@ -280,8 +281,8 @@ class CrossFileOrchestrator:
             # Fix missing locations
             ast.fix_missing_locations(tree)
 
-            # Convert back to source
-            new_source = ast.unparse(tree)
+            # Convert back to source (use CodeGenerator for Python 3.8 compatibility)
+            new_source = CodeGenerator.generate(tree)
 
             # Write to output directory, preserving directory structure
             output_file = output_dir / file_info.relative_path
