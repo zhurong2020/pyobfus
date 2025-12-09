@@ -15,6 +15,7 @@ import ast
 import pytest
 from pathlib import Path
 
+from pyobfus.core.generator import CodeGenerator
 from pyobfus.core.global_table import GlobalSymbolTable
 from pyobfus.transformers.all_list_updater import (
     AllListUpdater,
@@ -48,7 +49,7 @@ class TestAllListUpdater:
         updater = AllListUpdater(table, "calculator")
         new_tree = updater.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert '__all__ = ["I0"]' in new_source or "__all__ = ['I0']" in new_source
         assert updater.all_lists_updated == 1
         assert updater.names_updated == 1
@@ -66,7 +67,7 @@ class TestAllListUpdater:
         updater = AllListUpdater(table, "utils")
         new_tree = updater.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "I0" in new_source
         assert "I1" in new_source
         assert "I2" in new_source
@@ -85,7 +86,7 @@ class TestAllListUpdater:
         updater = AllListUpdater(table, "calculator")
         new_tree = updater.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "I0" in new_source
         assert "I1" in new_source
         assert updater.all_lists_updated == 1
@@ -102,7 +103,7 @@ class TestAllListUpdater:
         updater = AllListUpdater(table, "calculator")
         new_tree = updater.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "I0" in new_source
         assert "list[str]" in new_source
         assert updater.all_lists_updated == 1
@@ -118,7 +119,7 @@ class TestAllListUpdater:
         updater = AllListUpdater(table, "calculator")
         new_tree = updater.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "I0" in new_source
         assert "NotFound" in new_source
         assert updater.names_updated == 1
@@ -136,7 +137,7 @@ class TestAllListUpdater:
         updater = AllListUpdater(table, "calculator")
         new_tree = updater.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "I0" in new_source
         assert "I1" in new_source
         assert updater.all_lists_updated == 1
@@ -151,7 +152,7 @@ class TestAllListUpdater:
         updater = AllListUpdater(table, "calculator")
         new_tree = updater.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "__all__ = []" in new_source
         assert updater.all_lists_updated == 1
         assert updater.names_updated == 0
@@ -210,7 +211,7 @@ class Calculator:
         updater = AllListUpdater(table, "calculator")
         new_tree = updater.visit(tree)
 
-        new_source = ast.unparse(new_tree)
+        new_source = CodeGenerator.generate(new_tree)
         assert "I0" in new_source
         assert "class Calculator:" in new_source
         assert "def add" in new_source
