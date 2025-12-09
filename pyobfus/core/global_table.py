@@ -7,7 +7,7 @@ registry of all exported names across files in a multi-file project.
 
 from pathlib import Path
 from typing import Dict, List, Optional, Set, Tuple
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass

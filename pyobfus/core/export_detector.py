@@ -6,7 +6,7 @@ exported by a Python module using AST analysis.
 """
 
 import ast
-from typing import Set, Optional
+from typing import Set
 
 
 class ExportDetector(ast.NodeVisitor):
