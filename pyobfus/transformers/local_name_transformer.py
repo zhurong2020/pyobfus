@@ -9,7 +9,7 @@ calls to `run_demo()` within the same file must be updated to `I2()`.
 """
 
 import ast
-from typing import Optional, Set, Dict, Tuple, List
+from typing import Optional, Set, Tuple, List
 from pathlib import Path
 
 from pyobfus.core.generator import CodeGenerator

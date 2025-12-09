@@ -6,7 +6,7 @@ exported definitions (classes, functions, variables) to their obfuscated names.
 """
 
 import ast
-from typing import Optional, Set, Dict, Tuple
+from typing import Optional, Tuple
 from pathlib import Path
 
 from pyobfus.core.generator import CodeGenerator

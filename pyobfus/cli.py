@@ -350,7 +350,7 @@ def _obfuscate_file(
     else:
         if verbose:
             click.echo(f"  Would write to: {output_file}")
-            click.echo(f"  Preview (first 10 lines):")
+            click.echo("  Preview (first 10 lines):")
             lines = obfuscated_code.split("\n")[:10]
             for line in lines:
                 click.echo(f"    {line}")
@@ -433,7 +433,7 @@ def _obfuscate_directory_crossfile(
         dry_run: Preview mode without writing files
     """
     if verbose:
-        click.echo(f"\nUsing cross-file obfuscation mode")
+        click.echo("\nUsing cross-file obfuscation mode")
         click.echo(f"Input:  {input_dir}")
         click.echo(f"Output: {output_dir}")
 
