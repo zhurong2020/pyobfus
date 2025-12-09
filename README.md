@@ -30,14 +30,19 @@ The following features are **fully implemented and available** in the current ve
 - **Configuration Files**: YAML-based configuration for repeatable builds
 - **Selective Obfuscation**: Preserve specific names (builtins, magic methods, custom exclusions)
 
-### 🔒 Pro Edition (Planned for v0.1.6+)
+### 🔒 Pro Edition (Available Now)
 
-The following advanced features are **planned but not yet implemented**:
+The following advanced features are available with a Pro license:
 
-- **String Encryption** (Coming in v0.1.6)
+- **String Encryption** (v0.1.6+)
   - AES-256 encryption for strings
-  - Runtime decryption
-  - Custom encryption schemes
+  - Runtime decryption with injected decoder
+  - Automatic key generation
+
+- **Anti-Debugging** (v0.1.6+)
+  - Debugger detection checks injected into functions
+  - Multiple detection methods (sys.gettrace, sys.settrace)
+  - Configurable behavior
 
 - **Control Flow Obfuscation** (Coming in v0.3.0)
   - If-to-while conversion
@@ -49,11 +54,7 @@ The following advanced features are **planned but not yet implemented**:
   - Insertion of unreachable code paths
   - Complexity increase
 
-- **Opaque Predicates** (Coming in v0.3.0)
-  - Always-true/false conditions that are hard to detect
-  - Control flow obscuring
-
-**Note**: Configuration options for Pro features (e.g., `string_encryption: true`, `anti_debug: true`) are accepted for future compatibility but currently have **no effect**. They will be enabled in future releases. See [ROADMAP.md](docs/ROADMAP.md#v020---core-functionality--initial-pro-features-6-8-weeks) for detailed implementation timeline.
+See [ROADMAP.md](docs/ROADMAP.md) for the full feature timeline.
 
 ## Purchase Professional Edition
 
@@ -253,8 +254,7 @@ pytest tests/ -v
 # With coverage
 pytest tests/ -v --cov=pyobfus --cov-report=html
 
-# Run integration tests (requires external project)
-python scripts/test_ml_research.py --all --max-files 10
+# Run integration tests
 pytest integration_tests/ -v
 ```
 
@@ -324,7 +324,7 @@ Add an additional layer of protection for commercial Python software.
 
   **Trade-off**: Parameter names reveal some information about the function's interface, but function bodies and local variables are still fully obfuscated.
 
-- **Cross-file imports**: Name mapping across files is basic (improvements planned)
+- **Cross-file imports**: ✅ Resolved in v0.2.0 with full cross-file obfuscation support
 - **Dynamic code**: `eval()`, `exec()` with obfuscated code may require adjustments
 - **Debugging**: Obfuscated code is harder to debug (by design)
 - **Performance**: Some obfuscation techniques may impact runtime performance
@@ -341,8 +341,8 @@ Add an additional layer of protection for commercial Python software.
 
 - **Python Support**: 3.8, 3.9, 3.10, 3.11, 3.12
 - **Naming Scheme**: Index-based (I0, I1, I2...) - simple and effective
-- **Architecture**: Modular transformer pipeline
-- **Testing**: 57 tests, 54% coverage, multi-OS CI/CD
+- **Architecture**: Modular transformer pipeline with two-phase cross-file obfuscation
+- **Testing**: 302 tests, 69% coverage, multi-OS CI/CD
 
 ## Documentation
 
