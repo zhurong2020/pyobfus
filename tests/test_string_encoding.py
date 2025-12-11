@@ -398,3 +398,150 @@ x = 42
 
         stats = encoder.get_statistics()
         assert stats["encoded_strings"] == 0
+
+    def test_exclude_names_does_not_affect_string_encoding(self):
+        """
+        Test that exclude_names only affects name obfuscation, not string encoding.
+
+        This is a critical behavior test: when a variable name is in exclude_names,
+        the name should be preserved, but strings assigned to it should still be
+        encoded. This prevents users from accidentally exposing sensitive strings
+        by adding variable names to exclude_names.
+
+        Regression test for: https://github.com/zhurong2020/pyobfus/issues/XX
+        """
+        code = """
+SECRET_KEY = "admin-password-123"
+NORMAL_VAR = "normal-value"
+"""
+        config = ObfuscationConfig()
+        config.string_encoding = True
+        config.add_exclude_name("SECRET_KEY")
+
+        tree = ASTParser.parse_string(code)
+        analyzer = SymbolAnalyzer(config)
+        analyzer.analyze(tree)
+
+        encoder = StringEncoder(config, analyzer)
+        obfuscated_tree = encoder.transform(tree)
+        obfuscated_code = CodeGenerator.generate(obfuscated_tree)
+
+        # Both strings should be encoded, regardless of exclude_names
+        assert "admin-password-123" not in obfuscated_code
+        assert "normal-value" not in obfuscated_code
+
+        # Decoder function should be present
+        assert "_decode_str" in obfuscated_code
+
+        # Code should execute correctly
+        namespace = {}
+        exec(obfuscated_code, namespace)
+        # Note: Variable names may or may not be preserved depending on
+        # whether NameMangler was applied. StringEncoder alone doesn't
+        # modify variable names.
+
+    def test_exclude_names_with_full_obfuscation_pipeline(self):
+        """
+        Test exclude_names behavior with both NameMangler and StringEncoder.
+
+        This tests the complete obfuscation pipeline to verify:
+        1. Excluded names ARE preserved (NameMangler respects exclude_names)
+        2. Strings ARE still encoded (StringEncoder ignores exclude_names)
+        """
+        from pyobfus.transformers.name_mangler import NameMangler
+
+        code = """
+SECRET_KEY = "admin-password-123"
+NORMAL_VAR = "normal-value"
+
+def check(key):
+    if key == "admin-password-123":
+        return True
+    return False
+"""
+        config = ObfuscationConfig()
+        config.string_encoding = True
+        config.add_exclude_name("SECRET_KEY")
+
+        tree = ASTParser.parse_string(code)
+        analyzer = SymbolAnalyzer(config)
+        analyzer.analyze(tree)
+
+        # Apply NameMangler first (like the actual pipeline)
+        mangler = NameMangler(config, analyzer)
+        transformed_tree = mangler.transform(tree)
+
+        # Then apply StringEncoder
+        encoder = StringEncoder(config, analyzer)
+        transformed_tree = encoder.transform(transformed_tree)
+
+        obfuscated_code = CodeGenerator.generate(transformed_tree)
+
+        # SECRET_KEY name should be preserved (due to exclude_names)
+        assert "SECRET_KEY" in obfuscated_code
+
+        # NORMAL_VAR should be obfuscated (not in exclude_names)
+        assert "NORMAL_VAR" not in obfuscated_code
+
+        # But ALL strings should be encoded, including SECRET_KEY's value
+        assert "admin-password-123" not in obfuscated_code
+        assert "normal-value" not in obfuscated_code
+
+        # Decoder function should be present
+        assert "_decode_str" in obfuscated_code
+
+        # Code should execute correctly
+        namespace = {}
+        exec(obfuscated_code, namespace)
+        assert namespace["SECRET_KEY"] == "admin-password-123"
+
+    def test_dict_strings_encoded_even_with_exclude_names(self):
+        """
+        Test that dictionary key/value strings are encoded even when
+        the dictionary variable name is in exclude_names.
+
+        This is particularly important for license validation scenarios
+        where users might want to preserve variable names for debugging
+        but still protect the actual license keys.
+        """
+        from pyobfus.transformers.name_mangler import NameMangler
+
+        code = """
+VALID_LICENSES = {
+    "ADMIN-KEY-2025": {"description": "Admin License", "days": 365},
+    "USER-KEY-2025": {"description": "User License", "days": 30}
+}
+"""
+        config = ObfuscationConfig()
+        config.string_encoding = True
+        config.add_exclude_name("VALID_LICENSES")
+
+        tree = ASTParser.parse_string(code)
+        analyzer = SymbolAnalyzer(config)
+        analyzer.analyze(tree)
+
+        # Apply full pipeline
+        mangler = NameMangler(config, analyzer)
+        transformed_tree = mangler.transform(tree)
+
+        encoder = StringEncoder(config, analyzer)
+        transformed_tree = encoder.transform(transformed_tree)
+
+        obfuscated_code = CodeGenerator.generate(transformed_tree)
+
+        # Variable name should be preserved
+        assert "VALID_LICENSES" in obfuscated_code
+
+        # But all dictionary strings should be encoded
+        assert "ADMIN-KEY-2025" not in obfuscated_code
+        assert "USER-KEY-2025" not in obfuscated_code
+        assert "Admin License" not in obfuscated_code
+        assert "User License" not in obfuscated_code
+        assert "description" not in obfuscated_code
+        assert "days" not in obfuscated_code
+
+        # Code should execute correctly
+        namespace = {}
+        exec(obfuscated_code, namespace)
+        assert "ADMIN-KEY-2025" in namespace["VALID_LICENSES"]
+        assert namespace["VALID_LICENSES"]["ADMIN-KEY-2025"]["days"] == 365
