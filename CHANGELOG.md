@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.3] - 2025-12-11
+
+### Fixed
+- **[P0] Python 3.6-3.11 Compatibility**: Fixed f-string quote handling to work on ALL Python versions
+  - Problem: v0.2.2 fix only activated when `compile()` failed, but Python 3.12+ (PEP 701) allows same quotes
+  - This meant code generated on Python 3.12+ would fail on Python 3.10 and earlier
+  - Solution: ALWAYS normalize f-string quotes for backward compatibility
+  - Example: `f'Value: {d['key']}'` → `f'Value: {d["key"]}'` (works on Python 3.6+)
+
+### Added
+- **Python 3.6+ Compatibility Tests**: Added 3 new tests verifying backward compatibility
+
 ## [0.2.2] - 2025-12-11
 
 ### Fixed

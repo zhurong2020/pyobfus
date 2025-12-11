@@ -151,6 +151,46 @@ def process(data):
         compile(result, "<test>", "exec")
 
 
+class TestPython36Compatibility:
+    """Test that generated code is compatible with Python 3.6-3.11."""
+
+    def test_fstring_quotes_always_normalized(self):
+        """f-string quotes should ALWAYS be normalized for backward compatibility.
+
+        Python 3.12+ (PEP 701) allows f'text {d['key']}' but Python 3.6-3.11 don't.
+        PyObfus must generate code compatible with ALL supported Python versions.
+        """
+        # Even if this code would compile on Python 3.12+, we need to normalize it
+        # Input simulates what ast.unparse might produce on Python 3.12+
+        code_with_same_quotes = """print(f'Value: {data['key']}')"""
+
+        result = CodeGenerator._fix_fstring_quotes(code_with_same_quotes)
+
+        # Should use different quotes for subscript
+        assert '["key"]' in result or "['key']" not in result.replace("f'", "")
+        # Must compile on all Python versions
+        compile(result, "<test>", "exec")
+
+    def test_double_quote_fstring_normalized(self):
+        """Double-quote f-strings with double-quote subscripts should be fixed."""
+        code = '''print(f"Value: {data["key"]}")'''
+        result = CodeGenerator._fix_fstring_quotes(code)
+
+        # Should use single quotes for subscript inside double-quoted f-string
+        assert "['key']" in result
+        compile(result, "<test>", "exec")
+
+    def test_already_compatible_code_unchanged(self):
+        """Code already using different quotes should remain valid."""
+        # This is already compatible with all Python versions
+        compatible_code = '''print(f"Value: {data['key']}")'''
+        result = CodeGenerator._fix_fstring_quotes(compatible_code)
+
+        # Should remain unchanged (or equivalent)
+        compile(result, "<test>", "exec")
+        assert "['key']" in result  # Still uses single quotes for subscript
+
+
 class TestIntegrationWithObfuscation:
     """Test f-string handling with actual obfuscation pipeline."""
 

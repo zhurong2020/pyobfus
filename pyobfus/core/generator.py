@@ -54,40 +54,35 @@ class CodeGenerator:
     @staticmethod
     def _fix_fstring_quotes(source_code: str) -> str:
         """
-        Fix f-string quote conflicts in generated code.
+        Fix f-string quote conflicts in generated code for Python 3.6-3.11 compatibility.
 
-        When an f-string uses single quotes and contains a subscript with single quotes,
-        this causes a syntax error. This method detects and fixes such conflicts.
+        Python 3.12+ (PEP 701) allows f'text {d['key']}' but earlier versions don't.
+        This method ALWAYS normalizes f-strings to ensure backward compatibility,
+        regardless of whether the code compiles on the current Python version.
 
         Example:
-            Invalid: f'Value: {data['key']}'
-            Fixed:   f'Value: {data["key"]}'
+            Input:  f'Value: {data['key']}'   (valid in 3.12+, invalid in 3.11-)
+            Output: f'Value: {data["key"]}'   (valid in all Python 3.6+ versions)
 
         Args:
             source_code: Generated source code
 
         Returns:
-            str: Source code with fixed f-string quotes
+            str: Source code with fixed f-string quotes (Python 3.6+ compatible)
         """
-        # First, check if the code compiles without issues
-        try:
-            compile(source_code, "<string>", "exec")
-            return source_code  # No issues, return as-is
-        except SyntaxError:
-            pass  # Continue to fix
-
-        # Use a more robust approach: find f-strings and fix quote conflicts
-        # within each one individually
+        # ALWAYS fix f-string quotes for backward compatibility with Python 3.6-3.11
+        # Python 3.12+ allows same quotes in f-string expressions (PEP 701),
+        # but we need to generate code that works on older Python versions too.
         fixed_code = CodeGenerator._fix_single_quote_fstrings(source_code)
         fixed_code = CodeGenerator._fix_double_quote_fstrings(fixed_code)
 
-        # Verify the fix worked
+        # Verify the result compiles (should always work, but defensive check)
         try:
             compile(fixed_code, "<string>", "exec")
             return fixed_code
         except SyntaxError:
-            # If still failing, return original code and let the error propagate
-            # during actual execution
+            # If fixing introduced errors, return original
+            # (this shouldn't happen with correct fix logic)
             return source_code
 
     @staticmethod
