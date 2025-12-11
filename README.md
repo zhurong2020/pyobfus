@@ -191,6 +191,50 @@ print(f'Risk score: {I6}')
 
 ## Configuration
 
+### Quick Start with Templates
+
+Generate a configuration template for your project type:
+
+```bash
+# For Django projects
+pyobfus --init-config django
+
+# For Flask projects
+pyobfus --init-config flask
+
+# For Python libraries
+pyobfus --init-config library
+
+# For general projects
+pyobfus --init-config general
+```
+
+This creates a `pyobfus.yaml` file with sensible defaults for your project type.
+
+### Validate Configuration
+
+Check your configuration file for errors before use:
+
+```bash
+pyobfus --validate-config pyobfus.yaml
+```
+
+The validator checks for:
+- YAML syntax errors
+- Invalid configuration options
+- Common typos (e.g., `exclude_pattern` -> `exclude_patterns`)
+- Pro features used with community level
+
+### Auto-Discovery
+
+When you run `pyobfus` without `-c`, it automatically searches for:
+1. `pyobfus.yaml`
+2. `pyobfus.yml`
+3. `.pyobfus.yaml`
+4. `.pyobfus.yml`
+
+### Manual Configuration
+
 Create `pyobfus.yaml`:
 
 ```yaml
