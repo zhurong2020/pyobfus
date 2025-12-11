@@ -71,7 +71,6 @@ obfuscation:
 # Verbose output recommended for first run
 verbose: false
 """,
-
     "flask": """# pyobfus configuration for Flask projects
 # Generated with: pyobfus --init-config flask
 
@@ -130,7 +129,6 @@ obfuscation:
 
 verbose: false
 """,
-
     "library": """# pyobfus configuration for Python libraries/packages
 # Generated with: pyobfus --init-config library
 
@@ -174,7 +172,6 @@ obfuscation:
 
 verbose: false
 """,
-
     "general": """# pyobfus configuration - General purpose
 # Generated with: pyobfus --init-config general
 
