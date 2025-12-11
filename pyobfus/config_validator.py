@@ -215,9 +215,7 @@ def _validate_dict(
             elif "valid_values" in key_schema:
                 if value not in key_schema["valid_values"]:
                     valid = ", ".join(key_schema["valid_values"])
-                    result.add_error(
-                        f"'{current_path}' must be one of: {valid} (got '{value}')"
-                    )
+                    result.add_error(f"'{current_path}' must be one of: {valid} (got '{value}')")
 
         elif expected_type == "bool":
             if not isinstance(value, bool):
@@ -227,9 +225,7 @@ def _validate_dict(
             if not isinstance(value, int) or isinstance(value, bool):
                 result.add_error(f"'{current_path}' must be an integer")
             elif "min_value" in key_schema and value < key_schema["min_value"]:
-                result.add_error(
-                    f"'{current_path}' must be >= {key_schema['min_value']}"
-                )
+                result.add_error(f"'{current_path}' must be >= {key_schema['min_value']}")
 
 
 def _check_typos(config: Dict[str, Any], result: ValidationResult) -> None:

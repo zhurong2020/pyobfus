@@ -628,8 +628,8 @@ def _handle_init_config(template_name: str) -> None:
         template_content = get_template(template_name)
         output_file.write_text(template_content, encoding="utf-8")
         click.echo(f"Generated '{output_file}' with {template_name} template")
-        click.echo(f"\nNext steps:")
-        click.echo(f"  1. Review and customize the configuration")
+        click.echo("\nNext steps:")
+        click.echo("  1. Review and customize the configuration")
         click.echo(f"  2. Run: pyobfus src/ -o dist/ -c {output_file}")
     except ValueError as e:
         click.echo(f"Error: {e}", err=True)
