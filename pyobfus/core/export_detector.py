@@ -203,7 +203,7 @@ class ExportDetector(ast.NodeVisitor):
                 if isinstance(elt, ast.Constant) and isinstance(elt.value, str):
                     names.add(elt.value)
                 elif isinstance(elt, ast.Str):  # Python 3.7 compatibility
-                    names.add(elt.s)
+                    names.add(str(elt.s))
 
         elif isinstance(node, ast.BinOp):
             # __all__ = ["name1"] + ["name2"]

@@ -6,7 +6,7 @@ exported definitions (classes, functions, variables) to their obfuscated names.
 """
 
 import ast
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 from pathlib import Path
 
 from pyobfus.core.generator import CodeGenerator
@@ -204,7 +204,7 @@ class ExportedNameTransformer(ast.NodeTransformer):
         """
         if self._is_top_level():
             # Check each target
-            new_targets = []
+            new_targets: List[ast.expr] = []
             any_renamed = False
 
             for target in node.targets:

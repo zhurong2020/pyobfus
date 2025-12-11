@@ -118,8 +118,8 @@ class CrossFileOrchestrator:
         Returns:
             ObfuscationResult with statistics and messages
         """
-        warnings = []
-        errors = []
+        warnings: List[str] = []
+        errors: List[str] = []
 
         try:
             # Phase 1: Scan
