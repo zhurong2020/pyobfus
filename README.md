@@ -416,6 +416,99 @@ Add an additional layer of protection for commercial Python software.
 - **Architecture**: Modular transformer pipeline with two-phase cross-file obfuscation
 - **Testing**: 302 tests, 69% coverage, multi-OS CI/CD
 
+## Frequently Asked Questions
+
+### Is pyobfus Right for Me?
+
+**Use pyobfus if you:**
+- Need to protect proprietary algorithms before distributing Python applications
+- Want a tool that "just works" without DLL conflicts or native dependencies
+- Prefer transparent pricing without hidden trial limitations
+- Support open-source software with optional paid features
+
+### How do I obfuscate Python code?
+
+```bash
+# Install
+pip install pyobfus
+
+# Obfuscate a single file
+pyobfus script.py -o script_obf.py
+
+# Obfuscate an entire project
+pyobfus src/ -o dist/
+
+# Preview without writing files
+pyobfus src/ -o dist/ --dry-run
+```
+
+### Will my code still work after obfuscation?
+
+Yes, pyobfus guarantees **100% functional equivalence**. The obfuscated code produces identical outputs to your original code. We use Python's AST (Abstract Syntax Tree) for syntax-aware transformations, ensuring syntactically correct output.
+
+### Does obfuscated code run slower?
+
+Minimal impact:
+- **Name mangling**: Zero runtime cost (just renamed identifiers)
+- **String encoding** (Base64): ~0.1ms per string at startup
+- **String encryption** (AES-256, Pro): ~0.5ms per string at startup
+
+### Can I obfuscate Django/Flask projects?
+
+Yes! Use our built-in templates:
+
+```bash
+# Django
+pyobfus --init-config django
+
+# Flask
+pyobfus --init-config flask
+
+# Then run obfuscation
+pyobfus src/ -o dist/ -c pyobfus.yaml
+```
+
+### What Python versions are supported?
+
+pyobfus supports **Python 3.8, 3.9, 3.10, 3.11, and 3.12**. Generated code is compatible with all these versions regardless of which version you use to run pyobfus.
+
+### PyArmor vs pyobfus: Which should I choose?
+
+| Feature | pyobfus | PyArmor |
+|---------|---------|---------|
+| **Price** | $45 (Pro) | $89 (Pro) |
+| **Free tier** | Clear limits (5 files/1000 LOC) | Vague "trial" limitations |
+| **Open source** | Yes (Apache 2.0) | No |
+| **Native dependencies** | None (pure Python output) | Requires runtime library |
+| **Python 3.12 support** | Yes | Yes |
+
+**Choose pyobfus if:** You want transparent pricing, open-source trust, and simpler deployment without native dependencies.
+
+See our [detailed comparison](docs/COMPARISON.md) for more information.
+
+### What if obfuscation breaks my code?
+
+1. **Use `--dry-run`** to preview changes before writing files
+2. **Use `--preserve-param-names`** if you rely on keyword arguments
+3. **Add exclusions** in `pyobfus.yaml` for names that must stay unchanged
+4. **Report issues** on [GitHub](https://github.com/zhurong2020/pyobfus/issues) - we fix bugs quickly!
+
+### Can obfuscated code be reversed?
+
+Name mangling is **irreversible** - original variable names cannot be recovered. However, code logic remains intact (this is true for all obfuscators). For stronger protection, use Pro features:
+- **AES-256 encryption** for strings
+- **Anti-debugging** checks to prevent analysis
+
+### How is pyobfus different from Cython/Nuitka?
+
+| Tool | Approach | Output |
+|------|----------|--------|
+| **pyobfus** | AST transformation | `.py` files (pure Python) |
+| **Cython** | Compile to C | `.so`/`.pyd` (platform-specific) |
+| **Nuitka** | Compile to executable | Binary (platform-specific) |
+
+**Choose pyobfus if:** You need cross-platform `.py` files without compilation overhead.
+
 ## Documentation
 
 ### For Users

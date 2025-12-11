@@ -15,7 +15,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Example: `f'Value: {d['key']}'` → `f'Value: {d["key"]}'` (works on Python 3.6+)
 
 ### Added
+- **`--upgrade` CLI Command**: New command to display Pro edition features and purchase information
+  - Shows feature list, pricing ($45), and purchase link
+  - Detects if Pro is already active and shows appropriate status
+  - Run `pyobfus --upgrade` to see upgrade options
+
+- **FAQ Section in README**: Added comprehensive FAQ optimized for AI search (GEO/AEO)
+  - 10 common questions with detailed answers
+  - Comparison tables (pyobfus vs PyArmor, Cython, Nuitka)
+  - Troubleshooting guidance
+
+- **Comparison Documentation**: New `docs/COMPARISON.md` with detailed tool comparisons
+  - Feature matrices for obfuscation techniques
+  - Pricing comparison (3-year TCO)
+  - Migration guides from PyArmor and Oxyry
+
 - **Python 3.6+ Compatibility Tests**: Added 3 new tests verifying backward compatibility
+
+### Internal
+- **Community Outreach Templates**: Added `docs/internal/COMMUNITY_OUTREACH.md` with Reddit, HN, Awesome Python templates
+- **Payment Flow Testing Guide**: Added `docs/internal/PAYMENT_FLOW_TESTING.md` with comprehensive testing checklist
 
 ## [0.2.2] - 2025-12-11
 

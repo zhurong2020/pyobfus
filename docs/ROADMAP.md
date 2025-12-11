@@ -12,6 +12,9 @@ This document outlines the planned technical features and improvements for pyobf
 ✅ **v0.2.3 Released** (December 2025)
 - **[P0 Bug Fix] Python 3.6-3.11 Compatibility**: Fixed f-string quotes to work on ALL Python versions
 - **Always Normalize**: Quote handling now runs unconditionally (not just when compile fails)
+- **`--upgrade` CLI Command**: Show Pro edition features and purchase information
+- **FAQ Section**: AI-optimized FAQ in README with comparison tables
+- **Comparison Page**: New `docs/COMPARISON.md` with detailed tool comparisons
 - **Test Suite**: 350 tests, 69% coverage
 
 ✅ **v0.2.2 Released** (December 2025)
@@ -424,5 +427,5 @@ For detailed competitive analysis and feature comparison, see [docs/internal/FEA
 
 ---
 
-**Last Updated**: November 12, 2025
-**Next Review**: After v0.2.0 release
+**Last Updated**: December 11, 2025
+**Next Review**: After v0.3.0 release
