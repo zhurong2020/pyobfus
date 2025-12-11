@@ -208,6 +208,34 @@ obfuscation:
   remove_comments: true
 ```
 
+### exclude_names Behavior
+
+The `exclude_names` option preserves specified names from being renamed during obfuscation:
+
+```yaml
+obfuscation:
+  exclude_names:
+    - MyPublicClass      # Name preserved, but strings inside are still encoded
+    - exported_function  # Name preserved for external callers
+```
+
+**Important**: `exclude_names` only affects **name obfuscation**, not **string encoding**:
+
+```python
+# Original
+SECRET_KEY = "admin-password-123"
+
+# With exclude_names: [SECRET_KEY] and string_encoding: true
+SECRET_KEY = _decode_str('YWRtaW4tcGFzc3dvcmQtMTIz')
+# ✅ Name 'SECRET_KEY' is preserved
+# ✅ String content is still encoded (Base64)
+```
+
+**Use cases**:
+- Preserve names for public APIs that external code imports
+- Keep class/function names for debugging while still protecting string content
+- Maintain compatibility with external frameworks expecting specific names
+
 ### File Filtering
 
 Exclude patterns support glob syntax:

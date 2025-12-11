@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Documentation**: Added `exclude_names Behavior` section in README explaining the relationship between `exclude_names` and `string_encoding`
+- **Tests**: Added 3 new unit tests for `exclude_names` behavior verification:
+  - `test_exclude_names_does_not_affect_string_encoding`: Verifies strings are encoded regardless of exclude_names
+  - `test_exclude_names_with_full_obfuscation_pipeline`: Tests complete NameMangler + StringEncoder pipeline
+  - `test_dict_strings_encoded_even_with_exclude_names`: Tests dictionary key/value encoding with excluded variable names
+
+### Clarified
+- **exclude_names behavior**: `exclude_names` only affects name obfuscation, not string encoding. Variables in `exclude_names` will have their names preserved, but string values are still Base64 encoded.
+
 ## [0.2.0] - 2025-11-19
 
 ### Added
