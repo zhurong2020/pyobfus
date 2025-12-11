@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.2] - 2025-12-11
+
+### Fixed
+- **[P0] F-String Quote Handling Bug**: Fixed syntax errors when obfuscating f-strings containing dictionary subscript access
+  - Problem: F-strings like `f'Value: {data['key']}'` could generate invalid code with quote conflicts
+  - Solution: Added `_fix_fstring_quotes()` in CodeGenerator that detects and fixes quote conflicts
+  - Handles single-quoted f-strings with single-quoted subscripts: `f'..{d['k']}..'` → `f'..{d["k"]}..'`
+  - Handles double-quoted f-strings with double-quoted subscripts: `f"..{d["k"]}.."` → `f"..{d['k']}..'`
+  - Defensive approach: Only activates when generated code has syntax errors
+  - Supports multiple subscripts, nested access, and complex expressions
+
+### Added
+- **New Test Suite**: Added `tests/test_generator.py` with 19 comprehensive tests for f-string quote handling
+  - Unit tests for quote fix functions
+  - Integration tests with full obfuscation pipeline
+  - Edge case coverage (nested dicts, multiple subscripts, mixed content)
+
 ## [0.2.1] - 2025-12-10
 
 ### Added
