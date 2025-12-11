@@ -102,6 +102,11 @@ except ImportError:
     default=True,
     help="Enable cross-file import mapping (default: enabled)",
 )
+@click.option(
+    "--upgrade",
+    is_flag=True,
+    help="Show Pro edition features and purchase information",
+)
 @click.version_option(version=__version__, prog_name="pyobfus")
 def main(
     input_path: Optional[str],
@@ -117,6 +122,7 @@ def main(
     verbose: bool,
     dry_run: bool,
     cross_file: bool,
+    upgrade: bool,
 ) -> None:
     """
     Obfuscate Python source code.
@@ -131,6 +137,11 @@ def main(
       pyobfus --init-config django
       pyobfus --validate-config pyobfus.yaml
     """
+    # Handle --upgrade: Show Pro edition information
+    if upgrade:
+        _handle_upgrade()
+        return
+
     # Handle --init-config: Generate configuration template
     if init_config_template:
         _handle_init_config(init_config_template)
@@ -540,6 +551,62 @@ def _obfuscate_directory_crossfile(
 
             traceback.print_exc()
         sys.exit(1)
+
+
+def _handle_upgrade() -> None:
+    """
+    Display Pro edition features and purchase information.
+    """
+    # Check current status
+    if PRO_AVAILABLE:
+        click.echo("\n" + "=" * 60)
+        click.echo("  pyobfus Professional Edition - ACTIVE")
+        click.echo("=" * 60)
+        click.echo("\nYour Pro license is active. You have access to all features:")
+        click.echo("  - AES-256 string encryption (--string-encryption)")
+        click.echo("  - Anti-debugging protection (--anti-debug)")
+        click.echo("  - Unlimited files and lines of code")
+        click.echo("  - Priority email support")
+        click.echo("\nRun 'pyobfus-license status' to view license details.")
+        return
+
+    # Show Pro edition information for Community users
+    click.echo("\n" + "=" * 60)
+    click.echo("  pyobfus Professional Edition")
+    click.echo("=" * 60)
+    click.echo("")
+    click.echo("  Upgrade to Pro for advanced code protection:")
+    click.echo("")
+    click.echo("  FEATURES")
+    click.echo("  ---------")
+    click.echo("  [x] AES-256 string encryption")
+    click.echo("      Encrypt all strings with military-grade encryption")
+    click.echo("")
+    click.echo("  [x] Anti-debugging protection")
+    click.echo("      Detect and prevent debugger attachment")
+    click.echo("")
+    click.echo("  [x] Unlimited files & lines of code")
+    click.echo("      No restrictions on project size")
+    click.echo("")
+    click.echo("  [x] Priority email support")
+    click.echo("      Get help within 24 hours")
+    click.echo("")
+    click.echo("  PRICING")
+    click.echo("  --------")
+    click.echo("  $45.00 USD (one-time payment)")
+    click.echo("  - 50% cheaper than PyArmor Pro ($89)")
+    click.echo("  - Lifetime license, no subscription")
+    click.echo("  - 30-day money-back guarantee")
+    click.echo("")
+    click.echo("  PURCHASE")
+    click.echo("  ---------")
+    click.echo("  https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400")
+    click.echo("")
+    click.echo("  After purchase, activate with:")
+    click.echo("    pip install --upgrade pyobfus")
+    click.echo("    pyobfus-license register YOUR-LICENSE-KEY")
+    click.echo("")
+    click.echo("=" * 60)
 
 
 def _handle_init_config(template_name: str) -> None:
