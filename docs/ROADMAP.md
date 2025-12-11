@@ -9,6 +9,19 @@ This document outlines the planned technical features and improvements for pyobf
 
 ## Current Status
 
+✅ **v0.2.1 Released** (December 2025)
+- **Configuration Templates**: `pyobfus --init-config django/flask/library/general`
+- **Configuration Validation**: `pyobfus --validate-config pyobfus.yaml` with typo detection
+- **Auto-Discovery**: Automatically find config files without `-c` flag
+- **Documentation**: Clarified `exclude_names` behavior with `string_encoding`
+- **Test Suite**: 330+ tests, 69% coverage
+
+✅ **v0.2.0 Released** (November 2025)
+- **Cross-File Obfuscation**: Consistent name obfuscation across multiple files
+- **Import Rewriting**: Automatic `from module import name` updates
+- **Two-Phase Pipeline**: Scan → Transform architecture
+- **Test Suite**: 302 tests, 69% coverage
+
 ✅ **v0.1.6 Released** (November 2025)
 - **Pro Features Production Ready**: AES-256 encryption and anti-debugging fully tested
 - **Self-Service Purchase Flow**: Automated Stripe payment with instant license delivery
@@ -81,16 +94,16 @@ This document outlines the planned technical features and improvements for pyobf
 - **Effort**: 1-2 weeks
 - **Success**: 5-10x speed improvement
 
-**3. Configuration Enhancement** ⭐⭐⭐⭐ *(Partially completed in v0.1.1)*
+**3. Configuration Enhancement** ⭐⭐⭐⭐ *(Completed in v0.2.1)*
 - **Issue**: Configuration requires manual setup, no validation
 - **Features**:
   - ✅ **Preset levels**: `preset_safe()`, `preset_balanced()`, `preset_aggressive()` (v0.1.1)
   - ✅ **Auto-detection of public APIs** via docstrings and naming conventions (v0.1.1)
-  - 🔲 Project templates: `pyobfus --init-config django/flask/library` (pending)
-  - 🔲 Config validation: `pyobfus --validate-config` (pending)
-  - 🔲 Auto-discovery of config files (pending)
-- **Effort**: 1 week (50% complete)
-- **Success**: 4+ templates, 100% accurate validation
+  - ✅ **Project templates**: `pyobfus --init-config django/flask/library/general` (v0.2.1)
+  - ✅ **Config validation**: `pyobfus --validate-config` with typo detection (v0.2.1)
+  - ✅ **Auto-discovery of config files**: pyobfus.yaml, .pyobfus.yaml, pyproject.toml (v0.2.1)
+- **Effort**: 1 week (100% complete)
+- **Success**: 4 templates, schema validation, typo detection
 
 **4. Keyword Argument Support** ⭐⭐⭐ *(Addresses Issue #8)*
 - **Issue**: Obfuscated functions cannot be called with keyword arguments
