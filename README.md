@@ -10,7 +10,7 @@ A Python code obfuscator built with AST-based transformations for Python 3.8+. P
 
 ## Features
 
-### ✅ Free Edition (Current Version: v0.2.1)
+### ✅ Free Edition (Current Version: v0.2.2)
 
 The following features are **fully implemented and available** in the current version:
 

@@ -9,6 +9,12 @@ This document outlines the planned technical features and improvements for pyobf
 
 ## Current Status
 
+✅ **v0.2.2 Released** (December 2025)
+- **[P0 Bug Fix] F-String Quote Handling**: Fixed syntax errors when obfuscating f-strings with dictionary subscript access
+- **Defensive Code Generation**: Added `_fix_fstring_quotes()` to detect and fix quote conflicts automatically
+- **New Test Suite**: Added `tests/test_generator.py` with 19 comprehensive tests
+- **Test Suite**: 347 tests, 67% coverage
+
 ✅ **v0.2.1 Released** (December 2025)
 - **Configuration Templates**: `pyobfus --init-config django/flask/library/general`
 - **Configuration Validation**: `pyobfus --validate-config pyobfus.yaml` with typo detection
