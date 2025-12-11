@@ -183,7 +183,7 @@ class AllListUpdater(ast.NodeTransformer):
         if isinstance(node, ast.Constant) and isinstance(node.value, str):
             original_name = node.value
         elif isinstance(node, ast.Str):  # Python 3.7 compatibility
-            original_name = node.s
+            original_name = str(node.s)
 
         if original_name is None:
             return None

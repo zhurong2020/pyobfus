@@ -77,7 +77,7 @@ class GlobalSymbolTable:
         # Check for name collision
         if obfuscated_name in self.used_names:
             existing = self._reverse_mapping.get(obfuscated_name)
-            if existing != (module, original_name):
+            if existing is not None and existing != (module, original_name):
                 raise ValueError(
                     f"Name collision: {obfuscated_name} already used for "
                     f"{existing[0]}.{existing[1]}, cannot use for "

@@ -5,7 +5,7 @@ Validates pyobfus YAML configuration files and reports errors/warnings.
 """
 
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 import yaml
 
 
@@ -261,7 +261,9 @@ def _check_pro_requirements(config: Dict[str, Any], result: ValidationResult) ->
         result.add_suggestion("Set 'obfuscation.level: pro' to enable Pro features")
 
 
-def find_config_file(start_path: Path = None) -> Tuple[Path, str]:
+def find_config_file(
+    start_path: Optional[Path] = None,
+) -> Tuple[Optional[Path], Optional[str]]:
     """
     Auto-discover configuration file.
 
@@ -276,7 +278,7 @@ def find_config_file(start_path: Path = None) -> Tuple[Path, str]:
         start_path: Starting directory (default: current working directory)
 
     Returns:
-        Tuple[Path, str]: (config_path, config_type) or (None, None) if not found
+        Tuple[Optional[Path], Optional[str]]: (config_path, config_type) or (None, None) if not found
     """
     if start_path is None:
         start_path = Path.cwd()
