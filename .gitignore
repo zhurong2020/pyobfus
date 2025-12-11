@@ -158,4 +158,4 @@ local-testing/
 # Temporary scripts and utilities
 scripts/upload_pypi.py
 scripts/temp_*.py
-test_*.py
+/test_*.py

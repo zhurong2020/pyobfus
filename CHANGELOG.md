@@ -8,11 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Configuration Templates** (`--init-config`): Generate pre-configured YAML templates for common project types
+  - `pyobfus --init-config django` - Django projects with migrations, admin, models exclusions
+  - `pyobfus --init-config flask` - Flask projects with blueprints, extensions support
+  - `pyobfus --init-config library` - Python libraries with public API preservation
+  - `pyobfus --init-config general` - General purpose configuration
+
+- **Configuration Validation** (`--validate-config`): Validate configuration files before use
+  - Syntax validation for YAML format
+  - Schema validation for configuration options
+  - Typo detection with suggestions (e.g., `exclude_pattern` -> `exclude_patterns`)
+  - Pro feature warnings when using community level
+
+- **Auto-Discovery of Config Files**: Automatically find configuration without `-c` flag
+  - Searches for: `pyobfus.yaml`, `pyobfus.yml`, `.pyobfus.yaml`, `.pyobfus.yml`
+  - Supports `pyproject.toml` with `[tool.pyobfus]` section
+
 - **Documentation**: Added `exclude_names Behavior` section in README explaining the relationship between `exclude_names` and `string_encoding`
-- **Tests**: Added 3 new unit tests for `exclude_names` behavior verification:
-  - `test_exclude_names_does_not_affect_string_encoding`: Verifies strings are encoded regardless of exclude_names
-  - `test_exclude_names_with_full_obfuscation_pipeline`: Tests complete NameMangler + StringEncoder pipeline
-  - `test_dict_strings_encoded_even_with_exclude_names`: Tests dictionary key/value encoding with excluded variable names
+
+- **Tests**: Added 28 new unit tests for configuration features and exclude_names behavior
 
 ### Clarified
 - **exclude_names behavior**: `exclude_names` only affects name obfuscation, not string encoding. Variables in `exclude_names` will have their names preserved, but string values are still Base64 encoded.

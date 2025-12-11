@@ -12,6 +12,8 @@ import click
 
 from pyobfus import __version__
 from pyobfus.config import ObfuscationConfig
+from pyobfus.config_templates import get_template, list_templates
+from pyobfus.config_validator import validate_config_file, find_config_file
 from pyobfus.core.analyzer import SymbolAnalyzer
 from pyobfus.core.generator import CodeGenerator
 from pyobfus.core.parser import ASTParser
@@ -31,13 +33,12 @@ except ImportError:
 
 
 @click.command()
-@click.argument("input_path", type=click.Path(exists=True))
+@click.argument("input_path", type=click.Path(exists=True), required=False)
 @click.option(
     "-o",
     "--output",
     "output_path",
     type=click.Path(),
-    required=True,
     help="Output file or directory path",
 )
 @click.option(
@@ -46,6 +47,18 @@ except ImportError:
     "config_path",
     type=click.Path(exists=True),
     help="Configuration file (YAML)",
+)
+@click.option(
+    "--init-config",
+    "init_config_template",
+    type=click.Choice(["django", "flask", "library", "general"], case_sensitive=False),
+    help="Generate configuration template (django, flask, library, general)",
+)
+@click.option(
+    "--validate-config",
+    "validate_config_path",
+    type=click.Path(exists=True),
+    help="Validate a configuration file",
 )
 @click.option(
     "--level",
@@ -91,9 +104,11 @@ except ImportError:
 )
 @click.version_option(version=__version__, prog_name="pyobfus")
 def main(
-    input_path: str,
-    output_path: str,
+    input_path: Optional[str],
+    output_path: Optional[str],
     config_path: Optional[str],
+    init_config_template: Optional[str],
+    validate_config_path: Optional[str],
     level: str,
     remove_docstrings: bool,
     remove_comments: bool,
@@ -113,13 +128,46 @@ def main(
       pyobfus script.py -o script_obf.py
       pyobfus src/ -o dist/
       pyobfus src/ -o dist/ --config pyobfus.yaml
+      pyobfus --init-config django
+      pyobfus --validate-config pyobfus.yaml
     """
+    # Handle --init-config: Generate configuration template
+    if init_config_template:
+        _handle_init_config(init_config_template)
+        return
+
+    # Handle --validate-config: Validate configuration file
+    if validate_config_path:
+        _handle_validate_config(validate_config_path)
+        return
+
+    # For obfuscation, input_path and output_path are required
+    if not input_path:
+        click.echo("Error: Missing argument 'INPUT_PATH'.", err=True)
+        click.echo("\nUsage: pyobfus INPUT_PATH -o OUTPUT_PATH", err=True)
+        click.echo("\nOr use utility commands:", err=True)
+        click.echo("  pyobfus --init-config django     Generate Django config template", err=True)
+        click.echo("  pyobfus --validate-config FILE   Validate config file", err=True)
+        sys.exit(1)
+
+    if not output_path:
+        click.echo("Error: Missing required option '-o' / '--output'.", err=True)
+        sys.exit(1)
+
     try:
         # Load configuration
-        if config_path:
-            config = ObfuscationConfig.from_file(Path(config_path))
+        effective_config_path = config_path
+
+        # Auto-discover config if not specified
+        if not config_path:
+            auto_config = _try_auto_discover_config(verbose)
+            if auto_config:
+                effective_config_path = str(auto_config)
+
+        if effective_config_path:
+            config = ObfuscationConfig.from_file(Path(effective_config_path))
             if verbose:
-                click.echo(f"Loaded configuration from: {config_path}")
+                click.echo(f"Loaded configuration from: {effective_config_path}")
         else:
             # Use default based on level
             if level == "pro":
@@ -492,6 +540,84 @@ def _obfuscate_directory_crossfile(
 
             traceback.print_exc()
         sys.exit(1)
+
+
+def _handle_init_config(template_name: str) -> None:
+    """
+    Generate configuration template file.
+
+    Args:
+        template_name: Template type (django, flask, library, general)
+    """
+    output_file = Path("pyobfus.yaml")
+
+    # Check if file already exists
+    if output_file.exists():
+        if not click.confirm(f"'{output_file}' already exists. Overwrite?"):
+            click.echo("Aborted.")
+            return
+
+    try:
+        template_content = get_template(template_name)
+        output_file.write_text(template_content, encoding="utf-8")
+        click.echo(f"Generated '{output_file}' with {template_name} template")
+        click.echo(f"\nNext steps:")
+        click.echo(f"  1. Review and customize the configuration")
+        click.echo(f"  2. Run: pyobfus src/ -o dist/ -c {output_file}")
+    except ValueError as e:
+        click.echo(f"Error: {e}", err=True)
+        click.echo(f"\nAvailable templates: {', '.join(list_templates())}", err=True)
+        sys.exit(1)
+
+
+def _handle_validate_config(config_path: str) -> None:
+    """
+    Validate a configuration file and report errors/warnings.
+
+    Args:
+        config_path: Path to configuration file
+    """
+    click.echo(f"Validating: {config_path}\n")
+
+    result = validate_config_file(Path(config_path))
+
+    # Print errors
+    for error in result.errors:
+        click.echo(error, err=True)
+
+    # Print warnings
+    for warning in result.warnings:
+        click.echo(warning)
+
+    # Print suggestions
+    for suggestion in result.suggestions:
+        click.echo(suggestion)
+
+    # Print summary
+    click.echo(f"\n{result.get_summary()}")
+
+    if not result.is_valid:
+        sys.exit(1)
+
+
+def _try_auto_discover_config(verbose: bool) -> Optional[Path]:
+    """
+    Try to auto-discover configuration file.
+
+    Args:
+        verbose: Whether to print discovery messages
+
+    Returns:
+        Path to config file if found, None otherwise
+    """
+    config_path, _ = find_config_file()
+
+    if config_path:
+        if verbose:
+            click.echo(f"Auto-discovered config: {config_path}")
+        return config_path
+
+    return None
 
 
 if __name__ == "__main__":
