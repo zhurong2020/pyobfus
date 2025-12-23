@@ -10,6 +10,23 @@ This guide explains how to activate and manage your pyobfus Professional Edition
 
 > **Important**: Your license key email may be in your **Spam/Junk folder**. Please check there if you don't see it in your inbox within a few minutes of purchase.
 
+## Try Before You Buy
+
+Not sure if Pro features are right for you? Try them free for 5 days:
+
+```bash
+# Start a free trial (no credit card required)
+pyobfus-trial start --email your@email.com
+
+# Test Pro features during trial
+pyobfus input.py -o output.py --string-encryption --anti-debug
+
+# Check trial status
+pyobfus-trial status
+```
+
+The trial includes all Pro features. After 5 days, purchase a license to continue using them.
+
 ## Quick Activation
 
 ```bash
@@ -245,5 +262,5 @@ We'll resend your license key to the registered email.
 
 ---
 
-**Last Updated**: 2025-11-12
-**Version**: v0.1.6
+**Last Updated**: 2025-12-23
+**Version**: v0.2.4

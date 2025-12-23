@@ -143,6 +143,23 @@ def I0(I1, I2):
   </div>
 </div>
 
+### Try Before You Buy
+
+Want to test Pro features before purchasing? Use the **5-day free trial**:
+
+```bash
+# Start a free trial (no credit card required)
+pyobfus-trial start --email your@email.com
+
+# Test Pro features
+pyobfus input.py -o output.py --string-encryption --anti-debug
+
+# Check trial status
+pyobfus-trial status
+```
+
+The trial includes all Pro features with full functionality for 5 days.
+
 ### How to Purchase
 
 **Step 1**: Click "Buy Now" and complete secure checkout (Stripe)
@@ -152,7 +169,7 @@ def I0(I1, I2):
 **Step 3**: Activate your license
 ```bash
 pip install --upgrade pyobfus
-pyobfus-license register PYOBFUS-XXXX-XXXX-XXXX-XXXX
+pyobfus-license register PYOB-XXXX-XXXX-XXXX-XXXX
 ```
 
 ### Activation Guide
