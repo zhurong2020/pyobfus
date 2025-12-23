@@ -5,7 +5,6 @@ Tests that string literals are encrypted with AES-256 (Fernet) and runtime
 decryption infrastructure is properly injected.
 """
 
-import ast
 import pytest
 from typing import TYPE_CHECKING
 
@@ -21,6 +20,7 @@ if TYPE_CHECKING:
 else:
     try:
         from pyobfus_pro.string_aes import StringAESEncryptor
+
         PRO_AVAILABLE = True
     except ImportError:
         pass
@@ -50,10 +50,14 @@ message = "Hello, World!"
         assert "Hello, World!" not in obfuscated_code
 
         # Decryption function should be present
-        assert "_decrypt_str" in obfuscated_code or encryptor.decrypt_function_name in obfuscated_code
+        assert (
+            "_decrypt_str" in obfuscated_code or encryptor.decrypt_function_name in obfuscated_code
+        )
 
         # Encryption key should be present
-        assert "_ENCRYPTION_KEY" in obfuscated_code or encryptor.key_variable_name in obfuscated_code
+        assert (
+            "_ENCRYPTION_KEY" in obfuscated_code or encryptor.key_variable_name in obfuscated_code
+        )
 
         # Code should be executable and produce correct result
         namespace = {}
@@ -264,7 +268,9 @@ result = func()
 
         # Docstrings should remain (not encrypted)
         assert "Module docstring" in obfuscated_code or "Module docstring" in str(obfuscated_tree)
-        assert "Function docstring" in obfuscated_code or "Function docstring" in str(obfuscated_tree)
+        assert "Function docstring" in obfuscated_code or "Function docstring" in str(
+            obfuscated_tree
+        )
         assert "Class docstring" in obfuscated_code or "Class docstring" in str(obfuscated_tree)
 
         # Regular string should be encrypted
@@ -436,7 +442,9 @@ data = {
         assert "value1" not in obfuscated_code
         assert "item1" not in obfuscated_code
         assert "item2" not in obfuscated_code
-        assert "value" not in obfuscated_code or obfuscated_code.count("value") <= 1  # May appear once in key
+        assert (
+            "value" not in obfuscated_code or obfuscated_code.count("value") <= 1
+        )  # May appear once in key
 
         # Code should execute correctly
         namespace = {}

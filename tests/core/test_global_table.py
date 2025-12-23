@@ -259,9 +259,7 @@ class TestGlobalSymbolTable:
         table.register_export("calculator", "Calculator", "I0")
 
         # Register import that cannot be resolved
-        table.register_import(
-            Path("main.py"), ImportInfo("calculator", "NonExistent")
-        )
+        table.register_import(Path("main.py"), ImportInfo("calculator", "NonExistent"))
 
         is_valid, errors = table.validate()
 

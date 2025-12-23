@@ -5,9 +5,6 @@ Tests that string literals are encoded with Base64 and runtime decoding
 infrastructure is properly injected.
 """
 
-import ast
-import base64
-import pytest
 
 from pyobfus.core.parser import ASTParser
 from pyobfus.core.generator import CodeGenerator
