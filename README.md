@@ -10,7 +10,7 @@ A Python code obfuscator built with AST-based transformations for Python 3.8+. P
 
 ## Features
 
-### ✅ Free Edition (Current Version: v0.2.3)
+### ✅ Free Edition (Current Version: v0.2.4)
 
 The following features are **fully implemented and available** in the current version:
 
@@ -56,6 +56,28 @@ The following advanced features are available with a Pro license:
 
 See [ROADMAP.md](docs/ROADMAP.md) for the full feature timeline.
 
+## Try Pro Features FREE
+
+**Try all Pro features for 5 days - no registration or credit card required!**
+
+```bash
+# Start your free trial
+pyobfus-trial start
+
+# Check trial status
+pyobfus-trial status
+
+# Use Pro features during trial
+pyobfus input.py -o output.py --level pro
+```
+
+**What's included in the trial:**
+- AES-256 string encryption
+- Anti-debugging protection
+- Unlimited files and lines of code
+
+After your trial, purchase a license to continue using Pro features.
+
 ## Purchase Professional Edition
 
 **Pro Edition Features (v0.1.6)**:
@@ -82,12 +104,13 @@ See [ROADMAP.md](docs/ROADMAP.md) for the full feature timeline.
 
 2. **Receive License Key**
    - License key delivered to your email within minutes
-   - Format: `PYOBFUS-XXXX-XXXX-XXXX-XXXX`
+   - Format: `PYOB-XXXX-XXXX-XXXX-XXXX`
+   - **Check Spam/Junk folder** if not in inbox
 
 3. **Activate License**
    ```bash
    pip install --upgrade pyobfus
-   pyobfus-license register PYOBFUS-XXXX-XXXX-XXXX-XXXX
+   pyobfus-license register PYOB-XXXX-XXXX-XXXX-XXXX
    pyobfus-license status
    ```
 
