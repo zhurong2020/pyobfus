@@ -189,17 +189,14 @@ def _verify_online(license_key: str) -> Dict[str, Any]:
     device_id = get_device_fingerprint()
 
     # Prepare request data
-    request_data = json.dumps({
-        "license_key": license_key,
-        "device_id": device_id
-    }).encode("utf-8")
+    request_data = json.dumps({"license_key": license_key, "device_id": device_id}).encode("utf-8")
 
     # Create request
     req = urllib.request.Request(
         LICENSE_API_URL,
         data=request_data,
         headers={"Content-Type": "application/json"},
-        method="POST"
+        method="POST",
     )
 
     try:

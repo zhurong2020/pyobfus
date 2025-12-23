@@ -44,13 +44,13 @@ The following advanced features are available with a Pro license:
   - Multiple detection methods (sys.gettrace, sys.settrace)
   - Configurable behavior
 
-- **Control Flow Obfuscation** (Coming in v0.3.0)
-  - If-to-while conversion
-  - Loop unrolling
-  - Jump tables
-  - False branch injection
+- **Control Flow Flattening** (v0.3.0+)
+  - State machine transformation for if/else/elif
+  - For/while loop flattening
+  - Nested structure support
+  - CLI: `--control-flow`
 
-- **Dead Code Injection** (Coming in v0.3.0)
+- **Dead Code Injection** (Coming Soon)
   - Insertion of unreachable code paths
   - Complexity increase
 
@@ -72,15 +72,17 @@ pyobfus input.py -o output.py --level pro
 ```
 
 **What's included in the trial:**
-- AES-256 string encryption
-- Anti-debugging protection
+- Control flow flattening (`--control-flow`)
+- AES-256 string encryption (`--string-encryption`)
+- Anti-debugging protection (`--anti-debug`)
 - Unlimited files and lines of code
 
 After your trial, purchase a license to continue using Pro features.
 
 ## Purchase Professional Edition
 
-**Pro Edition Features (v0.1.6)**:
+**Pro Edition Features**:
+- 🔀 Control Flow Flattening (v0.3.0+)
 - 🔐 AES-256 String Encryption
 - 🛡️ Anti-Debugging Checks
 - 🔄 Lifetime Updates

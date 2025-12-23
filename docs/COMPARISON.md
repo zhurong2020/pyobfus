@@ -32,7 +32,7 @@ PyArmor is the most established Python obfuscator. Here's how pyobfus compares:
 | **Python 3.8-3.13** | Yes | Yes |
 | **String encryption** | AES-256 (Pro) | AES (Pro) |
 | **Anti-debugging** | Yes (Pro) | Yes (Pro) |
-| **Control flow flattening** | Coming v0.3.0 | Yes (Pro) |
+| **Control flow flattening** | Yes (Pro v0.3.0+) | Yes (Pro) |
 | **License binding** | Per-device (3 devices) | Per-device |
 | **Future Python support** | Community-driven | "Can't guarantee" (per docs) |
 

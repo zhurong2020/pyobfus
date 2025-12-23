@@ -5,6 +5,68 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - v0.3.0
+
+### Added
+- **Control Flow Flattening** (Pro Feature): Transform structured control flow into state machine representations
+  - State machine transformation for if/else/elif chains
+  - For loop flattening with iterator pattern
+  - While loop flattening
+  - Nested structure support
+  - Configurable via `CFFConfig` class
+  - New CLI options:
+    - `--control-flow`: Enable control flow flattening
+    - `--string-encryption`: Enable AES-256 string encryption (explicit)
+    - `--anti-debug`: Enable anti-debugging protection (explicit)
+  - 23 comprehensive unit tests
+
+- **Pro Feature CLI Flags**: Direct access to Pro features via CLI
+  - Users can now enable specific Pro features individually
+  - Automatic license/trial verification when Pro features requested
+  - Works with both full license and 5-day trial
+
+### Technical Details
+- **New Modules**:
+  - `pyobfus_pro/control_flow/__init__.py`: Module exports
+  - `pyobfus_pro/control_flow/state_machine.py`: StateMachine and State classes (~185 lines)
+  - `pyobfus_pro/control_flow/flattener.py`: ControlFlowFlattener AST transformer (~340 lines)
+  - `tests/test_control_flow_flattening.py`: 23 unit tests (~380 lines)
+
+- **Config Updates**:
+  - Added CFF state variable exclusions (`_cff_state`, `_cff_return`, `_cff_iter`)
+  - Infrastructure pattern matching for `_cff_*` variables
+
+### Example
+```python
+# Before
+def calculate(x, y):
+    if x > 0:
+        result = x + y
+    else:
+        result = x - y
+    return result
+
+# After (with --control-flow)
+def I0(I1, I2):
+    _cff_state_0 = 0
+    while _cff_state_0 != -1:
+        if _cff_state_0 == 0:
+            if I1 > 0:
+                _cff_state_0 = 1
+            else:
+                _cff_state_0 = 2
+        elif _cff_state_0 == 1:
+            I3 = I1 + I2
+            _cff_state_0 = 3
+        elif _cff_state_0 == 2:
+            I3 = I1 - I2
+            _cff_state_0 = 3
+        elif _cff_state_0 == 3:
+            _cff_return_1 = I3
+            _cff_state_0 = -1
+    return _cff_return_1
+```
+
 ## [0.2.4] - 2025-12-22
 
 ### Added
