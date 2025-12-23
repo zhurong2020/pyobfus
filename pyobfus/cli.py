@@ -12,6 +12,7 @@ import click
 
 from pyobfus import __version__
 from pyobfus.config import ObfuscationConfig
+from pyobfus.constants import STRIPE_PAYMENT_LINK, PRO_PRICE_USD
 from pyobfus.config_templates import get_template, list_templates
 from pyobfus.config_validator import validate_config_file, find_config_file
 from pyobfus.core.analyzer import SymbolAnalyzer
@@ -273,7 +274,7 @@ def main(
                         err=True,
                     )
                     click.echo(
-                        "  https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400",
+                        f"  {STRIPE_PAYMENT_LINK}",
                         err=True,
                     )
                     sys.exit(1)
@@ -618,8 +619,8 @@ def _handle_upgrade() -> None:
         click.echo("  - Unlimited files and lines of code")
         click.echo("")
         click.echo("  To keep using Pro after trial:")
-        click.echo("  $45.00 USD (one-time payment)")
-        click.echo("  https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400")
+        click.echo(f"  ${PRO_PRICE_USD}.00 USD (one-time payment)")
+        click.echo(f"  {STRIPE_PAYMENT_LINK}")
         click.echo("")
         click.echo("  Check trial status: pyobfus-trial status")
         click.echo("=" * 60)
@@ -658,7 +659,7 @@ def _handle_upgrade() -> None:
     click.echo("")
     click.echo("  PURCHASE")
     click.echo("  ---------")
-    click.echo("  https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400")
+    click.echo(f"  {STRIPE_PAYMENT_LINK}")
     click.echo("")
     click.echo("  After purchase, activate with:")
     click.echo("    pip install --upgrade pyobfus")
