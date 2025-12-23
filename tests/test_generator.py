@@ -6,7 +6,6 @@ in generated code.
 """
 
 import ast
-import pytest
 
 from pyobfus.core.generator import CodeGenerator
 
@@ -173,7 +172,7 @@ class TestPython36Compatibility:
 
     def test_double_quote_fstring_normalized(self):
         """Double-quote f-strings with double-quote subscripts should be fixed."""
-        code = '''print(f"Value: {data["key"]}")'''
+        code = """print(f"Value: {data["key"]}")"""
         result = CodeGenerator._fix_fstring_quotes(code)
 
         # Should use single quotes for subscript inside double-quoted f-string
@@ -183,7 +182,7 @@ class TestPython36Compatibility:
     def test_already_compatible_code_unchanged(self):
         """Code already using different quotes should remain valid."""
         # This is already compatible with all Python versions
-        compatible_code = '''print(f"Value: {data['key']}")'''
+        compatible_code = """print(f"Value: {data['key']}")"""
         result = CodeGenerator._fix_fstring_quotes(compatible_code)
 
         # Should remain unchanged (or equivalent)
@@ -259,4 +258,6 @@ result = f"K1: {data['key1']}, K2: {data['key2']}"
             if namespace[var] == "K1: value1, K2: value2":
                 found_expected = True
                 break
-        assert found_expected, f"Expected 'K1: value1, K2: value2' in namespace values: {[namespace[v] for v in obfuscated_vars]}"
+        assert (
+            found_expected
+        ), f"Expected 'K1: value1, K2: value2' in namespace values: {[namespace[v] for v in obfuscated_vars]}"

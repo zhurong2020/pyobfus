@@ -5,7 +5,6 @@ Tests that anti-debugging checks are properly injected into functions
 and work correctly to detect debuggers.
 """
 
-import ast
 import sys
 import pytest
 from typing import TYPE_CHECKING
@@ -22,6 +21,7 @@ if TYPE_CHECKING:
 else:
     try:
         from pyobfus_pro.anti_debug import AntiDebugInjector
+
         PRO_AVAILABLE = True
     except ImportError:
         pass
@@ -49,7 +49,9 @@ def my_function():
         obfuscated_code = CodeGenerator.generate(obfuscated_tree)
 
         # Check function should be present
-        assert "_check_debugger" in obfuscated_code or injector.check_function_name in obfuscated_code
+        assert (
+            "_check_debugger" in obfuscated_code or injector.check_function_name in obfuscated_code
+        )
 
         # sys.gettrace() should be present
         assert "gettrace" in obfuscated_code

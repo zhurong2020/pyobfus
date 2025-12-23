@@ -10,8 +10,6 @@ Tests cover:
 """
 
 import ast
-import pytest
-from pathlib import Path
 
 from pyobfus.core.global_table import GlobalSymbolTable
 from pyobfus.transformers.exported_name_transformer import (

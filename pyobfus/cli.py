@@ -34,7 +34,6 @@ except ImportError:
     PRO_AVAILABLE = False
 
 
-
 @click.command()
 @click.argument("input_path", type=click.Path(exists=True), required=False)
 @click.option(

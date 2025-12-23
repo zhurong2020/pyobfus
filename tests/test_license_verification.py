@@ -42,14 +42,17 @@ except ImportError:
     # Stub exception classes
     class LicenseExpiredError(Exception):  # type: ignore[no-redef]
         """Stub for LicenseExpiredError."""
+
         pass
 
     class LicenseRevokedError(Exception):  # type: ignore[no-redef]
         """Stub for LicenseRevokedError."""
+
         pass
 
     class LicenseVerificationError(Exception):  # type: ignore[no-redef]
         """Stub for LicenseVerificationError."""
+
         pass
 
     # Stub functions - marked with type: ignore to avoid conflicts with real implementations

@@ -9,10 +9,9 @@ import sys
 import click
 
 from pyobfus import __version__
-from pyobfus.constants import STRIPE_PAYMENT_LINK, PRO_PRICE_USD
+from pyobfus.constants import STRIPE_PAYMENT_LINK
 from pyobfus.trial import (
     get_trial_status,
-    is_trial_active,
     start_trial,
     TRIAL_DURATION,
 )

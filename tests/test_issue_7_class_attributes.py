@@ -32,14 +32,16 @@ def run_obfuscated_code(code: str) -> dict:
 
     # Compile and execute
     try:
-        compiled = compile(transformed, '<test>', 'exec')
+        compiled = compile(transformed, "<test>", "exec")
         namespace = {}
         exec(compiled, namespace)
         return namespace
     except AttributeError as e:
         pytest.fail(f"AttributeError raised: {e}\nObfuscated code:\n{obfuscated_code}")
     except Exception as e:
-        pytest.fail(f"Unexpected error: {type(e).__name__}: {e}\nObfuscated code:\n{obfuscated_code}")
+        pytest.fail(
+            f"Unexpected error: {type(e).__name__}: {e}\nObfuscated code:\n{obfuscated_code}"
+        )
 
 
 def test_class_attribute_direct_access():
@@ -172,11 +174,11 @@ class MyClass:
     analyzer.analyze(tree)
 
     # Verify that class attributes are tracked
-    assert 'MyClass' in analyzer.class_attributes
-    assert 'class_var1' in analyzer.class_attributes['MyClass']
-    assert 'class_var2' in analyzer.class_attributes['MyClass']
-    assert 'class_var1' in analyzer.all_class_attributes
-    assert 'class_var2' in analyzer.all_class_attributes
+    assert "MyClass" in analyzer.class_attributes
+    assert "class_var1" in analyzer.class_attributes["MyClass"]
+    assert "class_var2" in analyzer.class_attributes["MyClass"]
+    assert "class_var1" in analyzer.all_class_attributes
+    assert "class_var2" in analyzer.all_class_attributes
 
 
 def test_class_attribute_vs_method():

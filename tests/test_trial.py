@@ -5,8 +5,6 @@ Tests for the trial management system.
 import json
 import pytest
 from datetime import datetime, timedelta
-from pathlib import Path
-from unittest.mock import patch
 
 from pyobfus.trial import (
     start_trial,
