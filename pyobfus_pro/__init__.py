@@ -13,6 +13,7 @@ __license__ = "Proprietary"
 
 from .string_aes import StringAESEncryptor
 from .anti_debug import AntiDebugInjector
+from .control_flow import ControlFlowFlattener, StateMachine, State
 from .license import (
     verify_license,
     get_license_status,
@@ -27,6 +28,9 @@ from .fingerprint import get_device_fingerprint, get_device_info
 __all__ = [
     "StringAESEncryptor",
     "AntiDebugInjector",
+    "ControlFlowFlattener",
+    "StateMachine",
+    "State",
     "verify_license",
     "get_license_status",
     "remove_cached_license",
