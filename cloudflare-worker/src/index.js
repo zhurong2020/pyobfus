@@ -216,14 +216,14 @@ async function handleStripeWebhook(request, env, corsHeaders) {
 
 /**
  * Generate a unique license key
- * Format: PYOBFUS-XXXX-XXXX-XXXX-XXXX
+ * Format: PYOB-XXXX-XXXX-XXXX-XXXX (hex characters only)
  */
 function generateLicenseKey() {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const chars = '0123456789ABCDEF';  // HEX only - required by CLI validation
   const segments = 4;
   const segmentLength = 4;
 
-  let key = 'PYOBFUS';
+  let key = 'PYOB';
   for (let i = 0; i < segments; i++) {
     key += '-';
     for (let j = 0; j < segmentLength; j++) {
@@ -256,12 +256,19 @@ async function sendLicenseEmail(apiKey, toEmail, licenseKey) {
 
 Thank you for purchasing pyobfus Professional Edition!
 
-Your license key is:
+════════════════════════════════════════════
+YOUR LICENSE KEY
+════════════════════════════════════════════
+
 ${licenseKey}
+
+════════════════════════════════════════════
+
+IMPORTANT: Please save this email! Your license key cannot be recovered without it.
 
 To activate your license:
 
-1. Install pyobfus:
+1. Install/upgrade pyobfus:
    pip install --upgrade pyobfus
 
 2. Register your license:
@@ -270,19 +277,26 @@ To activate your license:
 3. Verify activation:
    pyobfus-license status
 
-Documentation: https://github.com/zhurong2020/pyobfus
-Support: zhurong0525@gmail.com
+4. Start using Pro features:
+   pyobfus input.py -o output.py --level pro
 
 Your license includes:
 - AES-256 String Encryption
 - Anti-Debugging Checks
-- Lifetime Updates
+- Lifetime Updates (never expires)
 - Up to 3 devices
+
+Documentation: https://github.com/zhurong2020/pyobfus
+Full Activation Guide: https://github.com/zhurong2020/pyobfus/blob/main/docs/LICENSE_ACTIVATION_GUIDE.md
+Support: zhurong0525@gmail.com
 
 Thank you for supporting pyobfus!
 
 Best regards,
-The pyobfus Team`;
+The pyobfus Team
+
+---
+Note: If you found this email in your spam/junk folder, please mark it as "Not Spam" to ensure you receive future updates.`;
 
   try {
     const response = await fetch('https://api.resend.com/emails', {
@@ -292,7 +306,7 @@ The pyobfus Team`;
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        from: 'pyobfus <onboarding@resend.dev>',
+        from: 'pyobfus <license@arong.eu.org>',
         to: [toEmail],
         subject: 'Your pyobfus Professional License Key',
         text: emailBody
