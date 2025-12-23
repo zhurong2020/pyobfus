@@ -50,9 +50,10 @@ The following advanced features are available with a Pro license:
   - Nested structure support
   - CLI: `--control-flow`
 
-- **Dead Code Injection** (Coming Soon)
+- **Dead Code Injection** (v0.3.0+)
   - Insertion of unreachable code paths
-  - Complexity increase
+  - Four strategies: after-return, false branches, opaque predicates, decoy functions
+  - CLI: `--dead-code`
 
 See [ROADMAP.md](docs/ROADMAP.md) for the full feature timeline.
 
@@ -75,6 +76,7 @@ pyobfus input.py -o output.py --level pro
 - Control flow flattening (`--control-flow`)
 - AES-256 string encryption (`--string-encryption`)
 - Anti-debugging protection (`--anti-debug`)
+- Dead code injection (`--dead-code`)
 - Unlimited files and lines of code
 
 After your trial, purchase a license to continue using Pro features.
@@ -83,6 +85,7 @@ After your trial, purchase a license to continue using Pro features.
 
 **Pro Edition Features**:
 - 🔀 Control Flow Flattening (v0.3.0+)
+- 🧩 Dead Code Injection (v0.3.0+)
 - 🔐 AES-256 String Encryption
 - 🛡️ Anti-Debugging Checks
 - 🔄 Lifetime Updates
@@ -124,8 +127,11 @@ After your trial, purchase a license to continue using Pro features.
    # Enable anti-debugging
    pyobfus input.py -o output.py --anti-debug
 
-   # Both features
-   pyobfus input.py -o output.py --string-encryption --anti-debug
+   # Enable dead code injection
+   pyobfus input.py -o output.py --dead-code
+
+   # All Pro features
+   pyobfus input.py -o output.py --string-encryption --anti-debug --control-flow --dead-code
    ```
 
 **Support**: If you encounter any issues, contact zhurong0525@gmail.com with your license key.

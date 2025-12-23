@@ -14,14 +14,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - While loop flattening
   - Nested structure support
   - Configurable via `CFFConfig` class
-  - New CLI options:
-    - `--control-flow`: Enable control flow flattening
-    - `--string-encryption`: Enable AES-256 string encryption (explicit)
-    - `--anti-debug`: Enable anti-debugging protection (explicit)
   - 23 comprehensive unit tests
 
+- **Dead Code Injection** (Pro Feature): Inject unreachable code to increase complexity
+  - `--dead-code`: Enable dead code injection
+  - Four injection strategies:
+    - After Return: Code after `return` statements that never executes
+    - False Branches: `if False:` blocks with realistic-looking code
+    - Opaque Predicates: Always-true conditions (e.g., `x*x >= 0`) with dead else branches
+    - Decoy Functions: Functions that are never called
+  - Configurable via `DCIConfig` class
+  - Reproducible results with seed support
+  - 21 comprehensive unit tests
+
 - **Pro Feature CLI Flags**: Direct access to Pro features via CLI
-  - Users can now enable specific Pro features individually
+  - `--control-flow`: Enable control flow flattening
+  - `--string-encryption`: Enable AES-256 string encryption
+  - `--anti-debug`: Enable anti-debugging protection
+  - `--dead-code`: Enable dead code injection
   - Automatic license/trial verification when Pro features requested
   - Works with both full license and 5-day trial
 
@@ -31,10 +41,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `pyobfus_pro/control_flow/state_machine.py`: StateMachine and State classes (~185 lines)
   - `pyobfus_pro/control_flow/flattener.py`: ControlFlowFlattener AST transformer (~340 lines)
   - `tests/test_control_flow_flattening.py`: 23 unit tests (~380 lines)
+  - `pyobfus_pro/dead_code/__init__.py`: Module exports
+  - `pyobfus_pro/dead_code/injector.py`: DeadCodeInjector AST transformer (~430 lines)
+  - `tests/test_dead_code_injection.py`: 21 unit tests (~500 lines)
 
 - **Config Updates**:
   - Added CFF state variable exclusions (`_cff_state`, `_cff_return`, `_cff_iter`)
-  - Infrastructure pattern matching for `_cff_*` variables
+  - Added DCI variable exclusions (`_dci_*`)
+  - Infrastructure pattern matching for `_cff_*` and `_dci_*` variables
+  - New config option: `dead_code_injection` (bool)
 
 ### Example
 ```python
