@@ -9,6 +9,7 @@ import sys
 import click
 
 from pyobfus import __version__
+from pyobfus.constants import STRIPE_PAYMENT_LINK, PRO_PRICE_USD
 from pyobfus.trial import (
     get_trial_status,
     is_trial_active,
@@ -83,7 +84,7 @@ def start() -> None:
         click.echo("  PURCHASE PRO LICENSE")
         click.echo("  ---------------------")
         click.echo("  $45 USD (one-time payment)")
-        click.echo("  https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400")
+        click.echo(f"  {STRIPE_PAYMENT_LINK}")
         click.echo("")
         click.echo("=" * 60)
         sys.exit(1)
@@ -114,7 +115,7 @@ def status() -> None:
         click.echo("    pyobfus-trial start")
         click.echo("")
         click.echo("  Or purchase a license:")
-        click.echo("    https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400")
+        click.echo(f"    {STRIPE_PAYMENT_LINK}")
         click.echo("")
         click.echo("=" * 60)
         return
@@ -135,7 +136,7 @@ def status() -> None:
             click.echo("")
             click.echo("  Don't lose access to Pro features!")
             click.echo("  Purchase a license: $45 USD (one-time)")
-            click.echo("  https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400")
+            click.echo(f"  {STRIPE_PAYMENT_LINK}")
             click.echo("")
     else:
         click.echo("  Status: " + click.style("EXPIRED", fg="red", bold=True))
@@ -147,7 +148,7 @@ def status() -> None:
         click.echo("  Purchase a license to keep using Pro features:")
         click.echo("")
         click.echo("  Price: $45 USD (one-time payment)")
-        click.echo("  URL:   https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400")
+        click.echo(f"  URL:   {STRIPE_PAYMENT_LINK}")
         click.echo("")
         click.echo("  50% cheaper than PyArmor Pro ($89)")
         click.echo("  30-day money-back guarantee")
