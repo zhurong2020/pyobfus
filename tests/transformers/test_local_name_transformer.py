@@ -348,7 +348,7 @@ if __name__ == "__main__":
         tree = ast.parse(source)
 
         transformer = LocalNameTransformer(table, "module")
-        new_tree = transformer.visit(tree)
+        _new_tree = transformer.visit(tree)  # noqa: F841
 
         assert transformer.names_renamed == 0
         assert transformer.names_unchanged == 0

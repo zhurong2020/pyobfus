@@ -353,7 +353,7 @@ fstring = f"Dynamic {string1}"
         analyzer.analyze(tree)
 
         encryptor = StringAESEncryptor(config, analyzer)
-        obfuscated_tree = encryptor.transform(tree)
+        _obfuscated_tree = encryptor.transform(tree)  # noqa: F841
 
         stats = encryptor.get_statistics()
         assert "encrypted_strings" in stats

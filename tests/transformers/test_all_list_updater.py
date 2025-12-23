@@ -229,7 +229,7 @@ def add(a, b):
         tree = ast.parse(source)
 
         updater = AllListUpdater(table, "calculator")
-        new_tree = updater.visit(tree)
+        _new_tree = updater.visit(tree)  # noqa: F841
 
         assert updater.all_lists_updated == 0
         assert updater.names_updated == 0
