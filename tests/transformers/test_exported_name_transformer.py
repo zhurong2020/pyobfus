@@ -311,7 +311,7 @@ def func2():
         tree = ast.parse(source)
 
         transformer = ExportedNameTransformer(table, "calculator")
-        new_tree = transformer.visit(tree)
+        _new_tree = transformer.visit(tree)  # noqa: F841
 
         assert transformer.definitions_renamed == 0
         assert transformer.definitions_unchanged == 0

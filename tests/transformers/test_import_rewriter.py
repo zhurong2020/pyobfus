@@ -378,7 +378,7 @@ class Main:
         tree = ast.parse(source)
 
         rewriter = ImportRewriter(table, "main")
-        new_tree = rewriter.visit(tree)
+        _new_tree = rewriter.visit(tree)  # noqa: F841
 
         assert rewriter.imports_rewritten == 0
         assert rewriter.imports_unchanged == 0
@@ -396,7 +396,7 @@ def my_function():
         tree = ast.parse(source)
 
         rewriter = ImportRewriter(table, "main")
-        new_tree = rewriter.visit(tree)
+        _new_tree = rewriter.visit(tree)  # noqa: F841
 
         assert rewriter.imports_rewritten == 0
         assert rewriter.imports_unchanged == 0

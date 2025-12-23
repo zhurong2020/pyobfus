@@ -155,7 +155,7 @@ def normal():
         analyzer.analyze(tree)
 
         injector = AntiDebugInjector(config, analyzer)
-        obfuscated_tree = injector.transform(tree)
+        _obfuscated_tree = injector.transform(tree)  # noqa: F841
 
         stats = injector.get_statistics()
         # Only "normal" function should be injected (has >= 2 statements)
@@ -183,7 +183,7 @@ def public():
 
         injector = AntiDebugInjector(config, analyzer)
         obfuscated_tree = injector.transform(tree)
-        obfuscated_code = CodeGenerator.generate(obfuscated_tree)
+        _obfuscated_code = CodeGenerator.generate(obfuscated_tree)  # noqa: F841
 
         # _private should not have check injected
         # public should have check injected
@@ -275,7 +275,7 @@ def func3():
         analyzer.analyze(tree)
 
         injector = AntiDebugInjector(config, analyzer)
-        obfuscated_tree = injector.transform(tree)
+        _obfuscated_tree = injector.transform(tree)  # noqa: F841
 
         stats = injector.get_statistics()
         assert "injected_functions" in stats
