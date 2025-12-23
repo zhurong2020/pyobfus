@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.4] - 2025-12-22
+
+### Added
+- **5-Day Pro Trial** (`pyobfus-trial`): Try Pro features FREE without registration or credit card
+  - `pyobfus-trial start` - Start a 5-day trial
+  - `pyobfus-trial status` - Check trial status
+  - `pyobfus-trial features` - View available Pro features
+  - Device-bound trial (one trial per machine)
+  - Seamless integration with main CLI (`pyobfus --level pro` works during trial)
+
+- **Trial-Aware CLI**: Main CLI now checks trial status and shows appropriate messages
+  - Shows trial expiration warnings
+  - Suggests trial start when using `--level pro` without license
+  - Updated `--upgrade` command to show trial options
+
+- **New Tests**: Added 16 unit tests for trial management system
+
+### Improved
+- **Pro Feature Hints**: Updated hints to mention free trial option
+- **Error Messages**: All Pro-related errors now suggest starting a trial
+
 ## [0.2.3] - 2025-12-11
 
 ### Fixed

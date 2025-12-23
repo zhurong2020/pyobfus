@@ -8,6 +8,8 @@ This guide explains how to activate and manage your pyobfus Professional Edition
 - pyobfus package installed: `pip install pyobfus`
 - Valid license key (received via email after purchase)
 
+> **Important**: Your license key email may be in your **Spam/Junk folder**. Please check there if you don't see it in your inbox within a few minutes of purchase.
+
 ## Quick Activation
 
 ```bash
@@ -15,7 +17,7 @@ This guide explains how to activate and manage your pyobfus Professional Edition
 pip install --upgrade pyobfus
 
 # 2. Register your license
-pyobfus-license register PYOBFUS-XXXX-XXXX-XXXX-XXXX
+pyobfus-license register PYOB-XXXX-XXXX-XXXX-XXXX
 
 # 3. Verify activation
 pyobfus-license status
@@ -42,14 +44,14 @@ pip install --upgrade pyobfus
 Use the `pyobfus-license` command to register your license:
 
 ```bash
-pyobfus-license register PYOBFUS-XXXX-XXXX-XXXX-XXXX
+pyobfus-license register PYOB-XXXX-XXXX-XXXX-XXXX
 ```
 
-Replace `PYOBFUS-XXXX-XXXX-XXXX-XXXX` with your actual license key.
+Replace `PYOB-XXXX-XXXX-XXXX-XXXX` with your actual license key.
 
 **Expected output**:
 ```
-[INFO] Registering license: PYOBFUS-XXXX-XXXX-XXXX-XXXX
+[INFO] Registering license: PYOB-XXXX-XXXX-XXXX-XXXX
 [SUCCESS] License registered successfully
 [INFO] License cached locally for offline use
 ```
@@ -65,7 +67,7 @@ pyobfus-license status
 **Expected output**:
 ```
 License Status:
-  License Key: PYOBFUS-XXXX-XXXX-XXXX-XXXX
+  License Key: PYOB-XXXX-XXXX-XXXX-XXXX
   Status: Active
   Email: your-email@example.com
   Device: 1/3 devices used
@@ -128,7 +130,7 @@ Each license works on up to 3 devices. To transfer:
 2. **On new device**:
    ```bash
    pip install pyobfus
-   pyobfus-license register PYOBFUS-XXXX-XXXX-XXXX-XXXX
+   pyobfus-license register PYOB-XXXX-XXXX-XXXX-XXXX
    ```
 
 If you've reached the 3-device limit, contact support to reset device bindings.
@@ -190,7 +192,7 @@ pyobfus-license status --verify
 2. Remove and re-register:
    ```bash
    pyobfus-license remove
-   pyobfus-license register PYOBFUS-XXXX-XXXX-XXXX-XXXX
+   pyobfus-license register PYOB-XXXX-XXXX-XXXX-XXXX
    ```
 
 ## Support
