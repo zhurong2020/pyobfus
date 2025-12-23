@@ -5,6 +5,7 @@ These tests verify the license verification, caching, and management functionali
 """
 
 import hashlib
+import io
 import json
 import tempfile
 from datetime import datetime, timedelta
@@ -232,25 +233,25 @@ class TestLicenseVerification:
             verify_license("WRONG-AAAA-BBBB-CCCC-DDDD")  # Wrong prefix
 
     @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
-    @patch("urllib.request.urlopen")
+    @patch("pyobfus_pro.license.urllib.request.urlopen")
     def test_verify_license_online_success(self, mock_urlopen):
         """Test successful online license verification."""
-        # Mock the GitHub API response
-        license_data = {
-            "version": "1.0",
-            "licenses": [
-                {
-                    "key": "PYOB-AAAA-BBBB-CCCC-DDDD",
-                    "type": "professional",
-                    "issued": "2025-01-01",
-                    "expires": "2026-01-01",
-                    "status": "active",
-                }
-            ],
+        # Mock the Worker API response
+        api_response = {
+            "valid": True,
+            "license_key": "PYOB-AAAA-BBBB-CCCC-DDDD",
+            "email": "test@example.com",
+            "created_at": "2025-01-01T00:00:00Z",
+            "expires_at": None,  # Lifetime license
+            "features": {
+                "string_encryption": True,
+                "anti_debug": True,
+                "control_flow": False,
+            },
         }
 
         mock_response = MagicMock()
-        mock_response.read.return_value = json.dumps(license_data).encode()
+        mock_response.read.return_value = json.dumps(api_response).encode()
         mock_response.__enter__.return_value = mock_response
         mock_response.__exit__.return_value = None
         mock_urlopen.return_value = mock_response
@@ -259,8 +260,7 @@ class TestLicenseVerification:
         result = verify_license("PYOB-AAAA-BBBB-CCCC-DDDD")
 
         assert result["valid"] is True
-        assert result["type"] == "professional"
-        assert result["expires"] == "2026-01-01"
+        assert result["type"] == "pro"
         assert "success" in result["message"].lower()
 
         # Check that license was cached
@@ -269,80 +269,62 @@ class TestLicenseVerification:
         assert cached["key"] == "PYOB-AAAA-BBBB-CCCC-DDDD"
 
     @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
-    @patch("urllib.request.urlopen")
+    @patch("pyobfus_pro.license.urllib.request.urlopen")
     def test_verify_license_revoked(self, mock_urlopen):
         """Test verification of revoked license."""
-        license_data = {
-            "version": "1.0",
-            "licenses": [
-                {
-                    "key": "PYOB-AAAA-BBBB-CCCC-DDDD",
-                    "type": "professional",
-                    "issued": "2025-01-01",
-                    "expires": "2026-01-01",
-                    "status": "revoked",
-                }
-            ],
-        }
+        # Worker returns 403 for revoked licenses
+        import urllib.error
 
-        mock_response = MagicMock()
-        mock_response.read.return_value = json.dumps(license_data).encode()
-        mock_response.__enter__.return_value = mock_response
-        mock_response.__exit__.return_value = None
-        mock_urlopen.return_value = mock_response
+        # Use BytesIO for proper file-like object behavior
+        error_body = io.BytesIO(
+            json.dumps({"valid": False, "error": "License is revoked"}).encode()
+        )
 
-        # Should raise LicenseRevokedError
-        with pytest.raises(LicenseRevokedError, match="revoked"):
+        mock_urlopen.side_effect = urllib.error.HTTPError(
+            url="", code=403, msg="Forbidden", hdrs={}, fp=error_body
+        )
+
+        # Should raise LicenseVerificationError (revoked is handled as verification failure)
+        with pytest.raises(LicenseVerificationError, match="revoked"):
             verify_license("PYOB-AAAA-BBBB-CCCC-DDDD")
 
     @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
-    @patch("urllib.request.urlopen")
+    @patch("pyobfus_pro.license.urllib.request.urlopen")
     def test_verify_license_expired(self, mock_urlopen):
         """Test verification of expired license."""
-        # License expired yesterday
-        expired_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+        # Worker returns 403 for expired licenses
+        import urllib.error
 
-        license_data = {
-            "version": "1.0",
-            "licenses": [
-                {
-                    "key": "PYOB-AAAA-BBBB-CCCC-DDDD",
-                    "type": "professional",
-                    "issued": "2024-01-01",
-                    "expires": expired_date,
-                    "status": "active",
-                }
-            ],
-        }
+        # Use BytesIO for proper file-like object behavior
+        error_body = io.BytesIO(
+            json.dumps({"valid": False, "error": "License has expired"}).encode()
+        )
 
-        mock_response = MagicMock()
-        mock_response.read.return_value = json.dumps(license_data).encode()
-        mock_response.__enter__.return_value = mock_response
-        mock_response.__exit__.return_value = None
-        mock_urlopen.return_value = mock_response
+        mock_urlopen.side_effect = urllib.error.HTTPError(
+            url="", code=403, msg="Forbidden", hdrs={}, fp=error_body
+        )
 
-        # Should raise LicenseExpiredError
-        with pytest.raises(LicenseExpiredError, match="expired"):
+        # Should raise LicenseVerificationError
+        with pytest.raises(LicenseVerificationError, match="expired"):
             verify_license("PYOB-AAAA-BBBB-CCCC-DDDD")
 
     @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
-    @patch("urllib.request.urlopen")
+    @patch("pyobfus_pro.license.urllib.request.urlopen")
     def test_verify_license_not_found(self, mock_urlopen):
         """Test verification of non-existent license key."""
-        license_data = {"version": "1.0", "licenses": []}
+        # Worker returns 404 for not found
+        import urllib.error
 
-        mock_response = MagicMock()
-        mock_response.read.return_value = json.dumps(license_data).encode()
-        mock_response.__enter__.return_value = mock_response
-        mock_response.__exit__.return_value = None
-        mock_urlopen.return_value = mock_response
+        mock_urlopen.side_effect = urllib.error.HTTPError(
+            url="", code=404, msg="Not Found", hdrs={}, fp=None
+        )
 
         # Should raise LicenseVerificationError
         with pytest.raises(LicenseVerificationError, match="not found"):
             verify_license("PYOB-AAAA-BBBB-CCCC-DDDD")
 
     @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
-    @patch("urllib.request.urlopen")
+    @patch("pyobfus_pro.license.urllib.request.urlopen")
     def test_verify_license_uses_cache(self, mock_urlopen):
         """Test that valid cached license is used without online verification."""
         # Cache a valid license from "yesterday"
@@ -366,7 +348,7 @@ class TestLicenseVerification:
         mock_urlopen.assert_not_called()
 
     @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
-    @patch("urllib.request.urlopen")
+    @patch("pyobfus_pro.license.urllib.request.urlopen")
     def test_verify_license_network_error_fallback_to_cache(self, mock_urlopen):
         """Test fallback to cache when network verification fails."""
         # Cache a valid license
