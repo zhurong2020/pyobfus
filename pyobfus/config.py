@@ -61,6 +61,10 @@ class ObfuscationConfig:
             "_ENCRYPTION_KEY",
             "_decrypt_str",
             "_check_debugger",
+            # Control Flow Flattening state variables
+            "_cff_state",
+            "_cff_return",
+            "_cff_iter",
         }
     )
     name_prefix: str = "I"
@@ -188,7 +192,7 @@ class ObfuscationConfig:
             return True
 
         # Exclude infrastructure names (Pro feature support functions/variables)
-        # Pattern: _decrypt_*, _encrypt_*, _check_*, _ENCRYPTION_*, etc.
+        # Pattern: _decrypt_*, _encrypt_*, _check_*, _ENCRYPTION_*, _cff_*, etc.
         if name.startswith("_"):
             infrastructure_patterns = [
                 "_decrypt",
@@ -196,6 +200,7 @@ class ObfuscationConfig:
                 "_check",
                 "_ENCRYPTION",
                 "_KEY",
+                "_cff_",  # Control Flow Flattening state variables
             ]
             if any(pattern in name for pattern in infrastructure_patterns):
                 return True

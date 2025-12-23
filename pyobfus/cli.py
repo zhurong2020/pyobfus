@@ -109,6 +109,21 @@ except ImportError:
     is_flag=True,
     help="Show Pro edition features and purchase information",
 )
+@click.option(
+    "--control-flow",
+    is_flag=True,
+    help="Enable control flow flattening (Pro feature)",
+)
+@click.option(
+    "--string-encryption",
+    is_flag=True,
+    help="Enable AES-256 string encryption (Pro feature)",
+)
+@click.option(
+    "--anti-debug",
+    is_flag=True,
+    help="Enable anti-debugging protection (Pro feature)",
+)
 @click.version_option(version=__version__, prog_name="pyobfus")
 def main(
     input_path: Optional[str],
@@ -125,6 +140,9 @@ def main(
     dry_run: bool,
     cross_file: bool,
     upgrade: bool,
+    control_flow: bool,
+    string_encryption: bool,
+    anti_debug: bool,
 ) -> None:
     """
     Obfuscate Python source code.
@@ -287,6 +305,45 @@ def main(
         config.name_prefix = name_prefix
         config.preserve_param_names = preserve_param_names
 
+        # Handle Pro feature flags (--control-flow, --string-encryption, --anti-debug)
+        pro_features_requested = control_flow or string_encryption or anti_debug
+        if pro_features_requested:
+            # Check if user has Pro access (license or trial)
+            trial_active = is_trial_active()
+            has_pro_access = trial_active or PRO_AVAILABLE
+
+            if not has_pro_access:
+                click.echo(
+                    "Error: Pro features require a license or active trial.",
+                    err=True,
+                )
+                click.echo(
+                    "\nStart a free 5-day trial (no registration required):",
+                    err=True,
+                )
+                click.echo("  pyobfus-trial start", err=True)
+                click.echo(
+                    f"\nOr purchase a license (${PRO_PRICE_USD} one-time):",
+                    err=True,
+                )
+                click.echo(f"  {STRIPE_PAYMENT_LINK}", err=True)
+                sys.exit(1)
+
+            # User has Pro access - enable requested features
+            config.level = "pro"
+            if control_flow:
+                config.control_flow_flattening = True
+                if verbose:
+                    click.echo("Enabled: Control Flow Flattening")
+            if string_encryption:
+                config.string_encryption = True
+                if verbose:
+                    click.echo("Enabled: AES-256 String Encryption")
+            if anti_debug:
+                config.anti_debug = True
+                if verbose:
+                    click.echo("Enabled: Anti-Debugging Protection")
+
         # Determine if input is file or directory
         input_path_obj = Path(input_path)
         output_path_obj = Path(output_path)
@@ -400,6 +457,16 @@ def _obfuscate_file(
     # 3. Pro features (if enabled)
     if config.level == "pro":
         try:
+            # Control Flow Flattening
+            if config.control_flow_flattening:
+                from pyobfus_pro.control_flow import ControlFlowFlattener
+
+                cff = ControlFlowFlattener()
+                transformed_tree = cff.visit(transformed_tree)
+
+                if verbose:
+                    click.echo("  Control flow flattening: Applied")
+
             # String encryption (AES-256)
             if config.string_encryption:
                 from pyobfus_pro.string_aes import StringAESEncryptor
