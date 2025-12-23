@@ -21,6 +21,7 @@ from pyobfus.core.orchestrator import CrossFileOrchestrator
 from pyobfus.exceptions import LimitExceededError, PyObfusError
 from pyobfus.transformers.name_mangler import NameMangler
 from pyobfus.utils import filter_python_files
+from pyobfus.trial import is_trial_active, get_trial_expiry_message
 
 # Check if Pro edition is available
 try:
@@ -30,6 +31,7 @@ try:
 except ImportError:
     pyobfus_pro = None  # type: ignore[assignment]
     PRO_AVAILABLE = False
+
 
 
 @click.command()
@@ -182,67 +184,99 @@ def main(
         else:
             # Use default based on level
             if level == "pro":
-                # Pro edition requires license verification
-                if not PRO_AVAILABLE:
-                    click.echo(
-                        "Error: Pro edition features not installed.",
-                        err=True,
-                    )
-                    click.echo(
-                        "Install with: pip install pyobfus-pro",
-                        err=True,
-                    )
-                    sys.exit(1)
+                # Check trial status first (refreshed at runtime)
+                trial_active = is_trial_active()
 
-                # Verify license (imports are guaranteed to exist when PRO_AVAILABLE is True)
-                assert PRO_AVAILABLE, "Pro features should be available"
-                assert pyobfus_pro is not None, "pyobfus_pro module should be loaded"
+                if trial_active:
+                    # Trial is active - allow Pro features without license
+                    trial_msg = get_trial_expiry_message()
+                    if verbose:
+                        click.echo(f"Trial mode: {trial_msg}")
+                    config = ObfuscationConfig.pro_edition()
+                elif PRO_AVAILABLE:
+                    # Pro edition installed - verify license
+                    assert pyobfus_pro is not None, "pyobfus_pro module should be loaded"
 
-                try:
-                    # Get cached license status (unmasked to get full key)
-                    cached_status = pyobfus_pro.get_license_status(masked=False)
-                    if not cached_status:
+                    try:
+                        # Get cached license status (unmasked to get full key)
+                        cached_status = pyobfus_pro.get_license_status(masked=False)
+                        if not cached_status:
+                            click.echo(
+                                "Error: No license key found. Please register your license first.",
+                                err=True,
+                            )
+                            click.echo(
+                                "\nTo register your license key, run:",
+                                err=True,
+                            )
+                            click.echo(
+                                "  pyobfus-license register YOUR-LICENSE-KEY",
+                                err=True,
+                            )
+                            click.echo(
+                                "\nOr start a free 5-day trial:",
+                                err=True,
+                            )
+                            click.echo(
+                                "  pyobfus-trial start",
+                                err=True,
+                            )
+                            click.echo(
+                                "\nPurchase a license at: https://github.com/zhurong2020/pyobfus",
+                                err=True,
+                            )
+                            sys.exit(1)
+
+                        # Verify the cached license (use unmasked key)
+                        full_license_key = cached_status["key"]
+                        license_result = pyobfus_pro.verify_license(full_license_key)
+
+                        if verbose:
+                            click.echo(f"License verified: {license_result['message']}")
+
+                    except pyobfus_pro.LicenseError as e:
                         click.echo(
-                            "Error: No license key found. Please register your license first.",
+                            f"Error: License verification failed - {e}",
                             err=True,
                         )
                         click.echo(
-                            "\nTo register your license key, run:",
+                            "\nPlease check your license status with: pyobfus-license status",
                             err=True,
                         )
                         click.echo(
-                            "  pyobfus-license register YOUR-LICENSE-KEY",
+                            "Or register a new license: pyobfus-license register YOUR-LICENSE-KEY",
                             err=True,
                         )
                         click.echo(
-                            "\nPurchase a license at: https://github.com/zhurong2020/pyobfus",
+                            "\nOr start a free 5-day trial: pyobfus-trial start",
                             err=True,
                         )
                         sys.exit(1)
 
-                    # Verify the cached license (use unmasked key)
-                    full_license_key = cached_status["key"]
-                    license_result = pyobfus_pro.verify_license(full_license_key)
-
-                    if verbose:
-                        click.echo(f"License verified: {license_result['message']}")
-
-                except pyobfus_pro.LicenseError as e:
+                    config = ObfuscationConfig.pro_edition()
+                else:
+                    # No Pro installed and no trial - show options
                     click.echo(
-                        f"Error: License verification failed - {e}",
+                        "Error: Pro edition features require a license or active trial.",
                         err=True,
                     )
                     click.echo(
-                        "\nPlease check your license status with: pyobfus-license status",
+                        "\nStart a free 5-day trial (no registration required):",
                         err=True,
                     )
                     click.echo(
-                        "Or register a new license: pyobfus-license register YOUR-LICENSE-KEY",
+                        "  pyobfus-trial start",
+                        err=True,
+                    )
+                    click.echo(
+                        "\nOr purchase a license ($45 one-time):",
+                        err=True,
+                    )
+                    click.echo(
+                        "  https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400",
                         err=True,
                     )
                     sys.exit(1)
-
-                config = ObfuscationConfig.pro_edition()
             else:
                 config = ObfuscationConfig.community_edition()
 
@@ -281,10 +315,10 @@ def main(
         else:
             click.echo("\n[DRY RUN] Preview completed. Use without --dry-run to write files.")
 
-        # Subtle Pro feature hint (only for Community users)
-        if level == "community" and not PRO_AVAILABLE:
-            click.echo("\nTip: Upgrade to Pro for AES-256 encryption & anti-debugging")
-            click.echo("     Learn more: https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400")
+        # Subtle Pro feature hint (only for Community users without trial)
+        if level == "community" and not PRO_AVAILABLE and not is_trial_active():
+            click.echo("\nTip: Try Pro FREE for 5 days - AES-256 encryption & anti-debugging")
+            click.echo("     Start trial: pyobfus-trial start")
 
     except LimitExceededError as e:
         click.echo(f"\nError: {e}", err=True)
@@ -558,6 +592,9 @@ def _handle_upgrade() -> None:
     Display Pro edition features and purchase information.
     """
     # Check current status
+    trial_active = is_trial_active()
+    trial_msg = get_trial_expiry_message()
+
     if PRO_AVAILABLE:
         click.echo("\n" + "=" * 60)
         click.echo("  pyobfus Professional Edition - ACTIVE")
@@ -570,12 +607,33 @@ def _handle_upgrade() -> None:
         click.echo("\nRun 'pyobfus-license status' to view license details.")
         return
 
+    if trial_active:
+        click.echo("\n" + "=" * 60)
+        click.echo("  pyobfus Professional Edition - TRIAL ACTIVE")
+        click.echo("=" * 60)
+        click.echo(f"\n  {trial_msg}")
+        click.echo("\n  You have access to all Pro features:")
+        click.echo("  - AES-256 string encryption (--level pro)")
+        click.echo("  - Anti-debugging protection (--level pro)")
+        click.echo("  - Unlimited files and lines of code")
+        click.echo("")
+        click.echo("  To keep using Pro after trial:")
+        click.echo("  $45.00 USD (one-time payment)")
+        click.echo("  https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400")
+        click.echo("")
+        click.echo("  Check trial status: pyobfus-trial status")
+        click.echo("=" * 60)
+        return
+
     # Show Pro edition information for Community users
     click.echo("\n" + "=" * 60)
     click.echo("  pyobfus Professional Edition")
     click.echo("=" * 60)
     click.echo("")
-    click.echo("  Upgrade to Pro for advanced code protection:")
+    click.echo("  TRY FREE FOR 5 DAYS")
+    click.echo("  --------------------")
+    click.echo("  No registration or credit card required!")
+    click.echo("  Start now: pyobfus-trial start")
     click.echo("")
     click.echo("  FEATURES")
     click.echo("  ---------")
