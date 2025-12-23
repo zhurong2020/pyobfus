@@ -155,27 +155,64 @@ This document outlines the planned technical features and improvements for pyobf
 
 ---
 
-### v0.3.0 - Enhanced Protection (6-8 weeks)
+### v0.3.0 - Control Flow Protection (4-6 weeks)
 
-**Goal**: Increase obfuscation strength, complete Pro features (Issue #9)
+**Goal**: Implement Control Flow Flattening - the #1 missing feature vs PyArmor
 
-#### P1 - Should Have
+**Why This Matters**:
+- Control Flow Flattening is what separates "basic" from "professional" obfuscation
+- Without it, code structure is still readable (just with weird variable names)
+- This is the #1 reason users choose PyArmor over pyobfus
+- Completing this feature allows us to claim "professional-grade protection"
 
-**6. Control Flow Obfuscation** ⭐⭐⭐ *(Completes Issue #9 - Pro feature)*
-- **Purpose**: Make code harder to analyze manually
-- **Issue**: Pro feature `control_flow` currently has no effect
+#### P0 - Must Have (v0.3.0 Core)
+
+**6. Control Flow Flattening** ⭐⭐⭐⭐⭐ *(PRIORITY #1)*
+- **Purpose**: Transform code structure to prevent manual analysis
+- **Competitive Gap**: PyArmor Pro has this, pyobfus doesn't
+- **Technical Design**: See `docs/internal/CONTROL_FLOW_FLATTENING_DESIGN.md`
 - **Features**:
-  - If/else flattening
-  - False branch injection
-  - Loop transformation
-  - While-loop conversion for simple if statements
-- **Tradeoff**: 10-30% performance overhead
+  - State machine transformation for if/else
+  - Loop flattening (for/while → state machine)
+  - Nested structure support
+  - Switch-case style dispatch
+- **Tradeoff**: 10-30% performance overhead (acceptable)
 - **Effort**: 2-3 weeks
-- **Success**: 100% correctness, < 30% slowdown
+- **Success Criteria**:
+  - 100% functional correctness
+  - < 30% runtime overhead
+  - 25+ unit tests
+  - Works with all Python 3.8-3.13 features
 
-**7. Dead Code Injection** ⭐⭐⭐ *(Completes Issue #9 - Pro feature)*
+**Example Transformation**:
+```python
+# Before
+if x > 0:
+    result = x * 2
+else:
+    result = x / 2
+return result
+
+# After (flattened)
+_state = 0
+while _state != -1:
+    if _state == 0:
+        _state = 1 if x > 0 else 2
+    elif _state == 1:
+        result = x * 2
+        _state = 3
+    elif _state == 2:
+        result = x / 2
+        _state = 3
+    elif _state == 3:
+        _state = -1
+return result
+```
+
+#### P1 - Should Have (v0.3.0 Bonus)
+
+**7. Dead Code Injection** ⭐⭐⭐
 - **Purpose**: Increase code complexity, hinder manual analysis
-- **Issue**: Pro feature `dead_code` currently has no effect
 - **Features**:
   - Insert unreachable code blocks
   - Realistic-looking but non-functional code
@@ -183,9 +220,8 @@ This document outlines the planned technical features and improvements for pyobf
 - **Effort**: 1-2 weeks
 - **Success**: Code runs correctly, analysis time increased
 
-**8. Opaque Predicates** ⭐⭐⭐ *(Completes Issue #9 - Pro feature)*
+**8. Opaque Predicates** ⭐⭐⭐
 - **Purpose**: Obscure control flow with always-true/false conditions
-- **Issue**: Pro feature `opaque_predicates` currently has no effect
 - **Features**:
   - Mathematical invariants (e.g., x*x >= 0)
   - Complex boolean expressions
@@ -193,29 +229,31 @@ This document outlines the planned technical features and improvements for pyobf
 - **Effort**: 1-2 weeks
 - **Success**: Predicates are opaque, no false positives
 
-**9. String Encryption Enhancement** ⭐⭐⭐
+#### P2 - Nice to Have (v0.3.x or v0.4.0)
+
+**9. String Encryption Enhancement** ⭐⭐
 - **Purpose**: Protect sensitive strings (API keys, passwords)
 - **Features**:
   - Auto-detect sensitive patterns
   - Multiple algorithms (AES-256, Fernet, XOR)
   - Runtime decryption caching
 - **Effort**: 1-2 weeks
-- **Success**: 3+ algorithms, > 90% auto-detection accuracy
+- **Note**: AES-256 already implemented, this is enhancement only
 
-**10. License Management (Lightweight)** ⭐⭐⭐
-- **Purpose**: Support commercial distribution
+**10. License Embedding** ⭐⭐
+- **Purpose**: Support commercial distribution of obfuscated code
 - **Features**:
   - Expiration date: `--expire 2026-12-31`
   - Hardware binding: `--bind-machine`
   - Usage limits: `--max-runs 100`
 - **Note**: Basic implementation, not deep protection
 - **Effort**: 2-3 weeks
-- **Success**: 3 license types working
 
 **Release Criteria**:
-- ✅ Medium-level protection strength
-- ✅ License features documented
+- ✅ Control Flow Flattening fully working
+- ✅ All existing tests pass
 - ✅ Performance impact < 30%
+- ✅ Test coverage > 70%
 
 ---
 
