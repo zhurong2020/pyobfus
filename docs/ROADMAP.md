@@ -9,6 +9,13 @@ This document outlines the planned technical features and improvements for pyobf
 
 ## Current Status
 
+✅ **v0.2.4 Released** (December 2025)
+- **Trial System**: New `pyobfus-trial` command for testing Pro features
+- **HTTP Error Handling Fix**: Fixed exception handling in license verification
+- **Test Improvements**: Fixed test mocks for HTTP error simulation
+- **Constants Refactoring**: Centralized URLs in `pyobfus/constants.py`
+- **Test Suite**: 366 tests, 69% coverage
+
 ✅ **v0.2.3 Released** (December 2025)
 - **[P0 Bug Fix] Python 3.6-3.11 Compatibility**: Fixed f-string quotes to work on ALL Python versions
 - **Always Normalize**: Quote handling now runs unconditionally (not just when compile fails)
@@ -427,5 +434,5 @@ For detailed competitive analysis and feature comparison, see [docs/internal/FEA
 
 ---
 
-**Last Updated**: December 11, 2025
+**Last Updated**: December 23, 2025
 **Next Review**: After v0.3.0 release
