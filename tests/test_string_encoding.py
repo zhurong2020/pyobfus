@@ -5,7 +5,6 @@ Tests that string literals are encoded with Base64 and runtime decoding
 infrastructure is properly injected.
 """
 
-
 from pyobfus.core.parser import ASTParser
 from pyobfus.core.generator import CodeGenerator
 from pyobfus.core.analyzer import SymbolAnalyzer
