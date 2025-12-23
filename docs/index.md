@@ -34,6 +34,7 @@ title: pyobfus - Modern Python Code Obfuscator
   <ul style="list-style: none; padding-left: 0; margin: 0.5em 0;">
     <li style="margin: 0.5em 0;">✨ <strong>All Community Features</strong> +</li>
     <li style="margin: 0.5em 0;">🔀 <strong>Control Flow Flattening</strong>: Transform code structure into state machines</li>
+    <li style="margin: 0.5em 0;">🧩 <strong>Dead Code Injection</strong>: Inject unreachable code to increase complexity</li>
     <li style="margin: 0.5em 0;">🔐 <strong>AES-256 String Encryption</strong>: Military-grade encryption for strings</li>
     <li style="margin: 0.5em 0;">🛡️ <strong>Anti-Debugging Checks</strong>: Detect and prevent debugging attempts</li>
     <li style="margin: 0.5em 0;">🔄 <strong>Lifetime Updates</strong>: All future Pro features included</li>
@@ -132,6 +133,7 @@ def I0(I1, I2):
   <h4 style="color: #34495e; margin-top: 1.5em;">What's Included:</h4>
   <ul style="color: #555; line-height: 1.8;">
     <li>✅ <strong>Control Flow Flattening</strong> - State machine transformation</li>
+    <li>✅ <strong>Dead Code Injection</strong> - Increase code complexity</li>
     <li>✅ <strong>AES-256 String Encryption</strong></li>
     <li>✅ <strong>Anti-Debugging Checks</strong></li>
     <li>✅ <strong>Lifetime Updates</strong></li>
@@ -154,7 +156,7 @@ Want to test Pro features before purchasing? Use the **5-day free trial**:
 pyobfus-trial start --email your@email.com
 
 # Test Pro features
-pyobfus input.py -o output.py --control-flow --string-encryption --anti-debug
+pyobfus input.py -o output.py --control-flow --string-encryption --anti-debug --dead-code
 
 # Check trial status
 pyobfus-trial status
