@@ -22,13 +22,14 @@ PyArmor is the most established Python obfuscator. Here's how pyobfus compares:
 |---------|---------|---------|
 | **Price (Pro)** | **$45** (one-time) | $89 (one-time) |
 | **Price savings** | **50% cheaper** | - |
-| **Free tier** | 5 files / 1,000 LOC | Vague "trial" limits |
+| **Free tier** | Unlimited (Community features) | Vague "trial" limits |
+| **Pro trial** | **5 days free** (full features) | Vague limits |
 | **Open source** | Yes (Apache 2.0) | No |
 | **Auditable code** | Yes | No |
 | **Native dependencies** | None | Requires `pytransform` runtime |
 | **Output format** | Pure `.py` files | `.py` + native libraries |
 | **Cross-platform output** | Yes (single output works everywhere) | Requires per-platform build |
-| **Python 3.12** | Yes | Yes |
+| **Python 3.8-3.13** | Yes | Yes |
 | **String encryption** | AES-256 (Pro) | AES (Pro) |
 | **Anti-debugging** | Yes (Pro) | Yes (Pro) |
 | **Control flow flattening** | Coming v0.3.0 | Yes (Pro) |
@@ -69,7 +70,7 @@ Oxyry is an online Python obfuscation service.
 |---------|---------|-------|
 | **Deployment** | CLI tool (local) | Web service only |
 | **Privacy** | Code never leaves your machine | Code uploaded to server |
-| **Python versions** | 3.8 - 3.12 | 3.3 - 3.7 (outdated) |
+| **Python versions** | 3.8 - 3.13 | 3.3 - 3.7 (outdated) |
 | **Multi-file support** | Yes (cross-file) | Limited |
 | **Configuration** | YAML files | Web interface |
 | **CI/CD integration** | Yes | No |
@@ -180,7 +181,7 @@ Nuitka compiles Python to standalone executables.
 
 | Tool | Free Tier | Pro/Commercial |
 |------|-----------|----------------|
-| **pyobfus** | 5 files / 1,000 LOC | **$45** |
+| **pyobfus** | Unlimited (5-day Pro trial) | **$45** |
 | **PyArmor Basic** | Trial (vague limits) | $52 |
 | **PyArmor Pro** | Trial (vague limits) | $89 |
 | **PyArmor Group** | Trial (vague limits) | $158 |
@@ -244,7 +245,7 @@ Nuitka compiles Python to standalone executables.
 
 3. **Benefits**:
    - Code stays on your machine
-   - Modern Python 3.8-3.12 support
+   - Modern Python 3.8-3.13 support
    - Batch processing for directories
 
 ---
@@ -256,7 +257,7 @@ Nuitka compiles Python to standalone executables.
 - Open-source trust and auditability
 - Pure Python output without native dependencies
 - Cross-platform compatibility from a single build
-- Modern Python 3.8-3.12 support
+- Modern Python 3.8-3.13 support
 
 **Get started:**
 ```bash
