@@ -65,6 +65,8 @@ class ObfuscationConfig:
             "_cff_state",
             "_cff_return",
             "_cff_iter",
+            # Dead Code Injection variables
+            "_dci_",
         }
     )
     name_prefix: str = "I"
@@ -76,7 +78,8 @@ class ObfuscationConfig:
     # Pro Edition features
     string_encryption: bool = False  # AES-256 encryption (Pro only)
     anti_debug: bool = False  # Anti-debugging checks (Pro only)
-    control_flow_flattening: bool = False  # Control flow flattening (Pro only, Phase 2)
+    control_flow_flattening: bool = False  # Control flow flattening (Pro only)
+    dead_code_injection: bool = False  # Dead code injection (Pro only)
 
     # Community Edition limits
     max_files: Optional[int] = None  # None = unlimited for Pro
@@ -201,6 +204,7 @@ class ObfuscationConfig:
                 "_ENCRYPTION",
                 "_KEY",
                 "_cff_",  # Control Flow Flattening state variables
+                "_dci_",  # Dead Code Injection variables
             ]
             if any(pattern in name for pattern in infrastructure_patterns):
                 return True
