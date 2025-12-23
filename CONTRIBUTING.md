@@ -286,25 +286,33 @@ Now shows user-friendly error message.
 
 ```
 pyobfus/
-├── pyobfus/              # Main package
-│   ├── core/            # Core obfuscation engine
-│   │   ├── parser.py    # AST parsing
-│   │   ├── analyzer.py  # Symbol analysis
+├── pyobfus/              # Main package (Community Edition)
+│   ├── core/             # Core obfuscation engine
+│   │   ├── parser.py     # AST parsing
+│   │   ├── analyzer.py   # Symbol analysis
 │   │   ├── transformer.py
 │   │   └── generator.py
-│   ├── transformers/    # Community transformers
-│   │   └── name_mangler.py
-│   ├── plugins/         # Plugin system
-│   ├── cli.py          # Command-line interface
-│   ├── config.py       # Configuration management
-│   ├── exceptions.py   # Custom exceptions
-│   └── utils.py        # Utility functions
-├── tests/              # Test suite
-│   ├── test_core/
-│   ├── test_transformers/
-│   └── integration/
-├── examples/           # Example scripts
-└── docs/              # Documentation
+│   ├── transformers/     # Community transformers
+│   │   ├── name_mangler.py
+│   │   └── string_encoder.py
+│   ├── plugins/          # Plugin system
+│   ├── cli.py            # Command-line interface
+│   ├── config.py         # Configuration management
+│   ├── config_templates.py  # Config templates (django, flask, etc.)
+│   ├── config_validator.py  # Config validation
+│   ├── constants.py      # Centralized URLs and constants
+│   ├── exceptions.py     # Custom exceptions
+│   └── utils.py          # Utility functions
+├── pyobfus_pro/          # Pro Edition (proprietary)
+│   ├── license.py        # License verification
+│   ├── fingerprint.py    # Device fingerprinting
+│   ├── string_aes.py     # AES-256 encryption
+│   └── anti_debug.py     # Anti-debugging
+├── cloudflare-worker/    # License server
+├── tests/                # Test suite (366 tests)
+├── integration_tests/    # External project testing
+├── examples/             # Example scripts
+└── docs/                 # Documentation
 ```
 
 ## Areas for Contribution

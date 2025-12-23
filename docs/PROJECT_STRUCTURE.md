@@ -10,45 +10,75 @@ pyobfus/
 │   └── workflows/        # CI/CD pipelines
 │       └── ci.yml        # Test and code quality checks
 │
-├── pyobfus/              # Main package
+├── pyobfus/              # Main package (Community Edition)
 │   ├── __init__.py       # Package version and exports
 │   ├── cli.py            # Command-line interface
 │   ├── config.py         # Configuration management
+│   ├── config_templates.py  # Configuration templates (django, flask, etc.)
+│   ├── config_validator.py  # Configuration validation with typo detection
+│   ├── constants.py      # Centralized URLs and configuration
 │   ├── exceptions.py     # Custom exception classes
+│   ├── trial.py          # Trial system for Pro features
+│   ├── trial_cli.py      # Trial CLI commands
 │   ├── utils.py          # Utility functions
 │   │
 │   ├── core/             # Core obfuscation engine
 │   │   ├── parser.py     # AST parsing
 │   │   ├── analyzer.py   # Symbol table and scope analysis
 │   │   ├── transformer.py# Base transformer class
-│   │   └── generator.py  # Code generation
+│   │   └── generator.py  # Code generation with f-string handling
 │   │
 │   ├── transformers/     # Obfuscation transformers
-│   │   ├── name_mangler.py  # Variable/function name obfuscation
+│   │   ├── name_mangler.py    # Variable/function name obfuscation
+│   │   ├── string_encoder.py  # Base64 string encoding
 │   │   └── ...           # Additional transformers
 │   │
 │   └── plugins/          # Plugin system
 │       ├── base.py       # Plugin base classes
 │       └── ...           # Plugin implementations
 │
-├── tests/                # Test suite
+├── pyobfus_pro/          # Pro Edition (proprietary)
+│   ├── __init__.py       # Pro package initialization
+│   ├── cli.py            # License management CLI (pyobfus-license)
+│   ├── license.py        # License verification system
+│   ├── fingerprint.py    # Device fingerprinting
+│   ├── string_aes.py     # AES-256 string encryption
+│   └── anti_debug.py     # Anti-debugging protection
+│
+├── cloudflare-worker/    # License server (Cloudflare Workers)
+│   ├── src/index.js      # Worker code (license verification + Stripe webhook)
+│   ├── wrangler.toml     # Worker configuration
+│   └── README.md         # Worker management guide
+│
+├── tests/                # Test suite (366 tests, 69% coverage)
 │   ├── test_core/        # Tests for core modules
-│   │   ├── test_parser.py
-│   │   └── test_analyzer.py
 │   ├── test_transformers/# Tests for transformers
-│   │   └── test_name_mangler.py
 │   ├── integration/      # Integration tests
-│   │   └── test_simple_obfuscation.py
 │   ├── fixtures/         # Test fixtures
-│   └── test_utils.py     # Utility tests
+│   ├── test_license_verification.py  # License system tests
+│   ├── test_fingerprint.py     # Device fingerprint tests
+│   ├── test_string_aes.py      # AES encryption tests
+│   ├── test_anti_debug.py      # Anti-debugging tests
+│   ├── test_generator.py       # Code generator tests
+│   ├── test_config_features.py # Config template/validation tests
+│   └── test_trial.py           # Trial system tests
+│
+├── integration_tests/    # External project testing
+│   ├── test_external_projects.py  # pytest suite
+│   ├── interactive_testing.ipynb  # Jupyter notebook
+│   ├── README.md         # Detailed instructions
+│   └── QUICK_REFERENCE.md # Quick command reference
 │
 ├── examples/             # Example files
 │   ├── simple.py         # Basic obfuscation example
+│   ├── string_encoding.py      # String encoding demo
+│   ├── keyword_arguments.py    # Parameter preservation demo
 │   └── multifile/        # Multi-file project example
-│       ├── calculator.py
-│       ├── utils.py
-│       ├── main.py
-│       └── pyobfus.yaml
+│
+├── scripts/              # Utility scripts
+│   ├── test_ml_research.py     # CLI testing tool
+│   ├── setup_stripe_webhook.py # Stripe webhook configuration
+│   └── test_license_server.py  # License server integration tests
 │
 ├── pyproject.toml        # Project configuration and dependencies
 ├── README.md             # Project documentation
@@ -59,8 +89,13 @@ pyobfus/
 ├── .gitignore            # Git ignore patterns
 ├── .editorconfig         # Editor configuration
 └── docs/                 # Documentation
+    ├── index.md          # GitHub Pages homepage
     ├── ROADMAP.md        # Development roadmap
+    ├── COMPARISON.md     # Tool comparison (vs PyArmor, etc.)
+    ├── PROJECT_STRUCTURE.md    # This file
+    ├── LICENSE_ACTIVATION_GUIDE.md  # Pro license activation
     ├── INTEGRATION_TESTING.md  # Integration testing guide
+    ├── internal/         # Internal docs (git-ignored)
     └── legal/            # Legal documents
         ├── TERMS_OF_SERVICE.md
         ├── REFUND_POLICY.md
@@ -114,8 +149,37 @@ pyobfus/
 - Renames variables, functions, classes
 - Uses index-based naming (I0, I1, I2...)
 - Respects scope rules and exclusion lists
+- Supports cross-file consistent naming (v0.2.0+)
+
+**`pyobfus/transformers/string_encoder.py`**
+- Base64 encoding for string literals
+- Automatic decoder function injection
+- F-string expression preservation
 
 Additional transformers can be added following the same pattern.
+
+### Pro Edition Modules
+
+**`pyobfus_pro/license.py`**
+- License verification against Cloudflare Worker API
+- Local caching with HMAC-SHA256 signing
+- Device fingerprint validation
+- 3-day cache duration with offline fallback
+
+**`pyobfus_pro/fingerprint.py`**
+- Device fingerprinting (MAC + hostname + OS)
+- Cross-platform support (Windows, macOS, Linux)
+- Tamper-resistant design
+
+**`pyobfus_pro/string_aes.py`**
+- AES-256 string encryption
+- Runtime decryption infrastructure
+- Automatic key management
+
+**`pyobfus_pro/anti_debug.py`**
+- Anti-debugging checks injection
+- Debugger detection techniques
+- Runtime protection
 
 ### Plugins
 
@@ -232,11 +296,13 @@ class MyTransformer(BaseTransformer):
 
 1. Update version in `pyproject.toml`
 2. Update `CHANGELOG.md` with release notes
-3. Run full test suite
-4. Create git tag: `git tag v0.1.0`
-5. Push tag: `git push origin v0.1.0`
+3. Run full test suite: `pytest tests/ -v`
+4. Create git tag: `git tag v0.2.4`
+5. Push tag: `git push origin v0.2.4`
 6. Build distribution: `python -m build`
 7. Upload to PyPI: `python -m twine upload dist/*`
+
+Current version: **v0.2.4** (December 2025)
 
 ## Troubleshooting
 
