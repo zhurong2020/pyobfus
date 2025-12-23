@@ -124,6 +124,11 @@ except ImportError:
     is_flag=True,
     help="Enable anti-debugging protection (Pro feature)",
 )
+@click.option(
+    "--dead-code",
+    is_flag=True,
+    help="Enable dead code injection (Pro feature)",
+)
 @click.version_option(version=__version__, prog_name="pyobfus")
 def main(
     input_path: Optional[str],
@@ -143,6 +148,7 @@ def main(
     control_flow: bool,
     string_encryption: bool,
     anti_debug: bool,
+    dead_code: bool,
 ) -> None:
     """
     Obfuscate Python source code.
@@ -305,8 +311,8 @@ def main(
         config.name_prefix = name_prefix
         config.preserve_param_names = preserve_param_names
 
-        # Handle Pro feature flags (--control-flow, --string-encryption, --anti-debug)
-        pro_features_requested = control_flow or string_encryption or anti_debug
+        # Handle Pro feature flags (--control-flow, --string-encryption, --anti-debug, --dead-code)
+        pro_features_requested = control_flow or string_encryption or anti_debug or dead_code
         if pro_features_requested:
             # Check if user has Pro access (license or trial)
             trial_active = is_trial_active()
@@ -343,6 +349,10 @@ def main(
                 config.anti_debug = True
                 if verbose:
                     click.echo("Enabled: Anti-Debugging Protection")
+            if dead_code:
+                config.dead_code_injection = True
+                if verbose:
+                    click.echo("Enabled: Dead Code Injection")
 
         # Determine if input is file or directory
         input_path_obj = Path(input_path)
@@ -488,6 +498,17 @@ def _obfuscate_file(
                 if verbose:
                     stats = anti_debug.get_statistics()
                     click.echo(f"  Anti-debug checks: {stats['injected_functions'] + 1}")
+
+            # Dead Code Injection
+            if config.dead_code_injection:
+                from pyobfus_pro.dead_code import DeadCodeInjector
+
+                dead_code_injector = DeadCodeInjector()
+                transformed_tree = dead_code_injector.visit(transformed_tree)
+
+                if verbose:
+                    stats = dead_code_injector.get_statistics()
+                    click.echo(f"  Dead code injection: {stats['injected_statements']} statements")
 
         except ImportError as e:
             click.echo(f"\n⚠️  Pro features not available: {e}", err=True)
