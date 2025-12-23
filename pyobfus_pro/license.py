@@ -22,7 +22,10 @@ import urllib.error
 from .fingerprint import get_device_fingerprint
 
 
-# GitHub repository for license data
+# Cloudflare Worker API for license verification
+LICENSE_API_URL = "https://pyobfus-license-server.zhurong0525.workers.dev/api/verify"
+
+# Legacy: GitHub repository for license data (deprecated, kept for reference)
 LICENSE_REPO_URL = "https://raw.githubusercontent.com/zhurong2020/pyobfus-licenses/main"
 
 # Local cache configuration
@@ -172,49 +175,75 @@ def verify_license(license_key: str) -> Dict[str, Any]:
 
 def _verify_online(license_key: str) -> Dict[str, Any]:
     """
-    Verify license key against GitHub repository.
+    Verify license key against Cloudflare Worker API.
 
     Args:
         license_key: License key to verify
 
     Returns:
-        dict: License data from repository
+        dict: License data from API
 
     Raises:
         LicenseVerificationError: If license not found or network error
     """
-    # Determine which file to check based on current date
-    # We'll check the current month's file
-    now = datetime.now()
+    device_id = get_device_fingerprint()
 
-    # Try current year/month first
-    for year_offset in [0, -1]:  # Try current year, then previous year
-        year = now.year + year_offset
-        month = now.month if year_offset == 0 else 12
+    # Prepare request data
+    request_data = json.dumps({
+        "license_key": license_key,
+        "device_id": device_id
+    }).encode("utf-8")
 
-        url = f"{LICENSE_REPO_URL}/licenses/{year}/{month:02d}.json"
+    # Create request
+    req = urllib.request.Request(
+        LICENSE_API_URL,
+        data=request_data,
+        headers={"Content-Type": "application/json"},
+        method="POST"
+    )
 
-        try:
-            with urllib.request.urlopen(url, timeout=REQUEST_TIMEOUT) as response:
-                data = json.loads(response.read())
+    try:
+        with urllib.request.urlopen(req, timeout=REQUEST_TIMEOUT) as response:
+            data = json.loads(response.read())
 
-            # Find license key in this file
-            for license in data.get("licenses", []):
-                if license["key"] == license_key:
-                    return cast(Dict[str, Any], license)
+        # Check if verification was successful
+        if data.get("valid"):
+            # Calculate expiration: lifetime licenses expire in 100 years
+            expires_at = data.get("expires_at")
+            if expires_at is None:
+                # Lifetime license - set far future date
+                expires_at = (datetime.now() + timedelta(days=36500)).isoformat()
 
-        except urllib.error.HTTPError as e:
-            if e.code == 404:
-                # File not found, try previous month/year
-                continue
-            raise LicenseVerificationError(f"HTTP error: {e.code}")
-        except urllib.error.URLError as e:
-            raise LicenseVerificationError(f"Network error: {e.reason}")
-        except json.JSONDecodeError:
-            raise LicenseVerificationError("Invalid license data format")
+            return {
+                "key": license_key,
+                "status": "active",  # Worker only returns valid licenses
+                "type": "pro",
+                "expires": expires_at,
+                "email": data.get("email", ""),
+                "created_at": data.get("created_at", ""),
+                "features": data.get("features", {}),
+            }
+        else:
+            error_msg = data.get("error", "License verification failed")
+            raise LicenseVerificationError(error_msg)
 
-    # License not found in any file
-    raise LicenseVerificationError("License key not found in repository")
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            raise LicenseVerificationError("License key not found")
+        elif e.code == 403:
+            # Read error message from response
+            error_msg = "Access denied"
+            try:
+                error_data = json.loads(e.read())
+                error_msg = error_data.get("error", "Access denied")
+            except (json.JSONDecodeError, ValueError, IOError):
+                pass
+            raise LicenseVerificationError(error_msg)
+        raise LicenseVerificationError(f"HTTP error: {e.code}")
+    except urllib.error.URLError as e:
+        raise LicenseVerificationError(f"Network error: {e.reason}")
+    except json.JSONDecodeError:
+        raise LicenseVerificationError("Invalid response from license server")
 
 
 def _validate_license_format(license_key: str) -> bool:
