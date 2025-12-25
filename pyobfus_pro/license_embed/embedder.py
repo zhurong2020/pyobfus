@@ -517,7 +517,8 @@ def embed_license_checks(
         The transformed AST with license checks embedded
     """
     embedder = LicenseEmbedder(config)
-    return embedder.visit(tree)
+    result = embedder.visit(tree)
+    return result  # type: ignore[no-any-return]
 
 
 def get_machine_fingerprint() -> str:

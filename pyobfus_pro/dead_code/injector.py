@@ -286,13 +286,19 @@ class DeadCodeInjector(ast.NodeTransformer):
 
         elif value_type == "list":
             num_elts = self._random.randint(0, 5)
-            elts = [ast.Constant(value=self._random.randint(0, 100)) for _ in range(num_elts)]
+            elts: List[ast.expr] = [
+                ast.Constant(value=self._random.randint(0, 100)) for _ in range(num_elts)
+            ]
             return ast.List(elts=elts, ctx=ast.Load())
 
         else:  # dict
             num_pairs = self._random.randint(0, 3)
-            keys = [ast.Constant(value=f"key_{i}") for i in range(num_pairs)]
-            values = [ast.Constant(value=self._random.randint(0, 100)) for _ in range(num_pairs)]
+            keys: List[Optional[ast.expr]] = [
+                ast.Constant(value=f"key_{i}") for i in range(num_pairs)
+            ]
+            values: List[ast.expr] = [
+                ast.Constant(value=self._random.randint(0, 100)) for _ in range(num_pairs)
+            ]
             return ast.Dict(keys=keys, values=values)
 
     def _generate_false_branch(self) -> ast.If:
@@ -446,4 +452,5 @@ def inject_dead_code(
         The transformed AST with dead code injected
     """
     injector = DeadCodeInjector(config, seed)
-    return injector.visit(tree)
+    result = injector.visit(tree)
+    return result  # type: ignore[no-any-return]

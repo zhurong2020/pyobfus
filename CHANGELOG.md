@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.1] - 2025-12-25
+
+### Fixed
+- **Type Annotations**: Fixed mypy type errors in control flow, dead code, and license embedding modules
+  - Added proper type assertions for AST node handling in `state_machine.py`
+  - Fixed `Sequence` vs `List` type annotations for AST body parameters
+  - Added type ignore comments for `NodeTransformer.visit()` return values
+  - Fixed `Dict` type annotations in `dead_code/injector.py`
+  - Added proper type annotations for preset dictionary in `config.py`
+- **Version Sync**: Fixed `__version__` in `pyobfus/__init__.py` and `pyobfus_pro/__init__.py` to match package version
+
 ## [0.3.0] - 2025-12-25
 
 ### Added

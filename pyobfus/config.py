@@ -7,7 +7,7 @@ and defining default settings.
 
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Optional, Set
+from typing import Callable, Dict, List, Optional, Set
 import yaml
 
 
@@ -294,7 +294,7 @@ class ObfuscationConfig:
         Raises:
             ValueError: If preset name is unknown
         """
-        presets = {
+        presets: Dict[str, Callable[[], "ObfuscationConfig"]] = {
             "trial": cls.preset_trial,
             "commercial": cls.preset_commercial,
             "library": cls.preset_library,
