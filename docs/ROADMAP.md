@@ -9,7 +9,11 @@ This document outlines the planned technical features and improvements for pyobf
 
 ## Current Status
 
-🚧 **v0.3.0 In Development** (Coming Soon)
+✅ **v0.3.1 Released** (December 2025)
+- **Bug Fixes**: Fixed mypy type errors and Python 3.8 compatibility
+- **Version Sync**: All version numbers now consistent across the codebase
+
+✅ **v0.3.0 Released** (December 2025)
 - **Control Flow Flattening**: Transform code structure into state machines (Pro)
 - **Dead Code Injection**: Inject unreachable code blocks to increase complexity (Pro)
 - **License Embedding**: Embed license restrictions directly into obfuscated code (Pro)
@@ -23,7 +27,6 @@ This document outlines the planned technical features and improvements for pyobf
   - `--preset maximum` - All protections enabled
   - `--list-presets` - Show all available presets
 - **Test Suite**: 451 tests, 70%+ coverage
-- **Status**: All features implemented and tested, pending release
 
 ✅ **v0.2.4 Released** (December 2025)
 - **Trial System**: New `pyobfus-trial` command for testing Pro features
@@ -171,11 +174,11 @@ This document outlines the planned technical features and improvements for pyobf
 
 ---
 
-### v0.3.0 - Control Flow Protection 🚧 READY FOR RELEASE
+### v0.3.0 - Control Flow Protection ✅ RELEASED
 
 **Goal**: Implement Control Flow Flattening - the #1 missing feature vs PyArmor
 
-**Status**: ✅ **COMPLETED** - All features implemented and tested, awaiting release
+**Status**: ✅ **RELEASED** - v0.3.0 released on December 25, 2025
 
 #### P0 - Must Have (v0.3.0 Core) ✅
 
@@ -476,5 +479,5 @@ For detailed competitive analysis and feature comparison, see [docs/internal/FEA
 
 ---
 
-**Last Updated**: December 23, 2025
-**Next Review**: Before v0.3.0 release
+**Last Updated**: December 25, 2025
+**Next Review**: Before v0.4.0 planning

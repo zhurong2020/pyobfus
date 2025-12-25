@@ -297,12 +297,12 @@ class MyTransformer(BaseTransformer):
 1. Update version in `pyproject.toml`
 2. Update `CHANGELOG.md` with release notes
 3. Run full test suite: `pytest tests/ -v`
-4. Create git tag: `git tag v0.2.4`
-5. Push tag: `git push origin v0.2.4`
+4. Create git tag: `git tag v0.3.1`
+5. Push tag: `git push origin v0.3.1`
 6. Build distribution: `python -m build`
 7. Upload to PyPI: `python -m twine upload dist/*`
 
-Current version: **v0.2.4** (December 2025)
+Current version: **v0.3.1** (December 2025)
 
 ## Troubleshooting
 
