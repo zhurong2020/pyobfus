@@ -1,74 +1,74 @@
 # Integration Tests for External Projects
 
-这个目录包含用于测试 pyobfus 在真实项目（如 ml-research）上的功能的集成测试。
+This directory contains integration tests for testing pyobfus on real projects (e.g., ml-research).
 
-## 设置
+## Setup
 
-### 1. 配置 ml-research 路径
+### 1. Configure ml-research Path
 
-编辑测试文件中的路径配置：
+Edit the path configuration in the test file:
 
 ```python
 # integration_tests/test_external_projects.py
 ML_RESEARCH_PATH = Path(r"c:\path\to\your\ml-research")
 ```
 
-或在脚本中：
+Or in the script:
 
 ```python
 # scripts/test_ml_research.py
 ML_RESEARCH_PATH = Path(r"c:\path\to\your\ml-research")
 ```
 
-### 2. 安装 pyobfus（开发模式）
+### 2. Install pyobfus (Development Mode)
 
 ```bash
 pip install -e .
 ```
 
-## 使用方法
+## Usage
 
-### 方法 1: 使用便捷脚本（推荐）
+### Method 1: Using Convenience Script (Recommended)
 
 ```bash
-# 测试单个文件
-python scripts/test_ml_research.py data_loader.py
+# Test a single file
+python scripts/test_ml_research.py your_module.py
 
-# 测试特定路径的文件
+# Test a file at a specific path
 python scripts/test_ml_research.py "utils/preprocessing.py"
 
-# 测试所有文件（前 10 个）
+# Test all files (first 10)
 python scripts/test_ml_research.py --all
 
-# 测试更多文件
+# Test more files
 python scripts/test_ml_research.py --all --max-files 20
 
-# 详细输出
+# Verbose output
 python scripts/test_ml_research.py module.py -v
 
-# 保存混淆后的代码
+# Save obfuscated code
 python scripts/test_ml_research.py module.py -o obfuscated/module_obf.py
 ```
 
-### 方法 2: 使用 pytest
+### Method 2: Using pytest
 
 ```bash
-# 运行所有集成测试
+# Run all integration tests
 pytest integration_tests/ -v
 
-# 运行特定测试
+# Run specific test
 pytest integration_tests/test_external_projects.py::TestMLResearchModules::test_obfuscation_preserves_functionality -v
 
-# 批量测试
+# Batch testing
 pytest integration_tests/test_external_projects.py::TestMLResearchModules::test_batch_obfuscation -v
 ```
 
-### 方法 3: Python 脚本中使用
+### Method 3: Using in Python Script
 
 ```python
 from integration_tests.test_external_projects import obfuscate_ml_research_module
 
-# 混淆单个模块
+# Obfuscate a single module
 obfuscated_code = obfuscate_ml_research_module(
     "data_processing.py",
     output_path="obf/data_processing_obf.py",
@@ -78,94 +78,94 @@ obfuscated_code = obfuscate_ml_research_module(
 print(obfuscated_code)
 ```
 
-### 方法 4: 交互式测试（Python REPL）
+### Method 4: Interactive Testing (Python REPL)
 
 ```python
-# 在 pyobfus 项目根目录
+# In the pyobfus project root directory
 python
 
 >>> from pathlib import Path
 >>> from integration_tests.test_external_projects import obfuscate_ml_research_module
 
->>> # 测试你的模块
+>>> # Test your module
 >>> code = obfuscate_ml_research_module("your_module.py")
 >>> print(code)
 
->>> # 保存到文件
+>>> # Save to file
 >>> Path("obf_output.py").write_text(code)
 ```
 
-## 测试场景
+## Test Scenarios
 
-### 场景 1: 快速验证（单个文件）
+### Scenario 1: Quick Validation (Single File)
 
-当你修改了 pyobfus 代码后，想快速验证：
+After modifying pyobfus code, quickly validate:
 
 ```bash
-# 1. 修改 pyobfus 代码
+# 1. Modify pyobfus code
 vim pyobfus/transformers/string_encoder.py
 
-# 2. 立即测试
+# 2. Test immediately
 python scripts/test_ml_research.py test_module.py -v
 
-# 3. 查看输出，发现问题
-# 4. 修改 pyobfus
-# 5. 重新测试（无需重新安装）
+# 3. Review output, identify issues
+# 4. Modify pyobfus
+# 5. Retest (no reinstall needed)
 ```
 
-### 场景 2: 全面回归测试
+### Scenario 2: Full Regression Testing
 
-发布新版本前，测试所有模块：
+Before releasing a new version, test all modules:
 
 ```bash
-# 测试所有文件
+# Test all files
 python scripts/test_ml_research.py --all --max-files 50
 
-# 查看摘要
+# View summary
 # ✅ Successful: 45/50
 # ❌ Failed: 5/50
 ```
 
-### 场景 3: 调试特定问题
+### Scenario 3: Debugging Specific Issues
 
-当某个模块混淆失败时：
+When a module fails to obfuscate:
 
 ```bash
-# 详细模式查看问题
+# Use verbose mode to see details
 python scripts/test_ml_research.py problematic_module.py -v
 
-# 输出会显示：
-# - 代码分析统计
-# - 名称转换数量
-# - 字符串编码统计
-# - 编译检查结果
-# - 详细错误信息
+# Output shows:
+# - Code analysis statistics
+# - Name transformation count
+# - String encoding statistics
+# - Compilation check result
+# - Detailed error messages
 ```
 
-### 场景 4: 对比测试
+### Scenario 4: Comparison Testing
 
-测试混淆前后的功能等价性：
+Test functional equivalence before and after obfuscation:
 
 ```python
 # integration_tests/test_external_projects.py
 def test_obfuscate_and_execute(self):
-    # 执行原始代码
+    # Execute original code
     original_namespace = {}
     exec(original_code, original_namespace)
 
-    # 执行混淆代码
+    # Execute obfuscated code
     obfuscated_namespace = {}
     exec(obfuscated_code, obfuscated_namespace)
 
-    # 对比结果
+    # Compare results
     assert original_namespace['result'] == obfuscated_namespace['result']
 ```
 
-## 自定义测试
+## Custom Tests
 
-### 添加特定模块测试
+### Adding Specific Module Tests
 
-编辑 `integration_tests/test_external_projects.py`：
+Edit `integration_tests/test_external_projects.py`:
 
 ```python
 def test_specific_ml_modules(self):
@@ -176,97 +176,97 @@ def test_specific_ml_modules(self):
     ]
 
     for module_name in modules_to_test:
-        # ... 测试逻辑 ...
+        # ... test logic ...
 ```
 
-### 自定义混淆配置
+### Custom Obfuscation Configuration
 
 ```python
 from pyobfus.config import ObfuscationConfig
 
-# 创建自定义配置
+# Create custom configuration
 config = ObfuscationConfig()
 config.string_encoding = True
 config.preserve_param_names = True
 config.add_exclude_name("important_function")
 
-# 使用自定义配置测试
+# Test with custom configuration
 obfuscated_code = self.obfuscate_file(file_path, config)
 ```
 
-## 工作流示例
+## Workflow Example
 
-### 典型开发流程
+### Typical Development Flow
 
 ```bash
-# 1. 在 pyobfus 中开发新功能
+# 1. Develop new feature in pyobfus
 cd /path/to/pyobfus
 vim pyobfus/transformers/new_feature.py
 
-# 2. 单元测试
+# 2. Unit tests
 pytest tests/test_new_feature.py -v
 
-# 3. 集成测试（使用 ml-research）
+# 3. Integration tests (using ml-research)
 python scripts/test_ml_research.py --all
 
-# 4. 如果发现问题，查看详细信息
+# 4. If issues found, view details
 python scripts/test_ml_research.py problematic_file.py -v
 
-# 5. 修复问题
+# 5. Fix issues
 vim pyobfus/transformers/new_feature.py
 
-# 6. 重新测试（无需重新安装！）
+# 6. Retest (no reinstall needed!)
 python scripts/test_ml_research.py problematic_file.py -v
 
-# 7. 全部通过后提交
+# 7. Commit after all tests pass
 git add .
 git commit -m "feat: Add new feature"
 ```
 
-## 优势
+## Advantages
 
-✅ **快速迭代**：修改后立即测试，无需重新安装
-✅ **真实场景**：使用实际项目的代码测试
-✅ **不污染 PyPI**：无需发布到 PyPI 即可测试
-✅ **方便调试**：详细的错误信息和统计数据
-✅ **批量测试**：一次测试多个文件
-✅ **灵活配置**：可自定义混淆配置
+✅ **Fast Iteration**: Test immediately after changes, no reinstall needed
+✅ **Real Scenarios**: Test with actual project code
+✅ **No PyPI Pollution**: No need to publish to PyPI for testing
+✅ **Easy Debugging**: Detailed error messages and statistics
+✅ **Batch Testing**: Test multiple files at once
+✅ **Flexible Configuration**: Customizable obfuscation settings
 
-## 故障排除
+## Troubleshooting
 
-### 问题：找不到 ml-research
+### Problem: Cannot find ml-research
 
 ```
 ❌ ml-research project not found at: ...
 ```
 
-**解决**：更新测试文件中的 `ML_RESEARCH_PATH`
+**Solution**: Update `ML_RESEARCH_PATH` in the test file
 
-### 问题：导入错误
+### Problem: Import error
 
 ```
 ModuleNotFoundError: No module named 'pyobfus'
 ```
 
-**解决**：安装开发版本
+**Solution**: Install development version
 ```bash
 pip install -e .
 ```
 
-### 问题：编译错误
+### Problem: Compilation error
 
 ```
 ❌ Syntax error in obfuscated code
 ```
 
-**解决**：使用详细模式查看详细信息
+**Solution**: Use verbose mode for details
 ```bash
 python scripts/test_ml_research.py module.py -v
 ```
 
-## 下一步
+## Next Steps
 
-- 根据测试结果修复问题
-- 添加更多特定场景的测试
-- 自动化测试流程（CI/CD）
-- 性能基准测试
+- Fix issues based on test results
+- Add more specific scenario tests
+- Automate testing (CI/CD)
+- Performance benchmarking
