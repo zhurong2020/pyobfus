@@ -198,6 +198,16 @@ By purchasing pyobfus Professional Edition, you agree to our:
 
 ---
 
+## Security Note
+
+**String Encryption Limitations**: AES-256 string encryption is designed as a **deterrent against casual reverse engineering**, not as cryptographic security. Because obfuscated code must decrypt strings at runtime, the encryption key is embedded in the output. This is a fundamental limitation of all client-side obfuscators.
+
+**Recommendation**: For sensitive credentials (API keys, passwords), use environment variables or external secret management systems rather than embedding them in code.
+
+See our [full README](https://github.com/zhurong2020/pyobfus#security-note-string-encryption-limitations) for detailed security guidance.
+
+---
+
 ## License
 
 Apache License 2.0 - See [LICENSE](https://github.com/zhurong2020/pyobfus/blob/main/LICENSE)
