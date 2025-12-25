@@ -8,7 +8,7 @@ License: Proprietary - Commercial Use Only
 Copyright 2025 Rong Zhu
 """
 
-__version__ = "0.1.4"
+__version__ = "0.3.0"
 __license__ = "Proprietary"
 
 from .string_aes import StringAESEncryptor
