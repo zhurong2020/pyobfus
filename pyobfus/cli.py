@@ -129,6 +129,35 @@ except ImportError:
     is_flag=True,
     help="Enable dead code injection (Pro feature)",
 )
+@click.option(
+    "--expire",
+    type=str,
+    help="Set expiration date for obfuscated code (YYYY-MM-DD format, Pro feature)",
+)
+@click.option(
+    "--bind-machine",
+    is_flag=True,
+    help="Bind obfuscated code to current machine (Pro feature)",
+)
+@click.option(
+    "--max-runs",
+    type=int,
+    default=0,
+    help="Set maximum run count for obfuscated code (0=unlimited, Pro feature)",
+)
+@click.option(
+    "--preset",
+    type=click.Choice(
+        ["trial", "commercial", "library", "maximum", "safe", "balanced", "aggressive"],
+        case_sensitive=False,
+    ),
+    help="Use a preset configuration (Pro feature for trial/commercial/library/maximum)",
+)
+@click.option(
+    "--list-presets",
+    is_flag=True,
+    help="List all available presets with descriptions",
+)
 @click.version_option(version=__version__, prog_name="pyobfus")
 def main(
     input_path: Optional[str],
@@ -149,6 +178,11 @@ def main(
     string_encryption: bool,
     anti_debug: bool,
     dead_code: bool,
+    expire: Optional[str],
+    bind_machine: bool,
+    max_runs: int,
+    preset: Optional[str],
+    list_presets: bool,
 ) -> None:
     """
     Obfuscate Python source code.
@@ -166,6 +200,11 @@ def main(
     # Handle --upgrade: Show Pro edition information
     if upgrade:
         _handle_upgrade()
+        return
+
+    # Handle --list-presets: Show available presets
+    if list_presets:
+        _handle_list_presets()
         return
 
     # Handle --init-config: Generate configuration template
@@ -205,6 +244,31 @@ def main(
             config = ObfuscationConfig.from_file(Path(effective_config_path))
             if verbose:
                 click.echo(f"Loaded configuration from: {effective_config_path}")
+        elif preset:
+            # Use preset configuration
+            pro_presets = ["trial", "commercial", "library", "maximum"]
+            if preset.lower() in pro_presets:
+                # Check Pro access for Pro presets
+                trial_active = is_trial_active()
+                has_pro_access = trial_active or PRO_AVAILABLE
+
+                if not has_pro_access:
+                    click.echo(
+                        f"Error: The '{preset}' preset requires Pro edition or active trial.",
+                        err=True,
+                    )
+                    click.echo("\nStart a free 5-day trial:", err=True)
+                    click.echo("  pyobfus-trial start", err=True)
+                    click.echo(
+                        f"\nOr purchase a license (${PRO_PRICE_USD} one-time):",
+                        err=True,
+                    )
+                    click.echo(f"  {STRIPE_PAYMENT_LINK}", err=True)
+                    sys.exit(1)
+
+            config = ObfuscationConfig.get_preset(preset.lower())
+            if verbose:
+                click.echo(f"Using preset: {preset}")
         else:
             # Use default based on level
             if level == "pro":
@@ -311,8 +375,15 @@ def main(
         config.name_prefix = name_prefix
         config.preserve_param_names = preserve_param_names
 
-        # Handle Pro feature flags (--control-flow, --string-encryption, --anti-debug, --dead-code)
-        pro_features_requested = control_flow or string_encryption or anti_debug or dead_code
+        # Handle Pro feature flags
+        license_embedding_requested = expire or bind_machine or max_runs > 0
+        pro_features_requested = (
+            control_flow
+            or string_encryption
+            or anti_debug
+            or dead_code
+            or license_embedding_requested
+        )
         if pro_features_requested:
             # Check if user has Pro access (license or trial)
             trial_active = is_trial_active()
@@ -353,6 +424,20 @@ def main(
                 config.dead_code_injection = True
                 if verbose:
                     click.echo("Enabled: Dead Code Injection")
+
+            # License embedding options
+            if expire:
+                config.license_expire = expire
+                if verbose:
+                    click.echo(f"Enabled: License Expiration ({expire})")
+            if bind_machine:
+                config.license_bind_machine = True
+                if verbose:
+                    click.echo("Enabled: Machine Binding")
+            if max_runs > 0:
+                config.license_max_runs = max_runs
+                if verbose:
+                    click.echo(f"Enabled: Run Limit ({max_runs} runs)")
 
         # Determine if input is file or directory
         input_path_obj = Path(input_path)
@@ -509,6 +594,32 @@ def _obfuscate_file(
                 if verbose:
                     stats = dead_code_injector.get_statistics()
                     click.echo(f"  Dead code injection: {stats['injected_statements']} statements")
+
+            # License Embedding (applied last to inject at module start)
+            license_embed_enabled = (
+                config.license_expire or config.license_bind_machine or config.license_max_runs > 0
+            )
+            if license_embed_enabled:
+                from pyobfus_pro.license_embed import LicenseEmbedder, LicenseEmbedConfig
+
+                embed_config = LicenseEmbedConfig(
+                    expire_date=config.license_expire,
+                    bind_machine=config.license_bind_machine,
+                    max_runs=config.license_max_runs,
+                )
+                license_embedder = LicenseEmbedder(embed_config)
+                transformed_tree = license_embedder.visit(transformed_tree)
+
+                if verbose:
+                    embed_info = []
+                    if config.license_expire:
+                        embed_info.append(f"expires {config.license_expire}")
+                    if config.license_bind_machine:
+                        fp = license_embedder.get_current_fingerprint()
+                        embed_info.append(f"bound to {fp[:8]}...")
+                    if config.license_max_runs > 0:
+                        embed_info.append(f"max {config.license_max_runs} runs")
+                    click.echo(f"  License embedding: {', '.join(embed_info)}")
 
         except ImportError as e:
             click.echo(f"\n⚠️  Pro features not available: {e}", err=True)
@@ -753,6 +864,60 @@ def _handle_upgrade() -> None:
     click.echo("    pyobfus-license register YOUR-LICENSE-KEY")
     click.echo("")
     click.echo("=" * 60)
+
+
+def _handle_list_presets() -> None:
+    """
+    Display all available presets with descriptions.
+    """
+    click.echo("\n" + "=" * 60)
+    click.echo("  pyobfus Configuration Presets")
+    click.echo("=" * 60)
+
+    click.echo("\n  COMMUNITY PRESETS (Free)")
+    click.echo("  " + "-" * 30)
+
+    click.echo("\n  safe")
+    click.echo("    Preserves docstrings and public APIs")
+    click.echo("    Ideal for libraries and production code")
+    click.echo("    Usage: pyobfus src/ -o dist/ --preset safe")
+
+    click.echo("\n  balanced (default)")
+    click.echo("    Removes docstrings, obfuscates private names")
+    click.echo("    Good balance between security and compatibility")
+    click.echo("    Usage: pyobfus src/ -o dist/ --preset balanced")
+
+    click.echo("\n  aggressive")
+    click.echo("    Obfuscates everything possible")
+    click.echo("    Use with caution - may break code")
+    click.echo("    Usage: pyobfus src/ -o dist/ --preset aggressive")
+
+    click.echo("\n  PRO PRESETS (Requires Pro license or trial)")
+    click.echo("  " + "-" * 30)
+
+    click.echo("\n  trial")
+    click.echo("    30-day time-limited version")
+    click.echo("    All Pro features + expiration date")
+    click.echo("    Usage: pyobfus src/ -o dist/ --preset trial")
+
+    click.echo("\n  commercial")
+    click.echo("    Maximum protection for paid software")
+    click.echo("    CFF + DCI + AES + Anti-debug + Machine binding")
+    click.echo("    Usage: pyobfus src/ -o dist/ --preset commercial")
+
+    click.echo("\n  library")
+    click.echo("    For distributing Python libraries")
+    click.echo("    Preserves APIs, encrypts internal code")
+    click.echo("    Usage: pyobfus src/ -o dist/ --preset library")
+
+    click.echo("\n  maximum")
+    click.echo("    Highest security for sensitive code")
+    click.echo("    All features + machine binding + run limits")
+    click.echo("    Usage: pyobfus src/ -o dist/ --preset maximum")
+
+    click.echo("\n" + "=" * 60)
+    click.echo("\n  Start a free 5-day trial: pyobfus-trial start")
+    click.echo("")
 
 
 def _handle_init_config(template_name: str) -> None:
