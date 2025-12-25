@@ -56,9 +56,9 @@ Based on GitHub issues and community feedback, common PyArmor frustrations inclu
 
 #### When to Choose PyArmor
 
-- You need **control flow flattening** now (pyobfus: v0.3.0)
 - You require **Themida protection** (Windows only)
 - You're already invested in PyArmor's ecosystem
+- You need bytecode-level encryption
 
 ---
 
@@ -159,8 +159,10 @@ Nuitka compiles Python to standalone executables.
 | Docstring removal | Yes | Yes | Yes | No |
 | Comment removal | Yes | Yes | Yes | Yes |
 | Anti-debugging | No | **Yes** | Yes | No |
-| Control flow flattening | No | v0.3.0 | Yes | No |
-| Dead code injection | No | v0.3.0 | No | No |
+| Control flow flattening | No | **Yes** | Yes | No |
+| Dead code injection | No | **Yes** | No | No |
+| License embedding | No | **Yes** | Yes | No |
+| Configuration presets | No | **Yes** | No | No |
 
 ### Developer Experience
 

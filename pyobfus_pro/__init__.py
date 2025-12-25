@@ -15,6 +15,7 @@ from .string_aes import StringAESEncryptor
 from .anti_debug import AntiDebugInjector
 from .control_flow import ControlFlowFlattener, StateMachine, State
 from .dead_code import DeadCodeInjector, DCIConfig
+from .license_embed import LicenseEmbedder, LicenseEmbedConfig, embed_license_checks
 from .license import (
     verify_license,
     get_license_status,
@@ -34,6 +35,9 @@ __all__ = [
     "State",
     "DeadCodeInjector",
     "DCIConfig",
+    "LicenseEmbedder",
+    "LicenseEmbedConfig",
+    "embed_license_checks",
     "verify_license",
     "get_license_status",
     "remove_cached_license",

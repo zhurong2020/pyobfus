@@ -5,9 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased] - v0.3.0
+## [0.3.0] - 2025-12-25
 
 ### Added
+- **License Embedding** (Pro Feature): Embed license restrictions directly into obfuscated code
+  - `--expire YYYY-MM-DD`: Set expiration date for obfuscated code
+  - `--bind-machine`: Bind code to specific machine fingerprint
+  - `--max-runs N`: Limit number of executions
+  - Offline verification - no external dependencies
+  - 24 comprehensive unit tests
+
+- **Configuration Presets**: Simplified configuration with pre-built presets
+  - `--preset trial`: 30-day time-limited version with all Pro features
+  - `--preset commercial`: Maximum protection with machine binding
+  - `--preset library`: For pip-distributable libraries (preserves APIs)
+  - `--preset maximum`: Highest security with all protections + run limits
+  - `--preset safe/balanced/aggressive`: Community edition presets
+  - `--list-presets`: View all available presets with descriptions
+  - 17 comprehensive unit tests
+
 - **Control Flow Flattening** (Pro Feature): Transform structured control flow into state machine representations
   - State machine transformation for if/else/elif chains
   - For loop flattening with iterator pattern
@@ -37,6 +53,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Technical Details
 - **New Modules**:
+  - `pyobfus_pro/license_embed/__init__.py`: Module exports
+  - `pyobfus_pro/license_embed/embedder.py`: LicenseEmbedder AST transformer (~350 lines)
+  - `tests/test_license_embed.py`: 24 unit tests (~300 lines)
+  - `tests/test_presets.py`: 17 unit tests (~200 lines)
   - `pyobfus_pro/control_flow/__init__.py`: Module exports
   - `pyobfus_pro/control_flow/state_machine.py`: StateMachine and State classes (~185 lines)
   - `pyobfus_pro/control_flow/flattener.py`: ControlFlowFlattener AST transformer (~340 lines)
@@ -46,9 +66,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `tests/test_dead_code_injection.py`: 21 unit tests (~500 lines)
 
 - **Config Updates**:
+  - Added license embedding options (`license_expire`, `license_bind_machine`, `license_max_runs`)
+  - Added preset methods (`preset_trial`, `preset_commercial`, `preset_library`, `preset_maximum`)
+  - Added `get_preset()` and `list_presets()` class methods
   - Added CFF state variable exclusions (`_cff_state`, `_cff_return`, `_cff_iter`)
   - Added DCI variable exclusions (`_dci_*`)
-  - Infrastructure pattern matching for `_cff_*` and `_dci_*` variables
+  - Added license embedding variable exclusions (`_lic_*`)
+  - Infrastructure pattern matching for `_cff_*`, `_dci_*`, and `_lic_*` variables
   - New config option: `dead_code_injection` (bool)
 
 ### Example
@@ -80,6 +104,21 @@ def I0(I1, I2):
             _cff_return_1 = I3
             _cff_state_0 = -1
     return _cff_return_1
+```
+
+### Usage Examples
+```bash
+# Create a 30-day trial version
+pyobfus src/ -o dist/ --preset trial
+
+# Commercial distribution with machine binding
+pyobfus src/ -o dist/ --preset commercial
+
+# Custom license restrictions
+pyobfus src/ -o dist/ --expire 2025-12-31 --bind-machine --max-runs 100
+
+# List all available presets
+pyobfus --list-presets
 ```
 
 ## [0.2.4] - 2025-12-22
