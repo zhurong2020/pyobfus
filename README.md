@@ -552,6 +552,29 @@ Name mangling is **irreversible** - original variable names cannot be recovered.
 - **AES-256 encryption** for strings
 - **Anti-debugging** checks to prevent analysis
 
+### Security Note: String Encryption Limitations
+
+**Important**: String encryption (AES-256) is designed as a **deterrent against casual reverse engineering**, not as cryptographic security.
+
+Because obfuscated code must decrypt strings at runtime, the encryption key is necessarily embedded in the output. A determined attacker with access to the obfuscated code can:
+1. Locate the embedded key
+2. Extract and decrypt all strings
+
+**This is a fundamental limitation of ALL client-side obfuscators** (including PyArmor, Nuitka, etc.) - true cryptographic security would require server-side decryption, which is impractical for most use cases.
+
+**What string encryption DOES provide:**
+- ✅ Prevents casual `strings` or `grep` searches from revealing sensitive text
+- ✅ Increases effort required for reverse engineering
+- ✅ Deters non-technical users from extracting information
+- ✅ Adds a layer of protection combined with other techniques
+
+**What string encryption does NOT provide:**
+- ❌ Protection against determined reverse engineers
+- ❌ Cryptographic security for secrets (use environment variables or secret management instead)
+- ❌ DRM-level protection
+
+**Recommendation**: For sensitive credentials (API keys, passwords), use environment variables or external secret management systems rather than embedding them in code.
+
 ### How is pyobfus different from Cython/Nuitka?
 
 | Tool | Approach | Output |

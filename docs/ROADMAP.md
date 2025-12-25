@@ -267,24 +267,39 @@ return result
 
 **Goal**: Improve user experience, build community
 
+#### P1 - Should Have
+
+**11. Enhanced Key Obfuscation** ⭐⭐⭐⭐
+- **Purpose**: Make encryption key extraction more difficult
+- **Background**: Current AES string encryption embeds key directly in code, which can be easily extracted
+- **Features**:
+  - Key splitting across multiple variables
+  - Decoy/fake keys to confuse analysis
+  - Key derivation from code structure (e.g., hash of AST)
+  - Dynamic key reconstruction at runtime
+  - Obfuscated decryption function names
+- **Note**: This is a hardening measure, not a security guarantee (see README security notes)
+- **Effort**: 1-2 weeks
+- **Success**: Significantly increases effort required to extract encryption key
+
 #### P2 - Nice to Have
 
-**11. Junk Code Injection** ⭐⭐
+**12. Junk Code Injection** ⭐⭐
 - Insert harmless but realistic-looking code
 - Increase manual analysis difficulty
 - Effort: 1 week
 
-**12. VSCode Extension** ⭐⭐
+**13. VSCode Extension** ⭐⭐
 - Right-click obfuscation
 - Config file intellisense
 - Effort: 2-3 weeks
 
-**13. Incremental Obfuscation** ⭐⭐
+**14. Incremental Obfuscation** ⭐⭐
 - Only process changed files
 - Result caching
 - Effort: 1-2 weeks
 
-**14. Code Compression** ⭐⭐
+**15. Code Compression** ⭐⭐
 - Minify whitespace
 - Reduce file size
 - Effort: 1 week
