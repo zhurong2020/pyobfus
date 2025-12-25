@@ -436,4 +436,5 @@ def flatten_control_flow(tree: ast.AST, config: Optional[CFFConfig] = None) -> a
         The transformed AST
     """
     flattener = ControlFlowFlattener(config)
-    return flattener.visit(tree)
+    result = flattener.visit(tree)
+    return result  # type: ignore[no-any-return]

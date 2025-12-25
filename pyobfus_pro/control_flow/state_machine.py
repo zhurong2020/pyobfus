@@ -7,7 +7,7 @@ of Python control flow structures.
 
 import ast
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 
 @dataclass
@@ -161,11 +161,13 @@ class StateMachine:
             else:
                 # Subsequent states become 'elif'
                 # We need to append to the orelse of the previous if
-                self._append_elif(result[0], condition, body)
+                first_if = result[0]
+                assert isinstance(first_if, ast.If)
+                self._append_elif(first_if, condition, body)
 
         return result
 
-    def _append_elif(self, if_node: ast.If, condition: ast.expr, body: List[ast.stmt]) -> None:
+    def _append_elif(self, if_node: ast.If, condition: ast.expr, body: Sequence[ast.stmt]) -> None:
         """Append an elif clause to an existing if statement."""
         # Navigate to the deepest orelse
         current = if_node
@@ -173,7 +175,8 @@ class StateMachine:
             current = current.orelse[0]
 
         # Append new elif
-        current.orelse = [ast.If(test=condition, body=body, orelse=[])]
+        new_if: ast.stmt = ast.If(test=condition, body=list(body), orelse=[])
+        current.orelse = [new_if]
 
     def _build_transitions(self, state: State) -> List[ast.stmt]:
         """Build AST statements for state transitions."""
@@ -245,7 +248,9 @@ class StateMachine:
                     )
                 else:
                     # Append as elif
-                    self._append_elif(result[0], cond, [self._make_state_assignment(target)])
+                    first_if = result[0]
+                    assert isinstance(first_if, ast.If)
+                    self._append_elif(first_if, cond, [self._make_state_assignment(target)])
 
         return result
 
