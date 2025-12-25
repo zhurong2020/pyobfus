@@ -288,14 +288,15 @@ def example(x):
         tree1 = ast.parse(code)
         injector1 = DeadCodeInjector(config, seed=12345)
         result1 = injector1.visit(tree1)
-        code1 = ast.unparse(result1)
+        # Use ast.dump for comparison (works on Python 3.8+)
+        dump1 = ast.dump(result1)
 
         tree2 = ast.parse(code)
         injector2 = DeadCodeInjector(config, seed=12345)
         result2 = injector2.visit(tree2)
-        code2 = ast.unparse(result2)
+        dump2 = ast.dump(result2)
 
-        assert code1 == code2, "Same seed should produce same results"
+        assert dump1 == dump2, "Same seed should produce same results"
 
     def test_statistics(self):
         """Test that statistics are tracked correctly."""
