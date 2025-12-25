@@ -67,6 +67,8 @@ class ObfuscationConfig:
             "_cff_iter",
             # Dead Code Injection variables
             "_dci_",
+            # License Embedding variables
+            "_lic_",
         }
     )
     name_prefix: str = "I"
@@ -80,6 +82,11 @@ class ObfuscationConfig:
     anti_debug: bool = False  # Anti-debugging checks (Pro only)
     control_flow_flattening: bool = False  # Control flow flattening (Pro only)
     dead_code_injection: bool = False  # Dead code injection (Pro only)
+
+    # License Embedding options (Pro only)
+    license_expire: Optional[str] = None  # Expiration date (YYYY-MM-DD format)
+    license_bind_machine: bool = False  # Bind to current machine fingerprint
+    license_max_runs: int = 0  # Maximum run count (0 = unlimited)
 
     # Community Edition limits
     max_files: Optional[int] = None  # None = unlimited for Pro
@@ -176,6 +183,144 @@ class ObfuscationConfig:
         config.remove_comments = True
         return config
 
+    @classmethod
+    def preset_trial(cls, expire_days: int = 30) -> "ObfuscationConfig":
+        """
+        Trial preset: Create time-limited trial versions.
+
+        - 30-day expiration by default
+        - Full obfuscation features
+        - Ideal for demo/evaluation versions
+
+        Args:
+            expire_days: Number of days until expiration (default: 30)
+        """
+        from datetime import datetime, timedelta
+
+        expire_date = (datetime.now() + timedelta(days=expire_days)).strftime("%Y-%m-%d")
+
+        config = cls(
+            level="pro",
+            max_files=None,
+            max_total_loc=None,
+            string_encryption=True,
+            anti_debug=True,
+            control_flow_flattening=True,
+            dead_code_injection=True,
+            license_expire=expire_date,
+        )
+        return config
+
+    @classmethod
+    def preset_commercial(cls) -> "ObfuscationConfig":
+        """
+        Commercial preset: Maximum protection for paid software.
+
+        - All Pro features enabled
+        - Control flow flattening
+        - Dead code injection
+        - AES-256 string encryption
+        - Anti-debugging protection
+        - Machine binding
+        """
+        config = cls(
+            level="pro",
+            max_files=None,
+            max_total_loc=None,
+            string_encryption=True,
+            anti_debug=True,
+            control_flow_flattening=True,
+            dead_code_injection=True,
+            license_bind_machine=True,
+        )
+        return config
+
+    @classmethod
+    def preset_library(cls) -> "ObfuscationConfig":
+        """
+        Library preset: For distributing Python libraries.
+
+        - Preserves public APIs
+        - Keeps docstrings for documentation
+        - Only obfuscates internal implementation
+        - Safe for pip distribution
+        """
+        config = cls(
+            level="pro",
+            max_files=None,
+            max_total_loc=None,
+            remove_docstrings=False,
+            preserve_param_names=True,
+            string_encryption=True,
+        )
+        return config
+
+    @classmethod
+    def preset_maximum(cls) -> "ObfuscationConfig":
+        """
+        Maximum preset: Highest security for sensitive code.
+
+        - All protection features enabled
+        - Machine binding
+        - Run count limit (1000)
+        - Control flow flattening
+        - Dead code injection
+        - Anti-debugging
+        """
+        config = cls(
+            level="pro",
+            max_files=None,
+            max_total_loc=None,
+            string_encryption=True,
+            anti_debug=True,
+            control_flow_flattening=True,
+            dead_code_injection=True,
+            license_bind_machine=True,
+            license_max_runs=1000,
+        )
+        return config
+
+    @classmethod
+    def get_preset(cls, name: str) -> "ObfuscationConfig":
+        """
+        Get a preset configuration by name.
+
+        Args:
+            name: Preset name (trial, commercial, library, maximum, safe, balanced, aggressive)
+
+        Returns:
+            ObfuscationConfig with preset settings
+
+        Raises:
+            ValueError: If preset name is unknown
+        """
+        presets = {
+            "trial": cls.preset_trial,
+            "commercial": cls.preset_commercial,
+            "library": cls.preset_library,
+            "maximum": cls.preset_maximum,
+            "safe": cls.preset_safe,
+            "balanced": cls.preset_balanced,
+            "aggressive": cls.preset_aggressive,
+        }
+
+        name_lower = name.lower()
+        if name_lower not in presets:
+            available = ", ".join(sorted(presets.keys()))
+            raise ValueError(f"Unknown preset '{name}'. Available presets: {available}")
+
+        return presets[name_lower]()
+
+    @classmethod
+    def list_presets(cls) -> list:
+        """
+        List all available preset names.
+
+        Returns:
+            List of preset names
+        """
+        return ["trial", "commercial", "library", "maximum", "safe", "balanced", "aggressive"]
+
     def add_exclude_pattern(self, pattern: str) -> None:
         """Add a file pattern to exclude."""
         self.exclude_patterns.append(pattern)
@@ -205,6 +350,7 @@ class ObfuscationConfig:
                 "_KEY",
                 "_cff_",  # Control Flow Flattening state variables
                 "_dci_",  # Dead Code Injection variables
+                "_lic_",  # License Embedding variables
             ]
             if any(pattern in name for pattern in infrastructure_patterns):
                 return True
