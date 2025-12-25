@@ -9,6 +9,22 @@ This document outlines the planned technical features and improvements for pyobf
 
 ## Current Status
 
+🚧 **v0.3.0 In Development** (Coming Soon)
+- **Control Flow Flattening**: Transform code structure into state machines (Pro)
+- **Dead Code Injection**: Inject unreachable code blocks to increase complexity (Pro)
+- **License Embedding**: Embed license restrictions directly into obfuscated code (Pro)
+  - `--expire YYYY-MM-DD` - Expiration date enforcement
+  - `--bind-machine` - Hardware binding with machine fingerprint
+  - `--max-runs N` - Runtime execution limits
+- **Configuration Presets**: One-command setup for different use cases (Pro)
+  - `--preset trial` - 30-day trial with all Pro features
+  - `--preset commercial` - Machine binding for commercial distribution
+  - `--preset library` - Preserve docstrings for library development
+  - `--preset maximum` - All protections enabled
+  - `--list-presets` - Show all available presets
+- **Test Suite**: 451 tests, 70%+ coverage
+- **Status**: All features implemented and tested, pending release
+
 ✅ **v0.2.4 Released** (December 2025)
 - **Trial System**: New `pyobfus-trial` command for testing Pro features
 - **HTTP Error Handling Fix**: Fixed exception handling in license verification
@@ -155,34 +171,25 @@ This document outlines the planned technical features and improvements for pyobf
 
 ---
 
-### v0.3.0 - Control Flow Protection (4-6 weeks)
+### v0.3.0 - Control Flow Protection 🚧 READY FOR RELEASE
 
 **Goal**: Implement Control Flow Flattening - the #1 missing feature vs PyArmor
 
-**Why This Matters**:
-- Control Flow Flattening is what separates "basic" from "professional" obfuscation
-- Without it, code structure is still readable (just with weird variable names)
-- This is the #1 reason users choose PyArmor over pyobfus
-- Completing this feature allows us to claim "professional-grade protection"
+**Status**: ✅ **COMPLETED** - All features implemented and tested, awaiting release
 
-#### P0 - Must Have (v0.3.0 Core)
+#### P0 - Must Have (v0.3.0 Core) ✅
 
-**6. Control Flow Flattening** ⭐⭐⭐⭐⭐ *(PRIORITY #1)*
+**6. Control Flow Flattening** ⭐⭐⭐⭐⭐ ✅ **COMPLETED**
 - **Purpose**: Transform code structure to prevent manual analysis
-- **Competitive Gap**: PyArmor Pro has this, pyobfus doesn't
-- **Technical Design**: See `docs/internal/CONTROL_FLOW_FLATTENING_DESIGN.md`
+- **Status**: Fully implemented with state machine transformation
 - **Features**:
-  - State machine transformation for if/else
-  - Loop flattening (for/while → state machine)
-  - Nested structure support
-  - Switch-case style dispatch
-- **Tradeoff**: 10-30% performance overhead (acceptable)
-- **Effort**: 2-3 weeks
-- **Success Criteria**:
-  - 100% functional correctness
-  - < 30% runtime overhead
-  - 25+ unit tests
-  - Works with all Python 3.8-3.13 features
+  - ✅ State machine transformation for if/else
+  - ✅ Loop flattening (for/while → state machine)
+  - ✅ Nested structure support
+  - ✅ Switch-case style dispatch
+- **CLI**: `pyobfus input.py -o output.py --control-flow`
+- **Performance**: ~15% overhead (within acceptable range)
+- **Tests**: 25+ unit tests covering all scenarios
 
 **Example Transformation**:
 ```python
@@ -209,49 +216,45 @@ while _state != -1:
 return result
 ```
 
-#### P1 - Should Have (v0.3.0 Bonus)
+#### P1 - Should Have (v0.3.0 Bonus) ✅
 
-**7. Dead Code Injection** ⭐⭐⭐
+**7. Dead Code Injection** ⭐⭐⭐ ✅ **COMPLETED**
 - **Purpose**: Increase code complexity, hinder manual analysis
 - **Features**:
-  - Insert unreachable code blocks
-  - Realistic-looking but non-functional code
-  - Configurable complexity level
-- **Effort**: 1-2 weeks
-- **Success**: Code runs correctly, analysis time increased
+  - ✅ Insert unreachable code blocks with opaque predicates
+  - ✅ Realistic-looking but non-functional code
+  - ✅ Configurable complexity level (3 levels)
+- **CLI**: `pyobfus input.py -o output.py --dead-code`
+- **Tests**: 15+ unit tests
 
-**8. Opaque Predicates** ⭐⭐⭐
-- **Purpose**: Obscure control flow with always-true/false conditions
-- **Features**:
-  - Mathematical invariants (e.g., x*x >= 0)
-  - Complex boolean expressions
-  - Hard to detect statically
-- **Effort**: 1-2 weeks
-- **Success**: Predicates are opaque, no false positives
+**8. Opaque Predicates** ⭐⭐⭐ *(Included in Dead Code Injection)*
+- Integrated into dead code injection feature
+- Uses mathematical invariants for always-false predicates
 
-#### P2 - Nice to Have (v0.3.x or v0.4.0)
+#### P2 - v0.3.0 Implemented ✅
 
-**9. String Encryption Enhancement** ⭐⭐
-- **Purpose**: Protect sensitive strings (API keys, passwords)
-- **Features**:
-  - Auto-detect sensitive patterns
-  - Multiple algorithms (AES-256, Fernet, XOR)
-  - Runtime decryption caching
-- **Effort**: 1-2 weeks
-- **Note**: AES-256 already implemented, this is enhancement only
-
-**10. License Embedding** ⭐⭐
+**9. License Embedding** ⭐⭐⭐ ✅ **COMPLETED**
 - **Purpose**: Support commercial distribution of obfuscated code
 - **Features**:
-  - Expiration date: `--expire 2026-12-31`
-  - Hardware binding: `--bind-machine`
-  - Usage limits: `--max-runs 100`
-- **Note**: Basic implementation, not deep protection
-- **Effort**: 2-3 weeks
+  - ✅ Expiration date: `--expire 2026-12-31`
+  - ✅ Hardware binding: `--bind-machine`
+  - ✅ Usage limits: `--max-runs 100`
+- **Implementation**: AST-based injection of license checks
+- **Tests**: 24 unit tests
 
-**Release Criteria**:
+**10. Configuration Presets** ⭐⭐⭐ ✅ **COMPLETED**
+- **Purpose**: One-command setup for different use cases
+- **Presets**:
+  - ✅ `trial` - 30-day trial with all Pro features
+  - ✅ `commercial` - Machine binding for commercial distribution
+  - ✅ `library` - Preserve docstrings for library development
+  - ✅ `maximum` - All protections enabled
+- **CLI**: `pyobfus input.py -o output.py --preset commercial`
+- **Tests**: 17 unit tests
+
+**Release Criteria**: ✅ ALL MET
 - ✅ Control Flow Flattening fully working
-- ✅ All existing tests pass
+- ✅ All existing tests pass (451 tests)
 - ✅ Performance impact < 30%
 - ✅ Test coverage > 70%
 
@@ -451,18 +454,19 @@ For detailed competitive analysis and feature comparison, see [docs/internal/FEA
 - 10 comprehensive tests covering all parameter types and edge cases
 - Documentation updated with usage examples and recommendations
 
-**Issue #9 - Pro Features Not Implemented**: ⏳ **PARTIAL IMPLEMENTATION**
+**Issue #9 - Pro Features Not Implemented**: ✅ **FULLY IMPLEMENTED** (v0.3.0)
 - ✅ String Encoding (Base64) - **COMPLETED** (Community Edition)
   - Base64 encoding for all string literals
   - Automatic decoder function injection
   - F-string expression preservation
   - Unicode string support (UTF-8)
   - 15 comprehensive tests covering all string types
-  - Example file demonstrating feature
-- 🔲 String Encryption (AES-256) - Planned for future Pro release
-- 🔲 Control Flow Obfuscation - Planned for v0.3.0
-- 🔲 Dead Code Injection - Planned for v0.3.0
-- 🔲 Opaque Predicates - Planned for v0.3.0
+- ✅ String Encryption (AES-256) - **COMPLETED** (Pro Edition)
+- ✅ Control Flow Flattening - **COMPLETED** (v0.3.0, Pro Edition)
+- ✅ Dead Code Injection - **COMPLETED** (v0.3.0, Pro Edition)
+- ✅ Opaque Predicates - **COMPLETED** (integrated into Dead Code Injection)
+- ✅ License Embedding - **COMPLETED** (v0.3.0, Pro Edition)
+- ✅ Configuration Presets - **COMPLETED** (v0.3.0, Pro Edition)
 
 ### v0.1.5 (November 12, 2025)
 
@@ -473,4 +477,4 @@ For detailed competitive analysis and feature comparison, see [docs/internal/FEA
 ---
 
 **Last Updated**: December 23, 2025
-**Next Review**: After v0.3.0 release
+**Next Review**: Before v0.3.0 release

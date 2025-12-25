@@ -37,6 +37,8 @@ title: pyobfus - Modern Python Code Obfuscator
     <li style="margin: 0.5em 0;">🧩 <strong>Dead Code Injection</strong>: Inject unreachable code to increase complexity</li>
     <li style="margin: 0.5em 0;">🔐 <strong>AES-256 String Encryption</strong>: Military-grade encryption for strings</li>
     <li style="margin: 0.5em 0;">🛡️ <strong>Anti-Debugging Checks</strong>: Detect and prevent debugging attempts</li>
+    <li style="margin: 0.5em 0;">📅 <strong>License Embedding</strong>: Expiration dates, machine binding, run limits</li>
+    <li style="margin: 0.5em 0;">⚡ <strong>Configuration Presets</strong>: One-command setup (trial, commercial, library)</li>
     <li style="margin: 0.5em 0;">🔄 <strong>Lifetime Updates</strong>: All future Pro features included</li>
     <li style="margin: 0.5em 0;">💻 <strong>Up to 3 Devices</strong>: Use on multiple machines</li>
     <li style="margin: 0.5em 0;">📧 <strong>Priority Email Support</strong></li>
@@ -136,6 +138,8 @@ def I0(I1, I2):
     <li>✅ <strong>Dead Code Injection</strong> - Increase code complexity</li>
     <li>✅ <strong>AES-256 String Encryption</strong></li>
     <li>✅ <strong>Anti-Debugging Checks</strong></li>
+    <li>✅ <strong>License Embedding</strong> - Expiration, machine binding, run limits</li>
+    <li>✅ <strong>Configuration Presets</strong> - One-command setup</li>
     <li>✅ <strong>Lifetime Updates</strong></li>
     <li>✅ <strong>Up to 3 Devices</strong></li>
     <li>✅ <strong>Email Support</strong> (zhurong0525@gmail.com)</li>
@@ -155,8 +159,14 @@ Want to test Pro features before purchasing? Use the **5-day free trial**:
 # Start a free trial (no credit card required)
 pyobfus-trial start --email your@email.com
 
-# Test Pro features
+# Quick start with presets
+pyobfus src/ -o dist/ --preset commercial
+
+# Or use individual features
 pyobfus input.py -o output.py --control-flow --string-encryption --anti-debug --dead-code
+
+# With license restrictions
+pyobfus src/ -o dist/ --expire 2025-12-31 --bind-machine
 
 # Check trial status
 pyobfus-trial status

@@ -55,6 +55,19 @@ The following advanced features are available with a Pro license:
   - Four strategies: after-return, false branches, opaque predicates, decoy functions
   - CLI: `--dead-code`
 
+- **License Embedding** (v0.3.0+)
+  - Embed expiration dates: `--expire 2025-12-31`
+  - Machine binding: `--bind-machine`
+  - Run count limits: `--max-runs 100`
+  - Offline verification - no external dependencies
+
+- **Configuration Presets** (v0.3.0+)
+  - `--preset trial` - 30-day time-limited version
+  - `--preset commercial` - Maximum protection with machine binding
+  - `--preset library` - For pip-distributable libraries
+  - `--preset maximum` - Highest security with all protections
+  - `--list-presets` - View all presets
+
 See [ROADMAP.md](docs/ROADMAP.md) for the full feature timeline.
 
 ## Try Pro Features FREE
@@ -77,6 +90,8 @@ pyobfus input.py -o output.py --level pro
 - AES-256 string encryption (`--string-encryption`)
 - Anti-debugging protection (`--anti-debug`)
 - Dead code injection (`--dead-code`)
+- License embedding (`--expire`, `--bind-machine`, `--max-runs`)
+- Configuration presets (`--preset trial/commercial/library/maximum`)
 - Unlimited files and lines of code
 
 After your trial, purchase a license to continue using Pro features.
@@ -88,6 +103,8 @@ After your trial, purchase a license to continue using Pro features.
 - 🧩 Dead Code Injection (v0.3.0+)
 - 🔐 AES-256 String Encryption
 - 🛡️ Anti-Debugging Checks
+- 📅 License Embedding (v0.3.0+) - Expiration, machine binding, run limits
+- ⚡ Configuration Presets (v0.3.0+) - One-command setup
 - 🔄 Lifetime Updates
 - 💻 Up to 3 devices per license
 - 📧 Priority Email Support
@@ -121,14 +138,19 @@ After your trial, purchase a license to continue using Pro features.
 
 4. **Start Using Pro Features**
    ```bash
-   # Enable AES-256 encryption
+   # Quick start with presets
+   pyobfus src/ -o dist/ --preset commercial   # Maximum protection
+   pyobfus src/ -o dist/ --preset trial        # 30-day trial version
+   pyobfus src/ -o dist/ --preset library      # For pip distribution
+
+   # Individual features
    pyobfus input.py -o output.py --string-encryption
-
-   # Enable anti-debugging
    pyobfus input.py -o output.py --anti-debug
-
-   # Enable dead code injection
+   pyobfus input.py -o output.py --control-flow
    pyobfus input.py -o output.py --dead-code
+
+   # License restrictions
+   pyobfus src/ -o dist/ --expire 2025-12-31 --bind-machine --max-runs 100
 
    # All Pro features
    pyobfus input.py -o output.py --string-encryption --anti-debug --control-flow --dead-code
