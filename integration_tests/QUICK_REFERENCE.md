@@ -1,95 +1,95 @@
-# 🚀 集成测试快速参考
+# 🚀 Integration Testing Quick Reference
 
-## 一行命令测试
+## One-Line Commands
 
 ```bash
-# 最简单 - 测试单个文件
+# Simplest - test a single file
 python scripts/test_ml_research.py your_module.py
 
-# 详细信息
+# Verbose output
 python scripts/test_ml_research.py your_module.py -v
 
-# 批量测试
+# Batch testing
 python scripts/test_ml_research.py --all
 ```
 
-## 常用命令
+## Common Commands
 
 ```bash
-# 1. 测试并保存结果
+# 1. Test and save results
 python scripts/test_ml_research.py module.py -o output.py
 
-# 2. 测试多个文件
+# 2. Test multiple files
 python scripts/test_ml_research.py --all --max-files 20
 
-# 3. 使用 pytest
+# 3. Using pytest
 pytest integration_tests/ -v
 
-# 4. 启动 Jupyter
+# 4. Launch Jupyter
 jupyter notebook integration_tests/interactive_testing.ipynb
 ```
 
-## Python 中使用
+## Using in Python
 
 ```python
-# 导入
+# Import
 from integration_tests.test_external_projects import obfuscate_ml_research_module
 
-# 混淆
+# Obfuscate
 code = obfuscate_ml_research_module("module.py")
 
-# 混淆并保存
+# Obfuscate and save
 code = obfuscate_ml_research_module("module.py", "output.py")
 ```
 
-## 典型工作流
+## Typical Workflow
 
 ```bash
-# 1. 修改 pyobfus 代码
+# 1. Modify pyobfus code
 vim pyobfus/transformers/...
 
-# 2. 立即测试（无需重新安装！）
+# 2. Test immediately (no reinstall needed!)
 python scripts/test_ml_research.py test.py -v
 
-# 3. 全面测试
+# 3. Full testing
 python scripts/test_ml_research.py --all
 ```
 
-## 配置
+## Configuration
 
-只需修改一次：
+Only need to modify once:
 
 ```python
-# scripts/test_ml_research.py (第17行)
+# scripts/test_ml_research.py (line 17)
 ML_RESEARCH_PATH = Path(r"c:\your\path\to\ml-research")
 ```
 
-## 故障排除
+## Troubleshooting
 
 ```bash
-# 找不到 pyobfus
+# Cannot find pyobfus
 pip install -e .
 
-# 找不到 ml-research
-# 更新上面的 ML_RESEARCH_PATH
+# Cannot find ml-research
+# Update ML_RESEARCH_PATH above
 
-# 修改不生效
-# 确保使用了 pip install -e .
+# Changes not taking effect
+# Make sure you used pip install -e .
 ```
 
-## 优势 ✅
+## Advantages ✅
 
-- 不需要上传到 PyPI
-- 修改立即生效
-- 真实项目测试
-- 快速迭代
+- No need to upload to PyPI
+- Changes take effect immediately
+- Test with real projects
+- Fast iteration
 
-## 对比传统方法
+## Comparison with Traditional Approach
 
-传统：修改 → 打包 → 上传 PyPI → pip install → 测试 → 发现问题 → 重复
-新方法：修改 → 测试 ✅
+Traditional: Modify → Package → Upload to PyPI → pip install → Test → Find issues → Repeat
+New approach: Modify → Test ✅
 
-## 示例输出
+## Example Output
 
 ```
 🧪 pyobfus Integration Testing
