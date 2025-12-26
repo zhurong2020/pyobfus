@@ -299,7 +299,274 @@ pip install pyobfus
 
 ---
 
+## Personal Branding Strategy
+
+### Brand Positioning
+
+**Core Identity**: 热爱学习的技术人 / Lifelong learner exploring tech
+
+**Not just a programmer, but:**
+- 终身学习者 (Lifelong learner)
+- AI 探索者 (AI explorer)
+- 有生活气息的人 (Person with life interests)
+- 开源贡献者 (Open source contributor)
+
+### X vs Facebook Positioning
+
+| Aspect | X (Twitter) | Facebook |
+|--------|-------------|----------|
+| **Language** | English primary | Chinese primary |
+| **Audience** | Developers, tech community | Friends, family, local network |
+| **Tone** | Professional + learning | Personal + warm |
+| **Content Ratio** | 40% tech, 30% learning, 20% thoughts, 10% life | 40% life, 30% learning, 20% growth, 10% work |
+| **Goal** | Industry influence, product awareness | Personal connections, local presence |
+
+### Profile Bios
+
+**X/Twitter (English):**
+```
+Building things. Learning stuff. Sharing the journey.
+🐍 Python | 🤖 AI | 📚 Books | ⚡ Open Source
+github.com/zhurong2020
+```
+
+**Facebook (Chinese):**
+```
+终身学习者 | 喜欢读书和折腾新技术
+最近在探索AI，偶尔写点开源代码
+相信每天进步一点点 📚
+```
+
+---
+
+## X Account Restart Plan
+
+### Week 1: Warm Up
+
+| Day | Action |
+|-----|--------|
+| Mon | Update profile, follow 20-30 accounts, like/reply only |
+| Tue | Like/reply to 5 posts, no original posts |
+| Wed | First post: Simple life observation or learning |
+| Thu | Reply to anyone who engaged |
+| Fri | Post about something you learned |
+| Sat | Casual weekend post |
+| Sun | Rest or light engagement |
+
+### Week 2: Building Rhythm
+
+| Day | Content Type |
+|-----|--------------|
+| Mon | Learning/AI experiment |
+| Tue | Personal observation |
+| Wed | Tech opinion or tip |
+| Thu | Learning journey update |
+| Fri | Weekend plans or reflection |
+| Sat | Casual/personal |
+| Sun | Reading/learning content |
+
+### First Posts After Long Break
+
+**Post 1 (Breaking the ice):**
+```
+Back on X after a long break.
+
+What I've been up to:
+• Building open-source Python tools
+• Diving deep into AI workflows
+• Rediscovering the joy of learning
+
+Time to share the journey again.
+
+What have you all been working on? 👋
+```
+
+**Post 2 (Next day - AI focus):**
+```
+Today's AI experiment:
+
+Used Claude to help refactor some complex Python code.
+
+What surprised me: It caught edge cases I missed.
+
+Still learning when to trust AI vs. when to verify everything.
+
+#AI #Python
+```
+
+**Post 3 (Learning focus):**
+```
+Morning thought:
+
+The best skill in 2025 isn't knowing everything.
+
+It's knowing how to learn anything quickly.
+
+What are you learning this week?
+```
+
+---
+
+## Accounts to Follow (Monetization Focus)
+
+### Indie Hackers & Solo Entrepreneurs
+
+| Account | Why Follow |
+|---------|------------|
+| **@levelsio** | $3M+/year indie dev, shares building process |
+| **@marc_louvion** | Open source + SaaS monetization |
+| **@dannypostmaa** | Shares revenue and strategies publicly |
+| **@tdinh_me** | Multiple profitable projects |
+| **@adamwathan** | Tailwind CSS founder, open source monetization model |
+| **@dhh** | Rails founder, open source business thinking |
+
+### Open Source Monetization Success Stories
+
+| Account | Project | Model |
+|---------|---------|-------|
+| **@simonw** | Datasette | Open source + sponsorship |
+| **@charliemmarsh** | Ruff (Python linter) | Open source + company |
+| **@tiangolo** | FastAPI | Sponsorship + courses |
+| **@samuelcolvin** | Pydantic | Open source + LogFire |
+| **@willmcgugan** | Rich/Textual | Open source + sponsorship |
+
+### Python Ecosystem (Potential Users)
+
+| Account | Area |
+|---------|------|
+| **@mkennedy** | Talk Python podcast |
+| **@realpython** | Python tutorials |
+| **@PythonWeekly** | Python news |
+| **@ThePSF** | Python Software Foundation |
+
+### Developer Tools SaaS (Learn Marketing)
+
+| Account | Product | Learn From |
+|---------|---------|------------|
+| **@natfriedman** | GitHub (former CEO) | Developer product thinking |
+| **@rauchg** | Vercel CEO | Developer marketing |
+| **@swyx** | AI developer | Content marketing |
+
+### Media & Exposure Channels
+
+| Account | Type | How to Use |
+|---------|------|------------|
+| **@ProductHunt** | Product launch | Launch new versions |
+| **@hackernews** | Tech news | Track trends |
+| **@Python_News** | Python news | Product exposure |
+
+---
+
+## #buildinpublic Post Templates
+
+### Milestone Sharing
+```
+🎉 pyobfus milestone:
+
+• 500+ downloads this month
+• First paying customer from [country]
+• 2 feature requests implemented
+
+Building in public. More to come!
+
+#buildinpublic #python #opensource
+```
+
+### User Feedback
+```
+Got this message from a user today:
+
+"pyobfus saved me hours of work protecting my trading algorithm"
+
+This is why I build. 🙏
+
+#buildinpublic #python
+```
+
+### Feature Release
+```
+🚀 Just shipped: Control Flow Flattening
+
+Transforms this:
+if x > 0:
+    result = x * 2
+
+Into a state machine that's much harder to reverse.
+
+Try it: pip install pyobfus --upgrade
+
+#python #opensource #security
+```
+
+### Weekly Update
+```
+Week 12 of building pyobfus:
+
+✅ Fixed 3 bugs
+✅ Added dead code injection
+✅ Wrote 20 new tests
+🎯 Next: Enhanced key obfuscation
+
+Downloads this week: 127
+
+#buildinpublic
+```
+
+---
+
+## Hashtags Strategy
+
+### Primary Hashtags
+```
+#buildinpublic    - Building in public community
+#indiehackers     - Indie developer community
+#python           - Python ecosystem
+#opensource       - Open source projects
+```
+
+### Secondary Hashtags
+```
+#saas             - SaaS products
+#devtools         - Developer tools
+#coding           - General coding
+#security         - Security topics
+```
+
+---
+
+## Posting Guidelines
+
+### Do's ✅
+1. Be authentic - share real thoughts
+2. Show process - "Working on..." posts perform well
+3. Ask questions - triggers engagement
+4. Reply to others - build relationships first
+5. Consistent timing - same time daily
+6. Mix content - don't only promote product
+
+### Don'ts ❌
+1. Don't over-promote - max 1 product post per 5 posts
+2. Don't be too perfect - vulnerability builds connection
+3. Don't ignore replies - respond within 24 hours
+4. Don't post walls of text - keep it short
+5. Don't use too many hashtags - 1-3 is enough
+
+---
+
+## Content Ratio (80/20 Rule)
+
+| Type | Percentage | Examples |
+|------|------------|----------|
+| **Personal/Life** | 30% | Daily observations, hobbies, thoughts |
+| **Learning Journey** | 30% | AI experiments, books, new skills |
+| **Tech/Industry** | 20% | Opinions on trends, interesting discoveries |
+| **Product/Work** | 20% | pyobfus updates, coding tips |
+
+---
+
 **Next Actions:**
-1. Post X/Twitter announcement
-2. Register Reddit account
-3. Start Reddit karma building
+1. Update X profile with new bio
+2. Follow 20-30 recommended accounts
+3. Start warm-up period (like/reply only)
+4. Post first "comeback" post after 2-3 days
+5. Register Reddit account
