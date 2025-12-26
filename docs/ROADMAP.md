@@ -430,6 +430,13 @@ Throughout all versions:
 - License inquiry self-service automation
 - Refund request tracking and management
 
+**Marketing & Content**:
+- See [MARKETING_PLAN.md](MARKETING_PLAN.md) for detailed content strategy
+- X/Twitter presence and engagement
+- Reddit r/Python community participation
+- Dev.to tutorials and articles
+- Track metrics: GitHub stars, PyPI downloads, Pro license sales
+
 ---
 
 ## Success Metrics
