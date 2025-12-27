@@ -300,6 +300,7 @@ def hello():
         result = embed_license_checks(tree, config)
 
         # Should have expiration check
+        assert isinstance(result, ast.Module)
         assert len(result.body) > 1
         ast.fix_missing_locations(result)
         compile(result, "<test>", "exec")
@@ -314,6 +315,7 @@ def hello():
         result = embed_license_checks(tree)  # No config = no restrictions
 
         # Should be unchanged
+        assert isinstance(result, ast.Module)
         assert len(result.body) == 1
 
 
@@ -333,9 +335,12 @@ def hello():
         result = embedder.visit(tree)
 
         # First statement should still be the docstring
+        assert isinstance(result, ast.Module)
         assert isinstance(result.body[0], ast.Expr)
         assert isinstance(result.body[0].value, ast.Constant)
-        assert "module docstring" in result.body[0].value.value
+        docstring_value = result.body[0].value.value
+        assert isinstance(docstring_value, str)
+        assert "module docstring" in docstring_value
 
     def test_preserves_future_imports(self):
         """Test that __future__ imports are preserved at the top."""
