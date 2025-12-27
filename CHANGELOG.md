@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.2] - 2025-12-27
+
+### Added
+- **Statistics Summary**: New `--stats` CLI flag to display obfuscation statistics
+  - Files processed, names obfuscated, strings encoded/encrypted
+  - Pro feature counts (control flow, dead code, anti-debug)
+- **PyPI Badges**: Version and download count badges in README
+- **Dual Licensing Documentation**: Synced Open Core license model across all docs
+
+### Changed
+- **Version Management**: Refactored to Single Source of Truth pattern
+  - `pyproject.toml` is now the only place version is defined
+  - `pyobfus.__version__` reads from package metadata via `importlib.metadata`
+  - Removed hardcoded versions from README.md, ROADMAP.md, and other docs
+- Improved documentation consistency for Apache 2.0 (core) + Proprietary (Pro) licensing
+
 ## [0.3.1] - 2025-12-25
 
 ### Fixed
