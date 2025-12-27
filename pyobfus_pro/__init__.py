@@ -8,7 +8,14 @@ License: Proprietary - Commercial Use Only
 Copyright 2025 Rong Zhu
 """
 
-__version__ = "0.3.1"
+from importlib.metadata import version, PackageNotFoundError
+
+try:
+    __version__ = version("pyobfus")
+except PackageNotFoundError:
+    # Package not installed (development mode)
+    __version__ = "0.0.0-dev"
+
 __license__ = "Proprietary"
 
 from .string_aes import StringAESEncryptor
