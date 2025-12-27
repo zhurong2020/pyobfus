@@ -9,18 +9,17 @@ This document outlines **future plans** for pyobfus. For released version histor
 
 ## Current Status
 
-**Latest Release**: v0.3.1 (December 2025)
-- 451 tests, 70%+ coverage
-- Full Pro feature set available
+See [CHANGELOG.md](../CHANGELOG.md) for the latest release and version history.
 
-See [CHANGELOG.md](../CHANGELOG.md) for complete version history.
+- 410+ tests with 56%+ coverage
+- Full Pro feature set available
 
 ---
 
-## Next Release (v0.3.2+)
+## Next Release (v0.3.3+)
 
 ### Pending Items
-- [ ] Logo displays on PyPI (README.md updated, awaiting release)
+- None currently planned
 
 ### Potential Additions
 - [ ] Performance optimization for large projects (1000+ files)

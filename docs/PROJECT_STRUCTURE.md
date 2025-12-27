@@ -294,15 +294,17 @@ class MyTransformer(BaseTransformer):
 
 ## Release Process
 
-1. Update version in `pyproject.toml`
+**Version is defined in ONE place**: `pyproject.toml`
+
+1. Update version in `pyproject.toml` (single source of truth)
 2. Update `CHANGELOG.md` with release notes
 3. Run full test suite: `pytest tests/ -v`
-4. Create git tag: `git tag v0.3.1`
-5. Push tag: `git push origin v0.3.1`
+4. Create git tag: `git tag vX.Y.Z`
+5. Push tag: `git push origin vX.Y.Z`
 6. Build distribution: `python -m build`
 7. Upload to PyPI: `python -m twine upload dist/*`
 
-Current version: **v0.3.1** (December 2025)
+Note: `pyobfus.__version__` is automatically read from package metadata via `importlib.metadata`.
 
 ## Troubleshooting
 
