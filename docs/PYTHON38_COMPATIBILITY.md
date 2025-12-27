@@ -9,7 +9,7 @@
 
 ## 背景
 
-pyobfus支持Python 3.8-3.12。Python 3.8与3.9+在AST API方面有重要差异：
+pyobfus支持Python 3.8-3.14。Python 3.8与3.9+在AST API方面有重要差异：
 
 - **Python 3.9+**: 内置 `ast.unparse()` 函数
 - **Python 3.8**: 无 `ast.unparse()`，需要使用 `astunparse` 库
