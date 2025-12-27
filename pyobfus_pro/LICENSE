@@ -1,0 +1,50 @@
+pyobfus Pro - Proprietary License
+
+Copyright (c) 2025 Rong Zhu. All rights reserved.
+
+IMPORTANT: This license applies only to the pyobfus_pro module.
+The core pyobfus module is licensed under Apache License 2.0.
+
+1. LICENSE GRANT
+
+   Subject to the terms of this license and payment of applicable fees,
+   you are granted a non-exclusive, non-transferable license to use the
+   pyobfus Pro software ("Software") for your internal business purposes.
+
+2. RESTRICTIONS
+
+   You may NOT:
+   a) Copy, modify, or distribute the Software
+   b) Reverse engineer, decompile, or disassemble the Software
+   c) Remove or alter any proprietary notices
+   d) Sublicense, rent, lease, or lend the Software
+   e) Use the Software to create a competing product
+
+3. LICENSE KEY
+
+   The Software requires a valid license key for operation. Each license
+   key is bound to a limited number of devices as specified at purchase.
+
+4. TRIAL VERSION
+
+   A 5-day trial is available for evaluation purposes only. Trial use
+   does not grant any rights beyond the trial period.
+
+5. DISCLAIMER
+
+   THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND.
+   IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DAMAGES ARISING
+   FROM THE USE OF THIS SOFTWARE.
+
+6. TERMINATION
+
+   This license terminates automatically if you violate any terms.
+   Upon termination, you must destroy all copies of the Software.
+
+7. GOVERNING LAW
+
+   This license shall be governed by the laws of the jurisdiction
+   where the licensor resides.
+
+For licensing inquiries: https://github.com/zhurong2020/pyobfus
+Purchase: https://pyobfus.dev

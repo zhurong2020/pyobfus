@@ -609,7 +609,9 @@ Because obfuscated code must decrypt strings at runtime, the encryption key is n
 - **[Security Policy](https://github.com/zhurong2020/pyobfus/blob/main/SECURITY.md)** - How to report security vulnerabilities
 
 ### Legal & License
-- **[Apache 2.0 License](https://github.com/zhurong2020/pyobfus/blob/main/LICENSE)** - Open source license terms
+- **Dual License Model**:
+  - **pyobfus** (Core): [Apache 2.0](https://github.com/zhurong2020/pyobfus/blob/main/LICENSE) - Free and open source
+  - **pyobfus_pro** (Pro): [Proprietary](https://github.com/zhurong2020/pyobfus/blob/main/pyobfus_pro/LICENSE) - Requires paid license
 
 ## Support the Project
 
