@@ -15,7 +15,7 @@ authors = [
 maintainers = [
     {name = "Rong Zhu", email = "zhurong0525@gmail.com"}
 ]
-keywords = ["obfuscation", "code-protection", "security", "python", "ast", "code-obfuscator", "name-mangling"]
+keywords = ["obfuscation", "code-protection", "security", "python", "ast", "code-obfuscator", "name-mangling", "python3.14", "python3.13", "python-obfuscator"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
