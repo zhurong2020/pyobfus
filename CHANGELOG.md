@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.3.2] - 2025-12-27
 
 ### Added
+- **Python 3.14 Support**: Full support for Python 3.14 (latest stable release)
+  - CI testing on Python 3.8-3.14 across all platforms
+  - Updated documentation and SEO keywords
 - **Statistics Summary**: New `--stats` CLI flag to display obfuscation statistics
   - Files processed, names obfuscated, strings encoded/encrypted
   - Pro feature counts (control flow, dead code, anti-debug)
