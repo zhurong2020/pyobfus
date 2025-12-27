@@ -147,7 +147,7 @@ class StateMachine:
             )
 
             # Build body: state statements + state transitions
-            body = list(state.statements)  # Copy statements
+            body: List[ast.stmt] = list(state.statements)  # Copy statements
             body.extend(self._build_transitions(state))
 
             # Ensure body is not empty

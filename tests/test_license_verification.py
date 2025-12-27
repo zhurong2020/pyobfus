@@ -284,7 +284,7 @@ class TestLicenseVerification:
         )
 
         mock_urlopen.side_effect = urllib.error.HTTPError(
-            url="", code=403, msg="Forbidden", hdrs={}, fp=error_body
+            url="", code=403, msg="Forbidden", hdrs=None, fp=error_body  # type: ignore[arg-type]
         )
 
         # Should raise LicenseVerificationError (revoked is handled as verification failure)
@@ -304,7 +304,7 @@ class TestLicenseVerification:
         )
 
         mock_urlopen.side_effect = urllib.error.HTTPError(
-            url="", code=403, msg="Forbidden", hdrs={}, fp=error_body
+            url="", code=403, msg="Forbidden", hdrs=None, fp=error_body  # type: ignore[arg-type]
         )
 
         # Should raise LicenseVerificationError
@@ -319,7 +319,7 @@ class TestLicenseVerification:
         import urllib.error
 
         mock_urlopen.side_effect = urllib.error.HTTPError(
-            url="", code=404, msg="Not Found", hdrs={}, fp=None
+            url="", code=404, msg="Not Found", hdrs=None, fp=None  # type: ignore[arg-type]
         )
 
         # Should raise LicenseVerificationError

@@ -303,7 +303,7 @@ class DeadCodeInjector(ast.NodeTransformer):
 
     def _generate_false_branch(self) -> ast.If:
         """Generate an if False: block with dead code."""
-        dead_stmts = self._generate_dead_statements()
+        dead_stmts: List[ast.stmt] = self._generate_dead_statements()
         if not dead_stmts:
             dead_stmts = [ast.Pass()]
 
