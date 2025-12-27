@@ -85,7 +85,7 @@ pyobfus/
 ├── CHANGELOG.md          # Version history
 ├── CONTRIBUTING.md       # Contribution guidelines
 ├── SECURITY.md           # Security policy
-├── LICENSE               # Apache 2.0 license
+├── LICENSE               # Dual license (Apache 2.0 for core, Proprietary for Pro)
 ├── .gitignore            # Git ignore patterns
 ├── .editorconfig         # Editor configuration
 └── docs/                 # Documentation

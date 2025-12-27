@@ -210,7 +210,9 @@ See our [full README](https://github.com/zhurong2020/pyobfus#security-note-strin
 
 ## License
 
-Apache License 2.0 - See [LICENSE](https://github.com/zhurong2020/pyobfus/blob/main/LICENSE)
+**Dual License Model**:
+- **pyobfus** (Core): [Apache 2.0](https://github.com/zhurong2020/pyobfus/blob/main/LICENSE) - Free and open source
+- **pyobfus_pro** (Pro): [Proprietary](https://github.com/zhurong2020/pyobfus/blob/main/pyobfus_pro/LICENSE) - Requires paid license
 
 ---
 

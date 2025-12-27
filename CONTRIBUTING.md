@@ -372,7 +372,11 @@ Contributors will be:
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the Apache License 2.0.
+**Dual License Model**: pyobfus uses an Open Core model:
+- **pyobfus** (Core): Apache 2.0 - Open source
+- **pyobfus_pro** (Pro): Proprietary - Requires paid license
+
+By contributing, you agree that your contributions to the Community Edition (pyobfus) will be licensed under the Apache License 2.0. Pro features (pyobfus_pro) are not open source and not accepting external contributions.
 
 ---
 
