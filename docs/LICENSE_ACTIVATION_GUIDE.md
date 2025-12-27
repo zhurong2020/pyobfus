@@ -262,5 +262,4 @@ We'll resend your license key to the registered email.
 
 ---
 
-**Last Updated**: 2025-12-25
-**Version**: v0.3.1
+**Last Updated**: 2025-12-27

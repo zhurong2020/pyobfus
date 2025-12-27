@@ -6,6 +6,8 @@
 
 **Modern Python Code Obfuscator**
 
+[![PyPI version](https://img.shields.io/pypi/v/pyobfus.svg)](https://pypi.org/project/pyobfus/)
+[![PyPI downloads](https://img.shields.io/pypi/dm/pyobfus.svg)](https://pypi.org/project/pyobfus/)
 [![License](https://img.shields.io/badge/License-Dual%20(Apache%202.0%20%2B%20Proprietary)-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -14,7 +16,7 @@ A Python code obfuscator built with AST-based transformations for Python 3.8+. P
 
 ## Features
 
-### ✅ Free Edition (Current Version: v0.3.1)
+### ✅ Free Edition
 
 The following features are **fully implemented and available** in the current version:
 
