@@ -155,6 +155,9 @@ obfuscated/
 local-testing/
 .test_env/
 
+# Integration tests with local paths (personal use only)
+integration_tests/
+
 # Temporary scripts and utilities
 scripts/upload_pypi.py
 scripts/temp_*.py
