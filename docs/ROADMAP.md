@@ -9,6 +9,10 @@ This document outlines the planned technical features and improvements for pyobf
 
 ## Current Status
 
+📋 **Next Release Checklist** (for v0.3.2 or later)
+- [ ] Logo now displays on PyPI (added to README.md in commit db84412)
+- [ ] Any additional features or fixes
+
 ✅ **v0.3.1 Released** (December 2025)
 - **Bug Fixes**: Fixed mypy type errors and Python 3.8 compatibility
 - **Version Sync**: All version numbers now consistent across the codebase
