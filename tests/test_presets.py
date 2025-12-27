@@ -68,6 +68,7 @@ class TestProPresets:
         """Test trial preset with custom expiration days."""
         config = ObfuscationConfig.preset_trial(expire_days=7)
 
+        assert config.license_expire is not None
         expire_date = datetime.strptime(config.license_expire, "%Y-%m-%d")
         days_until = (expire_date - datetime.now()).days
         assert 6 <= days_until <= 8  # Allow for timing differences
