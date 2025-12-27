@@ -1,5 +1,9 @@
 # pyobfus
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/zhurong2020/pyobfus/main/docs/assets/logo.jpeg" alt="pyobfus Logo" width="200">
+</p>
+
 **Modern Python Code Obfuscator**
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
