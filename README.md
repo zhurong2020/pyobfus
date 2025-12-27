@@ -6,7 +6,7 @@
 
 **Modern Python Code Obfuscator**
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/License-Dual%20(Apache%202.0%20%2B%20Proprietary)-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
@@ -535,7 +535,7 @@ pyobfus supports **Python 3.8, 3.9, 3.10, 3.11, and 3.12**. Generated code is co
 |---------|---------|---------|
 | **Price** | $45 (Pro) | $89 (Pro) |
 | **Free tier** | Clear limits (5 files/1000 LOC) | Vague "trial" limitations |
-| **Open source** | Yes (Apache 2.0) | No |
+| **Open source** | Yes (Core: Apache 2.0, Pro: Proprietary) | No |
 | **Native dependencies** | None (pure Python output) | Requires runtime library |
 | **Python 3.12 support** | Yes | Yes |
 

@@ -24,7 +24,7 @@ PyArmor is the most established Python obfuscator. Here's how pyobfus compares:
 | **Price savings** | **50% cheaper** | - |
 | **Free tier** | Unlimited (Community features) | Vague "trial" limits |
 | **Pro trial** | **5 days free** (full features) | Vague limits |
-| **Open source** | Yes (Apache 2.0) | No |
+| **Open source** | Yes (Core: Apache 2.0, Pro: Proprietary) | No |
 | **Auditable code** | Yes | No |
 | **Native dependencies** | None | Requires `pytransform` runtime |
 | **Output format** | Pure `.py` files | `.py` + native libraries |
