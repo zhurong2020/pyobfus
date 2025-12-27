@@ -158,6 +158,11 @@ except ImportError:
     is_flag=True,
     help="List all available presets with descriptions",
 )
+@click.option(
+    "--stats",
+    is_flag=True,
+    help="Show obfuscation statistics summary",
+)
 @click.version_option(version=__version__, prog_name="pyobfus")
 def main(
     input_path: Optional[str],
@@ -183,6 +188,7 @@ def main(
     max_runs: int,
     preset: Optional[str],
     list_presets: bool,
+    stats: bool,
 ) -> None:
     """
     Obfuscate Python source code.
@@ -446,18 +452,42 @@ def main(
         if dry_run:
             click.echo("\n[DRY RUN MODE] - No files will be written")
 
+        # Initialize statistics
+        obfuscation_stats: dict = {
+            "files_processed": 0,
+            "total_names_obfuscated": 0,
+            "strings_encoded": 0,
+            "strings_encrypted": 0,
+            "control_flow_applied": 0,
+            "dead_code_injected": 0,
+            "anti_debug_checks": 0,
+        }
+
         if input_path_obj.is_file():
             # Single file obfuscation
-            _obfuscate_file(input_path_obj, output_path_obj, config, verbose, dry_run)
+            file_stats = _obfuscate_file(
+                input_path_obj, output_path_obj, config, verbose, dry_run
+            )
+            if file_stats:
+                obfuscation_stats["files_processed"] = 1
+                for key, value in file_stats.items():
+                    if key in obfuscation_stats:
+                        obfuscation_stats[key] += value
         elif input_path_obj.is_dir():
             # Directory obfuscation - use CrossFileOrchestrator if enabled
             if cross_file:
-                _obfuscate_directory_crossfile(
+                dir_stats = _obfuscate_directory_crossfile(
                     input_path_obj, output_path_obj, config, verbose, dry_run
                 )
+                if dir_stats:
+                    obfuscation_stats.update(dir_stats)
             else:
                 # Legacy single-file mode
-                _obfuscate_directory(input_path_obj, output_path_obj, config, verbose, dry_run)
+                dir_stats = _obfuscate_directory(
+                    input_path_obj, output_path_obj, config, verbose, dry_run
+                )
+                if dir_stats:
+                    obfuscation_stats.update(dir_stats)
         else:
             click.echo(f"Error: {input_path} is neither a file nor a directory", err=True)
             sys.exit(1)
@@ -466,6 +496,10 @@ def main(
             click.echo("\nObfuscation completed successfully!")
         else:
             click.echo("\n[DRY RUN] Preview completed. Use without --dry-run to write files.")
+
+        # Display statistics if requested
+        if stats and not dry_run:
+            _display_stats(obfuscation_stats, config)
 
         # Subtle Pro feature hint (only for Community users without trial)
         if level == "community" and not PRO_AVAILABLE and not is_trial_active():
@@ -494,7 +528,7 @@ def _obfuscate_file(
     config: ObfuscationConfig,
     verbose: bool,
     dry_run: bool = False,
-) -> None:
+) -> dict:
     """
     Obfuscate a single Python file.
 
@@ -504,7 +538,18 @@ def _obfuscate_file(
         config: Obfuscation configuration
         verbose: Verbose output
         dry_run: Preview mode without writing files
+
+    Returns:
+        Dictionary with obfuscation statistics
     """
+    file_stats: dict = {
+        "total_names_obfuscated": 0,
+        "strings_encoded": 0,
+        "strings_encrypted": 0,
+        "control_flow_applied": 0,
+        "dead_code_injected": 0,
+        "anti_debug_checks": 0,
+    }
     if verbose:
         click.echo(f"\nObfuscating: {input_file}")
 
@@ -532,6 +577,7 @@ def _obfuscate_file(
     # 1. Name mangling (always applied)
     mangler = NameMangler(config, analyzer)
     transformed_tree = mangler.transform(transformed_tree)
+    file_stats["total_names_obfuscated"] = mangler.get_transformation_count()
 
     if verbose:
         click.echo(f"  Name transformations: {mangler.get_transformation_count()}")
@@ -542,12 +588,13 @@ def _obfuscate_file(
 
         string_encoder = StringEncoder(config, analyzer)
         transformed_tree = string_encoder.transform(transformed_tree)
+        encoder_stats = string_encoder.get_statistics()
+        file_stats["strings_encoded"] = encoder_stats.get("encoded_strings", 0)
 
         if verbose:
-            stats = string_encoder.get_statistics()
-            click.echo(f"  Encoded strings: {stats['encoded_strings']}")
-            if stats["skipped_fstrings"] > 0:
-                click.echo(f"  Skipped f-strings: {stats['skipped_fstrings']}")
+            click.echo(f"  Encoded strings: {encoder_stats['encoded_strings']}")
+            if encoder_stats["skipped_fstrings"] > 0:
+                click.echo(f"  Skipped f-strings: {encoder_stats['skipped_fstrings']}")
 
     # 3. Pro features (if enabled)
     if config.level == "pro":
@@ -558,6 +605,7 @@ def _obfuscate_file(
 
                 cff = ControlFlowFlattener()
                 transformed_tree = cff.visit(transformed_tree)
+                file_stats["control_flow_applied"] = 1
 
                 if verbose:
                     click.echo("  Control flow flattening: Applied")
@@ -568,10 +616,11 @@ def _obfuscate_file(
 
                 string_encryptor = StringAESEncryptor(config, analyzer)
                 transformed_tree = string_encryptor.transform(transformed_tree)
+                encryptor_stats = string_encryptor.get_statistics()
+                file_stats["strings_encrypted"] = encryptor_stats.get("encrypted_strings", 0)
 
                 if verbose:
-                    stats = string_encryptor.get_statistics()
-                    click.echo(f"  Encrypted strings: {stats['encrypted_strings']}")
+                    click.echo(f"  Encrypted strings: {encryptor_stats['encrypted_strings']}")
 
             # Anti-debugging checks
             if config.anti_debug:
@@ -579,10 +628,11 @@ def _obfuscate_file(
 
                 anti_debug = AntiDebugInjector(config, analyzer)
                 transformed_tree = anti_debug.transform(transformed_tree)
+                anti_debug_stats = anti_debug.get_statistics()
+                file_stats["anti_debug_checks"] = anti_debug_stats.get("injected_functions", 0) + 1
 
                 if verbose:
-                    stats = anti_debug.get_statistics()
-                    click.echo(f"  Anti-debug checks: {stats['injected_functions'] + 1}")
+                    click.echo(f"  Anti-debug checks: {anti_debug_stats['injected_functions'] + 1}")
 
             # Dead Code Injection
             if config.dead_code_injection:
@@ -590,10 +640,11 @@ def _obfuscate_file(
 
                 dead_code_injector = DeadCodeInjector()
                 transformed_tree = dead_code_injector.visit(transformed_tree)
+                dci_stats = dead_code_injector.get_statistics()
+                file_stats["dead_code_injected"] = dci_stats.get("injected_statements", 0)
 
                 if verbose:
-                    stats = dead_code_injector.get_statistics()
-                    click.echo(f"  Dead code injection: {stats['injected_statements']} statements")
+                    click.echo(f"  Dead code injection: {dci_stats['injected_statements']} statements")
 
             # License Embedding (applied last to inject at module start)
             license_embed_enabled = (
@@ -647,6 +698,8 @@ def _obfuscate_file(
             for line in lines:
                 click.echo(f"    {line}")
 
+    return file_stats
+
 
 def _obfuscate_directory(
     input_dir: Path,
@@ -654,7 +707,7 @@ def _obfuscate_directory(
     config: ObfuscationConfig,
     verbose: bool,
     dry_run: bool = False,
-) -> None:
+) -> dict:
     """
     Obfuscate all Python files in a directory (legacy single-file mode).
 
@@ -664,13 +717,26 @@ def _obfuscate_directory(
         config: Obfuscation configuration
         verbose: Verbose output
         dry_run: Preview mode without writing files
+
+    Returns:
+        Dictionary with aggregated obfuscation statistics
     """
+    dir_stats: dict = {
+        "files_processed": 0,
+        "total_names_obfuscated": 0,
+        "strings_encoded": 0,
+        "strings_encrypted": 0,
+        "control_flow_applied": 0,
+        "dead_code_injected": 0,
+        "anti_debug_checks": 0,
+    }
+
     # Find all Python files, excluding patterns from config
     python_files = filter_python_files(input_dir, config.exclude_patterns)
 
     if not python_files:
         click.echo(f"No Python files found in {input_dir}")
-        return
+        return dir_stats
 
     if verbose and config.exclude_patterns:
         click.echo(f"Excluding patterns: {', '.join(config.exclude_patterns)}")
@@ -701,10 +767,16 @@ def _obfuscate_directory(
         output_file = output_dir / rel_path
 
         try:
-            _obfuscate_file(python_file, output_file, config, verbose, dry_run)
+            file_stats = _obfuscate_file(python_file, output_file, config, verbose, dry_run)
+            dir_stats["files_processed"] += 1
+            for key, value in file_stats.items():
+                if key in dir_stats:
+                    dir_stats[key] += value
         except PyObfusError as e:
             click.echo(f"  Warning: Failed to obfuscate {python_file}: {e}", err=True)
             # Continue with other files
+
+    return dir_stats
 
 
 def _obfuscate_directory_crossfile(
@@ -713,7 +785,7 @@ def _obfuscate_directory_crossfile(
     config: ObfuscationConfig,
     verbose: bool,
     dry_run: bool = False,
-) -> None:
+) -> dict:
     """
     Obfuscate directory with cross-file import mapping using CrossFileOrchestrator.
 
@@ -723,7 +795,20 @@ def _obfuscate_directory_crossfile(
         config: Obfuscation configuration
         verbose: Verbose output
         dry_run: Preview mode without writing files
+
+    Returns:
+        Dictionary with obfuscation statistics
     """
+    dir_stats: dict = {
+        "files_processed": 0,
+        "total_names_obfuscated": 0,
+        "strings_encoded": 0,
+        "strings_encrypted": 0,
+        "control_flow_applied": 0,
+        "dead_code_injected": 0,
+        "anti_debug_checks": 0,
+    }
+
     if verbose:
         click.echo("\nUsing cross-file obfuscation mode")
         click.echo(f"Input:  {input_dir}")
@@ -740,6 +825,9 @@ def _obfuscate_directory_crossfile(
         global_table = orchestrator.phase1_scan(input_dir)
 
         stats = orchestrator.get_statistics()
+        dir_stats["files_processed"] = stats.get("files_discovered", 0)
+        dir_stats["total_names_obfuscated"] = stats.get("total_exports", 0)
+
         click.echo(f"\nDiscovered {stats['files_discovered']} Python file(s)")
         click.echo(f"  Modules: {stats['total_modules']}")
         click.echo(f"  Exports: {stats['total_exports']}")
@@ -764,7 +852,7 @@ def _obfuscate_directory_crossfile(
                         click.echo(f"    {orig} -> {obf}")
             if stats["total_modules"] > 5:
                 click.echo(f"\n  ... and {stats['total_modules'] - 5} more modules")
-            return
+            return dir_stats
 
         # Phase 2: Transform
         if verbose:
@@ -776,6 +864,8 @@ def _obfuscate_directory_crossfile(
 
         if verbose:
             click.echo(f"\nOutput written to: {output_dir}")
+
+        return dir_stats
 
     except Exception as e:
         click.echo(f"\nError during cross-file obfuscation: {e}", err=True)
@@ -996,6 +1086,37 @@ def _try_auto_discover_config(verbose: bool) -> Optional[Path]:
         return config_path
 
     return None
+
+
+def _display_stats(stats: dict, config: ObfuscationConfig) -> None:
+    """
+    Display obfuscation statistics summary.
+
+    Args:
+        stats: Dictionary with obfuscation statistics
+        config: Obfuscation configuration
+    """
+    click.echo("\n" + "=" * 50)
+    click.echo("  Obfuscation Statistics")
+    click.echo("=" * 50)
+
+    click.echo(f"\n  Files processed:      {stats.get('files_processed', 0)}")
+    click.echo(f"  Names obfuscated:     {stats.get('total_names_obfuscated', 0)}")
+
+    if stats.get("strings_encoded", 0) > 0:
+        click.echo(f"  Strings encoded:      {stats['strings_encoded']}")
+
+    if config.level == "pro":
+        if stats.get("strings_encrypted", 0) > 0:
+            click.echo(f"  Strings encrypted:    {stats['strings_encrypted']}")
+        if stats.get("control_flow_applied", 0) > 0:
+            click.echo(f"  Control flow files:   {stats['control_flow_applied']}")
+        if stats.get("dead_code_injected", 0) > 0:
+            click.echo(f"  Dead code statements: {stats['dead_code_injected']}")
+        if stats.get("anti_debug_checks", 0) > 0:
+            click.echo(f"  Anti-debug checks:    {stats['anti_debug_checks']}")
+
+    click.echo("\n" + "=" * 50)
 
 
 if __name__ == "__main__":
