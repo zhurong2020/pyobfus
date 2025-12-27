@@ -465,9 +465,7 @@ def main(
 
         if input_path_obj.is_file():
             # Single file obfuscation
-            file_stats = _obfuscate_file(
-                input_path_obj, output_path_obj, config, verbose, dry_run
-            )
+            file_stats = _obfuscate_file(input_path_obj, output_path_obj, config, verbose, dry_run)
             if file_stats:
                 obfuscation_stats["files_processed"] = 1
                 for key, value in file_stats.items():
@@ -644,7 +642,9 @@ def _obfuscate_file(
                 file_stats["dead_code_injected"] = dci_stats.get("injected_statements", 0)
 
                 if verbose:
-                    click.echo(f"  Dead code injection: {dci_stats['injected_statements']} statements")
+                    click.echo(
+                        f"  Dead code injection: {dci_stats['injected_statements']} statements"
+                    )
 
             # License Embedding (applied last to inject at module start)
             license_embed_enabled = (
