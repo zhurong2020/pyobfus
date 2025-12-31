@@ -1,0 +1,24 @@
+site_name: pyobfus Documentation
+site_url: https://pyobfus.readthedocs.io
+site_description: Modern Python Code Obfuscator
+
+repo_name: zhurong2020/pyobfus
+repo_url: https://github.com/zhurong2020/pyobfus
+
+theme:
+  name: readthedocs
+
+nav:
+  - Home: index.md
+  - Comparison: COMPARISON.md
+  - Roadmap: ROADMAP.md
+  - Python 3.8 Compatibility: PYTHON38_COMPATIBILITY.md
+  - License Activation: LICENSE_ACTIVATION_GUIDE.md
+  - Project Structure: PROJECT_STRUCTURE.md
+  - Integration Testing: INTEGRATION_TESTING.md
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true
