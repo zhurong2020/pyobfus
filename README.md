@@ -8,7 +8,7 @@
 
 [![PyPI version](https://img.shields.io/pypi/v/pyobfus.svg)](https://pypi.org/project/pyobfus/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/pyobfus.svg)](https://pypi.org/project/pyobfus/)
-[![Documentation Status](https://readthedocs.org/projects/pyobfus/badge/?version=stable)](https://pyobfus.readthedocs.io/en/stable/)
+[![Documentation Status](https://readthedocs.org/projects/pyobfus/badge/?version=latest)](https://pyobfus.readthedocs.io/en/latest/)
 [![License](https://img.shields.io/badge/License-Dual%20(Apache%202.0%20%2B%20Proprietary)-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.8--3.14-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
