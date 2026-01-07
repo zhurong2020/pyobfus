@@ -65,7 +65,7 @@ for url in meta.get_all('Project-URL'):
     print(url)
 # 输出：
 # Homepage, https://github.com/zhurong2020/pyobfus
-# Documentation, https://zhurong2020.github.io/pyobfus/
+# Documentation, https://pyobfus.readthedocs.io/
 # Repository, https://github.com/zhurong2020/pyobfus
 # ...
 
