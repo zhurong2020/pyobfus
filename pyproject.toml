@@ -50,7 +50,7 @@ dev = [
 
 [project.urls]
 Homepage = "https://github.com/zhurong2020/pyobfus"
-Documentation = "https://zhurong2020.github.io/pyobfus/"
+Documentation = "https://pyobfus.readthedocs.io/"
 Repository = "https://github.com/zhurong2020/pyobfus"
 "Source Code" = "https://github.com/zhurong2020/pyobfus"
 "Bug Tracker" = "https://github.com/zhurong2020/pyobfus/issues"
