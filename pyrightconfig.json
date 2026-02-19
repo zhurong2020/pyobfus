@@ -1,0 +1,22 @@
+{
+  "include": [
+    "pyobfus",
+    "pyobfus_pro",
+    "tests"
+  ],
+  "exclude": [
+    "**/__pycache__",
+    "**/node_modules",
+    "dist",
+    "*.egg-info",
+    "htmlcov"
+  ],
+  "pythonVersion": "3.12",
+  "typeCheckingMode": "basic",
+  "useLibraryCodeForTypes": true,
+  "reportMissingImports": false,
+  "reportMissingTypeStubs": false,
+  "reportPossiblyUnbound": false,
+  "reportOptionalMemberAccess": false,
+  "reportArgumentType": false
+}
