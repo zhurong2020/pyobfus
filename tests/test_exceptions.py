@@ -1,7 +1,5 @@
 """Tests for pyobfus exceptions module."""
 
-import pytest
-
 from pyobfus.exceptions import (
     PyObfusError,
     ParseError,

@@ -17,7 +17,6 @@ Tests cover the main CLI entry point including:
 
 import pytest
 from pathlib import Path
-from unittest.mock import patch
 from click.testing import CliRunner
 
 from pyobfus.cli import main

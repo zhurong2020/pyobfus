@@ -14,11 +14,20 @@ Tests cover:
 """
 
 import pytest
-from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from click.testing import CliRunner
 
 from pyobfus.cli import main
+
+try:
+    import pyobfus_pro  # noqa: F401
+
+    PRO_AVAILABLE = True
+except ImportError:
+    PRO_AVAILABLE = False
+
+# Tests that actually execute Pro features need pyobfus_pro installed
+requires_pro = pytest.mark.skipif(not PRO_AVAILABLE, reason="pyobfus_pro not installed")
 
 
 @pytest.fixture
@@ -51,6 +60,7 @@ def project_dir(tmp_path):
     return src
 
 
+@requires_pro
 class TestProLevelWithTrial:
     """Test --level pro with trial active (no license needed)."""
 
@@ -73,6 +83,7 @@ class TestProLevelWithTrial:
         assert "Statistics" in result.output
 
 
+@requires_pro
 class TestProFeatureExecution:
     """Test actual Pro feature execution with trial active."""
 
@@ -149,6 +160,7 @@ class TestProFeatureExecution:
         assert result.exit_code == 0
 
 
+@requires_pro
 class TestLicenseEmbedding:
     """Test license embedding features with trial active."""
 
@@ -202,9 +214,9 @@ class TestLicenseEmbedding:
 class TestHandleUpgrade:
     """Test _handle_upgrade() branches."""
 
+    @pytest.mark.skipif(not PRO_AVAILABLE, reason="pyobfus_pro not installed")
     def test_upgrade_pro_available(self, runner):
         """Test --upgrade when PRO_AVAILABLE is True."""
-        # PRO_AVAILABLE is already True in our env (pyobfus_pro importable)
         result = runner.invoke(main, ["--upgrade"])
         assert result.exit_code == 0
         assert "Pro" in result.output
@@ -227,6 +239,7 @@ class TestHandleUpgrade:
         assert "TRY FREE" in result.output or "$45" in result.output
 
 
+@requires_pro
 class TestProPresets:
     """Test Pro presets with trial active."""
 
@@ -366,6 +379,7 @@ class TestStringEncoding:
         assert "Encoded strings" in result.output or output.exists()
 
 
+@requires_pro
 class TestDisplayStatsProBranches:
     """Test _display_stats with Pro-level stats."""
 
@@ -392,6 +406,7 @@ class TestDisplayStatsProBranches:
         assert "Statistics" in result.output
 
 
+@requires_pro
 class TestDirectoryProMode:
     """Test directory obfuscation in Pro mode."""
 
