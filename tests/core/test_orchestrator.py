@@ -7,13 +7,19 @@ Tests cover:
 - Module name conversion
 - Name generation
 - Integration with GlobalSymbolTable and ExportDetector
+- Parallel processing
 """
 
 import pytest
 from pathlib import Path
 
 from pyobfus.config import ObfuscationConfig
-from pyobfus.core.orchestrator import CrossFileOrchestrator, ObfuscationResult, FileInfo
+from pyobfus.core.orchestrator import (
+    CrossFileOrchestrator,
+    ObfuscationResult,
+    FileInfo,
+    _transform_single_file,
+)
 
 
 class TestObfuscationResult:
@@ -467,3 +473,173 @@ def func4():
         assert len(orchestrator.files) == 0
         stats = orchestrator.get_statistics()
         assert stats["files_discovered"] == 0
+
+
+class TestParallelProcessing:
+    """Test suite for parallel file processing."""
+
+    def _create_multi_file_project(self, tmp_path, num_files=10):
+        """Helper to create a multi-file test project."""
+        for i in range(num_files):
+            (tmp_path / f"module_{i}.py").write_text(
+                f"def func_{i}(x):\n    return x + {i}\n\n"
+                f"class Handler_{i}:\n    def process(self):\n        return {i}\n"
+            )
+
+    def test_sequential_mode(self, tmp_path):
+        """Test that sequential mode (max_workers=1) works."""
+        self._create_multi_file_project(tmp_path, 5)
+        config = ObfuscationConfig()
+        config.max_workers = 1
+        config.exclude_patterns = []
+
+        orchestrator = CrossFileOrchestrator(config)
+        orchestrator.phase1_scan(tmp_path)
+
+        output_dir = tmp_path / "output"
+        errors = orchestrator.phase2_transform(tmp_path, output_dir)
+
+        assert errors == []
+        assert len(list(output_dir.glob("*.py"))) == 5
+
+    def test_parallel_mode(self, tmp_path):
+        """Test that parallel mode (max_workers=2) works."""
+        self._create_multi_file_project(tmp_path, 10)
+        config = ObfuscationConfig()
+        config.max_workers = 2
+        config.exclude_patterns = []
+
+        orchestrator = CrossFileOrchestrator(config)
+        orchestrator.phase1_scan(tmp_path)
+
+        output_dir = tmp_path / "output"
+        errors = orchestrator.phase2_transform(tmp_path, output_dir)
+
+        assert errors == []
+        assert len(list(output_dir.glob("*.py"))) == 10
+
+        # Verify all output files are valid Python
+        for py_file in output_dir.glob("*.py"):
+            content = py_file.read_text()
+            compile(content, str(py_file), "exec")  # raises SyntaxError if invalid
+
+    def test_auto_workers(self, tmp_path):
+        """Test that max_workers=None (auto) works."""
+        self._create_multi_file_project(tmp_path, 5)
+        config = ObfuscationConfig()
+        config.max_workers = None
+        config.exclude_patterns = []
+
+        orchestrator = CrossFileOrchestrator(config)
+        orchestrator.phase1_scan(tmp_path)
+
+        output_dir = tmp_path / "output"
+        errors = orchestrator.phase2_transform(tmp_path, output_dir)
+
+        assert errors == []
+        assert len(list(output_dir.glob("*.py"))) == 5
+
+    def test_progress_callback(self, tmp_path):
+        """Test that progress callback is invoked for each file."""
+        self._create_multi_file_project(tmp_path, 3)
+        config = ObfuscationConfig()
+        config.max_workers = 1
+        config.exclude_patterns = []
+
+        orchestrator = CrossFileOrchestrator(config)
+        orchestrator.phase1_scan(tmp_path)
+
+        progress_calls = []
+
+        def callback(module_name, error):
+            progress_calls.append((module_name, error))
+
+        output_dir = tmp_path / "output"
+        orchestrator.phase2_transform(tmp_path, output_dir, progress_callback=callback)
+
+        assert len(progress_calls) == 3
+        assert all(error is None for _, error in progress_calls)
+
+    def test_parallel_preserves_correctness(self, tmp_path):
+        """Test that parallel output is functionally equivalent to sequential."""
+        self._create_multi_file_project(tmp_path, 5)
+        config_seq = ObfuscationConfig()
+        config_seq.max_workers = 1
+        config_seq.exclude_patterns = []
+
+        config_par = ObfuscationConfig()
+        config_par.max_workers = 2
+        config_par.exclude_patterns = []
+
+        # Sequential
+        orch_seq = CrossFileOrchestrator(config_seq)
+        orch_seq.phase1_scan(tmp_path)
+        out_seq = tmp_path / "out_seq"
+        orch_seq.phase2_transform(tmp_path, out_seq)
+
+        # Parallel
+        orch_par = CrossFileOrchestrator(config_par)
+        orch_par.phase1_scan(tmp_path)
+        out_par = tmp_path / "out_par"
+        orch_par.phase2_transform(tmp_path, out_par)
+
+        # Both should produce same number of files
+        seq_files = sorted(f.name for f in out_seq.glob("*.py"))
+        par_files = sorted(f.name for f in out_par.glob("*.py"))
+        assert seq_files == par_files
+
+        # Both outputs should be valid Python
+        for name in seq_files:
+            compile((out_seq / name).read_text(), name, "exec")
+            compile((out_par / name).read_text(), name, "exec")
+
+    def test_transform_single_file_function(self, tmp_path):
+        """Test the module-level _transform_single_file function directly."""
+        from pyobfus.core.global_table import GlobalSymbolTable
+
+        # Setup
+        (tmp_path / "module.py").write_text("def my_func():\n    return 42\n")
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+
+        global_table = GlobalSymbolTable()
+        global_table.register_export("module", "my_func", "I0")
+
+        module_name, error = _transform_single_file(
+            tmp_path / "module.py",
+            Path("module.py"),
+            "module",
+            tmp_path,
+            output_dir,
+            global_table,
+        )
+
+        assert module_name == "module"
+        assert error is None
+        assert (output_dir / "module.py").exists()
+
+        content = (output_dir / "module.py").read_text()
+        assert "I0" in content
+        assert "my_func" not in content
+
+    def test_single_file_returns_error_on_invalid_python(self, tmp_path):
+        """Test _transform_single_file handles parse errors gracefully."""
+        from pyobfus.core.global_table import GlobalSymbolTable
+
+        (tmp_path / "bad.py").write_text("def incomplete(:\n")
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+
+        global_table = GlobalSymbolTable()
+
+        module_name, error = _transform_single_file(
+            tmp_path / "bad.py",
+            Path("bad.py"),
+            "bad",
+            tmp_path,
+            output_dir,
+            global_table,
+        )
+
+        assert module_name == "bad"
+        assert error is not None
