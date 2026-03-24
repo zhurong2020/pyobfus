@@ -58,9 +58,7 @@ class TestProLevelWithTrial:
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial: 3 days left")
     def test_pro_level_trial_single_file(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(simple_file), "-o", str(output), "--level", "pro", "-v"]
-        )
+        result = runner.invoke(main, [str(simple_file), "-o", str(output), "--level", "pro", "-v"])
         assert result.exit_code == 0
         assert output.exists()
 
@@ -82,9 +80,7 @@ class TestProFeatureExecution:
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_control_flow_flattening(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(simple_file), "-o", str(output), "--control-flow", "-v"]
-        )
+        result = runner.invoke(main, [str(simple_file), "-o", str(output), "--control-flow", "-v"])
         assert result.exit_code == 0
         assert "Control flow" in result.output or output.exists()
 
@@ -101,18 +97,14 @@ class TestProFeatureExecution:
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_anti_debug(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(simple_file), "-o", str(output), "--anti-debug", "-v"]
-        )
+        result = runner.invoke(main, [str(simple_file), "-o", str(output), "--anti-debug", "-v"])
         assert result.exit_code == 0
 
     @patch("pyobfus.cli.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_dead_code_injection(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(simple_file), "-o", str(output), "--dead-code", "-v"]
-        )
+        result = runner.invoke(main, [str(simple_file), "-o", str(output), "--dead-code", "-v"])
         assert result.exit_code == 0
 
     @patch("pyobfus.cli.is_trial_active", return_value=True)
@@ -120,11 +112,18 @@ class TestProFeatureExecution:
     def test_all_pro_features_combined(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
         result = runner.invoke(
-            main, [
-                str(simple_file), "-o", str(output),
-                "--control-flow", "--string-encryption", "--anti-debug", "--dead-code",
-                "-v", "--stats",
-            ]
+            main,
+            [
+                str(simple_file),
+                "-o",
+                str(output),
+                "--control-flow",
+                "--string-encryption",
+                "--anti-debug",
+                "--dead-code",
+                "-v",
+                "--stats",
+            ],
         )
         assert result.exit_code == 0
         assert "Statistics" in result.output
@@ -135,11 +134,17 @@ class TestProFeatureExecution:
         """Test _display_stats Pro branches with non-zero counts."""
         output = tmp_path / "output.py"
         result = runner.invoke(
-            main, [
-                str(simple_file), "-o", str(output),
-                "--control-flow", "--string-encryption", "--anti-debug", "--dead-code",
+            main,
+            [
+                str(simple_file),
+                "-o",
+                str(output),
+                "--control-flow",
+                "--string-encryption",
+                "--anti-debug",
+                "--dead-code",
                 "--stats",
-            ]
+            ],
         )
         assert result.exit_code == 0
 
@@ -160,9 +165,7 @@ class TestLicenseEmbedding:
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_bind_machine_flag(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(simple_file), "-o", str(output), "--bind-machine", "-v"]
-        )
+        result = runner.invoke(main, [str(simple_file), "-o", str(output), "--bind-machine", "-v"])
         assert result.exit_code == 0
 
     @patch("pyobfus.cli.is_trial_active", return_value=True)
@@ -179,11 +182,18 @@ class TestLicenseEmbedding:
     def test_all_license_embed_combined(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
         result = runner.invoke(
-            main, [
-                str(simple_file), "-o", str(output),
-                "--expire", "2030-12-31", "--bind-machine", "--max-runs", "500",
+            main,
+            [
+                str(simple_file),
+                "-o",
+                str(output),
+                "--expire",
+                "2030-12-31",
+                "--bind-machine",
+                "--max-runs",
+                "500",
                 "-v",
-            ]
+            ],
         )
         assert result.exit_code == 0
         assert "License embedding" in result.output or "expires" in result.output
@@ -286,9 +296,7 @@ class TestProLicenseVerification:
             "message": "License verified",
         }
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(simple_file), "-o", str(output), "--level", "pro", "-v"]
-        )
+        result = runner.invoke(main, [str(simple_file), "-o", str(output), "--level", "pro", "-v"])
         assert result.exit_code == 0
         assert "License verified" in result.output
 
@@ -298,9 +306,7 @@ class TestProLicenseVerification:
         """Test --level pro with no cached license."""
         mock_pro.get_license_status.return_value = None
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(simple_file), "-o", str(output), "--level", "pro"]
-        )
+        result = runner.invoke(main, [str(simple_file), "-o", str(output), "--level", "pro"])
         assert result.exit_code == 1
         assert "license" in result.output.lower() or "register" in result.output.lower()
 
@@ -311,15 +317,15 @@ class TestProLicenseVerification:
         mock_pro.get_license_status.return_value = {
             "key": "PYOB-AAAA-BBBB-CCCC-DDDD",
         }
+
         # Create a real exception class for the mock
         class MockLicenseError(Exception):
             pass
+
         mock_pro.LicenseError = MockLicenseError
         mock_pro.verify_license.side_effect = MockLicenseError("Invalid key")
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(simple_file), "-o", str(output), "--level", "pro"]
-        )
+        result = runner.invoke(main, [str(simple_file), "-o", str(output), "--level", "pro"])
         assert result.exit_code == 1
         assert "failed" in result.output.lower() or "Invalid" in result.output
 
@@ -331,9 +337,7 @@ class TestProNoAccess:
     @patch("pyobfus.cli.is_trial_active", return_value=False)
     def test_pro_level_no_access(self, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(simple_file), "-o", str(output), "--level", "pro"]
-        )
+        result = runner.invoke(main, [str(simple_file), "-o", str(output), "--level", "pro"])
         assert result.exit_code == 1
         assert "trial" in result.output.lower() or "license" in result.output.lower()
 
@@ -341,9 +345,7 @@ class TestProNoAccess:
     @patch("pyobfus.cli.is_trial_active", return_value=False)
     def test_pro_features_no_access(self, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(simple_file), "-o", str(output), "--control-flow"]
-        )
+        result = runner.invoke(main, [str(simple_file), "-o", str(output), "--control-flow"])
         assert result.exit_code == 1
 
 
@@ -359,9 +361,7 @@ class TestStringEncoding:
             "  max_files: null\n  max_total_loc: null\n"
         )
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(f), "-o", str(output), "-c", str(cfg), "-v"]
-        )
+        result = runner.invoke(main, [str(f), "-o", str(output), "-c", str(cfg), "-v"])
         assert result.exit_code == 0
         assert "Encoded strings" in result.output or output.exists()
 
@@ -375,11 +375,17 @@ class TestDisplayStatsProBranches:
         """All Pro stats should appear when non-zero."""
         output = tmp_path / "output.py"
         result = runner.invoke(
-            main, [
-                str(simple_file), "-o", str(output),
-                "--control-flow", "--string-encryption", "--anti-debug", "--dead-code",
+            main,
+            [
+                str(simple_file),
+                "-o",
+                str(output),
+                "--control-flow",
+                "--string-encryption",
+                "--anti-debug",
+                "--dead-code",
                 "--stats",
-            ]
+            ],
         )
         assert result.exit_code == 0
         # Stats section should be present
@@ -393,8 +399,6 @@ class TestDirectoryProMode:
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_directory_crossfile_pro(self, mock_msg, mock_trial, runner, project_dir, tmp_path):
         output = tmp_path / "dist"
-        result = runner.invoke(
-            main, [str(project_dir), "-o", str(output), "--level", "pro", "-v"]
-        )
+        result = runner.invoke(main, [str(project_dir), "-o", str(output), "--level", "pro", "-v"])
         assert result.exit_code == 0
         assert (output / "app.py").exists()

@@ -97,16 +97,12 @@ class TestSingleFileObfuscation:
         f = tmp_path / "doc.py"
         f.write_text('def func():\n    """Docstring."""\n    return 1\n')
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(f), "-o", str(output), "--keep-docstrings"]
-        )
+        result = runner.invoke(main, [str(f), "-o", str(output), "--keep-docstrings"])
         assert result.exit_code == 0
 
     def test_custom_name_prefix(self, runner, single_file, tmp_path):
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(single_file), "-o", str(output), "--name-prefix", "OBF"]
-        )
+        result = runner.invoke(main, [str(single_file), "-o", str(output), "--name-prefix", "OBF"])
         assert result.exit_code == 0
         content = output.read_text()
         assert "OBF" in content
@@ -123,33 +119,25 @@ class TestDirectoryObfuscation:
 
     def test_directory_no_crossfile(self, runner, project_dir, tmp_path):
         output = tmp_path / "dist"
-        result = runner.invoke(
-            main, [str(project_dir), "-o", str(output), "--no-cross-file"]
-        )
+        result = runner.invoke(main, [str(project_dir), "-o", str(output), "--no-cross-file"])
         assert result.exit_code == 0
         assert (output / "main.py").exists()
 
     def test_directory_with_stats(self, runner, project_dir, tmp_path):
         output = tmp_path / "dist"
-        result = runner.invoke(
-            main, [str(project_dir), "-o", str(output), "--stats"]
-        )
+        result = runner.invoke(main, [str(project_dir), "-o", str(output), "--stats"])
         assert result.exit_code == 0
         assert "Statistics" in result.output
 
     def test_directory_dry_run(self, runner, project_dir, tmp_path):
         output = tmp_path / "dist"
-        result = runner.invoke(
-            main, [str(project_dir), "-o", str(output), "--dry-run"]
-        )
+        result = runner.invoke(main, [str(project_dir), "-o", str(output), "--dry-run"])
         assert result.exit_code == 0
         assert "DRY RUN" in result.output
 
     def test_directory_with_jobs(self, runner, project_dir, tmp_path):
         output = tmp_path / "dist"
-        result = runner.invoke(
-            main, [str(project_dir), "-o", str(output), "-j", "2"]
-        )
+        result = runner.invoke(main, [str(project_dir), "-o", str(output), "-j", "2"])
         assert result.exit_code == 0
         assert (output / "main.py").exists()
 
@@ -161,9 +149,7 @@ class TestDirectoryObfuscation:
         for i in range(6):
             (src / f"mod_{i}.py").write_text(f"def f{i}(): pass\n")
         output = tmp_path / "dist"
-        result = runner.invoke(
-            main, [str(src), "-o", str(output), "--no-cross-file"]
-        )
+        result = runner.invoke(main, [str(src), "-o", str(output), "--no-cross-file"])
         assert result.exit_code == 1
         assert "limit" in result.output.lower() or "Community" in result.output
 
@@ -223,9 +209,7 @@ class TestConfigAutoDiscovery:
         output = tmp_path / "dist"
         # Run from the directory with the config
         with runner.isolated_filesystem(temp_dir=tmp_path):
-            result = runner.invoke(
-                main, [str(src), "-o", str(output), "-v"]
-            )
+            result = runner.invoke(main, [str(src), "-o", str(output), "-v"])
             # May or may not find config depending on CWD
             assert result.exit_code == 0
 
@@ -248,16 +232,12 @@ class TestListPresets:
 class TestPresetFlag:
     def test_preset_safe(self, runner, single_file, tmp_path):
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(single_file), "-o", str(output), "--preset", "safe"]
-        )
+        result = runner.invoke(main, [str(single_file), "-o", str(output), "--preset", "safe"])
         assert result.exit_code == 0
 
     def test_preset_balanced(self, runner, single_file, tmp_path):
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(single_file), "-o", str(output), "--preset", "balanced"]
-        )
+        result = runner.invoke(main, [str(single_file), "-o", str(output), "--preset", "balanced"])
         assert result.exit_code == 0
 
     def test_preset_aggressive(self, runner, single_file, tmp_path):
@@ -273,31 +253,23 @@ class TestProFeatureGating:
 
     def test_control_flow_flag_accepted(self, runner, single_file, tmp_path):
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(single_file), "-o", str(output), "--control-flow"]
-        )
+        result = runner.invoke(main, [str(single_file), "-o", str(output), "--control-flow"])
         # Either succeeds (silently ignored) or fails with Pro/trial message
         assert result.exit_code in (0, 1)
 
     def test_string_encryption_flag_accepted(self, runner, single_file, tmp_path):
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(single_file), "-o", str(output), "--string-encryption"]
-        )
+        result = runner.invoke(main, [str(single_file), "-o", str(output), "--string-encryption"])
         assert result.exit_code in (0, 1)
 
     def test_anti_debug_flag_accepted(self, runner, single_file, tmp_path):
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(single_file), "-o", str(output), "--anti-debug"]
-        )
+        result = runner.invoke(main, [str(single_file), "-o", str(output), "--anti-debug"])
         assert result.exit_code in (0, 1)
 
     def test_dead_code_flag_accepted(self, runner, single_file, tmp_path):
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(single_file), "-o", str(output), "--dead-code"]
-        )
+        result = runner.invoke(main, [str(single_file), "-o", str(output), "--dead-code"])
         assert result.exit_code in (0, 1)
 
     def test_expire_flag_accepted(self, runner, single_file, tmp_path):
@@ -309,16 +281,12 @@ class TestProFeatureGating:
 
     def test_bind_machine_flag_accepted(self, runner, single_file, tmp_path):
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(single_file), "-o", str(output), "--bind-machine"]
-        )
+        result = runner.invoke(main, [str(single_file), "-o", str(output), "--bind-machine"])
         assert result.exit_code in (0, 1)
 
     def test_max_runs_flag_accepted(self, runner, single_file, tmp_path):
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(single_file), "-o", str(output), "--max-runs", "100"]
-        )
+        result = runner.invoke(main, [str(single_file), "-o", str(output), "--max-runs", "100"])
         assert result.exit_code in (0, 1)
 
     def test_pro_preset_accepted(self, runner, single_file, tmp_path):
@@ -340,9 +308,7 @@ class TestEdgeCases:
         src = tmp_path / "empty"
         src.mkdir()
         output = tmp_path / "dist"
-        result = runner.invoke(
-            main, [str(src), "-o", str(output), "--no-cross-file"]
-        )
+        result = runner.invoke(main, [str(src), "-o", str(output), "--no-cross-file"])
         assert result.exit_code == 0
         assert "No Python files" in result.output
 
@@ -360,7 +326,5 @@ class TestEdgeCases:
             "  max_files: null\n  max_total_loc: null\n"
         )
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(single_file), "-o", str(output), "-c", str(cfg)]
-        )
+        result = runner.invoke(main, [str(single_file), "-o", str(output), "-c", str(cfg)])
         assert result.exit_code == 0

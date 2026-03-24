@@ -87,16 +87,14 @@ class TestConfigValidator:
         """Test validation of a valid configuration."""
         with tempfile.TemporaryDirectory() as tmpdir:
             config_path = Path(tmpdir) / "config.yaml"
-            config_path.write_text(
-                """
+            config_path.write_text("""
 obfuscation:
   level: community
   string_encoding: true
   exclude_names:
     - main
     - logger
-"""
-            )
+""")
             result = validate_config_file(config_path)
             assert result.is_valid
             assert len(result.errors) == 0
@@ -105,12 +103,10 @@ obfuscation:
         """Test validation catches invalid obfuscation level."""
         with tempfile.TemporaryDirectory() as tmpdir:
             config_path = Path(tmpdir) / "config.yaml"
-            config_path.write_text(
-                """
+            config_path.write_text("""
 obfuscation:
   level: ultra
-"""
-            )
+""")
             result = validate_config_file(config_path)
             assert not result.is_valid
             assert len(result.errors) == 1
@@ -121,15 +117,13 @@ obfuscation:
         """Test validation detects common typos."""
         with tempfile.TemporaryDirectory() as tmpdir:
             config_path = Path(tmpdir) / "config.yaml"
-            config_path.write_text(
-                """
+            config_path.write_text("""
 obfuscation:
   level: community
   exclude_pattern:
     - test.py
   string_encode: true
-"""
-            )
+""")
             result = validate_config_file(config_path)
             # Should have warnings for typos
             assert len(result.warnings) > 0
@@ -144,13 +138,11 @@ obfuscation:
         """Test validation warns about Pro features with community level."""
         with tempfile.TemporaryDirectory() as tmpdir:
             config_path = Path(tmpdir) / "config.yaml"
-            config_path.write_text(
-                """
+            config_path.write_text("""
 obfuscation:
   level: community
   string_encryption: true
-"""
-            )
+""")
             result = validate_config_file(config_path)
             # Should have warning about Pro features
             assert len(result.warnings) > 0

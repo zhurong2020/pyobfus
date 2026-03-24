@@ -45,9 +45,7 @@ class TestDryRunVerbose:
     def test_single_file_dry_run_verbose(self, runner, simple_file, tmp_path):
         """Covers lines 703-708: dry_run + verbose preview."""
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(simple_file), "-o", str(output), "--dry-run", "-v"]
-        )
+        result = runner.invoke(main, [str(simple_file), "-o", str(output), "--dry-run", "-v"])
         assert result.exit_code == 0
         assert "Would write to" in result.output
         assert "Preview" in result.output
@@ -55,9 +53,7 @@ class TestDryRunVerbose:
     def test_directory_crossfile_dry_run(self, runner, project_dir, tmp_path):
         """Covers lines 860-870: crossfile dry-run mapping preview."""
         output = tmp_path / "dist"
-        result = runner.invoke(
-            main, [str(project_dir), "-o", str(output), "--dry-run"]
-        )
+        result = runner.invoke(main, [str(project_dir), "-o", str(output), "--dry-run"])
         assert result.exit_code == 0
         assert "DRY RUN" in result.output
         assert "Module:" in result.output or "mappings" in result.output
@@ -67,9 +63,7 @@ class TestLegacyDirectoryVerbose:
     def test_no_crossfile_verbose(self, runner, project_dir, tmp_path):
         """Covers legacy _obfuscate_directory with verbose."""
         output = tmp_path / "dist"
-        result = runner.invoke(
-            main, [str(project_dir), "-o", str(output), "--no-cross-file", "-v"]
-        )
+        result = runner.invoke(main, [str(project_dir), "-o", str(output), "--no-cross-file", "-v"])
         assert result.exit_code == 0
         assert "Obfuscating:" in result.output
 
@@ -78,9 +72,7 @@ class TestLegacyDirectoryVerbose:
         src = tmp_path / "empty"
         src.mkdir()
         output = tmp_path / "dist"
-        result = runner.invoke(
-            main, [str(src), "-o", str(output), "--no-cross-file"]
-        )
+        result = runner.invoke(main, [str(src), "-o", str(output), "--no-cross-file"])
         assert result.exit_code == 0
         assert "No Python files" in result.output
 
@@ -89,9 +81,7 @@ class TestCrossfileVerbose:
     def test_crossfile_verbose(self, runner, project_dir, tmp_path):
         """Covers lines 828-876: crossfile verbose output."""
         output = tmp_path / "dist"
-        result = runner.invoke(
-            main, [str(project_dir), "-o", str(output), "-v"]
-        )
+        result = runner.invoke(main, [str(project_dir), "-o", str(output), "-v"])
         assert result.exit_code == 0
         assert "Phase 1" in result.output or "Scanning" in result.output
         assert "Phase 2" in result.output or "Transforming" in result.output
@@ -142,9 +132,7 @@ class TestDisplayStatsEncodedStrings:
             "  max_files: null\n  max_total_loc: null\n"
         )
         output = tmp_path / "output.py"
-        result = runner.invoke(
-            main, [str(f), "-o", str(output), "-c", str(cfg), "--stats"]
-        )
+        result = runner.invoke(main, [str(f), "-o", str(output), "-c", str(cfg), "--stats"])
         assert result.exit_code == 0
         assert "Statistics" in result.output
 
