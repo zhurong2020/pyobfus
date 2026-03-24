@@ -13,7 +13,6 @@ Targets the uncovered visit methods and edge cases:
 - kwonlyargs, posonlyargs, vararg, kwarg
 """
 
-import ast
 import pytest
 
 from pyobfus.config import ObfuscationConfig
