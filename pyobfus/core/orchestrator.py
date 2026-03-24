@@ -6,8 +6,10 @@ the two-phase obfuscation process for multi-file projects.
 """
 
 import ast
+import os
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, Tuple
 from dataclasses import dataclass
 
 from pyobfus.config import ObfuscationConfig
@@ -24,6 +26,73 @@ from pyobfus.transformers.imported_name_transformer import (
 )
 from pyobfus.transformers.local_name_transformer import LocalNameTransformer
 from pyobfus.utils import filter_python_files
+
+
+def _transform_single_file(
+    file_path: Path,
+    relative_path: Path,
+    module_name: str,
+    input_dir: Path,
+    output_dir: Path,
+    global_table: "GlobalSymbolTable",
+) -> Tuple[str, Optional[str]]:
+    """
+    Transform a single file using the global symbol table.
+
+    This is a module-level function so it can be used with ProcessPoolExecutor.
+
+    Returns:
+        Tuple of (module_name, error_message_or_None)
+    """
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            source = f.read()
+
+        original_tree = ast.parse(source)
+        tree = ast.parse(source)
+
+        # Collect imported names from original tree
+        import_collector = ImportCollector(global_table, module_name)
+        import_collector.visit(original_tree)
+        imported_names = set(import_collector.import_mappings.keys())
+
+        # Apply transformers in order
+        exported_name_transformer = ExportedNameTransformer(
+            global_table, module_name, file_path,
+        )
+        tree = exported_name_transformer.visit(tree)
+
+        import_rewriter = ImportRewriter(
+            global_table, module_name, file_path,
+        )
+        tree = import_rewriter.visit(tree)
+
+        imported_name_transformer = ImportedNameTransformer(
+            original_tree, global_table, module_name, file_path,
+        )
+        tree = imported_name_transformer.visit(tree)
+
+        local_name_transformer = LocalNameTransformer(
+            global_table, module_name, imported_names, file_path,
+        )
+        tree = local_name_transformer.visit(tree)
+
+        all_updater = AllListUpdater(
+            global_table, module_name, file_path,
+        )
+        tree = all_updater.visit(tree)
+
+        ast.fix_missing_locations(tree)
+        new_source = CodeGenerator.generate(tree)
+
+        output_file = output_dir / relative_path
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(output_file, "w", encoding="utf-8") as f:
+            f.write(new_source)
+
+        return (module_name, None)
+    except Exception as e:
+        return (module_name, str(e))
 
 
 @dataclass
@@ -138,7 +207,8 @@ class CrossFileOrchestrator:
                 )
 
             # Phase 2: Transform
-            self.phase2_transform(input_dir, output_dir)
+            transform_errors = self.phase2_transform(input_dir, output_dir)
+            errors.extend(transform_errors)
 
         except Exception as e:
             errors.append(f"Obfuscation failed: {e}")
@@ -200,9 +270,14 @@ class CrossFileOrchestrator:
 
         return self.global_table
 
-    def phase2_transform(self, input_dir: Path, output_dir: Path) -> None:
+    def phase2_transform(
+        self,
+        input_dir: Path,
+        output_dir: Path,
+        progress_callback: Any = None,
+    ) -> List[str]:
         """
-        Phase 2: Transform all files.
+        Phase 2: Transform all files (supports parallel processing).
 
         Uses global symbol table to:
         1. Rename exported definitions (class Calculator -> class I0)
@@ -214,80 +289,54 @@ class CrossFileOrchestrator:
         Args:
             input_dir: Source directory
             output_dir: Output directory
+            progress_callback: Optional callable(module_name, error_or_none) for progress
+
+        Returns:
+            List of error messages (empty if all successful)
         """
-        # Create output directory if it doesn't exist
         output_dir.mkdir(parents=True, exist_ok=True)
+        errors: List[str] = []
 
-        # Transform each file
-        for file_info in self.files:
-            # Read source file
-            with open(file_info.path, "r", encoding="utf-8") as f:
-                source = f.read()
+        max_workers = self.config.max_workers
+        use_parallel = max_workers != 1 and len(self.files) > 1
 
-            # Parse to AST and save original for reference analysis
-            original_tree = ast.parse(source)
-            tree = ast.parse(source)
+        if use_parallel:
+            workers = max_workers or min(os.cpu_count() or 1, len(self.files))
+            with ProcessPoolExecutor(max_workers=workers) as executor:
+                futures = {
+                    executor.submit(
+                        _transform_single_file,
+                        fi.path,
+                        fi.relative_path,
+                        fi.module_name,
+                        input_dir,
+                        output_dir,
+                        self.global_table,
+                    ): fi
+                    for fi in self.files
+                }
+                for future in as_completed(futures):
+                    module_name, error = future.result()
+                    if error:
+                        errors.append(f"{module_name}: {error}")
+                    if progress_callback:
+                        progress_callback(module_name, error)
+        else:
+            for file_info in self.files:
+                module_name, error = _transform_single_file(
+                    file_info.path,
+                    file_info.relative_path,
+                    file_info.module_name,
+                    input_dir,
+                    output_dir,
+                    self.global_table,
+                )
+                if error:
+                    errors.append(f"{module_name}: {error}")
+                if progress_callback:
+                    progress_callback(module_name, error)
 
-            # Collect imported names from original tree (before any transformation)
-            import_collector = ImportCollector(self.global_table, file_info.module_name)
-            import_collector.visit(original_tree)
-            imported_names = set(import_collector.import_mappings.keys())
-
-            # Apply transformers in order:
-            # 1. Rename exported definitions (class Calculator -> class I0)
-            exported_name_transformer = ExportedNameTransformer(
-                self.global_table,
-                file_info.module_name,
-                file_info.path,
-            )
-            tree = exported_name_transformer.visit(tree)
-
-            # 2. Rewrite import statements (from X import Y -> from X import I0)
-            import_rewriter = ImportRewriter(
-                self.global_table,
-                file_info.module_name,
-                file_info.path,
-            )
-            tree = import_rewriter.visit(tree)
-
-            # 3. Update references to imported names (Y() -> I0())
-            imported_name_transformer = ImportedNameTransformer(
-                original_tree,  # Use original to analyze imports
-                self.global_table,
-                file_info.module_name,
-                file_info.path,
-            )
-            tree = imported_name_transformer.visit(tree)
-
-            # 4. Update references to local exported names (run_demo() -> I2())
-            local_name_transformer = LocalNameTransformer(
-                self.global_table,
-                file_info.module_name,
-                imported_names,  # Don't rename imported names
-                file_info.path,
-            )
-            tree = local_name_transformer.visit(tree)
-
-            # 5. Update __all__ lists
-            all_updater = AllListUpdater(
-                self.global_table,
-                file_info.module_name,
-                file_info.path,
-            )
-            tree = all_updater.visit(tree)
-
-            # Fix missing locations
-            ast.fix_missing_locations(tree)
-
-            # Convert back to source (use CodeGenerator for Python 3.8 compatibility)
-            new_source = CodeGenerator.generate(tree)
-
-            # Write to output directory, preserving directory structure
-            output_file = output_dir / file_info.relative_path
-            output_file.parent.mkdir(parents=True, exist_ok=True)
-
-            with open(output_file, "w", encoding="utf-8") as f:
-                f.write(new_source)
+        return errors
 
     def _discover_files(self, input_dir: Path) -> List[FileInfo]:
         """
