@@ -877,7 +877,7 @@ def _obfuscate_directory_crossfile(
         completed = [0]
         total = stats["files_discovered"]
 
-        def _progress(module_name: str, error: str | None) -> None:
+        def _progress(module_name: str, error: Optional[str]) -> None:
             completed[0] += 1
             if verbose:
                 status = "OK" if not error else f"FAILED: {error}"
@@ -891,7 +891,9 @@ def _obfuscate_directory_crossfile(
                 )
 
         transform_errors = orchestrator.phase2_transform(
-            input_dir, output_dir, progress_callback=_progress,
+            input_dir,
+            output_dir,
+            progress_callback=_progress,
         )
 
         if not verbose and total > 0:

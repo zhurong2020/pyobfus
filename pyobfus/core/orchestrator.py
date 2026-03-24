@@ -58,27 +58,39 @@ def _transform_single_file(
 
         # Apply transformers in order
         exported_name_transformer = ExportedNameTransformer(
-            global_table, module_name, file_path,
+            global_table,
+            module_name,
+            file_path,
         )
         tree = exported_name_transformer.visit(tree)
 
         import_rewriter = ImportRewriter(
-            global_table, module_name, file_path,
+            global_table,
+            module_name,
+            file_path,
         )
         tree = import_rewriter.visit(tree)
 
         imported_name_transformer = ImportedNameTransformer(
-            original_tree, global_table, module_name, file_path,
+            original_tree,
+            global_table,
+            module_name,
+            file_path,
         )
         tree = imported_name_transformer.visit(tree)
 
         local_name_transformer = LocalNameTransformer(
-            global_table, module_name, imported_names, file_path,
+            global_table,
+            module_name,
+            imported_names,
+            file_path,
         )
         tree = local_name_transformer.visit(tree)
 
         all_updater = AllListUpdater(
-            global_table, module_name, file_path,
+            global_table,
+            module_name,
+            file_path,
         )
         tree = all_updater.visit(tree)
 

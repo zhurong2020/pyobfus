@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 import yaml
 
-
 # Valid configuration schema
 VALID_SCHEMA = {
     "obfuscation": {

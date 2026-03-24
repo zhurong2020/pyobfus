@@ -483,8 +483,7 @@ class MyClass:
 
         # Create temporary Python file
         test_file = tmp_path / "test_module.py"
-        test_file.write_text(
-            """
+        test_file.write_text("""
 def public_func():
     pass
 
@@ -493,8 +492,7 @@ def _private_func():
 
 class PublicClass:
     pass
-"""
-        )
+""")
 
         exports = detect_exports_from_file(str(test_file))
 

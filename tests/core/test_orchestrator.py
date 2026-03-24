@@ -197,15 +197,13 @@ class TestCrossFileOrchestrator:
     def test_phase1_scan_single_file(self, orchestrator, tmp_path):
         """Test Phase 1 scan with single file."""
         # Create test file
-        (tmp_path / "calculator.py").write_text(
-            """
+        (tmp_path / "calculator.py").write_text("""
 def add(a, b):
     return a + b
 
 class Calculator:
     pass
-"""
-        )
+""")
 
         orchestrator.phase1_scan(tmp_path)
 
@@ -226,21 +224,17 @@ class Calculator:
     def test_phase1_scan_multiple_files(self, orchestrator, tmp_path):
         """Test Phase 1 scan with multiple files."""
         # Create test files
-        (tmp_path / "calculator.py").write_text(
-            """
+        (tmp_path / "calculator.py").write_text("""
 class Calculator:
     pass
-"""
-        )
-        (tmp_path / "utils.py").write_text(
-            """
+""")
+        (tmp_path / "utils.py").write_text("""
 def format_result():
     pass
 
 def validate():
     pass
-"""
-        )
+""")
 
         orchestrator.phase1_scan(tmp_path)
 
@@ -261,15 +255,13 @@ def validate():
     def test_phase1_scan_private_names_excluded(self, orchestrator, tmp_path):
         """Test that private names are not added to global table."""
         # Create file with private name
-        (tmp_path / "module.py").write_text(
-            """
+        (tmp_path / "module.py").write_text("""
 def public_func():
     pass
 
 def _private_func():
     pass
-"""
-        )
+""")
 
         orchestrator.phase1_scan(tmp_path)
 
@@ -283,8 +275,7 @@ def _private_func():
     def test_phase1_scan_with_all_list(self, orchestrator, tmp_path):
         """Test Phase 1 scan respects __all__ list."""
         # Create file with __all__
-        (tmp_path / "module.py").write_text(
-            """
+        (tmp_path / "module.py").write_text("""
 __all__ = ["public_func"]
 
 def public_func():
@@ -292,8 +283,7 @@ def public_func():
 
 def not_exported():
     pass
-"""
-        )
+""")
 
         orchestrator.phase1_scan(tmp_path)
 
@@ -310,15 +300,13 @@ def not_exported():
         orchestrator.config.exclude_names = ["logger"]
 
         # Create file
-        (tmp_path / "module.py").write_text(
-            """
+        (tmp_path / "module.py").write_text("""
 def logger():
     pass
 
 def other_func():
     pass
-"""
-        )
+""")
 
         orchestrator.phase1_scan(tmp_path)
 
@@ -393,14 +381,12 @@ def other_func():
         """Test that Phase 2 transforms files correctly."""
         # Create test file
         test_file = tmp_path / "module.py"
-        test_file.write_text(
-            """
+        test_file.write_text("""
 from other import Something
 
 def my_function():
     pass
-"""
-        )
+""")
 
         # Run Phase 1 first
         orchestrator.phase1_scan(tmp_path)
@@ -423,24 +409,20 @@ def my_function():
     def test_obfuscated_names_are_unique_across_modules(self, orchestrator, tmp_path):
         """Test that obfuscated names are globally unique."""
         # Create multiple files
-        (tmp_path / "module1.py").write_text(
-            """
+        (tmp_path / "module1.py").write_text("""
 def func1():
     pass
 
 def func2():
     pass
-"""
-        )
-        (tmp_path / "module2.py").write_text(
-            """
+""")
+        (tmp_path / "module2.py").write_text("""
 def func3():
     pass
 
 def func4():
     pass
-"""
-        )
+""")
 
         orchestrator.phase1_scan(tmp_path)
 
