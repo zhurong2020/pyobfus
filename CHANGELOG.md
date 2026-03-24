@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **Parallel File Processing**: New `-j/--jobs` CLI option for multi-process obfuscation
+  - `-j 0` (default): auto-detect CPU cores
+  - `-j 1`: sequential processing
+  - `-j N`: use N worker processes
+  - Phase 1 (scan) remains sequential; Phase 2 (transform) runs in parallel
+  - Real-time progress display with percentage
+- **`max_workers`** config option in `ObfuscationConfig` for programmatic control
+
+### Changed
+- **Test Coverage**: 56% -> 90% (410 -> 561 tests)
+  - Comprehensive CLI tests (single file, directory, cross-file, Pro features, presets)
+  - Pro feature path tests using mock (control flow, dead code, string encryption, anti-debug, license embedding)
+  - Trial CLI tests (start, status, features commands)
+  - Extended analyzer, transformer, plugin, and exception tests
+
 ## [0.3.2] - 2025-12-27
 
 ### Added

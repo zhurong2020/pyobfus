@@ -11,8 +11,9 @@ This document outlines **future plans** for pyobfus. For released version histor
 
 See [CHANGELOG.md](../CHANGELOG.md) for the latest release and version history.
 
-- 410+ tests with 56%+ coverage
+- 560+ tests with 90% coverage
 - Full Pro feature set available
+- Parallel file processing support (`-j/--jobs`)
 
 ---
 
@@ -21,9 +22,10 @@ See [CHANGELOG.md](../CHANGELOG.md) for the latest release and version history.
 ### Pending Items
 - None currently planned
 
-### Potential Additions
-- [ ] Performance optimization for large projects (1000+ files)
-- [ ] Parallel file processing
+### Recently Completed
+- [x] Performance optimization for large projects (1000+ files)
+- [x] Parallel file processing (`-j/--jobs` CLI option)
+- [x] Test coverage improvement (56% -> 90%)
 
 ---
 
