@@ -163,6 +163,13 @@ except ImportError:
     is_flag=True,
     help="Show obfuscation statistics summary",
 )
+@click.option(
+    "-j",
+    "--jobs",
+    type=int,
+    default=0,
+    help="Parallel workers (0=auto, 1=sequential, N=N workers)",
+)
 @click.version_option(version=__version__, prog_name="pyobfus")
 def main(
     input_path: Optional[str],
@@ -189,6 +196,7 @@ def main(
     preset: Optional[str],
     list_presets: bool,
     stats: bool,
+    jobs: int,
 ) -> None:
     """
     Obfuscate Python source code.
@@ -380,6 +388,7 @@ def main(
         config.remove_comments = remove_comments
         config.name_prefix = name_prefix
         config.preserve_param_names = preserve_param_names
+        config.max_workers = jobs if jobs > 0 else None  # 0=auto, N=explicit
 
         # Handle Pro feature flags
         license_embedding_requested = expire or bind_machine or max_runs > 0
@@ -761,10 +770,14 @@ def _obfuscate_directory(
             raise LimitExceededError("total_lines_of_code", total_loc, config.max_total_loc)
 
     # Obfuscate each file
-    for python_file in python_files:
-        # Calculate relative path
+    total = len(python_files)
+    for idx, python_file in enumerate(python_files, 1):
         rel_path = python_file.relative_to(input_dir)
         output_file = output_dir / rel_path
+
+        if not verbose and total > 1:
+            pct = idx * 100 // total
+            click.echo(f"\r  Processing: {idx}/{total} ({pct}%)", nl=False)
 
         try:
             file_stats = _obfuscate_file(python_file, output_file, config, verbose, dry_run)
@@ -774,7 +787,9 @@ def _obfuscate_directory(
                     dir_stats[key] += value
         except PyObfusError as e:
             click.echo(f"  Warning: Failed to obfuscate {python_file}: {e}", err=True)
-            # Continue with other files
+
+    if not verbose and total > 1:
+        click.echo()  # newline after progress
 
     return dir_stats
 
@@ -856,9 +871,36 @@ def _obfuscate_directory_crossfile(
 
         # Phase 2: Transform
         if verbose:
-            click.echo("\n[Phase 2] Transforming files...")
+            workers_desc = f"{config.max_workers} workers" if config.max_workers else "auto"
+            click.echo(f"\n[Phase 2] Transforming files... (parallel: {workers_desc})")
 
-        orchestrator.phase2_transform(input_dir, output_dir)
+        completed = [0]
+        total = stats["files_discovered"]
+
+        def _progress(module_name: str, error: str | None) -> None:
+            completed[0] += 1
+            if verbose:
+                status = "OK" if not error else f"FAILED: {error}"
+                click.echo(f"  [{completed[0]}/{total}] {module_name} ... {status}")
+            elif not error:
+                # Simple progress line
+                pct = completed[0] * 100 // total
+                click.echo(
+                    f"\r  Processing: {completed[0]}/{total} ({pct}%)",
+                    nl=False,
+                )
+
+        transform_errors = orchestrator.phase2_transform(
+            input_dir, output_dir, progress_callback=_progress,
+        )
+
+        if not verbose and total > 0:
+            click.echo()  # newline after progress
+
+        if transform_errors:
+            click.echo(f"\nWarnings: {len(transform_errors)} file(s) had errors:", err=True)
+            for err in transform_errors[:5]:
+                click.echo(f"  - {err}", err=True)
 
         click.echo(f"\nSuccessfully obfuscated {stats['files_discovered']} file(s)")
 

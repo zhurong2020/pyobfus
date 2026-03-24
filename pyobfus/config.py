@@ -88,6 +88,9 @@ class ObfuscationConfig:
     license_bind_machine: bool = False  # Bind to current machine fingerprint
     license_max_runs: int = 0  # Maximum run count (0 = unlimited)
 
+    # Performance options
+    max_workers: Optional[int] = None  # None = auto (cpu_count), 1 = sequential
+
     # Community Edition limits
     max_files: Optional[int] = None  # None = unlimited for Pro
     max_total_loc: Optional[int] = None  # None = unlimited for Pro
