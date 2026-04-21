@@ -149,10 +149,19 @@ except ImportError:
 @click.option(
     "--preset",
     type=click.Choice(
-        ["trial", "commercial", "library", "maximum", "safe", "balanced", "aggressive"],
+        [
+            # Community
+            "safe", "balanced", "aggressive",
+            # Framework-aware (community-tier)
+            "fastapi", "django", "flask", "pydantic", "click", "sqlalchemy",
+            # Pro
+            "trial", "commercial", "library", "maximum",
+        ],
         case_sensitive=False,
     ),
-    help="Use a preset configuration (Pro feature for trial/commercial/library/maximum)",
+    help="Use a preset configuration. Community: safe/balanced/aggressive. "
+    "Framework-aware: fastapi/django/flask/pydantic/click/sqlalchemy. "
+    "Pro: trial/commercial/library/maximum.",
 )
 @click.option(
     "--list-presets",
@@ -1129,6 +1138,37 @@ def _handle_list_presets() -> None:
     click.echo("    Obfuscates everything possible")
     click.echo("    Use with caution - may break code")
     click.echo("    Usage: pyobfus src/ -o dist/ --preset aggressive")
+
+    click.echo("\n  FRAMEWORK-AWARE PRESETS (Free — built on 'safe')")
+    click.echo("  " + "-" * 30)
+
+    click.echo("\n  fastapi")
+    click.echo("    Preserves dependency-injection param names + HTTP verbs")
+    click.echo("    Auto-excludes **/routers/**, **/dependencies.py")
+    click.echo("    Usage: pyobfus src/ -o dist/ --preset fastapi")
+
+    click.echo("\n  django")
+    click.echo("    Preserves ORM, CBV, signals, forms, admin")
+    click.echo("    Auto-excludes migrations/, urls.py, settings.py, manage.py")
+    click.echo("    Usage: pyobfus src/ -o dist/ --preset django")
+
+    click.echo("\n  flask")
+    click.echo("    Preserves view functions and url_for() targets")
+    click.echo("    Auto-excludes **/views/**, **/blueprints/**")
+    click.echo("    Usage: pyobfus src/ -o dist/ --preset flask")
+
+    click.echo("\n  pydantic")
+    click.echo("    Preserves BaseModel field API (v1 and v2)")
+    click.echo("    Usage: pyobfus src/ -o dist/ --preset pydantic")
+
+    click.echo("\n  click")
+    click.echo("    Preserves CLI command/group/option parameter names")
+    click.echo("    Usage: pyobfus src/ -o dist/ --preset click")
+
+    click.echo("\n  sqlalchemy")
+    click.echo("    Preserves ORM columns, relationships, session API")
+    click.echo("    Auto-excludes alembic/, migrations/")
+    click.echo("    Usage: pyobfus src/ -o dist/ --preset sqlalchemy")
 
     click.echo("\n  PRO PRESETS (Requires Pro license or trial)")
     click.echo("  " + "-" * 30)
