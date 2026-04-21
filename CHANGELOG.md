@@ -5,6 +5,45 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 2026-04-22
+
+**AI-native release.** Ten features shipped in one day around a single theme: making pyobfus the Python obfuscator that AI coding agents (Claude Code, Cursor, Windsurf, Zed) can actually use. Reshape v0.4 goals toward adoption + AI-native integration (see `docs/ROADMAP.md`, `docs/AI_INTEGRATION_STRATEGY.md`, `docs/V0.4_EXECUTION_LOG.md`).
+
+### Added — P0 Core Features
+
+- **`pyobfus --check` pre-flight risk scanner** — Detects `eval`/`exec`/`compile`, dynamic `getattr`/`setattr` with non-literal names, `__import__` / `importlib.import_module`, `vars`/`locals`/`globals`/`dir`/`inspect.*`, `.__name__`/`.__qualname__`/`.__class__` string references, `__all__` exports, and `__main__` entry-point guards. Auto-detects imports of FastAPI, Django, Flask, Pydantic, Click, SQLAlchemy and suggests a matching preset. Exit codes: `0` safe / `1` high-risk / `2` parse errors.
+- **`pyobfus --unmap` reverse mapping** — Reverses obfuscated identifiers in a production stack trace using a `mapping.json`. Identifier-boundary-aware (no false replacements inside longer names). Solves the "I can't debug obfuscated code with my AI assistant" dead end.
+- **`pyobfus --save-mapping PATH`** — Writes a versioned JSON mapping during obfuscation (both single-file and cross-file modes). Format v1 includes pyobfus version, scan root, mode, per-module forward map, and a precomputed reverse index.
+- **Framework-aware presets** — `--preset fastapi | django | flask | pydantic | click | sqlalchemy`. All community-tier (free), built on `preset_safe`, with `preserve_param_names=True` and framework-specific `exclude_names` + `exclude_patterns` bundled in.
+- **AI-friendly global `--json`** — Every CLI mode (obfuscate, `--check`, `--init`, `--unmap`) emits a stable JSON schema with `version`, `status`, `ai_hint`, and `exit_code` fields. Errors follow `{error_type, message, suggestion, ai_hint, exit_code}`. `ai_hint` contains the single next command for an AI agent to run.
+- **`pyobfus --init`** — Zero-config onboarding. Scans project → detects framework → writes `pyobfus.yaml` with the matching preset, auto-assembled `exclude_patterns`, and explanatory comments aimed at both humans and AI assistants.
+- **`preset:` YAML key support** — `ObfuscationConfig.from_file()` now accepts a top-level `preset:` that's applied first; other fields override individual settings. `exclude_patterns` and `exclude_names` merge additively. Unknown keys raise a clear `ValueError`.
+
+### Added — P1 AI Ecosystem
+
+- **`pyobfus-mcp` (new sibling package)** — Model Context Protocol server exposing five tools (`check_obfuscation_risks`, `generate_pyobfus_config`, `unmap_stack_trace`, `list_presets`, `explain_preset`) to Claude Desktop, Claude Code, Cursor, Windsurf, Zed, and any MCP-capable agent. See `pyobfus_mcp/README.md`.
+- **`llms.txt` + `llms-full.txt`** (llmstxt.org standard) — Concise project overview + full JSON schema reference at the repo root and docs site.
+- **AI integration templates** — `templates/ai-integration/` contains drop-in rule files for Claude Code (`CLAUDE.md`), Cursor (`cursor-rules.mdc`, `.cursorrules`), Windsurf, GitHub Copilot, and a generic `AGENTS.md`.
+- **`--incremental` flag** — Project-level skip-if-unchanged cache at `<output>/.pyobfus-cache/manifest.json`. Unchanged rebuilds become O(scan) instead of O(transform).
+
+### Changed
+
+- **Package description + keywords** — PyPI description rewritten for keyword density; adds `python-obfuscator`, `py-obfuscator`, `pyobfuscator`, all 6 framework names, `mcp`, `claude-code`, `cursor`, `llm-tools`, `ai-native`. README headline now reads **"pyobfus — the Python obfuscator"** with a pronunciation line to build AI training-corpus association.
+- **Development Status classifier** — `3 - Alpha` → `4 - Beta` (consistent with 655 tests / 91% coverage).
+- **GitHub repo topics** — 12 new topics including `python-obfuscator`, `mcp-server`, `claude-code`, `cursor`, `pyarmor-alternative`.
+
+### Testing
+
+- Test suite grew **561 → 655** (+94 tests in main package). New test files: `test_preflight.py`, `test_mapping.py`, `test_unmap_cli.py`, `test_framework_presets.py`, `test_json_cli.py`, `test_init_config.py`, `test_incremental.py`. Plus 16 tests in `pyobfus_mcp/tests/test_tools.py`.
+- Coverage **90% → 91%**.
+- Zero regressions.
+
+### Documentation
+
+- New: `docs/AI_INTEGRATION_STRATEGY.md`, `docs/V0.4_EXECUTION_LOG.md`.
+- Updated: `docs/ROADMAP.md` fully reshaped around P0/P1 priorities with effort estimates.
+- Updated: `README.md` AI-native features section, `CHANGELOG.md` (this entry).
+
 ## [0.3.3] - 2026-03-24
 
 ### Added
