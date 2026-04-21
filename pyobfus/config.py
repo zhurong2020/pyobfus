@@ -97,21 +97,54 @@ class ObfuscationConfig:
 
     @classmethod
     def from_file(cls, config_path: Path) -> "ObfuscationConfig":
-        """Load configuration from YAML file."""
+        """Load configuration from YAML file.
+
+        The YAML may optionally contain a `preset:` key naming a built-in
+        preset (safe/balanced/aggressive/fastapi/django/…). When present,
+        the preset is applied first and the remaining keys override
+        individual fields. This matches the output of `pyobfus --init`.
+        """
         if not config_path.exists():
             raise FileNotFoundError(f"Configuration file not found: {config_path}")
 
         with open(config_path, "r", encoding="utf-8") as f:
-            data = yaml.safe_load(f)
+            data = yaml.safe_load(f) or {}
 
-        # Get obfuscation config
-        obf_config = data.get("obfuscation", {})
+        obf_config = dict(data.get("obfuscation", {}))
+
+        # Pop `preset:` if present and use it as the base configuration
+        preset_name = obf_config.pop("preset", None)
+        if preset_name:
+            base = cls.get_preset(str(preset_name))
+        else:
+            base = cls()
 
         # Convert exclude_names list to set if present
         if "exclude_names" in obf_config and isinstance(obf_config["exclude_names"], list):
             obf_config["exclude_names"] = set(obf_config["exclude_names"])
 
-        return cls(**obf_config)
+        # Merge exclude_patterns: YAML entries extend the preset's baseline
+        if "exclude_patterns" in obf_config and isinstance(obf_config["exclude_patterns"], list):
+            merged: List[str] = list(base.exclude_patterns)
+            for pattern in obf_config["exclude_patterns"]:
+                if pattern not in merged:
+                    merged.append(pattern)
+            obf_config["exclude_patterns"] = merged
+
+        # Merge exclude_names: YAML entries extend the preset's baseline
+        if "exclude_names" in obf_config:
+            obf_config["exclude_names"] = set(base.exclude_names) | set(
+                obf_config["exclude_names"]
+            )
+
+        # Apply overrides field-by-field (dataclass doesn't let us replace with unknown keys)
+        for key, value in obf_config.items():
+            if hasattr(base, key):
+                setattr(base, key, value)
+            else:
+                raise ValueError(f"Unknown configuration key: {key}")
+
+        return base
 
     @classmethod
     def community_edition(cls) -> "ObfuscationConfig":
