@@ -4,10 +4,12 @@ Command-line interface for pyobfus.
 Provides a user-friendly CLI for obfuscating Python files and projects.
 """
 
+import contextlib
+import io
 import json
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, Optional
 
 import click
 
@@ -317,8 +319,23 @@ def main(
         sys.exit(1)
 
     if not output_path:
-        click.echo("Error: Missing required option '-o' / '--output'.", err=True)
+        if json_output:
+            _emit_error_json(
+                "UsageError",
+                "Missing required option '-o' / '--output'.",
+                "Pass -o PATH to specify output location.",
+                "pyobfus INPUT -o OUTPUT [options]",
+                exit_code=1,
+            )
+        else:
+            click.echo("Error: Missing required option '-o' / '--output'.", err=True)
         sys.exit(1)
+
+    # In JSON mode, buffer all chatty intermediate output so the final JSON
+    # on stdout stays parseable. Text is discarded (stats go into the JSON).
+    _saved_stdout = sys.stdout
+    if json_output:
+        sys.stdout = io.StringIO()
 
     try:
         # Load configuration
@@ -587,6 +604,19 @@ def main(
             click.echo(f"Error: {input_path} is neither a file nor a directory", err=True)
             sys.exit(1)
 
+        if json_output:
+            sys.stdout = _saved_stdout
+            _emit_obfuscate_success_json(
+                input_path=input_path,
+                output_path=output_path,
+                preset=preset,
+                level=config.level,
+                dry_run=dry_run,
+                stats=obfuscation_stats,
+                mapping_path=save_mapping_path,
+            )
+            return
+
         if not dry_run:
             click.echo("\nObfuscation completed successfully!")
         else:
@@ -602,19 +632,55 @@ def main(
             click.echo("     Start trial: pyobfus-trial start")
 
     except LimitExceededError as e:
-        click.echo(f"\nError: {e}", err=True)
-        click.echo("\nConsider upgrading to pyobfus Pro for unlimited obfuscation.")
+        sys.stdout = _saved_stdout
+        if json_output:
+            _emit_error_json(
+                "LimitExceededError",
+                str(e),
+                "Community Edition is capped at 5 files / 1000 LOC. "
+                "Start a free 5-day trial: pyobfus-trial start",
+                "pyobfus-trial start",
+                exit_code=1,
+            )
+        else:
+            click.echo(f"\nError: {e}", err=True)
+            click.echo("\nConsider upgrading to pyobfus Pro for unlimited obfuscation.")
         sys.exit(1)
     except PyObfusError as e:
-        click.echo(f"\nError: {e}", err=True)
+        sys.stdout = _saved_stdout
+        if json_output:
+            _emit_error_json(
+                type(e).__name__,
+                str(e),
+                "Run 'pyobfus --check INPUT' to scan for incompatible constructs.",
+                f"pyobfus --check {input_path}",
+                exit_code=1,
+            )
+        else:
+            click.echo(f"\nError: {e}", err=True)
         sys.exit(1)
     except Exception as e:
-        click.echo(f"\nUnexpected error: {e}", err=True)
-        if verbose:
-            import traceback
+        sys.stdout = _saved_stdout
+        if json_output:
+            _emit_error_json(
+                type(e).__name__,
+                str(e),
+                "Unexpected error — re-run with --verbose for a traceback, "
+                "and open an issue at https://github.com/zhurong2020/pyobfus/issues.",
+                "pyobfus --verbose",
+                exit_code=1,
+            )
+        else:
+            click.echo(f"\nUnexpected error: {e}", err=True)
+            if verbose:
+                import traceback
 
-            traceback.print_exc()
+                traceback.print_exc()
         sys.exit(1)
+    finally:
+        # Restore stdout in case we returned via an unhandled path
+        if sys.stdout is not _saved_stdout:
+            sys.stdout = _saved_stdout
 
 
 def _obfuscate_file(
@@ -1224,6 +1290,70 @@ def _handle_init_config(template_name: str) -> None:
         click.echo(f"Error: {e}", err=True)
         click.echo(f"\nAvailable templates: {', '.join(list_templates())}", err=True)
         sys.exit(1)
+
+
+def _emit_success_json_payload(payload: Dict[str, Any]) -> None:
+    """Serialize a success payload to stdout (one JSON object)."""
+    click.echo(json.dumps(payload, indent=2, ensure_ascii=False))
+
+
+def _emit_obfuscate_success_json(
+    input_path: str,
+    output_path: str,
+    preset: Optional[str],
+    level: str,
+    dry_run: bool,
+    stats: Dict[str, int],
+    mapping_path: Optional[str],
+) -> None:
+    """Emit the obfuscation success summary as JSON."""
+    # AI hint: suggest the most useful next command based on context
+    if mapping_path:
+        ai_hint = (
+            f"Obfuscation complete. To reverse a production traceback: "
+            f"pyobfus --unmap --trace error.log --mapping {mapping_path}"
+        )
+    elif dry_run:
+        ai_hint = "Dry run complete — no files written. Remove --dry-run to persist output."
+    else:
+        ai_hint = (
+            "Obfuscation complete. Add '--save-mapping mapping.json' next time "
+            "to enable 'pyobfus --unmap' for debugging obfuscated stack traces."
+        )
+
+    payload: Dict[str, Any] = {
+        "version": 1,
+        "status": "success",
+        "input": input_path,
+        "output": output_path,
+        "preset": preset,
+        "level": level,
+        "dry_run": dry_run,
+        "stats": stats,
+        "mapping": mapping_path,
+        "ai_hint": ai_hint,
+    }
+    _emit_success_json_payload(payload)
+
+
+def _emit_error_json(
+    error_type: str,
+    message: str,
+    suggestion: str,
+    ai_hint: str,
+    exit_code: int = 1,
+) -> None:
+    """Emit a structured error payload as JSON."""
+    payload = {
+        "version": 1,
+        "status": "error",
+        "error_type": error_type,
+        "message": message,
+        "suggestion": suggestion,
+        "ai_hint": ai_hint,
+        "exit_code": exit_code,
+    }
+    click.echo(json.dumps(payload, indent=2, ensure_ascii=False))
 
 
 def _handle_unmap(
