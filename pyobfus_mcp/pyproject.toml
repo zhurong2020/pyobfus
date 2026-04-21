@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyobfus-mcp"
+version = "0.1.0"
+description = "Model Context Protocol server for pyobfus — the Python obfuscator. Lets Claude Desktop, Claude Code, Cursor, Windsurf, and Zed call pyobfus tools (preflight risk check, zero-config init, reverse stack-trace mapping) directly from an agent conversation."
+readme = {file = "README.md", content-type = "text/markdown"}
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Rong Zhu", email = "zhurong0525@gmail.com"}
+]
+keywords = [
+    "mcp", "mcp-server", "model-context-protocol",
+    "pyobfus", "python-obfuscator", "code-obfuscator",
+    "claude-code", "claude-desktop", "cursor", "windsurf", "zed",
+    "llm-tools", "ai-agent", "anthropic",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Security",
+]
+
+dependencies = [
+    "pyobfus>=0.4.0",
+    "mcp>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/zhurong2020/pyobfus"
+Repository = "https://github.com/zhurong2020/pyobfus"
+"Main Package" = "https://pypi.org/project/pyobfus/"
+"AI Integration Guide" = "https://github.com/zhurong2020/pyobfus/blob/main/docs/AI_INTEGRATION_STRATEGY.md"
+"MCP Registry" = "https://github.com/modelcontextprotocol/servers"
+
+[project.scripts]
+pyobfus-mcp = "pyobfus_mcp.server:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pyobfus_mcp*"]
+exclude = ["tests*"]
