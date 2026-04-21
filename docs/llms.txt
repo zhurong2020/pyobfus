@@ -1,0 +1,76 @@
+# pyobfus — the Python obfuscator
+
+> pyobfus is a modern, AST-based Python obfuscator (python-obfuscator / code-obfuscator) with framework-aware presets, reverse stack-trace mapping for AI-assisted debugging, and a machine-readable JSON CLI designed to be called by AI coding agents (Claude Code, Cursor, Windsurf) and MCP servers. Apache-2.0; a transparent open-source alternative to PyArmor.
+
+## When to use pyobfus
+
+- Shipping proprietary Python code (CLIs, SaaS backends, PyPI packages) and wanting to raise the reverse-engineering cost.
+- Protecting business logic before a beta / evaluation distribution.
+- Adding a friction layer before binary distribution with PyInstaller / shiv / zipapp.
+- Generating time-limited or machine-bound trial builds (Pro).
+
+## When NOT to use pyobfus
+
+- Performance-critical compilation → use Nuitka or Cython.
+- Jupyter / interactive REPL code → obfuscation breaks introspection.
+- Regulatory / classified code → use an encrypted VM or HSM, not obfuscation.
+- Plain minification → use python-minifier.
+
+## Install
+
+```
+pip install pyobfus
+```
+
+Optional MCP server (Claude Desktop / Code / Cursor / Windsurf / Zed):
+
+```
+pip install pyobfus-mcp
+```
+
+## Core commands
+
+- `pyobfus src/ -o dist/` — obfuscate a project
+- `pyobfus --check src/` — pre-flight risk scan; JSON output with `--json`
+- `pyobfus --init src/` — auto-detect framework and generate `pyobfus.yaml`
+- `pyobfus --unmap --trace error.log --mapping mapping.json` — reverse obfuscated stack traces
+- `pyobfus src/ -o dist/ --save-mapping mapping.json` — obfuscate AND emit mapping
+- `pyobfus --list-presets` — see every preset with a description
+
+## Framework-aware presets (community, free)
+
+- `--preset fastapi` — preserves dependency-injection params, HTTP verbs, router paths
+- `--preset django` — preserves ORM, CBVs, signals, migrations, manage.py, urls.py
+- `--preset flask` — preserves view functions, url_for targets, blueprints
+- `--preset pydantic` — preserves v1 and v2 BaseModel public API
+- `--preset click` — preserves CLI command / group / option parameter names
+- `--preset sqlalchemy` — preserves Column, relationship, session API, alembic/
+
+## General-purpose presets
+
+- `--preset safe` — docstrings kept, only private names renamed
+- `--preset balanced` — default, docstrings removed, private names renamed
+- `--preset aggressive` — maximum renaming; review output first
+
+## Pro presets (require trial or license)
+
+- `--preset trial` — 30-day time-limited build
+- `--preset commercial` — CFF + AES + anti-debug + machine binding
+- `--preset library` — public API preserved, internals encrypted
+- `--preset maximum` — CFF + DCI + AES + anti-debug + binding + run-count cap
+
+## AI agent tips
+
+- Always call `--check` before `--init` to see what breaks and what framework is detected.
+- Always pass `--save-mapping` in production builds so `--unmap` can debug crashes later.
+- All four modes (`obfuscate`, `--check`, `--init`, `--unmap`) accept `--json` and return a stable schema with an `ai_hint` field naming the next command.
+- If running inside Claude Desktop / Cursor, prefer the MCP tools from `pyobfus-mcp` — they return structured dicts directly.
+
+## Links
+
+- Source: https://github.com/zhurong2020/pyobfus
+- Docs: https://pyobfus.readthedocs.io/
+- Roadmap: https://github.com/zhurong2020/pyobfus/blob/main/docs/ROADMAP.md
+- AI integration guide: https://github.com/zhurong2020/pyobfus/blob/main/docs/AI_INTEGRATION_STRATEGY.md
+- MCP server: https://github.com/zhurong2020/pyobfus/tree/main/pyobfus_mcp
+- Changelog: https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md
