@@ -231,6 +231,13 @@ except ImportError:
     "suggested preset and exclude patterns. Zero-config onboarding for "
     "new projects (or AI agents wiring up pyobfus for the user).",
 )
+@click.option(
+    "--incremental",
+    is_flag=True,
+    help="Skip the run when every input file and the config are unchanged "
+    "since the last successful build (cache at <output>/.pyobfus-cache/). "
+    "Useful in CI pipelines that cache build artifacts.",
+)
 @click.version_option(version=__version__, prog_name="pyobfus")
 def main(
     input_path: Optional[str],
@@ -265,6 +272,7 @@ def main(
     trace_path: Optional[str],
     mapping_path: Optional[str],
     init_mode: bool,
+    incremental: bool,
 ) -> None:
     """
     Obfuscate Python source code.
@@ -572,6 +580,7 @@ def main(
         # Initialize statistics
         obfuscation_stats: dict = {
             "files_processed": 0,
+            "files_skipped": 0,
             "total_names_obfuscated": 0,
             "strings_encoded": 0,
             "strings_encrypted": 0,
@@ -579,6 +588,46 @@ def main(
             "dead_code_injected": 0,
             "anti_debug_checks": 0,
         }
+
+        # Incremental short-circuit: directory mode only (single-file
+        # rebuilds are cheap enough to skip this machinery)
+        if incremental and input_path_obj.is_dir() and not dry_run:
+            from pyobfus.core.cache import BuildCache
+
+            cache = BuildCache(output_path_obj)
+            input_files_for_sig = filter_python_files(
+                input_path_obj, config.exclude_patterns
+            )
+            current_sig = cache.build_signature(
+                input_path_obj, input_files_for_sig, config
+            )
+            hit, reason, cached_outputs = cache.can_reuse(current_sig)
+            if hit:
+                click.echo(
+                    f"\nIncremental: skipping — {reason} "
+                    f"({len(cached_outputs or [])} output file(s) reused)"
+                )
+                obfuscation_stats["files_processed"] = 0
+                obfuscation_stats["files_skipped"] = len(cached_outputs or [])
+                # Short-circuit to summary
+                if json_output:
+                    sys.stdout = _saved_stdout
+                    _emit_obfuscate_success_json(
+                        input_path=input_path,
+                        output_path=output_path,
+                        preset=preset,
+                        level=config.level,
+                        dry_run=dry_run,
+                        stats=obfuscation_stats,
+                        mapping_path=save_mapping_path,
+                    )
+                    return
+                # Fall through to normal text success path below by
+                # flagging that we have nothing more to do
+                click.echo("\nObfuscation completed successfully! (cache hit)")
+                return
+            elif verbose:
+                click.echo(f"\nIncremental: rebuilding — {reason}")
 
         if input_path_obj.is_file():
             # Single file obfuscation
@@ -615,6 +664,30 @@ def main(
                 )
                 if dir_stats:
                     obfuscation_stats.update(dir_stats)
+
+            # Save manifest after a successful rebuild (directory mode only)
+            if (
+                incremental
+                and not dry_run
+                and input_path_obj.is_dir()
+            ):
+                from pyobfus.core.cache import BuildCache
+
+                cache = BuildCache(output_path_obj)
+                final_inputs = filter_python_files(
+                    input_path_obj, config.exclude_patterns
+                )
+                output_files = []
+                for f in final_inputs:
+                    try:
+                        rel = f.relative_to(input_path_obj)
+                    except ValueError:
+                        continue
+                    output_files.append(str(output_path_obj / rel))
+                final_sig = cache.build_signature(
+                    input_path_obj, final_inputs, config
+                )
+                cache.save_manifest(final_sig, output_files)
         else:
             click.echo(f"Error: {input_path} is neither a file nor a directory", err=True)
             sys.exit(1)
