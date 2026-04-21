@@ -1,102 +1,140 @@
 # Development Roadmap
 
-This document outlines **future plans** for pyobfus. For released version history, see [CHANGELOG.md](../CHANGELOG.md).
+This document outlines **future plans** for pyobfus. For released version history, see [CHANGELOG.md](../CHANGELOG.md). For the detailed AI-era positioning strategy, see [AI_INTEGRATION_STRATEGY.md](AI_INTEGRATION_STRATEGY.md). For execution tracking, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTION_LOG.md).
 
-**Target Users**: Individual developers and small teams
-**Positioning**: Free open-source alternative to commercial tools (PyArmor, Oxyry)
+**Target Users**: Individual developers and small teams shipping Python code in the AI-assisted development era
+**Positioning**: The AI-native Python obfuscator — MCP-ready, framework-aware, open-source alternative to PyArmor
 
 ---
 
-## Current Status
+## Current Status (2026-04-22)
 
 See [CHANGELOG.md](../CHANGELOG.md) for the latest release and version history.
 
-- 560+ tests with 90% coverage
+- v0.3.3 released (2026-03-24)
+- 561 tests with 90% coverage
 - Full Pro feature set available
 - Parallel file processing support (`-j/--jobs`)
+- PyPI downloads: ~324/month (real users ~30%, rest is mirror scanning)
+- GitHub stars: 0 → major visibility problem (see strategy doc)
 
 ---
 
-## Next Release (v0.3.3+)
+## Strategic Shift (2026-04): AI-Native Positioning
 
-### Pending Items
-- None currently planned
+After competitive analysis and PyPI/GitHub signal review, the roadmap below has been reshaped around two insights:
 
-### Recently Completed
-- [x] Performance optimization for large projects (1000+ files)
-- [x] Parallel file processing (`-j/--jobs` CLI option)
-- [x] Test coverage improvement (56% -> 90%)
+1. **Feature gaps blocking adoption** are not more obfuscation techniques — they are friction points (framework incompatibility, debugging blocker, zero-config onboarding)
+2. **AI coding tools** (Claude Code, Cursor, Copilot, Windsurf) are becoming the primary tool-discovery channel. pyobfus must be "AI-native" to be recommended.
 
----
-
-## v0.4.0 - Ecosystem Enhancements
-
-**Goal**: Improve user experience, build community
-
-### P1 - Should Have
-
-**1. Enhanced Key Obfuscation**
-- Key splitting across multiple variables
-- Decoy/fake keys to confuse analysis
-- Key derivation from code structure
-- Dynamic key reconstruction at runtime
-
-### P2 - Nice to Have
-
-**2. VSCode Extension**
-- Right-click obfuscation
-- Config file intellisense
-
-**3. Incremental Obfuscation**
-- Only process changed files
-- Result caching
-
-**4. Code Compression**
-- Minify whitespace
-- Reduce file size
+The previous v0.4.0 plan (Enhanced Key Obfuscation, Code Compression) has been deprioritized in favor of the plan below.
 
 ---
 
-## Long-term Ideas
+## v0.4.0 - Foundation for Adoption (4-6 weeks)
 
-**Future Consideration** (not yet planned):
-- Professional email system with auto-responders
-- License inquiry self-service automation
-- Plugin system for custom transformers
+**Goal**: Remove adoption friction + make pyobfus AI-discoverable.
+
+### P0 - Must Ship (Weeks 1-3)
+
+Core functionality that unblocks real user scenarios and becomes the foundation for AI integration.
+
+- [ ] **P0-1: `pyobfus --check` pre-flight mode** — Scan project for `eval`/`exec`/`getattr`/dynamic attribute access, framework reflection points, `__all__` exports. Output JSON risk report with `ai-hint` field suggesting next command. _Estimate: 1 week_
+- [ ] **P0-2: `pyobfus unmap` reverse mapping command** — Input error stacktrace + mapping.json → output original variable-name trace. Unlocks "AI can still debug obfuscated code". _Estimate: 3-5 days_
+- [ ] **P0-3: Framework presets** — `--preset fastapi|django|flask|pydantic|click` with built-in exclusion rules for each framework's reflection points. _Estimate: 1 week_
+- [ ] **P0-4: AI-friendly CLI** — Global `--json` output mode, structured error messages with `ai-hint` field, machine-readable exit codes. _Estimate: 2-3 days_
+- [ ] **P0-5: `pyobfus init`** — Scan project → detect framework → generate `pyobfus.yaml` with auto-exclude list. One-command onboarding. _Estimate: 3-5 days_
+
+### P1 - AI Ecosystem Integration (Weeks 4-6)
+
+Builds on top of P0 primitives to make pyobfus appear natively in the AI-assisted workflow.
+
+- [ ] **P1-1: `pyobfus-mcp` server** (separate package) — Expose P0 tools as Model Context Protocol server for Claude Desktop / Claude Code / Cursor / Windsurf. _Estimate: 1 week_
+- [ ] **P1-2: `llms.txt` + `llms-full.txt`** — Deploy at repo root and docs site. _Estimate: 2 hours_
+- [ ] **P1-3: AI integration templates** — `templates/ai-integration/` with CLAUDE.md, .cursorrules, AGENTS.md, windsurfrules.md. _Estimate: 1 day_
+- [ ] **P1-4: PyPI metadata overhaul** — New keyword-dense description, Project-URL additions (MCP Server, AI Guide), Development Status → Beta. _Estimate: 1 hour_
+- [ ] **P1-5: Incremental obfuscation** — AST hash caching, only process changed files. Enables CI/CD embedding. _Estimate: 1-2 weeks_
+
+### Branding & Discoverability (Parallel, Week 1)
+
+- [ ] Reserve PyPI alias packages: `python-obfuscator`, `pyobfuscator`, `py-obfuscator` (if available)
+- [ ] Add GitHub topics: `python-obfuscator`, `code-obfuscator`, `ast-obfuscation`, `mcp-server`, `claude-code`, `cursor`, `llm-tools`
+- [ ] README: add pronunciation / alias line: "pyobfus — the Python obfuscator"
+- [ ] Upgrade classifier: `Development Status :: 3 - Alpha` → `4 - Beta`
+
+---
+
+## v0.5.0 - AI-Native Differentiation (Weeks 7-14)
+
+**Goal**: Establish a defensible position PyArmor cannot easily copy.
+
+### P2 - Differentiation Layer
+
+- [ ] **P2-1: Selective Opacity (Layered Protection)** — `layers:` config allowing users to choose which parts AI can read vs. which are AES-encrypted. Philosophical differentiator. _Estimate: 2-3 weeks_
+- [ ] **P2-2: VSCode Extension** — Right-click obfuscate + yaml IntelliSense + status bar. Marketplace as a new distribution channel. _Estimate: 1-2 weeks_
+- [ ] **P2-3: `--strip-ai-artifacts` mode** — Clean up "# Generated by Claude"-style markers, TODO comments, AI fingerprints before shipping. _Estimate: 1 week_
+- [ ] **P2-4: Import obfuscation (Pro)** — Top-level imports → runtime `importlib` + encrypted strings. Closes gap with PyArmor Pro. _Estimate: 1-2 weeks_
+- [ ] **P2-5: Numeric / Constant obfuscation** — Opaque arithmetic expressions for number literals. _Estimate: 3-5 days_
+
+---
+
+## v0.6.0+ Long-term (3-6 months)
+
+### P3 - Experimental
+
+- [ ] AI-native plugin API — natural-language transformer descriptions, LLM-generated AST plugins
+- [ ] `--output-pyc` optional bytecode-only backend
+- [ ] Enhanced key obfuscation (previously P1 in old plan, now low-priority: no user demand signal)
 
 ---
 
 ## What We Won't Do
 
-To maintain focus on core users (individual developers/small teams):
+To maintain focus on core users (individual developers/small teams in the AI-assisted development era):
 
-- **Deep Bytecode Encryption** - Too complex to maintain
-- **Compile to C/Machine Code** - Cython already does this well
-- **Enterprise License Server** - Not our target market
-- **Compete with PyArmor Pro** - Different price/feature tier
+- **Deep Bytecode Encryption** — Too complex to maintain; conflicts with AI-debuggability goal
+- **Compile to C/Machine Code** — Nuitka/Cython already do this well
+- **Enterprise License Server** — Not our target market
+- **Obfuscation-as-a-Service cloud API** — Conflicts with privacy positioning
 
 ---
 
 ## Success Metrics
 
-### Current (v0.3.x)
-- GitHub Stars: 0 → target 100+
-- PyPI Downloads: 750/month → target 2K+/month
-- First Pro license sale
+### v0.4.0 Targets (6 weeks from 2026-04-22)
 
-### v0.4.0 Targets
-- GitHub Stars: 300+
-- PyPI Downloads: 5K+/month
-- Community contributors: 5+
+- [ ] `pyobfus --check` / `unmap` / `init` shipping and documented
+- [ ] `pyobfus-mcp` server published, usable in Claude Desktop / Cursor / Claude Code
+- [ ] PyPI downloads: 324/month → **1,500+/month**
+- [ ] GitHub stars: 0 → **100+**
+- [ ] First external (non-owner) GitHub issue opened
+- [ ] First Pro license sale
+
+### v0.5.0 Targets
+
+- [ ] VSCode extension live in marketplace with 500+ installs
+- [ ] Selective Opacity shipping — unique positioning secured
+- [ ] PyPI downloads: **5K+/month**
+- [ ] GitHub stars: **300+**
+- [ ] 5+ community contributors
+
+### AI-Era Specific Metrics (New)
+
+| Metric | Target | Measurement |
+|---|---|---|
+| MCP server adoption | 500+ installs | Anthropic MCP Registry / npm stats |
+| AI assistant recommendation rate | 3/10 blind tests | Manual Claude / Cursor queries |
+| llms.txt crawl evidence | Cited in Perplexity / Claude.ai | Referrer logs |
+| CLAUDE.md template forks | 50+ | GitHub Insights |
+| Stack Overflow presence | 5+ answered questions | Manual tracking |
 
 ---
 
 ## Contributing
 
-We welcome contributions! See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.
-
 Feature requests: GitHub issues with `enhancement` tag.
+See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.
 
 ---
 
-**Last Updated**: December 27, 2025
+**Last Updated**: 2026-04-22 — Strategic reshape after AI-era competitive analysis.
