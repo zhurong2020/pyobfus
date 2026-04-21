@@ -4,6 +4,7 @@ Command-line interface for pyobfus.
 Provides a user-friendly CLI for obfuscating Python files and projects.
 """
 
+import json
 import sys
 from pathlib import Path
 from typing import Optional
@@ -184,6 +185,33 @@ except ImportError:
     is_flag=True,
     help="Emit machine-readable JSON output (for --check and future AI-agent integrations).",
 )
+@click.option(
+    "--save-mapping",
+    "save_mapping_path",
+    type=click.Path(),
+    help="Write original→obfuscated name mapping to a JSON file. "
+    "Use with `pyobfus --unmap` to reverse obfuscated stack traces.",
+)
+@click.option(
+    "--unmap",
+    "unmap_mode",
+    is_flag=True,
+    help="Reverse obfuscated names back to originals. Reads stack trace from "
+    "--trace FILE (or stdin) and applies --mapping FILE.",
+)
+@click.option(
+    "--trace",
+    "trace_path",
+    type=click.Path(),
+    help="Path to an obfuscated stack trace or error log (used with --unmap). "
+    "Pass '-' to read from stdin.",
+)
+@click.option(
+    "--mapping",
+    "mapping_path",
+    type=click.Path(),
+    help="Path to a mapping.json file produced by --save-mapping (used with --unmap).",
+)
 @click.version_option(version=__version__, prog_name="pyobfus")
 def main(
     input_path: Optional[str],
@@ -213,6 +241,10 @@ def main(
     jobs: int,
     check_mode: bool,
     json_output: bool,
+    save_mapping_path: Optional[str],
+    unmap_mode: bool,
+    trace_path: Optional[str],
+    mapping_path: Optional[str],
 ) -> None:
     """
     Obfuscate Python source code.
@@ -235,6 +267,15 @@ def main(
             click.echo("Error: --check requires INPUT_PATH.", err=True)
             sys.exit(1)
         _handle_check(Path(input_path), json_output=json_output)
+        return
+
+    # Handle --unmap: reverse obfuscated names in a stack trace
+    if unmap_mode:
+        _handle_unmap(
+            trace_path=trace_path,
+            mapping_path=mapping_path,
+            json_output=json_output,
+        )
         return
 
     # Handle --upgrade: Show Pro edition information
@@ -500,7 +541,14 @@ def main(
 
         if input_path_obj.is_file():
             # Single file obfuscation
-            file_stats = _obfuscate_file(input_path_obj, output_path_obj, config, verbose, dry_run)
+            file_stats = _obfuscate_file(
+                input_path_obj,
+                output_path_obj,
+                config,
+                verbose,
+                dry_run,
+                save_mapping_path=save_mapping_path,
+            )
             if file_stats:
                 obfuscation_stats["files_processed"] = 1
                 for key, value in file_stats.items():
@@ -510,7 +558,12 @@ def main(
             # Directory obfuscation - use CrossFileOrchestrator if enabled
             if cross_file:
                 dir_stats = _obfuscate_directory_crossfile(
-                    input_path_obj, output_path_obj, config, verbose, dry_run
+                    input_path_obj,
+                    output_path_obj,
+                    config,
+                    verbose,
+                    dry_run,
+                    save_mapping_path=save_mapping_path,
                 )
                 if dir_stats:
                     obfuscation_stats.update(dir_stats)
@@ -561,6 +614,7 @@ def _obfuscate_file(
     config: ObfuscationConfig,
     verbose: bool,
     dry_run: bool = False,
+    save_mapping_path: Optional[str] = None,
 ) -> dict:
     """
     Obfuscate a single Python file.
@@ -614,6 +668,19 @@ def _obfuscate_file(
 
     if verbose:
         click.echo(f"  Name transformations: {mangler.get_transformation_count()}")
+
+    # Save single-file mapping if requested
+    if save_mapping_path and not dry_run:
+        from pyobfus.core.mapping import ObfuscationMapping
+
+        mapping = ObfuscationMapping.from_single_file(
+            mangler.get_name_mapping(),
+            root=str(input_file.parent),
+            module=input_file.stem,
+        )
+        mapping.save(save_mapping_path)
+        if verbose:
+            click.echo(f"  Wrote mapping: {save_mapping_path}")
 
     # 2. String encoding (Community Edition - if enabled)
     if config.string_encoding and config.level == "community":
@@ -826,6 +893,7 @@ def _obfuscate_directory_crossfile(
     config: ObfuscationConfig,
     verbose: bool,
     dry_run: bool = False,
+    save_mapping_path: Optional[str] = None,
 ) -> dict:
     """
     Obfuscate directory with cross-file import mapping using CrossFileOrchestrator.
@@ -934,6 +1002,16 @@ def _obfuscate_directory_crossfile(
 
         if verbose:
             click.echo(f"\nOutput written to: {output_dir}")
+
+        # Save cross-file mapping if requested
+        if save_mapping_path:
+            from pyobfus.core.mapping import ObfuscationMapping
+
+            mapping = ObfuscationMapping.from_global_table(
+                orchestrator.global_table, root=str(input_dir)
+            )
+            mapping.save(save_mapping_path)
+            click.echo(f"Wrote mapping: {save_mapping_path} ({mapping.stats()})")
 
         return dir_stats
 
@@ -1106,6 +1184,71 @@ def _handle_init_config(template_name: str) -> None:
         click.echo(f"Error: {e}", err=True)
         click.echo(f"\nAvailable templates: {', '.join(list_templates())}", err=True)
         sys.exit(1)
+
+
+def _handle_unmap(
+    trace_path: Optional[str],
+    mapping_path: Optional[str],
+    json_output: bool = False,
+) -> None:
+    """
+    Reverse obfuscated identifiers in a stack trace / error log.
+
+    Reads text from `trace_path` (or stdin when `-`) and substitutes every
+    known obfuscated identifier with its original name, using a mapping.json
+    produced by --save-mapping. Prints the rewritten text to stdout.
+    """
+    from pyobfus.core.mapping import ObfuscationMapping
+
+    if not mapping_path:
+        click.echo("Error: --unmap requires --mapping PATH.", err=True)
+        click.echo("Example: pyobfus --unmap --trace error.log --mapping mapping.json", err=True)
+        sys.exit(2)
+
+    try:
+        mapping = ObfuscationMapping.load(Path(mapping_path))
+    except FileNotFoundError as e:
+        click.echo(f"Error: {e}", err=True)
+        sys.exit(2)
+    except (ValueError, json.JSONDecodeError) as e:  # noqa: F821 — json imported below
+        click.echo(f"Error: invalid mapping file: {e}", err=True)
+        sys.exit(2)
+
+    if trace_path in (None, "-"):
+        trace_text = sys.stdin.read()
+    else:
+        trace_file = Path(trace_path)  # type: ignore[arg-type]
+        if not trace_file.exists():
+            click.echo(f"Error: trace file not found: {trace_path}", err=True)
+            sys.exit(2)
+        trace_text = trace_file.read_text(encoding="utf-8")
+
+    if not trace_text.strip():
+        click.echo("Error: no trace input (empty file or stdin).", err=True)
+        sys.exit(2)
+
+    rewritten = mapping.unmap_text(trace_text)
+
+    if json_output:
+        click.echo(
+            json.dumps(
+                {
+                    "version": 1,
+                    "mapping": str(mapping_path),
+                    "mapping_stats": mapping.stats(),
+                    "original_trace": trace_text,
+                    "unmapped_trace": rewritten,
+                    "ai_hint": (
+                        "Unmapped names use the pre-obfuscation identifiers; "
+                        "line numbers still refer to the obfuscated output."
+                    ),
+                },
+                indent=2,
+                ensure_ascii=False,
+            )
+        )
+    else:
+        click.echo(rewritten, nl=False)
 
 
 def _handle_check(input_path: Path, json_output: bool = False) -> None:
