@@ -1,10 +1,10 @@
-# pyobfus
+# pyobfus — the Python obfuscator
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/zhurong2020/pyobfus/main/docs/assets/logo.jpeg" alt="pyobfus Logo" width="200">
 </p>
 
-**Modern Python Code Obfuscator**
+**pyobfus** (pronounced as "Python obfuscator") is a modern, AST-based **python-obfuscator / code-obfuscator** with framework-aware presets, reverse stack-trace mapping for AI-assisted debugging, and a machine-readable JSON CLI designed for [Claude Code](https://claude.com/claude-code), [Cursor](https://cursor.com/), and MCP agents. A transparent, open-source alternative to PyArmor.
 
 [![PyPI version](https://img.shields.io/pypi/v/pyobfus.svg)](https://pypi.org/project/pyobfus/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/pyobfus.svg)](https://pypi.org/project/pyobfus/)
@@ -13,7 +13,15 @@
 [![Python](https://img.shields.io/badge/python-3.8--3.14-blue.svg)](https://www.python.org/downloads/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-A Python code obfuscator built with AST-based transformations. **Supports Python 3.8 through 3.14** (including the latest stable release). Provides reliable name mangling, string encoding, and code protection features.
+A Python code obfuscator built with AST-based transformations. **Supports Python 3.8 through 3.14**. Provides reliable name mangling, string encoding, control-flow flattening, AES-256 string encryption, and — unique to pyobfus — a reverse-mapping workflow that lets you (or your AI coding assistant) debug obfuscated stack traces without giving up the protection.
+
+### 🤖 New in v0.4.0 — AI-native features
+
+- **`pyobfus --check src/`** — pre-flight risk scan: detects `eval`/`exec`, dynamic attribute access, and framework reflection points before you obfuscate. JSON output with an `ai_hint` telling your AI assistant what to run next.
+- **`pyobfus --init src/`** — zero-config onboarding: scans the project, detects FastAPI/Django/Pydantic/Click/SQLAlchemy, and writes a ready-to-use `pyobfus.yaml`.
+- **`pyobfus --unmap --trace error.log --mapping mapping.json`** — reverse obfuscated identifiers in a production stack trace so you can debug (or hand the trace to an AI assistant) without reversing the obfuscation itself.
+- **Framework-aware presets** — `--preset fastapi | django | flask | pydantic | click | sqlalchemy` with built-in exclusions for dispatch methods, decorators, ORM fields, migrations, and dependency-injection parameters.
+- **Global `--json`** — every CLI mode (`obfuscate`, `--check`, `--unmap`, `--init`) emits the same structured schema with an `ai_hint` field, ready for Claude Code, Cursor, Windsurf, and MCP servers to consume.
 
 ## Features
 
