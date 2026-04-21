@@ -170,6 +170,20 @@ except ImportError:
     default=0,
     help="Parallel workers (0=auto, 1=sequential, N=N workers)",
 )
+@click.option(
+    "--check",
+    "check_mode",
+    is_flag=True,
+    help="Pre-flight risk check: scan for eval/exec, dynamic attributes, "
+    "framework reflection points. No files are written. "
+    "Exit code 0=safe, 1=high-risk findings, 2=parse errors.",
+)
+@click.option(
+    "--json",
+    "json_output",
+    is_flag=True,
+    help="Emit machine-readable JSON output (for --check and future AI-agent integrations).",
+)
 @click.version_option(version=__version__, prog_name="pyobfus")
 def main(
     input_path: Optional[str],
@@ -197,6 +211,8 @@ def main(
     list_presets: bool,
     stats: bool,
     jobs: int,
+    check_mode: bool,
+    json_output: bool,
 ) -> None:
     """
     Obfuscate Python source code.
@@ -208,9 +224,19 @@ def main(
       pyobfus script.py -o script_obf.py
       pyobfus src/ -o dist/
       pyobfus src/ -o dist/ --config pyobfus.yaml
+      pyobfus --check src/                  # pre-flight risk scan
+      pyobfus --check src/ --json           # machine-readable report
       pyobfus --init-config django
       pyobfus --validate-config pyobfus.yaml
     """
+    # Handle --check: pre-flight risk scan (no output files)
+    if check_mode:
+        if not input_path:
+            click.echo("Error: --check requires INPUT_PATH.", err=True)
+            sys.exit(1)
+        _handle_check(Path(input_path), json_output=json_output)
+        return
+
     # Handle --upgrade: Show Pro edition information
     if upgrade:
         _handle_upgrade()
@@ -1080,6 +1106,25 @@ def _handle_init_config(template_name: str) -> None:
         click.echo(f"Error: {e}", err=True)
         click.echo(f"\nAvailable templates: {', '.join(list_templates())}", err=True)
         sys.exit(1)
+
+
+def _handle_check(input_path: Path, json_output: bool = False) -> None:
+    """
+    Run pre-flight risk scan and print report.
+
+    Exits with code 0 (safe), 1 (high-severity findings), or 2 (parse errors).
+    """
+    from pyobfus.core.preflight import PreflightChecker, format_report_text
+
+    checker = PreflightChecker()
+    report = checker.check_path(input_path)
+
+    if json_output:
+        click.echo(report.to_json())
+    else:
+        click.echo(format_report_text(report))
+
+    sys.exit(report.exit_code())
 
 
 def _handle_validate_config(config_path: str) -> None:
