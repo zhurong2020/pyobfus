@@ -283,13 +283,184 @@ class ObfuscationConfig:
         )
         return config
 
+    # ------------------------------------------------------------------
+    # Framework-aware presets (community, no Pro features required)
+    # ------------------------------------------------------------------
+    #
+    # Each framework preset extends preset_safe() with:
+    #   - preserve_param_names = True  (frameworks lean heavily on kwargs /
+    #     dependency injection / field names as identifiers)
+    #   - framework-specific `exclude_names` for symbols reached through
+    #     reflection or framework-managed dispatch
+    #   - `exclude_patterns` for files/directories commonly expected to
+    #     remain unmodified (migrations, generated code, entry scripts)
+    #
+    # See docs/ROADMAP.md P0-3 and docs/AI_INTEGRATION_STRATEGY.md for
+    # why these presets exist and what "framework-aware" means here.
+
+    @classmethod
+    def preset_fastapi(cls) -> "ObfuscationConfig":
+        """FastAPI preset: preserves dependency-injection param names and routers.
+
+        - Based on preset_safe (docstrings preserved)
+        - preserve_param_names=True (Depends(), Query(), Body() rely on names)
+        - Excludes HTTP verb method names used by APIRouter / Starlette
+        - Excludes common router and dependency modules by path pattern
+        """
+        config = cls.preset_safe()
+        config.preserve_param_names = True
+        config.exclude_names = config.exclude_names | {
+            # Starlette / FastAPI dispatch methods
+            "dispatch", "__call__", "app", "router", "lifespan",
+            # HTTP verbs commonly overridden on class-based routes
+            "get", "post", "put", "delete", "patch", "head", "options", "trace",
+            # Pydantic model interfaces frequently used inside handlers
+            "model_dump", "model_validate", "dict", "json", "parse_obj",
+            "Config", "fields",
+        }
+        config.exclude_patterns = list(config.exclude_patterns) + [
+            "**/routers/**",
+            "**/dependencies.py",
+            "**/main.py",
+        ]
+        return config
+
+    @classmethod
+    def preset_django(cls) -> "ObfuscationConfig":
+        """Django preset: preserves ORM, CBV, signals, migrations.
+
+        - Based on preset_safe (docstrings preserved)
+        - preserve_param_names=True (form/model fields, template context)
+        - Excludes Django-managed method names (Meta, save, clean, get/post…)
+        - Excludes migrations, manage.py, wsgi/asgi entry points by path
+        """
+        config = cls.preset_safe()
+        config.preserve_param_names = True
+        config.exclude_names = config.exclude_names | {
+            # CBV HTTP verb handlers
+            "get", "post", "put", "delete", "patch", "head", "options",
+            # Generic CBV hooks
+            "get_queryset", "get_object", "get_context_data", "get_form_class",
+            "form_valid", "form_invalid", "get_success_url",
+            # Model / Form protocol
+            "Meta", "save", "delete", "clean", "full_clean", "is_valid",
+            "save_m2m", "natural_key", "from_db", "refresh_from_db",
+            # Admin
+            "ModelAdmin", "list_display", "list_filter", "search_fields",
+            # Signal receivers reached via sender string
+            "pre_save", "post_save", "pre_delete", "post_delete", "m2m_changed",
+        }
+        config.exclude_patterns = list(config.exclude_patterns) + [
+            "**/migrations/**",
+            "**/apps.py",
+            "**/urls.py",
+            "**/wsgi.py",
+            "**/asgi.py",
+            "**/manage.py",
+            "**/settings.py",
+        ]
+        return config
+
+    @classmethod
+    def preset_flask(cls) -> "ObfuscationConfig":
+        """Flask preset: preserves view functions and url_for() targets.
+
+        - Based on preset_safe
+        - preserve_param_names=True (URL variable names become handler kwargs)
+        - Excludes Flask/Werkzeug dispatch methods
+        - Excludes blueprint / views directories by path pattern
+        """
+        config = cls.preset_safe()
+        config.preserve_param_names = True
+        config.exclude_names = config.exclude_names | {
+            "dispatch_request", "full_dispatch_request", "app", "blueprint",
+            "before_request", "after_request", "teardown_request",
+            "errorhandler", "register_blueprint",
+            # HTTP verbs on MethodView
+            "get", "post", "put", "delete", "patch", "head", "options",
+        }
+        config.exclude_patterns = list(config.exclude_patterns) + [
+            "**/views/**",
+            "**/blueprints/**",
+            "**/wsgi.py",
+        ]
+        return config
+
+    @classmethod
+    def preset_pydantic(cls) -> "ObfuscationConfig":
+        """Pydantic preset: preserves BaseModel field API.
+
+        - Based on preset_safe (docstrings preserved)
+        - preserve_param_names=True (field names are the serialization keys)
+        - Excludes v1 and v2 public BaseModel interfaces + validator hooks
+        """
+        config = cls.preset_safe()
+        config.preserve_param_names = True
+        config.exclude_names = config.exclude_names | {
+            # Pydantic v2 public API
+            "model_dump", "model_dump_json", "model_validate",
+            "model_validate_json", "model_copy", "model_config",
+            "model_fields", "model_computed_fields", "model_json_schema",
+            # Pydantic v1 public API (still widely used)
+            "dict", "json", "parse_obj", "parse_raw", "parse_file",
+            "from_orm", "copy", "schema", "schema_json",
+            # Config + validator decorators
+            "Config", "validator", "root_validator", "field_validator",
+            "model_validator", "computed_field",
+        }
+        return config
+
+    @classmethod
+    def preset_click(cls) -> "ObfuscationConfig":
+        """Click preset: preserves CLI command, group, and option names.
+
+        - Based on preset_safe
+        - preserve_param_names=True (Click maps --option to handler kwargs)
+        - Excludes Click decorator-managed symbols
+        """
+        config = cls.preset_safe()
+        config.preserve_param_names = True
+        config.exclude_names = config.exclude_names | {
+            "command", "group", "option", "argument", "pass_context",
+            "pass_obj", "confirmation_option", "help_option", "version_option",
+            "cli", "main", "ctx",
+        }
+        return config
+
+    @classmethod
+    def preset_sqlalchemy(cls) -> "ObfuscationConfig":
+        """SQLAlchemy preset: preserves ORM columns, relationships, sessions.
+
+        - Based on preset_safe
+        - preserve_param_names=True (column names = python attribute names)
+        - Excludes ORM-managed dunder-like attributes and session API
+        """
+        config = cls.preset_safe()
+        config.preserve_param_names = True
+        config.exclude_names = config.exclude_names | {
+            "__tablename__", "__table_args__", "metadata", "registry",
+            "Base", "DeclarativeBase", "MappedAsDataclass",
+            "Column", "Mapped", "mapped_column", "relationship",
+            "primary_key", "foreign_key", "ForeignKey",
+            "session", "Session", "sessionmaker", "query",
+            "add", "add_all", "commit", "rollback", "flush", "merge", "refresh",
+        }
+        config.exclude_patterns = list(config.exclude_patterns) + [
+            "**/alembic/**",
+            "**/migrations/**",
+        ]
+        return config
+
     @classmethod
     def get_preset(cls, name: str) -> "ObfuscationConfig":
         """
         Get a preset configuration by name.
 
         Args:
-            name: Preset name (trial, commercial, library, maximum, safe, balanced, aggressive)
+            name: Preset name. Available:
+                - Community: safe, balanced, aggressive
+                - Framework: fastapi, django, flask, pydantic, click, sqlalchemy
+                - Pro: trial, commercial, library, maximum
 
         Returns:
             ObfuscationConfig with preset settings
@@ -298,13 +469,22 @@ class ObfuscationConfig:
             ValueError: If preset name is unknown
         """
         presets: Dict[str, Callable[[], "ObfuscationConfig"]] = {
+            # Community
+            "safe": cls.preset_safe,
+            "balanced": cls.preset_balanced,
+            "aggressive": cls.preset_aggressive,
+            # Framework-aware (community, no Pro required)
+            "fastapi": cls.preset_fastapi,
+            "django": cls.preset_django,
+            "flask": cls.preset_flask,
+            "pydantic": cls.preset_pydantic,
+            "click": cls.preset_click,
+            "sqlalchemy": cls.preset_sqlalchemy,
+            # Pro
             "trial": cls.preset_trial,
             "commercial": cls.preset_commercial,
             "library": cls.preset_library,
             "maximum": cls.preset_maximum,
-            "safe": cls.preset_safe,
-            "balanced": cls.preset_balanced,
-            "aggressive": cls.preset_aggressive,
         }
 
         name_lower = name.lower()
@@ -322,7 +502,19 @@ class ObfuscationConfig:
         Returns:
             List of preset names
         """
-        return ["trial", "commercial", "library", "maximum", "safe", "balanced", "aggressive"]
+        return [
+            # Community
+            "safe", "balanced", "aggressive",
+            # Framework-aware
+            "fastapi", "django", "flask", "pydantic", "click", "sqlalchemy",
+            # Pro
+            "trial", "commercial", "library", "maximum",
+        ]
+
+    # Framework presets are community-tier (no Pro license required)
+    FRAMEWORK_PRESETS = frozenset(
+        {"fastapi", "django", "flask", "pydantic", "click", "sqlalchemy"}
+    )
 
     def add_exclude_pattern(self, pattern: str) -> None:
         """Add a file pattern to exclude."""
