@@ -223,6 +223,14 @@ except ImportError:
     type=click.Path(),
     help="Path to a mapping.json file produced by --save-mapping (used with --unmap).",
 )
+@click.option(
+    "--init",
+    "init_mode",
+    is_flag=True,
+    help="Scan project, detect frameworks, and generate pyobfus.yaml with a "
+    "suggested preset and exclude patterns. Zero-config onboarding for "
+    "new projects (or AI agents wiring up pyobfus for the user).",
+)
 @click.version_option(version=__version__, prog_name="pyobfus")
 def main(
     input_path: Optional[str],
@@ -256,6 +264,7 @@ def main(
     unmap_mode: bool,
     trace_path: Optional[str],
     mapping_path: Optional[str],
+    init_mode: bool,
 ) -> None:
     """
     Obfuscate Python source code.
@@ -287,6 +296,12 @@ def main(
             mapping_path=mapping_path,
             json_output=json_output,
         )
+        return
+
+    # Handle --init: scan project and generate pyobfus.yaml
+    if init_mode:
+        scan_root = Path(input_path) if input_path else Path.cwd()
+        _handle_init(scan_root, json_output=json_output)
         return
 
     # Handle --upgrade: Show Pro edition information
@@ -1354,6 +1369,61 @@ def _emit_error_json(
         "exit_code": exit_code,
     }
     click.echo(json.dumps(payload, indent=2, ensure_ascii=False))
+
+
+def _handle_init(scan_root: Path, json_output: bool = False) -> None:
+    """
+    Scan a project and write a suggested `pyobfus.yaml`.
+
+    When `--json` is set, emits a structured payload on stdout and exits
+    without asking for confirmation (overwrites existing file). The JSON
+    mode is intended for AI agents and CI pipelines.
+    """
+    from pyobfus.core.init_config import build_init_result
+
+    result = build_init_result(scan_root)
+    target = result.config_path
+
+    if target.exists() and not json_output:
+        if not click.confirm(f"'{target}' already exists. Overwrite?"):
+            click.echo("Aborted.")
+            return
+
+    target.write_text(result.yaml_text, encoding="utf-8")
+    result.written = True
+
+    if json_output:
+        payload = result.to_dict()
+        payload["status"] = "success"
+        # Context-aware next-step for AI agents
+        if result.high_risk_findings > 0:
+            payload["ai_hint"] = (
+                f"Generated {target}. "
+                f"{result.high_risk_findings} high-risk pattern(s) detected — "
+                f"run 'pyobfus --check {scan_root}' for details before obfuscating."
+            )
+        else:
+            payload["ai_hint"] = (
+                f"Generated {target}. Next: pyobfus {scan_root} -o dist/ -c {target}"
+            )
+        click.echo(json.dumps(payload, indent=2, ensure_ascii=False))
+        return
+
+    click.echo(f"Generated {target}")
+    click.echo(f"  Preset: {result.preset}")
+    if result.frameworks_detected:
+        click.echo(f"  Frameworks detected: {', '.join(result.frameworks_detected)}")
+    click.echo(f"  Files scanned: {result.files_scanned}")
+    click.echo(f"  Exclude patterns: {len(result.excludes)} entries")
+    if result.high_risk_findings > 0:
+        click.echo(
+            f"  Warning: {result.high_risk_findings} high-risk pattern(s) detected. "
+            f"Run 'pyobfus --check {scan_root}' for details."
+        )
+    click.echo("")
+    click.echo("Next steps:")
+    click.echo(f"  1. Review {target}")
+    click.echo(f"  2. Run: pyobfus {scan_root} -o dist/ -c {target}")
 
 
 def _handle_unmap(
