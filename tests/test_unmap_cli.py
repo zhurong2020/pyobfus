@@ -48,9 +48,9 @@ def test_save_mapping_and_unmap_roundtrip(tmp_path: Path) -> None:
     assert obfuscated_for_calculator and obfuscated_for_add
 
     trace = (
-        f'Traceback (most recent call last):\n'
+        f"Traceback (most recent call last):\n"
         f'  File "out.py", line 7, in main\n'
-        f'    return calc.{obfuscated_for_add}(1, 2)\n'
+        f"    return calc.{obfuscated_for_add}(1, 2)\n"
         f"TypeError: {obfuscated_for_calculator}.{obfuscated_for_add}() missing 1 required argument\n"
     )
     trace_file = tmp_path / "trace.log"
@@ -112,9 +112,7 @@ def test_unmap_without_mapping_fails_cleanly(tmp_path: Path) -> None:
 
 def test_unmap_with_missing_trace_file_fails(tmp_path: Path) -> None:
     mapping = tmp_path / "m.json"
-    mapping.write_text(
-        json.dumps({"version": 1, "modules": {}, "global": {}}), encoding="utf-8"
-    )
+    mapping.write_text(json.dumps({"version": 1, "modules": {}, "global": {}}), encoding="utf-8")
     result = CliRunner().invoke(
         main,
         [
@@ -134,9 +132,7 @@ def test_unmap_rejects_bad_mapping_version(tmp_path: Path) -> None:
     mapping.write_text(json.dumps({"version": 999, "modules": {}}), encoding="utf-8")
     trace = tmp_path / "t.log"
     trace.write_text("x", encoding="utf-8")
-    result = CliRunner().invoke(
-        main, ["--unmap", "--trace", str(trace), "--mapping", str(mapping)]
-    )
+    result = CliRunner().invoke(main, ["--unmap", "--trace", str(trace), "--mapping", str(mapping)])
     assert result.exit_code == 2
     assert "Unsupported mapping version" in result.output
 

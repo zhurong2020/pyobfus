@@ -8,7 +8,6 @@ from click.testing import CliRunner
 from pyobfus.cli import main
 from pyobfus.config import ObfuscationConfig
 
-
 # ---------------------------------------------------------------------------
 # Individual preset factories
 # ---------------------------------------------------------------------------

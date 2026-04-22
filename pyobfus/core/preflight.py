@@ -22,7 +22,6 @@ from pyobfus.core.parser import ASTParser
 from pyobfus.exceptions import ParseError
 from pyobfus.utils import filter_python_files
 
-
 # Severity ordering (higher = more likely to break obfuscation)
 SEVERITY_HIGH = "high"
 SEVERITY_MEDIUM = "medium"
@@ -232,8 +231,8 @@ class _RiskVisitor(ast.NodeVisitor):
                     SEVERITY_HIGH,
                     node,
                     f"{name}() with non-constant attribute name will break after obfuscation.",
-                    f"Use 'exclude_names' for the referenced attributes, "
-                    f"or rewrite to static attribute access.",
+                    "Use 'exclude_names' for the referenced attributes, "
+                    "or rewrite to static attribute access.",
                 )
             else:
                 self._add(
@@ -292,8 +291,8 @@ class _RiskVisitor(ast.NodeVisitor):
                 SEVERITY_LOW,
                 node,
                 f"Access to .{node.attr} — returns obfuscated string at runtime.",
-                f"If this string is compared to a literal, obfuscation will break it. "
-                f"Exclude affected names or refactor the comparison.",
+                "If this string is compared to a literal, obfuscation will break it. "
+                "Exclude affected names or refactor the comparison.",
             )
         self.generic_visit(node)
 
@@ -411,8 +410,8 @@ class PreflightChecker:
     def _finalize(self, report: PreflightReport) -> None:
         # Framework-driven preset suggestion (first detected wins, highest priority first)
         priority = ["fastapi", "django", "flask", "pydantic", "click", "sqlalchemy"]
-        detected_lower = {f.name.lower().split()[0]: f for f in report.frameworks}
-        # Map "FastAPI" -> "fastapi", "Click CLI" -> "click"
+        # Map framework display name -> preset key via _FRAMEWORK_SIGNATURES
+        # ("FastAPI" -> "fastapi", "Click CLI" -> "click", ...)
         framework_keys: Dict[str, FrameworkHit] = {}
         for fw in report.frameworks:
             for key, (name, _p, _e) in _FRAMEWORK_SIGNATURES.items():
@@ -447,8 +446,8 @@ class PreflightChecker:
             )
         elif counts[SEVERITY_HIGH] > 0:
             report.ai_hint = (
-                f"High-risk patterns found. Review risks, add 'exclude_names' / "
-                f"'exclude_patterns' to pyobfus.yaml, then re-run --check."
+                "High-risk patterns found. Review risks, add 'exclude_names' / "
+                "'exclude_patterns' to pyobfus.yaml, then re-run --check."
             )
         elif report.suggested_preset:
             report.ai_hint = (
@@ -456,9 +455,7 @@ class PreflightChecker:
                 f"pyobfus {report.root} -o dist/ --preset {report.suggested_preset}"
             )
         else:
-            report.ai_hint = (
-                f"Low risk. Run: pyobfus {report.root} -o dist/ --preset balanced"
-            )
+            report.ai_hint = f"Low risk. Run: pyobfus {report.root} -o dist/ --preset balanced"
 
 
 # ---------------------------------------------------------------------------
@@ -518,7 +515,9 @@ def format_report_text(report: PreflightReport, show_risks_limit: int = 20) -> s
             lines.append(f"           {risk.message}")
             lines.append(f"           suggest: {risk.suggestion}")
         if len(sorted_risks) > show_risks_limit:
-            lines.append(f"  ... and {len(sorted_risks) - show_risks_limit} more. Use --json for full list.")
+            lines.append(
+                f"  ... and {len(sorted_risks) - show_risks_limit} more. Use --json for full list."
+            )
 
     lines.append("")
     lines.append(f"  Next: {report.ai_hint}")
