@@ -1,7 +1,7 @@
 # Python 3.8 兼容性指南
 
 **创建日期**: 2025-11-12
-**最后更新**: 2025-12-09
+**最后更新**: 2026-04-22
 
 ## 概述
 
@@ -263,6 +263,57 @@ new_source = CodeGenerator.generate(new_tree)
 #### 修复提交
 - Commit: d4d44ae
 - 文件: `pyobfus/transformers/import_rewriter.py`
+
+---
+
+### 问题8: 单个 Pro 特性的 CLI 集成测试在 Python 3.8 上 flaky
+
+**发现时间**: 2026-04-22
+**影响范围**: `tests/test_cli_pro_paths.py::TestProFeatureExecution` 的 4 个单特性测试
+
+#### 症状
+
+非确定性失败：同一次 push 第一次 CI 运行可能是 macOS 3.8 失败、重跑后 Windows 3.8 失败。Ubuntu 3.8 和 Python 3.9-3.14 × 所有 OS 全过。失败时的错误只是：
+
+```
+FAILED tests/test_cli_pro_paths.py::TestProFeatureExecution::test_dead_code_injection - assert 1 == 0
+ +  where 1 = <Result SystemExit(1)>.exit_code
+```
+
+首次失败（macOS 3.8）甚至显示 `648 passed, 7 skipped`，但 `Process completed with exit code 1` 没有具体 traceback —— astunparse 在某些输入上生成的 AST pytest-cov 收尾阶段异常退出。
+
+#### 根本原因
+
+单特性 Pro CLI 测试（`test_control_flow_flattening` / `test_string_encryption` / `test_anti_debug` / `test_dead_code_injection`）都走 `CliRunner().invoke(main, [..., "--<feature>", "-v"])`，最终会穿过 `astunparse → 生成代码` 的路径。和问题 #1/#2 一样，这条路径在 Python 3.8 上对某些 AST 输入行为不一致，在 macOS ARM64 / Windows runner 上表现为 flaky。
+
+和 `ee80edf` 提交里已处理的 *组合* Pro 测试（`test_all_pro_features_combined` 等）同一问题，只是单特性测试当时没触发。
+
+#### 解决方案
+
+对这 4 个单特性 CLI 测试加 `@requires_py39` 装饰器（与已有的组合 Pro 测试保持一致）：
+
+```python
+@requires_py39
+@patch("pyobfus.cli.is_trial_active", return_value=True)
+@patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
+def test_dead_code_injection(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
+    ...
+```
+
+纯 transformer 单元测试（`tests/test_control_flow_flattening.py`、`tests/test_dead_code_injection.py`、`tests/test_string_aes.py`、`tests/test_anti_debug.py`）**继续在所有 Python 版本上运行** —— 它们不经 astunparse 生成代码路径，所以不受影响。
+
+#### 修复提交
+
+- Commit: （即将提交）
+- 文件: `tests/test_cli_pro_paths.py`
+
+#### 诊断要点（下次遇到直接照抄）
+
+| 信号 | 判断 |
+|---|---|
+| 只有 Python 3.8 matrix 某一个 OS 失败，其他 OS 3.8 和所有 3.9+ 通过 | Python 3.8 astunparse flake |
+| `Process completed with exit code 1` 但显示 "648 passed, 7 skipped" | pytest-cov 退出码受 astunparse 副作用污染 |
+| `test_dead_code_injection` / `test_string_encryption` / `test_anti_debug` / `test_control_flow_flattening` 失败 | 应用 `@requires_py39`，已有同类先例 |
 
 ---
 

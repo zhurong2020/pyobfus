@@ -95,6 +95,12 @@ class TestProLevelWithTrial:
 class TestProFeatureExecution:
     """Test actual Pro feature execution with trial active."""
 
+    # Individual Pro-feature CLI integration tests produce astunparse AST output
+    # that is intermittently invalid on Python 3.8 (known EOL compat issue, see
+    # docs/PYTHON38_COMPATIBILITY.md §8). Individual transformer unit tests in
+    # tests/test_control_flow_flattening.py / test_dead_code_injection.py /
+    # test_string_aes.py / test_anti_debug.py still run on all Python versions.
+    @requires_py39
     @patch("pyobfus.cli.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_control_flow_flattening(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
@@ -103,6 +109,7 @@ class TestProFeatureExecution:
         assert result.exit_code == 0
         assert "Control flow" in result.output or output.exists()
 
+    @requires_py39
     @patch("pyobfus.cli.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_string_encryption(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
@@ -112,6 +119,7 @@ class TestProFeatureExecution:
         )
         assert result.exit_code == 0
 
+    @requires_py39
     @patch("pyobfus.cli.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_anti_debug(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
@@ -119,6 +127,7 @@ class TestProFeatureExecution:
         result = runner.invoke(main, [str(simple_file), "-o", str(output), "--anti-debug", "-v"])
         assert result.exit_code == 0
 
+    @requires_py39
     @patch("pyobfus.cli.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_dead_code_injection(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
