@@ -45,6 +45,8 @@ pytest tests/ -v --cov=pyobfus --cov-report=html
 pytest integration_tests/ -v
 ```
 
+**⚠️ Python 3.8 注意**：`astunparse` 库在某些 AST 输入上的输出不稳定，会导致 Pro 特性的 CLI 集成测试在 macOS ARM64 / Windows runner 上 flaky。**添加新的 Pro 特性 CLI 集成测试（`CliRunner().invoke + --<pro-flag>`）前务必阅读 [`docs/PYTHON38_COMPATIBILITY.md`](docs/PYTHON38_COMPATIBILITY.md)**，并对新测试套用 `@requires_py39` 装饰器（参考 `tests/test_cli_pro_paths.py::TestProFeatureExecution`）。纯 AST transformer 单元测试不受影响。
+
 ### 代码规范
 
 - 格式化: `black pyobfus/`

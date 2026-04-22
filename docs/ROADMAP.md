@@ -78,6 +78,21 @@ Builds on top of P0 primitives to make pyobfus appear natively in the AI-assiste
 
 ---
 
+## v0.5.0 — Candidate: drop Python 3.8 support
+
+Python 3.8 reached end-of-life in **October 2024**. The ecosystem has moved on, yet we continue to hit it with recurring CI flakes from `astunparse` (our 3.8 fallback for `ast.unparse()`). Already-documented incidents in [`docs/PYTHON38_COMPATIBILITY.md`](PYTHON38_COMPATIBILITY.md): 8 distinct problems, including the 2026-04 single-Pro-feature CLI flake that required skipping four CLI integration tests on 3.8.
+
+**Proposed action in v0.5**:
+- Bump `requires-python = ">=3.9"` in `pyobfus/pyproject.toml`
+- Drop the `astunparse` dependency marker (only needed for 3.8)
+- Remove `@requires_py39` decorators across the test suite
+- Drop `3.8` from the CI matrix
+- Remove `docs/PYTHON38_COMPATIBILITY.md` (or move to an archived-notes folder for history)
+
+Benefits: simpler test matrix (~15% faster CI), one less dependency, and eliminates the whole class of astunparse-vs-ast.unparse divergences.
+
+---
+
 ## v0.6.0+ Long-term (3-6 months)
 
 ### P3 - Experimental
