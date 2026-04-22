@@ -177,16 +177,39 @@ Each template explains (in < 50 lines): when to invoke pyobfus, typical command 
 
 Rule: **No marketing article until the MCP server and unmap command are live.** Otherwise we sell vaporware and damage credibility.
 
-### Planned content (weeks 7-8)
+### Strategy revision 2026-04-22 — pause Stack Overflow seeding
 
-| # | Title | Channel | Goal |
-|---|---|---|---|
-| 1 | Enabling Claude Code to auto-obfuscate: pyobfus MCP integration | dev.to, 有心工坊, 知乎 | Technical authority + traffic |
-| 2 | pyobfus vs PyArmor 2026: Python protection in the AI era | Medium, 有心工坊 | Intercept PyArmor searches |
-| 3 | Selective Opacity: the layered obfuscation PyArmor can't do | Hacker News (Show HN), dev.to | Establish original theory |
-| 4 | 5 high-rank Stack Overflow answers: FastAPI obfuscation, reverse-mapping debug, AI-assisted debugging of obfuscated code | Stack Overflow | **Seed training corpus** |
-| 5 | /r/Python weekly showcase post | Reddit | Community exposure |
-| 6 | Product Hunt launch | Product Hunt | One-shot high-visibility |
+Initial plan had Stack Overflow as channel #4 (5 seeded answers). Concrete investigation on 2026-04-22 — see `_drafts/stackoverflow-seeding-targets.md` — found:
+
+- Best 2024+ candidate (Q79400498) has **40 views/month**. Expected click-through to pyobfus: ~0.4/month even if our answer ranks well.
+- Three top-tier targets combined ≈ 2 clicks/month.
+- SO's site-wide ban on AI-generated content is strictly enforced (meta banner on every page, April 2026 policy reaffirmations).
+- Maintainer at 11 rep + self-promotion answer = highest-scrutiny combo. Mod-removal risk outweighs marginal exposure.
+
+**Decision**: pause SO for 6 months. Redirect effort to higher-ROI channels. Revisit Q4 2026 based on organic signal from the other channels.
+
+### Revised content plan (weeks 7-10)
+
+| # | Title | Channel | Goal | AI-policy risk |
+|---|---|---|---|---|
+| 1 | Enabling Claude Code to auto-obfuscate: pyobfus MCP integration | dev.to, 有心工坊, 知乎 | Technical authority + traffic | 🟢 disclosure-allowed |
+| 2 | pyobfus vs PyArmor 2026: Python protection in the AI era | Medium (with AI-disclosure line), 有心工坊 | Intercept PyArmor searches | 🟢 disclosure-allowed |
+| 3 | Selective Opacity: the layered obfuscation PyArmor can't do | Hacker News Show HN (after dev.to #1 provides social proof), dev.to | Establish original theory | 🟡 HN bans AI, must be hand-polished |
+| 4 | ~~Stack Overflow seeding~~ **PAUSED — see revision note above** | Stack Overflow | — | 🔴 banned |
+| 5 | /r/Python Showcase Saturday post | Reddit | Community exposure | 🟡 mods remove AI-flavored |
+| 6 | Product Hunt launch | Product Hunt | One-shot high-visibility | 🟢 no AI policy |
+| 7 | awesome-mcp-servers PR to 3 community lists (punkpeye / wong2 / appcypher) | GitHub | Developer-browsing discoverability | 🟢 metadata, not content |
+
+### Forum AI-policy reality check (as of 2026-04)
+
+See `_drafts/forum-ai-policy-and-voice-guide.md` for the full matrix. Short version:
+
+- **Stack Overflow, Hacker News**: AI content banned outright. No disclosure path. Post removal + account penalty on detection.
+- **Medium**: AI allowed with first-two-paragraph disclosure. Undisclosed → Network-Only distribution (effectively shadow-banned).
+- **dev.to, Reddit /r/Python**: no formal AI policy, but moderators actively remove low-effort AI-looking content.
+- Current detectors (Originality.ai, GPTZero) flag unmodified Claude 4 output at ~98%. Human rewrite removing AI tells + adding specifics usually clears.
+
+All drafts produced with AI assistance are to be **rewritten in the maintainer's voice before submission**, using the checklist in the voice guide. Final gate: GPTZero < 30% AI before posting.
 
 ---
 
