@@ -162,3 +162,8 @@ integration_tests/
 scripts/upload_pypi.py
 scripts/temp_*.py
 /test_*.py
+
+# pyobfus-mcp build artifacts (built locally per release, not tracked)
+pyobfus_mcp/dist/
+pyobfus_mcp/build/
+pyobfus_mcp/*.egg-info/
