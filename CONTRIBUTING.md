@@ -229,6 +229,21 @@ These practices improve both type safety and code clarity while eliminating fals
 - **Coverage target**: 80%+ for new code
 - **Test types**: Unit, integration, end-to-end
 
+#### Python 3.8 Caveat for Pro-feature CLI integration tests
+
+`astunparse` (used on Python 3.8 as a fallback for `ast.unparse()`) produces intermittently-invalid generated code for certain AST shapes emitted by Pro transformers. End-to-end CLI tests that invoke `pyobfus ... --<pro-flag>` via `CliRunner().invoke` are flaky on macOS ARM64 / Windows Python 3.8 runners. Plain unit tests of the transformer classes (not going through `CliRunner`) are fine.
+
+**Rule**: when adding a new `CliRunner().invoke(main, [..., "--<pro-flag>", ...])`-style test, apply the `@requires_py39` decorator defined at the top of `tests/test_cli_pro_paths.py`:
+
+```python
+@requires_py39
+@patch("pyobfus.cli.is_trial_active", return_value=True)
+def test_my_new_pro_feature(self, mock, runner, simple_file, tmp_path):
+    ...
+```
+
+See [`docs/PYTHON38_COMPATIBILITY.md`](docs/PYTHON38_COMPATIBILITY.md) §8 for the full diagnostic signature and historical context.
+
 #### Test Structure
 
 ```python
