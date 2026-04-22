@@ -81,7 +81,8 @@ pyobfus-license = "pyobfus_pro.cli:cli"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["pyobfus*"]
-exclude = ["tests*", "docs*", "examples*"]
+# Exclude sibling packages that are distributed separately (e.g. pyobfus_mcp)
+exclude = ["tests*", "docs*", "examples*", "pyobfus_mcp*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
