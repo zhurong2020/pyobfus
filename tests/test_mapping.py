@@ -12,16 +12,13 @@ from pyobfus.core.mapping import (
     ObfuscationMapping,
 )
 
-
 # ---------------------------------------------------------------------------
 # Construction
 # ---------------------------------------------------------------------------
 
 
 def test_from_single_file_builds_forward_and_reverse() -> None:
-    m = ObfuscationMapping.from_single_file(
-        {"Calculator": "I0", "add": "I1"}, module="calc"
-    )
+    m = ObfuscationMapping.from_single_file({"Calculator": "I0", "add": "I1"}, module="calc")
     assert m.modules["calc"]["Calculator"] == "I0"
     assert m.reverse("I0") == "Calculator"
     assert m.reverse("I1") == "add"
@@ -138,15 +135,13 @@ def test_unmap_text_stacktrace_rewrite() -> None:
         "AttributeError: 'I0' object has no attribute 'I2'\n"
     )
     out = m.unmap_text(trace)
-    assert 'in add' in out
-    assert 'Calculator.x + other' in out
+    assert "in add" in out
+    assert "Calculator.x + other" in out
     assert "'Calculator' object has no attribute 'x'" in out
 
 
 def test_reverse_qualified_dotted_path() -> None:
-    m = ObfuscationMapping.from_single_file(
-        {"Calculator": "I0", "add": "I1"}, module="calc"
-    )
+    m = ObfuscationMapping.from_single_file({"Calculator": "I0", "add": "I1"}, module="calc")
     assert m.reverse_qualified("I0.I1") == "Calculator.add"
     # Unknown parts pass through
     assert m.reverse_qualified("I0.unknown.I1") == "Calculator.unknown.add"

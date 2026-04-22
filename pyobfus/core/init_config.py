@@ -19,7 +19,6 @@ from typing import List, Optional
 from pyobfus import __version__ as PYOBFUS_VERSION
 from pyobfus.core.preflight import PreflightChecker, PreflightReport
 
-
 # Always-useful default excludes (test directories, venv, common cache)
 _BASELINE_EXCLUDES: List[str] = [
     "test_*.py",
@@ -136,8 +135,8 @@ def _render_yaml(
     lines.append("obfuscation:")
     lines.append("  # Preset selection")
     lines.append(f"  #   suggested based on detected frameworks: {preset}")
-    lines.append(f"  #   alternatives: safe, balanced, aggressive, fastapi, django, flask,")
-    lines.append(f"  #                 pydantic, click, sqlalchemy")
+    lines.append("  #   alternatives: safe, balanced, aggressive, fastapi, django, flask,")
+    lines.append("  #                 pydantic, click, sqlalchemy")
     lines.append(f"  preset: {preset}")
     lines.append("")
 

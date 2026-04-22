@@ -133,9 +133,7 @@ class ObfuscationConfig:
 
         # Merge exclude_names: YAML entries extend the preset's baseline
         if "exclude_names" in obf_config:
-            obf_config["exclude_names"] = set(base.exclude_names) | set(
-                obf_config["exclude_names"]
-            )
+            obf_config["exclude_names"] = set(base.exclude_names) | set(obf_config["exclude_names"])
 
         # Apply overrides field-by-field (dataclass doesn't let us replace with unknown keys)
         for key, value in obf_config.items():
@@ -344,12 +342,28 @@ class ObfuscationConfig:
         config.preserve_param_names = True
         config.exclude_names = config.exclude_names | {
             # Starlette / FastAPI dispatch methods
-            "dispatch", "__call__", "app", "router", "lifespan",
+            "dispatch",
+            "__call__",
+            "app",
+            "router",
+            "lifespan",
             # HTTP verbs commonly overridden on class-based routes
-            "get", "post", "put", "delete", "patch", "head", "options", "trace",
+            "get",
+            "post",
+            "put",
+            "delete",
+            "patch",
+            "head",
+            "options",
+            "trace",
             # Pydantic model interfaces frequently used inside handlers
-            "model_dump", "model_validate", "dict", "json", "parse_obj",
-            "Config", "fields",
+            "model_dump",
+            "model_validate",
+            "dict",
+            "json",
+            "parse_obj",
+            "Config",
+            "fields",
         }
         config.exclude_patterns = list(config.exclude_patterns) + [
             "**/routers/**",
@@ -371,17 +385,43 @@ class ObfuscationConfig:
         config.preserve_param_names = True
         config.exclude_names = config.exclude_names | {
             # CBV HTTP verb handlers
-            "get", "post", "put", "delete", "patch", "head", "options",
+            "get",
+            "post",
+            "put",
+            "delete",
+            "patch",
+            "head",
+            "options",
             # Generic CBV hooks
-            "get_queryset", "get_object", "get_context_data", "get_form_class",
-            "form_valid", "form_invalid", "get_success_url",
+            "get_queryset",
+            "get_object",
+            "get_context_data",
+            "get_form_class",
+            "form_valid",
+            "form_invalid",
+            "get_success_url",
             # Model / Form protocol
-            "Meta", "save", "delete", "clean", "full_clean", "is_valid",
-            "save_m2m", "natural_key", "from_db", "refresh_from_db",
+            "Meta",
+            "save",
+            "delete",
+            "clean",
+            "full_clean",
+            "is_valid",
+            "save_m2m",
+            "natural_key",
+            "from_db",
+            "refresh_from_db",
             # Admin
-            "ModelAdmin", "list_display", "list_filter", "search_fields",
+            "ModelAdmin",
+            "list_display",
+            "list_filter",
+            "search_fields",
             # Signal receivers reached via sender string
-            "pre_save", "post_save", "pre_delete", "post_delete", "m2m_changed",
+            "pre_save",
+            "post_save",
+            "pre_delete",
+            "post_delete",
+            "m2m_changed",
         }
         config.exclude_patterns = list(config.exclude_patterns) + [
             "**/migrations/**",
@@ -406,11 +446,23 @@ class ObfuscationConfig:
         config = cls.preset_safe()
         config.preserve_param_names = True
         config.exclude_names = config.exclude_names | {
-            "dispatch_request", "full_dispatch_request", "app", "blueprint",
-            "before_request", "after_request", "teardown_request",
-            "errorhandler", "register_blueprint",
+            "dispatch_request",
+            "full_dispatch_request",
+            "app",
+            "blueprint",
+            "before_request",
+            "after_request",
+            "teardown_request",
+            "errorhandler",
+            "register_blueprint",
             # HTTP verbs on MethodView
-            "get", "post", "put", "delete", "patch", "head", "options",
+            "get",
+            "post",
+            "put",
+            "delete",
+            "patch",
+            "head",
+            "options",
         }
         config.exclude_patterns = list(config.exclude_patterns) + [
             "**/views/**",
@@ -431,15 +483,32 @@ class ObfuscationConfig:
         config.preserve_param_names = True
         config.exclude_names = config.exclude_names | {
             # Pydantic v2 public API
-            "model_dump", "model_dump_json", "model_validate",
-            "model_validate_json", "model_copy", "model_config",
-            "model_fields", "model_computed_fields", "model_json_schema",
+            "model_dump",
+            "model_dump_json",
+            "model_validate",
+            "model_validate_json",
+            "model_copy",
+            "model_config",
+            "model_fields",
+            "model_computed_fields",
+            "model_json_schema",
             # Pydantic v1 public API (still widely used)
-            "dict", "json", "parse_obj", "parse_raw", "parse_file",
-            "from_orm", "copy", "schema", "schema_json",
+            "dict",
+            "json",
+            "parse_obj",
+            "parse_raw",
+            "parse_file",
+            "from_orm",
+            "copy",
+            "schema",
+            "schema_json",
             # Config + validator decorators
-            "Config", "validator", "root_validator", "field_validator",
-            "model_validator", "computed_field",
+            "Config",
+            "validator",
+            "root_validator",
+            "field_validator",
+            "model_validator",
+            "computed_field",
         }
         return config
 
@@ -454,9 +523,18 @@ class ObfuscationConfig:
         config = cls.preset_safe()
         config.preserve_param_names = True
         config.exclude_names = config.exclude_names | {
-            "command", "group", "option", "argument", "pass_context",
-            "pass_obj", "confirmation_option", "help_option", "version_option",
-            "cli", "main", "ctx",
+            "command",
+            "group",
+            "option",
+            "argument",
+            "pass_context",
+            "pass_obj",
+            "confirmation_option",
+            "help_option",
+            "version_option",
+            "cli",
+            "main",
+            "ctx",
         }
         return config
 
@@ -471,12 +549,31 @@ class ObfuscationConfig:
         config = cls.preset_safe()
         config.preserve_param_names = True
         config.exclude_names = config.exclude_names | {
-            "__tablename__", "__table_args__", "metadata", "registry",
-            "Base", "DeclarativeBase", "MappedAsDataclass",
-            "Column", "Mapped", "mapped_column", "relationship",
-            "primary_key", "foreign_key", "ForeignKey",
-            "session", "Session", "sessionmaker", "query",
-            "add", "add_all", "commit", "rollback", "flush", "merge", "refresh",
+            "__tablename__",
+            "__table_args__",
+            "metadata",
+            "registry",
+            "Base",
+            "DeclarativeBase",
+            "MappedAsDataclass",
+            "Column",
+            "Mapped",
+            "mapped_column",
+            "relationship",
+            "primary_key",
+            "foreign_key",
+            "ForeignKey",
+            "session",
+            "Session",
+            "sessionmaker",
+            "query",
+            "add",
+            "add_all",
+            "commit",
+            "rollback",
+            "flush",
+            "merge",
+            "refresh",
         }
         config.exclude_patterns = list(config.exclude_patterns) + [
             "**/alembic/**",
@@ -537,17 +634,25 @@ class ObfuscationConfig:
         """
         return [
             # Community
-            "safe", "balanced", "aggressive",
+            "safe",
+            "balanced",
+            "aggressive",
             # Framework-aware
-            "fastapi", "django", "flask", "pydantic", "click", "sqlalchemy",
+            "fastapi",
+            "django",
+            "flask",
+            "pydantic",
+            "click",
+            "sqlalchemy",
             # Pro
-            "trial", "commercial", "library", "maximum",
+            "trial",
+            "commercial",
+            "library",
+            "maximum",
         ]
 
     # Framework presets are community-tier (no Pro license required)
-    FRAMEWORK_PRESETS = frozenset(
-        {"fastapi", "django", "flask", "pydantic", "click", "sqlalchemy"}
-    )
+    FRAMEWORK_PRESETS = frozenset({"fastapi", "django", "flask", "pydantic", "click", "sqlalchemy"})
 
     def add_exclude_pattern(self, pattern: str) -> None:
         """Add a file pattern to exclude."""

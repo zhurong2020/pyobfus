@@ -11,7 +11,7 @@ from click.testing import CliRunner
 
 from pyobfus.cli import main
 from pyobfus.config import ObfuscationConfig
-from pyobfus.core.cache import BuildCache, MANIFEST_VERSION
+from pyobfus.core.cache import BuildCache
 
 
 def _write(tmp_path: Path, name: str, src: str) -> Path:
@@ -164,9 +164,7 @@ def test_incremental_rebuilds_after_source_edit(tmp_path: Path) -> None:
     # Change source
     a.write_text("def foo(): return 42\n", encoding="utf-8")
 
-    result = runner.invoke(
-        main, [str(src), "-o", str(out), "--incremental", "--verbose"]
-    )
+    result = runner.invoke(main, [str(src), "-o", str(out), "--incremental", "--verbose"])
     assert result.exit_code == 0
     # Verbose message signals rebuild reason
     assert "rebuilding" in result.output or "Discovered" in result.output

@@ -9,7 +9,6 @@ from click.testing import CliRunner
 
 from pyobfus.cli import main
 
-
 # ---------------------------------------------------------------------------
 # Obfuscation success JSON
 # ---------------------------------------------------------------------------
@@ -57,9 +56,7 @@ def test_obfuscate_dry_run_json(tmp_path: Path) -> None:
     src.write_text("def foo(): return 1\n", encoding="utf-8")
     out = tmp_path / "out.py"
 
-    result = CliRunner().invoke(
-        main, [str(src), "-o", str(out), "--dry-run", "--json"]
-    )
+    result = CliRunner().invoke(main, [str(src), "-o", str(out), "--dry-run", "--json"])
     assert result.exit_code == 0, result.output
     data = json.loads(result.output)
     assert data["dry_run"] is True
@@ -74,9 +71,7 @@ def test_obfuscate_preset_flows_into_json(tmp_path: Path) -> None:
         encoding="utf-8",
     )
     out = tmp_path / "out.py"
-    result = CliRunner().invoke(
-        main, [str(src), "-o", str(out), "--preset", "pydantic", "--json"]
-    )
+    result = CliRunner().invoke(main, [str(src), "-o", str(out), "--preset", "pydantic", "--json"])
     assert result.exit_code == 0, result.output
     data = json.loads(result.output)
     assert data["preset"] == "pydantic"

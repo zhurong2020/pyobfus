@@ -4,7 +4,6 @@ Command-line interface for pyobfus.
 Provides a user-friendly CLI for obfuscating Python files and projects.
 """
 
-import contextlib
 import io
 import json
 import sys
@@ -153,11 +152,21 @@ except ImportError:
     type=click.Choice(
         [
             # Community
-            "safe", "balanced", "aggressive",
+            "safe",
+            "balanced",
+            "aggressive",
             # Framework-aware (community-tier)
-            "fastapi", "django", "flask", "pydantic", "click", "sqlalchemy",
+            "fastapi",
+            "django",
+            "flask",
+            "pydantic",
+            "click",
+            "sqlalchemy",
             # Pro
-            "trial", "commercial", "library", "maximum",
+            "trial",
+            "commercial",
+            "library",
+            "maximum",
         ],
         case_sensitive=False,
     ),
@@ -595,12 +604,8 @@ def main(
             from pyobfus.core.cache import BuildCache
 
             cache = BuildCache(output_path_obj)
-            input_files_for_sig = filter_python_files(
-                input_path_obj, config.exclude_patterns
-            )
-            current_sig = cache.build_signature(
-                input_path_obj, input_files_for_sig, config
-            )
+            input_files_for_sig = filter_python_files(input_path_obj, config.exclude_patterns)
+            current_sig = cache.build_signature(input_path_obj, input_files_for_sig, config)
             hit, reason, cached_outputs = cache.can_reuse(current_sig)
             if hit:
                 click.echo(
@@ -666,17 +671,11 @@ def main(
                     obfuscation_stats.update(dir_stats)
 
             # Save manifest after a successful rebuild (directory mode only)
-            if (
-                incremental
-                and not dry_run
-                and input_path_obj.is_dir()
-            ):
+            if incremental and not dry_run and input_path_obj.is_dir():
                 from pyobfus.core.cache import BuildCache
 
                 cache = BuildCache(output_path_obj)
-                final_inputs = filter_python_files(
-                    input_path_obj, config.exclude_patterns
-                )
+                final_inputs = filter_python_files(input_path_obj, config.exclude_patterns)
                 output_files = []
                 for f in final_inputs:
                     try:
@@ -684,9 +683,7 @@ def main(
                     except ValueError:
                         continue
                     output_files.append(str(output_path_obj / rel))
-                final_sig = cache.build_signature(
-                    input_path_obj, final_inputs, config
-                )
+                final_sig = cache.build_signature(input_path_obj, final_inputs, config)
                 cache.save_manifest(final_sig, output_files)
         else:
             click.echo(f"Error: {input_path} is neither a file nor a directory", err=True)

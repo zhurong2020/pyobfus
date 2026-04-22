@@ -39,7 +39,6 @@ from typing import Dict, Iterable, List, Optional, Tuple, Union
 
 from pyobfus import __version__ as PYOBFUS_VERSION
 
-
 # Identifier regex: Python 3 allows Unicode, but obfuscated names are always
 # ASCII-safe, so this simple pattern is enough for stack-trace rewriting.
 _IDENT_RE = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*)\b")
@@ -119,7 +118,11 @@ class ObfuscationMapping:
                     merged.global_map.setdefault(obfuscated, (module, original))
             if not merged.root and other.root:
                 merged.root = other.root
-        merged.mode = "cross_file" if len(mode_seen) > 1 else (mode_seen.pop() if mode_seen else "single_file")
+        merged.mode = (
+            "cross_file"
+            if len(mode_seen) > 1
+            else (mode_seen.pop() if mode_seen else "single_file")
+        )
         return merged
 
     # ---- I/O ---------------------------------------------------------

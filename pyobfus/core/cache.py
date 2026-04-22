@@ -31,7 +31,6 @@ from typing import Dict, Iterable, List, Optional, Tuple
 
 from pyobfus import __version__ as PYOBFUS_VERSION
 
-
 CACHE_DIR_NAME = ".pyobfus-cache"
 MANIFEST_NAME = "manifest.json"
 MANIFEST_VERSION = 1
@@ -77,11 +76,21 @@ def _extract_config_fields(config: object) -> Dict:
     # These are the knobs that change the obfuscator's behavior. Missing
     # attributes are tolerated so this stays forward-compatible.
     keys = (
-        "level", "exclude_patterns", "exclude_names", "name_prefix",
-        "remove_docstrings", "remove_comments", "string_encoding",
-        "preserve_param_names", "string_encryption", "anti_debug",
-        "control_flow_flattening", "dead_code_injection",
-        "license_expire", "license_bind_machine", "license_max_runs",
+        "level",
+        "exclude_patterns",
+        "exclude_names",
+        "name_prefix",
+        "remove_docstrings",
+        "remove_comments",
+        "string_encoding",
+        "preserve_param_names",
+        "string_encryption",
+        "anti_debug",
+        "control_flow_flattening",
+        "dead_code_injection",
+        "license_expire",
+        "license_bind_machine",
+        "license_max_runs",
     )
     out: Dict = {}
     for key in keys:
