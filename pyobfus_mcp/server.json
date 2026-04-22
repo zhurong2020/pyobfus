@@ -1,0 +1,21 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.zhurong2020/pyobfus-mcp",
+  "title": "pyobfus-mcp",
+  "description": "The Python obfuscator for AI-assisted development workflows. Exposes pyobfus tools over MCP: risk analysis, config generation, stack-trace unmapping, and preset browsing.",
+  "repository": {
+    "url": "https://github.com/zhurong2020/pyobfus",
+    "source": "github",
+    "subfolder": "pyobfus_mcp"
+  },
+  "version": "0.1.1",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "registryBaseUrl": "https://pypi.org",
+      "identifier": "pyobfus-mcp",
+      "version": "0.1.1",
+      "transport": { "type": "stdio" }
+    }
+  ]
+}
