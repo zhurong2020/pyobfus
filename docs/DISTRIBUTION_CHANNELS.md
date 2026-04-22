@@ -5,7 +5,7 @@ Living reference of where `pyobfus` has a foothold, what each account looks like
 For the **why** behind the channel mix, see [AI_INTEGRATION_STRATEGY.md](AI_INTEGRATION_STRATEGY.md).
 For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTION_LOG.md).
 
-**Last updated**: 2026-04-22
+**Last updated**: 2026-04-22 (evening)
 
 ---
 
@@ -64,13 +64,13 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 
 ---
 
-## 🟡 Pending action
+### MCP Registry — `io.github.zhurong2020/pyobfus-mcp` 🟢 LIVE
+- URL: https://registry.modelcontextprotocol.io/v0/servers?search=pyobfus
+- Published: 2026-04-22 01:48:45 UTC · status: `active` · isLatest: `true` · version: 0.1.1
+- Confirmed live via `curl https://registry.modelcontextprotocol.io/v0/servers?search=pyobfus`
+- Implications: Claude Desktop / Claude Code / Cursor / Windsurf / Zed users querying the registry for "pyobfus" or "python obfuscator" will discover this server without manual config file edits.
 
-### MCP Registry — `io.github.zhurong2020/pyobfus-mcp`
-- URL (future): https://registry.modelcontextprotocol.io/
-- Status: **Blocked on user go-ahead** for 0.1.1 publish + `mcp-publisher login github` + `mcp-publisher publish`
-- Plan: `_drafts/mcp-registry-publish-plan.md`
-- Staging: complete (README marker · server.json · pyproject bumped · twine-check passed · METADATA verified)
+## 🟡 Pending action
 
 ### `awesome-mcp-servers` community lists — 3 PRs pending
 - `punkpeye/awesome-mcp-servers` (largest, most active)
