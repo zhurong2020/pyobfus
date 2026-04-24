@@ -6,10 +6,11 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.8-3.14, AST, setuptools
-- **PyPI**: https://pypi.org/project/pyobfus/ (v0.3.2)
+- **PyPI**: https://pypi.org/project/pyobfus/ (v0.4.0，2026-04-22 发布)
 - **GitHub**: https://github.com/zhurong2020/pyobfus (public)
 - **文档**: https://pyobfus.readthedocs.io
 - **许可**: Apache 2.0 (Core) + Proprietary (Pro)
+- **中国软著登记**: V0.4.0 材料已准备完毕（申请人：[REDACTED-NAME]，自然人；与配偶[REDACTED-NAME]的医学 IP 严格隔离）· 详见 `docs/legal/software_copyright/README.md`
 
 ## 架构
 
