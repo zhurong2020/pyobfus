@@ -3,6 +3,9 @@
  * Handles license verification and Stripe webhook processing
  */
 
+// DRAFT: 嵘说 content membership webhook (not yet enabled in production)
+import { handleContentWebhook } from './content_webhook.js';
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -27,6 +30,14 @@ export default {
 
       if (url.pathname === '/api/webhook/stripe' && request.method === 'POST') {
         return await handleStripeWebhook(request, env, corsHeaders);
+      }
+
+      // DRAFT route — 嵘说 content membership. Activate by:
+      //   1. wrangler secret put STRIPE_WEBHOOK_SECRET_CONTENT / WP_BASE_URL / WP_ADMIN_USERNAME / WP_ADMIN_APP_PASSWORD / WP_JWT_AUTH_KEY
+      //   2. Add Stripe webhook endpoint pointing to /api/webhook/stripe-content with this whsec_
+      //   3. Test with Stripe CLI: stripe trigger checkout.session.completed --add 'metadata[product_kind]=rongshuo_membership' --add 'metadata[tier]=member'
+      if (url.pathname === '/api/webhook/stripe-content' && request.method === 'POST') {
+        return await handleContentWebhook(request, env, corsHeaders);
       }
 
       if (url.pathname === '/api/health') {
