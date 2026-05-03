@@ -5,6 +5,8 @@ Tests that string literals are encrypted with AES-256 (Fernet) and runtime
 decryption infrastructure is properly injected.
 """
 
+import ast
+
 import pytest
 from typing import TYPE_CHECKING
 
@@ -111,8 +113,17 @@ message = f"Hello, {name}!"
         obfuscated_tree = encryptor.transform(tree)
         obfuscated_code = CodeGenerator.generate(obfuscated_tree)
 
-        # Static string "Bob" should be encrypted
-        assert "Bob" not in obfuscated_code
+        # Static string "Bob" should be encrypted: no string-literal Constant
+        # with value "Bob" survives in the AST. We can't substring-search the
+        # generated source — the randomly generated Fernet key is base64 and
+        # occasionally contains "Bob" by chance (CI run 25281178378 hit this:
+        # _ENCRYPTION_KEY = b'CojaJDQXODBobFWAr...' on Windows Py3.14).
+        string_literals = {
+            node.value
+            for node in ast.walk(ast.parse(obfuscated_code))
+            if isinstance(node, ast.Constant) and isinstance(node.value, str)
+        }
+        assert "Bob" not in string_literals
 
         # F-string should still work
         namespace = {}
