@@ -182,3 +182,7 @@ scripts/temp_*.py
 pyobfus_mcp/dist/
 pyobfus_mcp/build/
 pyobfus_mcp/*.egg-info/
+
+# CN software copyright filing materials (PII: applicant name, address, spouse info, ID card refs).
+# Keep filing materials in a sibling directory (../pyobfus-legal/), never in the public repo.
+docs/legal/software_copyright/
