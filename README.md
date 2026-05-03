@@ -15,6 +15,27 @@
 
 A Python code obfuscator built with AST-based transformations. **Supports Python 3.8 through 3.14**. Provides reliable name mangling, string encoding, control-flow flattening, AES-256 string encryption, and — unique to pyobfus — a reverse-mapping workflow that lets you (or your AI coding assistant) debug obfuscated stack traces without giving up the protection.
 
+## 🔌 Companion MCP server: [`pyobfus-mcp`](pyobfus_mcp/)
+
+This repository ships **two installable packages**:
+
+| Package | What it is | Install |
+|---|---|---|
+| [`pyobfus`](https://pypi.org/project/pyobfus/) | The Python obfuscator (CLI + library). | `pip install pyobfus` |
+| [`pyobfus-mcp`](https://pypi.org/project/pyobfus-mcp/) | A **Model Context Protocol (MCP) server** that exposes pyobfus's tools to AI coding agents. | `pip install pyobfus-mcp` |
+
+The MCP server lives in [`pyobfus_mcp/`](pyobfus_mcp/) and is built on the official [Model Context Protocol Python SDK](https://github.com/modelcontextprotocol/python-sdk) (FastMCP). It registers five MCP tools so **Claude Desktop, Claude Code, Cursor, Windsurf, and Zed** can call pyobfus directly from agent conversations — no shelling out:
+
+| MCP tool | Implementation | Purpose |
+|---|---|---|
+| `check_obfuscation_risks` | [`pyobfus_mcp/tools.py`](pyobfus_mcp/pyobfus_mcp/tools.py) | Pre-flight risk scan (eval/exec, dynamic attribute, framework reflection) |
+| `generate_pyobfus_config` | [`pyobfus_mcp/tools.py`](pyobfus_mcp/pyobfus_mcp/tools.py) | Auto-detect framework → write a working `pyobfus.yaml` |
+| `unmap_stack_trace` | [`pyobfus_mcp/tools.py`](pyobfus_mcp/pyobfus_mcp/tools.py) | Reverse obfuscated identifiers in a production stack trace |
+| `list_presets` | [`pyobfus_mcp/tools.py`](pyobfus_mcp/pyobfus_mcp/tools.py) | Enumerate community / framework / Pro presets |
+| `explain_preset` | [`pyobfus_mcp/tools.py`](pyobfus_mcp/pyobfus_mcp/tools.py) | Describe what a named preset changes |
+
+The server is registered in the **official [MCP Registry](https://registry.modelcontextprotocol.io/)** under `io.github.zhurong2020/pyobfus-mcp`. The transport is stdio. See [`pyobfus_mcp/README.md`](pyobfus_mcp/README.md) for per-client configuration snippets.
+
 ### 🤖 New in v0.4.0 — AI-native features
 
 - **`pyobfus --check src/`** — pre-flight risk scan: detects `eval`/`exec`, dynamic attribute access, and framework reflection points before you obfuscate. JSON output with an `ai_hint` telling your AI assistant what to run next.
