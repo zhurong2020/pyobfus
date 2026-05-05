@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# pre-commit: block PII patterns from sneaking into commits.
+#
+# Origin: 2026-05-03 PII cleanup (V0.4_EXECUTION_LOG Sessions 13-15) removed
+# CCPC software-copyright filing materials from public history. This hook
+# prevents reintroduction by scanning staged blob content before each commit.
+#
+# Setup (one-time per clone):
+#     git config core.hooksPath .githooks
+#
+# Bypass once for a legitimate reference:
+#     PYOBFUS_ALLOW_PII=1 git commit ...
+
+set -eu
+
+if [[ "${PYOBFUS_ALLOW_PII:-0}" == "1" ]]; then
+    exit 0
+fi
+
+PATTERN='诸嵘|陈启稚|qizhi_chen|身份证|/home/wuxia/'
+
+# Allowlisted paths: files that legitimately discuss the cleanup itself.
+# Anchored to repo root with -x for full-line match.
+ALLOWLIST_RE='docs/V0\.4_EXECUTION_LOG\.md|\.githooks/pre-commit|\.githooks/README\.md|CLAUDE\.md'
+
+mapfile -t staged < <(
+    git diff --cached --name-only --diff-filter=AM \
+        | grep -vxE "$ALLOWLIST_RE" \
+        || true
+)
+
+if (( ${#staged[@]} == 0 )); then
+    exit 0
+fi
+
+hits=$(git grep --cached -nE "$PATTERN" -- "${staged[@]}" 2>/dev/null || true)
+
+if [[ -n "$hits" ]]; then
+    cat >&2 <<EOF
+============================================================
+ERROR: pre-commit blocked — PII pattern detected in staged content
+============================================================
+
+$hits
+
+Blocked patterns: 诸嵘 / 陈启稚 / qizhi_chen / 身份证 / /home/wuxia/
+
+Why this hook exists:
+  2026-05-03 git history rewrite removed CCPC software-copyright
+  filing materials and personal identifiers from this public repo.
+  This hook prevents accidental reintroduction.
+
+If the match is legitimate (e.g. you are documenting the cleanup):
+  1. add the file path to ALLOWLIST_RE in .githooks/pre-commit, or
+  2. bypass once with: PYOBFUS_ALLOW_PII=1 git commit ...
+
+============================================================
+EOF
+    exit 1
+fi
+
+exit 0

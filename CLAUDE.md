@@ -35,7 +35,12 @@ pyobfus/
 python -m venv venv
 source venv/bin/activate
 pip install -e ".[dev]"
+
+# 一次性激活仓库内的 PII 防护 pre-commit 钩子（每个 clone 各自做一次）
+git config core.hooksPath .githooks
 ```
+
+**PII 防护 pre-commit 钩子**：`.githooks/pre-commit` 拦截 `诸嵘 / 陈启稚 / qizhi_chen / 身份证 / /home/wuxia/` 5 个模式进入暂存区。源于 2026-05-03 的 git 历史改写（见 `docs/V0.4_EXECUTION_LOG.md` Sessions 13-15）。详见 `.githooks/README.md`。
 
 ### 测试
 
