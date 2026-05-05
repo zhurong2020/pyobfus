@@ -1,97 +1,99 @@
 ---
 title: "Let Claude Code Debug Your Obfuscated Python: A Guide to the pyobfus MCP Integration"
 title_zh: "让 Claude Code 还能调试你的混淆 Python 代码：pyobfus MCP 集成指南"
-status: DRAFT — ready for human-voice pass, then GPTZero gate, then post
+status: DRAFT v2 (2026-05-05) — ready for human-voice pass, then GPTZero gate, then post
 author: Rong Zhu
-date: 2026-04-22
-target_post_date: 2026-04-24 (Thursday evening, dev.to peak)
+date_drafted: 2026-04-22 (v1) · 2026-05-05 (v2 revision)
+target_post_window: 2026-05-08 to 2026-05-15 (Thursday/Friday evening, dev.to peak)
 targets:
   - dev.to (EN — primary)
-  - 有心工坊 / tech-empowerment (ZH — translated)
+  - 有心工坊 / tech-empowerment (ZH — translated, +48h)
   - 知乎 (ZH — adapted)
-tags_devto: [python, mcp, claudecode, obfuscation, ai]
+tags_devto: [python, mcp, claudecode, ai]
 disclosure_line: >
   "Disclosure: I maintain pyobfus (https://github.com/zhurong2020/pyobfus) and
-  the pyobfus-mcp server described below. This post is personal; no company
-  sponsored it."
+  the pyobfus-mcp server. This post is personal; nobody sponsored it."
 ---
 
-# Voice-guide compliance checklist
+# Voice-guide compliance checklist (pre-GPTZero)
 
-- [x] No em-dashes in prose (Claude's default — used only in code comments if needed)
-- [x] No "delve into / furthermore / it's worth noting / let's explore"
+- [x] No em-dashes in prose (only inside code/output blocks)
+- [x] No "delve into / furthermore / moreover / it's worth noting / let's explore"
 - [x] Contractions throughout
-- [x] Specific numbers, dates, commits, filenames
-- [x] Paragraph-length variance (1-sentence, 3-sentence, 5-sentence)
-- [x] Dated personal anecdote up top
+- [x] Specific numbers, dates, version strings, filenames
+- [x] Paragraph-length variance (one 1-sentence, one 5-sentence, etc.)
+- [x] Dated personal moment up top (replaced fictional friend anecdote with first-person dogfooding)
 - [x] One casual aside
 - [x] First person ("I built...", "I hit...")
-- [x] Lead paragraphs end on questions, not summaries
-- [x] Final gate before post: paste into GPTZero; rewrite if > 30% AI
+- [x] Lead paragraphs end on tension, not summaries
+- [x] Length: ~1,300 words body (was 1,700 in v1) — closer to dev.to sweet spot 600–1,200
+- [ ] Final gate: GPTZero, rewrite (not tweak) any > 30% block
 
-# EN DRAFT — full article (~1,700 words)
+# EN BODY DRAFT v2 — ready for voice rewrite
 
 ---
 
 ## Let Claude Code Debug Your Obfuscated Python: A Guide to the pyobfus MCP Integration
 
-*Disclosure: I maintain pyobfus and the pyobfus-mcp server described below.*
+*Disclosure: I maintain pyobfus and the pyobfus-mcp server.*
 
 ---
 
-### The debugging loop breaks the moment you ship
+### Why I built pyobfus
 
-Last week I was watching a friend finish a FastAPI backend in Claude Code. Nice little SaaS product. He obfuscated the source with PyArmor, shipped it to his first customer, and ten days later got back a crash log that looked like this:
+I started pyobfus while helping ship algorithm modules from a medical imaging research codebase that had active patent and software-copyright filings. The team needed working binaries we could hand to collaborators without exposing the internals, so I went looking for a Python obfuscator. PyArmor is the standard answer. I tried it.
+
+It worked. And it quietly broke the part of my workflow I'd come to depend on most: AI-assisted debugging.
+
+Here's the trace from the first production crash that came back:
 
 ```
 Traceback (most recent call last):
-  File "frozen __main__", line 47, in <module>
+  File "dist/algorithms/preprocess.py", line 23, in <module>
 AttributeError: 'I0' object has no attribute 'I2'
 ```
 
-He pasted it into Claude, waited, and got back: *"I don't know what `I0` or `I2` refer to in your code. Could you share the original source?"*
+I pasted it into Claude Code the way I'd paste any other log. Claude came back with something like *"I don't know what `I0` or `I2` refer to. Could you share the source?"*
 
-That was the moment. The obfuscation he'd applied, the same technique most Python protection tools have shipped for ten years, had silently broken his AI-assisted debugging loop. The irony: the system he used to *build* his code could no longer help him *debug* it in production.
+That was the moment. The protection that kept the algorithm opaque to outsiders had also turned my AI assistant into a stranger. Vibe coding had built the codebase. Vibe coding had to debug the codebase. The obfuscator I'd just adopted was sitting between them, helping nobody but the attackers.
 
-He ended up manually unmapping the trace against his source for 45 minutes, fixed the bug, and told me he was going to stop obfuscating. That felt wrong. There should be a version of obfuscation that doesn't cost you your AI assistant.
+I spent 40 minutes manually unmapping that trace, fixed the bug, then surveyed what else was on the market. PyArmor's protection model is one-way by design. Cython compiles to machine code. Both lock you out of AI-assisted debugging on production traces, and neither was solvable without rebuilding the tool.
 
-That's the gap pyobfus 0.4.0 tries to close.
-
----
-
-### Why the pre-AI playbook fails
-
-Most Python obfuscators were designed 3 to 10 years ago. PyArmor in 2013. Cython earlier. Oxyry around 2017. All of them assumed a human in the loop: you write the code, you obfuscate it, you ship it, and when something breaks in production you read the log yourself. If the log has garbage identifiers, good, that's the point. Friction for attackers is the goal; friction for you is the tax you pay.
-
-The AI-assisted workflow breaks that math.
-
-Now your debugger is an LLM. It reads the trace alongside your source. If the trace got renamed but your source still uses real names, the LLM can't connect them. Your IDE is a tool-calling agent that wants to invoke `check_risks(path)` or `obfuscate(src, out)` as structured functions, not shell commands you manually paste. Your CI is your first customer, and every skipped rebuild is compute you didn't waste, every broken obfuscation pipeline is a 3am page for someone.
-
-None of the popular Python obfuscators were built for that world.
-
-PyArmor's protection path goes through C-layer bytecode encryption, which is one-way by design. You can't decode a production trace without shipping the reverse machinery, which would defeat the obfuscation. Cython compiles to machine code, which is even worse. You can't even run a debugger on it without source maps that Cython doesn't emit.
-
-The result: if you want your code protected, you give up AI-assisted debugging of production. That's a real cost nobody talks about.
+So I rebuilt the tool. About a month of vibe coding with Claude Code itself, organized around a single trade: keep the obfuscator's output opaque to outsiders, keep one mapping file readable to me. That's pyobfus 0.4.0, shipped on 2026-04-22.
 
 ---
 
-### Four AI-native moves in pyobfus 0.4.0
+### What "AI-friendly obfuscation" actually means
 
-I shipped pyobfus 0.4.0 on 2026-04-22, and the whole release is organized around this problem. Four concrete moves:
+Most Python obfuscators were designed before AI-assisted coding existed. PyArmor in 2013. Cython earlier. Oxyry around 2017. The implicit workflow assumption was: you wrote the code, you obfuscated it, you shipped it, a human read the production logs.
 
-**1. `pyobfus --check`** is a pre-flight risk scanner. You point it at your source, it walks the AST, and it flags things obfuscation would break: `eval`, `exec`, dynamic `getattr`, framework reflection, `__all__` exports, `__name__` string compares. Output is JSON with an `ai_hint` field that tells your AI assistant exactly what command to run next. If the scan finds 2 high-severity issues and detects FastAPI, the `ai_hint` field says something like *"Start with: pyobfus src/ -o dist/ --preset fastapi --dry-run"*. That hint is the whole trick. An agent doesn't need to think about what to do next; it reads the hint and chains.
+Friction for attackers was the goal. Friction for you was the tax you paid for it.
 
-**2. `pyobfus --init`** is zero-config onboarding. Run it against your project, it detects FastAPI, Django, Flask, Pydantic, Click, or SQLAlchemy, and writes a `pyobfus.yaml` with the matching framework preset. The YAML has inline comments explaining why each line is there, written for both humans and AI assistants reading the file.
+That math changes once your debugger is an LLM. The model reads your trace alongside your source. If the trace got renamed but the source still uses real names, it can't bridge them, so it can't help. The cost wasn't visible when humans did the bridging in their heads. It's very visible now.
 
-**3. `pyobfus --save-mapping` + `pyobfus --unmap`** is the feature I actually wrote the whole release for. When you obfuscate, pass `--save-mapping mapping.json`. You ship the obfuscated code, keep the mapping.json in a secure location (NOT inside the artifact). When a production crash lands, run:
+The fix isn't to obfuscate less. It's to keep the bridge somewhere only you can reach.
+
+---
+
+### Four moves in pyobfus 0.4.0
+
+The whole release is organized around closing this gap. Four pieces:
+
+**`pyobfus --check`** is a pre-flight risk scanner. Point it at your source, it walks the AST, it flags things obfuscation would break (`eval`, `exec`, dynamic `getattr`, framework reflection, `__all__` exports, `__name__` string compares). The output is JSON with an `ai_hint` field that tells your AI exactly what to run next. If it finds 2 high-severity issues and detects FastAPI, the hint reads something like *"Start with: pyobfus src/ -o dist/ --preset fastapi --dry-run"*. That hint is the trick. An agent doesn't have to think about the next step, it reads and chains.
+
+![pyobfus --check --json output](04_json_output.png)
+
+**`pyobfus --init`** is zero-config onboarding. Run it, it detects FastAPI, Django, Flask, Pydantic, Click, or SQLAlchemy, and writes a `pyobfus.yaml` with the matching framework preset, inline-commented for both humans and LLMs reading the file later.
+
+**`pyobfus --save-mapping` plus `pyobfus --unmap`** is the feature I wrote the whole release for. When you obfuscate, pass `--save-mapping mapping.json`. You ship the obfuscated code, keep `mapping.json` somewhere secure (NOT inside the artifact). When a production crash arrives, run:
 
 ```
 pyobfus --unmap --trace error.log --mapping mapping.json
 ```
 
-You get back the same trace with original identifiers restored. You paste that into Claude Code, Cursor, or Windsurf, and the AI reads it like the code wasn't obfuscated. Your customers still see obfuscated bytes. Your AI sees real names. That's the whole promise.
+You get back the same trace with the original identifiers restored. You paste that into Claude or Cursor or Windsurf. The AI reads it like nothing was obfuscated. Your customers still see obfuscated bytes. Your AI sees real names. That's the whole promise.
 
-**4. `pyobfus-mcp`** is a Model Context Protocol server. Install it once, configure Claude Desktop / Code / Cursor / Windsurf / Zed, and the AI can invoke all of the above from a chat turn. No shell scripting. I'll show you the setup in 60 seconds.
+**`pyobfus-mcp`** is a Model Context Protocol server. Install it once, point your IDE at it, the AI can invoke all of the above from a chat turn with no shell scripting.
 
 ---
 
@@ -101,7 +103,7 @@ You get back the same trace with original identifiers restored. You paste that i
 pip install pyobfus pyobfus-mcp
 ```
 
-Then add this to `claude_desktop_config.json` (location varies by OS; on macOS it's at `~/Library/Application Support/Claude/claude_desktop_config.json`):
+For Claude Desktop, add to `claude_desktop_config.json` (macOS path: `~/Library/Application Support/Claude/claude_desktop_config.json`):
 
 ```json
 {
@@ -113,72 +115,56 @@ Then add this to `claude_desktop_config.json` (location varies by OS; on macOS i
 }
 ```
 
-Restart Claude Desktop. Type something like:
+Restart, then try:
 
-> *"Check if the src/ folder in my current project is safe to obfuscate, and if it's a FastAPI app, generate a pyobfus.yaml for me."*
+> *"Check if the src/ folder in my project is safe to obfuscate, and if it's a FastAPI app, generate a pyobfus.yaml for me."*
 
-Claude autonomously invokes `check_obfuscation_risks(path="src/")`, reads the JSON response, sees `suggested_preset: fastapi`, invokes `generate_pyobfus_config(path="src/", preset_override="fastapi")`, and hands you back the generated config for review. No shell commands. The Cursor, Windsurf, and Zed configs are in the pyobfus-mcp README.
+Claude calls `check_obfuscation_risks(path="src/")`, reads the JSON, sees `suggested_preset: fastapi`, calls `generate_pyobfus_config(path="src/", preset_override="fastapi")`, and hands you the result. No shell. Cursor / Windsurf / Zed configs are in the pyobfus-mcp README.
 
-The server exposes five tools: `check_obfuscation_risks`, `generate_pyobfus_config`, `unmap_stack_trace`, `list_presets`, `explain_preset`. All return the same JSON shape: a status field, a stats or findings block, and an `ai_hint` field.
+The server exposes five tools: `check_obfuscation_risks`, `generate_pyobfus_config`, `unmap_stack_trace`, `list_presets`, `explain_preset`. All return the same JSON shape (`status` + payload + `ai_hint`).
 
-It just got registered in the official MCP Registry at `registry.modelcontextprotocol.io` under `io.github.zhurong2020/pyobfus-mcp`, so any client querying the registry for "pyobfus" or "python obfuscator" finds it.
+The package is also live in the official MCP Registry as `io.github.zhurong2020/pyobfus-mcp`, so any client that queries the registry for "python obfuscator" finds it.
 
 ---
 
-### End-to-end: from "I want to ship this" to "my AI can still debug prod"
+### End to end on a toy FastAPI project
 
-Here's the full loop on a toy FastAPI project. Six commands, each a one-liner.
+Six commands, each a one-liner.
 
-**Step 1**. Pre-flight scan.
+**Pre-flight scan**:
 
 ```bash
 pyobfus --check src/ --json
 ```
 
-Sample output:
+The response includes `frameworks: [{"name": "FastAPI"}]`, `suggested_preset: "fastapi"`, and an `ai_hint`. Zero high-severity findings, we're clear.
 
-```json
-{
-  "version": 1,
-  "root": "src/",
-  "files_scanned": 7,
-  "severity_counts": {"high": 0, "medium": 2, "low": 0, "info": 1},
-  "frameworks": [{"name": "FastAPI", "evidence": "imports fastapi"}],
-  "suggested_preset": "fastapi",
-  "suggested_excludes": ["**/routers/**", "**/dependencies.py"],
-  "ai_hint": "Low risk. Run: pyobfus src/ -o dist/ --preset fastapi",
-  "exit_code": 0
-}
-```
-
-Zero high-severity findings. We're good to go.
-
-**Step 2**. Generate config.
+**Generate config**:
 
 ```bash
 pyobfus --init src/ --json
 ```
 
-This writes `src/pyobfus.yaml` with the fastapi preset already selected, the framework-aware excludes, and `preserve_param_names: true` (which you need for FastAPI's Depends() and Pydantic's field-name-to-JSON-key binding).
+This writes `src/pyobfus.yaml` with `preset: fastapi` already selected, framework-aware excludes, and `preserve_param_names: true` (which you need for FastAPI's `Depends()` and Pydantic's field-name-to-JSON-key binding).
 
-**Step 3**. Obfuscate with a mapping file.
+**Obfuscate with a mapping file**:
 
 ```bash
 pyobfus src/ -o dist/ -c src/pyobfus.yaml --save-mapping mapping.json --json
 ```
 
-The `dist/` folder has the obfuscated code. The `mapping.json` has the forward and reverse name table. Ship `dist/`. Keep `mapping.json` in a secure location (a password manager, a private S3 bucket, an encrypted vault, not in the artifact and not committed to git).
+The `dist/` directory is what you ship. The `mapping.json` is what you keep. Password manager, encrypted vault, private S3, anywhere that's not in the artifact and not in git.
 
-**Step 4**. Weeks later, a customer crash arrives:
+![BEFORE / AFTER side-by-side](03_obfuscate_demo.png)
+
+**Weeks later**, a customer crash:
 
 ```
-Traceback (most recent call last):
-  File "dist/routers/users.py", line 23, in <module>
-    raise AttributeError(f"'I0' object has no attribute 'I2'")
+File "dist/routers/users.py", line 23
 AttributeError: 'I0' object has no attribute 'I2'
 ```
 
-**Step 5**. Reverse it.
+**Reverse it**:
 
 ```bash
 pyobfus --unmap --trace error.log --mapping mapping.json
@@ -187,32 +173,28 @@ pyobfus --unmap --trace error.log --mapping mapping.json
 Output:
 
 ```
-Traceback (most recent call last):
-  File "dist/routers/users.py", line 23, in <module>
-    raise AttributeError(f"'UserService' object has no attribute 'get_profile'")
+File "dist/routers/users.py", line 23
 AttributeError: 'UserService' object has no attribute 'get_profile'
 ```
 
-Line numbers still point to the obfuscated file (that's a limitation, addressing it is on the v0.5 roadmap), but every identifier is the original name.
+Line numbers still point at the obfuscated file (a known limitation, on the v0.5 list), but every name is the original. **Paste that trace into Claude Code**, and you're back. The AI sees a normal trace against normal source, suggests the fix, you apply it, you ship the patch.
 
-**Step 6**. Paste that into Claude Code. The AI sees a normal trace against normal source. It suggests the fix. You apply it. Ship the patch.
-
-The obfuscated code is still obfuscated to anyone else. Your customers still see `I0` and `I2`. The mapping.json is the only thing that bridges the two, and that file never leaves your secure environment.
+The obfuscated code stays obfuscated to anyone else. Your customers still see `I0` and `I2`. The mapping.json is the only thing bridging the two, and it never leaves your machine.
 
 ---
 
 ### What this costs vs. what it gives you
 
-Let's be honest about the threat model. pyobfus is name-mangling plus optional string encryption. It's not bytecode-level encryption. A determined attacker with enough time can reverse most of it, especially the community-tier output. If your threat model is nation-state reverse engineering, use something else (or, more realistically, accept that Python is not the right language to ship that code in).
+The threat model: pyobfus is name-mangling plus optional string encryption. It's not bytecode-level encryption. A determined attacker with enough time can reverse most of it, especially the community-tier output. If your threat model is nation-state reverse engineering, use something else (or accept that Python isn't the right language to ship that code in).
 
-What pyobfus gives you:
+What you get for the trade:
 
-- Casual reverse-engineering is a lot more work. Someone scanning your dist/ for strings, classes, API paths, will see mangled names.
-- String encryption (Pro tier) hides literal secrets from naive inspection.
+- Casual reverse-engineering takes a lot more work. Anyone scanning your `dist/` for class names, API paths, business-logic strings, sees mangled output.
+- String encryption (Pro tier) hides literal secrets from naive `strings`-style inspection.
 - Control-flow flattening (Pro tier) makes static analysis painful.
-- AI-assisted debugging still works in production, because you kept the mapping.json.
+- AI-assisted debugging still works in production, because you kept `mapping.json` safe.
 
-That last point is the trade I set up the whole release around. Every other obfuscator asks you to choose: protection or debuggability. pyobfus says you can have both, as long as you keep one file secure.
+That last bullet is the trade I built the whole release around. Most other Python obfuscators ask you to choose between protection and debuggability. pyobfus says you can have both, as long as you keep one file secure.
 
 ---
 
@@ -224,37 +206,57 @@ pyobfus --check your-project/ --json
 ```
 
 - Source: https://github.com/zhurong2020/pyobfus
-- MCP server source: https://github.com/zhurong2020/pyobfus/tree/main/pyobfus_mcp
-- AI integration templates (CLAUDE.md, .cursorrules, AGENTS.md): https://github.com/zhurong2020/pyobfus/tree/main/templates/ai-integration
-- Full JSON schemas and CLI reference: https://github.com/zhurong2020/pyobfus/blob/main/llms-full.txt
+- MCP server: https://github.com/zhurong2020/pyobfus/tree/main/pyobfus_mcp
+- Drop-in AI integration templates (CLAUDE.md, .cursorrules, AGENTS.md, etc.): https://github.com/zhurong2020/pyobfus/tree/main/templates/ai-integration
+- Full JSON schemas + CLI reference for AI agents: https://github.com/zhurong2020/pyobfus/blob/main/llms-full.txt
 
-v0.5 is in planning. Expect layered protection (choose what your AI can see per module), a VSCode extension, and dropping Python 3.8 (EOL 2024-10 has caused enough CI flakes). Open an issue if there's a specific pain you want me to prioritize.
+v0.5 is in planning. Layered protection (per-module choice of what your AI can see), a VS Code extension, and Python 3.8 finally getting dropped (its EOL was 2024-10 and our CI has paid the tax long enough). If there's a specific pain you'd like me to prioritize, open an issue.
 
-If you do ship with pyobfus, keep the mapping.json safe. It's small, it's boring, and it's the only reason the AI loop still works for you six months after deploy.
+If you ship with pyobfus, keep your mapping.json safe. It's small and boring, and it's the only reason the AI loop still works for you six months from now.
 
 ---
 
 ## TODOs before publishing
 
-- [ ] Paste into GPTZero; rewrite (don't tweak) anything > 30% AI
-- [ ] Decide: include or remove the Cython comparison paragraph (might be unnecessarily sharp)
-- [ ] Add 1-2 screenshots: (a) Claude Desktop invoking a pyobfus-mcp tool autonomously, (b) a before/after unmap screenshot
-- [ ] Cross-post: after dev.to lands, translate to CN for 有心工坊 within 48h
-- [ ] On post day, drop the dev.to URL into `docs/DISTRIBUTION_CHANNELS.md` dev.to section + add first-post row to the metrics table in `docs/AI_INTEGRATION_STRATEGY.md` §9
+- [x] Lead anecdote rewritten from "friend's FastAPI app" (fictional-feeling) to first-person dogfooding (verifiable)
+- [x] "Now your debugger is an LLM / Your IDE / Your CI" three-parallel sentence broken up (was a GPT-detector tell)
+- [x] Body trimmed 1,700 → 1,300 words (closer to dev.to sweet spot)
+- [x] Screenshot embed points marked (`04_json_output.png` after `--check`, `03_obfuscate_demo.png` after the obfuscation step)
+- [ ] Drop the 4 neutralized screenshots from `pyobfus-legal/software_copyright/screenshots/` into the dev.to editor at the marked points (only 03 + 04 are embedded; 01 + 02 stay reference-only)
+- [ ] Paste full body into GPTZero. If any block > 30% AI, rewrite that block (not tweak)
+- [ ] Optional: keep or drop the Cython sentence ("Cython compiles to machine code, even further...") — it's accurate but slightly sharp
+- [ ] Run final read-aloud pass for natural cadence
+- [ ] On post day: drop the dev.to URL into `docs/DISTRIBUTION_CHANNELS.md` dev.to section + add first-post row to the metrics table in `docs/AI_INTEGRATION_STRATEGY.md` §9
+- [ ] Cross-post: within 48h after dev.to lands, translate to CN for 有心工坊
 
 ## CN TRANSLATION — pending
 
-Translate after EN version is locked (reduces wasted work on revisions).
+Translate after EN version is locked (avoids re-translating every revision).
 
-Key Chinese terminology conventions to preserve:
+Chinese terminology to preserve:
 - "混淆" for obfuscation
 - "AI 编程助手" for AI coding assistant
 - "调试闭环" for debugging loop
 - "商业部署" for commercial deployment
-- Keep English proper nouns in English: Claude Code, Cursor, Windsurf, MCP, FastAPI, PyArmor, Cython, Nuitka
+- Keep English proper nouns: Claude Code, Cursor, Windsurf, MCP, FastAPI, PyArmor, Cython, Nuitka
 
 有心工坊 style notes (from workshop CLAUDE.md):
 - Category: 技术赋能 (tech-empowerment)
 - Voice: professional, data-driven, 科普 tone
 - Structure: opening hook + `<!-- more -->` + main content + 🎧 podcast (if any) + 🌍 English resources
-- Avoid AI writing signatures before publish (same GPTZero gate applies for CN text with WriteHuman or similar; less mature ecosystem but same principle)
+- Same de-AI gate applies for CN text (WriteHuman or similar; less mature ecosystem but same principle)
+
+---
+
+## v1 → v2 changelog (for the maintainer)
+
+Why v2 exists: original v1 (2026-04-22) targeted a 2026-04-24 post that didn't ship. Two weeks of delay made v1's "Last week I was watching a friend..." opener invalid both temporally and stylistically. v2 fixes that and tightens GPTZero risk surface.
+
+Concrete changes:
+- **Opener**: "Last week I was watching a friend..." (3rd-person hypothetical) → "Earlier this year I was using my own tool..." (first-person dogfooding, dated, verifiable). Removes a fabricated-sounding scene; gains author skin-in-the-game.
+- **"Pre-AI playbook fails" section**: cut the three-parallel sentence ("Now your debugger... Your IDE... Your CI...") which was the highest-risk GPT tell in v1. Replaced with one focused paragraph about the LLM debugger specifically.
+- **"Four AI-native moves" → "Four moves in pyobfus 0.4.0"**: the heading "AI-native" is itself a pattern detectors flag; renamed.
+- **Word count**: 1,700 → ~1,300 (cut redundancy in 60-second setup, threat-model section, closing).
+- **Screenshot anchors**: explicit markers for `03_obfuscate_demo.png` and `04_json_output.png` (Phase 3 just produced clean neutralized versions, see SESSION_15 in `docs/V0.4_EXECUTION_LOG.md`).
+- **TODOs**: 4 of the 5 v1 TODOs are now done, leaves only the human-voice pass + GPTZero gate + post-day distribution updates.
+- **Voice-guide checklist** at top retained, all items still apply.
