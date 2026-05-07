@@ -71,13 +71,13 @@ test-mcp-sdk-latest:
 
 ---
 
-### P0.3 — server.json `_meta` enrichment (30 min)
+### P0.3 — server.json `_meta` enrichment (✅ code committed · ⏸️ registry publish deferred to next version bump)
 
 **Why**: Glama's 2026-01-24 spec post documents that MCP Registry preserves *only* the publisher-claimed `_meta` namespace, drops others. Claiming `io.github.zhurong2020.pyobfus_mcp` namespace **now** with structured fields locks pyobfus-mcp into downstream aggregator filters before they freeze on conventions.
 
 **Reference**: <https://glama.ai/blog/2026-01-24-official-mcp-registry-serverjson-requirements>
 
-**Action**: edit `pyobfus_mcp/server.json` to add (alongside existing `name` / `version` / `packages`):
+**Action**: ✅ Done in commit `4f8886f` — `pyobfus_mcp/server.json` now contains:
 
 ```json
 "_meta": {
@@ -91,9 +91,19 @@ test-mcp-sdk-latest:
 }
 ```
 
-Then re-publish via `mcp-publisher publish`. (Token at `~/.config/mcp-publisher/token.json` may need refresh — `mcp-publisher login github` if expired; ours was refreshed 2026-05-07 so should be valid for ~15 days.)
+**Registry publish status (2026-05-07 finding)**: ⏸️ DEFERRED. We attempted `mcp-publisher publish` against the current 0.1.2 entry and got HTTP 400 `cannot publish duplicate version`. **MCP Registry behaves the same as PyPI / Glama Release flow — it rejects same-version re-publishes**, so `_meta` for an existing version cannot be backfilled in place. There is also no `_meta`-only update command in `mcp-publisher` 1.7.8 (full subcommand list: `init / login / logout / publish / status / validate`; `status` only toggles active/deprecated).
 
-**Done when**: registry.modelcontextprotocol.io's JSON for our entry shows the `_meta` field populated.
+The committed `_meta` block will ship to the registry **automatically on the next legitimate `pyobfus-mcp` version bump** — naturally bundled with N2 (FastMCP 3.0 → 0.2.0, P1 list) or any earlier bug-fix 0.1.3. **Do not bump just to refresh `_meta`** (see do-not-do list).
+
+**Token / auth note (2026-05-07 finding)**: the previous TODO claim that the mcp-publisher token at `~/.config/mcp-publisher/token.json` is good for "~15 days" was wrong — JWT in our refresh expired within ~80 minutes. Non-interactive re-login works:
+
+```bash
+mcp-publisher login github -token "$(gh auth token)"
+```
+
+(Needs `gh auth status` showing scopes ≥ `repo` — currently `gist, read:org, repo, workflow`.) See `~/.claude/projects/-mnt-c-onedrive-msft-OneDrive---MSFT-rong-3-job-program-pyobfus/memory/mcp_publisher_auth.md`.
+
+**Done when**: next pyobfus-mcp version bump is published to MCP Registry and `curl 'https://registry.modelcontextprotocol.io/v0/servers?search=pyobfus' | jq '...'` shows the `_meta.io.github.zhurong2020.pyobfus_mcp` block populated. Until then, `_meta` lives in source-controlled `server.json` only.
 
 ---
 
@@ -193,7 +203,7 @@ Then re-publish via `mcp-publisher publish`. (Token at `~/.config/mcp-publisher/
 
 - **Don't chase PyArmor's VMC virtualization**. They went deep into bytecode-VM obfuscation in 9.2.0 (Oct 2025) — that's a different lane, fundamentally stronger but conflicts with our AI-debuggability promise. Stay in AI-native lane.
 - **Don't compete on AST mechanics**. Two new commoditized AST obfuscators (python-obfuscator, python-obfuscation-framework) shipped in last 5 weeks. Adding "another transformer" doesn't move our metrics; integration story does.
-- **Don't bump pyobfus or pyobfus-mcp version just to refresh metadata**. Glama Release flow rejects same-version re-publishes; PyPI doesn't allow version overwrite. Use Glama's "Claim ownership flow again" mechanism (see `~/.claude/projects/-home-wuxia-projects-pyobfus/memory/glama_metadata_schemas.md`).
+- **Don't bump pyobfus or pyobfus-mcp version just to refresh metadata**. **All three downstream surfaces — PyPI, MCP Registry, and Glama — reject same-version re-publishes** (PyPI: 400 "version already exists"; MCP Registry: 400 "cannot publish duplicate version", confirmed 2026-05-07; Glama Release flow: same). Bundle metadata refresh with the next legitimate bump. For Glama-listing refresh specifically (no version change involved), use the "Claim ownership flow again" mechanism — see `~/.claude/projects/-home-wuxia-projects-pyobfus/memory/glama_metadata_schemas.md`.
 - **Don't add features to free tier that have no user-demand signal**. Old roadmap "Enhanced key obfuscation" and "Code compression" were deprioritized in 2026-04 strategic shift; keep them buried.
 
 ---
@@ -234,5 +244,5 @@ By 2026-06-15: v0.5.0 release candidate (P2-1 + P2-3 + P2-4 + P2-5 + N1 + N2 + d
 
 ---
 
-**Last updated**: 2026-05-07 (Session 17 + post-research synthesis)
+**Last updated**: 2026-05-07 (Session 17 + post-research synthesis · evening-revision: P0.1 + P0.2 + P0.4 done · P0.3 partial — code committed, registry publish deferred to next version bump after hitting MCP Registry same-version rejection)
 **Next review**: after launch posts go live (week 2-3) OR after 3 P0 items closed
