@@ -17,5 +17,14 @@
       "version": "0.1.2",
       "transport": { "type": "stdio" }
     }
-  ]
+  ],
+  "_meta": {
+    "io.github.zhurong2020.pyobfus_mcp": {
+      "framework_presets": ["fastapi", "django", "flask", "pydantic", "click", "sqlalchemy"],
+      "licensing_model": "apache-2.0-core-plus-proprietary-pro",
+      "quality_grade": "A",
+      "tool_intent": "code-protection",
+      "target_clients": ["claude-desktop", "claude-code", "cursor", "windsurf", "zed"]
+    }
+  }
 }
