@@ -227,26 +227,43 @@ mcp-publisher login github -token "$(gh auth token)"
 
 ---
 
-## Recommended near-term sequence (3 weeks)
+## Recommended near-term sequence (3 weeks · revised 2026-05-07 evening post-launch)
 
 ```
-Week 1 (5-7 → 5-14):
-  └─ P0.1 + P0.2 + P0.3 (technical hygiene · 3 hours total)
-  └─ P0.4 dev.to voice rewrite + GPTZero gate (2 hours)
-  └─ Post dev.to Thursday/Friday evening
+Week 1 (5-7 → 5-11) · ✅ TECH HYGIENE LANDED · 🟢 dev.to LIVE:
+  ├─ P0.1 ci smoke test                    commit 8ec0fcd
+  ├─ P0.2 OIDC release workflow            commit a3da282 + PyPI Trusted Publisher registered 5-7
+  ├─ P0.3 server.json _meta block          commit 4f8886f (registry publish deferred to N2)
+  ├─ P0.4 v3 voice rewrite                 commit ca12e25
+  ├─ P0.4 v4 GPTZero-diagnostic rewrite    commit ec5fc65
+  └─ P0.4 dev.to article LIVE 5-7 evening  https://dev.to/zhurong2020/let-claude-code-debug-...
 
-Week 2 (5-15 → 5-22):
-  ├─ +48h after dev.to: HN Show HN
-  ├─ +24h after HN: Reddit /r/Python
-  ├─ Within 48h of dev.to: CN trio (有心工坊 + 知乎 + V2EX)
-  └─ Parallel: ship N1 t-string handler + blog post
+Week 1 weekend (5-8 Fri → 5-9 Sat) · CN trio (within +48h of dev.to · scheduled per maintainer 2026-05-07):
+  ├─ 有心工坊 / tech-empowerment (long-form CN translation of dev.to article)
+  ├─ 知乎 (adapted CN with hook + cn-friendly formatting)
+  └─ V2EX (short post)
+  Source draft: _drafts/post-cn-bilingual.md
 
-Week 3 (5-23 → 5-30):
-  ├─ Review launch metrics; reweight v0.5 priorities accordingly
-  ├─ Start N3 claude-skill preset (1-week effort)
-  └─ N2 FastMCP 3.0 upgrade (2-3 day effort, can interleave)
+Week 2 launch wave (5-11 Mon → 5-12 Tue):
+  ├─ Mon 5-11 evening 9-10pm UTC: HN Show HN
+  │   Source draft: _drafts/post-hn-show-hn.md (DO NOT reuse dev.to long-form;
+  │   HN Show HN is a different format — short post, runnable demo, no upvote ask)
+  ├─ Tue 5-12 evening: Reddit /r/Python (+24h after HN, captures HN-bounce traffic)
+  │   Source draft: _drafts/post-reddit-rpython.md
+  └─ Parallel: review dev.to 24h + 48h + 7d reaction metrics, capture in
+     V0.4_EXECUTION_LOG.md
 
-By 2026-06-15: v0.5.0 release candidate (P2-1 + P2-3 + P2-4 + P2-5 + N1 + N2 + drop 3.8)
+Week 2 cont. (5-13 → 5-18):
+  ├─ Review launch wave metrics across 4 platforms; reweight v0.5 priorities
+  ├─ N1 PEP 750 t-string AST handler (1 day · narrow time-window first-mover)
+  └─ Begin v0.5 work depending on signal
+
+Week 3 (5-19 → 5-25):
+  ├─ N2 FastMCP 3.0 + Pro funnel bundle (3-4 days · pyobfus-mcp 0.2.0 ship · also
+  │   resolves deferred P0.3 _meta publish)
+  └─ Start N3 claude-skill preset (1 week effort · net-new market segment)
+
+By 2026-06-15: v0.5.0 release candidate (P2-1 + P2-3 + P2-4 + P2-5 + N1 + N2 + N3 + drop 3.8)
 ```
 
 ---
