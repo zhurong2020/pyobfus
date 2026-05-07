@@ -159,18 +159,20 @@ mcp-publisher login github -token "$(gh auth token)"
 
 ---
 
-#### N2 — pyobfus-mcp 0.2.0 = FastMCP 3.0 features + Pro funnel (3-4 days · expanded scope 2026-05-07)
+#### N2 — pyobfus-mcp 0.2.0 = FastMCP 3.0 features + Pro funnel + security hardening (4-5 days · 3-way bundle scope 2026-05-07 evening)
 
 **Why (FastMCP 3.0)**: FastMCP 3.0 + mcp SDK 1.27 (April 2026) added **tool versioning** (`@tool(version="1.0")` — schema breaking changes don't orphan existing Claude Code sessions), **per-tool authorization**, and **OpenTelemetry instrumentation**. pyobfus-mcp 0.1.2 has none of these. Glama and other MCP aggregators will eventually add a "production-ready" filter — being on the wrong side of that line means we lose visibility.
 
 **Why (Pro funnel · 2026-05-07 finding)**: 5 current MCP tools are community-only with weak Pro discovery. `check_obfuscation_risks` doesn't surface "Pro string-encryption would protect N sensitive literals" even when the scan finds them. `explain_preset` Pro-preset path returns the CLI hint `pyobfus-trial start` — no Stripe URL, no ROI framing, no value-prop. There is no `recommend_tier` tool. **Pro funnel via MCP is the highest-leverage monetization channel** (AI assistants invoke MCP far more often than humans run CLI directly), but it's currently the weakest funnel surface in the entire product. Bundling Pro funnel design with the FastMCP 3.0 upgrade because both touch every tool's response shape — one breaking-change window, one 0.2.0 ship.
+
+**Why (security hardening · 2026-05-07 evening finding)**: A 10-category audit of `pyobfus_mcp/pyobfus_mcp/tools.py` + `server.py` against Atlas Whoff's "5 MCP Server Security Mistakes" (dev.to, 2026-05-06) plus 5 additional categories surfaced **3 real gaps + 2 partial gaps** (full table in `~/.claude/projects/-mnt-c-onedrive-msft-OneDrive---MSFT-rong-3-job-program-pyobfus/memory/mcp_security_audit_baseline.md`). With launch wave starting (HN 5-11 + Reddit 5-12), the Atlas-style scanner exposure is 4 days out and the gaps would scan red. Bundling fixes here because per-tool auth (already in this scope under FastMCP 3.0 baseline) and audit logging share the same `@app.tool` decorator surface, so refactoring once is cheaper than refactoring twice.
 
 **Action**:
 
 *FastMCP 3.0 baseline*:
 1. Bump dep `mcp>=1.27.0,<2.0.0` (we're at `>=1.20.0,<2.0.0` after the 0.1.2 fix)
 2. Add `version="1"` to all 5 `@app.tool` decorators
-3. Add per-tool auth scaffold (config-driven allow-list of tools)
+3. Add per-tool auth scaffold (config-driven allow-list of tools) — *closes audit category #7 partial gap*
 4. Wire OpenTelemetry stdout exporter (default off; opt-in via env var)
 
 *Pro funnel*:
@@ -180,10 +182,15 @@ mcp-publisher login github -token "$(gh auth token)"
 8. New tool `start_pro_trial()` → returns structured response with download / activation steps; AI can guide user end-to-end without dropping out to a browser.
 9. Add `tier_context` field to all 5 tool responses so the AI knows which tier is currently active and which Pro paths are gated.
 
-*Ship*:
-10. Bump pyobfus-mcp to 0.2.0; CHANGELOG entry; `mcp-publisher publish` (this also picks up the deferred `_meta` from P0.3 — see P0.3 status above).
+*Security hardening (new 2026-05-07 evening · all 3 surfaced by 10-category audit)*:
+10. **Path scoping** — wrap all path-accepting tools (`check_obfuscation_risks`, `generate_pyobfus_config(write=True)`, `unmap_stack_trace`) with a sandbox that resolves the requested path, rejects `..`-traversal, and rejects absolute paths outside a configurable project root (default: `os.getcwd()` when the server starts). *Closes audit category #2 (overly broad filesystem access).*
+11. **Rate limiting** — token bucket per session, default 30 calls/min/tool. Exposed as `PYOBFUS_MCP_RATE_LIMIT_PER_MIN` env var override. Returns structured `RateLimitExceeded` error with `retry_after_seconds` in the standard error envelope. *Closes audit category #3 (no rate limiting).*
+12. **Audit logging** — JSON line per tool invocation to `stderr` (default) or `PYOBFUS_MCP_AUDIT_LOG=path/to/file.jsonl`. Fields: `ts`, `tool`, `session_id`, `params` (with `path`/`mapping_path`/`trace` value-redacted to `[REDACTED:N_chars]`), `outcome` (`success` / `error`), `duration_ms`. *Closes audit category #5 (no audit logging).*
 
-**Done when**: 5 tools versioned; Pro funnel surfaces in `check_obfuscation_risks` + `explain_preset` + new `recommend_tier` + new `start_pro_trial`; OTel traces visible with `OTEL_EXPORTER_OTLP_ENDPOINT=...`; 0.2.0 live on PyPI + MCP Registry with `_meta` block published; 1+ Stripe checkout link click sourced from MCP-driven prompts within 30 days of launch (instrumented via OTel).
+*Ship*:
+13. Bump pyobfus-mcp to 0.2.0; CHANGELOG entry includes a "Security baseline" section linking to this scope; `mcp-publisher publish` (this also picks up the deferred `_meta` from P0.3 — see P0.3 status above).
+
+**Done when**: 5 tools versioned; Pro funnel surfaces in `check_obfuscation_risks` + `explain_preset` + new `recommend_tier` + new `start_pro_trial`; OTel traces visible with `OTEL_EXPORTER_OTLP_ENDPOINT=...`; **path-traversal attempts return structured error**; **rate-limit kicks in past 30 calls/min/tool with structured retry hint**; **every tool call emits a JSON audit line**; 0.2.0 live on PyPI + MCP Registry with `_meta` block published; 1+ Stripe checkout link click sourced from MCP-driven prompts within 30 days of launch (instrumented via OTel); a fresh run of Atlas Whoff's MCP Security Scanner (or equivalent third-party scan) shows 5/5 of his categories green for pyobfus-mcp 0.2.0.
 
 ---
 
@@ -259,8 +266,9 @@ Week 2 cont. (5-13 → 5-18):
   └─ Begin v0.5 work depending on signal
 
 Week 3 (5-19 → 5-25):
-  ├─ N2 FastMCP 3.0 + Pro funnel bundle (3-4 days · pyobfus-mcp 0.2.0 ship · also
-  │   resolves deferred P0.3 _meta publish)
+  ├─ N2 FastMCP 3.0 + Pro funnel + security hardening (4-5 days · 3-way bundle ·
+  │   pyobfus-mcp 0.2.0 ship · also resolves deferred P0.3 _meta publish · also
+  │   closes audit gaps #2/#3/#5/#7 from 2026-05-07 evening self-audit)
   └─ Start N3 claude-skill preset (1 week effort · net-new market segment)
 
 By 2026-06-15: v0.5.0 release candidate (P2-1 + P2-3 + P2-4 + P2-5 + N1 + N2 + N3 + drop 3.8)
@@ -280,5 +288,5 @@ By 2026-06-15: v0.5.0 release candidate (P2-1 + P2-3 + P2-4 + P2-5 + N1 + N2 + N
 
 ---
 
-**Last updated**: 2026-05-07 (Session 17 + post-research synthesis · evening · **dev.to launch went live**) · P0 status: P0.1 ✅ · P0.2 ✅ · P0.3 code committed (registry publish deferred to N2's `mcp-publisher publish`) · P0.4 ✅ live at https://dev.to/zhurong2020/let-claude-code-debug-your-obfuscated-python-a-guide-to-the-pyobfus-mcp-integration-3epm · launch sequence ticking: HN Show HN +48-96h, Reddit +24h after HN, CN trio within 48h
+**Last updated**: 2026-05-07 (Session 17 + post-research synthesis · evening · **dev.to launch went live · self-audit completed · N2 expanded to 3-way bundle**) · P0 status: P0.1 ✅ · P0.2 ✅ · P0.3 code committed (registry publish deferred to N2's `mcp-publisher publish`) · P0.4 ✅ live at https://dev.to/zhurong2020/let-claude-code-debug-your-obfuscated-python-a-guide-to-the-pyobfus-mcp-integration-3epm · launch sequence ticking: HN Show HN +48-96h, Reddit +24h after HN, CN trio within 48h · N2 scope now FastMCP 3.0 + Pro funnel + security hardening (3 audit gaps closed)
 **Next review**: 24h post-launch (2026-05-08 evening) for first-day reaction metrics; 7d post-launch for the natural growth signal
