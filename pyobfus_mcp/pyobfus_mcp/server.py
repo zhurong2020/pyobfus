@@ -37,6 +37,8 @@ from pyobfus_mcp.tools import (
     explain_preset,
     generate_pyobfus_config,
     list_presets,
+    recommend_tier,
+    start_pro_trial,
     unmap_stack_trace,
 )
 
@@ -71,6 +73,7 @@ def _build_server() -> Any:
     # version "1" while new ones move to "2", per the MCP protocol's
     # forward-compatibility model.
     _META_COMMUNITY = {"version": "1", "tier": "community"}
+    _META_PRO_FUNNEL = {"version": "1", "tier": "pro_funnel"}
 
     # Each decorated function becomes a named MCP tool. Descriptions
     # come from the docstring of the underlying tools.* function.
@@ -128,12 +131,41 @@ def _build_server() -> Any:
         name="explain_preset",
         description=(
             "Describe what a named preset changes: exclude names count, "
-            "exclude patterns, preserve_param_names, docstring handling."
+            "exclude patterns, preserve_param_names, docstring handling. "
+            "For Pro presets, returns full pro_unlock metadata (trial "
+            "command, checkout URL, price, money-back guarantee)."
         ),
         meta=dict(_META_COMMUNITY),
     )
     def _explain(name: str) -> Dict[str, Any]:
         return explain_preset(name)
+
+    @app.tool(
+        name="recommend_tier",
+        description=(
+            "Analyze a Python project and recommend pyobfus tier "
+            "(community vs Pro) with reasons. Combines a preflight scan "
+            "with a sensitive-string-literal heuristic. Returns "
+            "free_action and pro_action with concrete next-step commands."
+        ),
+        meta=dict(_META_PRO_FUNNEL),
+    )
+    def _recommend_tier(path: str) -> Dict[str, Any]:
+        return recommend_tier(path)
+
+    @app.tool(
+        name="start_pro_trial",
+        description=(
+            "Return structured guidance for starting the 5-day pyobfus "
+            "Pro trial. Does NOT invoke the side effect — the user runs "
+            "`pyobfus-trial start` in their shell. Detects whether a "
+            "trial is already active and surfaces the appropriate next "
+            "step plus post-trial purchase URL."
+        ),
+        meta=dict(_META_PRO_FUNNEL),
+    )
+    def _start_pro_trial() -> Dict[str, Any]:
+        return start_pro_trial()
 
     return app
 
@@ -152,10 +184,13 @@ if __name__ == "__main__":  # pragma: no cover
 
 # Backwards-compat export: some test harnesses look for a `tool_functions`
 # list. Provide one that enumerates the underlying callable implementations.
+# Phase 3 added `recommend_tier` and `start_pro_trial` as pro_funnel tools.
 tool_functions = [
     check_obfuscation_risks,
     generate_pyobfus_config,
     unmap_stack_trace,
     list_presets,
     explain_preset,
+    recommend_tier,
+    start_pro_trial,
 ]
