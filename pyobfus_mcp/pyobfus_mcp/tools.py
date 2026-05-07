@@ -6,17 +6,31 @@ types, return dicts, and are independently testable without installing
 the `mcp` package. `server.py` wraps them as MCP tools; external callers
 (tests, CI, custom agent frameworks) can call them directly.
 
+Each public function is decorated with `@secure_tool(...)`, which adds
+sliding-window rate limiting and JSON-line audit logging around the call.
+Path-accepting tools additionally call `validate_path()` to enforce a
+project-root sandbox on filesystem arguments. See `_security.py` for the
+primitives and the env vars that tune them
+(`PYOBFUS_MCP_PROJECT_ROOT`, `PYOBFUS_MCP_RATE_LIMIT_PER_MIN`,
+`PYOBFUS_MCP_AUDIT_LOG`).
+
 All return dicts follow a stable shape with a `status` field
-("success" | "error") and an `ai_hint` field containing the single next
-command or action the calling agent should take.
+("success" | "warnings" | "error") and an `ai_hint` field containing the
+single next command or action the calling agent should take.
 """
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Any, Dict, Optional
 
+from pyobfus_mcp._security import (
+    PathScopeError,
+    secure_tool,
+    validate_path,
+)
 
+
+@secure_tool()
 def check_obfuscation_risks(path: str) -> Dict[str, Any]:
     """Scan a Python project for patterns that may break obfuscation.
 
@@ -37,13 +51,16 @@ def check_obfuscation_risks(path: str) -> Dict[str, Any]:
     except ImportError as e:
         return _error("PyobfusNotInstalled", str(e), "pip install pyobfus")
 
-    target = Path(path)
-    if not target.exists():
+    try:
+        target = validate_path(path, must_exist=True)
+    except PathScopeError as e:
         return _error(
-            "PathNotFound",
-            f"Path does not exist: {path}",
-            f"Double-check the path and try again.",
+            "PathScopeError",
+            str(e),
+            "Use a path inside PYOBFUS_MCP_PROJECT_ROOT (default: server cwd).",
         )
+    except FileNotFoundError as e:
+        return _error("PathNotFound", str(e), "Double-check the path and try again.")
 
     report = PreflightChecker().check_path(target)
     payload = report.to_dict()
@@ -51,6 +68,7 @@ def check_obfuscation_risks(path: str) -> Dict[str, Any]:
     return payload
 
 
+@secure_tool()
 def generate_pyobfus_config(
     path: str, preset_override: Optional[str] = None, write: bool = False
 ) -> Dict[str, Any]:
@@ -78,17 +96,22 @@ def generate_pyobfus_config(
     except ImportError as e:
         return _error("PyobfusNotInstalled", str(e), "pip install pyobfus")
 
-    target = Path(path)
-    if not target.exists():
+    try:
+        target = validate_path(path, must_exist=True)
+    except PathScopeError as e:
         return _error(
-            "PathNotFound",
-            f"Path does not exist: {path}",
-            "Pass a valid project directory.",
+            "PathScopeError",
+            str(e),
+            "Use a path inside PYOBFUS_MCP_PROJECT_ROOT (default: server cwd).",
         )
+    except FileNotFoundError as e:
+        return _error("PathNotFound", str(e), "Pass a valid project directory.")
 
     result = build_init_result(target, preset_override=preset_override)
 
     if write:
+        # The config_path is computed by build_init_result as <target>/pyobfus.yaml,
+        # so it inherits the same scope as the validated `target`.
         result.config_path.write_text(result.yaml_text, encoding="utf-8")
         result.written = True
 
@@ -104,6 +127,7 @@ def generate_pyobfus_config(
     return payload
 
 
+@secure_tool(redact_params={"trace"})
 def unmap_stack_trace(trace: str, mapping_path: str) -> Dict[str, Any]:
     """Reverse obfuscated identifiers in a stack trace using a mapping.json.
 
@@ -111,6 +135,10 @@ def unmap_stack_trace(trace: str, mapping_path: str) -> Dict[str, Any]:
     useful for agent workflows where the trace is already in the chat
     buffer); for large logs, callers can pre-read the file and pass
     its contents.
+
+    The `trace` parameter is redacted in audit logs (it can contain
+    user data captured by the original crash); only its length is
+    recorded.
 
     Args:
         trace: Obfuscated stack trace or error log as plain text.
@@ -126,11 +154,18 @@ def unmap_stack_trace(trace: str, mapping_path: str) -> Dict[str, Any]:
     except ImportError as e:
         return _error("PyobfusNotInstalled", str(e), "pip install pyobfus")
 
-    mp = Path(mapping_path)
-    if not mp.exists():
+    try:
+        mp = validate_path(mapping_path, must_exist=True)
+    except PathScopeError as e:
+        return _error(
+            "PathScopeError",
+            str(e),
+            "Use a mapping path inside PYOBFUS_MCP_PROJECT_ROOT.",
+        )
+    except FileNotFoundError as e:
         return _error(
             "MappingNotFound",
-            f"Mapping file not found: {mapping_path}",
+            str(e),
             "Generate one with: pyobfus src/ -o dist/ --save-mapping mapping.json",
         )
 
@@ -152,6 +187,7 @@ def unmap_stack_trace(trace: str, mapping_path: str) -> Dict[str, Any]:
     }
 
 
+@secure_tool()
 def list_presets() -> Dict[str, Any]:
     """List every pyobfus preset available, grouped by tier.
 
@@ -181,6 +217,7 @@ def list_presets() -> Dict[str, Any]:
     }
 
 
+@secure_tool()
 def explain_preset(name: str) -> Dict[str, Any]:
     """Describe what a named preset changes compared to balanced.
 

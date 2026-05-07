@@ -63,8 +63,9 @@ def test_check_obfuscation_risks_detects_fastapi(tmp_path: Path) -> None:
     assert any(fw["name"] == "FastAPI" for fw in result["frameworks"])
 
 
-def test_check_obfuscation_risks_path_not_found() -> None:
-    result = check_obfuscation_risks("/nonexistent/path/xyz123")
+def test_check_obfuscation_risks_path_not_found(tmp_path: Path) -> None:
+    nonexistent = tmp_path / "definitely_does_not_exist_xyz123"
+    result = check_obfuscation_risks(str(nonexistent))
     assert result["status"] == "error"
     assert result["error_type"] == "PathNotFound"
 
@@ -116,8 +117,9 @@ def test_generate_pyobfus_config_preset_override(tmp_path: Path) -> None:
     assert result["preset"] == "aggressive"
 
 
-def test_generate_pyobfus_config_path_not_found() -> None:
-    result = generate_pyobfus_config("/nonexistent/xyz")
+def test_generate_pyobfus_config_path_not_found(tmp_path: Path) -> None:
+    nonexistent = tmp_path / "definitely_does_not_exist_xyz"
+    result = generate_pyobfus_config(str(nonexistent))
     assert result["status"] == "error"
 
 
@@ -150,8 +152,9 @@ def test_unmap_stack_trace_roundtrip(tmp_path: Path) -> None:
     assert result["mapping_stats"]["unique_obfuscated"] == 2
 
 
-def test_unmap_stack_trace_missing_mapping() -> None:
-    result = unmap_stack_trace("foo", "/does/not/exist.json")
+def test_unmap_stack_trace_missing_mapping(tmp_path: Path) -> None:
+    nonexistent = tmp_path / "does_not_exist.json"
+    result = unmap_stack_trace("foo", str(nonexistent))
     assert result["status"] == "error"
     assert result["error_type"] == "MappingNotFound"
 
