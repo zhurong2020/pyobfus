@@ -1,14 +1,6 @@
 {
-  "version": 1,
-  "server": {
-    "name": "pyobfus-mcp",
-    "description": "Official MCP server for the pyobfus Python obfuscator. Five tools: pre-flight risk scan, zero-config init, reverse stack-trace mapping, list presets, and explain preset. Built for AI-assisted Python development workflows in Claude Desktop, Claude Code, Cursor, Windsurf, and Zed."
-  },
-  "startCommand": {
-    "type": "stdio",
-    "command": "pyobfus-mcp"
-  },
-  "build": {
-    "dockerfile": "pyobfus_mcp/Dockerfile"
-  }
+  "$schema": "https://glama.ai/mcp/schemas/server.json",
+  "maintainers": [
+    "zhurong2020"
+  ]
 }
