@@ -103,3 +103,30 @@ jobs:
     - name: Test directory obfuscation with config
       run: |
         pyobfus examples/multifile -o test_multifile --config examples/multifile/pyobfus.yaml -v
+
+  mcp-sdk-latest:
+    # Catches mcp SDK API drift against pyobfus-mcp (e.g. the FastMCP version=
+    # kwarg removal that shipped silently in mcp 1.20+ and forced the 0.1.2
+    # emergency release on 2026-05-07). Pins the floor at the version we
+    # currently require; CI fails the day a future floor breaks _build_server().
+    name: pyobfus-mcp build smoke test (latest mcp SDK)
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Set up Python 3.13
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+        cache: 'pip'
+
+    - name: Install pyobfus-mcp + latest mcp SDK
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ./pyobfus_mcp 'mcp>=1.20'
+        pip show mcp | grep -E '^(Name|Version):'
+
+    - name: Instantiate FastMCP server
+      run: |
+        python -c "from pyobfus_mcp.server import _build_server; _build_server()"
