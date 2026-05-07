@@ -7,20 +7,24 @@ Code, Cursor, Windsurf, Zed, and anything else that speaks MCP.
 See README.md in this directory for install + configuration snippets.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 from pyobfus_mcp.tools import (
     check_obfuscation_risks,
-    generate_pyobfus_config,
-    unmap_stack_trace,
-    list_presets,
     explain_preset,
+    generate_pyobfus_config,
+    list_presets,
+    recommend_tier,
+    start_pro_trial,
+    unmap_stack_trace,
 )
 
 __all__ = [
     "check_obfuscation_risks",
-    "generate_pyobfus_config",
-    "unmap_stack_trace",
-    "list_presets",
     "explain_preset",
+    "generate_pyobfus_config",
+    "list_presets",
+    "recommend_tier",
+    "start_pro_trial",
+    "unmap_stack_trace",
 ]
