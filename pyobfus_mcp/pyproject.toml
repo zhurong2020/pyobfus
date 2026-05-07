@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyobfus-mcp"
-version = "0.1.1"
+version = "0.1.2"
 description = "Model Context Protocol server for pyobfus — the Python obfuscator. Lets Claude Desktop, Claude Code, Cursor, Windsurf, and Zed call pyobfus tools (preflight risk check, zero-config init, reverse stack-trace mapping) directly from an agent conversation."
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.10"
@@ -34,7 +34,11 @@ classifiers = [
 
 dependencies = [
     "pyobfus>=0.4.0",
-    "mcp>=1.0.0",
+    # Pin to mcp >=1.20 because FastMCP.__init__() dropped the `version=`
+    # kwarg between 1.0 and 1.20+; 0.1.1 was built against the old signature
+    # and crashed at startup with mcp 1.27. Cap at <2.0 to keep the next
+    # major version from silently re-introducing a breaking change.
+    "mcp>=1.20.0,<2.0.0",
 ]
 
 [project.optional-dependencies]

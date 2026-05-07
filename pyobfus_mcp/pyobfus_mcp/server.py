@@ -32,7 +32,6 @@ from __future__ import annotations
 import sys
 from typing import Any, Dict, Optional
 
-from pyobfus_mcp import __version__
 from pyobfus_mcp.tools import (
     check_obfuscation_risks,
     explain_preset,
@@ -58,7 +57,10 @@ def _build_server() -> Any:
             f"(Original error: {e})"
         )
 
-    app = FastMCP(name="pyobfus", version=__version__)
+    # FastMCP dropped the `version=` kwarg between mcp SDK 1.0 and 1.20+.
+    # The MCP protocol surfaces server version via the InitializeResult
+    # capabilities object; FastMCP populates that from package metadata.
+    app = FastMCP(name="pyobfus")
 
     # Each decorated function becomes a named MCP tool. Descriptions
     # come from the docstring of the underlying tools.* function.

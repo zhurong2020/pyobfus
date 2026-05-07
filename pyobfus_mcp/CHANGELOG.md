@@ -4,6 +4,20 @@ All notable changes to the `pyobfus-mcp` companion package are documented here. 
 
 The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](../CHANGELOG.md).
 
+## [0.1.2] — 2026-05-07
+
+### Fixed
+
+- **Crash on startup with mcp SDK ≥ 1.20** — `_build_server()` called `FastMCP(name="pyobfus", version=__version__)`, but the `version=` keyword argument was removed from `FastMCP.__init__()` between mcp SDK 1.0 (when 0.1.0 was published) and 1.20+. The result was a `TypeError: FastMCP.__init__() got an unexpected keyword argument 'version'` immediately after install on any system that pulled a recent mcp SDK. Removed the kwarg; FastMCP populates the server version from package metadata via the MCP `InitializeResult.capabilities` object.
+
+### Changed
+
+- Tightened `mcp` dependency to `>=1.20.0,<2.0.0` (was `>=1.0.0`). The new lower bound matches the SDK version we now test against; the upper bound prevents a future mcp 2.0 from silently re-introducing breaking changes. Users on older mcp SDKs (< 1.20) must upgrade.
+
+### Notes
+
+The bug affected every install since the underlying `mcp` SDK shipped 1.20 (early 2026). All users on `pyobfus-mcp 0.1.0` / `0.1.1` who pulled a recent mcp SDK hit it. Recommended action for downstream users: `pip install --upgrade pyobfus-mcp`.
+
 ## [0.1.1] — 2026-04-22
 
 ### Added
