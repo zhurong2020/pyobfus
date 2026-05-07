@@ -161,7 +161,9 @@ mcp-publisher login github -token "$(gh auth token)"
 
 #### N2 — pyobfus-mcp 0.2.0 = FastMCP 3.0 features + Pro funnel + security hardening (4-5 days · 3-way bundle scope 2026-05-07 evening)
 
-**Why (FastMCP 3.0)**: FastMCP 3.0 + mcp SDK 1.27 (April 2026) added **tool versioning** (`@tool(version="1.0")` — schema breaking changes don't orphan existing Claude Code sessions), **per-tool authorization**, and **OpenTelemetry instrumentation**. pyobfus-mcp 0.1.2 has none of these. Glama and other MCP aggregators will eventually add a "production-ready" filter — being on the wrong side of that line means we lose visibility.
+**Why (FastMCP 3.0)**: pyobfus-mcp 0.1.2 lacks production-grade features that the MCP ecosystem is converging on (tool versioning, per-tool authorization gating, OTel observability). Glama and other MCP aggregators will eventually add a "production-ready" filter — being on the wrong side of that line means we lose visibility.
+
+> **2026-05-07 evening reality check**: when I went to wire Phase 2, I `inspect`-ed the actual `FastMCP.tool()` signature on `mcp==1.27.0`. The kwargs it accepts are: `name`, `title`, `description`, `annotations`, `icons`, `meta`, `structured_output`. **There is no typed `version=` kwarg, no per-tool `auth=` kwarg, and no native OpenTelemetry hooks** in mcp 1.27 — the "FastMCP 3.0 features" framing I'd been carrying turned out to be community/marketing aspiration, not what's actually shipped in the SDK. Plan corrected below: we use `meta={"version": "1", "tier": "..."}` dict (forward-compatible), implement tier gating at our `secure_tool` decorator layer (the Phase 1 wrapper), and add OTel via soft-import (no hard dep). This implementation is more honest and **less coupled to FastMCP API churn** — when mcp eventually ships native typed kwargs we can migrate without re-architecting.
 
 **Why (Pro funnel · 2026-05-07 finding)**: 5 current MCP tools are community-only with weak Pro discovery. `check_obfuscation_risks` doesn't surface "Pro string-encryption would protect N sensitive literals" even when the scan finds them. `explain_preset` Pro-preset path returns the CLI hint `pyobfus-trial start` — no Stripe URL, no ROI framing, no value-prop. There is no `recommend_tier` tool. **Pro funnel via MCP is the highest-leverage monetization channel** (AI assistants invoke MCP far more often than humans run CLI directly), but it's currently the weakest funnel surface in the entire product. Bundling Pro funnel design with the FastMCP 3.0 upgrade because both touch every tool's response shape — one breaking-change window, one 0.2.0 ship.
 
@@ -169,11 +171,19 @@ mcp-publisher login github -token "$(gh auth token)"
 
 **Action**:
 
-*FastMCP 3.0 baseline*:
-1. Bump dep `mcp>=1.27.0,<2.0.0` (we're at `>=1.20.0,<2.0.0` after the 0.1.2 fix)
-2. Add `version="1"` to all 5 `@app.tool` decorators
-3. Add per-tool auth scaffold (config-driven allow-list of tools) — *closes audit category #7 partial gap*
-4. Wire OpenTelemetry stdout exporter (default off; opt-in via env var)
+*FastMCP 1.27 baseline + own-layer tier gating + soft-import OTel*:
+1. Bump dep `mcp>=1.27.0,<2.0.0` (we're at `>=1.20.0,<2.0.0` after the 0.1.2 fix). Trivial change in `pyobfus_mcp/pyproject.toml`.
+2. Add `meta={"version": "1", "tier": "community"}` to all 5 `@app.tool` decorators in `pyobfus_mcp/pyobfus_mcp/server.py`. The `meta` dict is what mcp 1.27 actually accepts; future Pro-tier tools registered in Phase 3 will get `tier: "pro_funnel"`. This is the SDK-native forward-compatible carrier for our tool versioning intent.
+3. Add tier gating to `secure_tool` decorator (the Phase 1 wrapper in `pyobfus_mcp/pyobfus_mcp/_security.py`):
+   - Optional `requires_tier="community"` parameter (default community)
+   - Env var `PYOBFUS_MCP_DISABLED_TOOLS=tool1,tool2,...` administratively disables tools by name
+   - Disabled tools return a structured `ToolDisabled` error envelope, audit-logged with `outcome: "disabled"`
+   - Disabled check happens **before** rate-limit check so disabled tools don't burn budget
+   - *Closes audit category #7 partial gap*
+4. OpenTelemetry instrumentation via soft-import in `secure_tool`:
+   - Try to `import opentelemetry` at module load; if absent, no-op
+   - If installed AND `OTEL_EXPORTER_OTLP_ENDPOINT` env var set, emit a span per tool invocation with attributes: `tool.name`, `tool.status`, `tool.duration_ms`
+   - Don't add `opentelemetry-sdk` as a hard dep — install via `pip install pyobfus-mcp[otel]` (extras_require) or BYO. Keep the default install lean.
 
 *Pro funnel*:
 5. `check_obfuscation_risks` → add `pro_value` field. When scan finds N sensitive string literals or M complex CFG branches, return structured Pro recommendation including Stripe checkout URL.
