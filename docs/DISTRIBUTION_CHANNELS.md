@@ -41,19 +41,25 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 - Rationale: SO's site-wide AI-content ban + low per-question traffic + low-rep account = bad risk/reward
 - Re-evaluation trigger: pyobfus stars > 300 OR 6 months elapsed (whichever first)
 
-### dev.to — `@zhurong2020`
+### dev.to — `@zhurong2020` 🟢 FIRST POST LIVE
 - URL: https://dev.to/zhurong2020
 - Created: 2026-04-22
 - Profile: Rong Zhu · `#f59e08` brand color · bio + 4 "Coding" fields + Work + Pronouns filled
-- Current metrics (end of 2026-04-22):
-  - **Posts: 0** · Comments: 0 · Followers: 0
+- Current metrics (start of 2026-05-07 evening · post-publish baseline):
+  - **Posts: 1** · Comments: 0 · Followers: 0
   - Following users: 28 (dev.to auto-suggestions from signup flow)
   - Following tags: 6
-- Warm-up plan (48h before first post):
-  - [ ] Follow 10-15 deliberately-chosen MCP / python-obfuscation / claude-code authors (replacing / augmenting the auto-follows)
-  - [ ] Leave 3-5 substantive comments on related posts
-  - [ ] Post #1 scheduled 2026-04-24 evening (Thursday, dev.to peak traffic window)
-- First post: *"Let Claude Code Obfuscate Your Python Project Automatically: A Guide to the pyobfus MCP Integration"* (draft at `_drafts/article-01-claude-code-mcp-integration.md`)
+- Warm-up plan (executed pre-launch):
+  - [x] Follow 10-15 deliberately-chosen MCP / python-obfuscation / claude-code authors
+  - [x] Leave 3-5 substantive comments on related posts
+  - [x] Post #1 scheduled 2026-04-24 evening → slipped to **2026-05-07 evening** (article went through v1 → v2 → v3 voice rewrite → v4 GPTZero-diagnostic-driven rewrite before final publish)
+- **First post (LIVE 2026-05-07)**: *"Let Claude Code Debug Your Obfuscated Python: A Guide to the pyobfus MCP Integration"*
+  - URL: <https://dev.to/zhurong2020/let-claude-code-debug-your-obfuscated-python-a-guide-to-the-pyobfus-mcp-integration-3epm>
+  - Source-of-truth file: `_drafts/article-01-claude-code-mcp-integration.md` (kept post-publish for revision history)
+  - Tags: `ai`, `python`, `claudecode`, `mcp`
+  - Cover: `pyobfus-legal/software_copyright/screenshots/03_obfuscate_demo.png` (BEFORE/AFTER side-by-side)
+  - 2 inline images: `04_json_output.png` (after Preflight check section) + `03_obfuscate_demo.png` (after Obfuscate-with-mapping section)
+  - Body: 1,603 prose words · 9 fenced code blocks · disclosure line up-front
 
 #### Auto-followed users after signup (2026-04-22)
 Recording for provenance — these are dev.to's recommendations, not deliberate picks. Curated follow-ups happen during warm-up.
@@ -110,7 +116,9 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 | External GitHub issues opened | 0 | 1+ | 5+ |
 | MCP server installs | — | 500+ | — |
 | AI-assistant recommend rate (blind test) | 0/10 | 3/10 | 7/10 |
-| dev.to followers | 0 | 50+ | 200+ |
+| dev.to followers | 0 (2026-04-22) → 0 (2026-05-07 post-publish) | 50+ | 200+ |
+| dev.to first-post reactions @ 24h | TBD (publish 2026-05-07 evening) | 30+ | — |
+| dev.to first-post reactions @ 7d | TBD | 100+ | — |
 | First pyobfus Pro license sale | — | 1 | — |
 
 Tracking cadence: every 2 weeks append a row to V0.4_EXECUTION_LOG.md.

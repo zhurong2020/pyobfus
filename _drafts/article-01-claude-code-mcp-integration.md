@@ -1,7 +1,7 @@
 ---
 title: "Let Claude Code Debug Your Obfuscated Python: A Guide to the pyobfus MCP Integration"
 title_zh: "让 Claude Code 还能调试你的混淆 Python 代码：pyobfus MCP 集成指南"
-status: DRAFT v4 (2026-05-07) — v3 scored AI 100% on GPTZero · v4 rewrites the High-AI-Impact sentences GPTZero flagged · awaiting re-test
+status: PUBLISHED 2026-05-07 evening — v4 final · live at https://dev.to/zhurong2020/let-claude-code-debug-your-obfuscated-python-a-guide-to-the-pyobfus-mcp-integration-3epm
 author: Rong Zhu
 date_drafted: 2026-04-22 (v1) · 2026-05-05 (v2 revision)
 target_post_window: 2026-05-08 to 2026-05-15 (Thursday/Friday evening, dev.to peak)

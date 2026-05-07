@@ -107,7 +107,10 @@ mcp-publisher login github -token "$(gh auth token)"
 
 ---
 
-### P0.4 — dev.to article voice rewrite (✅ v4 ready · ⏸️ awaiting maintainer to post)
+### P0.4 — dev.to article (✅ FULLY DONE · LIVE 2026-05-07 evening)
+
+**Live URL**: <https://dev.to/zhurong2020/let-claude-code-debug-your-obfuscated-python-a-guide-to-the-pyobfus-mcp-integration-3epm>
+
 
 **Why**: this is the #1 leverage point. Article at `_drafts/article-01-claude-code-mcp-integration.md`, drafted 2026-05-05 (v2) → 2026-05-07 (v3 voice rewrite) → 2026-05-07 (v4 GPTZero-diagnostic-driven rewrite).
 
@@ -260,5 +263,5 @@ By 2026-06-15: v0.5.0 release candidate (P2-1 + P2-3 + P2-4 + P2-5 + N1 + N2 + d
 
 ---
 
-**Last updated**: 2026-05-07 (Session 17 + post-research synthesis · evening-revision · v4 article voice rewrite final after GPTZero-diagnostic-driven iteration · N2 scope expanded to bundle Pro funnel design with FastMCP 3.0 upgrade · P0 status: P0.1 ✅ · P0.2 ✅ · P0.3 partial (registry deferred to N2's mcp-publisher publish) · P0.4 ✅ v4 ready, awaiting maintainer to post)
-**Next review**: after dev.to article goes live (Thu/Fri 2026-05-08 / 5-09 evening) OR after first launch-week metrics land
+**Last updated**: 2026-05-07 (Session 17 + post-research synthesis · evening · **dev.to launch went live**) · P0 status: P0.1 ✅ · P0.2 ✅ · P0.3 code committed (registry publish deferred to N2's `mcp-publisher publish`) · P0.4 ✅ live at https://dev.to/zhurong2020/let-claude-code-debug-your-obfuscated-python-a-guide-to-the-pyobfus-mcp-integration-3epm · launch sequence ticking: HN Show HN +48-96h, Reddit +24h after HN, CN trio within 48h
+**Next review**: 24h post-launch (2026-05-08 evening) for first-day reaction metrics; 7d post-launch for the natural growth signal
