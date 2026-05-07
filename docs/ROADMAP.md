@@ -7,16 +7,20 @@ This document outlines **future plans** for pyobfus. For released version histor
 
 ---
 
-## Current Status (2026-04-22)
+## Current Status (2026-05-07)
 
 See [CHANGELOG.md](../CHANGELOG.md) for the latest release and version history.
 
-- v0.3.3 released (2026-03-24)
-- 561 tests with 90% coverage
+- **pyobfus 0.4.0** released 2026-04-22 (AI-native CLI + framework presets + reverse stack-trace mapping)
+- **pyobfus-mcp 0.1.2** released 2026-05-07 (emergency fix for `FastMCP.__init__()` `version=` kwarg drift in mcp SDK ≥ 1.20; see `pyobfus_mcp/CHANGELOG.md`)
+- 671+ tests with 91% coverage (655 core + 16 MCP, multi-OS CI/CD across Python 3.8-3.14)
 - Full Pro feature set available
 - Parallel file processing support (`-j/--jobs`)
-- PyPI downloads: ~324/month (real users ~30%, rest is mirror scanning)
-- GitHub stars: 0 → major visibility problem (see strategy doc)
+- PyPI downloads: pyobfus ~337/month, pyobfus-mcp ~239/month (real users only, ex-mirrors)
+- GitHub stars: 0 — launch posts drafted in `_drafts/` (dev.to / HN / Reddit / CN tri-platform), pending human-voice rewrite + GPTZero gate before publication
+- **Glama listing live** at <https://glama.ai/mcp/servers/zhurong2020/pyobfus> with Quality grade **A**, all 5 MCP tools individually A
+- **Anthropic MCP Registry**: `io.github.zhurong2020/pyobfus-mcp` v0.1.2 active and isLatest
+- **awesome-mcp-servers PR** [#5777](https://github.com/punkpeye/awesome-mcp-servers/pull/5777) all bot checks green, awaiting human merge
 
 ---
 
@@ -116,12 +120,12 @@ To maintain focus on core users (individual developers/small teams in the AI-ass
 
 ## Success Metrics
 
-### v0.4.0 Targets (6 weeks from 2026-04-22)
+### v0.4.0 Targets (set 2026-04-22 · status as of 2026-05-07)
 
-- [ ] `pyobfus --check` / `unmap` / `init` shipping and documented
-- [ ] `pyobfus-mcp` server published, usable in Claude Desktop / Cursor / Claude Code
-- [ ] PyPI downloads: 324/month → **1,500+/month**
-- [ ] GitHub stars: 0 → **100+**
+- [x] `pyobfus --check` / `unmap` / `init` shipping and documented (P0-1, P0-2, P0-5)
+- [x] `pyobfus-mcp` server published, usable in Claude Desktop / Cursor / Claude Code (PyPI 0.1.2 + MCP Registry isLatest + Glama Quality A)
+- [ ] PyPI downloads: 324/month → **1,500+/month** (current: pyobfus ~337/month; launch posts pending in `_drafts/`)
+- [ ] GitHub stars: 0 → **100+** (current: 0; same blocker — launch not yet executed)
 - [ ] First external (non-owner) GitHub issue opened
 - [ ] First Pro license sale
 
