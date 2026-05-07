@@ -324,3 +324,156 @@ def test_secure_tool_emits_audit_on_rate_limited_path(
     record = json.loads(capsys.readouterr().err.strip())
     assert record["outcome"] == "rate_limited"
     assert record["params"]["x"] == 2
+
+
+# ---------------------------------------------------------------------------
+# Administrative tool gating (Phase 2)
+# ---------------------------------------------------------------------------
+
+
+def test_disabled_tools_returns_empty_set_when_unset(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("PYOBFUS_MCP_DISABLED_TOOLS", raising=False)
+
+    from pyobfus_mcp._security import _disabled_tools
+
+    assert _disabled_tools() == frozenset()
+
+
+def test_disabled_tools_parses_comma_separated_list(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("PYOBFUS_MCP_DISABLED_TOOLS", "tool_a, tool_b ,tool_c")
+
+    from pyobfus_mcp._security import _disabled_tools
+
+    assert _disabled_tools() == frozenset({"tool_a", "tool_b", "tool_c"})
+
+
+def test_disabled_tools_skips_empty_entries(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("PYOBFUS_MCP_DISABLED_TOOLS", "tool_a,,tool_b,,,")
+
+    from pyobfus_mcp._security import _disabled_tools
+
+    assert _disabled_tools() == frozenset({"tool_a", "tool_b"})
+
+
+def test_secure_tool_disabled_returns_envelope(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setenv("PYOBFUS_MCP_DISABLED_TOOLS", "my_tool")
+    monkeypatch.delenv("PYOBFUS_MCP_AUDIT_LOG", raising=False)
+
+    @secure_tool()
+    def my_tool() -> dict:
+        return {"status": "success"}
+
+    result = my_tool()
+    assert result["status"] == "error"
+    assert result["error_type"] == "ToolDisabled"
+    assert "my_tool" in result["message"]
+    assert "PYOBFUS_MCP_DISABLED_TOOLS" in result["ai_hint"]
+
+    record = json.loads(capsys.readouterr().err.strip())
+    assert record["outcome"] == "disabled"
+    assert record["tool"] == "my_tool"
+
+
+def test_secure_tool_disabled_short_circuits_before_rate_limit(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Disabled tools must NOT consume rate-limit budget.
+
+    Set the rate limit very low (1 call/min) and call a disabled tool 5x.
+    If disabled-check ran AFTER rate-limit check, the bucket would fill
+    and we'd see RateLimitExceeded after the first call instead of
+    ToolDisabled on every call.
+    """
+    monkeypatch.setenv("PYOBFUS_MCP_DISABLED_TOOLS", "my_tool")
+    monkeypatch.setenv("PYOBFUS_MCP_RATE_LIMIT_PER_MIN", "1")
+
+    @secure_tool()
+    def my_tool() -> dict:
+        return {"status": "success"}
+
+    for _ in range(5):
+        result = my_tool()
+        # If disabled-check happened after rate-limit, this would flip
+        # to RateLimitExceeded on call #2.
+        assert result["error_type"] == "ToolDisabled"
+
+    # Re-enable: rate-limit budget should still be untouched, so the
+    # next call lands in the success path.
+    monkeypatch.setenv("PYOBFUS_MCP_DISABLED_TOOLS", "")
+    result = my_tool()
+    assert result["status"] == "success"
+
+
+def test_secure_tool_partial_disable_only_listed(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    monkeypatch.setenv("PYOBFUS_MCP_DISABLED_TOOLS", "tool_b")
+    monkeypatch.delenv("PYOBFUS_MCP_AUDIT_LOG", raising=False)
+
+    @secure_tool()
+    def tool_a() -> dict:
+        return {"status": "success", "from": "a"}
+
+    @secure_tool()
+    def tool_b() -> dict:
+        return {"status": "success", "from": "b"}
+
+    a_result = tool_a()
+    capsys.readouterr()  # discard tool_a's audit line
+    b_result = tool_b()
+
+    assert a_result["status"] == "success"
+    assert b_result["error_type"] == "ToolDisabled"
+
+
+# ---------------------------------------------------------------------------
+# OpenTelemetry soft-import (Phase 2)
+# ---------------------------------------------------------------------------
+
+
+def test_otel_span_yields_a_usable_span_object() -> None:
+    """`_otel_span` must yield something that supports `set_attribute` and
+    `record_exception` regardless of whether `opentelemetry` is installed.
+
+    In the default test environment OTel is NOT installed (per
+    pyobfus_mcp/pyproject.toml — opentelemetry-* are extras, not base
+    deps), so the no-op stub is exercised. If a future contributor
+    installs OTel transitively, the real span object satisfies the same
+    interface, so this test still passes.
+    """
+    from pyobfus_mcp._security import _otel_span
+
+    with _otel_span("test_tool") as span:
+        # No-op or real span — both must accept these calls without error.
+        span.set_attribute("tool.status", "success")
+        span.set_attribute("tool.duration_ms", 1.23)
+        span.record_exception(RuntimeError("smoke"))
+
+
+def test_secure_tool_works_when_otel_unavailable(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """End-to-end smoke: secure_tool returns the right envelope and emits the
+    audit line when OTel isn't installed (the default state in this suite).
+    """
+    monkeypatch.delenv("PYOBFUS_MCP_AUDIT_LOG", raising=False)
+
+    @secure_tool()
+    def my_tool(x: int) -> dict:
+        return {"status": "success", "x": x}
+
+    result = my_tool(42)
+    assert result == {"status": "success", "x": 42}
+
+    record = json.loads(capsys.readouterr().err.strip())
+    assert record["outcome"] == "success"
+    assert record["tool"] == "my_tool"
+    assert record["params"]["x"] == 42

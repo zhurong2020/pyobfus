@@ -1,9 +1,9 @@
 """
 Security baseline primitives for pyobfus-mcp.
 
-Three categories, all surfaced by the 2026-05-07 self-audit against Atlas
-Whoff's "5 MCP Server Security Mistakes That Could Expose Your AI Stack"
-(dev.to, 2026-05-06):
+Surfaced by the 2026-05-07 self-audit against Atlas Whoff's "5 MCP Server
+Security Mistakes That Could Expose Your AI Stack" (dev.to, 2026-05-06)
+plus Phase 2 production hardening:
 
   1. **Path scoping** (`validate_path`) — resolve a user-provided path,
      reject `..`-traversal and any absolute path that escapes the
@@ -16,10 +16,22 @@ Whoff's "5 MCP Server Security Mistakes That Could Expose Your AI Stack"
      stderr by default; override destination with the
      `PYOBFUS_MCP_AUDIT_LOG=path/to/file.jsonl` env var. Sensitive
      parameter values are redacted by name.
+  4. **Administrative tool gating** (Phase 2) — comma-separated tool
+     names listed in `PYOBFUS_MCP_DISABLED_TOOLS` are rejected with a
+     structured `ToolDisabled` error envelope and audit-logged with
+     `outcome: "disabled"`. Useful for restricting an exposed server
+     to a subset of tools without redeploying.
+  5. **OpenTelemetry instrumentation** (Phase 2) — soft-imported.
+     When `opentelemetry` is installed (e.g. via the `pyobfus-mcp[otel]`
+     extras) and a `TracerProvider` is configured (typically the user
+     sets `OTEL_EXPORTER_OTLP_ENDPOINT` and runs an SDK initializer at
+     app startup), every tool invocation emits a span with attributes
+     (`tool.name`, `tool.status`, `tool.duration_ms`). Without OTel the
+     span context yields a no-op object — zero runtime cost.
 
-The `secure_tool` decorator combines rate-limit + audit-log around any
-tool-implementation function. Path validation is left to the tool body
-so each tool can provide its own per-parameter error message.
+The `secure_tool` decorator wires all of (2)+(3)+(4)+(5) around any
+tool-implementation function. Path validation (1) is left to the tool
+body so each tool can provide its own per-parameter error message.
 
 This module is deliberately MCP-SDK-agnostic — it has no dependency on
 the `mcp` package and is independently unit-testable.
@@ -27,6 +39,7 @@ the `mcp` package and is independently unit-testable.
 
 from __future__ import annotations
 
+import contextlib
 import inspect
 import json
 import os
@@ -36,7 +49,59 @@ from collections import defaultdict
 from functools import wraps
 from pathlib import Path
 from threading import Lock
-from typing import Any, Callable, Dict, FrozenSet, Iterable, List
+from typing import Any, Callable, Dict, FrozenSet, Iterable, Iterator, List
+
+
+# ---------------------------------------------------------------------------
+# OpenTelemetry soft-import (Phase 2)
+# ---------------------------------------------------------------------------
+
+# OTel is intentionally a soft dependency: when `opentelemetry` is installed
+# the secure_tool decorator emits a span per tool invocation; when it isn't,
+# the same code path runs against a no-op span and there's zero overhead.
+# Install via `pip install pyobfus-mcp[otel]` to opt in (also requires
+# OTEL_EXPORTER_OTLP_ENDPOINT and a configured TracerProvider for spans
+# to actually go anywhere).
+try:
+    from opentelemetry import trace as _otel_trace  # type: ignore[import-not-found]
+
+    _OTEL_AVAILABLE = True
+    _otel_tracer = _otel_trace.get_tracer("pyobfus_mcp")
+except ImportError:  # pragma: no cover — exercised only on hosts without otel
+    _OTEL_AVAILABLE = False
+    _otel_tracer = None
+
+
+class _NoOpSpan:
+    """Stub span exposing the subset of the OTel span API we use.
+
+    When `opentelemetry` isn't installed the `_otel_span` context manager
+    yields one of these so `secure_tool` doesn't need any branching when
+    setting attributes.
+    """
+
+    def set_attribute(self, key: str, value: Any) -> None:
+        pass
+
+    def record_exception(self, exc: BaseException) -> None:
+        pass
+
+
+_NOOP_SPAN = _NoOpSpan()
+
+
+@contextlib.contextmanager
+def _otel_span(tool_name: str) -> Iterator[Any]:
+    """Yield an OTel span (or no-op stub) for the duration of a tool call."""
+    if _OTEL_AVAILABLE:
+        # The cast to `_otel_tracer` is safe inside this branch because
+        # _OTEL_AVAILABLE only flips True after the import succeeded.
+        assert _otel_tracer is not None
+        with _otel_tracer.start_as_current_span(f"pyobfus_mcp.{tool_name}") as span:
+            span.set_attribute("tool.name", tool_name)
+            yield span
+    else:
+        yield _NOOP_SPAN
 
 
 # ---------------------------------------------------------------------------
@@ -231,6 +296,25 @@ def audit_log(
 
 
 # ---------------------------------------------------------------------------
+# Administrative tool gating (Phase 2)
+# ---------------------------------------------------------------------------
+
+
+def _disabled_tools() -> FrozenSet[str]:
+    """Return the set of tool names administratively disabled via env var.
+
+    `PYOBFUS_MCP_DISABLED_TOOLS` is a comma-separated list of tool names
+    (function names of the underlying `tools.*` callables); whitespace
+    around individual entries is tolerated. Empty / unset env var = no
+    tools disabled. The list is re-read on every check so operators can
+    flip the env var on a running server with `kill -HUP` or equivalent
+    (no in-process caching).
+    """
+    raw = os.environ.get("PYOBFUS_MCP_DISABLED_TOOLS", "")
+    return frozenset(name.strip() for name in raw.split(",") if name.strip())
+
+
+# ---------------------------------------------------------------------------
 # Combined decorator
 # ---------------------------------------------------------------------------
 
@@ -255,20 +339,29 @@ def secure_tool(
     *,
     redact_params: Iterable[str] = (),
 ) -> Callable[[Callable[..., Dict[str, Any]]], Callable[..., Dict[str, Any]]]:
-    """Decorate an MCP tool implementation with rate-limiting + audit-logging.
+    """Decorate an MCP tool implementation with the full security baseline.
 
-    Path-scoping is intentionally *not* applied by this decorator. Tools that
-    accept path arguments call `validate_path()` explicitly inside their body
-    so they can map `PathScopeError` to a tool-specific structured error.
+    Wraps each call through four checks, in order:
+      1. **Disabled** (cheapest gate, before everything else): if the tool
+         name is listed in `PYOBFUS_MCP_DISABLED_TOOLS`, return a structured
+         `ToolDisabled` error envelope without consuming rate-limit budget
+         or hitting OTel.
+      2. **OTel span** (no-op when `opentelemetry` isn't installed): the
+         remainder of the call runs inside `_otel_span(tool_name)`. Span
+         attributes are set on every terminal exit (rate-limit, exception,
+         success).
+      3. **Rate limit**: token-bucket check. On overflow, return a
+         structured `RateLimitExceeded` error envelope and audit-log
+         `outcome: "rate_limited"`.
+      4. **Function call** with timing. On exception: audit-log
+         `outcome: "exception:<ClassName>"`, record on the span, re-raise.
+         On success: audit-log with the function's own `status` field as
+         the outcome string.
 
-    Wrapped behavior:
-      - Pre-call: increment & check the per-tool token bucket. On overflow,
-        return a structured `RateLimitExceeded` error matching the standard
-        error envelope (`status` / `error_type` / `message` / `ai_hint` /
-        `retry_after_seconds`). Audit-log the rate-limit event.
-      - Call: invoke the wrapped function. Time it.
-      - Post-call (success): audit-log with the function's `status` field.
-      - Post-call (exception): audit-log with `exception:<class>` and re-raise.
+    Path-scoping is intentionally *not* applied by this decorator — tools
+    that accept path arguments call `validate_path()` explicitly inside
+    their body so they can map `PathScopeError` to a tool-specific
+    structured error envelope.
 
     Args:
         redact_params: Parameter names whose values should be redacted in
@@ -289,53 +382,91 @@ def secure_tool(
             t_start = time.perf_counter()
             params = _bind_params(func, args, kwargs)
 
-            # Step 1: rate limit check.
-            try:
-                check_rate_limit(tool_name)
-            except RateLimitExceeded as exc:
+            # Step 1 (cheapest gate): administratively disabled?
+            if tool_name in _disabled_tools():
                 duration_ms = (time.perf_counter() - t_start) * 1000
                 audit_log(
                     tool_name,
                     params,
-                    "rate_limited",
+                    "disabled",
                     duration_ms,
                     redact_keys=redact_keys,
                 )
                 return {
                     "status": "error",
-                    "error_type": "RateLimitExceeded",
-                    "message": str(exc),
-                    "ai_hint": (
-                        f"Wait {exc.retry_after_seconds:.0f}s before retrying. "
-                        f"To raise the cap set PYOBFUS_MCP_RATE_LIMIT_PER_MIN=N "
-                        f"(0 disables)."
+                    "error_type": "ToolDisabled",
+                    "message": (
+                        f"Tool {tool_name!r} is administratively disabled "
+                        f"via PYOBFUS_MCP_DISABLED_TOOLS."
                     ),
-                    "retry_after_seconds": round(exc.retry_after_seconds, 2),
+                    "ai_hint": (
+                        f"Remove {tool_name!r} from PYOBFUS_MCP_DISABLED_TOOLS, "
+                        f"or call a different tool."
+                    ),
                 }
 
-            # Step 2: invoke the wrapped function. On exception, log + re-raise.
-            try:
-                result = func(*args, **kwargs)
-            except Exception as exc:
+            # Step 2: optional OTel span wraps everything from here.
+            with _otel_span(tool_name) as span:
+                # Step 3: rate limit.
+                try:
+                    check_rate_limit(tool_name)
+                except RateLimitExceeded as exc:
+                    duration_ms = (time.perf_counter() - t_start) * 1000
+                    audit_log(
+                        tool_name,
+                        params,
+                        "rate_limited",
+                        duration_ms,
+                        redact_keys=redact_keys,
+                    )
+                    span.set_attribute("tool.status", "rate_limited")
+                    span.set_attribute("tool.duration_ms", round(duration_ms, 2))
+                    return {
+                        "status": "error",
+                        "error_type": "RateLimitExceeded",
+                        "message": str(exc),
+                        "ai_hint": (
+                            f"Wait {exc.retry_after_seconds:.0f}s before retrying. "
+                            f"To raise the cap set PYOBFUS_MCP_RATE_LIMIT_PER_MIN=N "
+                            f"(0 disables)."
+                        ),
+                        "retry_after_seconds": round(exc.retry_after_seconds, 2),
+                    }
+
+                # Step 4: invoke the wrapped function.
+                try:
+                    result = func(*args, **kwargs)
+                except Exception as exc:
+                    duration_ms = (time.perf_counter() - t_start) * 1000
+                    audit_log(
+                        tool_name,
+                        params,
+                        f"exception:{type(exc).__name__}",
+                        duration_ms,
+                        redact_keys=redact_keys,
+                    )
+                    span.set_attribute("tool.status", "exception")
+                    span.set_attribute("tool.duration_ms", round(duration_ms, 2))
+                    span.record_exception(exc)
+                    raise
+
+                # Success path.
                 duration_ms = (time.perf_counter() - t_start) * 1000
+                outcome = (
+                    str(result.get("status", "unknown"))
+                    if isinstance(result, dict)
+                    else "unknown"
+                )
                 audit_log(
                     tool_name,
                     params,
-                    f"exception:{type(exc).__name__}",
+                    outcome,
                     duration_ms,
                     redact_keys=redact_keys,
                 )
-                raise
-
-            # Step 3: log success with the tool's own status field as outcome.
-            duration_ms = (time.perf_counter() - t_start) * 1000
-            outcome = (
-                str(result.get("status", "unknown"))
-                if isinstance(result, dict)
-                else "unknown"
-            )
-            audit_log(tool_name, params, outcome, duration_ms, redact_keys=redact_keys)
-            return result
+                span.set_attribute("tool.status", outcome)
+                span.set_attribute("tool.duration_ms", round(duration_ms, 2))
+                return result
 
         return wrapper
 

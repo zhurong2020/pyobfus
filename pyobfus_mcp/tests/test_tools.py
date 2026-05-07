@@ -226,3 +226,46 @@ def test_server_module_importable_without_mcp_sdk() -> None:
     # tool_functions export is independent of the SDK
     assert srv.tool_functions
     assert all(callable(fn) for fn in srv.tool_functions)
+
+
+def test_build_server_attaches_meta_to_each_tool() -> None:
+    """Every `@app.tool` registration must carry the Phase 2 meta dict.
+
+    Verifies the version + tier metadata is actually wired through the
+    FastMCP API so downstream aggregators (Glama, Anthropic registry) can
+    surface it. Skipped when the mcp SDK isn't installed in the test env;
+    the integration is also covered by the `mcp-sdk-latest` CI job.
+    """
+    import asyncio
+
+    pytest = __import__("pytest")
+    try:
+        from pyobfus_mcp.server import _build_server
+    except ImportError:  # pragma: no cover — only when mcp SDK isn't installed
+        pytest.skip("mcp SDK not installed in this test env")
+
+    app = _build_server()
+    tools = asyncio.run(app.list_tools())
+
+    expected_names = {
+        "check_obfuscation_risks",
+        "generate_pyobfus_config",
+        "unmap_stack_trace",
+        "list_presets",
+        "explain_preset",
+    }
+    actual_names = {t.name for t in tools}
+    assert actual_names == expected_names, (
+        f"unexpected tool set: {actual_names ^ expected_names}"
+    )
+
+    for tool in tools:
+        # mcp SDK exposes the meta dict via `.meta` on the Tool object.
+        meta = getattr(tool, "meta", None)
+        assert meta is not None, f"{tool.name} has no meta dict"
+        assert meta.get("version") == "1", (
+            f"{tool.name} meta.version={meta.get('version')!r}, expected '1'"
+        )
+        assert meta.get("tier") == "community", (
+            f"{tool.name} meta.tier={meta.get('tier')!r}, expected 'community'"
+        )

@@ -62,6 +62,16 @@ def _build_server() -> Any:
     # capabilities object; FastMCP populates that from package metadata.
     app = FastMCP(name="pyobfus")
 
+    # Per-tool metadata carried via the `meta` kwarg (mcp 1.27 SDK-native).
+    # We use it for tool versioning ("version": "1") and tier classification
+    # ("tier": "community" | "pro_funnel"), which downstream aggregators
+    # (Glama, Anthropic registry filters) can read to surface "production-
+    # ready" / "Pro-aware" badges. Bump version when a tool's request or
+    # response schema changes — old client sessions can keep referencing
+    # version "1" while new ones move to "2", per the MCP protocol's
+    # forward-compatibility model.
+    _META_COMMUNITY = {"version": "1", "tier": "community"}
+
     # Each decorated function becomes a named MCP tool. Descriptions
     # come from the docstring of the underlying tools.* function.
     @app.tool(
@@ -72,6 +82,7 @@ def _build_server() -> Any:
             "Returns severity counts, detected frameworks (FastAPI/Django/"
             "Flask/Pydantic/Click/SQLAlchemy), and a suggested preset."
         ),
+        meta=dict(_META_COMMUNITY),
     )
     def _check(path: str) -> Dict[str, Any]:
         return check_obfuscation_risks(path)
@@ -83,6 +94,7 @@ def _build_server() -> Any:
             "frameworks and applies the matching preset. By default returns "
             "the YAML text without writing to disk; set write=true to persist."
         ),
+        meta=dict(_META_COMMUNITY),
     )
     def _init(
         path: str, preset_override: Optional[str] = None, write: bool = False
@@ -96,6 +108,7 @@ def _build_server() -> Any:
             "pyobfus mapping.json. Accepts the trace as plain text and the "
             "path to a mapping file produced by --save-mapping."
         ),
+        meta=dict(_META_COMMUNITY),
     )
     def _unmap(trace: str, mapping_path: str) -> Dict[str, Any]:
         return unmap_stack_trace(trace, mapping_path)
@@ -106,6 +119,7 @@ def _build_server() -> Any:
             "List every pyobfus preset available, grouped by tier "
             "(community / framework-aware / Pro)."
         ),
+        meta=dict(_META_COMMUNITY),
     )
     def _list() -> Dict[str, Any]:
         return list_presets()
@@ -116,6 +130,7 @@ def _build_server() -> Any:
             "Describe what a named preset changes: exclude names count, "
             "exclude patterns, preserve_param_names, docstring handling."
         ),
+        meta=dict(_META_COMMUNITY),
     )
     def _explain(name: str) -> Dict[str, Any]:
         return explain_preset(name)
