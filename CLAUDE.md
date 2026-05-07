@@ -2,6 +2,14 @@
 
 Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
+## ⚡ Current pending work (cold-start 必读)
+
+**Single source of truth for forward TODO**: [`docs/POST_V0.4_TODO.md`](docs/POST_V0.4_TODO.md)
+
+Snapshot 2026-05-07 (v0.4 distribution leg 完整闭环之后)。包含 30-second resume cheat sheet · 4 个 self-actionable P0 item（CI smoke test + PEP 740 attestation + server.json _meta + dev.to voice pass）· v0.5 work（含 3 个 2026-05 research 发现的新机会：PEP 750 t-string handler · FastMCP 3.0 升级 · `--target claude-skill` preset）· passive waiting items · do-not-do list · 3 周建议节奏。
+
+**重启 session 第一份必读**。
+
 ## 项目概述
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
