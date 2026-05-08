@@ -1,7 +1,7 @@
 ---
 title: "Let Claude Code Debug Your Obfuscated Python: A Guide to the pyobfus MCP Integration"
 title_zh: "让 Claude Code 还能调试你的混淆 Python 代码：pyobfus MCP 集成指南"
-status: PUBLISHED 2026-05-07 evening — v4 final · live at https://dev.to/zhurong2020/let-claude-code-debug-your-obfuscated-python-a-guide-to-the-pyobfus-mcp-integration-3epm
+status: PUBLISHED 2026-05-07 evening (v4) · v5 honest rewrite drafted 2026-05-08 (Section 1 only · removes the I0/I2 incident anecdote that was fabricated narrative texture · keeps the AI-debug insight as forward-looking reasoning · live dev.to post still on v4 pending maintainer manual edit) · live at https://dev.to/zhurong2020/let-claude-code-debug-your-obfuscated-python-a-guide-to-the-pyobfus-mcp-integration-3epm
 author: Rong Zhu
 date_drafted: 2026-04-22 (v1) · 2026-05-05 (v2 revision)
 target_post_window: 2026-05-08 to 2026-05-15 (Thursday/Friday evening, dev.to peak)
@@ -44,23 +44,13 @@ disclosure_line: >
 
 Story starts about six months back. Cardiac imaging research project. Real patent filings in flight, software-copyright applications half-submitted, the kind of work where the lawyers actually read commit messages. The team needed algorithm modules they could hand to outside collaborators as binaries, no readable source. Python, naturally. Every research project is Python now. So: an obfuscator.
 
-PyArmor is the answer when you ask the internet. Fine. Installed PyArmor. Ran it through the test suite, ran it through the build pipeline, shipped the binaries.
+PyArmor is the answer when you ask the internet. I pulled up the docs, read the feature matrix, checked the pricing page. The serious protection — bytecode-level encryption, control-flow flattening, the things that actually slow a determined reverse engineer down — sits behind the paid Pro tier. Fine, that's a normal business model. But it made me stop for a second and ask the obvious question. Was I about to pay a license fee for a tool that fits my workflow, or was I about to pay a license fee for a tool that fits *somebody's* workflow, just not mine?
 
-Worked great. For about two weeks. Then a collaborator's first production crash came back, and I did what I do with every crash log, which is paste it into Claude Code:
+My workflow had a specific shape. The thing writing half my code those evenings was Claude Code, vibe coding sessions where I'd describe what I needed and iterate on output. The thing I'd reach for to debug a production trace was also Claude Code. If I shipped binaries where every class name was now `I0` and every method was `I2`, what happened the first time something crashed in production? I'd paste the trace into Claude, and Claude would say *"I have no idea what `I0` or `I2` refer to. Could you share the source?"* The protection meant for keeping outsiders out would also lock out the assistant I was already paying for. The only people it would actually help were the attackers, who have all the time in the world to unmangle.
 
-```
-Traceback (most recent call last):
-  File "dist/algorithms/preprocess.py", line 23, in <module>
-AttributeError: 'I0' object has no attribute 'I2'
-```
+PyArmor was designed for a workflow where the human reads the production logs. Cython compiles to machine code, even further from anything LLM-readable. Both made sense in 2013, in 2017. Neither made sense for an evening-vibes project where the model was the one in the debug seat.
 
-Reply came back polite. *"I don't know what `I0` or `I2` refer to. Could you share the source?"*
-
-Yeah. That was the moment. The protection that kept the algorithm opaque to outsiders had also turned my AI assistant into a polite stranger asking me for source code I'd just spent two weeks deliberately hiding from it. The obfuscator was sitting between the assistant that wrote the code and the assistant that needed to debug it, and the only people it was actually helping were attackers.
-
-I spent something like 40 minutes manually unmapping that trace by hand against the original source, fixed the bug (a missing import, naturally), and then went and surveyed what else was on the market. PyArmor's protection model is one-way by design. Cython compiles to machine code, even further. Neither was solvable without rebuilding the tool from scratch.
-
-So I rebuilt the tool. About a month of evenings vibe-coding with Claude Code itself, organized around a single trade-off: keep the obfuscator's output opaque to outsiders, keep one tiny mapping file readable to me. That's pyobfus 0.4.0, which I shipped on 2026-04-22.
+So instead of paying for a tool I'd then have to fight, I started building a smaller one. About a month of evenings vibe-coding with Claude Code itself, organized around a single trade-off: keep the obfuscator's output opaque to outsiders, keep one tiny mapping file readable to me. That's pyobfus 0.4.0, which I shipped on 2026-04-22.
 
 ---
 
