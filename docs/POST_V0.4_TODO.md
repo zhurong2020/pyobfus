@@ -242,12 +242,13 @@ mcp-publisher login github -token "$(gh auth token)"
 | GitHub stars 0 → 100+ | Launch + Glama/Registry organic discovery | depends on launch |
 | Glama Quality grade re-check after `glama.json` fix | Eventual cron | 1-3 days |
 
-### N5 — Diversify awesome-list distribution (parallel hedge against punkpeye merge latency · 1h total · ▶ IN FLIGHT 2026-05-08)
+### N5 — Diversify awesome-list distribution (parallel hedge against punkpeye merge latency · ✅ COMPLETED 2026-05-08 with caveat)
 
-**Status 2026-05-08 morning**:
-- ✅ **appcypher fork created + branch pushed**: `zhurong2020/awesome-mcp-servers-appcypher:add-pyobfus-mcp` (renamed from default `awesome-mcp-servers` to avoid collision with existing punkpeye fork) · README.md +1 line at end of Development Tools section · entry uses `simpleicons.org/python` icon + `<sup><sup>⭐</sup></sup>` Official marker per appcypher Legend · **PR creation requires browser click** (gh CLI cross-repo PR with non-default fork name returns 404; documented as known gh limitation). Compare URL ready for one-click submission.
-- ⏸️ **wong2 mcpservers.org submission**: form fields pre-filled (server_name / short_description / link / category=Development / contact_email) — **user click needed** (no API for form). Skip $39 premium tier.
-- 🟢 **Both submissions are user-actionable in <5 min**.
+**Status 2026-05-08 evening — FINAL**:
+- ✅ **wong2 SUBMITTED** via `mcpservers.org/submit` form. Site responded *"pyobfus-mcp submitted successfully. You'll receive an email once your submission is approved."* Watch `zhurong0525@gmail.com` inbox for the approval email; if no reply in 7 days follow up via the contact link on mcpservers.org.
+- ❌ **appcypher DEAD-END — owner disabled PRs + Issues** (discovered post-fork-push when the PR-create page returned *"An owner of this repository has disabled the ability to open pull requests."*; `gh api repos/appcypher/awesome-mcp-servers --jq '.has_issues'` returns `false` confirming the same setting on Issues). The CONTRIBUTING.md is stale. The repository is in read-only museum mode despite still appearing active (5.5K stars · last push 2026-05-06). **Investigation lessons**: when `gh pr list --state all` returns empty `[]` on a 5K-star awesome-list, suspect "PRs disabled" not "no PRs"; verify with `gh api repos/<owner>/<repo> --jq '{has_issues, has_pull_requests: (.has_issues==true)}'`.
+- ⏸️ **Fork retained** at `zhurong2020/awesome-mcp-servers-appcypher` (zero maintenance cost · re-fork is 1 click if owner reopens · branch `add-pyobfus-mcp` kept as ready-to-go evidence).
+- ✅ **N5 closed** — diversification reduced from 3 lists (punkpeye/wong2/appcypher) to 2 active (punkpeye PR #5777 still OPEN + wong2 submitted). 2 of 3 still ≥ 90K combined stars worth of distribution surface.
 
 Rationale: PR #5777 has been OPEN 5 days with all gates green. punkpeye repo carries ~1k open PRs and merges at human cadence. Two other major awesome-mcp-servers lists exist; investigating both 2026-05-08 yielded:
 
