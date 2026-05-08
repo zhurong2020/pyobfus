@@ -3,10 +3,16 @@ target_platforms:
   - 有心工坊 / tech-empowerment (primary, professional 科普 tone)
   - 知乎专栏 (adapted, more colloquial)
   - V2EX `/go/python` (adapted, even shorter, more casual)
-status: DRAFT v1 (2026-05-05) — for human-voice pass before posting
+status: DRAFT v1 (2026-05-05) — SUPERSEDED by ready-to-post versions in `post-cn-ready/` (2026-05-08)
+ready_versions: post-cn-ready/{tech_empowerment,zhihu,v2ex}.md (tech-deai cn_platforms.md workflow applied · 8 HIGH-AI fixes · LOW-AI preserved)
+ready_index: post-cn-ready/README.md (per-platform differences + posting schedule + rewrite log)
 target_post_window: 2026-05-08 to 2026-05-22 (within 48h after dev.to article lands)
 sequencing: post AFTER dev.to article goes live (CN traffic needs the EN canonical first for backlink credibility)
 length_target: 1,400-1,600 字（有心工坊）· 1,200-1,400（知乎）· 600-800（V2EX）
+---
+
+> ⚠️ **This file is now the design log, not the post source.** Posting versions live at `post-cn-ready/` (tech_empowerment / zhihu / v2ex / README). Do not edit this draft for content fixes — edit the corresponding `post-cn-ready/*.md` instead. This file retains the original design notes + per-platform adaptation guidelines that informed the ready versions.
+
 ---
 
 # CN platform notes (apply when adapting)

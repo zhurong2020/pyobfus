@@ -163,3 +163,15 @@ The pattern table above isn't speculation; it's GPTZero's actual sentence-by-sen
 # Skill candidate?
 
 This methodology is reusable across projects (any tech-blog rewrite scenario). Worth considering Claude Code Skill format. See `_drafts/de-ai-skill-proposal.md` (sibling) for the proposed structure, scope, and trade-offs.
+
+---
+
+# ✅ Skill shipped — methodology now operational
+
+**Update 2026-05-08**: this methodology has been distilled into a Claude Code skill and a placeholder commercial-MCP repo:
+
+- **Free Claude Code skill** (use this today): `~/.claude/skills/tech-deai/` — auto-surfaces in any Claude Code session that involves writing/revising technical prose. 12 HIGH AI patterns + 10 LOW AI patterns + 4 platform-specific workflow prompts (`devto_workflow.md` / `hn_strict.md` / `reddit_workflow.md` / `cn_platforms.md`) + burstiness measurement bash snippet. 4-step workflow (paste → diagnose → rewrite → re-test).
+- **Commercial MCP placeholder repo**: <https://github.com/zhurong2020/tech-deai-loop> (PRIVATE during placeholder phase; v0.1.0 license locked to Apache-2.0). Implementation gated on Phase 0 prerequisites — see `~/.claude/skills/tech-deai/BACKLOG.md` Phase 2.
+- **Phase 0 validation** (≥3 real-article runs required before MCP implementation): 1 of 3 complete (Run 1 = pyobfus CN trio prep, 2026-05-08; Run 2 = HN Show HN, planned 2026-05-11; Run 3 = Reddit /r/Python, planned 2026-05-12). See `~/.claude/skills/tech-deai/RUN_LOG.md` for findings.
+
+This methodology doc remains here as the **origin reference** — the institutional knowledge that birthed the skill. Future updates to the methodology should land in `~/.claude/skills/tech-deai/SKILL.md` (the runtime SSOT), not here.
