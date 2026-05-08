@@ -235,12 +235,37 @@ mcp-publisher login github -token "$(gh auth token)"
 
 | Item | Trigger condition | ETA |
 |---|---|---|
-| punkpeye merges PR #5777 | 86k★-repo human cadence | 3-7 days typical |
+| punkpeye merges PR #5777 | 86k★-repo human cadence · `state=OPEN` confirmed 2026-05-08 morning · all bot labels green (`has-emoji`/`has-glama`/`valid-name`) · 13h-old self status update referencing Glama Quality A still un-acked by maintainer | 3-7 days typical |
 | Glama "No glama.json" checklist clears | Glama cron re-scan after `glama.json` schema fix (commit `8d92487`) | 1-3 days |
 | First external GitHub issue | Real user encounters something | depends on launch |
 | First Pro license sale | Launch traffic + Stripe checkout funnel | depends on launch |
 | GitHub stars 0 → 100+ | Launch + Glama/Registry organic discovery | depends on launch |
 | Glama Quality grade re-check after `glama.json` fix | Eventual cron | 1-3 days |
+
+### N5 — Diversify awesome-list distribution (parallel hedge against punkpeye merge latency · 1h total · ▶ IN FLIGHT 2026-05-08)
+
+**Status 2026-05-08 morning**:
+- ✅ **appcypher fork created + branch pushed**: `zhurong2020/awesome-mcp-servers-appcypher:add-pyobfus-mcp` (renamed from default `awesome-mcp-servers` to avoid collision with existing punkpeye fork) · README.md +1 line at end of Development Tools section · entry uses `simpleicons.org/python` icon + `<sup><sup>⭐</sup></sup>` Official marker per appcypher Legend · **PR creation requires browser click** (gh CLI cross-repo PR with non-default fork name returns 404; documented as known gh limitation). Compare URL ready for one-click submission.
+- ⏸️ **wong2 mcpservers.org submission**: form fields pre-filled (server_name / short_description / link / category=Development / contact_email) — **user click needed** (no API for form). Skip $39 premium tier.
+- 🟢 **Both submissions are user-actionable in <5 min**.
+
+Rationale: PR #5777 has been OPEN 5 days with all gates green. punkpeye repo carries ~1k open PRs and merges at human cadence. Two other major awesome-mcp-servers lists exist; investigating both 2026-05-08 yielded:
+
+| List | Stars | Submission channel | Cost | Verdict |
+|---|---|---|---|---|
+| **`punkpeye/awesome-mcp-servers`** | 86K | PR (#5777 · OPEN) | ✅ already invested | — |
+| **`appcypher/awesome-mcp-servers`** | 5.5K | PR · standard `CONTRIBUTING.md` (alphabetical · 1 PR / suggestion · search-before-submit) · last push 2026-05-06 (active) · 558 open issues | 30 min single PR | **Submit** |
+| **`wong2/awesome-mcp-servers`** | 4K | **No PRs accepted** · README explicitly redirects to `https://mcpservers.org/submit` form · last push 2026-04-30 | 10 min web form | **Submit** |
+
+Why submit both despite stars-tier difference vs punkpeye:
+- (i) 9.5K combined stars + mcpservers.org's own search traffic = non-trivial discoverability hedge
+- (ii) Zero blocking dependency on punkpeye merge — if #5777 stalls past 14 days the two new listings prove the package
+- (iii) appcypher's CONTRIBUTING discipline (alphabetical · search-before-submit) means the same single-line entry from #5777 is reusable verbatim
+- (iv) wong2's mcpservers.org form is faster than any of these PR cycles
+
+Done when: PR landed in appcypher · mcpservers.org submission acked. Track in `docs/V0.4_EXECUTION_LOG.md`.
+
+**Cold-start hint** (do this in a fresh session, not bundled with launch wave): just open this file, jump to N5, copy the existing `#5777` single-line entry from `https://github.com/zhurong2020/pyobfus/blob/main/awesome-mcp-entry.md` (or the `git log -p` of the PR's only commit), and submit verbatim to both — alphabetical position differs but the line content is identical.
 
 ---
 
