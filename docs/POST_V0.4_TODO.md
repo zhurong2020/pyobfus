@@ -242,13 +242,15 @@ mcp-publisher login github -token "$(gh auth token)"
 | GitHub stars 0 → 100+ | Launch + Glama/Registry organic discovery | depends on launch |
 | Glama Quality grade re-check after `glama.json` fix | Eventual cron | 1-3 days |
 
-### N5 — Diversify awesome-list distribution (parallel hedge against punkpeye merge latency · ✅ COMPLETED 2026-05-08 with caveat)
+### N5 — Diversify awesome-list distribution (parallel hedge against punkpeye merge latency · ✅ COMPLETED 2026-05-08 — wong2 / mcpservers.org LIVE)
 
-**Status 2026-05-08 evening — FINAL**:
-- ✅ **wong2 SUBMITTED** via `mcpservers.org/submit` form. Site responded *"pyobfus-mcp submitted successfully. You'll receive an email once your submission is approved."* Watch `zhurong0525@gmail.com` inbox for the approval email; if no reply in 7 days follow up via the contact link on mcpservers.org.
+**Status 2026-05-08 (same-day approval)**:
+- ✅ **wong2 / mcpservers.org APPROVED + LIVE** — approval email *"Your MCP Server has been approved!"* received from `contact@mcpservers.org` on 2026-05-08, **same day as submission** (much faster than the 7-day SLA quoted on submit). Live listing: <https://mcpservers.org/servers/zhurong2020/pyobfus> (slug is `/pyobfus`, not `/pyobfus-mcp` — directory normalizes around the GitHub repo name). Listing reflects the description + 5-tool count + dual-license note as submitted; integrates with Claude Desktop / Claude Code / Cursor / Windsurf / Zed; visible install command `pip install pyobfus-mcp`.
 - ❌ **appcypher DEAD-END — owner disabled PRs + Issues** (discovered post-fork-push when the PR-create page returned *"An owner of this repository has disabled the ability to open pull requests."*; `gh api repos/appcypher/awesome-mcp-servers --jq '.has_issues'` returns `false` confirming the same setting on Issues). The CONTRIBUTING.md is stale. The repository is in read-only museum mode despite still appearing active (5.5K stars · last push 2026-05-06). **Investigation lessons**: when `gh pr list --state all` returns empty `[]` on a 5K-star awesome-list, suspect "PRs disabled" not "no PRs"; verify with `gh api repos/<owner>/<repo> --jq '{has_issues, has_pull_requests: (.has_issues==true)}'`.
 - ⏸️ **Fork retained** at `zhurong2020/awesome-mcp-servers-appcypher` (zero maintenance cost · re-fork is 1 click if owner reopens · branch `add-pyobfus-mcp` kept as ready-to-go evidence).
-- ✅ **N5 closed** — diversification reduced from 3 lists (punkpeye/wong2/appcypher) to 2 active (punkpeye PR #5777 still OPEN + wong2 submitted). 2 of 3 still ≥ 90K combined stars worth of distribution surface.
+- ✅ **N5 closed** — 2 of 3 lists actively distribute pyobfus-mcp: punkpeye PR #5777 still OPEN (86K★) + wong2/mcpservers.org LIVE (4K★ + own search traffic). Combined ≥ 90K stars worth of distribution surface. The mcpservers.org direct listing also lights up before #5777 merges, so launch-wave traffic (HN 5-11 + Reddit 5-12) has a non-PR-gated awesome-list landing target.
+
+**Sponsorship offer in approval email**: mcpservers.org pitched a sponsorship program for "maximum exposure on mcpservers.org + awesome-mcp-servers GitHub repo (3K stars)". **Decision: skip for now** — pyobfus has 0 GitHub stars and unproven launch metrics; spending discretionary marketing budget before launch-wave signal is irrational. Revisit post-launch (5-13+) only if (a) PyPI MoM growth ≥ 50% AND (b) sponsorship pricing is publicly disclosed AND (c) MCP-driven Stripe checkout signal exists.
 
 Rationale: PR #5777 has been OPEN 5 days with all gates green. punkpeye repo carries ~1k open PRs and merges at human cadence. Two other major awesome-mcp-servers lists exist; investigating both 2026-05-08 yielded:
 
@@ -333,5 +335,5 @@ By 2026-06-15: v0.5.0 release candidate (P2-1 + P2-3 + P2-4 + P2-5 + N1 + N2 + N
 
 ---
 
-**Last updated**: 2026-05-08 morning (post-N2-ship) · P0 status: P0.1 ✅ · P0.2 ✅ · P0.3 ✅ shipped with 0.2.0 (Registry stripped publisher namespace; investigation queued for next bump) · P0.4 ✅ live at https://dev.to/zhurong2020/let-claude-code-debug-your-obfuscated-python-a-guide-to-the-pyobfus-mcp-integration-3epm · **N2 ✅ SHIPPED**: pyobfus-mcp 0.2.0 live on PyPI (with PEP 740 attestations) + MCP Registry (active + isLatest) · launch wave next: HN Mon 5-11 / Reddit Tue 5-12 / CN trio Fri-Sat 5-8/9
+**Last updated**: 2026-05-08 (post-mcpservers.org approval) · P0 status: P0.1 ✅ · P0.2 ✅ · P0.3 ✅ shipped with 0.2.0 (Registry stripped publisher namespace; investigation queued for next bump) · P0.4 ✅ live at https://dev.to/zhurong2020/let-claude-code-debug-your-obfuscated-python-a-guide-to-the-pyobfus-mcp-integration-3epm · **N2 ✅ SHIPPED**: pyobfus-mcp 0.2.0 live on PyPI (with PEP 740 attestations) + MCP Registry (active + isLatest) · **N5 ✅ FINAL**: wong2/mcpservers.org LIVE at https://mcpservers.org/servers/zhurong2020/pyobfus (same-day approval) + punkpeye #5777 still OPEN + appcypher dead-end · launch wave next: HN Mon 5-11 / Reddit Tue 5-12 / CN trio Fri-Sat 5-8/9
 **Next review**: 24h post-dev.to (2026-05-08 evening) for first-day reaction metrics; post-launch-wave (5-13) for full multi-platform signal
