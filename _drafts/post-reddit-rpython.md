@@ -2,7 +2,7 @@
 target_subreddit: /r/Python
 post_type: standalone showcase post (NOT a comment in Showcase Saturday)
 title: "Pyobfus 0.4 – AST obfuscator with reverse stack-trace mapping for AI-assisted debugging"
-status: DRAFT v1 (2026-05-05) — for human-voice pass + GPTZero gate before posting
+status: DRAFT v2 (2026-05-08) — Disclosure paragraph honest rewrite (removes "Tried PyArmor first; ... broke ... loop I'd come to depend on" claim that was narrative texture not fact · reframes as "Looked at PyArmor first; Pro pricing + one-way structural design") · ready for human-voice pass + GPTZero gate before posting
 target_post_window: 2026-05-13 to 2026-05-20, weekday 12:00-15:00 EST (US lunch peak on /r/Python)
 sequencing: post AFTER HN attempt has resolved (HN feedback may surface revisions worth folding in)
 ---
@@ -51,7 +51,7 @@ Use `Showcase` flair on the subreddit's flair picker when submitting. Without it
 > | License | Apache 2.0 | BSD | Apache 2.0 | proprietary |
 > | Multi-file project support | yes | yes | yes | no |
 >
-> Disclosure: I'm the maintainer. Built it while shipping algorithm modules from a medical imaging research codebase that needed binaries for collaborators without exposing the internals. Tried PyArmor first; its protection model is one-way, which broke the AI-assisted debugging loop I'd come to depend on, so I built this around closing that specific gap.
+> Disclosure: I'm the maintainer. Built it while shipping algorithm modules from a medical imaging research codebase that needed binaries for collaborators without exposing the internals. Looked at PyArmor first, but the serious protection sits behind paid Pro and the bigger structural issue is one-way design: once class names are mangled to `I0` you can't reverse them to debug a production trace. That would break the AI-assisted debugging loop I'd come to depend on (most of the code was being written *with* Claude Code in the first place), so I built pyobfus around closing that specific gap.
 >
 > - `pip install pyobfus pyobfus-mcp`
 > - https://github.com/zhurong2020/pyobfus

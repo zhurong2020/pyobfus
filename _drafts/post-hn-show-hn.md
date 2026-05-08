@@ -2,7 +2,7 @@
 title_field: "Show HN: Pyobfus – Python obfuscator that doesn't break Claude Code"
 url_field: https://github.com/zhurong2020/pyobfus
 text_body: see below (HN allows EITHER url OR text — we use url, no text body, then engage in comments)
-status: DRAFT v1 (2026-05-05) — for human-voice pass + GPTZero gate before submission
+status: DRAFT v2 (2026-05-08) — Section 1 honest rewrite (removes "Tried PyArmor first; it works" claim that was narrative texture not fact · reframes as "Looked at PyArmor first; one-way design + Pro pricing" + structural concern about Claude debugging) · ready for human-voice pass + GPTZero gate before submission
 target_post_window: 2026-05-12 to 2026-05-19, weekday 09:00-11:00 EST (HN peak window)
 sequencing: post AFTER dev.to has been live ≥48h (so commenters have material to read), BEFORE Reddit
 ---
@@ -26,7 +26,7 @@ Title is 65 chars including "Show HN:". Under the 80-char HN limit. Lead noun ("
 
 Per HN convention, the submitter posts a top-level comment expanding context. This is what readers actually read first.
 
-> Author here. I built this while shipping algorithm modules from a medical imaging research codebase under active patent and software-copyright filing. Tried PyArmor first; it works, but its protection model is one-way by design — production stack traces come back as `'I0' object has no attribute 'I2'`, which Claude Code can't reason about. Cython has the same problem, plus it compiles to machine code.
+> Author here. Built this while shipping algorithm modules from a medical imaging research codebase under active patent and software-copyright filing. Looked at PyArmor first; the serious protection sits behind paid Pro, which made me stop and think about whether I needed all of it. The bigger thing was structural: PyArmor's protection is one-way by design. Once a class name is mangled to `I0`, you can't reverse it. Production traces come back as `'I0' object has no attribute 'I2'`, and Claude Code (which had been writing half the code in the first place) can't reason about that. Cython has the same problem, plus it compiles to machine code.
 >
 > The differentiator in pyobfus: `--save-mapping` writes a forward + reverse name table when you obfuscate; `--unmap` applies it in reverse to a trace. Customers see the obfuscated bytes; you keep the mapping somewhere safe; when a crash arrives you reverse it locally and paste the readable trace into Claude.
 >
