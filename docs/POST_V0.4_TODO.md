@@ -24,6 +24,7 @@
 | pyobfus-mcp latest | 0.2.0 (2026-05-08) | ✅ |
 | pyarmor latest | **9.2.4** (2026-03-18) — VMC/ECC modes since 9.2.0 (Oct 2025) | ✅ pypi.org/pypi/pyarmor |
 | pyarmor.cli | **9.2.4** (2026-03-18) — same release date / same maintainer / modular CLI subpackage of pyarmor; **NOT a separate competitor** | ✅ pypi.org/pypi/pyarmor.cli |
+| vmp-protector | **1.0.0** (2026-05-02) — anonymous (no author email / no GitHub repo / no homepage in PyPI metadata) · MIT · 16-reg / 28-opcode register-based VM + XOR+zlib+base64 string encryption + anti-debug + anti-tamper + control-flow flattening · **bytecode-VM lane (alongside PyArmor)** · NOT in pyobfus's AST/AI-debug lane · do NOT add to pyobfus's positioning copy until provenance verified | ✅ pypi.org/pypi/vmp-protector (investigated 2026-05-08 by competitive-intel agent; manifestguard + smelt are PyArmor-search false positives, NOT competitors) |
 | python-obfuscator | **0.1.0** (2026-04-03) — was dormant 2021-2026, just revived | ✅ pypi.org/pypi/python-obfuscator |
 | python-obfuscation-framework | **1.13.0** (2026-04-05) — 23 releases total, 14 in last 5 weeks | ✅ pypi.org/pypi/python-obfuscation-framework |
 | mcp SDK latest | 1.27.0 (2026-04-02) — the one that surfaced our `version=` kwarg drift | ✅ pypi.org/pypi/mcp |
