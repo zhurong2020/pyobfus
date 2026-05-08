@@ -1,37 +1,27 @@
 ---
 platform: 知乎专栏
 category: Python / 开源 / AI
-title: 我开源了一个 Python 代码混淆工具 pyobfus，因为 PyArmor 让 Claude Code 看不懂崩溃日志了
+title: 我用 Claude Code 写了一个 Python 代码混淆工具 pyobfus，因为不想付钱买一个之后还得对抗它的工具
 tags: [Python, 开源项目, 人工智能, 编程]
-status: READY (tech-deai cn_platforms.md workflow applied 2026-05-08)
+status: READY v2 (tech-deai 2026-05-08 morning · Section 1 honest rewrite 2026-05-08 evening · removes I0/I2 incident anecdote / 40-min unmap claim that were narrative texture not fact · keeps AI-debug insight as forward-looking reasoning)
 length: ~1280 字
 target_post: 2026-05-09 (≥24h after 有心工坊 to avoid simultaneous-multi-platform pattern)
 voice: 较 colloquial · 第一人称强 · 段落短 · 「我」化叙述 · 末段邀评论
 ---
 
-# 我开源了一个 Python 代码混淆工具 pyobfus，因为 PyArmor 让 Claude Code 看不懂崩溃日志了
+# 我用 Claude Code 写了一个 Python 代码混淆工具 pyobfus，因为不想付钱买一个之后还得对抗它的工具
 
 故事得从一份要申请专利的代码说起。
 
 我在帮一个医学影像研究项目做工程实现。核心算法模块跑通了，正准备走专利申请和软件著作权登记。意思是分发出去之前要做代码保护——不是国家级反编译那种，但至少不能让任何路过的人 `tar xf` 一下就读到核心。
 
-第一反应是 PyArmor。装上跑通，产物看起来很专业。
+第一反应是 PyArmor。翻了文档、看了功能矩阵、点开价格页。真正能让反编译变难的功能——字节码加密、控制流平坦化、反调试——都在付费 Pro 层。这是合理的商业模式。但让我停下来想了一下：我要买的，是一个适合我工作流的工具，还是一个适合**别人**工作流的工具？
 
-然后第一次生产报错，崩溃日志是这样：
+我的工作流有它自己的形状。写代码大半时间是 Claude Code，vibe coding 那种节奏。生产报错第一个动作就是把栈贴给 Claude。一个会把类名全换成 `I0`、方法名全换成 `I2` 的混淆器，落到这工作流里会怎样？日志贴过去，Claude 只能回一句 *"I have no idea what `I0` or `I2` refer to"*——**我亲手装的保护把我天天用的助手挡门外了**，反过来对真正的攻击者一点用都没有（他们有的是时间慢慢反推）。
 
-```
-Traceback (most recent call last):
-  File "dist/algorithms/preprocess.py", line 23, in <module>
-AttributeError: 'I0' object has no attribute 'I2'
-```
+PyArmor 是给「由人读日志」的时代设计的，Cython 直接机器码更远。两者放在 2013 年、2017 年都说得过去。但调试位上坐着模型的项目里，这假设接不上。
 
-我习惯性地贴给 Claude Code 让它帮我分析。Claude 回了一句 *"I don't know what `I0` or `I2` refer to"*。
-
-那一刻我意识到：**PyArmor 在保护代码免受外部窥视的同时，也悄无声息地把我自己最依赖的 AI 调试工具变成了陌生人**。Vibe coding 写出来的代码，结果 vibe coding 已经看不懂了。
-
-我花了 40 分钟手工把那个崩溃栈对照源代码反推回去，修了 bug。第二天开始调研，发现这条路上没有现成方案。PyArmor 的保护模型是单向设计；Cython 直接编进机器码，更糟。两个方向都意味着你必须放弃 AI 辅助调试。
-
-这是个真实的 trade-off，但好像没人讨论。所以我用了一个月时间跟 Claude Code 一起，把这个工具写出来了。pyobfus 0.4.0，2026-04-22 在 PyPI 发布。
+这是个真实的 trade-off，但好像没人讨论。所以我没付钱，反过来用了一个月晚上跟 Claude Code 一起把工具写出来——围绕一个取舍：保护对外不变，但对自己留一份小到能塞密码管理器的反向映射表。pyobfus 0.4.0，2026-04-22 在 PyPI 发布。
 
 ## 为什么 AI 编程时代的混淆器需要重新设计
 

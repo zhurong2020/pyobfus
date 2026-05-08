@@ -2,7 +2,7 @@
 platform: 有心工坊 / tech-empowerment
 category: 技术赋能
 title: pyobfus — 一个让 AI 还能读懂崩溃日志的 Python 代码混淆器
-status: READY (tech-deai cn_platforms.md workflow applied 2026-05-08)
+status: READY v2 (tech-deai 2026-05-08 morning · Section 1 honest rewrite 2026-05-08 evening · removes I0/I2 incident anecdote / 40-min unmap claim that were narrative texture not fact · keeps AI-debug insight as forward-looking reasoning)
 length: ~1480 字
 target_post: 2026-05-08
 embed_screenshots:
@@ -20,23 +20,13 @@ pyobfus 这个工具是从一个具体需求里长出来的。
 
 我在帮一个医学影像研究项目做工程实现，几个核心算法模块已经能在生产环境跑起来。问题是这些模块马上要走专利申请和软件著作权登记，分发出去之前必须做某种程度的代码保护。不是国家级反编译那种保护，但至少不能让任何路过的人 `tar xf` 一下就能读到核心算法。
 
-最直接的方案是 PyArmor。我装了，跑了，混淆产物看起来很专业。
+最直接的方案是 PyArmor。我去翻了文档，看了功能矩阵，找到了价格页。能真正给反编译者添堵的那些东西——字节码加密、控制流平坦化、反调试——都在付费 Pro 层。这是合理的商业模式，没问题。但让我停下来想了一下：我要付的授权费，是为一个适合我工作流的工具，还是为一个适合「**别人**」工作流的工具？
 
-然后第一次生产环境出错的时候，崩溃日志是这样：
+我的工作流有它自己的形状。那一阵子写代码大半时间是 Claude Code，vibe coding 的方式：我描述需求，模型给出实现，我看着调整。生产报错时第一个动作也是把崩溃栈贴给 Claude。那么一个会把所有类名换成 `I0`、所有方法名换成 `I2` 的混淆器，落到这种工作流里会怎样？崩溃日志贴过去，Claude 只能回一句 *"I have no idea what `I0` or `I2` refer to"*——我亲手装的保护，把我天天用的助手挡在门外，反过来对真正的攻击者一点用都没有（他们有的是时间慢慢反推）。
 
-```
-Traceback (most recent call last):
-  File "dist/algorithms/preprocess.py", line 23, in <module>
-AttributeError: 'I0' object has no attribute 'I2'
-```
+PyArmor 是给「由人读崩溃日志」的工作流设计的。Cython 编进机器码，离 LLM 可读更远。两者放在 2013 年、2017 年都讲得通。但放到一个晚上 vibe coding 的项目里，调试位上坐的是模型——这套老假设接不上。
 
-我习惯性地把这段贴给 Claude Code，让它分析问题。Claude 回了一句 *"I don't know what `I0` or `I2` refer to"*。
-
-那一刻我意识到：PyArmor 在保护代码免受外部窥视的同时，也悄无声息地把我自己最依赖的 AI 调试工具变成了陌生人。Vibe coding 写出来的代码，结果 vibe coding 已经看不懂了。
-
-我花了 40 分钟手工把那个崩溃栈对照源代码反推回去，修了 bug。第二天开始重新调研，结果发现这条路上没有现成的方案：PyArmor 的保护模型是单向设计；Cython 直接编进机器码，更糟。两个方向都意味着你必须放弃 AI 辅助调试。
-
-这是个真实的 trade-off，但好像没人讨论。所以我用了大概一个月时间，跟 Claude Code 一起，把这个工具写出来了——pyobfus 0.4.0，2026-04-22 在 PyPI 发布。
+这是个真实的 trade-off，但好像没人讨论。所以与其付钱买一个我之后还要对抗的工具，不如自己写一个小的。一个月晚上，跟 Claude Code 一起一行行码出来，围绕一个取舍：保护对外不变，但对自己留一份小到能塞进密码管理器的反向映射表。这就是 pyobfus 0.4.0，2026-04-22 在 PyPI 发布。
 
 <!-- more -->
 

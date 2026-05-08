@@ -56,12 +56,14 @@
 
 LOW AI patterns 全部保留 verbatim：
 
-- 第一人称 + 短句（「我装了，跑了，混淆产物看起来很专业」）
-- 具体数字（「40 分钟手工」「2026-04-22 在 PyPI 发布」「~1KB 小文件」）
-- 命名错误（`'I0' object has no attribute 'I2'`）
-- 网络口语（「踩到这个坑」「Vibe coding 写出来的代码，结果 vibe coding 已经看不懂了」）
+- 第一人称 + 短句
+- 具体数字（「2026-04-22 在 PyPI 发布」「~1KB 小文件」）
+- 命名错误的虚拟语气提及（`'I0' object has no attribute 'I2'` — v2 honest rewrite 里改成了「会怎样 / 假设贴过去」的条件式，不再是真实事故陈述）
+- 网络口语（「踩到这个坑」）
 - 自承认弱点（「老实说：pyobfus 是名字混淆 + 可选的字符串加密，不是字节码级加密」）
 - 网络口语段落收尾（「别用 Python 写那种代码」）
+
+> **2026-05-08 evening 更新（Path A v5 honest rewrite）**：原本被列在这个 LOW-AI 保留清单里的两条——「我装了，跑了，混淆产物看起来很专业」+「40 分钟手工反推」+「Vibe coding 写出来的代码，结果 vibe coding 已经看不懂了」——属于 *fabricated 叙事*（实际作者并未装 PyArmor 跑过崩溃栈，是为了戏剧化 hook 而虚构的事件）。这次 v2 修订把 Section 1 改成了 *forward-looking reasoning*（"调研了 PyArmor，价格 + 单向设计两层，停下来想了一下：如果用了会怎样"）。AI debug 担忧本身是真见解，只是事件层从「真发生过」改成「想到了所以没装」。低 AI 检测得分受影响有限——burstiness 还在、第一人称还在、具体数字（PyPI 发布日 / 一个月 / ~1KB）都还在。三平台 ready 文件已同步至 v2。
 
 ## Pre-publish 平台共用 checklist
 

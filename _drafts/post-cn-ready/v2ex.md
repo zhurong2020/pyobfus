@@ -1,7 +1,7 @@
 ---
 platform: V2EX `/go/python` 节点
 title: "[分享创造] pyobfus 0.4 — Python 代码混淆器，不会让 Claude 看不懂崩溃日志"
-status: READY (tech-deai cn_platforms.md workflow applied 2026-05-08)
+status: READY v2 (tech-deai 2026-05-08 morning · Section 1 honest rewrite 2026-05-08 evening · removes "试了 PyArmor → 客户回传崩溃日志" claim that was narrative texture not fact · keeps single-line-design / Claude-can't-read concern as forward-looking reasoning)
 length: ~700 字
 target_post: 2026-05-10 (≥24h after 知乎)
 voice: V2EX 短促 · 直接列点 · 不长 origin story · 末尾给 GitHub + PyPI
@@ -11,9 +11,9 @@ voice: V2EX 短促 · 直接列点 · 不长 origin story · 末尾给 GitHub + 
 
 > 利益声明：我是作者。
 
-最近因为给一个要申请专利的医学项目 ship 算法模块，需要 Python 代码混淆。试了 PyArmor，能用，但有个问题：客户回传的崩溃日志变成了 `'I0' object has no attribute 'I2'`，Claude Code 完全没法读。
+最近因为给一个要申请专利的医学项目 ship 算法模块，需要 Python 代码混淆。调研了 PyArmor — 真正能让反编译变难的功能（字节码加密 / 控制流平坦化 / 反调试）在付费 Pro 层，价格不是问题但停下来想了一下：现在我大半代码是 Claude Code 写的，崩溃日志也是贴给 Claude 看的。如果用 PyArmor 把类名全换成 `I0`、方法名换成 `I2`，崩溃栈一回来 Claude 就读不懂了。这事 PyArmor 不可能在它当前的架构下修，因为它的保护本来就是单向设计。Cython 更糟（直接机器码）。
 
-PyArmor 的保护是单向设计，本质上没办法在不破坏保护的前提下反向出原始名字。Cython 更糟（直接机器码）。所以花了一个月写了 pyobfus，重点解决一个 trade-off：保护 + AI 调试同时存在。
+所以没付，自己花一个月跟 Claude Code 一起写了 pyobfus，重点解决一个 trade-off：保护 + AI 调试同时存在。
 
 核心思路：
 
