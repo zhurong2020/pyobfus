@@ -21,8 +21,9 @@
 | Item | Value | Verified |
 |---|---|---|
 | pyobfus latest | 0.4.0 (2026-04-22) | ✅ |
-| pyobfus-mcp latest | 0.1.2 (2026-05-07) | ✅ |
+| pyobfus-mcp latest | 0.2.0 (2026-05-08) | ✅ |
 | pyarmor latest | **9.2.4** (2026-03-18) — VMC/ECC modes since 9.2.0 (Oct 2025) | ✅ pypi.org/pypi/pyarmor |
+| pyarmor.cli | **9.2.4** (2026-03-18) — same release date / same maintainer / modular CLI subpackage of pyarmor; **NOT a separate competitor** | ✅ pypi.org/pypi/pyarmor.cli |
 | python-obfuscator | **0.1.0** (2026-04-03) — was dormant 2021-2026, just revived | ✅ pypi.org/pypi/python-obfuscator |
 | python-obfuscation-framework | **1.13.0** (2026-04-05) — 23 releases total, 14 in last 5 weeks | ✅ pypi.org/pypi/python-obfuscation-framework |
 | mcp SDK latest | 1.27.0 (2026-04-02) — the one that surfaced our `version=` kwarg drift | ✅ pypi.org/pypi/mcp |
@@ -231,6 +232,30 @@ mcp-publisher login github -token "$(gh auth token)"
 
 ---
 
+#### N6 — PyPI search ranking SEO (staged for next bumps · 0 effort to ship · ride along with N1 / N3 / future bumps)
+
+**Why**: The user spot-checked PyPI search for "pyarmor" 2026-05-08 and pyobfus did not appear on page 1 of 4 result pages. Investigation:
+
+- pyobfus 0.4.0 IS in the search index (live PyPI summary has 1 "PyArmor" mention; live README has 4 case-insensitive "pyarmor" mentions; keywords include `pyarmor-alternative`). Realistic location is pages 2-3.
+- pyobfus-mcp 0.2.0 was **NOT in the index at all**: 0 PyArmor mentions in summary, 0 in keywords. Anyone searching "pyarmor" on PyPI would never find pyobfus-mcp.
+- Top 5 results are dominated by packages that have "pyarmor" literally in **package name** (`pyarmor`, `pyarmor.cli`, `pyarmor.man`, `pyarmor.mini`, `pyarmor-webui`). Structural advantage we cannot match without renaming pyobfus to `pyobfus-pyarmor` style — which would be trademark / passing-off risk and is firmly off-limits.
+
+**Realistic target**: page 1-2 of "pyarmor" PyPI search (top-half of the second page, not top 3). Search-result conversion (someone who finds us reading a 1-line differentiator) matters more than absolute rank.
+
+**Action (staged 2026-05-08, takes effect on next bump per do-not-do version-bump rule)**:
+1. ✅ `pyobfus/pyproject.toml` summary rewritten 2026-05-08: keeps 1 PyArmor mention but adds the differentiator phrase "same protection, traces stay debuggable" so a search-results scanner gets the value-prop in 1 sentence. Char count 320 → 282.
+2. ✅ `pyobfus_mcp/pyproject.toml` summary rewritten 2026-05-08: appended "PyArmor alternative with first-class AI-debug story." (0 → 1 PyArmor mention).
+3. ✅ `pyobfus_mcp/pyproject.toml` keywords gained `pyarmor-alternative` 2026-05-08.
+
+**Hard limits (do NOT do)**:
+- Don't add "pyarmor" to package name (trademark + passing-off risk; PyPI moderation may reject)
+- Don't go past 2 PyArmor mentions per summary (3+ looks like keyword stuffing; PyPI Acceptable Use Policy frowns on deceptive metadata)
+- Don't bump pyobfus or pyobfus-mcp version just to ship these metadata edits — same reason as P0.3 `_meta`. Bundle with N1 (PEP 750 t-string handler → 0.5.0) or N3 (claude-skill preset) or any other natural bump.
+
+**Done when**: pyobfus 0.5.0 (or first version after this entry) is published and a fresh `curl https://pypi.org/pypi/pyobfus/json | jq .info.summary` shows the new wording; same for pyobfus-mcp on its next bump. As secondary signal, manually search "pyarmor" on PyPI 1 week after both ship and verify pyobfus + pyobfus-mcp both appear in the result set (ranking may take longer to reflect).
+
+---
+
 ## 🟢 P2 — Passive / waiting (no action needed; just monitor)
 
 | Item | Trigger condition | ETA |
@@ -335,5 +360,5 @@ By 2026-06-15: v0.5.0 release candidate (P2-1 + P2-3 + P2-4 + P2-5 + N1 + N2 + N
 
 ---
 
-**Last updated**: 2026-05-08 (post-mcpservers.org approval) · P0 status: P0.1 ✅ · P0.2 ✅ · P0.3 ✅ shipped with 0.2.0 (Registry stripped publisher namespace; investigation queued for next bump) · P0.4 ✅ live at https://dev.to/zhurong2020/let-claude-code-debug-your-obfuscated-python-a-guide-to-the-pyobfus-mcp-integration-3epm · **N2 ✅ SHIPPED**: pyobfus-mcp 0.2.0 live on PyPI (with PEP 740 attestations) + MCP Registry (active + isLatest) · **N5 ✅ FINAL**: wong2/mcpservers.org LIVE at https://mcpservers.org/servers/zhurong2020/pyobfus (same-day approval) + punkpeye #5777 still OPEN + appcypher dead-end · launch wave next: HN Mon 5-11 / Reddit Tue 5-12 / CN trio Fri-Sat 5-8/9
+**Last updated**: 2026-05-08 (post-mcpservers.org approval + N6 PyPI-search-SEO staging) · P0 status: P0.1 ✅ · P0.2 ✅ · P0.3 ✅ shipped with 0.2.0 (Registry stripped publisher namespace; investigation queued for next bump) · P0.4 ✅ live at https://dev.to/zhurong2020/let-claude-code-debug-your-obfuscated-python-a-guide-to-the-pyobfus-mcp-integration-3epm · **N2 ✅ SHIPPED**: pyobfus-mcp 0.2.0 live on PyPI (with PEP 740 attestations) + MCP Registry (active + isLatest) · **N5 ✅ FINAL**: wong2/mcpservers.org LIVE at https://mcpservers.org/servers/zhurong2020/pyobfus (same-day approval) + punkpeye #5777 still OPEN + appcypher dead-end · **N6 ✅ STAGED**: PyPI summary + keywords edits in source (both packages); ride next legitimate version bump · launch wave next: HN Mon 5-11 / Reddit Tue 5-12 / CN trio Fri-Sat 5-8/9
 **Next review**: 24h post-dev.to (2026-05-08 evening) for first-day reaction metrics; post-launch-wave (5-13) for full multi-platform signal
