@@ -182,18 +182,33 @@ gh api repos/zhurong2020/pyobfus --jq '.topics' | tr ',' '\n' | grep -i pyarmor 
 
 ---
 
-## 🟡 P1 — v0.5 work (4-6 weeks)
+## 🟡 P1 — v0.5 work (8-10 weeks · revised 2026-05-09 evening for Path C patent gating)
 
-### Already in `docs/ROADMAP.md` v0.5+ (still valid · re-prioritized)
+> ⚠️ **Path C patent gating discipline (2026-05-09 evening — read first)**
+>
+> Audit on 2026-05-09 confirmed `pyobfus_pro/` source has been in the public GitHub repo + every PyPI wheel since V0.1.0 (2025-11-11). All V0.4.0 features are now public prior art under CN Patent Law §22, so the V0.4.0 patent path is dead. Only **未实现 + 未公开** features remain patentable.
+>
+> **6 v0.5/v0.5.1 Pro features have been earmarked for the patent application**: P2-1 (Selective Opacity), P2-7 (Forensic watermarking), P2-8 (License binding combo), P2-9 (`@seal_code`), P2-10 (`--scrub-traceback`), P2-11 (Runtime String Vault). Implementation of these MUST happen in a separate private repo (`pyobfus-pro-dev` or equivalent), NOT in the `zhurong2020/pyobfus` public repo, until the patent 申请号 is received.
+>
+> **No public commits, branches, PRs, issues, or comments referencing the algorithmic mechanism of these 6 items until patent filed.** Naming the feature in this TODO + ROADMAP is OK (no implementation detail revealed). See `~/.claude/projects/-mnt-c-onedrive-msft-OneDrive---MSFT-rong-3-job-program-pyobfus/memory/pro_disclosure_finding_2026-05-09.md` and `pyobfus_patent_strategy.md` for the full reasoning.
+>
+> v0.5 ship date pushed from 2026-06-15 → late July / early August 2026 to allow patent filing window (~4-6 weeks).
+
+### Already in `docs/ROADMAP.md` v0.5+ (still valid · re-prioritized · patent-gated marked 🔒)
 
 | ID | Item | Status | Re-prioritization rationale |
 |---|---|---|---|
-| **P2-1** | Selective Opacity (layered AES protection) | TODO | Keep · core philosophical differentiator |
-| **P2-3** | `--strip-ai-artifacts` mode | TODO · **promoted from P2-3** | Pairs naturally with new N3 (claude-skill preset); both serve "ship AI-generated code as IP" segment |
-| **P2-4** | Import obfuscation (Pro) | TODO | Keep · closes PyArmor Pro feature gap |
-| **P2-5** | Numeric / constant obfuscation | TODO | Keep · small effort, fills gap |
-| **P2-2** | VSCode extension | TODO · **demoted** | VSCode marketplace is slower-growing channel than launch posts; revisit after launch data |
-| **drop-3.8** | Drop Python 3.8 support | TODO | Both new competitors require `>=3.10`; we're paying 3.8 cost for shrinking userbase |
+| **P2-1** 🔒 | Selective Opacity (layered AES protection) | TODO · **PRIVATE-DEV** | Patent target. Core philosophical differentiator. **Implement in private repo only until 申请号 received.** |
+| **P2-3** | `--strip-ai-artifacts` mode | TODO · **promoted from P2-3** | Pairs naturally with new N3 (claude-skill preset); both serve "ship AI-generated code as IP" segment. Public-OK (Core feature, not patent-gated). |
+| **P2-4** | Import obfuscation (Pro) | TODO | Keep · closes PyArmor Pro feature gap. Public-OK (existing public Pro module category). |
+| **P2-5** | Numeric / constant obfuscation | TODO | Keep · small effort, fills gap. Public-OK (Core feature). |
+| **P2-2** | VSCode extension | TODO · **demoted** | VSCode marketplace is slower-growing channel than launch posts; revisit after launch data. Public-OK. |
+| **drop-3.8** | Drop Python 3.8 support | TODO | Both new competitors require `>=3.10`; we're paying 3.8 cost for shrinking userbase. Public-OK. |
+| **P2-7** 🔒 | Forensic watermarking / `--fingerprint <buyer-id>` (Pro) | TODO · **PRIVATE-DEV** | Patent target. Strongest novelty (only vmp-protector 1.0.0 ships per-buyer deterministic build; arXiv 2510.11251 CLASP backing). **Implement in private repo only until 申请号 received.** |
+| **P2-8** 🔒 | License binding combo (Pro) | TODO · **PRIVATE-DEV** | Patent target. `--expire` + `--bind-device` + `--period` combo, pure Python. **Implement in private repo only until 申请号 received.** |
+| **P2-9** 🔒 | `@seal_code` integrity decorator (Pro) | TODO · **PRIVATE-DEV** | Patent target. Build-time SHA256 + runtime detect patching. **Implement in private repo only until 申请号 received.** |
+| **P2-10** 🔒 | `--scrub-traceback` (Pro) | TODO · **PRIVATE-DEV** | Patent target. Production-side traceback encryption as inverse of unmap. First-of-kind architecture. **Implement in private repo only until 申请号 received.** |
+| **P2-11** 🔒 | Runtime String Vault (Pro) | TODO · **PRIVATE-DEV** | Patent target. KV namespace for runtime secrets (vmp-protector StringVault parity). **Implement in private repo only until 申请号 received.** |
 
 ### New items surfaced from 2026-05-07 research
 
@@ -381,6 +396,37 @@ gh api repos/zhurong2020/pyobfus --jq '.topics' | tr ',' '\n' | grep -i pyarmor 
 
 ---
 
+#### N11 — JOSS (Journal of Open Source Software) submission (gated on patent 申请号 · ~2-4 month review · added 2026-05-09)
+
+**Why**: free Crossref-DOI peer-reviewed venue for open-source software. Diamond Open Access (0 author APC, 0 reader paywall). pyobfus crosses JOSS's **6-month public-history threshold on 2026-05-12** (V0.1.0 first PyPI 2025-11-12; verified via cardiac-manuscripts JOSS submission path research 2026-04-27, source URL https://joss.theoj.org). Citing a JOSS DOI in README + landing pages + future research-software discussions raises pyobfus's academic legitimacy at zero cost.
+
+**Reference**: <https://joss.theoj.org> · <https://joss.readthedocs.io/en/latest/submitting.html> · `~/projects/cardiac-ml-research/docs/project/JOSS_OPEN_CORE_POLICY_RESEARCH.md` (2025-11-19 prior research confirming open-core compatible with JOSS) · `~/projects/cardiac-manuscripts/cac-plus_methodology/supplementary/joss_submission_path.md` (2026-04-27 verification of 6-month rule)
+
+**Critical sequencing constraint**: must be submitted **AFTER** patent 申请号 received per `memory/pyobfus_patent_strategy.md` Path C. JOSS publication is not net-new disclosure for already-public V0.4.0 features (PyPI release exhausted CN novelty 2025-11-11), but the JOSS paper:
+1. Citing "patent pending CN [申请号]" needs the申请号 to exist
+2. Forces precise articulation of the inventive step → must avoid leaking v0.5 patent claim wording before they're filed
+3. Gives more substance to discuss (v0.5 features observable in public source by then)
+
+So target submission window = **2026-Q3 / Q4** (after v0.5 ships on PyPI per Path C timeline).
+
+**Action sequence**:
+1. After patent 申请号 received: draft `paper.md` (500-1000 words per JOSS format) with structure `Summary` + `Statement of need` + `Implementation` + `Acknowledgments`
+2. **Statement of need framing**: lead with AI-collaborative-workflow-infrastructure positioning per Session 23 sync point 3 (layered deployment, ChatGPT-validated three-layer stack, OpenSSF passing badge as maturity evidence); cite cardiac-ml-research as real-world validation case study (per `JOSS_OPEN_CORE_POLICY_RESEARCH.md` 2025-11-19 strategy); frame the paper as "research software toolkit for code IP protection in AI-assisted development workflows" (avoids the JOSS scope-rejection risk for "thin wrapper" / "single-function package")
+3. Open-core disclosure (1-2 sentences per JOSS研究 doc): "PyObfus adopts an open-core model. The Community Edition (Apache 2.0, subject of this paper) provides core obfuscation features validated on production systems; a Professional Edition with advanced security features is available for commercial deployments."
+4. Cite "patent pending CN [申请号]" as legitimacy signal in Implementation section
+5. `paper.bib` for refs (pyca/cryptography for crypto baseline · arXiv 2510.11251 CLASP · vmp-protector 1.0.0 PyPI · OpenSSF Best Practices 12788 · JOSS design paper Katz 2018)
+6. Submit via <https://joss.theoj.org/papers/new>; review process is open via GitHub issue tracker; respond to reviewer comments publicly
+7. After acceptance: add JOSS DOI badge to README; cross-link from `pyobfus.dev` (N7) `/about` and PyPI long_description
+
+**Risk register**:
+- **Scope rejection**: JOSS sometimes rejects "thin API client" / "single-function package". Mitigation: framing per #2 above; emphasize cardiac-ml-research validation + OpenSSF badge + 90% test coverage + 21-job CI matrix as evidence of substantive engineering toolkit (≠ thin wrapper). Backup if rejected: arXiv `cs.SE` / `cs.CR` preprint (free, immediate, 0 review) → still gets timestamp + Google Scholar visibility, and most journals allow arXiv preprints alongside subsequent submission.
+- **Reviewer skepticism on commercial Pro version**: pre-empted in 2025-11-19 research (`JOSS_OPEN_CORE_POLICY_RESEARCH.md`) — JOSS has no policy against open-core, only requires submitted code be OSI-licensed (✅ Apache 2.0). Rebuttal language ready in that doc Q1/Q2/Q3.
+- **Review timeline uncertainty**: community-reported 2-4 months but not officially stated. Don't pin downstream marketing to JOSS DOI date.
+
+**Done when**: paper.md drafted post-patent · submitted to JOSS · accepted with Crossref DOI · JOSS badge added to README · DOI cross-linked from pyobfus.dev (if N7 live by then) · listed in `~/projects/cardiac-ml-research/docs/project/JOSS_OPEN_CORE_POLICY_RESEARCH.md` follow-up section.
+
+---
+
 ## 🟢 P2 — Passive / waiting (no action needed; just monitor)
 
 | Item | Trigger condition | ETA |
@@ -393,6 +439,9 @@ gh api repos/zhurong2020/pyobfus --jq '.topics' | tr ',' '\n' | grep -i pyarmor 
 | Glama Quality grade re-check after `glama.json` fix | Eventual cron | 1-3 days |
 | ReadTheDocs `pyobfus-mcp` section (extend existing pyobfus mkdocs site) | Polish item · defer until N7/N8 unifies docs surface OR until first MCP-tool API question lands in Issues/Discussions | depends on demand |
 | CCPC 软著 e-certificate | Filed via CCPC web portal after real-name auth cleared 2026-05-09 (file prep complete, see Session 24 log + `../pyobfus-legal/software_copyright/README.md` §十 for submission cheat sheet) | ~30 working days from submission |
+| Patent 受理通知书 + 申请号 (CN) | After Phase 4 of Path C — file via CPC client w/ 费减请求书 (per `memory/pyobfus_patent_strategy.md` revised 2026-05-09 evening) | ~1-2 weeks from CPC submission |
+| JOSS DOI | After patent申请号 in hand → submit per N11 → open peer review on GitHub issue tracker | community-reported 2-4 months |
+| 6-month JOSS public-history threshold | pyobfus V0.1.0 first PyPI 2025-11-12 → threshold met 2026-05-12 | passive — auto-clears in 3 days |
 
 ### N5 — Diversify awesome-list distribution (parallel hedge against punkpeye merge latency · ✅ COMPLETED 2026-05-08 — wong2 / mcpservers.org LIVE)
 
