@@ -1,6 +1,6 @@
 # pyobfus Post-v0.4 Action Plan
 
-**Snapshot**: 2026-05-07 (after v0.4 distribution leg fully closed · pyobfus-mcp 0.1.2 emergency release shipped · Glama Quality A · awesome-mcp-servers PR #5777 awaiting human merge).
+**Snapshot**: 2026-05-09 (after pyobfus-mcp 0.2.0 ship + mcpservers.org listing live + 2026-05-09 strategy review added P0.5/P0.6/P0.7 + N7/N8/N9 + single-tier pricing guardrail).
 
 **Use as cold-start cheat sheet** when resuming work after a session break. This doc supersedes ad-hoc TODO scattered in chat; future Claude sessions should read this first.
 
@@ -23,6 +23,7 @@
 | pyobfus latest | 0.4.0 (2026-04-22) | ✅ |
 | pyobfus-mcp latest | 0.2.0 (2026-05-08) | ✅ |
 | pyarmor latest | **9.2.4** (2026-03-18) — VMC/ECC modes since 9.2.0 (Oct 2025) | ✅ pypi.org/pypi/pyarmor |
+| pyarmor trial code-size limit | **~935-940 lines** for typical sparse Python (single-file threshold) — measured 2026-05-09 on PyArmor 9.2.4 trial in clean venv. 935 lines passes, 940 fails with `ERROR out of license`. By line count, not bytes (900 lines at 67 KB still passed). Gates the "Big Script / Mix String" feature paywalled across all paid tiers. Cited in launch articles to explain pyobfus's existence. | ✅ measured · full reproducible procedure in `docs/PYARMOR_TRIAL_LIMIT_EXPERIMENT.md` |
 | pyarmor.cli | **9.2.4** (2026-03-18) — same release date / same maintainer / modular CLI subpackage of pyarmor; **NOT a separate competitor** | ✅ pypi.org/pypi/pyarmor.cli |
 | vmp-protector | **1.0.0** (2026-05-02) — anonymous (no author email / no GitHub repo / no homepage in PyPI metadata) · MIT · 16-reg / 28-opcode register-based VM + XOR+zlib+base64 string encryption + anti-debug + anti-tamper + control-flow flattening · **bytecode-VM lane (alongside PyArmor)** · NOT in pyobfus's AST/AI-debug lane · do NOT add to pyobfus's positioning copy until provenance verified | ✅ pypi.org/pypi/vmp-protector (investigated 2026-05-08 by competitive-intel agent; manifestguard + smelt are PyArmor-search false positives, NOT competitors) |
 | python-obfuscator | **0.1.0** (2026-04-03) — was dormant 2021-2026, just revived | ✅ pypi.org/pypi/python-obfuscator |
@@ -130,6 +131,50 @@ mcp-publisher login github -token "$(gh auth token)"
 - `_drafts/forum-ai-policy-and-voice-guide.md` — per-platform AI policy + the "human at 11pm" voice cheatsheet
 - `_drafts/cross-review-prompt.md` — outside-eye review prompt (still useful if maintainer wants a Gemini/ChatGPT critique before posting)
 - The GPTZero per-sentence diagnostic from the v3 paste-test is captured in the v3 → v4 changelog inside the article — do not lose this if iterating future articles, the pattern (fragments + parentheticals + very-long-messy + concrete-dated specifics PASS; medium-length explanatory prose with subordinate clauses FAILS) is the actionable signal.
+
+---
+
+### P0.5 — GitHub topic curation (5 min · zero deferred effort · added 2026-05-09)
+
+**Why**: 2026-05-09 user audit of `https://github.com/topics/code-obfuscator` confirms only 12 repos in that topic, most stale 1-2 years; pyobfus is the only modern actively-maintained Python entry. Adding 1-2 more topics now claims SEO real estate before any future demo / VSCode extension launches — topic-history matters for GitHub topic ranking.
+
+**Action**:
+```bash
+gh repo edit zhurong2020/pyobfus --add-topic python-obfuscator-online
+# verify pyarmor-alternative is in current 12 topics; if missing add too
+gh api repos/zhurong2020/pyobfus --jq '.topics' | tr ',' '\n' | grep -i pyarmor || \
+  gh repo edit zhurong2020/pyobfus --add-topic pyarmor-alternative
+```
+
+**Done when**: `gh api repos/zhurong2020/pyobfus --jq .topics` shows the new topic(s); `python-obfuscator-online` placeholder is occupied before N7 demo ships so by N7 launch the topic page already lists pyobfus.
+
+---
+
+### P0.6 — Socket.dev `Supply Chain Security` 71 → 90+ (30 min · added 2026-05-09)
+
+**Why**: 2026-05-09 user observation — pyobfus is listed at `socket.dev/pypi/pyobfus` (accidentally categorized under "Control Flow" because of the `control-flow flattening` keyword) showing Quality 100 / Maintenance 100 / Vulnerability 100 / License 100 but **Supply Chain Security 71/100**. Visibly the lowest of 5 dimensions; security-conscious enterprise buyers DO check Socket as a trust signal. Both pyobfus and pyobfus-mcp share the same repo, so workflow fixes lift both packages' scores simultaneously.
+
+**Action** (in order of expected impact):
+1. **Re-scan first** — pyobfus-mcp 0.2.0 shipped with PEP 740 attestations 2026-05-08 (P0.2 work); pyobfus next bump will too. Socket may not have rescanned yet. Trigger via `https://socket.dev/pypi/pyobfus` "Refresh" button or wait for cron.
+2. Audit `.github/workflows/*.yml` for `actions/<name>@<tag>` (e.g. `actions/checkout@v5`); pin to commit SHA: `actions/checkout@<40-char-sha>  # v5`. Use `pinact` or hand-pin with `gh api`.
+3. Add `.github/workflows/codeql.yml` (GitHub's default Python template; 5 min)
+4. Apply for OpenSSF Best Practices passing badge at `bestpractices.coreinfrastructure.org`; embed badge in README
+
+**Done when**: re-scan shows ≥ 90 for BOTH `pyobfus` and `pyobfus-mcp` on Socket. As bonus signal, pyobfus may also recategorize off "Control Flow" once attestations present.
+
+---
+
+### P0.7 — GitHub Discussions "v0.5 priority signal" poll (15 min · trigger 5-13 post-launch)
+
+**Why**: launch wave (HN 5-11 / Reddit 5-12) brings the cheapest source of signal on which v0.5 direction to prioritize. Discussions native poll posted ≤ 24h after Reddit captures max participation overlap.
+
+**Action** (5-13 Wed evening):
+1. Open a "📊 Roadmap signal" discussion in `zhurong2020/pyobfus` Discussions
+2. Native poll, 3 candidates: (a) `pyobfus.dev` online demo · (b) VSCode extension · (c) Self-hosted team license server
+3. Pin to Discussions sidebar
+4. Cross-link from dev.to comments / HN comment thread / Reddit thread footer
+
+**Done when**: ≥ 10 votes by 5-20; results inform N7 / P2-2 / N9 sequencing decision in week 4.
 
 ---
 
@@ -257,6 +302,61 @@ mcp-publisher login github -token "$(gh auth token)"
 
 ---
 
+#### N7 — `pyobfus.dev` online demo + MCP gateway page (1 week · added 2026-05-09)
+
+**Why**: 2026-05-09 user SERP audit on Google "python obfuscator" — pyobfus is not on page 1; the query "python obfuscator online" appears in Google's "people also search" with no canonical pyobfus result. PyObfuscator (PyPI generic name), pyobfuscate.com (cloud SaaS), freecodingtools.org (free in-browser tool), and Oxyry hold rank ahead of us on this query. pyobfus has no in-browser demo. Building one claims the top result for a high-intent query, opens a zero-friction "try" channel that doesn't require `pip install`, and creates a natural `/mcp` landing page that drives `pip install pyobfus-mcp` from web traffic — the highest-conversion MCP install funnel we can build (better than PyPI's plain text page or Glama's listing).
+
+**Reference**: <https://pyodide.org/en/stable/> · pyobfus's pure-Python core makes it Pyodide-friendly for in-browser execution
+
+**Action**:
+1. Domain: register `pyobfus.dev` (~$15/yr Cloudflare Registrar) OR start with free `pyobfus.pages.dev` for MVP
+2. **Free tier (Pyodide, in-browser)**: static page on Cloudflare Pages; Pyodide loads pyobfus from PyPI; paste code → click obfuscate → BEFORE/AFTER side-by-side. Privacy framing prominent ("your code never leaves your browser") — this is a real differentiator vs pyobfuscate.com's server-side model.
+3. **Pro preview (Cloudflare Worker, rate-limited)**: Worker runs `pyobfus --string-encryption --control-flow` server-side, capped at 5 lines / no save. "Want to obfuscate the full file? $45 Pro" → Stripe checkout (single-tier per `pricing_strategy.md`).
+4. **`/mcp` landing tab**: one-page guide — "Already using Claude Code / Cursor? Add this MCP config." Each install path (Claude Desktop / Claude Code / Cursor / Windsurf / Zed) gets a copy-paste config block. **This is the MCP install funnel.** Cross-link from PyPI `pyobfus-mcp` long_description.
+5. **`/decode-stack-trace` reverse demo**: paste obfuscated stack trace + mapping.json → unmapped output (uses `unmap_stack_trace` MCP tool logic, runs in Pyodide). Captures "deobfuscate python" / "python obfuscator decode" search intent that currently goes to SO/Reddit.
+6. Cloudflare Web Analytics on every page (privacy-friendly, no cookie banner needed).
+
+**MCP tie-in**: every visitor to `/mcp` who copies a config is a pre-qualified Pro lead — they're already using AI assistants for coding (= our buyer profile). Instrument Stripe URL clicks from `/mcp` separately from `/` so we can measure MCP-attributed Pro conversion vs direct conversion.
+
+**Done when**: domain live (`pyobfus.dev` or `pages.dev`) · 4 sub-pages (`/`, `/mcp`, `/decode-stack-trace`, `/comparison/pyarmor`) live · GitHub topic `python-obfuscator-online` (P0.5) now backed by a real page · 1+ Stripe checkout click sourced from demo within 30 days · 1+ MCP install attributable to `/mcp` page traffic.
+
+---
+
+#### N8 — 5-6 SEO landing pages on `pyobfus.dev` (rolling · 1-2 pages/week post-N7 MVP · added 2026-05-09)
+
+**Why**: pyobfus's name structurally cannot win short-tail "python obfuscator" against literal-name competitors (PyObfuscator on PyPI, pyobfuscate.com domain). Winnable strategy = long-tail / high-intent queries where competitors have nothing: framework-aware preset queries, comparison queries, MCP/AI-tool integration queries. PyArmor explicitly does not have an MCP server — pages 4 monetizes that asymmetry, and the comparison page (#3) frames the MCP/AI-debug story as a category PyArmor structurally cannot enter.
+
+**Pages to build** (priority order; each ~800-1200 words + worked example + schema.org `SoftwareApplication` markup):
+1. `/pyarmor-alternative` — N6 already staged the keyword in PyPI metadata; this is the landing page that converts the click
+2. `/django-obfuscation` `/fastapi-obfuscation` `/flask-obfuscation` — preset-by-preset tutorials with real `pyobfus.yaml` configs and BEFORE/AFTER (3 pages; each is a near-zero-competition long-tail capture)
+3. `/comparison/pyobfus-vs-pyarmor-2026` — SEO version of `docs/COMPARISON.md`; emphasizes the MCP / AI-debug gap PyArmor doesn't address
+4. `/mcp-for-claude-code` — captures "claude code python obfuscator" / "MCP code protection" / "cursor python obfuscation" searches; deep cross-link to N7's `/mcp` install one-pager
+
+**MCP tie-in**: pages 3 and 4 are net-new traffic for `pyobfus-mcp` specifically. The comparison page should embed the 5-tool list and a 30-second "Claude Code uses pyobfus-mcp like this" demo block; the dedicated `/mcp-for-claude-code` page is the SEO destination for the AI-tool-first buyer segment. Cross-link both from the MCP server's `pyproject.toml long_description` on next bump.
+
+**Action**: each page is a single Markdown file rendered through Cloudflare Pages (same deployment as N7). Submit sitemap to Google Search Console + Bing Webmaster Tools after first 2 pages live.
+
+**Done when**: 5-6 pages live · Google Search Console confirms indexing · ≥ 1 page ranks top-10 for its target query within 60 days · `/mcp-for-claude-code` traffic correlates with measurable `pyobfus-mcp` PyPI install bumps.
+
+---
+
+#### N9 — Stripe `quantity` field on the existing $45 SKU (half day · added 2026-05-09)
+
+**Why**: closes the commercial-loop ARPU gap surfaced in 2026-05-09 strategy review WITHOUT adding Pro tiers. The single-tier $45 perpetual license is the right strategic positioning ("PyArmor alternative for the underserved low-mid segment"); a Solo/Team/Enterprise tier expansion was rejected because it breaks decision-fatigue economics at checkout, requires 6-8 weeks of team-license-server infrastructure, and pulls toward PyArmor's enterprise lane where they already win. See `~/.claude/projects/-mnt-c-onedrive-msft-OneDrive---MSFT-rong-3-job-program-pyobfus/memory/pricing_strategy.md` for the full rationale and guardrail. Stripe's native quantity field lets a small team buy 3 or 10 seats on the same SKU without cluttering the checkout page — same simplicity, higher ARPU per buyer.
+
+**Action**:
+1. In Stripe dashboard, enable `Adjustable quantity` on the existing `pyobfus Pro` price object
+2. Configure tiered display: 1 = $45 · 3 = $99 ($33/seat) · 10 = $199 ($20/seat) (Stripe `pricing_tiers` natively)
+3. Verify `pyobfus_pro/license/embedding.py` activation flow accepts a `seats=N` field; if not present, add it (the license-embedding framework is already there per ROADMAP P2-license-embedding work)
+4. Update README purchase section: keep prominent `$45 Buy Now`; add ONE line below — "Buying for a team? 3 seats $99 / 10 seats $199" with link to the same Stripe checkout. Do NOT build a separate pricing-tier table.
+5. **MCP tie-in**: update `recommend_tier` MCP tool (shipped in N2 / pyobfus-mcp 0.2.0) to surface seat-aware Stripe URLs. When AI agent detects multi-developer project structure (e.g., `CODEOWNERS` with multiple users, or `.git/config` with multiple committer signatures, or a `package.json`/`pyproject.toml` with `authors` array > 1), recommend the 3-seat or 10-seat tier instead of solo. This requires a small bump to `pyobfus-mcp` (0.2.1 patch) — bundle with the next legitimate bump per do-not-do version-bump rule, or fold into N3 claude-skill preset's MCP companion update.
+
+**Strategic guardrail**: this is the ONLY pricing change to make. If a future session proposes Solo/Team/Enterprise tier expansion, refer back to `pricing_strategy.md` memory. The single-tier positioning is load-bearing.
+
+**Done when**: Stripe checkout shows quantity selector and tiered pricing · README updated · `recommend_tier` MCP tool seat-aware on next pyobfus-mcp bump · 1+ multi-seat purchase within 60 days (proves the volume need exists; if zero multi-seat purchases in 60 days, that's signal the underserved-low-mid segment is genuinely solo-dominated and we can stop revisiting pricing).
+
+---
+
 ## 🟢 P2 — Passive / waiting (no action needed; just monitor)
 
 | Item | Trigger condition | ETA |
@@ -304,6 +404,7 @@ Done when: PR landed in appcypher · mcpservers.org submission acked. Track in `
 - **Don't compete on AST mechanics**. Two new commoditized AST obfuscators (python-obfuscator, python-obfuscation-framework) shipped in last 5 weeks. Adding "another transformer" doesn't move our metrics; integration story does.
 - **Don't bump pyobfus or pyobfus-mcp version just to refresh metadata**. **All three downstream surfaces — PyPI, MCP Registry, and Glama — reject same-version re-publishes** (PyPI: 400 "version already exists"; MCP Registry: 400 "cannot publish duplicate version", confirmed 2026-05-07; Glama Release flow: same). Bundle metadata refresh with the next legitimate bump. For Glama-listing refresh specifically (no version change involved), use the "Claim ownership flow again" mechanism — see `~/.claude/projects/-home-wuxia-projects-pyobfus/memory/glama_metadata_schemas.md`.
 - **Don't add features to free tier that have no user-demand signal**. Old roadmap "Enhanced key obfuscation" and "Code compression" were deprioritized in 2026-04 strategic shift; keep them buried.
+- **Don't propose Pro pricing tiers (Solo / Team / Enterprise)** (added 2026-05-09). pyobfus is positioned in the segment PyArmor underserves — solo devs, freelancers, educational users, small-tool authors. Multi-tier pricing breaks decision-fatigue economics at checkout, requires 6-8 weeks of team-license-server infrastructure, and pulls toward PyArmor's enterprise lane where they already win. Use Stripe `quantity` field on the same SKU for ARPU (N9), or build a SEPARATE product (e.g., `pyobfus.dev` SaaS) for MRR — never tier the Pro license itself. Full rationale + guardrails: `~/.claude/projects/-mnt-c-onedrive-msft-OneDrive---MSFT-rong-3-job-program-pyobfus/memory/pricing_strategy.md`.
 
 ---
 
@@ -335,16 +436,39 @@ Week 2 launch wave (5-11 Mon → 5-12 Tue):
 
 Week 2 cont. (5-13 → 5-18):
   ├─ Review launch wave metrics across 4 platforms; reweight v0.5 priorities
+  ├─ P0.5 GitHub topic add (5 min · python-obfuscator-online + verify pyarmor-alternative)
+  ├─ P0.6 Socket score push (30 min · re-scan first → maybe already 90+ from PEP 740 attestations)
+  ├─ P0.7 Discussions roadmap-signal poll (15 min · 5-13 evening · feeds week-4 prioritization)
   ├─ N1 PEP 750 t-string AST handler (1 day · narrow time-window first-mover)
   └─ Begin v0.5 work depending on signal
 
 Week 3 (5-19 → 5-25):
-  ├─ N2 FastMCP 3.0 + Pro funnel + security hardening (4-5 days · 3-way bundle ·
-  │   pyobfus-mcp 0.2.0 ship · also resolves deferred P0.3 _meta publish · also
-  │   closes audit gaps #2/#3/#5/#7 from 2026-05-07 evening self-audit)
   └─ Start N3 claude-skill preset (1 week effort · net-new market segment)
+  Note: N2 already SHIPPED 2026-05-08 ahead of original plan; original "FastMCP 3.0
+  + Pro funnel + security hardening" 4-5 day bundle is done. Week 3 is now lighter.
 
-By 2026-06-15: v0.5.0 release candidate (P2-1 + P2-3 + P2-4 + P2-5 + N1 + N2 + N3 + drop 3.8)
+Week 4 (5-26 → 6-1) · post-launch SEO build-out · gated on P0.7 poll signal:
+  ├─ N9 Stripe quantity field on existing $45 SKU (half day · single-tier preserved)
+  ├─ N7 pyobfus.dev demo MVP — Pyodide free tier + /mcp landing tab (~3-4 days)
+  └─ Continue N3 claude-skill preset
+
+Week 5 (6-2 → 6-8):
+  ├─ N7 demo Pro Worker tier + /decode-stack-trace reverse demo (~2 days)
+  ├─ N8 first 2 landing pages: /pyarmor-alternative + /mcp-for-claude-code
+  ├─ Submit to ProductHunt (catalog-style entry, NOT launch-day push;
+  │   sustained discovery · contingent on demo being live to anchor the listing)
+  └─ Cross-link N7 /mcp page from pyobfus-mcp pyproject.toml long_description
+     (bundle this metadata refresh with next legitimate pyobfus-mcp bump per
+     do-not-do version-bump rule — likely 0.2.1 patch or N3 companion update)
+
+Week 6 (6-9 → 6-15) · v0.5.0 RC node:
+  ├─ N8 remaining 3-4 landing pages (django/fastapi/flask + comparison)
+  └─ v0.5.0 RC ship: P2-1 + P2-3 + P2-4 + P2-5 + N1 + N3 + N6 metadata refresh
+     + drop 3.8 + N7 demo cross-linked from PyPI long_description
+
+By 2026-06-15: v0.5.0 release candidate (Core) + N7 demo live + 5-6 SEO pages indexed
+              + Stripe quantity-tiered SKU + N9-instrumented MCP recommend_tier seat-aware
+              (pyobfus-mcp 0.2.1 if needed)
 ```
 
 ---
@@ -361,5 +485,5 @@ By 2026-06-15: v0.5.0 release candidate (P2-1 + P2-3 + P2-4 + P2-5 + N1 + N2 + N
 
 ---
 
-**Last updated**: 2026-05-08 (post-mcpservers.org approval + N6 PyPI-search-SEO staging) · P0 status: P0.1 ✅ · P0.2 ✅ · P0.3 ✅ shipped with 0.2.0 (Registry stripped publisher namespace; investigation queued for next bump) · P0.4 ✅ live at https://dev.to/zhurong2020/let-claude-code-debug-your-obfuscated-python-a-guide-to-the-pyobfus-mcp-integration-3epm · **N2 ✅ SHIPPED**: pyobfus-mcp 0.2.0 live on PyPI (with PEP 740 attestations) + MCP Registry (active + isLatest) · **N5 ✅ FINAL**: wong2/mcpservers.org LIVE at https://mcpservers.org/servers/zhurong2020/pyobfus (same-day approval) + punkpeye #5777 still OPEN + appcypher dead-end · **N6 ✅ STAGED**: PyPI summary + keywords edits in source (both packages); ride next legitimate version bump · launch wave next: HN Mon 5-11 / Reddit Tue 5-12 / CN trio Fri-Sat 5-8/9
-**Next review**: 24h post-dev.to (2026-05-08 evening) for first-day reaction metrics; post-launch-wave (5-13) for full multi-platform signal
+**Last updated**: 2026-05-09 (added P0.5/P0.6/P0.7 + N7/N8/N9 + pricing-tier do-not-do guardrail · post-strategy-review with user) · P0 status: P0.1 ✅ · P0.2 ✅ · P0.3 ✅ shipped with 0.2.0 (Registry stripped publisher namespace; investigation queued for next bump) · P0.4 ✅ live at https://dev.to/zhurong2020/let-claude-code-debug-your-obfuscated-python-a-guide-to-the-pyobfus-mcp-integration-3epm · **P0.5/P0.6/P0.7 NEW**: GitHub topic curation + Socket score push + Discussions poll (all queued for week-2 cont. 5-13+) · **N2 ✅ SHIPPED**: pyobfus-mcp 0.2.0 live on PyPI (with PEP 740 attestations) + MCP Registry (active + isLatest) · **N5 ✅ FINAL**: wong2/mcpservers.org LIVE + punkpeye #5777 still OPEN + appcypher dead-end · **N6 ✅ STAGED**: PyPI summary + keywords edits in source (both packages); ride next legitimate version bump · **N7/N8/N9 NEW**: pyobfus.dev demo + 5-6 SEO landing pages + Stripe quantity field (gated on launch signal · weeks 4-6) · launch wave next: HN Mon 5-11 / Reddit Tue 5-12 / CN trio Fri-Sat 5-8/9
+**Next review**: 24h post-dev.to for first-day reaction metrics; post-launch-wave (5-13) for full multi-platform signal feeding P0.7 poll → N7/N8/N9 prioritization decision in week 4
