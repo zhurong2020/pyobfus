@@ -438,7 +438,7 @@ So target submission window = **2026-Q3 / Q4** (after v0.5 ships on PyPI per Pat
 | GitHub stars 0 → 100+ | Launch + Glama/Registry organic discovery | depends on launch |
 | Glama Quality grade re-check after `glama.json` fix | Eventual cron | 1-3 days |
 | ReadTheDocs `pyobfus-mcp` section (extend existing pyobfus mkdocs site) | Polish item · defer until N7/N8 unifies docs surface OR until first MCP-tool API question lands in Issues/Discussions | depends on demand |
-| CCPC 软著 e-certificate | Filed via CCPC web portal after real-name auth cleared 2026-05-09 (file prep complete, see Session 24 log + `../pyobfus-legal/software_copyright/README.md` §十 for submission cheat sheet) | ~30 working days from submission |
+| CCPC 软著 e-certificate | ✅ SUBMITTED 2026-05-09 evening (290元 paid · signed application PDF `软著登记申请确认签章.pdf` archived in `~/projects/pyobfus-legal/software_copyright/`); awaiting e-cert | ~30 working days from 2026-05-09 |
 | Patent 受理通知书 + 申请号 (CN) | After Phase 4 of Path C — file via CPC client w/ 费减请求书 (per `memory/pyobfus_patent_strategy.md` revised 2026-05-09 evening) | ~1-2 weeks from CPC submission |
 | JOSS DOI | After patent申请号 in hand → submit per N11 → open peer review on GitHub issue tracker | community-reported 2-4 months |
 | 6-month JOSS public-history threshold | pyobfus V0.1.0 first PyPI 2025-11-12 → threshold met 2026-05-12 | passive — auto-clears in 3 days |
