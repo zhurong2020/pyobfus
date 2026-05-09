@@ -1,0 +1,40 @@
+name: CodeQL
+
+# Static analysis security scanning for pyobfus + pyobfus-mcp.
+# Findings appear under the repo's "Security" tab.
+# Added 2026-05-09 as part of Socket supply-chain-security score push (P0.6).
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '37 14 * * 3'  # weekly Wednesday 14:37 UTC
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Analyze (Python)
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd  # v5 (pinned 2026-05-09)
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@7fd177fa680c9881b53cdab4d346d32574c9f7f4  # v3 (pinned 2026-05-09)
+        with:
+          languages: python
+          queries: security-extended
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@7fd177fa680c9881b53cdab4d346d32574c9f7f4  # v3 (pinned 2026-05-09)
+        with:
+          category: "/language:python"

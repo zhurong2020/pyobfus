@@ -4,26 +4,34 @@
 
 We currently support the following versions with security updates:
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 0.2.x   | :white_check_mark: |
-| 0.1.x   | :x:                |
+| Package        | Version | Supported          |
+| -------------- | ------- | ------------------ |
+| pyobfus        | 0.4.x   | :white_check_mark: |
+| pyobfus        | < 0.4   | :x:                |
+| pyobfus-mcp    | 0.2.x   | :white_check_mark: |
+| pyobfus-mcp    | < 0.2   | :x:                |
 
 ## Reporting a Vulnerability
 
-We take the security of pyobfus seriously. If you discover a security vulnerability, please follow these steps:
+We take the security of pyobfus seriously. If you discover a security vulnerability, please use **one** of these private channels:
 
-### Please Do:
+### Preferred: GitHub Security Advisories
 
-1. **Email us directly** at zhurong2020@users.noreply.github.com with:
-   - A description of the vulnerability
-   - Steps to reproduce the issue
-   - Potential impact of the vulnerability
-   - Any suggested fixes (if available)
+Open a private advisory at <https://github.com/zhurong2020/pyobfus/security/advisories/new>. This is a private channel between the reporter and the maintainer; the report stays confidential until a coordinated public disclosure.
 
-2. **Give us reasonable time** to respond and fix the issue before public disclosure (typically 90 days)
+### Alternative: Email
 
-3. **Act in good faith** - avoid privacy violations, data destruction, and service disruption
+Send the report to **zhurong0525@gmail.com** with:
+
+- A description of the vulnerability
+- Steps to reproduce the issue
+- Potential impact of the vulnerability
+- Any suggested fixes (if available)
+
+### Disclosure expectations
+
+1. **Give us reasonable time** to respond and fix the issue before public disclosure (typically 90 days)
+2. **Act in good faith** - avoid privacy violations, data destruction, and service disruption
 
 ### Please Don't:
 
@@ -42,7 +50,8 @@ We take the security of pyobfus seriously. If you discover a security vulnerabil
 
 This security policy applies to:
 
-- The core pyobfus package
+- The core `pyobfus` package
+- The `pyobfus-mcp` MCP server package
 - Official examples and documentation
 - The CI/CD pipeline
 
