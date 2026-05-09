@@ -211,9 +211,9 @@ gh api repos/zhurong2020/pyobfus --jq '.topics' | tr ',' '\n' | grep -i pyarmor 
 | **drop-3.8** | Drop Python 3.8 support | TODO | Both new competitors require `>=3.10`; we're paying 3.8 cost for shrinking userbase. Public-OK. |
 | **P2-7** 🔒 | Forensic watermarking / `--fingerprint <buyer-id>` (Pro) | TODO · **PRIVATE-DEV** | Patent target. Strongest novelty (only vmp-protector 1.0.0 ships per-buyer deterministic build; arXiv 2510.11251 CLASP backing). **Implement in private repo only until 申请号 received.** |
 | **P2-8** 🔒 | License binding combo (Pro) | TODO · **PRIVATE-DEV** | Patent target. `--expire` + `--bind-device` + `--period` combo, pure Python. **Implement in private repo only until 申请号 received.** |
-| **P2-9** 🔒 | `@seal_code` integrity decorator (Pro) | TODO · **PRIVATE-DEV** | Patent target. Build-time SHA256 + runtime detect patching. **Implement in private repo only until 申请号 received.** |
-| **P2-10** 🔒 | `--scrub-traceback` (Pro) | TODO · **PRIVATE-DEV** | Patent target. Production-side traceback encryption as inverse of unmap. First-of-kind architecture. **Implement in private repo only until 申请号 received.** |
-| **P2-11** 🔒 | Runtime String Vault (Pro) | TODO · **PRIVATE-DEV** | Patent target. KV namespace for runtime secrets (vmp-protector StringVault parity). **Implement in private repo only until 申请号 received.** |
+| **P2-9** 🔒 | `@seal_code` integrity decorator (Pro) | **DONE-PRIVATE 2026-05-09** (W0 runtime + W1 build-pass · 24 tests · 3 patent findings) | Patent target. Build-time SHA256 + runtime detect patching. Implementation lives in private `pyobfus-pro-dev` repo per Path C; ship to public on 申请号 receipt. |
+| **P2-10** 🔒 | `--scrub-traceback` (Pro) | **DONE-PRIVATE 2026-05-09** (W0 runtime + W1 build-pass · 28 tests · 3 patent findings · dev `pyobfus unscrub` CLI still TODO) | Patent target. Production-side traceback encryption as inverse of unmap. First-of-kind architecture. Implementation lives in private repo per Path C. |
+| **P2-11** 🔒 | Runtime String Vault (Pro) | **W0-DONE-PRIVATE 2026-05-09** (runtime · 21 tests · 3 patent findings · W1 build-pass deferred to W3 coupled to P2-1 layer model) | Patent target. KV namespace for runtime secrets (vmp-protector StringVault parity). Implementation lives in private repo per Path C. |
 
 ### New items surfaced from 2026-05-07 research
 
