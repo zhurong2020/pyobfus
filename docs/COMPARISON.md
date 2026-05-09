@@ -252,6 +252,26 @@ Nuitka compiles Python to standalone executables.
 
 ---
 
+## Layered Deployment Strategy
+
+Most production Python projects don't need a single obfuscation tool — they need the right tool for each layer of the codebase.
+
+A layered approach that fits the 2026 ecosystem:
+
+| Stage | Recommended | Why |
+|---|---|---|
+| **Development / testing** | No obfuscation | Faster iteration; full debug visibility |
+| **Pre-release / staging** | pyobfus (Community or Pro) | AST mangling + mapping preserved → AI assistants can still debug; cross-platform `.py` output; no native deps |
+| **Production / customer delivery** | pyobfus + optional PyArmor Pro or Nuitka Commercial on highest-value modules | pyobfus protects the entire codebase consistently; PyArmor adds bytecode-level protection on the few modules that genuinely need it; Nuitka adds compile-to-native for performance-critical sections |
+
+**Why pyobfus is the always-on default layer**: it's the only tool in this space that doesn't break AI-assisted debugging in production. PyArmor's bytecode encryption and Nuitka's compilation are both one-way — once a stack trace comes back from production, neither tool can map it back to readable identifiers without losing the protection. pyobfus's `--save-mapping` + `--unmap` workflow is purpose-built for this: the obfuscated artifact ships to customers, the mapping stays in your secure storage, and you can hand a reversed trace to Claude Code or Cursor without giving up the obfuscation.
+
+**Why pyobfus alone may not be enough for the crown jewels**: pyobfus's protection is AST-level, which means a determined attacker with time can reverse most of the structure. If a single algorithm module is the company's crown jewel, stacking PyArmor Pro's bytecode encryption or Nuitka's native compilation on top of that one module is rational. We don't pretend otherwise.
+
+This honest framing is part of why pyobfus is priced at $45 single-tier instead of competing with PyArmor's enterprise track — pyobfus is the tool you reach for first, not necessarily the only tool in the toolbox.
+
+---
+
 ## Conclusion
 
 **Choose pyobfus if you want:**
