@@ -156,7 +156,7 @@ gh api repos/zhurong2020/pyobfus --jq '.topics' | tr ',' '\n' | grep -i pyarmor 
 
 **Action ship summary (2026-05-09)**:
 1. ✅ **GitHub Actions SHA pinning** — all 11 action references in `.github/workflows/{ci,release}.yml` pinned to commit SHAs (was tag-pinned `@v5`). Pinned: `actions/checkout` (v5 → 93cb6efe), `actions/setup-python` (v5 → a26af69b), `codecov/codecov-action` (v5 → 75cd1169), `pypa/gh-action-pypi-publish` (release/v1 → cef22109 — refresh quarterly).
-2. ✅ **CodeQL workflow added** — `.github/workflows/codeql.yml` runs `security-extended` query suite on every push, every PR, and weekly Wednesday cron. SARIF results visible in repo Security tab.
+2. ✅ **CodeQL workflow added** — `.github/workflows/codeql.yml` runs `security-extended` query suite on every push, every PR, and weekly Wednesday cron. SARIF results visible in repo Security tab. **Path-ignore config added 2026-05-09 post-push** (`.github/codeql/codeql-config.yml`) excluding `examples/**` and `**/tests/**` after the first run produced 7 expected false positives (4 in examples — they intentionally demonstrate clear-text-credential anti-patterns to motivate AES-256 string encryption; 3 in tests — substring URL assertions verifying Stripe URLs appear in tool output, not security decisions). Standard OSS-CodeQL practice; the 7 alerts auto-close on next scan.
 3. ✅ **OpenSSF Best Practices passing badge achieved** — Project ID 12788 at <https://www.bestpractices.dev/projects/12788>. 67/67 criteria met across Basics / Change Control / Reporting / Quality / Security / Analysis. Badge added to README. Achieved 2026-05-09 04:23:38 UTC.
 4. ⏸️ **Socket re-scan pending** — Socket cron auto-rescans on ~24-48h cadence after PyPI changes; manual refresh trigger also available at `socket.dev/pypi/pyobfus`. Re-scan triggered by next pyobfus version bump anyway. Verify ≥ 90 supply-chain score post-rescan.
 
@@ -389,6 +389,7 @@ gh api repos/zhurong2020/pyobfus --jq '.topics' | tr ',' '\n' | grep -i pyarmor 
 | First Pro license sale | Launch traffic + Stripe checkout funnel | depends on launch |
 | GitHub stars 0 → 100+ | Launch + Glama/Registry organic discovery | depends on launch |
 | Glama Quality grade re-check after `glama.json` fix | Eventual cron | 1-3 days |
+| ReadTheDocs `pyobfus-mcp` section (extend existing pyobfus mkdocs site) | Polish item · defer until N7/N8 unifies docs surface OR until first MCP-tool API question lands in Issues/Discussions | depends on demand |
 
 ### N5 — Diversify awesome-list distribution (parallel hedge against punkpeye merge latency · ✅ COMPLETED 2026-05-08 — wong2 / mcpservers.org LIVE)
 

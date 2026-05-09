@@ -1,0 +1,25 @@
+name: pyobfus CodeQL config
+
+# Excludes paths that are out-of-scope for production-security analysis.
+# Standard OSS practice — examples and tests routinely contain anti-patterns
+# that exist precisely to demonstrate the problem the project solves OR to
+# exercise edge cases. Treating them as production code generates noise.
+#
+# Added 2026-05-09 after initial CodeQL run flagged 7 false positives:
+#   - examples/pro_example.py + examples/keyword_arguments.py: "clear-text
+#     logging" findings — the examples ARE the demonstration of why
+#     pyobfus's string encryption matters; renaming demo variables would
+#     defeat their educational purpose
+#   - pyobfus_mcp/tests/test_tools.py: "incomplete URL substring
+#     sanitization" findings — these are test assertions verifying that
+#     Stripe URLs appear in tool output, not security decisions
+
+paths-ignore:
+  - examples/**
+  - integration_tests/**
+  - "**/tests/**"
+  - tests/**
+  - "**/test_*.py"
+
+queries:
+  - uses: security-extended
