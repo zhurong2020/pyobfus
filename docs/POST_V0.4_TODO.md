@@ -360,6 +360,8 @@ gh api repos/zhurong2020/pyobfus --jq '.topics' | tr ',' '\n' | grep -i pyarmor 
 
 **Done when**: classifier changed (queued for N1 bump), COMPARISON.md upgraded (✅ this session), 32768-byte cross-reference added (deferred · coordinate with other session), README/HN/landing page reflect three-layer framing (README ✅ this session; HN/landing page later).
 
+**Additional doc-lag item discovered 2026-05-09**: `README.md` line ~27 says "registers **five** MCP tools" — pyobfus-mcp 0.2.0 actually has **7** (added `recommend_tier` + `start_pro_trial` per N2). Fix the count + add the 2 new tools to the bullet table when N1 bump goes out (same trigger as N10-1 classifier change · do-not-do version-bump rule applies). awesome-mcp-servers PR #5777 description was already refreshed independently 2026-05-09 (silent edit).
+
 ---
 
 #### N9 — Stripe `quantity` field on the existing $45 SKU (half day · added 2026-05-09)

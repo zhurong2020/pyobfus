@@ -1,0 +1,67 @@
+#!/usr/bin/env bash
+# pre-commit: block PII / credential / sensitive patterns from sneaking into commits.
+#
+# Customize the PATTERN list below for your project's specific data class.
+# Patterns shipped here are GENERIC — extend with project-specific identifiers
+# before relying on this hook for real PII protection.
+#
+# Setup (one-time per clone):
+#     git config core.hooksPath .githooks
+#
+# Bypass once for a legitimate reference (e.g., documenting the cleanup itself):
+#     ALLOW_PII=1 git commit ...
+
+set -eu
+
+if [[ "${ALLOW_PII:-0}" == "1" ]]; then
+    exit 0
+fi
+
+# CUSTOMIZE for your project. Generic starter patterns:
+#   - hardcoded credential shapes (tokens, keys)
+#   - hardcoded paths that leak username
+#   - real-name patterns (add specific names you need to avoid)
+#   - data-class identifiers (e.g., patient IDs, customer IDs)
+PATTERN='AKIA[0-9A-Z]{16}|sk_live_[A-Za-z0-9]{24,}|password\s*=\s*["\x27][^"\x27]{8,}|/home/[a-z]+/|/Users/[a-z]+/'
+
+# Allowlisted paths: files that legitimately discuss the patterns themselves
+# (e.g., the hook itself, security policy, history-cleanup logs).
+ALLOWLIST_RE='\.githooks/pre-commit|\.githooks/README\.md|SECURITY\.md|CHANGELOG\.md'
+
+mapfile -t staged < <(
+    git diff --cached --name-only --diff-filter=AM \
+        | grep -vxE "$ALLOWLIST_RE" \
+        || true
+)
+
+if (( ${#staged[@]} == 0 )); then
+    exit 0
+fi
+
+hits=$(git grep --cached -nE "$PATTERN" -- "${staged[@]}" 2>/dev/null || true)
+
+if [[ -n "$hits" ]]; then
+    cat >&2 <<EOF
+============================================================
+ERROR: pre-commit blocked — sensitive pattern detected in staged content
+============================================================
+
+$hits
+
+Blocked patterns: AWS keys, Stripe live keys, hardcoded passwords,
+                  /home/<user>/ paths, /Users/<user>/ paths
+
+If the match is legitimate (e.g. you are documenting the patterns):
+  1. add the file path to ALLOWLIST_RE in .githooks/pre-commit, or
+  2. bypass once with: ALLOW_PII=1 git commit ...
+
+To customize the PATTERN list for your project, edit .githooks/pre-commit
+and add project-specific patterns (real names, customer IDs, internal
+hostnames, etc.).
+
+============================================================
+EOF
+    exit 1
+fi
+
+exit 0

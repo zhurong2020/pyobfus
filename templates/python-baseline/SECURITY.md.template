@@ -1,0 +1,67 @@
+# Security Policy
+
+## Supported Versions
+
+We currently support the following versions with security updates:
+
+| Package        | Version | Supported          |
+| -------------- | ------- | ------------------ |
+| __PROJECT__    | latest  | :white_check_mark: |
+| __PROJECT__    | older   | :x:                |
+
+## Reporting a Vulnerability
+
+If you discover a security vulnerability, please use **one** of these private channels:
+
+### Preferred: GitHub Security Advisories
+
+Open a private advisory at <https://github.com/__GH_USER__/__PROJECT__/security/advisories/new>. This is a private channel between the reporter and the maintainer; the report stays confidential until a coordinated public disclosure.
+
+### Alternative: Email
+
+Send the report to **__EMAIL__** with:
+
+- A description of the vulnerability
+- Steps to reproduce the issue
+- Potential impact of the vulnerability
+- Any suggested fixes (if available)
+
+### Disclosure expectations
+
+1. **Give us reasonable time** to respond and fix the issue before public disclosure (typically 90 days)
+2. **Act in good faith** — avoid privacy violations, data destruction, and service disruption
+
+## Security Update Process
+
+1. We will acknowledge receipt of your vulnerability report within 48 hours
+2. We will provide a more detailed response within 7 days
+3. We will work on a fix and keep you informed of progress
+4. Once fixed, we will release a security update and credit you (unless you prefer to remain anonymous)
+
+## Scope
+
+This security policy applies to:
+
+- The __PROJECT__ package and its associated tools
+- Official examples and documentation
+- The CI/CD pipeline
+
+## Out of Scope
+
+- Vulnerabilities in dependencies (please report to the respective projects)
+- Issues in third-party integrations
+- Social engineering attacks
+
+## Recognition
+
+We appreciate the security research community's efforts to improve __PROJECT__'s security. Contributors who report valid security issues will be:
+
+- Credited in the security advisory (if desired)
+- Mentioned in the changelog
+- Added to our acknowledgments
+
+Thank you for helping keep __PROJECT__ and its users safe!
+
+---
+
+**After bootstrapping**: replace `__PROJECT__`, `__GH_USER__`, and `__EMAIL__` with your actual values. Delete this footer note when done.
