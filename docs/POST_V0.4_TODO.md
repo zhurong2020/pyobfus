@@ -150,15 +150,19 @@ gh api repos/zhurong2020/pyobfus --jq '.topics' | tr ',' '\n' | grep -i pyarmor 
 
 ---
 
-### P0.6 — Socket.dev `Supply Chain Security` 71 → 90+ (30 min · added 2026-05-09)
+### P0.6 — Socket.dev `Supply Chain Security` 71 → 90+ (✅ DONE 2026-05-09 · 4-step bundle landed)
 
 **Why**: 2026-05-09 user observation — pyobfus is listed at `socket.dev/pypi/pyobfus` (accidentally categorized under "Control Flow" because of the `control-flow flattening` keyword) showing Quality 100 / Maintenance 100 / Vulnerability 100 / License 100 but **Supply Chain Security 71/100**. Visibly the lowest of 5 dimensions; security-conscious enterprise buyers DO check Socket as a trust signal. Both pyobfus and pyobfus-mcp share the same repo, so workflow fixes lift both packages' scores simultaneously.
 
-**Action** (in order of expected impact):
-1. **Re-scan first** — pyobfus-mcp 0.2.0 shipped with PEP 740 attestations 2026-05-08 (P0.2 work); pyobfus next bump will too. Socket may not have rescanned yet. Trigger via `https://socket.dev/pypi/pyobfus` "Refresh" button or wait for cron.
-2. Audit `.github/workflows/*.yml` for `actions/<name>@<tag>` (e.g. `actions/checkout@v5`); pin to commit SHA: `actions/checkout@<40-char-sha>  # v5`. Use `pinact` or hand-pin with `gh api`.
-3. Add `.github/workflows/codeql.yml` (GitHub's default Python template; 5 min)
-4. Apply for OpenSSF Best Practices passing badge at `bestpractices.coreinfrastructure.org`; embed badge in README
+**Action ship summary (2026-05-09)**:
+1. ✅ **GitHub Actions SHA pinning** — all 11 action references in `.github/workflows/{ci,release}.yml` pinned to commit SHAs (was tag-pinned `@v5`). Pinned: `actions/checkout` (v5 → 93cb6efe), `actions/setup-python` (v5 → a26af69b), `codecov/codecov-action` (v5 → 75cd1169), `pypa/gh-action-pypi-publish` (release/v1 → cef22109 — refresh quarterly).
+2. ✅ **CodeQL workflow added** — `.github/workflows/codeql.yml` runs `security-extended` query suite on every push, every PR, and weekly Wednesday cron. SARIF results visible in repo Security tab.
+3. ✅ **OpenSSF Best Practices passing badge achieved** — Project ID 12788 at <https://www.bestpractices.dev/projects/12788>. 67/67 criteria met across Basics / Change Control / Reporting / Quality / Security / Analysis. Badge added to README. Achieved 2026-05-09 04:23:38 UTC.
+4. ⏸️ **Socket re-scan pending** — Socket cron auto-rescans on ~24-48h cadence after PyPI changes; manual refresh trigger also available at `socket.dev/pypi/pyobfus`. Re-scan triggered by next pyobfus version bump anyway. Verify ≥ 90 supply-chain score post-rescan.
+
+**Bonus side effects**:
+- SECURITY.md modernized in same session (replaced no-reply email with GitHub Security Advisories + real email; updated stale Supported Versions table to current 0.4.x / 0.2.x; added pyobfus-mcp to Scope)
+- The OpenSSF passing badge is a marketable signal in its own right — same tier as Kubernetes / Curl / etcd. Reference in HN/Reddit launch posts, dev.to articles, `/pyarmor-alternative` landing page (N8) when shipped.
 
 **Done when**: re-scan shows ≥ 90 for BOTH `pyobfus` and `pyobfus-mcp` on Socket. As bonus signal, pyobfus may also recategorize off "Control Flow" once attestations present.
 
@@ -327,9 +331,9 @@ gh api repos/zhurong2020/pyobfus --jq '.topics' | tr ',' '\n' | grep -i pyarmor 
 **Why**: pyobfus's name structurally cannot win short-tail "python obfuscator" against literal-name competitors (PyObfuscator on PyPI, pyobfuscate.com domain). Winnable strategy = long-tail / high-intent queries where competitors have nothing: framework-aware preset queries, comparison queries, MCP/AI-tool integration queries. PyArmor explicitly does not have an MCP server — pages 4 monetizes that asymmetry, and the comparison page (#3) frames the MCP/AI-debug story as a category PyArmor structurally cannot enter.
 
 **Pages to build** (priority order; each ~800-1200 words + worked example + schema.org `SoftwareApplication` markup):
-1. `/pyarmor-alternative` — N6 already staged the keyword in PyPI metadata; this is the landing page that converts the click
+1. `/pyarmor-alternative` — N6 already staged the keyword in PyPI metadata; this is the landing page that converts the click. **Centerpiece content (added 2026-05-09)**: the empirical PyArmor 9.2.4 trial-limit table from `docs/PYARMOR_TRIAL_LIMIT_EXPERIMENT.md` (~935-940 lines/file before `ERROR out of license`, no upgrade hint). Targets high-purchase-intent queries `pyarmor trial limit` / `pyarmor out of license` / `pyarmor 1000 lines` / `pyarmor trial size` — users hitting the opaque error in the angry moment, looking for an alternative. **Defensive framing rules**: always cite version "PyArmor 9.2.4", always date "verified 2026-05-09", always link to the reproducible methodology, always use first-person hedges ("in our test", "we measured"). Never frame as competitor-bashing — let the empirical data speak.
 2. `/django-obfuscation` `/fastapi-obfuscation` `/flask-obfuscation` — preset-by-preset tutorials with real `pyobfus.yaml` configs and BEFORE/AFTER (3 pages; each is a near-zero-competition long-tail capture)
-3. `/comparison/pyobfus-vs-pyarmor-2026` — SEO version of `docs/COMPARISON.md`; emphasizes the MCP / AI-debug gap PyArmor doesn't address
+3. `/comparison/pyobfus-vs-pyarmor-2026` — SEO version of `docs/COMPARISON.md`; emphasizes the MCP / AI-debug gap PyArmor doesn't address. Embed the empirical trial-limit table (same source as page 1) but as supporting evidence rather than centerpiece — comparison page is value-prop-driven, alternative page is angry-moment-driven; same fact, two framings.
 4. `/mcp-for-claude-code` — captures "claude code python obfuscator" / "MCP code protection" / "cursor python obfuscation" searches; deep cross-link to N7's `/mcp` install one-pager
 
 **MCP tie-in**: pages 3 and 4 are net-new traffic for `pyobfus-mcp` specifically. The comparison page should embed the 5-tool list and a 30-second "Claude Code uses pyobfus-mcp like this" demo block; the dedicated `/mcp-for-claude-code` page is the SEO destination for the AI-tool-first buyer segment. Cross-link both from the MCP server's `pyproject.toml long_description` on next bump.
