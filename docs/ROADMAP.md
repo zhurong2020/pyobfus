@@ -81,6 +81,15 @@ Builds on top of P0 primitives to make pyobfus appear natively in the AI-assiste
 - [ ] **P2-5: Numeric / Constant obfuscation** — Opaque arithmetic expressions for number literals. _Estimate: 3-5 days_
 - [ ] **P2-6: pyobfus-mcp 0.2.0 production hardening** — FastMCP 3.0 features (per-tool versioning + per-tool authorization + OpenTelemetry instrumentation), path-scoping sandbox for file-touching tools, token-bucket rate limiting with env-var override, JSON-line audit logging with parameter redaction. Brings pyobfus-mcp to production-grade against the emerging MCP-server-security baseline (Atlas Whoff, "5 MCP Server Security Mistakes That Could Expose Your AI Stack", dev.to 2026-05-06). _Estimate: 4-5 days_
 
+#### Additions from 2026-05-09 competitive scan
+
+The four items below were surfaced by a competitive feature scan against PyArmor 9.2.x, Nuitka Commercial, Sourcedefender, and vmp-protector 1.0.0. They stay inside the AST + AI-native lane and represent the highest-ROI Pro additions.
+
+- [ ] **P2-7: Forensic watermarking / `--fingerprint <buyer-id>` (Pro)** — Per-customer deterministic build: buyer-ID seeds the rename map and dead-code RNG so two builds diverge identifiably, enabling piracy traceback. Neither PyArmor nor Sourcedefender ships this; vmp-protector 1.0.0 introduced it 2026-05-02. arXiv 2510.11251 (CLASP) provides theoretical backing for diff-based watermark recovery. _Estimate: 1-2 weeks_
+- [ ] **P2-8: Hardware / time / period license binding (Pro)** — Three runtime flags closing the largest PyArmor parity gap: `--expire <ISO-date>` refuses to load past the date, `--bind-device {mac,ipv4,disk-serial,hostname}` accepts multiple bindings, `--period <interval>` re-checks during execution. Pure-Python (`uuid.getnode()` + `psutil`); does not require native runtime, does not break AI-debuggability. _Estimate: 1-2 weeks_
+- [ ] **P2-9: `@seal_code` integrity decorator (Pro)** — Build-time SHA256 of function bytecode baked into the obfuscated output; runtime recompute on first call detects in-memory patching. Failures surface as normal exceptions, preserving the AI-debuggable promise. _Estimate: 3-5 days_
+- [ ] **P2-10: `--scrub-traceback` production traceback encryption (Pro)** — End users see only opaque encrypted error IDs; developer reverses with the existing `--save-mapping` artifact (inverse of the `unmap` flow). Sells the AI-debuggable angle from the vendor side and opens enterprise framing without changing pricing tier. _Estimate: 3-5 days_
+
 ---
 
 ## v0.5.0 — Candidate: drop Python 3.8 support
@@ -95,6 +104,19 @@ Python 3.8 reached end-of-life in **October 2024**. The ecosystem has moved on, 
 - Remove `docs/PYTHON38_COMPATIBILITY.md` (or move to an archived-notes folder for history)
 
 Benefits: simpler test matrix (~15% faster CI), one less dependency, and eliminates the whole class of astunparse-vs-ast.unparse divergences.
+
+---
+
+## v0.5.1 - Pro Commercial Hardening (4-6 weeks)
+
+**Goal**: Round out the Pro feature surface against the 2026-05-09 competitive scan (PyArmor 9.2.x, Nuitka Commercial, Sourcedefender, vmp-protector 1.0.0, obfuscator-ai). Items here are smaller individually but together close most remaining feature-parity gaps without leaving the AST + AI-native lane.
+
+- [ ] **P2-11: Runtime String Vault (Pro)** — Promote Pro AES string encryption to a runtime-decryptable KV namespace for API secrets / hot keys (vmp-protector `StringVault` parity). _Estimate: 3-5 days_
+- [ ] **P2-12: `pyobfus-mcp` `scan_secrets` tool** — New MCP tool detecting emails / IPv4 / GUIDs / paths / API-key shapes; returns structured Pro recommendation and drives an encryption-review loop from Claude Code / Cursor. Tracks obfuscator-ai's interactive-review differentiator on the MCP surface. _Estimate: 3-5 days_
+- [ ] **P2-13: PyInstaller integration cookbook** — `examples/pyinstaller/` + docs page for "obfuscate then bundle to single exe". No code change; redirects Sourcedefender / Nuitka prospects who want single-binary delivery. _Estimate: 1 day_
+- [ ] **P2-14: `--embed-data <path>` (Pro)** — AES-encrypt a resource file at build time, emit it as a base85 module constant + accessor. Closes Nuitka Commercial "Protect Data Files" / PyArmor `--bind-data` gap. _Estimate: 3-5 days_
+- [ ] **P2-15: Anti-debug guard (Pro, opt-in)** — TracerPid (Linux) / IsDebuggerPresent (Windows) / timing-skew check. Default OFF to protect AI-debuggability; opt-in via `--anti-debug` for users who explicitly want hardened production builds. _Estimate: 3-5 days_
+- [ ] **P2-16: `@requires_runtime` policy decorator (Pro)** — Refuse to load if Python version / OS / architecture doesn't match build-time constraints (e.g., "this build licensed for Linux production only"). Generalizes PyArmor BCC platform restrictions in pure Python. _Estimate: 2-3 days_
 
 ---
 
@@ -113,9 +135,12 @@ Benefits: simpler test matrix (~15% faster CI), one less dependency, and elimina
 To maintain focus on core users (individual developers/small teams in the AI-assisted development era):
 
 - **Deep Bytecode Encryption** — Too complex to maintain; conflicts with AI-debuggability goal
+- **Bytecode-VM Virtualization** (vmp-protector / PyArmor BCC mode lane) — Architecturally incompatible with AI-debuggability; high maintenance burden; cyber.wtf 2025-05-30 BCC analysis shows partial reversal via symbolic execution is already feasible
 - **Compile to C/Machine Code** — Nuitka/Cython already do this well
-- **Enterprise License Server** — Not our target market
-- **Obfuscation-as-a-Service cloud API** — Conflicts with privacy positioning
+- **Anti-VM / Sandbox-Detection** — Overlaps with malware-evasion tooling and risks brand poisoning (`python-obfuscation-framework 1.13.0` is already classified `stager, payload` on PyPI). pyobfus is a defender tool; must keep clear lane separation
+- **Standalone Runtime Folder Model** (PyArmor `dist/` with native `.so`) — Pure Python output is part of the cross-platform value proposition
+- **Enterprise License Server** — Not our target market (a recipe / Cloudflare Worker reference is fine, a SaaS is not)
+- **Obfuscation-as-a-Service cloud API** — Conflicts with privacy positioning (PyArmor Basic/Pro phones home on every build; that's our negative-space)
 
 ---
 
@@ -157,4 +182,5 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.
 
 ---
 
-**Last Updated**: 2026-04-22 — Strategic reshape after AI-era competitive analysis.
+**Last Updated**: 2026-05-09 — Added P2-7..P2-10 to v0.5.0 (forensic watermarking, license binding, integrity seal, scrub-traceback) and a new v0.5.1 section with P2-11..P2-16 (string vault, scan_secrets MCP tool, PyInstaller cookbook, embed-data, anti-debug, requires_runtime). Expanded "What We Won't Do" with bytecode-VM virtualization, anti-VM detection, and standalone runtime folder model as explicit lane decisions. Source: 2026-05-09 competitive scan against PyArmor 9.2.x, Nuitka Commercial, Sourcedefender, vmp-protector 1.0.0, obfuscator-ai, plus arXiv 2025-2026 papers (2512.16538, 2510.11251).
+**Previous**: 2026-04-22 — Strategic reshape after AI-era competitive analysis.
