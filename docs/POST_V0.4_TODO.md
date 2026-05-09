@@ -203,7 +203,7 @@ gh api repos/zhurong2020/pyobfus --jq '.topics' | tr ',' '\n' | grep -i pyarmor 
 
 | ID | Item | Status | Re-prioritization rationale |
 |---|---|---|---|
-| **P2-1** 🔒 | Selective Opacity (layered AES protection) | **W3-ARCHITECTURE + W3-A-RUNTIME-DONE-PRIVATE 2026-05-09** (design doc + opacity/ scaffolding + 4-layer lattice + 3-channel API + L3 lazy-materialization runtime · 47 tests · 5 patent findings · build-pass AST transformer (W3-B) deferred ~3-5 days) | Patent target. Core philosophical differentiator. Main combination claim core. Implementation lives in private repo per Path C; ship to public on 申请号 receipt. |
+| **P2-1** 🔒 | Selective Opacity (layered AES protection) | **W3 + W3-A + W3-B DONE-PRIVATE 2026-05-09** (design doc + opacity/ scaffolding + 4-layer lattice + 3-channel API + L3 lazy-materialization runtime + build-pass AST transformer with per-layer dispatch / per-build `_LAYER_KEY` / per-function `_CIPHER_<name>` / `(qualname → Layer)` orchestrator interface · 88 P2-1 tests + 163 total · 9 patent findings · end-to-end round-trip working) | Patent target. Core philosophical differentiator. Main combination claim core. Implementation lives in private repo per Path C; ship to public on 申请号 receipt. |
 | **P2-3** | `--strip-ai-artifacts` mode | TODO · **promoted from P2-3** | Pairs naturally with new N3 (claude-skill preset); both serve "ship AI-generated code as IP" segment. Public-OK (Core feature, not patent-gated). |
 | **P2-4** | Import obfuscation (Pro) | TODO | Keep · closes PyArmor Pro feature gap. Public-OK (existing public Pro module category). |
 | **P2-5** | Numeric / constant obfuscation | TODO | Keep · small effort, fills gap. Public-OK (Core feature). |
