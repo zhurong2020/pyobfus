@@ -11,9 +11,9 @@ voice: V2EX 短促 · 直接列点 · 不长 origin story · 末尾给 GitHub + 
 
 > 利益声明：我是作者。
 
-最近给一个要申请专利的医学项目 ship 算法模块，需要 Python 代码混淆。调研了 PyArmor。真正能让反编译变难的功能（字节码加密 / 控制流平坦化 / 反调试）都在付费 Pro 层。价格不是问题，但我那阵子大半代码是 Claude Code 写的，崩溃日志也是贴给 Claude 看的。如果用 PyArmor 把类名全改成 `I0`、方法名改成 `I2`，崩溃栈一回来 Claude 就读不懂了。这事 PyArmor 不太可能在它当前架构下修，因为保护本来就是单向设计。Cython 更糟（直接机器码）。
+最近给一个要申请专利的医学项目 ship 算法模块，需要 Python 代码混淆。调研了 PyArmor。真正能让反编译变难的功能（字节码加密 / 控制流平坦化 / 反调试）都在付费 Pro 层。价格不是问题，但有两个具体阻力：(1) 我那阵子大半代码是 Claude Code 写的，崩溃日志也是贴给 Claude 看的。如果 PyArmor 把类名全改成 `I0`、方法名改成 `I2`，崩溃栈一回来 Claude 就读不懂了。这事 PyArmor 不太可能在它当前架构下修，因为保护本来就是单向设计。(2) PyArmor 免费版超过约 940 行就要付费版（今天专门跑了 PyArmor 9.2.4 trial 实测：935 行通过、940 行 `ERROR out of license`），我那个项目核心模块远超过这条线。Cython 更糟（直接机器码）。
 
-所以没付，自己花了一个月的晚上跟 Claude Code 一起写了 pyobfus，重点解决一个 trade-off：保护 + AI 调试可以同时存在。
+所以没付，反过来当时正好刚开始用 Claude Code vibe coding，想试这种方式能跑多远，就花了一个月的晚上跟 Claude Code 一起写了 pyobfus，重点解决一个 trade-off：保护 + AI 调试可以同时存在。
 
 旧文是 [pyobfus 0.1 入门介绍](https://www.arong.eu.org/protect-your-python-code-with-pyobfus/)，这帖讲 0.4 新加的能力。
 

@@ -50,6 +50,12 @@ My workflow had a specific shape. The thing writing half my code those evenings 
 
 PyArmor was designed for a workflow where the human reads the production logs. Cython compiles to machine code, even further from anything LLM-readable. Both made sense in 2013, in 2017. Neither made sense for an evening-vibes project where the model was the one in the debug seat.
 
+Two more nudges pushed me from "researching" to "building."
+
+One was PyArmor's free-tier line limit. Their license comparison table calls the relevant capability "Big Script" mode and gates it behind any paid tier (Basic / Pro / Group / CI — the Free row is blank). The exact threshold isn't in the docs, so I just spun up a clean venv on 2026-05-09 and measured it on PyArmor 9.2.4 trial: a single Python source file over roughly 940 lines refuses to obfuscate with a flat `ERROR out of license` (935 lines passes, 940 fails; the trigger is line count, not bytes — 900 lines stuffed with comments to 67 KB still passed). The core algorithm modules in that medical imaging project were well past that line. So if I'd decided to stay on PyArmor, "maybe pay later" turned into "pay right now." (Reproducible test commands archived in `docs/PYARMOR_TRIAL_LIMIT_EXPERIMENT.md`.)
+
+The other nudge was that Claude Code was still pretty new at that point. I'd just started vibe-coding seriously and was curious how far this style could run. Building a Python obfuscator from scratch isn't a giant project: AST rewriting plus a name map plus a CLI wrapper, bounded enough to be a clean test. If Claude Code could write this thing with me, it could probably write the harder things later. If it couldn't, at least I'd have first-hand knowledge of where the tool's edges sit. Turned out it could, at least for the basic functionality. So pyobfus is partly a tool and partly a self-experiment in whether vibe-coding holds up as a primary workflow.
+
 So instead of paying for a tool I'd then have to fight, I started building a smaller one. About a month of evenings vibe-coding with Claude Code itself, organized around a single trade-off: keep the obfuscator's output opaque to outsiders, keep one tiny mapping file readable to me. That's pyobfus 0.4.0, which I shipped on 2026-04-22.
 
 ---
