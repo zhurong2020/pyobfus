@@ -392,6 +392,7 @@ gh api repos/zhurong2020/pyobfus --jq '.topics' | tr ',' '\n' | grep -i pyarmor 
 | GitHub stars 0 → 100+ | Launch + Glama/Registry organic discovery | depends on launch |
 | Glama Quality grade re-check after `glama.json` fix | Eventual cron | 1-3 days |
 | ReadTheDocs `pyobfus-mcp` section (extend existing pyobfus mkdocs site) | Polish item · defer until N7/N8 unifies docs surface OR until first MCP-tool API question lands in Issues/Discussions | depends on demand |
+| CCPC 软著 e-certificate | Filed via CCPC web portal after real-name auth cleared 2026-05-09 (file prep complete, see Session 24 log + `../pyobfus-legal/software_copyright/README.md` §十 for submission cheat sheet) | ~30 working days from submission |
 
 ### N5 — Diversify awesome-list distribution (parallel hedge against punkpeye merge latency · ✅ COMPLETED 2026-05-08 — wong2 / mcpservers.org LIVE)
 
