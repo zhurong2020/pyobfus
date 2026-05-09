@@ -5,9 +5,9 @@ Living reference of where `pyobfus` has a foothold, what each account looks like
 For the **why** behind the channel mix, see [AI_INTEGRATION_STRATEGY.md](AI_INTEGRATION_STRATEGY.md).
 For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTION_LOG.md).
 
-**Last updated**: 2026-05-08 (mcpservers.org listing approved · awesome-mcp-servers section refreshed)
+**Last updated**: 2026-05-09 (Session 23 · OpenSSF passing badge + PR #5777 description silent-refreshed + version bumps reflected)
 
-> **Note (2026-05-08)**: this file is partially stale outside the awesome-mcp-servers section below — pyobfus is on 0.4.0, pyobfus-mcp is on 0.2.0 (live on PyPI + MCP Registry with PEP 740 attestations as of 2026-05-08 morning), Glama listing is Quality A. Consult `docs/POST_V0.4_TODO.md` and `docs/V0.4_EXECUTION_LOG.md` for the current truth on per-channel state until this doc gets a full refresh.
+> **Note (2026-05-09)**: most of the per-channel facts below are now current as of Session 23. Outside of the launch wave (HN 5-11 / Reddit 5-12 / CN trio 5-8/9), the live state is reflected here. Consult `docs/POST_V0.4_TODO.md` for forward TODO and `docs/V0.4_EXECUTION_LOG.md` for session-by-session deltas.
 
 ---
 
@@ -21,8 +21,8 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 
 ### PyPI — `pyobfus-mcp`
 - URL: https://pypi.org/project/pyobfus-mcp/
-- Current version: **0.1.0** live; **0.1.1** staged in `pyobfus_mcp/dist/` pending publish
-- 0.1.1 adds `<!-- mcp-name: io.github.zhurong2020/pyobfus-mcp -->` marker + `server.json` required by MCP Registry
+- Current version: **0.2.0** (released 2026-05-08) · ships with PEP 740 sigstore attestations via OIDC trusted publishing
+- 0.2.0 contents: FastMCP 1.27 baseline + Pro funnel surfaces (`recommend_tier`, `start_pro_trial`) + 10-category MCP server security baseline (path scoping / rate limiting / audit logging) — total 7 tools registered (was 5 in 0.1.x)
 
 ### GitHub — `zhurong2020/pyobfus`
 - URL: https://github.com/zhurong2020/pyobfus
@@ -74,9 +74,17 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 
 ### MCP Registry — `io.github.zhurong2020/pyobfus-mcp` 🟢 LIVE
 - URL: https://registry.modelcontextprotocol.io/v0/servers?search=pyobfus
-- Published: 2026-04-22 01:48:45 UTC · status: `active` · isLatest: `true` · version: 0.1.1
-- Confirmed live via `curl https://registry.modelcontextprotocol.io/v0/servers?search=pyobfus`
+- Latest published: 2026-05-08 with 0.2.0 · status: `active` · isLatest: `true`
+- Caveat: publisher-claimed `_meta.io.github.zhurong2020.pyobfus_mcp` namespace was silently stripped server-side on 0.2.0 publish. Investigation queued for next bump (try `io.github.zhurong2020` no-suffix form). See `~/.claude/projects/-mnt-c-onedrive-msft-OneDrive---MSFT-rong-3-job-program-pyobfus/memory/mcp_registry_meta_namespace.md`.
 - Implications: Claude Desktop / Claude Code / Cursor / Windsurf / Zed users querying the registry for "pyobfus" or "python obfuscator" will discover this server without manual config file edits.
+
+### OpenSSF Best Practices passing badge 🟢 LIVE
+- URL: https://www.bestpractices.dev/projects/12788
+- Project ID: 12788 · achieved: 2026-05-09 04:23:38 UTC · tier: passing (Metal series) · 67/67 criteria
+- Categories met: Basics 13/13 · Change Control 9/9 · Reporting 8/8 · Quality 13/13 · Security 16/16 · Analysis 8/8
+- Same tier as Kubernetes / Curl / etcd
+- Badge embedded in pyobfus README header (commit `eb634ab`)
+- Implications: marketable third-party project-maturity credential. Cross-referenced in awesome-mcp-servers PR #5777 description (silent edit 2026-05-09). Useful in HN/Reddit launch posts as supporting evidence; useful in 软著 / patent applications as "production use" proof (see `memory/patent_software_copyright_sync_2026-05-09.md`).
 
 ## 🟡 Pending action
 
