@@ -193,6 +193,11 @@ gh api repos/zhurong2020/pyobfus --jq '.topics' | tr ',' '\n' | grep -i pyarmor 
 > **No public commits, branches, PRs, issues, or comments referencing the algorithmic mechanism of these 6 items until patent filed.** Naming the feature in this TODO + ROADMAP is OK (no implementation detail revealed). See `~/.claude/projects/-mnt-c-onedrive-msft-OneDrive---MSFT-rong-3-job-program-pyobfus/memory/pro_disclosure_finding_2026-05-09.md` and `pyobfus_patent_strategy.md` for the full reasoning.
 >
 > v0.5 ship date pushed from 2026-06-15 → late July / early August 2026 to allow patent filing window (~4-6 weeks).
+>
+> **2026-05-09 late-evening update (Session 27)**:
+> - Patent dossier framework scaffolded at `~/projects/pyobfus-legal/patent/` (off-repo): 10 sub-directories matching the CNIPA web 端 8 个 upload tabs + reusable templates symlinked from `cac-plus-ip/02_china_发明专利/_templates_CNIPA/`. v0.5 session uses this as the working directory when patent draft starts. See `pyobfus-legal/patent/README.md` for full structure + 11-step submission flow.
+> - **CNIPA case # `10000559675571` already created** on 专利业务办理系统 web (https://cponline.cnipa.gov.cn → 我的办公桌 → 国家申请 → 发明专利申请) and recorded in `pyobfus-legal/patent/00_案卷信息/case_metadata.md`.
+> - **USB Key / CPC desktop client are NOT required** (Session 25/26 backlog mentions are superseded). Web-based 实名认证 user path supports full submission incl. 电子签章 — applicable for individual pro-se filing. USB Key only required for 代理批量 / PCT / 委托代理 scenarios.
 
 ### Already in `docs/ROADMAP.md` v0.5+ (still valid · re-prioritized · patent-gated marked 🔒)
 
