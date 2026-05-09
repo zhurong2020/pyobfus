@@ -81,6 +81,12 @@ Be direct, no deflection:
 
 > Pro adds string encryption (AES-256), control-flow flattening, anti-debug, and dead-code injection. Same Apache 2.0 core; commercial license for the Pro modules. Pricing on the GitHub README. Honestly the community tier handles 80% of what most people need.
 
+### "What was wrong with PyArmor's trial?" / "How big does my code need to be?" (added 2026-05-09)
+
+(Use only if asked directly. Don't bring up first — looks like competitor-bashing.)
+
+> Tested it 2026-05-09 in a clean venv against PyArmor 9.2.4 — per-file threshold sits around 935-940 lines for sparse Python (935 passed, 940 failed). Limit is on line count not bytes (900 lines at 67 KB still passed). Error is just `ERROR out of license` with no number and no upgrade hint. Pyobfus has no per-file line limit in either tier. Repro procedure in the repo: `docs/PYARMOR_TRIAL_LIMIT_EXPERIMENT.md`. Caveat: this is PyArmor 9.2.4 specifically — newer versions might shift.
+
 ### "I tried it and X broke"
 
 Always: ask for a minimal repro, file the GitHub issue together, link it in the Reddit reply. Public issue handling is the strongest single trust signal on /r/Python.

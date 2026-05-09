@@ -50,6 +50,12 @@ These are likely to come up. Don't pre-emptively address all of them in the seed
 
 > PyArmor's stronger if your only goal is making static analysis hurt. It's weaker if you also need to keep AI-assisted debugging working in production, because its bytecode encryption is one-way. Different tools for different threat models. I respect what they ship; their license is also more permissive than people remember (BSD).
 
+## "What's PyArmor's trial limit, actually?" (added 2026-05-09)
+
+(Use only if directly asked. Don't bring up unprompted — would read as competitor-bashing.)
+
+> Hadn't seen this measured anywhere, so I tested PyArmor 9.2.4 in a clean venv on 2026-05-09. Per-file threshold is around 935-940 lines for sparse Python: 935 passes, 940 fails. Line count not bytes (900 lines at 67 KB still passes). Error message is just `ERROR out of license` — no threshold number, no upgrade hint. Reproducible procedure is in the repo (`docs/PYARMOR_TRIAL_LIMIT_EXPERIMENT.md`) if anyone wants to verify or correct me; PyArmor 9.2.4 specifically, may shift on future versions.
+
 ## "Obfuscation is security through obscurity / it doesn't work"
 
 > Agreed if interpreted as "this stops a determined attacker." It doesn't. The intended use is friction against casual reverse engineering plus IP-claim documentation (e.g. for software-copyright filings). Read the threat-model section in the README; I'm trying to be specific about what it does and doesn't promise.

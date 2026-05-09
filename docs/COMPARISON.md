@@ -22,8 +22,8 @@ PyArmor is the most established Python obfuscator. Here's how pyobfus compares:
 |---------|---------|---------|
 | **Price (Pro)** | **$45** (one-time) | $89 (one-time) |
 | **Price savings** | **50% cheaper** | - |
-| **Free tier** | Unlimited (Community features) | Vague "trial" limits |
-| **Pro trial** | **5 days free** (full features) | Vague limits |
+| **Free tier** | Unlimited (Community features) | ~935-940 lines/file before `ERROR out of license` (PyArmor 9.2.4, verified 2026-05-09) |
+| **Pro trial** | **5 days free** (full features) | Same opaque trial limits as free; no documented threshold |
 | **Open source** | Yes (Core: Apache 2.0, Pro: Proprietary) | No |
 | **Auditable code** | Yes | No |
 | **Native dependencies** | None | Requires `pytransform` runtime |
@@ -40,7 +40,7 @@ PyArmor is the most established Python obfuscator. Here's how pyobfus compares:
 
 Based on GitHub issues and community feedback, common PyArmor frustrations include:
 
-1. **Unpredictable trial limits**: "My big script fails to obfuscate" with no clear explanation
+1. **Opaque trial limit (~935-940 lines/file)**: Errors out at this threshold with the message `ERROR out of license` — no threshold number, no upgrade hint, no documentation. Verified empirically on PyArmor 9.2.4 in clean venv on 2026-05-09 (935 lines passes, 940 fails; line count not byte count — 900 lines at 67 KB still passes). Full reproducible methodology: [`PYARMOR_TRIAL_LIMIT_EXPERIMENT.md`](PYARMOR_TRIAL_LIMIT_EXPERIMENT.md).
 2. **PyInstaller conflicts**: DLL version mismatches, slow startup times
 3. **Environment issues**: Doesn't work in MSYS, no warning given
 4. **Future compatibility**: License may not work with future PyArmor versions
