@@ -4,11 +4,34 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ## ⚡ Current pending work (cold-start 必读)
 
-**Single source of truth for forward TODO**: [`docs/POST_V0.4_TODO.md`](docs/POST_V0.4_TODO.md)
+**Single source of truth for forward TODO**: [`docs/POST_V0.4_TODO.md`](docs/POST_V0.4_TODO.md) — 重启 session 第一份必读
 
 Snapshot 2026-05-07 (v0.4 distribution leg 完整闭环之后)。包含 30-second resume cheat sheet · 4 个 self-actionable P0 item（CI smoke test + PEP 740 attestation + server.json _meta + dev.to voice pass）· v0.5 work（含 3 个 2026-05 research 发现的新机会：PEP 750 t-string handler · FastMCP 3.0 升级 · `--target claude-skill` preset）· passive waiting items · do-not-do list · 3 周建议节奏。
 
-**重启 session 第一份必读**。
+### 🔥 2026-05-10 active state — pyobfus v0.5 中国发明专利申请
+
+**当前最高优先级活动**：v0.5 中国发明专利已进入 CNIPA web 端上传阶段，等费减备案审批通过后点最终「提交」按钮。
+
+- ✅ Patent draft v1 完成（5 docx + disclosure 母本 + 7 mermaid 图 + ID PDF）
+- ✅ 5 web tabs 全部填写并保存（2026-05-10 11:30 · 案卷 `10000559675571`）
+- ✅ 费减备案 已提交（2026-05-10 09:16 · Path A 年度备案 · cac-plus-ip 共用）
+- ⏳ **当前阻塞项 = 等费减备案审批结果**（1-15 工作日 · 预计 2026-05-12 → 2026-05-25）
+- 📋 审批后流程：填备案号 → 5 tab 最终校对 → 点「提交」（= 申请日 = 优先权日 · 不可撤销）→ 缴费 510 元（85% 减免后）→ 1-2 周受理 → 申请号到手 → Path C 解禁 v0.5 → 公开 release
+
+**Cold-start session 第一句话应问 user**：「费减备案审批了吗？」
+
+**Cold-start 资料定位**（按读取优先级）：
+
+| 优先级 | 文件 | 用途 |
+|---|---|---|
+| 1 | `~/projects/pyobfus-legal/patent/SESSION_LOG_20260510.md` | 完整时间线 + 当前状态 + next session 入口（off-repo · 含完整 narrative）|
+| 2 | `~/.claude/projects/-mnt-c-onedrive-msft-OneDrive---MSFT-rong-3-job-program-pyobfus/memory/patent_draft_v1_2026-05-10.md` | 上午 9 项进度 + 阻塞项 + 待处理项 |
+| 3 | `~/projects/pyobfus-legal/patent/00_案卷信息/case_metadata.md` | 案卷号 / 备案号占位 / 申请号占位（看哪些已回填）|
+| 4 | `https://github.com/zhurong2020/pyobfus/blob/main/docs/POST_V0.4_TODO.md` § P1 | 公开版状态块（2026-05-10 update 块）|
+
+**跨项目联动**：cac-plus-ip 与本 pyobfus 共享同一个人申请人 + 同一 2026 年度费减备案；`~/projects/cac-plus-ip/CLAUDE.md` 含完整跨项目索引。pyobfus 备案号到手后**自动覆盖** cac-plus-ip 当年所有专利缴费。详见 memory `ip_workflow_cross_project.md`。
+
+**Path C 红线**（持续生效至申请号到手）：pyobfus-legal/ 永不入 git；pyobfus-pro-dev v0.5 mechanism 永不 push 公开 repo；公开 commits 中不出现 v0.5 patent-gated 内部符号（命名清单与具体禁忌见 memory `pro_disclosure_finding_2026-05-09.md` + `pyobfus_patent_strategy.md`）。
 
 ## 项目概述
 
