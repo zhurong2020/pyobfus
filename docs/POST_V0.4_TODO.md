@@ -390,6 +390,7 @@ gh api repos/zhurong2020/pyobfus --jq '.topics' | tr ',' '\n' | grep -i pyarmor 
 **Done when**: classifier changed (queued for N1 bump), COMPARISON.md upgraded (✅ this session), 32768-byte cross-reference added (deferred · coordinate with other session), README/HN/landing page reflect three-layer framing (README ✅ this session; HN/landing page later).
 
 **Additional doc-lag item discovered 2026-05-09**: `README.md` line ~27 says "registers **five** MCP tools" — pyobfus-mcp 0.2.0 actually has **7** (added `recommend_tier` + `start_pro_trial` per N2). Fix the count + add the 2 new tools to the bullet table when N1 bump goes out (same trigger as N10-1 classifier change · do-not-do version-bump rule applies). awesome-mcp-servers PR #5777 description was already refreshed independently 2026-05-09 (silent edit).
+- **2026-05-29 update**: the awesome-mcp-servers **README entry line** (not just the PR description) was bumped from "Five tools" → "Seven tools" (added `recommend_tier` + `start_pro_trial`) on fork branch `add-pyobfus-mcp`. The pyobfus repo's own `README.md` line ~27 count fix **remains deferred** to the N1 bump per the do-not-do version-bump rule.
 
 ---
 
@@ -445,7 +446,8 @@ So target submission window = **2026-Q3 / Q4** (after v0.5 ships on PyPI per Pat
 
 | Item | Trigger condition | ETA |
 |---|---|---|
-| punkpeye merges PR #5777 | 86k★-repo human cadence · `state=OPEN` confirmed 2026-05-08 morning · all bot labels green (`has-emoji`/`has-glama`/`valid-name`) · 13h-old self status update referencing Glama Quality A still un-acked by maintainer | 3-7 days typical |
+| punkpeye merges PR #5777 | 86k★-repo human cadence · `state=OPEN` · all bot labels green (`has-emoji`/`has-glama`/`valid-name`). **2026-05-29: PR had gone `CONFLICTING`/`DIRTY` (README.md collided with newer merges) — resolved by merging `upstream/main` into branch + re-appending the pyobfus entry (now 7 tools); GitHub back to `MERGEABLE`.** | 3-7 days typical |
+| Glama license badge F → A | **2026-05-29: root-caused — GitHub `licensee` returned `NOASSERTION` because the dual-license preamble prefixed the Apache text; Glama mirrors that field.** Fix on branch `fix/license-spdx-detection` (PR #15): `LICENSE` now pure Apache-2.0, notice moved to `LICENSE-NOTICE.md`. Clears after PR #15 merges to `main` → GitHub re-detects Apache-2.0 → Glama cron re-crawl. | minutes (GitHub) + 1-3 days (Glama crawl) after merge |
 | Glama "No glama.json" checklist clears | Glama cron re-scan after `glama.json` schema fix (commit `8d92487`) | 1-3 days |
 | First external GitHub issue | Real user encounters something | depends on launch |
 | First Pro license sale | Launch traffic + Stripe checkout funnel | depends on launch |
