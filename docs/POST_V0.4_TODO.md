@@ -447,7 +447,7 @@ So target submission window = **2026-Q3 / Q4** (after v0.5 ships on PyPI per Pat
 | Item | Trigger condition | ETA |
 |---|---|---|
 | punkpeye merges PR #5777 | 86k★-repo human cadence · `state=OPEN` · all bot labels green (`has-emoji`/`has-glama`/`valid-name`). **2026-05-29: PR had gone `CONFLICTING`/`DIRTY` (README.md collided with newer merges) — resolved by merging `upstream/main` into branch + re-appending the pyobfus entry (now 7 tools); GitHub back to `MERGEABLE`.** | 3-7 days typical |
-| Glama license badge F → A | **2026-05-29: root-caused — GitHub `licensee` returned `NOASSERTION` because the dual-license preamble prefixed the Apache text; Glama mirrors that field.** Fix on branch `fix/license-spdx-detection` (PR #15): `LICENSE` now pure Apache-2.0, notice moved to `LICENSE-NOTICE.md`. Clears after PR #15 merges to `main` → GitHub re-detects Apache-2.0 → Glama cron re-crawl. | minutes (GitHub) + 1-3 days (Glama crawl) after merge |
+| Glama license badge F → A | **2026-05-29: root-caused** — GitHub `licensee` returned `NOASSERTION` because the dual-license preamble prefixed the Apache text; Glama mirrors that field. Fix: `LICENSE` → pure Apache-2.0, notice moved to `LICENSE-NOTICE.md`. **PR #15 MERGED 2026-05-29 (commit `5556f8b`); GitHub now reports `spdx_id=Apache-2.0` ✅ (verified via `gh api repos/zhurong2020/pyobfus/license`).** Only remaining step is passive: Glama cron re-crawl flips the badge F → A. | 1-3 days (Glama crawl) |
 | Glama "No glama.json" checklist clears | Glama cron re-scan after `glama.json` schema fix (commit `8d92487`) | 1-3 days |
 | First external GitHub issue | Real user encounters something | depends on launch |
 | First Pro license sale | Launch traffic + Stripe checkout funnel | depends on launch |
