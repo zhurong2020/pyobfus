@@ -25,7 +25,7 @@ This repository ships **two installable packages**:
 | [`pyobfus`](https://pypi.org/project/pyobfus/) | The Python obfuscator (CLI + library). | `pip install pyobfus` |
 | [`pyobfus-mcp`](https://pypi.org/project/pyobfus-mcp/) | A **Model Context Protocol (MCP) server** that exposes pyobfus's tools to AI coding agents. | `pip install pyobfus-mcp` |
 
-The MCP server lives in [`pyobfus_mcp/`](pyobfus_mcp/) and is built on the official [Model Context Protocol Python SDK](https://github.com/modelcontextprotocol/python-sdk) (FastMCP). It registers five MCP tools so **Claude Desktop, Claude Code, Cursor, Windsurf, and Zed** can call pyobfus directly from agent conversations — no shelling out:
+The MCP server lives in [`pyobfus_mcp/`](pyobfus_mcp/) and is built on the official [Model Context Protocol Python SDK](https://github.com/modelcontextprotocol/python-sdk) (FastMCP). It registers seven MCP tools so **Claude Desktop, Claude Code, Cursor, Windsurf, and Zed** can call pyobfus directly from agent conversations — no shelling out:
 
 | MCP tool | Implementation | Purpose |
 |---|---|---|
@@ -34,6 +34,8 @@ The MCP server lives in [`pyobfus_mcp/`](pyobfus_mcp/) and is built on the offic
 | `unmap_stack_trace` | [`pyobfus_mcp/tools.py`](pyobfus_mcp/pyobfus_mcp/tools.py) | Reverse obfuscated identifiers in a production stack trace |
 | `list_presets` | [`pyobfus_mcp/tools.py`](pyobfus_mcp/pyobfus_mcp/tools.py) | Enumerate community / framework / Pro presets |
 | `explain_preset` | [`pyobfus_mcp/tools.py`](pyobfus_mcp/pyobfus_mcp/tools.py) | Describe what a named preset changes |
+| `recommend_tier` | [`pyobfus_mcp/tools.py`](pyobfus_mcp/pyobfus_mcp/tools.py) | Analyze a project and recommend community vs Pro tier, with reasoning |
+| `start_pro_trial` | [`pyobfus_mcp/tools.py`](pyobfus_mcp/pyobfus_mcp/tools.py) | Return structured guidance for starting the 5-day Pro trial |
 
 The server is registered in the **official [MCP Registry](https://registry.modelcontextprotocol.io/)** under `io.github.zhurong2020/pyobfus-mcp`. The transport is stdio. See [`pyobfus_mcp/README.md`](pyobfus_mcp/README.md) for per-client configuration snippets.
 
