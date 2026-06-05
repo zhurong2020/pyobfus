@@ -26,15 +26,15 @@ Title is 65 chars including "Show HN:". Under the 80-char HN limit. Lead noun ("
 
 Per HN convention, the submitter posts a top-level comment expanding context. This is what readers actually read first.
 
-> Author here. Built this while shipping algorithm modules from a medical imaging research codebase under active patent and software-copyright filing. Looked at PyArmor first; the serious protection sits behind paid Pro, which made me stop and think about whether I needed all of it. The bigger thing was structural: PyArmor's protection is one-way by design. Once a class name is mangled to `I0`, you can't reverse it. Production traces come back as `'I0' object has no attribute 'I2'`, and Claude Code (which had been writing half the code in the first place) can't reason about that. Cython has the same problem, plus it compiles to machine code.
+> Author here, I maintain pyobfus. Built it while shipping algorithm modules out of a medical-imaging research codebase that's under active patent + software-copyright filing. Looked at PyArmor first; the real protection sits behind paid Pro, which made me stop and wonder if I needed all of it. Price wasn't the dealbreaker though. PyArmor's protection is one-way by design: once a class name is mangled to `I0`, you can't get it back. Production traces come back as `'I0' object has no attribute 'I2'`, and Claude Code (which had written half the code in the first place) can't do anything with that. Cython's the same, plus it compiles to machine code.
 >
-> The differentiator in pyobfus: `--save-mapping` writes a forward + reverse name table when you obfuscate; `--unmap` applies it in reverse to a trace. Customers see the obfuscated bytes; you keep the mapping somewhere safe; when a crash arrives you reverse it locally and paste the readable trace into Claude.
+> So the whole thing is built around the mapping. `--save-mapping` writes a forward + reverse name table when you obfuscate. `--unmap` runs it backwards over a trace. Customers get the obfuscated bytes. You keep mapping.json somewhere safe, and when a crash report shows up you reverse it locally and paste the readable trace into Claude.
 >
 > Also ships an MCP server (`pyobfus-mcp`) so Claude Desktop / Cursor / Windsurf / Zed can invoke `check_obfuscation_risks`, `unmap_stack_trace`, etc. as tool calls.
 >
-> Apache 2.0 core, 671 tests, Python 3.8–3.14. Honest about the threat model: this is name mangling plus optional string encryption, not bytecode-level encryption. A determined attacker with time can reverse most of it. If your threat model is nation-state RE, use something else.
+> Apache 2.0 core, 671 tests, Python 3.8–3.14. On what it isn't: this is name mangling plus optional string encryption, not bytecode-level encryption. Someone determined with enough time can reverse most of it. If your threat model is nation-state RE, use something else.
 >
-> Feedback welcome on threat-model edge cases I'm missing, and on the MCP tool surface.
+> Happy to hear about threat-model edge cases I've missed, or where the MCP tool surface falls short.
 
 Word count: 188. HN sweet spot for a Show-HN seed comment is 100–200 words.
 
@@ -62,7 +62,7 @@ These are likely to come up. Don't pre-emptively address all of them in the seed
 
 ## "How is this different from Oxyry?"
 
-> Oxyry is single-file, free-tier, no AI integration, no reverse mapping. We're aiming at the multi-file project + AI-assisted-debugging niche specifically. Oxyry is great for one-off scripts.
+> Oxyry's single-file and free, but there's no AI integration and no reverse mapping. We're after the multi-file-project + AI-debugging niche. For one-off scripts Oxyry's genuinely great.
 
 ## "What about decompiling .pyc files?"
 
