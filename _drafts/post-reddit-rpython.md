@@ -3,7 +3,7 @@ target_subreddit: /r/Python
 post_type: standalone showcase post (NOT a comment in Showcase Saturday)
 title: "Pyobfus 0.4 – AST obfuscator with reverse stack-trace mapping for AI-assisted debugging"
 status: DRAFT v2 (2026-05-08) — Disclosure paragraph honest rewrite (removes "Tried PyArmor first; ... broke ... loop I'd come to depend on" claim that was narrative texture not fact · reframes as "Looked at PyArmor first; Pro pricing + one-way structural design") · ready for human-voice pass + GPTZero gate before posting
-target_post_window: 2026-05-13 to 2026-05-20, weekday 12:00-15:00 EST (US lunch peak on /r/Python)
+target_post_window: 2026-06-10 to 2026-06-13, weekday 12:00-15:00 EDT (US lunch peak on /r/Python) — REVISED 2026-06-05 (post ~+24h after the HN attempt on 6-09/6-10)
 sequencing: post AFTER HN attempt has resolved (HN feedback may surface revisions worth folding in)
 ---
 
@@ -27,15 +27,15 @@ Use `Showcase` flair on the subreddit's flair picker when submitting. Without it
 
 > ## What My Project Does
 >
-> Pyobfus is an AST-based Python obfuscator (Apache 2.0). It mangles names, has framework-aware presets for FastAPI / Django / Flask / Pydantic / Click / SQLAlchemy, and ships an MCP server so Claude / Cursor / Windsurf can invoke it as tool calls. The differentiator: a forward + reverse name mapping. When you obfuscate, save it to `mapping.json`; when a production crash arrives, run `pyobfus --unmap --trace error.log --mapping mapping.json` and get a trace with the original identifiers restored. Paste that into your AI assistant and your debugging loop still works.
+> Pyobfus is an AST-based Python obfuscator (Apache 2.0). It mangles names and has framework-aware presets for FastAPI / Django / Flask / Pydantic / Click / SQLAlchemy. It also ships an MCP server so Claude / Cursor / Windsurf can invoke it as tool calls. The part that makes it different is a forward + reverse name mapping. When you obfuscate, you save that to `mapping.json`. When a production crash arrives, you run `pyobfus --unmap --trace error.log --mapping mapping.json` and get the trace back with the original identifiers restored. Paste that into your AI assistant and your debugging loop still works.
 >
 > ## Target Audience
 >
-> Production-ready, but the threat model is honest about what it covers. Targeted at:
+> Production-ready, with a threat model that's honest about what it covers. Roughly three groups:
 >
-> - Solo devs and small teams shipping commercial Python with the goal of making casual reverse engineering more work
-> - Researchers shipping algorithm modules under active patent or software-copyright filings
-> - Teams already using Claude Code / Cursor / Windsurf and unwilling to lose AI-assisted debugging when they ship
+> - Solo devs and small teams shipping commercial Python who just want casual reverse engineering to cost more effort
+> - Researchers shipping algorithm modules under active patent or software-copyright filing
+> - Anyone already on Claude Code / Cursor / Windsurf who doesn't want to give up AI-assisted debugging once they ship obfuscated code
 >
 > Not for nation-state-grade RE resistance. For that, don't use Python.
 >
@@ -51,7 +51,7 @@ Use `Showcase` flair on the subreddit's flair picker when submitting. Without it
 > | License | Apache 2.0 | BSD | Apache 2.0 | proprietary |
 > | Multi-file project support | yes | yes | yes | no |
 >
-> Disclosure: I'm the maintainer. Built it while shipping algorithm modules from a medical imaging research codebase that needed binaries for collaborators without exposing the internals. Looked at PyArmor first, but the serious protection sits behind paid Pro and the bigger structural issue is one-way design: once class names are mangled to `I0` you can't reverse them to debug a production trace. That would break the AI-assisted debugging loop I'd come to depend on (most of the code was being written *with* Claude Code in the first place), so I built pyobfus around closing that specific gap.
+> Disclosure: I'm the maintainer. I built it while shipping algorithm modules from a medical-imaging research codebase that needed binaries for collaborators without exposing the internals. Looked at PyArmor first, but the real protection sits behind paid Pro, and the thing that actually stopped me was the one-way design: once class names are mangled to `I0` you can't reverse them to debug a production trace. That breaks the AI-assisted debugging loop I'd come to depend on (most of the code was written *with* Claude Code in the first place), so I built pyobfus around closing that one gap.
 >
 > - `pip install pyobfus pyobfus-mcp`
 > - https://github.com/zhurong2020/pyobfus
