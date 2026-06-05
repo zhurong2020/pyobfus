@@ -55,7 +55,7 @@ Use `Showcase` flair on the subreddit's flair picker when submitting. Without it
 >
 > - `pip install pyobfus pyobfus-mcp`
 > - https://github.com/zhurong2020/pyobfus
-> - 643 tests, Python 3.8 to 3.14
+> - 671 tests, Python 3.8 to 3.14
 
 Word count target: ~280. Current ~310, slight trim possible. Showcase posts on /r/Python in 2025-2026 average 200-400 words; under 200 reads as low-effort, over 500 reads as marketing.
 

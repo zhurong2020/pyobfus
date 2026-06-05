@@ -3,7 +3,7 @@ title_field: "Show HN: Pyobfus – Python obfuscator that doesn't break Claude C
 url_field: https://github.com/zhurong2020/pyobfus
 text_body: see below (HN allows EITHER url OR text — we use url, no text body, then engage in comments)
 status: DRAFT v2 (2026-05-08) — Section 1 honest rewrite (removes "Tried PyArmor first; it works" claim that was narrative texture not fact · reframes as "Looked at PyArmor first; one-way design + Pro pricing" + structural concern about Claude debugging) · ready for human-voice pass + GPTZero gate before submission
-target_post_window: 2026-05-12 to 2026-05-19, weekday 09:00-11:00 EST (HN peak window)
+target_post_window: 2026-06-09 to 2026-06-13, weekday 09:00-11:00 EST (HN peak window) — REVISED 2026-06-05 (original May window lapsed; launch wave was never sent. dev.to article has been live since 2026-05-07 so the ≥48h-after-dev.to precondition is long met — HN can go any weekday this window)
 sequencing: post AFTER dev.to has been live ≥48h (so commenters have material to read), BEFORE Reddit
 ---
 
@@ -32,7 +32,7 @@ Per HN convention, the submitter posts a top-level comment expanding context. Th
 >
 > Also ships an MCP server (`pyobfus-mcp`) so Claude Desktop / Cursor / Windsurf / Zed can invoke `check_obfuscation_risks`, `unmap_stack_trace`, etc. as tool calls.
 >
-> Apache 2.0 core, 643 tests, Python 3.8–3.14. Honest about the threat model: this is name mangling plus optional string encryption, not bytecode-level encryption. A determined attacker with time can reverse most of it. If your threat model is nation-state RE, use something else.
+> Apache 2.0 core, 671 tests, Python 3.8–3.14. Honest about the threat model: this is name mangling plus optional string encryption, not bytecode-level encryption. A determined attacker with time can reverse most of it. If your threat model is nation-state RE, use something else.
 >
 > Feedback welcome on threat-model edge cases I'm missing, and on the MCP tool surface.
 
@@ -96,7 +96,7 @@ These are likely to come up. Don't pre-emptively address all of them in the seed
 - [x] No em-dashes in prose (only in title field per HN convention)
 - [x] No "delve into / furthermore / moreover / it's worth noting / let's explore"
 - [x] Contractions throughout
-- [x] First person, dated, specific (medical imaging research, 643 tests, Python 3.8–3.14)
+- [x] First person, dated, specific (medical imaging research, 671 tests, Python 3.8–3.14)
 - [x] Length: 188 words (HN seed sweet spot 100–200)
 - [x] One concession ("It works") to defuse fanboy framing
 - [x] Honest threat-model statement up front (HN crowd respects it; punishes overclaim)

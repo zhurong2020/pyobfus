@@ -6,11 +6,13 @@
 
 按 `_drafts/post-cn-bilingual.md` 头部 sequencing + tech-deai 工作流 Step 6 「三平台间隔 24h 以上发布」要求：
 
-| 顺序 | 平台 | 文件 | 目标日期 | 长度 |
+> ⚠️ **日期已刷新 2026-06-05**：原排期(5-08~10)随 launch wave 未发而作废。CN 三件套在全局序列里**排在 HN + Reddit 之后**(dev.to → HN 6-09~13 → Reddit +24h → CN +48h 起)。下面为当前周占位日期,**以实际 HN 投放日为锚顺延**。
+
+| 顺序 | 平台 | 文件 | 目标日期(随 HN 顺延) | 长度 |
 |---|---|---|---|---|
-| 1 | 有心工坊 / tech-empowerment | [`tech_empowerment.md`](tech_empowerment.md) | 2026-05-08 (Fri) | ~1480 字 |
-| 2 | 知乎专栏 | [`zhihu.md`](zhihu.md) | 2026-05-09 (Sat, ≥24h gap) | ~1280 字 |
-| 3 | V2EX `/go/python` | [`v2ex.md`](v2ex.md) | 2026-05-10 (Sun, ≥24h gap) | ~700 字 |
+| 1 | 有心工坊 / tech-empowerment | [`tech_empowerment.md`](tech_empowerment.md) | HN 后 ~+48h(占位 2026-06-15 Mon) | ~1480 字 |
+| 2 | 知乎专栏 | [`zhihu.md`](zhihu.md) | +≥24h(占位 2026-06-16 Tue) | ~1280 字 |
+| 3 | V2EX `/go/python` | [`v2ex.md`](v2ex.md) | +≥24h(占位 2026-06-17 Wed) | ~700 字 |
 
 ## 每篇关键差异
 
@@ -35,7 +37,7 @@
 - 标题前缀「[分享创造]」（V2EX 节点常规格式）
 - 利益声明 1 行（V2EX 用户最敏感）
 - 不复用长 origin story
-- 直接列差别 + 命令 + 数字（643 tests / Apache 2.0 / Python 3.8-3.14）
+- 直接列差别 + 命令 + 数字（671 tests / Apache 2.0 / Python 3.8-3.14）
 - 末尾邀的是「踩坑经历」而不是「问题反馈」（V2EX 文化更喜欢平等技术讨论）
 - 长度严格 ≤800 字（实际 ~700）
 

@@ -204,7 +204,7 @@ pyobfus --unmap --trace error.log --mapping mapping.json
 
 技术细节：
 - Apache 2.0 开源核心
-- 643 个测试，Python 3.8-3.14 全过
+- 671 个测试，Python 3.8-3.14 全过
 - 框架预设：FastAPI / Django / Flask / Pydantic / Click / SQLAlchemy
 - 商业版 Pro 模块（控制流平坦化 / AES 字符串加密 / 反调试）闭源
 
