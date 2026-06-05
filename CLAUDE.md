@@ -38,9 +38,9 @@ Snapshot 2026-05-07 (v0.4 distribution leg 完整闭环之后)。包含 30-secon
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.8-3.14, AST, setuptools
 - **PyPI 主包**: https://pypi.org/project/pyobfus/ (v0.4.0，2026-04-22 发布)
-- **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (v0.1.2，2026-05-07 发布 — fix `FastMCP.__init__()` `version=` kwarg drift)
-- **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp` (active, isLatest=true)
-- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus (Quality A · 5 tools 全 A)
+- **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (v0.2.0，2026-05-08 发布 — 7 tools: 5 community + 2 pro_funnel `recommend_tier`/`start_pro_trial` · FastMCP 1.27 + security hardening. 0.1.2 曾修 `FastMCP.__init__()` `version=` kwarg drift)
+- **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp` (active, isLatest=true · 0.2.0)
+- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus (Quality A · 全 A) — 2026-06-05 修 `pyobfus_mcp/Dockerfile` pin 0.1.1→0.2.0(0.1.1 启动崩溃致 Glama introspection 抓不到工具，API `tools:[]`），同步 glama.yaml/README 描述 5→7 tools；等 Glama 自动重建容器后工具列表应刷新为 7
 - **GitHub**: https://github.com/zhurong2020/pyobfus (public)
 - **文档**: https://pyobfus.readthedocs.io
 - **许可**: Apache 2.0 (Core) + Proprietary (Pro)

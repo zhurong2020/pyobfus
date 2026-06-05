@@ -8,7 +8,9 @@
 
 ## 30-Second Resume
 
-**Where we are**: pyobfus 0.4.0 + pyobfus-mcp 0.1.2 published · Glama Quality A · MCP Registry isLatest · 671 tests / 91% coverage / Python 3.8-3.14. **Where we're not**: 0 GitHub stars, ~337 PyPI/month (v0.4 target was 1,500+/month). The gap is **launch execution**, not feature gaps.
+**Where we are**: pyobfus 0.4.0 + pyobfus-mcp 0.2.0 published · Glama Quality A · MCP Registry isLatest · 671 tests / 91% coverage / Python 3.8-3.14.
+
+> **2026-06-05 Glama introspection fix** (commit `bbeefb8`): Glama listing was stuck showing 5 tools and its API returned `tools:[]`. Root cause = `pyobfus_mcp/Dockerfile` pinned `pyobfus-mcp==0.1.1`, the crash-on-startup version (FastMCP `version=` kwarg drift, fixed in 0.1.2) — Glama's container introspection never got a running server. Fixed Dockerfile pin 0.1.1→0.2.0 + synced `glama.yaml`/`README.md` tool descriptions 5→7 (added `recommend_tier`, `start_pro_trial`). Verified locally: FastMCP `list_tools()` returns all 7. CI + CodeQL green. Glama re-indexes from repo automatically; recheck `curl https://glama.ai/api/mcp/v1/servers/zhurong2020/pyobfus` in a few days for `tools` length 7. **Lesson: a tool-bundle Dockerfile/distribution must track the same minimum version the package fixed its startup crash at — don't leave it pinned to a known-broken release.** **Where we're not**: 0 GitHub stars, ~337 PyPI/month (v0.4 target was 1,500+/month). The gap is **launch execution**, not feature gaps.
 
 **Single biggest unblocked TODO**: get the 4-platform launch out of `_drafts/` (dev.to → HN → Reddit → CN trio). Every day of delay loses ~1 week of natural-growth compound effect.
 
