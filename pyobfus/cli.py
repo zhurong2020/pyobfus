@@ -91,6 +91,11 @@ except ImportError:
     help="Preserve parameter names to allow keyword arguments after obfuscation",
 )
 @click.option(
+    "--numeric-obfuscation",
+    is_flag=True,
+    help="Replace numeric literals with equivalent opaque expressions (Community feature)",
+)
+@click.option(
     "--verbose",
     "-v",
     is_flag=True,
@@ -259,6 +264,7 @@ def main(
     remove_comments: bool,
     name_prefix: str,
     preserve_param_names: bool,
+    numeric_obfuscation: bool,
     verbose: bool,
     dry_run: bool,
     cross_file: bool,
@@ -513,6 +519,8 @@ def main(
         config.remove_comments = remove_comments
         config.name_prefix = name_prefix
         config.preserve_param_names = preserve_param_names
+        if numeric_obfuscation:
+            config.numeric_obfuscation = True
         config.max_workers = jobs if jobs > 0 else None  # 0=auto, N=explicit
 
         # Handle Pro feature flags
@@ -792,6 +800,7 @@ def _obfuscate_file(
     file_stats: dict = {
         "total_names_obfuscated": 0,
         "strings_encoded": 0,
+        "numbers_obfuscated": 0,
         "strings_encrypted": 0,
         "control_flow_applied": 0,
         "dead_code_injected": 0,
@@ -855,6 +864,21 @@ def _obfuscate_file(
             click.echo(f"  Encoded strings: {encoder_stats['encoded_strings']}")
             if encoder_stats["skipped_fstrings"] > 0:
                 click.echo(f"  Skipped f-strings: {encoder_stats['skipped_fstrings']}")
+
+    # 2.5 Numeric / constant obfuscation (Community Edition - if enabled)
+    # Runs after string encoding so the float.fromhex() hex strings it emits
+    # are not themselves re-encoded; runs after name mangling so the injected
+    # `float` builtin reference is never renamed.
+    if config.numeric_obfuscation:
+        from pyobfus.transformers.numeric_obfuscator import NumericObfuscator
+
+        numeric_obfuscator = NumericObfuscator(config, analyzer)
+        transformed_tree = numeric_obfuscator.transform(transformed_tree)
+        numeric_stats = numeric_obfuscator.get_statistics()
+        file_stats["numbers_obfuscated"] = numeric_stats.get("numbers_obfuscated", 0)
+
+        if verbose:
+            click.echo(f"  Numbers obfuscated: {numeric_stats['numbers_obfuscated']}")
 
     # 3. Pro features (if enabled)
     if config.level == "pro":

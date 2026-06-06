@@ -30,6 +30,10 @@ VALID_SCHEMA = {
                 "type": "bool",
                 "default": False,
             },
+            "numeric_obfuscation": {
+                "type": "bool",
+                "default": False,
+            },
             "string_encryption": {
                 "type": "bool",
                 "default": False,
