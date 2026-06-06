@@ -11,7 +11,7 @@ voice: V2EX 短促 · 直接列点 · 不长 origin story · 末尾给 GitHub + 
 
 > 利益声明：我是作者。
 
-最近给一个要申请专利的医学项目 ship 算法模块，需要 Python 代码混淆。调研了 PyArmor，发现两件事不太对：(1) PyArmor 免费版超过约 940 行就要付费版（[今天专门实测过](https://github.com/zhurong2020/pyobfus/blob/main/docs/PYARMOR_TRIAL_LIMIT_EXPERIMENT.md)），我那个项目核心模块远超过这条线。(2) 即使付费用了，工作流也对不上：我那阵子代码大半是 Claude Code 写的，崩溃日志也贴给 Claude 看的，PyArmor 把类名改成 `I0`，崩溃栈回来 Claude 就读不懂了，而 PyArmor 的保护是单向设计没法在保留保护的前提下反向。Cython 更糟（直接机器码）。
+最近给一个要申请专利的医学项目 ship 算法模块，需要 Python 代码混淆。调研了 PyArmor，发现两件事不太对：(1) PyArmor 免费版超过约 940 行就要付费版（[5 月实测过](https://github.com/zhurong2020/pyobfus/blob/main/docs/PYARMOR_TRIAL_LIMIT_EXPERIMENT.md)），我那个项目核心模块远超过这条线。(2) 即使付费用了，工作流也对不上：我那阵子代码大半是 Claude Code 写的，崩溃日志也贴给 Claude 看的，PyArmor 把类名改成 `I0`，崩溃栈回来 Claude 就读不懂了，而 PyArmor 的保护是单向设计没法在保留保护的前提下反向。Cython 更糟（直接机器码）。
 
 所以没付，反过来当时刚开始用 Claude Code vibe coding，想试这种方式能跑多远，就花了一个月的晚上跟 Claude Code 一起写了 pyobfus，重点解决一个 trade-off：保护 + AI 调试可以同时存在。
 
@@ -33,7 +33,7 @@ pyobfus --unmap --trace error.log --mapping mapping.json
 技术细节：
 
 - Apache 2.0 开源核心
-- 671 个测试，Python 3.8-3.14 全过
+- 655 个测试，Python 3.8-3.14 全过
 - 框架预设：FastAPI / Django / Flask / Pydantic / Click / SQLAlchemy
 - 商业版 Pro 模块（控制流平坦化、AES 字符串加密、反调试）闭源
 

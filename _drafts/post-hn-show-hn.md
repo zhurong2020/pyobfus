@@ -32,7 +32,7 @@ Per HN convention, the submitter posts a top-level comment expanding context. Th
 >
 > It also ships an MCP server (`pyobfus-mcp`) so Claude Desktop / Cursor / Windsurf / Zed can invoke `check_obfuscation_risks`, `unmap_stack_trace`, etc. as tool calls.
 >
-> Apache 2.0 core, 671 tests, Python 3.8–3.14. On what it isn't: this is name mangling plus optional string encryption, not bytecode-level encryption. Someone determined with enough time can reverse most of it. If your threat model is nation-state RE, use something else.
+> Apache 2.0 core, 655 tests, Python 3.8–3.14. On what it isn't: this is name mangling plus optional string encryption, not bytecode-level encryption. Someone determined with enough time can reverse most of it. If your threat model is nation-state RE, use something else.
 >
 > I'm happy to hear about threat-model edge cases I've missed, or where the MCP tool surface falls short.
 
@@ -48,7 +48,7 @@ These are likely to come up. Don't pre-emptively address all of them in the seed
 
 ## "Why not just use PyArmor?"
 
-> PyArmor's stronger if your only goal is making static analysis hurt. It's weaker if you also need to keep AI-assisted debugging working in production, because its bytecode encryption is one-way. Different tools for different threat models. I respect what they ship; their license is also more permissive than people remember (BSD).
+> PyArmor's stronger if your only goal is making static analysis hurt. It's weaker if you also need to keep AI-assisted debugging working in production, because its bytecode encryption is one-way. Different tools for different threat models, and I respect what they ship.
 
 ## "What's PyArmor's trial limit, actually?" (added 2026-05-09)
 
@@ -96,7 +96,7 @@ These are likely to come up. Don't pre-emptively address all of them in the seed
 - [x] No em-dashes in prose (only in title field per HN convention)
 - [x] No "delve into / furthermore / moreover / it's worth noting / let's explore"
 - [x] Contractions throughout
-- [x] First person, dated, specific (medical imaging research, 671 tests, Python 3.8–3.14)
+- [x] First person, dated, specific (medical imaging research, 655 tests, Python 3.8–3.14)
 - [x] Length: 188 words (HN seed sweet spot 100–200)
 - [x] One concession ("It works") to defuse fanboy framing
 - [x] Honest threat-model statement up front (HN crowd respects it; punishes overclaim)

@@ -48,14 +48,14 @@ Use `Showcase` flair on the subreddit's flair picker when submitting. Without it
 > | Compilation to native | no | no | yes | no |
 > | Reverse stack trace from prod | yes (mapping.json) | no (one-way by design) | no | no |
 > | MCP / AI-tool-call surface | yes | no | no | no |
-> | License | Apache 2.0 | BSD | Apache 2.0 | proprietary |
+> | License | Apache 2.0 | Free to use but restricted | Apache 2.0 | proprietary |
 > | Multi-file project support | yes | yes | yes | no |
 >
 > Disclosure: I'm the maintainer. I built it while shipping algorithm modules from a medical-imaging research codebase that needed binaries for collaborators without exposing the internals. Looked at PyArmor first, but the real protection sits behind paid Pro, and the thing that actually stopped me was the one-way design: once class names are mangled to `I0` you can't reverse them to debug a production trace. That breaks the AI-assisted debugging loop I'd come to depend on (most of the code was written *with* Claude Code in the first place), so I built pyobfus around closing that one gap.
 >
 > - `pip install pyobfus pyobfus-mcp`
 > - https://github.com/zhurong2020/pyobfus
-> - 671 tests, Python 3.8 to 3.14
+> - 655 tests, Python 3.8 to 3.14
 
 Word count target: ~280. Current ~310, slight trim possible. Showcase posts on /r/Python in 2025-2026 average 200-400 words; under 200 reads as low-effort, over 500 reads as marketing.
 

@@ -8,7 +8,7 @@
 
 ## 30-Second Resume
 
-**Where we are**: pyobfus 0.4.0 + pyobfus-mcp 0.2.0 published · Glama Quality A · MCP Registry isLatest · 671 tests / 91% coverage / Python 3.8-3.14.
+**Where we are**: pyobfus 0.4.0 + pyobfus-mcp 0.2.0 published · Glama Quality A · MCP Registry isLatest · 655 tests / 91% coverage / Python 3.8-3.14.
 
 > **2026-06-05 Glama introspection fix** (commit `bbeefb8`): Glama listing was stuck showing 5 tools and its API returned `tools:[]`. Root cause = `pyobfus_mcp/Dockerfile` pinned `pyobfus-mcp==0.1.1`, the crash-on-startup version (FastMCP `version=` kwarg drift, fixed in 0.1.2) — Glama's container introspection never got a running server. Fixed Dockerfile pin 0.1.1→0.2.0 + synced `glama.yaml`/`README.md` tool descriptions 5→7 (added `recommend_tier`, `start_pro_trial`). Verified locally: FastMCP `list_tools()` returns all 7. CI + CodeQL green. Glama re-indexes from repo automatically; recheck `curl https://glama.ai/api/mcp/v1/servers/zhurong2020/pyobfus` in a few days for `tools` length 7. **Lesson: a tool-bundle Dockerfile/distribution must track the same minimum version the package fixed its startup crash at — don't leave it pinned to a known-broken release.** **Where we're not**: 0 GitHub stars, ~337 PyPI/month (v0.4 target was 1,500+/month). The gap is **launch execution**, not feature gaps.
 
@@ -388,7 +388,7 @@ gh api repos/zhurong2020/pyobfus --jq '.topics' | tr ',' '\n' | grep -i pyarmor 
 
 **4 gaps the ChatGPT response also exposed**:
 
-1. **PyPI `Development Status :: 4 - Beta` undersells maturity.** ChatGPT cited the classifier directly: "适合作为内部试点，不建议直接无测试上生产". By objective measures (671 tests · 91% coverage · 7 Python × 3 OS · OpenSSF passing · PEP 740 attestations · 22 releases) we're "5 - Production/Stable". **Action**: bundle classifier change in `pyobfus/pyproject.toml` and `pyobfus_mcp/pyproject.toml` with the next legitimate version bump (N1 PEP 750 t-string → 0.5.0 is the natural carrier). Do NOT bump just for this (do-not-do version-bump rule).
+1. **PyPI `Development Status :: 4 - Beta` undersells maturity.** ChatGPT cited the classifier directly: "适合作为内部试点，不建议直接无测试上生产". By objective measures (655 tests · 91% coverage · 7 Python × 3 OS · OpenSSF passing · PEP 740 attestations · 22 releases) we're "5 - Production/Stable". **Action**: bundle classifier change in `pyobfus/pyproject.toml` and `pyobfus_mcp/pyproject.toml` with the next legitimate version bump (N1 PEP 750 t-string → 0.5.0 is the natural carrier). Do NOT bump just for this (do-not-do version-bump rule).
 
 2. **COMPARISON.md missing "pyobfus Pro full feature list".** ChatGPT enumerated PyArmor's four tiers correctly (Basic $52 / Pro $89 / Group $158 / CI $90/yr) — and our COMPARISON.md already has them — but ChatGPT missed dead-code injection / license embedding (`--expire` / `--bind-machine` / `--max-runs`) / 4 presets in our Pro tier because the COMPARISON.md feature matrix is buried mid-document. **Action**: ✅ Layered Deployment Strategy section added to COMPARISON.md in this session (2026-05-09). N8 `/pyarmor-alternative` landing page should mirror the "every PyArmor tier vs pyobfus single-SKU" framing prominently and lead with the full Pro feature list rather than burying it.
 

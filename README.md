@@ -506,7 +506,7 @@ Add an additional layer of protection for commercial Python software.
 - **Python Support**: 3.8, 3.9, 3.10, 3.11, 3.12, 3.13, 3.14
 - **Naming Scheme**: Index-based (I0, I1, I2...) - simple and effective
 - **Architecture**: Modular transformer pipeline with two-phase cross-file obfuscation
-- **Testing**: 671+ tests, 91% coverage, multi-OS CI/CD (Python 3.8-3.14 × Ubuntu / macOS / Windows)
+- **Testing**: 655 tests, 91% coverage, multi-OS CI/CD (Python 3.8-3.14 × Ubuntu / macOS / Windows)
 
 ## Frequently Asked Questions
 
