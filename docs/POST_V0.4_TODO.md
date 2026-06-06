@@ -39,41 +39,38 @@
 
 ## 🔴 P0 — Self-actionable, do this week (5-7 → 5-14)
 
-These 4 items together = ~6 hours of work, all independent.
+> **✅ P0 STATUS RECONCILED 2026-06-06** — all P0 items are now done or infra-ready; the only remaining gates are external/launch-timing, not engineering:
+> - P0.1 CI mcp-sdk smoke test — ✅ DONE (`8ec0fcd`, re-verified locally)
+> - P0.2 PEP 740 attestations — ✅ INFRA DONE (release.yml OIDC, live on pyobfus-mcp 0.2.0; main package picks it up on next release, gated behind v0.5 patent)
+> - P0.3 server.json `_meta` — ✅ DONE (shipped 0.2.0; Registry stripped the publisher namespace, retry on next mcp bump)
+> - P0.4 dev.to article — ✅ DONE (live since 2026-05-07)
+> - P0.5 GitHub topic curation — ✅ DONE (both `pyarmor-alternative` + `python-obfuscator-online` present, verified 2026-06-06)
+> - P0.6 Socket / OpenSSF passing badge — ✅ DONE (badge live, project 12788)
+> - P0.7 Discussions roadmap poll — ⏳ blocked on launch (post-launch +24h trigger)
+>
+> **Net: no self-actionable P0 engineering work remains.** The real remaining lever is executing the launch wave (see 30-Second Resume) and, on the patent track, the 补正 deadline (~2026-08-01).
 
-### P0.1 — CI smoke test against latest mcp SDK (10 min)
+These 4 items were originally ~6 hours of work, all independent. They are now complete (see reconciliation box above).
 
-**Why**: directly prevents repeat of today's 0.1.2 emergency. mcp SDK API broke `FastMCP.__init__()` `version=` kwarg silently between 1.0 and 1.20+; we caught it because Glama's container build complained, not because CI noticed.
+### P0.1 — CI smoke test against latest mcp SDK (✅ DONE · commit `8ec0fcd`)
 
-**Action**: add a job to `.github/workflows/ci.yml`:
+**Status (verified 2026-06-06)**: shipped as the `mcp-sdk-latest` job in `.github/workflows/ci.yml` (lines ~107-132). Installs `pyobfus-mcp` + `mcp>=1.20` (pulls the latest mcp SDK), then runs `python -c "from pyobfus_mcp.server import _build_server; _build_server()"`. Local re-verify: `_build_server()` returns a `FastMCP` instance against mcp 1.27.0. CI now fails the day a future mcp SDK floor breaks server instantiation — exactly the 0.1.2 failure mode, now guarded. (This page previously listed it as TODO; it was actually shipped alongside the P0.6 hardening wave.)
 
-```yaml
-test-mcp-sdk-latest:
-  runs-on: ubuntu-latest
-  steps:
-    - uses: actions/checkout@v5
-    - uses: actions/setup-python@v5
-      with: { python-version: "3.13" }
-    - run: pip install -e ./pyobfus_mcp 'mcp>=1.20'
-    - run: python -c "from pyobfus_mcp.server import _build_server; _build_server()"
-```
+**Why**: directly prevents repeat of the 0.1.2 emergency. mcp SDK API broke `FastMCP.__init__()` `version=` kwarg silently between 1.0 and 1.20+; we caught it because Glama's container build complained, not because CI noticed.
 
-**Done when**: green CI run; intentional regression (re-add `version=` kwarg, push to a branch) makes it red.
+**Done when**: green CI run; intentional regression (re-add `version=` kwarg, push to a branch) makes it red. ✅ Met — job is green on `main`.
 
 ---
 
-### P0.2 — PEP 740 sigstore attestations (2 hours)
+### P0.2 — PEP 740 sigstore attestations (✅ INFRA DONE · takes effect on next pyobfus release · verified 2026-06-06)
 
-**Why**: pyobfus is a **security tool** without supply-chain attestations as of 2026-05. Trail of Bits' tracker shows ~5-6% of top-360 PyPI projects publish attestations; for our category that's table-stakes credibility. GitHub Actions Trusted Publishing emits them automatically.
+**Status**: `.github/workflows/release.yml` already runs OIDC Trusted Publishing with `id-token: write` + `attestations: write` + `attestations: true` on **both** publish jobs (`Build + publish pyobfus` and `Build + publish pyobfus-mcp`), via `pypa/gh-action-pypi-publish` (SHA-pinned). This was proven end-to-end on the **pyobfus-mcp 0.2.0** release (2026-05-08 — "PyPI Trusted Publisher's first real exercise", attestations present on that PyPI page). The MCP package leg is fully live.
+
+**Remaining gap (not standalone-actionable now)**: the currently-live **main pyobfus 0.4.0** wheel predates this workflow (it was twine-uploaded 2026-04-22), so it carries no attestations — and a published version can't be retroactively attested. The main package picks up attestations automatically on its **next tagged release**, which is gated behind v0.5 (patent-gated, blocked until 补正办结). One residual check worth doing when that release lands: confirm the **pyobfus** package (separate from pyobfus-mcp) has its own PyPI "Trusted Publisher" entry configured, since Trusted Publisher config is per-package on pypi.org.
 
 **Reference**: <https://peps.python.org/pep-0740/> · <https://blog.sigstore.dev/pypi-attestations-ga/> · <https://trailofbits.github.io/are-we-pep740-yet/>
 
-**Action**:
-1. Configure pypi.org "Trusted Publisher" for `zhurong2020/pyobfus` repo (one-time, 5 min on pypi.org settings)
-2. Switch existing release workflow from explicit token auth to OIDC trusted publishing
-3. Verify `pip install pyobfus --require-hashes` shows attestation present
-
-**Done when**: PyPI page for pyobfus 0.4.1 (or whatever next release) shows green "Verified" badges + provenance JSON visible.
+**Done when**: PyPI page for the next pyobfus release (0.4.1 / 0.5.0) shows green "Verified" badges + provenance JSON visible. ✅ Already true for pyobfus-mcp 0.2.0; ⏳ pending for the main package's next release.
 
 ---
 
@@ -137,7 +134,9 @@ mcp-publisher login github -token "$(gh auth token)"
 
 ---
 
-### P0.5 — GitHub topic curation (5 min · zero deferred effort · added 2026-05-09)
+### P0.5 — GitHub topic curation (✅ DONE · verified 2026-06-06)
+
+**Status**: both target topics are live on the repo. `gh api repos/zhurong2020/pyobfus --jq '.topics'` (2026-06-06) returns: `ai-native, ast-obfuscation, claude-code, code-obfuscator, code-protection, cursor, llm-tools, mcp-server, pyarmor-alternative, python-obfuscator, python-obfuscator-online, python-security, source-protection`. Both `pyarmor-alternative` and `python-obfuscator-online` are present, so the SEO real estate is claimed ahead of the launch wave + N7 demo.
 
 **Why**: 2026-05-09 user audit of `https://github.com/topics/code-obfuscator` confirms only 12 repos in that topic, most stale 1-2 years; pyobfus is the only modern actively-maintained Python entry. Adding 1-2 more topics now claims SEO real estate before any future demo / VSCode extension launches — topic-history matters for GitHub topic ranking.
 
