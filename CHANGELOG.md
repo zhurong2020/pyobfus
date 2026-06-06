@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added — Core Features
+
+- **Numeric / constant obfuscation (`--numeric-obfuscation`)** — Community-tier AST transformer that replaces integer and float literals with value-preserving opaque expressions, so the original constants no longer appear in shipped source (ROADMAP P2-5). Integers become random XOR / add / sub identities (exact in Python's arbitrary-precision arithmetic, any sign); floats become `float.fromhex(...)` calls (bit-exact round-trip, unlike a naive `a + b` split). Booleans, `None`, strings, bytes, and complex literals are left untouched, as are numeric literals inside `match`/`case` patterns (which must stay literal). Runs after name mangling and string encoding so the emitted `float` builtin reference is never renamed and the hex strings are not re-encoded. 37 new tests covering int/float round-trip exactness, skip rules, and match-case preservation.
+
+### Testing
+
+- Test suite **655 → 692** (+37 in `tests/test_numeric_obfuscation.py`). Zero regressions.
+
 ## [0.4.0] - 2026-04-22
 
 **AI-native release.** Ten features shipped in one day around a single theme: making pyobfus the Python obfuscator that AI coding agents (Claude Code, Cursor, Windsurf, Zed) can actually use. Reshape v0.4 goals toward adoption + AI-native integration (see `docs/ROADMAP.md`, `docs/AI_INTEGRATION_STRATEGY.md`, `docs/V0.4_EXECUTION_LOG.md`).
