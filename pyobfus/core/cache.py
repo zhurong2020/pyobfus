@@ -84,6 +84,7 @@ def _extract_config_fields(config: object) -> Dict:
         "remove_comments",
         "string_encoding",
         "numeric_obfuscation",
+        "strip_ai_artifacts",
         "preserve_param_names",
         "string_encryption",
         "anti_debug",

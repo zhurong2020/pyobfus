@@ -76,6 +76,7 @@ class ObfuscationConfig:
     remove_comments: bool = True
     string_encoding: bool = False
     numeric_obfuscation: bool = False  # Opaque arithmetic for numeric literals (Community)
+    strip_ai_artifacts: bool = False  # Remove AI provenance markers (Community)
     preserve_param_names: bool = False  # Preserve parameter names for keyword arguments
 
     # Pro Edition features
