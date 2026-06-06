@@ -34,6 +34,10 @@ VALID_SCHEMA = {
                 "type": "bool",
                 "default": False,
             },
+            "strip_ai_artifacts": {
+                "type": "bool",
+                "default": False,
+            },
             "string_encryption": {
                 "type": "bool",
                 "default": False,
