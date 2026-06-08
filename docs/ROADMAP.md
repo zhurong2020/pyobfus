@@ -18,9 +18,9 @@ See [CHANGELOG.md](../CHANGELOG.md) for the latest release and version history.
 - Parallel file processing support (`-j/--jobs`)
 - PyPI downloads: pyobfus ~337/month, pyobfus-mcp ~239/month (real users only, ex-mirrors)
 - GitHub stars: 0 — launch posts drafted in `_drafts/` (dev.to / HN / Reddit / CN tri-platform), pending human-voice rewrite + GPTZero gate before publication
-- **Glama listing live** at <https://glama.ai/mcp/servers/zhurong2020/pyobfus> with Quality grade **A**, all 5 MCP tools individually A
-- **Anthropic MCP Registry**: `io.github.zhurong2020/pyobfus-mcp` v0.1.2 active and isLatest
-- **awesome-mcp-servers PR** [#5777](https://github.com/punkpeye/awesome-mcp-servers/pull/5777) all bot checks green, awaiting human merge
+- **Glama listing live** at <https://glama.ai/mcp/servers/zhurong2020/pyobfus> with Quality grade **A**, all 7 MCP tools individually A
+- **Anthropic MCP Registry**: `io.github.zhurong2020/pyobfus-mcp` v0.2.0 active and isLatest
+- **awesome-mcp-servers** [#5777](https://github.com/punkpeye/awesome-mcp-servers/pull/5777) **MERGED 2026-06-06** — pyobfus-mcp now listed in `punkpeye/awesome-mcp-servers` (86K★) under Developer Tools
 
 ---
 

@@ -5,7 +5,7 @@ Living reference of where `pyobfus` has a foothold, what each account looks like
 For the **why** behind the channel mix, see [AI_INTEGRATION_STRATEGY.md](AI_INTEGRATION_STRATEGY.md).
 For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTION_LOG.md).
 
-**Last updated**: 2026-05-09 (Session 23 · OpenSSF passing badge + PR #5777 description silent-refreshed + version bumps reflected)
+**Last updated**: 2026-06-08 (PR #5777 MERGED 2026-06-06 → punkpeye/awesome-mcp-servers now LIVE; Glama tool-count resolved 7/7). Earlier: 2026-05-09 (Session 23 · OpenSSF passing badge + PR #5777 description silent-refreshed + version bumps reflected)
 
 > **Note (2026-05-09)**: most of the per-channel facts below are now current as of Session 23. Outside of the launch wave (HN 5-11 / Reddit 5-12 / CN trio 5-8/9), the live state is reflected here. Consult `docs/POST_V0.4_TODO.md` for forward TODO and `docs/V0.4_EXECUTION_LOG.md` for session-by-session deltas.
 
@@ -88,11 +88,11 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 
 ## 🟡 Pending action
 
-### `awesome-mcp-servers` community lists — 1 LIVE / 1 OPEN / 1 dead-end (refreshed 2026-05-08)
+### `awesome-mcp-servers` community lists — 2 LIVE / 1 dead-end (refreshed 2026-06-08)
 - 🟢 **`wong2/awesome-mcp-servers` LIVE** via mcpservers.org (the list has retired direct PRs; submissions go through the form-driven `mcpservers.org/submit` channel). Listing: <https://mcpservers.org/servers/zhurong2020/pyobfus>. Approval landed same-day (2026-05-08) vs the 7-day SLA.
-- 🟡 **`punkpeye/awesome-mcp-servers` PR #5777 OPEN** since 2026-05-03. All bot gates green (`has-emoji`/`has-glama`/`valid-name`); awaiting human merge from a 86K★ repo with ~1K open PRs (human cadence). 3-7 days typical wait.
+- 🟢 **`punkpeye/awesome-mcp-servers` PR #5777 MERGED 2026-06-06** (opened 2026-05-03 · merged by punkpeye/Frank Fiegel after ~34 days at 86K★-repo human cadence). pyobfus-mcp now listed under Developer Tools. All bot gates were green throughout (`has-emoji`/`has-glama`/`valid-name`).
 - ❌ **`appcypher/awesome-mcp-servers` DEAD-END** — repo owner has disabled both PRs and Issues (`gh api repos/appcypher/awesome-mcp-servers --jq '.has_issues'` returns `false`). The CONTRIBUTING.md is stale; repo is in read-only museum mode despite still appearing active. Fork retained at `zhurong2020/awesome-mcp-servers-appcypher` for re-fork in 1 click if owner reopens.
-- Implications: 2 of 3 lists actively distribute pyobfus-mcp (≥ 90K combined stars). Launch wave (HN 5-11 / Reddit 5-12 / CN trio 5-8/9) has a non-PR-gated awesome-list landing target via mcpservers.org.
+- Implications: **2 of 3 lists now actively distribute pyobfus-mcp (≥ 90K combined stars), both LIVE** (no longer PR-gated). The launch wave's awesome-list discoverability is fully in place.
 
 ---
 

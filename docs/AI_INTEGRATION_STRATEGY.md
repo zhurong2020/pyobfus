@@ -198,7 +198,7 @@ Initial plan had Stack Overflow as channel #4 (5 seeded answers). Concrete inves
 | 4 | ~~Stack Overflow seeding~~ **PAUSED — see revision note above** | Stack Overflow | — | 🔴 banned |
 | 5 | /r/Python Showcase Saturday post | Reddit | Community exposure | 🟡 mods remove AI-flavored |
 | 6 | Product Hunt launch | Product Hunt | One-shot high-visibility | 🟢 no AI policy |
-| 7 | awesome-mcp-servers distribution to 3 community lists (punkpeye PR #5777 OPEN · wong2/mcpservers.org LIVE 2026-05-08 · appcypher dead-end / repo owner disabled PRs) | GitHub + mcpservers.org | Developer-browsing discoverability | 🟢 metadata, not content |
+| 7 | awesome-mcp-servers distribution to 3 community lists (punkpeye PR #5777 MERGED 2026-06-06 · wong2/mcpservers.org LIVE 2026-05-08 · appcypher dead-end / repo owner disabled PRs) | GitHub + mcpservers.org | Developer-browsing discoverability | 🟢 metadata, not content |
 
 ### Forum AI-policy reality check (as of 2026-04)
 
