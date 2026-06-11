@@ -8,8 +8,8 @@ We currently support the following versions with security updates:
 | -------------- | ------- | ------------------ |
 | pyobfus        | 0.4.x   | :white_check_mark: |
 | pyobfus        | < 0.4   | :x:                |
-| pyobfus-mcp    | 0.2.x   | :white_check_mark: |
-| pyobfus-mcp    | < 0.2   | :x:                |
+| pyobfus-mcp    | 0.3.x   | :white_check_mark: |
+| pyobfus-mcp    | < 0.3   | :x:                |
 
 ## Reporting a Vulnerability
 

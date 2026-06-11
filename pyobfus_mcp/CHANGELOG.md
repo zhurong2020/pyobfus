@@ -4,6 +4,16 @@ All notable changes to the `pyobfus-mcp` companion package are documented here. 
 
 The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](../CHANGELOG.md).
 
+## [Unreleased]
+
+## [0.3.0] — 2026-06-11
+
+### Added
+
+- **`protect_project` tool — the one-call, self-verifying obfuscation pipeline.** Scans risks → picks a framework-aware preset → obfuscates (via the real `pyobfus` CLI) → **round-trip-verifies** the output and returns `verified: true/false` plus a `confidence` level. Verification never imports the obfuscated code into the server process: it byte-compiles the output (`compileall`) and import-smoke-tests each top-level module in isolated subprocesses, so a renamed-but-consistent codebase still passes while genuinely broken output (won't compile / won't import) comes back `verified: false` with `status: "warnings"` so an agent knows **not** to ship it. The de-obfuscation mapping is written *alongside* (never inside) the output. An optional caller-supplied `verify_cmd` (app-level end-to-end check) is gated behind `PYOBFUS_MCP_ALLOW_VERIFY_CMD=1` since it runs an arbitrary command. Brings the registered tool count to **eight**. 15 new tests.
+- **`next_tool` field on tool responses.** A machine-readable `{tool, reason, args}` companion to the free-text `ai_hint`, so agents chain multi-step workflows deterministically instead of re-parsing prose each hop.
+- **`protect_project` stamps the `--trace-marker` header by default** (`trace_marker=True`). Obfuscated files carry a `# pyobfus:obfuscated` header so an agent that later opens one from a traceback knows to reverse the names with `unmap_stack_trace`. The response surfaces `obfuscation.trace_marker_id`. Set `trace_marker=False` to skip.
+
 ## [0.2.0] — 2026-05-08
 
 Production hardening release. Closes the 3 ❌ gaps + 2 ⚠️ partials surfaced
