@@ -42,7 +42,7 @@ Snapshot 2026-05-07 (v0.4 distribution leg 完整闭环之后)。包含 30-secon
 - **技术栈**: Python 3.8-3.14, AST, setuptools
 - **PyPI 主包**: https://pypi.org/project/pyobfus/ (v0.4.0，2026-04-22 发布)
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (v0.2.0，2026-05-08 发布 — 7 tools: 5 community + 2 pro_funnel `recommend_tier`/`start_pro_trial` · FastMCP 1.27 + security hardening. 0.1.2 曾修 `FastMCP.__init__()` `version=` kwarg drift)
-- **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp` (active, isLatest=true · 0.2.0)
+- **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp` (active, isLatest=true · 0.3.0)
 - **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus (Quality A · 全 A) — **2026-06-08 tool-count 真根因已修**：Glama 容器 build 自 **admin Dockerfile→Configuration「Build steps」字段**(web-UI 专属设置)，**不读 repo 自带 `pyobfus_mcp/Dockerfile`**；该字段独立 pin 在 `0.1.2` 一直卡住(06-05 改 repo Dockerfile pin 0.1.1→0.2.0 方向错、无效)。改 Build steps `0.1.2`→`0.2.0` 保存后 test `019ea6c5` 18:27 CST 跑绿、introspection 返回全部 7 工具。剩公开 API/列表/Inspector 被动 re-index(≤1 天)。教训见 memory `glama_container_build_source.md`
 - **GitHub**: https://github.com/zhurong2020/pyobfus (public)
 - **文档**: https://pyobfus.readthedocs.io
@@ -58,7 +58,7 @@ pyobfus/
 │   ├── transformers/   # AST 变换器
 │   └── cross_file/    # 跨文件混淆
 ├── pyobfus_pro/       # Pro Edition (商业许可)
-├── tests/             # 719 测试用例 (91% coverage · 0.4.0 发布版 655)
+├── tests/             # 727 测试用例 (91% coverage · 0.4.1 发布版)
 ├── examples/          # 示例代码
 ├── docs/              # 项目文档
 └── cloudflare-worker/ # 许可验证 Worker
