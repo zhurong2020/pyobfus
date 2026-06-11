@@ -1,26 +1,40 @@
 # pyobfus AI-integration templates
 
-Drop-in rule files that teach AI coding assistants (Claude Code, Cursor, Windsurf, Zed, GitHub Copilot) how to invoke pyobfus on *your* project. Copy the file that matches your tool into your project root.
+Drop-in files that teach AI coding assistants how to invoke pyobfus on *your*
+project.
 
-| Tool | File to copy | Destination in your repo |
-|---|---|---|
-| Claude Code | `CLAUDE.md` | Project root (or merge into existing `CLAUDE.md`) |
-| Cursor (new) | `cursor-rules.mdc` | `.cursor/rules/pyobfus.mdc` |
-| Cursor (legacy) | `.cursorrules` | Project root |
-| Windsurf | `windsurfrules.md` | Project root |
-| GitHub Copilot | `copilot-instructions.md` | `.github/copilot-instructions.md` |
-| Generic agent | `AGENTS.md` | Project root |
+## `AGENTS.md` is the canonical file
 
-All templates are short (~50 lines). They encode the same set of facts:
+The agent protocol now lives in a single canonical **`AGENTS.md`** — the 2026
+cross-tool standard, read natively by Cursor, Windsurf, Aider, Continue, Cline,
+Codex, and more. The other files are **thin shims that point back to it**, so
+there's one source of truth instead of six divergent copies.
 
-- What pyobfus does (one sentence)
-- When to invoke it (shipping, pre-distribution)
-- The standard 3-step workflow: `--check` → `--init` → obfuscate with `--save-mapping`
-- Reverse debugging: `pyobfus --unmap ...`
-- Which preset to pick per framework
+| Tool | File to copy | Destination | Notes |
+|---|---|---|---|
+| **Any agent (canonical)** | `AGENTS.md` | Project root | Read natively by most 2026 agents. Start here. |
+| Claude Code | `CLAUDE.md` | Project root | Just `@AGENTS.md`-imports the canonical file. |
+| Cursor (new) | `cursor-rules.mdc` | `.cursor/rules/pyobfus.mdc` | Pointer; Cursor also reads `AGENTS.md` directly. |
+| Cursor (legacy) | `.cursorrules` | Project root | Pointer. |
+| Windsurf | `windsurfrules.md` | Project root | Pointer; Windsurf also reads `AGENTS.md` directly. |
+| GitHub Copilot | `copilot-instructions.md` | `.github/copilot-instructions.md` | Self-contained (Copilot does **not** read `AGENTS.md`). |
 
-If you use the `pyobfus-mcp` MCP server, most of this is redundant — your agent discovers the tools automatically. Keep the template anyway; it hints to the agent *when* to reach for them.
+**Simplest setup**: copy `AGENTS.md` into your project root. Add `CLAUDE.md`
+(for Claude Code) and/or `copilot-instructions.md` (for Copilot) only if you use
+those tools.
+
+All shims encode the same facts as `AGENTS.md`: what pyobfus does, when to
+invoke it, the `--check` → `--init` → obfuscate (`--save-mapping`) workflow,
+reverse debugging via `--unmap`, per-framework preset selection, and — when the
+`pyobfus-mcp` server is connected — the one-call, self-verifying
+`protect_project` tool.
+
+## Want a packaged capability instead of a fact sheet?
+
+These templates teach an agent *about* pyobfus inside your repo. If you'd
+rather install a ready-made **skill** that drives the whole protect-and-verify
+workflow on demand, see [`../../skills/`](../../skills/) (Claude Code plugin).
 
 ## Contributing
 
-Have a fix or an additional client (Zed, Continue, Aider)? PRs welcome at https://github.com/zhurong2020/pyobfus.
+Have a fix or an additional client? PRs welcome at https://github.com/zhurong2020/pyobfus.

@@ -2,6 +2,10 @@
 
 Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
+> 通用 agent 约定(build/test/lint、仓库结构、专利 gate 等)见根目录 [`AGENTS.md`](AGENTS.md)(规范源,工具无关)。本文件保留 Claude / 中文 / 专利申报相关的项目专属细节。
+>
+> @AGENTS.md
+
 ## ⚡ Current pending work (cold-start 必读)
 
 **Single source of truth for forward TODO**: [`docs/POST_V0.4_TODO.md`](docs/POST_V0.4_TODO.md) — 重启 session 第一份必读

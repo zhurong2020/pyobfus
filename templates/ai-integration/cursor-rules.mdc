@@ -6,59 +6,19 @@ alwaysApply: false
 
 # pyobfus — Cursor rules (new .mdc format)
 
-pyobfus (pronounced "Python obfuscator") is an AST-based Python code obfuscator
-with framework-aware presets, reverse stack-trace mapping for AI-assisted
-debugging, and a JSON CLI designed for agent tool-use.
+This project uses **pyobfus** (the Python obfuscator). The canonical agent
+protocol is **`AGENTS.md`** at the project root, which Cursor reads natively.
+Copy `AGENTS.md` into your repo; keep this `.mdc` only for Cursor-scoped
+glob targeting.
 
-## Invoke when
+Rule: when the user asks to **obfuscate**, **protect source**, or **prepare a
+commercial / evaluation build**, follow `AGENTS.md`:
 
-The user asks to **obfuscate**, **protect source**, **ship a CLI / SaaS
-backend / PyPI package** without publishing source, or **prepare a
-commercial / evaluation build**.
+- If `pyobfus-mcp` is connected → call `protect_project(path)` (one call;
+  obfuscates **and** verifies). If it returns `verified: false`, don't ship —
+  follow the response's `next_tool`.
+- Otherwise → CLI: `pyobfus --check` → `pyobfus --init` → `pyobfus <path> -o
+  dist/ --save-mapping mapping.json --json`, picking a framework preset.
 
-Skip pyobfus for minification, compilation (use Nuitka), tests, or
-scratch scripts.
-
-## Standard workflow
-
-```
-# 1. Pre-flight risk scan
-pyobfus --check <path> --json
-
-# 2. Generate pyobfus.yaml with framework-aware preset
-pyobfus --init <path> --json
-
-# 3. Obfuscate with mapping for debugging
-pyobfus <path> -o dist/ -c pyobfus.yaml --save-mapping mapping.json --json
-
-# 4. Reverse production traces
-pyobfus --unmap --trace error.log --mapping mapping.json --json
-```
-
-All modes emit JSON with an `ai_hint` field naming the next command.
-
-## Preset selection
-
-| Framework detected | Preset |
-|---|---|
-| FastAPI | `--preset fastapi` |
-| Django | `--preset django` |
-| Flask | `--preset flask` |
-| Pydantic | `--preset pydantic` |
-| Click | `--preset click` |
-| SQLAlchemy | `--preset sqlalchemy` |
-| None | `--preset balanced` |
-
-## Safety rules
-
-- Keep `mapping.json` out of the distributed artifact — it contains every original name.
-- Never obfuscate `tests/**` — add to exclude_patterns if not already there.
-- When `--check` reports high-severity findings, report them to the user and
-  propose exclusions before running the obfuscation step.
-
-## MCP integration
-
-If `pyobfus-mcp` is installed and registered, the same workflow is available
-as the tools `check_obfuscation_risks`, `generate_pyobfus_config`,
-`unmap_stack_trace`, `list_presets`, `explain_preset`. Prefer MCP tool calls
-over shell commands when available.
+Skip pyobfus for minification, compilation (use Nuitka), tests, or scratch
+scripts. Keep `mapping.json` out of the distributed artifact.

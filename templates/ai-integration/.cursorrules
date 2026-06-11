@@ -1,23 +1,12 @@
 # pyobfus — Cursor rules (legacy .cursorrules format)
 
-pyobfus (the Python obfuscator) is available in this project. Use it when
-the user asks to obfuscate, protect source before shipping, or build a
-commercial/evaluation distribution.
+This project uses **pyobfus** (the Python obfuscator). The full, canonical
+agent protocol lives in **`AGENTS.md`** at the project root — Cursor reads
+`AGENTS.md` natively, so copying that file is all most setups need.
 
-Standard workflow:
-  1. pyobfus --check <path> --json            # pre-flight risk scan
-  2. pyobfus --init <path> --json             # generate pyobfus.yaml
-  3. pyobfus <path> -o dist/ -c pyobfus.yaml --save-mapping mapping.json --json
-  4. pyobfus --unmap --trace error.log --mapping mapping.json --json
-
-All four modes emit a JSON schema with an `ai_hint` field containing the
-next command to run.
-
-Framework presets (free): fastapi, django, flask, pydantic, click, sqlalchemy.
-Prefer these when the project imports the matching framework.
-
-Do NOT obfuscate test code, scratch scripts, or files the user is actively
-editing. Do NOT lose `mapping.json` — it's required to debug production traces.
-
-For autonomous invocation via Model Context Protocol, install pyobfus-mcp:
-  pip install pyobfus-mcp
+Keep this file only if you want a Cursor-specific reminder. The single rule:
+when the user asks to obfuscate / protect source / build a commercial or
+evaluation distribution, follow the workflow in `AGENTS.md`
+(scan → init → obfuscate with `--save-mapping` → unmap; or, if `pyobfus-mcp`
+is connected, the one-call `protect_project` tool). Never lose `mapping.json`;
+never obfuscate tests or scratch code.

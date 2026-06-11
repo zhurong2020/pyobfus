@@ -43,6 +43,20 @@ sqlalchemy only   -> --preset sqlalchemy
 none of above     -> --preset balanced
 ```
 
+## Recognizing an obfuscated file (auto-unmap)
+
+If a traceback points you into a file whose first line is:
+
+```
+# pyobfus:obfuscated id=<id> mapping=<mapping-file>
+```
+
+then it is pyobfus-obfuscated. Don't try to read the mangled names — reverse
+the trace with that mapping file: `pyobfus --unmap --trace <log> --mapping
+<mapping-file>` (or the `unmap_stack_trace` MCP tool). Produce these markers by
+obfuscating with `--trace-marker` (the `protect_project` MCP tool sets it by
+default).
+
 ## Safety invariants
 
 1. `mapping.json` must NOT be committed to the distributed artifact.
@@ -50,15 +64,22 @@ none of above     -> --preset balanced
 3. If `severity_counts.high > 0`, surface findings before running obfuscation.
 4. When running via CI, prefer `--json` and branch on `exit_code`.
 
-## MCP alternative
+## MCP alternative (preferred when available)
 
-If `pyobfus-mcp` is available in the environment, prefer MCP tool calls
-over shell commands:
+If `pyobfus-mcp` is available in the environment, prefer MCP tool calls over
+shell commands. **For the common "protect before shipping" case, the one-call
+self-verifying tool replaces the whole scan→init→obfuscate→verify sequence:**
 
+- `protect_project(path, output_dir?, preset?, verify?, verify_cmd?, save_mapping?)`
+  — runs the full pipeline and returns `verified: true/false`. If
+  `verified` is false, do NOT ship; follow the response's `next_tool`.
 - `check_obfuscation_risks(path)`
 - `generate_pyobfus_config(path, preset_override?, write?)`
 - `unmap_stack_trace(trace, mapping_path)`
 - `list_presets()`
 - `explain_preset(name)`
+- `recommend_tier(path)`
 
-Same JSON schema family. Zero CLI parsing overhead.
+Same JSON schema family. Zero CLI parsing overhead. Each response carries a
+machine-readable `next_tool` (`{tool, reason, args}`) — chain on it rather than
+re-parsing the prose `ai_hint`.
