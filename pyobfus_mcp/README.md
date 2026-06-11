@@ -14,13 +14,16 @@ and the agent will autonomously call `check_obfuscation_risks` and `generate_pyo
 
 | Tool | What it does |
 |---|---|
+| `protect_project(path, output_dir?, preset?, verify?, verify_cmd?, save_mapping?)` | **One-call, self-verifying pipeline.** Scans risks, picks a framework-aware preset, obfuscates, then byte-compiles and import-smoke-tests the output in isolated subprocesses and returns `verified: true/false` (+ `confidence`). Writes a private de-obfuscation mapping *alongside* (never inside) the output. Reach for this when the user wants to "protect/obfuscate before shipping" and expects a green check, not just a transform. |
 | `check_obfuscation_risks(path)` | Pre-flight scan for `eval`/`exec`, dynamic attribute access, framework reflection. Returns severity counts, detected frameworks, and a suggested preset. |
 | `generate_pyobfus_config(path, preset_override?, write?)` | Auto-detect framework → generate `pyobfus.yaml`. Returns the YAML text without writing by default; `write=True` persists to disk. |
 | `unmap_stack_trace(trace, mapping_path)` | Reverse obfuscated identifiers in a production stack trace using a `mapping.json`. |
 | `list_presets()` | Enumerate every preset (community / framework-aware / Pro). |
 | `explain_preset(name)` | Describe what a named preset changes: exclusions, docstring handling, parameter preservation. |
+| `recommend_tier(path)` | Analyze a project and recommend community vs Pro, with reasoning and concrete next-step commands. |
+| `start_pro_trial()` | Return structured guidance for starting the 5-day Pro trial. |
 
-All tools return dicts with a `status` field and an `ai_hint` field suggesting the next action.
+All tools return dicts with a `status` field, a free-text `ai_hint`, and a machine-readable `next_tool` field (`{tool, reason, args}`) so an agent can chain steps deterministically. `verify_cmd` in `protect_project` runs an arbitrary command and is therefore opt-in behind `PYOBFUS_MCP_ALLOW_VERIFY_CMD=1`.
 
 ## Install
 

@@ -17,6 +17,8 @@ from pyobfus_mcp.tools import (
     explain_preset,
     generate_pyobfus_config,
     list_presets,
+    recommend_tier,
+    start_pro_trial,
     unmap_stack_trace,
 )
 
@@ -26,6 +28,32 @@ def _write(tmp_path: Path, name: str, src: str) -> Path:
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(textwrap.dedent(src).lstrip(), encoding="utf-8")
     return p
+
+
+def _assert_next_tool_shape(result: dict) -> None:
+    """Every successful tool response must carry a machine-readable next_tool."""
+    assert "next_tool" in result, result.get("status")
+    nt = result["next_tool"]
+    assert set(nt) == {"tool", "reason", "args"}
+    assert nt["tool"] is None or isinstance(nt["tool"], str)
+    assert isinstance(nt["reason"], str) and nt["reason"]
+    assert isinstance(nt["args"], dict)
+
+
+def test_every_tool_success_carries_next_tool(tmp_path: Path) -> None:
+    """The next_tool agent-chaining convention holds across all tools."""
+    _write(tmp_path, "a.py", "def greet(name):\n    return f'hi {name}'\n")
+    mapping = tmp_path / "m.json"
+    mapping.write_text(json.dumps({"version": 1, "modules": {}, "global": {}}), encoding="utf-8")
+
+    _assert_next_tool_shape(check_obfuscation_risks(str(tmp_path)))
+    _assert_next_tool_shape(generate_pyobfus_config(str(tmp_path)))
+    _assert_next_tool_shape(unmap_stack_trace("at I0", str(mapping)))
+    _assert_next_tool_shape(list_presets())
+    _assert_next_tool_shape(explain_preset("balanced"))
+    _assert_next_tool_shape(explain_preset("commercial"))  # Pro path
+    _assert_next_tool_shape(recommend_tier(str(tmp_path)))
+    _assert_next_tool_shape(start_pro_trial())
 
 
 # ---------------------------------------------------------------------------
@@ -251,6 +279,7 @@ def test_build_server_attaches_meta_to_each_tool() -> None:
     tools = asyncio.run(app.list_tools())
 
     expected_community = {
+        "protect_project",
         "check_obfuscation_risks",
         "generate_pyobfus_config",
         "unmap_stack_trace",
@@ -261,21 +290,19 @@ def test_build_server_attaches_meta_to_each_tool() -> None:
     expected_names = expected_community | expected_pro_funnel
 
     actual_names = {t.name for t in tools}
-    assert actual_names == expected_names, (
-        f"unexpected tool set: {actual_names ^ expected_names}"
-    )
+    assert actual_names == expected_names, f"unexpected tool set: {actual_names ^ expected_names}"
 
     for tool in tools:
         # mcp SDK exposes the meta dict via `.meta` on the Tool object.
         meta = getattr(tool, "meta", None)
         assert meta is not None, f"{tool.name} has no meta dict"
-        assert meta.get("version") == "1", (
-            f"{tool.name} meta.version={meta.get('version')!r}, expected '1'"
-        )
+        assert (
+            meta.get("version") == "1"
+        ), f"{tool.name} meta.version={meta.get('version')!r}, expected '1'"
         expected_tier = "pro_funnel" if tool.name in expected_pro_funnel else "community"
-        assert meta.get("tier") == expected_tier, (
-            f"{tool.name} meta.tier={meta.get('tier')!r}, expected {expected_tier!r}"
-        )
+        assert (
+            meta.get("tier") == expected_tier
+        ), f"{tool.name} meta.tier={meta.get('tier')!r}, expected {expected_tier!r}"
 
 
 # ---------------------------------------------------------------------------
@@ -299,9 +326,9 @@ def test_check_obfuscation_risks_no_pro_value_on_clean_project(tmp_path: Path) -
     _write(tmp_path, "a.py", "def greet(name): return f'hi {name}'\n")
     result = check_obfuscation_risks(str(tmp_path))
     assert result["status"] == "success"
-    assert "pro_value" not in result, (
-        f"clean project should not get pro_value; got {result.get('pro_value')!r}"
-    )
+    assert (
+        "pro_value" not in result
+    ), f"clean project should not get pro_value; got {result.get('pro_value')!r}"
 
 
 def test_check_obfuscation_risks_pro_value_on_sensitive_literals(
@@ -320,13 +347,13 @@ def test_check_obfuscation_risks_pro_value_on_sensitive_literals(
     _write(
         tmp_path,
         "secrets.py",
-        '''
+        """
         API_KEY = "totally_fake_long_alphanumeric_test_value_xxxxxxxx_yyyy"
         SECRET_KEY = "another_long_random_alphanumeric_token_for_testing_only"
         access_token = "third_long_alphanumeric_value_purely_test_data_xx_yyy"
         password = "hunter2_long_enough_to_trigger_the_pattern_match_x"
         bearer = "very_long_bearer_token_value_for_authentication_purposes"
-        ''',
+        """,
     )
     result = check_obfuscation_risks(str(tmp_path))
     assert "pro_value" in result, "sensitive literals should trigger pro_value"
@@ -362,9 +389,7 @@ def test_explain_preset_community_no_pro_unlock_field() -> None:
     result = explain_preset("balanced")
     assert result["status"] == "success"
     assert result["level"] == "community"
-    assert "pro_unlock" not in result, (
-        "community preset should not carry pro_unlock"
-    )
+    assert "pro_unlock" not in result, "community preset should not carry pro_unlock"
     # but tier_context is still attached so the AI knows the user's tier
     assert "tier_context" in result
 
@@ -382,7 +407,10 @@ def test_recommend_tier_clean_project_recommends_community(tmp_path: Path) -> No
     result = recommend_tier(str(tmp_path))
     assert result["status"] == "success"
     assert result["recommended_tier"] == "community"
-    assert any("balanced" in r or "no risk" in r.lower() for r in result["reasons"]) or result["reasons"]
+    assert (
+        any("balanced" in r or "no risk" in r.lower() for r in result["reasons"])
+        or result["reasons"]
+    )
     # Community-recommended ai_hint should suggest a runnable pyobfus command.
     assert "pyobfus" in result["ai_hint"]
 
@@ -394,14 +422,14 @@ def test_recommend_tier_sensitive_secrets_recommends_pro(tmp_path: Path) -> None
     _write(
         tmp_path,
         "secrets.py",
-        '''
+        """
         API_KEY_1 = "totally_fake_long_alphanumeric_test_value_aaaaaaaa_bbbb"
         API_KEY_2 = "another_fake_long_alphanumeric_test_value_cccccccc_dddd"
         access_token = "third_fake_long_test_value_eeeeeeee_ffff_gggg_hhhh"
         password = "fake_long_test_password_for_pattern_match_iiii_jjjj_x"
         secret_key = "another_long_alphanumeric_secret_value_xy_kkkk_llll"
         bearer_token = "long_opaque_bearer_value_for_auth_xyz_mmmm_nnnn_oooo"
-        ''',
+        """,
     )
     result = recommend_tier(str(tmp_path))
     assert result["status"] == "success"
@@ -455,6 +483,4 @@ def test_start_pro_trial_does_not_invoke_side_effect() -> None:
     state_before = get_trial_status()
     _ = start_pro_trial()
     state_after = get_trial_status()
-    assert state_before == state_after, (
-        "start_pro_trial unexpectedly changed local trial state"
-    )
+    assert state_before == state_after, "start_pro_trial unexpectedly changed local trial state"

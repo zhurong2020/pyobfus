@@ -30,6 +30,7 @@ File format (version 1):
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from dataclasses import dataclass, field
@@ -133,11 +134,25 @@ class ObfuscationMapping:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(self.to_json(), encoding="utf-8")
 
+    def marker_id(self) -> str:
+        """Stable 8-char id derived from the obfuscation name map.
+
+        Deterministic across runs with the same names (independent of the
+        timestamp), so the per-file ``# pyobfus:obfuscated`` trace marker and
+        this mapping file cross-reference reliably. An agent that finds the
+        marker in an obfuscated traceback can confirm it matches the mapping
+        it holds before trusting an `--unmap`.
+        """
+        items = sorted(f"{obf}:{mod}.{orig}" for obf, (mod, orig) in self.global_map.items())
+        digest = hashlib.sha256("\n".join(items).encode("utf-8")).hexdigest()
+        return digest[:8]
+
     def to_json(self, indent: int = 2) -> str:
         payload = {
             "version": MAPPING_FORMAT_VERSION,
             "pyobfus_version": self.pyobfus_version,
             "created_at": self.created_at,
+            "marker_id": self.marker_id(),
             "root": self.root,
             "mode": self.mode,
             "modules": self.modules,

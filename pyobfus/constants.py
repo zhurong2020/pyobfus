@@ -28,6 +28,15 @@ SUPPORT_EMAIL = "zhurong0525@gmail.com"
 GITHUB_REPO = "https://github.com/zhurong2020/pyobfus"
 
 # =============================================================================
+# TRACE MARKER (auto-unmap convention)
+# =============================================================================
+# A stable header prepended to obfuscated files (opt-in via --trace-marker) so
+# an AI agent that lands in an obfuscated file from a traceback immediately
+# knows the artifact is pyobfus-obfuscated and how to reverse the names.
+# The first token is matched verbatim by tooling — do not reword.
+TRACE_MARKER_PREFIX = "# pyobfus:obfuscated"
+
+# =============================================================================
 # LICENSE SERVER
 # =============================================================================
 # Note: This URL is also defined in pyobfus_pro/license.py (for package independence)

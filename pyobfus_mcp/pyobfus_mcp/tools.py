@@ -29,13 +29,21 @@ Phase 3 (Pro funnel via MCP) adds:
     AI knows which tier the user is currently on.
 
 All return dicts follow a stable shape with a `status` field
-("success" | "warnings" | "error") and an `ai_hint` field containing the
-single next command or action the calling agent should take.
+("success" | "warnings" | "error"), a free-text `ai_hint`, and (on success) a
+machine-readable `next_tool` field (`{tool, reason, args}` — `tool=None` means
+no further call is needed) so agents can chain steps deterministically instead
+of re-parsing the prose hint each hop.
 """
 
 from __future__ import annotations
 
+import importlib.util
+import json
+import os
 import re
+import shlex
+import subprocess
+import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -44,6 +52,24 @@ from pyobfus_mcp._security import (
     secure_tool,
     validate_path,
 )
+
+# ---------------------------------------------------------------------------
+# Agent-chaining convention (the `next_tool` field)
+# ---------------------------------------------------------------------------
+
+
+def _next_tool(
+    tool: Optional[str], reason: str, args: Optional[Dict[str, Any]] = None
+) -> Dict[str, Any]:
+    """Build the structured ``next_tool`` envelope every tool response carries.
+
+    Unlike the free-text ``ai_hint`` (which a human or model reads as prose),
+    ``next_tool`` is machine-readable: "call THIS tool with THESE args next".
+    It lets a calling agent chain multi-step workflows deterministically
+    instead of re-parsing English each hop, and keeps each hand-off cheap on
+    tokens. ``tool=None`` means "no further pyobfus tool call is needed."
+    """
+    return {"tool": tool, "reason": reason, "args": args or {}}
 
 
 # ---------------------------------------------------------------------------
@@ -289,6 +315,11 @@ def check_obfuscation_risks(path: str) -> Dict[str, Any]:
     if pro_value is not None:
         payload["pro_value"] = pro_value
     payload["tier_context"] = _tier_context(tool_tier="community")
+    payload["next_tool"] = _next_tool(
+        "protect_project",
+        "obfuscate-and-verify now that risks are known",
+        {"path": path, "preset": payload.get("suggested_preset")},
+    )
 
     return payload
 
@@ -348,6 +379,11 @@ def generate_pyobfus_config(
         f"'pyobfus {path} -o dist/ -c {result.config_path}'."
         if not write
         else f"Wrote {result.config_path}. Next: pyobfus {path} -o dist/ -c {result.config_path}"
+    )
+    payload["next_tool"] = _next_tool(
+        "protect_project",
+        "obfuscate-and-verify with the detected preset",
+        {"path": path, "preset": payload.get("preset")},
     )
     return payload
 
@@ -409,6 +445,9 @@ def unmap_stack_trace(trace: str, mapping_path: str) -> Dict[str, Any]:
             "Names are reversed, but line numbers still point to the obfuscated "
             "file. Cross-reference with the original source if needed."
         ),
+        "next_tool": _next_tool(
+            None, "trace is de-obfuscated; read the unmapped_trace and continue debugging"
+        ),
     }
 
 
@@ -439,6 +478,7 @@ def list_presets() -> Dict[str, Any]:
             "when your project imports fastapi/django/flask/pydantic/click/"
             "sqlalchemy. Fall back to 'balanced' otherwise."
         ),
+        "next_tool": _next_tool("explain_preset", "inspect a specific preset before applying it"),
     }
 
 
@@ -496,6 +536,15 @@ def explain_preset(name: str) -> Dict[str, Any]:
         )
 
     payload["tier_context"] = _tier_context(tool_tier="community")
+    payload["next_tool"] = (
+        _next_tool(
+            "protect_project",
+            "apply this community preset and verify the result",
+            {"preset": name.lower()},
+        )
+        if cfg.level == "community"
+        else _next_tool("start_pro_trial", "this is a Pro preset; offer the trial before applying")
+    )
     return payload
 
 
@@ -558,7 +607,9 @@ def recommend_tier(path: str) -> Dict[str, Any]:
             f"Detected framework(s): {', '.join(frameworks)} — covered by community framework presets."
         )
     if not reasons:
-        reasons.append("No risk patterns or sensitive literals detected — community 'balanced' preset is sufficient.")
+        reasons.append(
+            "No risk patterns or sensitive literals detected — community 'balanced' preset is sufficient."
+        )
 
     free_action = {
         "command": (
@@ -567,7 +618,10 @@ def recommend_tier(path: str) -> Dict[str, Any]:
         ),
         "estimated_protection": "moderate (name mangling + framework-aware excludes)",
     }
-    pro_action = {**_pro_unlock(), "estimated_protection": "high (adds AES-256 string encryption + anti-debugging)"}
+    pro_action = {
+        **_pro_unlock(),
+        "estimated_protection": "high (adds AES-256 string encryption + anti-debugging)",
+    }
 
     payload: Dict[str, Any] = {
         "status": "success",
@@ -602,6 +656,16 @@ def recommend_tier(path: str) -> Dict[str, Any]:
             f"Try free trial first: {pro_action['trial_command']} "
             f"(no card, {pro_action['trial_duration_days']} days). "
             f"Or buy direct: {pro_action['checkout_url']} (${pro_action['price_usd']} USD)."
+        )
+    )
+    payload["next_tool"] = (
+        _next_tool(
+            "start_pro_trial",
+            "Pro is recommended; surface the trial before obfuscating",
+        )
+        if pro_recommended
+        else _next_tool(
+            "protect_project", "community tier is sufficient; obfuscate and verify", {"path": path}
         )
     )
     return payload
@@ -663,7 +727,411 @@ def start_pro_trial() -> Dict[str, Any]:
         "current_status": current_status,
         "tier_context": _tier_context(tool_tier="pro_funnel"),
         "ai_hint": ai_hint,
+        "next_tool": _next_tool(
+            None,
+            "user runs `pyobfus-trial start` in their shell; no further tool call",
+        ),
     }
+
+
+# ---------------------------------------------------------------------------
+# protect_project — the one-call, self-verifying obfuscation pipeline
+# ---------------------------------------------------------------------------
+
+# Exception class names in a failed-import traceback that mean obfuscation
+# genuinely *broke* the code (a renamed reference didn't resolve, a rewritten
+# import points nowhere, the output won't parse). Anything else (e.g. the
+# module needs argv, network, or env at import time) is treated as
+# "inconclusive" — it doesn't prove breakage, so it lowers confidence rather
+# than failing the verification outright.
+_VERIFY_BREAKING_ERRORS = (
+    "SyntaxError",
+    "IndentationError",
+    "ImportError",
+    "ModuleNotFoundError",
+    "NameError",
+    "AttributeError",
+)
+
+
+def _obfuscate_command() -> List[str]:
+    """Return the argv prefix that invokes the pyobfus CLI in a subprocess.
+
+    Prefers ``python -m pyobfus`` using the *same* interpreter that runs this
+    server — where ``pyobfus`` is guaranteed importable because pyobfus-mcp
+    depends on it. Falls back to a ``-c`` launcher that calls
+    ``pyobfus.cli.main`` directly, so the tool still works against an
+    installed pyobfus that predates the ``pyobfus/__main__.py`` module entry.
+    """
+    if importlib.util.find_spec("pyobfus.__main__") is not None:
+        return [sys.executable, "-m", "pyobfus"]
+    return [
+        sys.executable,
+        "-c",
+        "import sys; from pyobfus.cli import main; " "main(args=sys.argv[1:], prog_name='pyobfus')",
+    ]
+
+
+def _discover_top_level_modules(out: Path, *, limit: int = 50) -> List[str]:
+    """Top-level importable module names produced in an obfuscated output dir."""
+    mods: List[str] = []
+    for child in sorted(out.iterdir()):
+        if child.is_dir() and (child / "__init__.py").exists():
+            mods.append(child.name)
+        elif child.is_file() and child.suffix == ".py" and child.name != "__init__.py":
+            mods.append(child.stem)
+        if len(mods) >= limit:
+            break
+    return mods
+
+
+def _classify_import_failure(stderr: str) -> str:
+    """Return 'broke' if stderr names a breaking error, else 'inconclusive'."""
+    for err in _VERIFY_BREAKING_ERRORS:
+        if err in stderr:
+            return "broke"
+    return "inconclusive"
+
+
+def _run_verification(
+    out: Path,
+    *,
+    verify_cmd: Optional[str],
+    allow_cmd: bool,
+    timeout: int,
+) -> Dict[str, Any]:
+    """Round-trip-verify obfuscated output WITHOUT importing it into this process.
+
+    Two always-safe, API-agnostic signals (a renamed-but-consistent codebase
+    still passes both):
+
+      1. ``compileall`` — every output module byte-compiles (catches any
+         structural/syntactic breakage the transform could introduce).
+      2. import smoke test — each top-level module imports in a *subprocess*
+         (catches broken cross-file references / mis-rewritten imports).
+
+    Plus an optional caller-supplied ``verify_cmd`` (e.g. an end-to-end app
+    check) — gated behind ``PYOBFUS_MCP_ALLOW_VERIFY_CMD`` because it runs an
+    arbitrary command. NOTE for callers: ``verify_cmd`` should exercise the
+    app end-to-end, NOT unit tests bound to internal symbol names — those are
+    *expected* to fail once the public surface is renamed, and would be a
+    false negative here.
+    """
+    result: Dict[str, Any] = {}
+
+    # 1. compileall ---------------------------------------------------------
+    compile_proc = subprocess.run(
+        [sys.executable, "-m", "compileall", "-q", str(out)],
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+    )
+    compile_ok = compile_proc.returncode == 0
+    result["compile_ok"] = compile_ok
+    if not compile_ok:
+        result["compile_error"] = (compile_proc.stdout + compile_proc.stderr).strip()[-800:]
+
+    # 2. import smoke test --------------------------------------------------
+    modules = _discover_top_level_modules(out)
+    import_code = (
+        "import importlib, sys; "
+        "sys.path.insert(0, sys.argv[1]); "
+        "importlib.import_module(sys.argv[2])"
+    )
+    modules_ok: List[str] = []
+    modules_broke: List[Dict[str, str]] = []
+    import_inconclusive: List[Dict[str, str]] = []
+    for mod in modules:
+        try:
+            proc = subprocess.run(
+                [sys.executable, "-c", import_code, str(out), mod],
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+                cwd=str(out),
+            )
+        except subprocess.TimeoutExpired:
+            import_inconclusive.append({"module": mod, "reason": "import timed out"})
+            continue
+        if proc.returncode == 0:
+            modules_ok.append(mod)
+        else:
+            tail = proc.stderr.strip()[-400:]
+            if _classify_import_failure(proc.stderr) == "broke":
+                modules_broke.append({"module": mod, "error": tail})
+            else:
+                import_inconclusive.append({"module": mod, "error": tail})
+
+    result["modules_checked"] = len(modules)
+    result["modules_imported_ok"] = modules_ok
+    result["modules_broke"] = modules_broke
+    result["import_inconclusive"] = import_inconclusive
+
+    # 3. optional caller verify command ------------------------------------
+    cmd_ok: Optional[bool] = None
+    if verify_cmd:
+        if not allow_cmd:
+            result["verify_cmd"] = {
+                "ran": False,
+                "skipped_reason": (
+                    "Arbitrary verify_cmd execution is disabled by default. "
+                    "Set PYOBFUS_MCP_ALLOW_VERIFY_CMD=1 to enable."
+                ),
+            }
+        else:
+            try:
+                cproc = subprocess.run(
+                    shlex.split(verify_cmd),
+                    capture_output=True,
+                    text=True,
+                    timeout=timeout,
+                    cwd=str(out),
+                    env={
+                        **os.environ,
+                        "PYTHONPATH": os.pathsep.join([str(out), os.environ.get("PYTHONPATH", "")]),
+                    },
+                )
+                cmd_ok = cproc.returncode == 0
+                result["verify_cmd"] = {
+                    "ran": True,
+                    "command": verify_cmd,
+                    "exit_code": cproc.returncode,
+                    "passed": cmd_ok,
+                    "output_tail": (cproc.stdout + cproc.stderr).strip()[-800:],
+                }
+            except (OSError, subprocess.TimeoutExpired) as e:
+                cmd_ok = False
+                result["verify_cmd"] = {"ran": True, "command": verify_cmd, "error": str(e)}
+
+    # Decide verified + confidence -----------------------------------------
+    verified = compile_ok and not modules_broke
+    if cmd_ok is not None:
+        verified = verified and cmd_ok
+        confidence = "high" if verified else "low"
+    elif verified and not import_inconclusive:
+        confidence = "medium"
+    elif verified:
+        confidence = "low"  # compiled + no breakage, but some imports inconclusive
+    else:
+        confidence = "low"
+
+    result["verified"] = verified
+    result["confidence"] = confidence
+    return result
+
+
+@secure_tool()
+def protect_project(
+    path: str,
+    output_dir: str = "dist",
+    preset: Optional[str] = None,
+    verify: bool = True,
+    verify_cmd: Optional[str] = None,
+    save_mapping: bool = True,
+    trace_marker: bool = True,
+    timeout: int = 120,
+) -> Dict[str, Any]:
+    """Obfuscate a Python project end-to-end and verify it still works — in one call.
+
+    This is the high-level tool an AI agent reaches for when the user says
+    "protect this code before I ship it". It runs the whole pipeline and,
+    crucially, **self-verifies** the result so the agent can report a green
+    check instead of hoping the transform didn't break anything:
+
+        scan risks  →  pick a framework-aware preset  →  obfuscate
+                    →  byte-compile + import-smoke-test the output
+                    →  return verified: true/false (+ what changed)
+
+    Verification never imports the obfuscated code into this server process —
+    every check runs in a subprocess (see ``_run_verification``).
+
+    Args:
+        path: Python file or directory to protect (must be inside the
+            server's project-root sandbox).
+        output_dir: Where to write obfuscated output (default ``dist``).
+        preset: Force a preset (e.g. ``fastapi``, ``balanced``). Default:
+            auto-detected from a preflight framework scan.
+        verify: Run the round-trip verification (default True). Set False to
+            skip (faster, but you lose the green check).
+        verify_cmd: Optional end-to-end check (e.g. ``python -m myapp --selftest``)
+            run against the obfuscated output. Gated behind
+            ``PYOBFUS_MCP_ALLOW_VERIFY_CMD=1``. Use an APP-level check, not
+            unit tests bound to internal names (those are expected to fail
+            once the public surface is renamed).
+        save_mapping: Write the de-obfuscation mapping next to the output so
+            tracebacks can later be reversed with ``unmap_stack_trace``
+            (default True). The mapping is the de-obfuscation key — keep it
+            private; it is intentionally NOT written inside ``output_dir``.
+        trace_marker: Stamp each obfuscated file with a ``# pyobfus:obfuscated``
+            header (id + mapping filename + the exact unmap command) so an agent
+            that later opens one of these files from a traceback knows to
+            reverse the names (default True; requires save_mapping).
+        timeout: Per-subprocess timeout in seconds (default 120).
+
+    Returns:
+        Dict with: status, verified, confidence, preset_used, input, output,
+        obfuscation (stats + trace_marker_id), mapping_path,
+        mapping_security_note, risks, pro_value (optional), verification,
+        ai_hint, next_tool, tier_context.
+    """
+    # --- imports up front so a missing core install fails fast -------------
+    try:
+        from pyobfus.core.preflight import PreflightChecker
+    except ImportError as e:
+        return _error("PyobfusNotInstalled", str(e), "pip install pyobfus")
+
+    # --- validate + scope the source and the write targets -----------------
+    try:
+        target = validate_path(path, must_exist=True)
+        out = validate_path(output_dir, must_exist=False)
+    except PathScopeError as e:
+        return _error(
+            "PathScopeError",
+            str(e),
+            "Keep path and output_dir inside PYOBFUS_MCP_PROJECT_ROOT (default: server cwd).",
+        )
+    except FileNotFoundError as e:
+        return _error("PathNotFound", str(e), "Double-check the source path and try again.")
+
+    if out == target or out in target.parents or target in out.parents:
+        return _error(
+            "BadOutputDir",
+            f"output_dir {out} overlaps the source {target}.",
+            "Pick an output_dir outside the source tree (e.g. 'dist').",
+        )
+
+    # --- 1. preflight scan → preset selection ------------------------------
+    report = PreflightChecker().check_path(target)
+    report_dict = report.to_dict()
+    severity = report_dict.get("severity_counts") or {}
+    high_sev = int(severity.get("high", 0))
+    frameworks = [fw.get("name") for fw in (report_dict.get("frameworks") or [])]
+    preset_used = preset or report_dict.get("suggested_preset") or "balanced"
+
+    # --- 2. obfuscate via the real CLI (--json) ----------------------------
+    # Mapping is written as a SIBLING of the output dir, never inside it, so
+    # it never ships with the protected artifact.
+    mapping_path = out.parent / f"{out.name}.mapping.json"
+    cmd = _obfuscate_command() + [str(target), "-o", str(out), "--preset", preset_used, "--json"]
+    if save_mapping:
+        cmd += ["--save-mapping", str(mapping_path)]
+        # Stamp each obfuscated file with a '# pyobfus:obfuscated' header so an
+        # agent that later lands in one of these files from a traceback knows
+        # to reverse the names with unmap_stack_trace. On by default here (the
+        # AI-native path); harmless comment lines that don't affect execution.
+        if trace_marker:
+            cmd += ["--trace-marker"]
+
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        return _error(
+            "ObfuscationTimeout",
+            f"Obfuscation exceeded {timeout}s.",
+            "Raise the `timeout` argument or obfuscate a smaller subtree.",
+        )
+
+    try:
+        obf = json.loads(proc.stdout)
+    except json.JSONDecodeError:
+        return _error(
+            "ObfuscationFailed",
+            (proc.stderr or proc.stdout or "no output").strip()[-800:],
+            "Run `check_obfuscation_risks` on this path to find the blocker.",
+        )
+
+    if obf.get("status") != "success":
+        return {
+            "status": "error",
+            "error_type": "ObfuscationFailed",
+            "message": obf.get("message", "obfuscation did not succeed"),
+            "obfuscation": obf,
+            "ai_hint": "Inspect the obfuscation report; run check_obfuscation_risks first.",
+            "next_tool": _next_tool(
+                "check_obfuscation_risks", "find what blocks obfuscation", {"path": path}
+            ),
+        }
+
+    # --- 3. round-trip verification (subprocess-isolated) ------------------
+    verification: Optional[Dict[str, Any]] = None
+    verified: Optional[bool] = None
+    confidence = "unverified"
+    if verify:
+        allow_cmd = os.environ.get("PYOBFUS_MCP_ALLOW_VERIFY_CMD", "").lower() in (
+            "1",
+            "true",
+            "yes",
+        )
+        verification = _run_verification(
+            out, verify_cmd=verify_cmd, allow_cmd=allow_cmd, timeout=timeout
+        )
+        verified = verification["verified"]
+        confidence = verification["confidence"]
+
+    # --- assemble payload --------------------------------------------------
+    stats = obf.get("stats") or {}
+    pro_value = _pro_value_for_scan(_count_sensitive_literals(target), high_sev)
+
+    if verify and not verified:
+        status = "warnings"
+        ai_hint = (
+            "Obfuscation ran but verification did NOT pass — the obfuscated "
+            "output failed to compile or import. Do NOT ship it. Inspect "
+            "verification.modules_broke / compile_error, then re-run "
+            "check_obfuscation_risks to find the offending construct."
+        )
+        next_tool = _next_tool(
+            "check_obfuscation_risks",
+            "diagnose why the obfuscated output broke",
+            {"path": path},
+        )
+    else:
+        status = "success"
+        ai_hint = f"Protected {stats.get('files_processed', '?')} file(s) into '{output_dir}' " f"with preset '{preset_used}'" + (
+            f" — verified (confidence: {confidence}); safe to ship."
+            if verify
+            else " (verification skipped)."
+        ) + (
+            f" Keep {mapping_path.name} private; reverse future tracebacks with unmap_stack_trace."
+            if save_mapping
+            else ""
+        )
+        next_tool = _next_tool(None, "pipeline complete; obfuscated output is ready to ship")
+
+    payload: Dict[str, Any] = {
+        "status": status,
+        "verified": verified,
+        "confidence": confidence,
+        "preset_used": preset_used,
+        "input": str(target),
+        "output": str(out),
+        "obfuscation": {
+            "files_processed": stats.get("files_processed"),
+            "total_names_obfuscated": stats.get("total_names_obfuscated"),
+            "strings_encoded": stats.get("strings_encoded"),
+            "level": obf.get("level"),
+            "trace_marker_id": obf.get("trace_marker_id"),
+        },
+        "mapping_path": str(mapping_path) if save_mapping else None,
+        "mapping_security_note": (
+            "This file de-obfuscates your code — keep it private, never ship it."
+            if save_mapping
+            else None
+        ),
+        "risks": {
+            "severity_counts": severity,
+            "high_severity_findings": high_sev,
+            "frameworks_detected": frameworks,
+            "files_scanned": report_dict.get("files_scanned", 0),
+        },
+        "verification": verification,
+        "ai_hint": ai_hint,
+        "next_tool": next_tool,
+        "tier_context": _tier_context(tool_tier="community"),
+    }
+    if pro_value is not None:
+        payload["pro_value"] = pro_value
+    return payload
 
 
 # ---------------------------------------------------------------------------

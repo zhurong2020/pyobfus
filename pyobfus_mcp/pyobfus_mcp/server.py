@@ -29,7 +29,6 @@ Zed are in `pyobfus_mcp/README.md`.
 
 from __future__ import annotations
 
-import sys
 from typing import Any, Dict, Optional
 
 from pyobfus_mcp.tools import (
@@ -37,6 +36,7 @@ from pyobfus_mcp.tools import (
     explain_preset,
     generate_pyobfus_config,
     list_presets,
+    protect_project,
     recommend_tier,
     start_pro_trial,
     unmap_stack_trace,
@@ -77,6 +77,40 @@ def _build_server() -> Any:
 
     # Each decorated function becomes a named MCP tool. Descriptions
     # come from the docstring of the underlying tools.* function.
+    @app.tool(
+        name="protect_project",
+        description=(
+            "One call to protect a Python project end-to-end AND verify it "
+            "still works: scans risks, picks a framework-aware preset, "
+            "obfuscates, then byte-compiles + import-smoke-tests the output "
+            "in isolated subprocesses and returns verified:true/false. Writes "
+            "a private de-obfuscation mapping alongside (not inside) the "
+            "output. Use this when the user wants to 'protect/obfuscate before "
+            "shipping' and expects a green check, not just a transform."
+        ),
+        meta=dict(_META_COMMUNITY),
+    )
+    def _protect_project(
+        path: str,
+        output_dir: str = "dist",
+        preset: Optional[str] = None,
+        verify: bool = True,
+        verify_cmd: Optional[str] = None,
+        save_mapping: bool = True,
+        trace_marker: bool = True,
+        timeout: int = 120,
+    ) -> Dict[str, Any]:
+        return protect_project(
+            path,
+            output_dir=output_dir,
+            preset=preset,
+            verify=verify,
+            verify_cmd=verify_cmd,
+            save_mapping=save_mapping,
+            trace_marker=trace_marker,
+            timeout=timeout,
+        )
+
     @app.tool(
         name="check_obfuscation_risks",
         description=(
@@ -186,6 +220,7 @@ if __name__ == "__main__":  # pragma: no cover
 # list. Provide one that enumerates the underlying callable implementations.
 # Phase 3 added `recommend_tier` and `start_pro_trial` as pro_funnel tools.
 tool_functions = [
+    protect_project,
     check_obfuscation_risks,
     generate_pyobfus_config,
     unmap_stack_trace,

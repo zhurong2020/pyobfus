@@ -6,15 +6,21 @@ Provides a user-friendly CLI for obfuscating Python files and projects.
 
 import io
 import json
+import re
 import sys
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 import click
 
 from pyobfus import __version__
 from pyobfus.config import ObfuscationConfig
-from pyobfus.constants import STRIPE_PAYMENT_LINK, PRO_PRICE_USD
+from pyobfus.constants import (
+    GITHUB_REPO,
+    PRO_PRICE_USD,
+    STRIPE_PAYMENT_LINK,
+    TRACE_MARKER_PREFIX,
+)
 from pyobfus.config_templates import get_template, list_templates
 from pyobfus.config_validator import validate_config_file, find_config_file
 from pyobfus.core.analyzer import SymbolAnalyzer
@@ -224,6 +230,15 @@ except ImportError:
     "Use with `pyobfus --unmap` to reverse obfuscated stack traces.",
 )
 @click.option(
+    "--trace-marker/--no-trace-marker",
+    "trace_marker",
+    default=False,
+    help="Prepend a '# pyobfus:obfuscated' header (id + mapping filename + the "
+    "exact --unmap command) to each obfuscated file, so an AI agent that lands "
+    "in an obfuscated file from a traceback knows to reverse the names. "
+    "Requires --save-mapping. Default: off.",
+)
+@click.option(
     "--unmap",
     "unmap_mode",
     is_flag=True,
@@ -290,6 +305,7 @@ def main(
     check_mode: bool,
     json_output: bool,
     save_mapping_path: Optional[str],
+    trace_marker: bool,
     unmap_mode: bool,
     trace_path: Optional[str],
     mapping_path: Optional[str],
@@ -706,6 +722,23 @@ def main(
             click.echo(f"Error: {input_path} is neither a file nor a directory", err=True)
             sys.exit(1)
 
+        # Auto-unmap convention: stamp each obfuscated file with a stable
+        # '# pyobfus:obfuscated' header pointing at the mapping + unmap command,
+        # so an AI agent that opens an obfuscated file from a traceback knows to
+        # reverse the names. Opt-in (--trace-marker) and requires a mapping.
+        trace_marker_id: Optional[str] = None
+        if trace_marker and not dry_run:
+            if save_mapping_path:
+                trace_marker_id = _apply_trace_markers(output_path_obj, save_mapping_path)
+                if verbose:
+                    click.echo(f"  Stamped trace marker (id={trace_marker_id})")
+            else:
+                click.echo(
+                    "Warning: --trace-marker has no effect without --save-mapping "
+                    "(the marker points at a mapping file). Skipped.",
+                    err=True,
+                )
+
         if json_output:
             sys.stdout = _saved_stdout
             _emit_obfuscate_success_json(
@@ -716,6 +749,7 @@ def main(
                 dry_run=dry_run,
                 stats=obfuscation_stats,
                 mapping_path=save_mapping_path,
+                trace_marker_id=trace_marker_id,
             )
             return
 
@@ -1435,6 +1469,64 @@ def _emit_success_json_payload(payload: Dict[str, Any]) -> None:
     click.echo(json.dumps(payload, indent=2, ensure_ascii=False))
 
 
+# PEP 263 encoding cookie — must stay within the first two lines of a file, so
+# the trace marker is inserted *after* it (and after any shebang) to avoid
+# silently disabling the declared source encoding.
+_CODING_COOKIE_RE = re.compile(r"coding[:=]\s*([-\w.]+)")
+
+
+def _trace_marker_block(marker_id: str, mapping_basename: str) -> str:
+    """Build the '# pyobfus:obfuscated' header block (trailing newline included)."""
+    return (
+        f"{TRACE_MARKER_PREFIX} id={marker_id} mapping={mapping_basename}\n"
+        f"# Obfuscated with pyobfus ({GITHUB_REPO}). The original names are recoverable.\n"
+        f"# To de-obfuscate a traceback from this file:\n"
+        f"#   pyobfus --unmap --trace <logfile> --mapping {mapping_basename}\n"
+    )
+
+
+def _insert_after_prologue(text: str, marker_block: str) -> str:
+    """Prepend `marker_block`, but keep a shebang line first and a PEP 263
+    encoding cookie within the first two lines."""
+    lines = text.splitlines(keepends=True)
+    idx = 0
+    if idx < len(lines) and lines[idx].startswith("#!"):
+        idx += 1
+    if idx < len(lines) and idx < 2 and _CODING_COOKIE_RE.search(lines[idx]):
+        idx += 1
+    return "".join(lines[:idx]) + marker_block + "".join(lines[idx:])
+
+
+def _apply_trace_markers(output_path: Path, mapping_path: str) -> Optional[str]:
+    """Stamp every obfuscated `.py` file under `output_path` with the trace marker.
+
+    Returns the mapping's `marker_id` (read from the saved mapping JSON), or
+    None if the mapping can't be read. Idempotent: files that already carry the
+    marker are left untouched, so re-running is safe.
+    """
+    mp = Path(mapping_path)
+    try:
+        marker_id = json.loads(mp.read_text(encoding="utf-8")).get("marker_id")
+    except (OSError, ValueError):
+        return None
+    if not marker_id:
+        return None
+
+    block = _trace_marker_block(marker_id, mp.name)
+    targets: List[Path] = (
+        [output_path] if output_path.is_file() else sorted(output_path.rglob("*.py"))
+    )
+    for f in targets:
+        try:
+            txt = f.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        if TRACE_MARKER_PREFIX in txt[:512]:
+            continue  # already stamped — keep idempotent
+        f.write_text(_insert_after_prologue(txt, block), encoding="utf-8")
+    return marker_id
+
+
 def _emit_obfuscate_success_json(
     input_path: str,
     output_path: str,
@@ -1443,6 +1535,7 @@ def _emit_obfuscate_success_json(
     dry_run: bool,
     stats: Dict[str, int],
     mapping_path: Optional[str],
+    trace_marker_id: Optional[str] = None,
 ) -> None:
     """Emit the obfuscation success summary as JSON."""
     # AI hint: suggest the most useful next command based on context
@@ -1469,6 +1562,7 @@ def _emit_obfuscate_success_json(
         "dry_run": dry_run,
         "stats": stats,
         "mapping": mapping_path,
+        "trace_marker_id": trace_marker_id,
         "ai_hint": ai_hint,
     }
     _emit_success_json_payload(payload)

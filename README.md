@@ -26,10 +26,11 @@ This repository ships **two installable packages**:
 | [`pyobfus`](https://pypi.org/project/pyobfus/) | The Python obfuscator (CLI + library). | `pip install pyobfus` |
 | [`pyobfus-mcp`](https://pypi.org/project/pyobfus-mcp/) | A **Model Context Protocol (MCP) server** that exposes pyobfus's tools to AI coding agents. | `pip install pyobfus-mcp` |
 
-The MCP server lives in [`pyobfus_mcp/`](pyobfus_mcp/) and is built on the official [Model Context Protocol Python SDK](https://github.com/modelcontextprotocol/python-sdk) (FastMCP). It registers seven MCP tools so **Claude Desktop, Claude Code, Cursor, Windsurf, and Zed** can call pyobfus directly from agent conversations — no shelling out:
+The MCP server lives in [`pyobfus_mcp/`](pyobfus_mcp/) and is built on the official [Model Context Protocol Python SDK](https://github.com/modelcontextprotocol/python-sdk) (FastMCP). It registers eight MCP tools so **Claude Desktop, Claude Code, Cursor, Windsurf, and Zed** can call pyobfus directly from agent conversations — no shelling out:
 
 | MCP tool | Implementation | Purpose |
 |---|---|---|
+| `protect_project` | [`pyobfus_mcp/tools.py`](pyobfus_mcp/pyobfus_mcp/tools.py) | **One-call, self-verifying pipeline**: scan → preset → obfuscate → byte-compile + import-smoke-test the output → return `verified: true/false`. The agent reports a green check instead of hoping the transform didn't break anything |
 | `check_obfuscation_risks` | [`pyobfus_mcp/tools.py`](pyobfus_mcp/pyobfus_mcp/tools.py) | Pre-flight risk scan (eval/exec, dynamic attribute, framework reflection) |
 | `generate_pyobfus_config` | [`pyobfus_mcp/tools.py`](pyobfus_mcp/pyobfus_mcp/tools.py) | Auto-detect framework → write a working `pyobfus.yaml` |
 | `unmap_stack_trace` | [`pyobfus_mcp/tools.py`](pyobfus_mcp/pyobfus_mcp/tools.py) | Reverse obfuscated identifiers in a production stack trace |
@@ -40,11 +41,23 @@ The MCP server lives in [`pyobfus_mcp/`](pyobfus_mcp/) and is built on the offic
 
 The server is registered in the **official [MCP Registry](https://registry.modelcontextprotocol.io/)** under `io.github.zhurong2020/pyobfus-mcp`. The transport is stdio. See [`pyobfus_mcp/README.md`](pyobfus_mcp/README.md) for per-client configuration snippets.
 
+### 🧩 Claude Code skill / plugin
+
+This repo is also a **Claude Code plugin marketplace**. The `pyobfus-protect` skill teaches an agent the full "protect Python before shipping — obfuscate **and** verify it still runs" workflow (MCP-first, CLI fallback):
+
+```
+/plugin marketplace add zhurong2020/pyobfus
+/plugin install pyobfus@pyobfus
+```
+
+See [`skills/`](skills/) for the skill and install details. (This is distinct from [`templates/ai-integration/`](templates/ai-integration/), which are copy-in rule files for *your* project.)
+
 ### 🤖 New in v0.4.0 — AI-native features
 
 - **`pyobfus --check src/`** — pre-flight risk scan: detects `eval`/`exec`, dynamic attribute access, and framework reflection points before you obfuscate. JSON output with an `ai_hint` telling your AI assistant what to run next.
 - **`pyobfus --init src/`** — zero-config onboarding: scans the project, detects FastAPI/Django/Pydantic/Click/SQLAlchemy, and writes a ready-to-use `pyobfus.yaml`.
 - **`pyobfus --unmap --trace error.log --mapping mapping.json`** — reverse obfuscated identifiers in a production stack trace so you can debug (or hand the trace to an AI assistant) without reversing the obfuscation itself.
+- **`pyobfus … --save-mapping mapping.json --trace-marker`** — stamp each obfuscated file with a `# pyobfus:obfuscated` header (id + mapping filename + the exact `--unmap` command) so an AI agent that lands in an obfuscated file from a traceback immediately knows it's pyobfus output and how to reverse the names.
 - **Framework-aware presets** — `--preset fastapi | django | flask | pydantic | click | sqlalchemy` with built-in exclusions for dispatch methods, decorators, ORM fields, migrations, and dependency-injection parameters.
 - **Global `--json`** — every CLI mode (`obfuscate`, `--check`, `--unmap`, `--init`) emits the same structured schema with an `ai_hint` field, ready for Claude Code, Cursor, Windsurf, and MCP servers to consume.
 
