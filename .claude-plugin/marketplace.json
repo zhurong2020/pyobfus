@@ -1,0 +1,25 @@
+{
+  "name": "pyobfus",
+  "owner": {
+    "name": "zhurong2020",
+    "url": "https://github.com/zhurong2020"
+  },
+  "metadata": {
+    "description": "Python source-protection tooling for AI coding agents.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "pyobfus",
+      "source": "./",
+      "description": "Obfuscate/protect Python before shipping and verify the output still runs. Ships the 'pyobfus-protect' skill; pairs with the pyobfus-mcp server for in-chat tool calls.",
+      "category": "developer-tools",
+      "keywords": [
+        "python-obfuscator",
+        "code-obfuscator",
+        "source-protection",
+        "pyarmor-alternative"
+      ]
+    }
+  ]
+}

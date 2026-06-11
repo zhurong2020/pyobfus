@@ -1,0 +1,19 @@
+{
+  "name": "pyobfus",
+  "version": "0.1.0",
+  "description": "Protect Python source before shipping it — obfuscate AND verify the output still runs. Wraps the pyobfus obfuscator (AST-based, framework-aware, AI-debuggable) and its MCP server.",
+  "author": {
+    "name": "zhurong2020",
+    "url": "https://github.com/zhurong2020"
+  },
+  "homepage": "https://github.com/zhurong2020/pyobfus",
+  "repository": "https://github.com/zhurong2020/pyobfus",
+  "license": "Apache-2.0",
+  "keywords": [
+    "python-obfuscator",
+    "code-obfuscator",
+    "source-protection",
+    "pyarmor-alternative",
+    "mcp"
+  ]
+}
