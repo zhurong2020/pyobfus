@@ -20,6 +20,18 @@
 
 ---
 
+## 🆕 TODO — 0.4.1 新卖点发布公告（gated：先让发布流量过 1-2 天）
+
+**Added 2026-06-11.** pyobfus 0.4.1 + pyobfus-mcp 0.3.0 已发布（见 CHANGELOG / memory `release-0.4.1-patent-clean`）。新卖点 = **"一键混淆 + 自验证"**（`protect_project`：scan→preset→obfuscate→编译+import 验证→`verified:true/false`）+ `--trace-marker` auto-unmap + 8-tool `next_tool` 链式 + Claude skill/plugin。
+
+- **Gate（用户决定 2026-06-11）**：**等已发布版本的自然流量先过 1-2 天**再推公告（≈ **2026-06-13 之后**）。先观察 PyPI 下载/任何 issue 反馈，避免公告把"刚发现的回归"放大。
+- **载体**：dev.to 长文 +（可选）HN / Reddit / 公众号 / X 短贴。可与 `_drafts/` 里压着的 4-platform launch 合流，或单独发"protect-and-verify"主题贴。
+- **主信息**：定位在 PyArmor 给不了的 "AI-debuggable + 一键自验证" —— agent 敢用、好用、自动用。
+- 🔒 **专利安全护栏（写文案前必读）**：只描述**公开的社区版**能力（编排 + 验证 + 经 mapping/`--unmap` 的 AI 可调试 + framework presets + MCP/skill 可发现性）。**严禁**在文案中描述或暗示说明书 §2.6 列举的 7 项未满足需求 (a)–(g)（= 专利 S1–S8 机制：分层选择保护 / 加密字节码 / 法医水印 / license 融入解密 / **traceback 加密** / 纵深签章 / 运行期机密 Vault）。**特别注意 (e)**：`--trace-marker` 是**明文标记指向公开的名称反解**，与 (e)"traceback 加密成短 ID、私钥解密、无回退" **方向相反**——文案不得把 trace-marker 说成"加密 traceback"，以免（1）误导用户（2）触碰尚未解锁的 v0.5 机制叙事。
+- **依赖/正交**：与 v0.5 专利 gate 无关（0.4.1 全是公开内容）；可在补正办结前发。
+
+---
+
 ## Verified facts baseline (2026-05-07 · cross-checked against PyPI authoritative APIs)
 
 | Item | Value | Verified |
