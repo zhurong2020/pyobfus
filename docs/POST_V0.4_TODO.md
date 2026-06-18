@@ -18,6 +18,7 @@
 3. **0.5.2 — finish the P2-8 / opacity-config surface** (deferred from 0.5.1): `--bind-device` (runtime device-key substitution), `--period` (run-count counter file), `--opacity-config` TOML pattern rules (needs name-map coupling so patterns match pre-mangle qualnames). Design notes in `docs/V0.5_RELEASE_PLAN.md`.
 4. **Re-check PEP 740 attestations** — PyPI's `provenance` field read `False` on the 0.5.0 wheel despite `attestations: true` in `release.yml`. Verify on the 0.5.0/0.5.1 page; if genuinely missing, debug `gh-action-pypi-publish` config.
 5. **Distribution (Phase 5.6, now unblocked)** — JOSS submission (was gated on 申请号; cite "patent pending CN 202610712171X"); launch wave (HN/Reddit/dev.to/CN drafts in `_drafts/`, run through AI-detector gate first); GitHub Discussions v0.5 priority poll.
+   - **JOSS paper drafted + de-AI'd** at `paper/paper.md` + `paper/paper.bib` (commit `e18d8d9`). **Decision 2026-06-18: affiliation = "Independent Researcher" (personal), NO separate COI sentence for now** — the open-core disclosure in the text already signals the commercial relationship. The company-named COI line (e.g. "the author commercializes the Pro edition via 上海旎嵘科技") is an **optional backup card** that can be added anytime before/during JOSS review (not required by JOSS; reversible until acceptance). Still open before submit: verify the CLASP arXiv cite (2510.11251); submit after 0.5.1 merges to main; add JOSS DOI badge to README only after acceptance.
 
 ---
 
