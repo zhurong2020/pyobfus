@@ -15,7 +15,7 @@ title: pyobfus - Modern Python Code Obfuscator
     <a href="https://pypi.org/project/pyobfus/"><img src="https://img.shields.io/pypi/dm/pyobfus.svg" alt="PyPI downloads"></a>
     <a href="https://pyobfus.readthedocs.io/en/latest/"><img src="https://readthedocs.org/projects/pyobfus/badge/?version=latest" alt="Documentation Status"></a>
   </p>
-  <p style="font-size: 1em; color: #7f8c8d; max-width: 600px; margin: 1em auto;">A Python code obfuscator built with AST-based transformations. <strong>Supports Python 3.8 through 3.14</strong> (including the latest stable release). Provides reliable name mangling, string encoding, and code protection features.</p>
+  <p style="font-size: 1em; color: #7f8c8d; max-width: 600px; margin: 1em auto;">A Python code obfuscator built with AST-based transformations. <strong>Supports Python 3.9 through 3.14</strong> (including the latest stable release). Provides reliable name mangling, string encoding, and code protection features.</p>
 </div>
 
 ## Features
@@ -221,4 +221,4 @@ See our [full README](https://github.com/zhurong2020/pyobfus#security-note-strin
 
 ---
 
-**Built with Python 3.8-3.14 • AST-based Transformations • Open Source**
+**Built with Python 3.9-3.14 • AST-based Transformations • Open Source**

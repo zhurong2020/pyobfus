@@ -45,9 +45,9 @@ Note: the core and MCP test roots are collected as **separate** pytest
 invocations (CI runs them as separate jobs) — don't point one `pytest` at both
 roots at once.
 
-Targets: Python **3.8–3.14** must all pass. New Pro-feature CLI integration
-tests need `@requires_py39` — read [`docs/PYTHON38_COMPATIBILITY.md`](docs/PYTHON38_COMPATIBILITY.md)
-first (astunparse output is unstable on 3.8).
+Targets: Python **3.9–3.14** must all pass. (Python 3.8 was dropped in 0.5.0 —
+EOL 2024-10 — which removed the old `astunparse`/`@requires_py39` flakiness;
+`docs/PYTHON38_COMPATIBILITY.md` is retained only as historical record.)
 
 ## Repository layout
 

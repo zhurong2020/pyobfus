@@ -58,7 +58,7 @@ print(meta['Version'])           # 0.1.0
 print(meta['Summary'])           # 描述
 print(meta['Author-email'])      # Rong Zhu <email>
 print(meta['License'])           # Apache-2.0
-print(meta['Requires-Python'])   # >=3.8
+print(meta['Requires-Python'])   # >=3.9
 
 # 项目链接
 for url in meta.get_all('Project-URL'):

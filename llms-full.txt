@@ -14,7 +14,7 @@ pip install pyobfus-mcp          # MCP server (adds `pyobfus-mcp` console script
 pip install --upgrade pyobfus    # upgrade
 ```
 
-Requires Python 3.8–3.14. License: Apache-2.0 for the community tier; the optional Pro tier (`pyobfus_pro/`) is license-gated.
+Requires Python 3.9–3.14. License: Apache-2.0 for the community tier; the optional Pro tier (`pyobfus_pro/`) is license-gated.
 
 ## CLI — every mode
 

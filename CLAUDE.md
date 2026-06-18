@@ -12,17 +12,18 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 Snapshot 2026-05-07 (v0.4 distribution leg 完整闭环之后)。包含 30-second resume cheat sheet · 4 个 self-actionable P0 item（CI smoke test + PEP 740 attestation + server.json _meta + dev.to voice pass）· v0.5 work（含 3 个 2026-05 research 发现的新机会：PEP 750 t-string handler · FastMCP 3.0 升级 · `--target claude-skill` preset）· passive waiting items · do-not-do list · 3 周建议节奏。
 
-### 🟢 2026-06-17 active state — 发明专利初步审查合格，v0.5 公开发布已解锁
+### 🟢 2026-06-18 active state — pyobfus 0.5.0 已发布到 PyPI
 
-**当前最高优先级活动**：发明专利**初步审查合格**，段号补正被认可、形式缺陷办结 → **Path C 公开发布 gate 已满足**，进入 **v0.5 公开发布准备（Phase 5）**。
+**当前状态**：发明专利初审合格（2026-06-17，Path C gate 解除）→ **v0.5.0 已公开发布**（PyPI 2026-06-18），6 项专利机制随之公开。
 
 - ✅ 已提交并受理（申请号 `202610712171X` · 申请日/优先权日 2026-05-22 · 17 项权利要求）
 - ✅ 费用全部缴清（共 1610 元 · 2026-05-22 一次缴清 · 含申请费类 1235 与实审费 375 · 官方审查信息查询「费足」核实）
 - ✅ **段号补正答复**（2026-06-11 提交）→ **初步审查合格通知书**（发文 2026-06-17 · 发文序号 2026061200904340 · 审查员 陈立英），据专利法第 34 条进入「申请日满 18 个月（≈2027-11）即行公布」轨道
 - ✅ **补正硬期限彻底关闭**；下一硬期限仅剩实审请求（申请日起 3 年 ≈2029-05-22，实审费 375 已缴）
-- 🚀 **当前任务 = v0.5 公开发布准备（Phase 5）**：把 `pyobfus-pro-dev/pyobfus_pro_v05/` 的 6 项专利机制并入公开 `pyobfus_pro/` → 版本 bump → 跨 Python 测试 → PyPI 发布（详见 [`docs/POST_V0.4_TODO.md`](docs/POST_V0.4_TODO.md) § P1 + `docs/V0.5_RELEASE_PLAN.md`）
+- ✅ **v0.5.0 已发布**：6 项专利机制（P2-1/7/8/9/10/11）已并入公开 `pyobfus_pro/`，1016 测试 / 砍 3.8 / Beta→Production/Stable，tag `v0.5.0` 经 OIDC Trusted Publishing 发到 PyPI。机制经 `pyobfus_pro` API + `pyobfus-unscrub` CLI + standalone passes 可用
+- ⏭️ **下一步（0.5.1）**：`pyobfus build --flag` 融合（交错顺序设计见 `docs/V0.5_RELEASE_PLAN.md` 0.5.1 节）；分发项（JOSS 现已解锁 / launch wave）见 Phase 5.6；残留复核 = PyPI provenance/PEP740 attestation 是否真上链
 
-**Cold-start session 第一句话应问 user**：「v0.5 公开发布进行到哪一步了？（Pro 机制并入公开 repo / PyPI 发布）」
+**Cold-start session 第一句话应问 user**：「0.5.0 之后想推进 0.5.1 融合，还是先做 launch / JOSS 分发？」
 
 **Cold-start 资料定位**（按读取优先级）：
 
@@ -40,8 +41,8 @@ Snapshot 2026-05-07 (v0.4 distribution leg 完整闭环之后)。包含 30-secon
 ## 项目概述
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
-- **技术栈**: Python 3.8-3.14, AST, setuptools
-- **PyPI 主包**: https://pypi.org/project/pyobfus/ (v0.4.0，2026-04-22 发布)
+- **技术栈**: Python 3.9-3.14, AST, setuptools
+- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**v0.5.0，2026-06-18 发布** — 6 项专利机制公开 + 砍 3.8)
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (v0.2.0，2026-05-08 发布 — 7 tools: 5 community + 2 pro_funnel `recommend_tier`/`start_pro_trial` · FastMCP 1.27 + security hardening. 0.1.2 曾修 `FastMCP.__init__()` `version=` kwarg drift)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp` (active, isLatest=true · 0.3.0)
 - **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus (Quality A · 全 A) — **2026-06-08 tool-count 真根因已修**：Glama 容器 build 自 **admin Dockerfile→Configuration「Build steps」字段**(web-UI 专属设置)，**不读 repo 自带 `pyobfus_mcp/Dockerfile`**；该字段独立 pin 在 `0.1.2` 一直卡住(06-05 改 repo Dockerfile pin 0.1.1→0.2.0 方向错、无效)。改 Build steps `0.1.2`→`0.2.0` 保存后 test `019ea6c5` 18:27 CST 跑绿、introspection 返回全部 7 工具。剩公开 API/列表/Inspector 被动 re-index(≤1 天)。教训见 memory `glama_container_build_source.md`
@@ -59,7 +60,7 @@ pyobfus/
 │   ├── transformers/   # AST 变换器
 │   └── cross_file/    # 跨文件混淆
 ├── pyobfus_pro/       # Pro Edition (商业许可)
-├── tests/             # 727 测试用例 (91% coverage · 0.4.1 发布版)
+├── tests/             # 1016 测试用例 (89% coverage · 0.5.0 发布版)
 ├── examples/          # 示例代码
 ├── docs/              # 项目文档
 └── cloudflare-worker/ # 许可验证 Worker
@@ -88,7 +89,7 @@ pytest tests/ -v --cov=pyobfus --cov-report=html
 pytest integration_tests/ -v
 ```
 
-**⚠️ Python 3.8 注意**：`astunparse` 库在某些 AST 输入上的输出不稳定，会导致 Pro 特性的 CLI 集成测试在 macOS ARM64 / Windows runner 上 flaky。**添加新的 Pro 特性 CLI 集成测试（`CliRunner().invoke + --<pro-flag>`）前务必阅读 [`docs/PYTHON38_COMPATIBILITY.md`](docs/PYTHON38_COMPATIBILITY.md)**，并对新测试套用 `@requires_py39` 装饰器（参考 `tests/test_cli_pro_paths.py::TestProFeatureExecution`）。纯 AST transformer 单元测试不受影响。
+**ℹ️ Python 3.8 已于 0.5.0 移除**（EOL 2024-10，floor 升到 3.9）：当年 `astunparse` 在 3.8 上的 CLI 集成测试 flaky 问题随之消失，`@requires_py39` 装饰器现为 no-op（可逐步清理）。`docs/PYTHON38_COMPATIBILITY.md` 仅作历史记录保留。
 
 ### 代码规范
 
@@ -105,7 +106,7 @@ pytest integration_tests/ -v
 ## 注意事项
 
 - **公开仓库**: 不要提交 Pro 许可密钥或 Stripe Webhook Secret
-- **跨版本兼容**: 确保 Python 3.8-3.14 全部通过测试
+- **跨版本兼容**: 确保 Python 3.9-3.14 全部通过测试
 - **双许可模型**: Free (pyobfus/) 和 Pro (pyobfus_pro/) 代码分离管理
 
 ## 跨 Workspace 关联

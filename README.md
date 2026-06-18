@@ -10,12 +10,12 @@
 [![PyPI downloads](https://img.shields.io/pypi/dm/pyobfus.svg)](https://pypi.org/project/pyobfus/)
 [![Documentation Status](https://readthedocs.org/projects/pyobfus/badge/?version=latest)](https://pyobfus.readthedocs.io/en/latest/)
 [![License](https://img.shields.io/badge/License-Dual%20(Apache%202.0%20%2B%20Proprietary)-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/python-3.8--3.14-blue.svg)](https://www.python.org/downloads/)
+[![Python](https://img.shields.io/badge/python-3.9--3.14-blue.svg)](https://www.python.org/downloads/)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/12788/badge)](https://www.bestpractices.dev/projects/12788)
 [![pyobfus MCP server](https://glama.ai/mcp/servers/zhurong2020/pyobfus/badges/score.svg)](https://glama.ai/mcp/servers/zhurong2020/pyobfus)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-A Python code obfuscator built with AST-based transformations. **Supports Python 3.8 through 3.14**. Provides reliable name mangling, string encoding, control-flow flattening, AES-256 string encryption, and — unique to pyobfus — a reverse-mapping workflow that lets you (or your AI coding assistant) debug obfuscated stack traces without giving up the protection.
+A Python code obfuscator built with AST-based transformations. **Supports Python 3.9 through 3.14**. Provides reliable name mangling, string encoding, control-flow flattening, AES-256 string encryption, and — unique to pyobfus — a reverse-mapping workflow that lets you (or your AI coding assistant) debug obfuscated stack traces without giving up the protection.
 
 ## 🔌 Companion MCP server: [`pyobfus-mcp`](pyobfus_mcp/)
 
@@ -532,10 +532,10 @@ Add an additional layer of protection for commercial Python software.
 
 ## Technical Details
 
-- **Python Support**: 3.8, 3.9, 3.10, 3.11, 3.12, 3.13, 3.14
+- **Python Support**: 3.9, 3.10, 3.11, 3.12, 3.13, 3.14
 - **Naming Scheme**: Index-based (I0, I1, I2...) - simple and effective
 - **Architecture**: Modular transformer pipeline with two-phase cross-file obfuscation
-- **Testing**: 655 tests, 91% coverage, multi-OS CI/CD (Python 3.8-3.14 × Ubuntu / macOS / Windows)
+- **Testing**: 1016 tests, 89% coverage, multi-OS CI/CD (Python 3.9-3.14 × Ubuntu / macOS / Windows)
 
 ## Frequently Asked Questions
 
@@ -591,7 +591,7 @@ pyobfus src/ -o dist/ -c pyobfus.yaml
 
 ### What Python versions are supported?
 
-pyobfus supports **Python 3.8 through 3.14**. Generated code is compatible with all these versions regardless of which version you use to run pyobfus.
+pyobfus supports **Python 3.9 through 3.14**. Generated code is compatible with all these versions regardless of which version you use to run pyobfus.
 
 ### PyArmor vs pyobfus: Which should I choose?
 

@@ -4,7 +4,7 @@ This guide explains how to activate and manage your pyobfus Professional Edition
 
 ## Prerequisites
 
-- Python 3.8 or higher installed
+- Python 3.9 or higher installed
 - pyobfus package installed: `pip install pyobfus`
 - Valid license key (received via email after purchase)
 

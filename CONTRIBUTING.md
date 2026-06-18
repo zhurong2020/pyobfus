@@ -65,7 +65,7 @@ Enhancement suggestions are tracked as GitHub issues. Provide:
 
 ### Prerequisites
 
-- Python 3.8 or higher
+- Python 3.9 or higher
 - Git
 - Virtual environment tool (venv, conda, etc.)
 
@@ -122,7 +122,7 @@ git push origin feature/your-feature-name
 
 - **Formatter**: black (line length: 100)
 - **Linter**: ruff
-- **Type hints**: Preferred (Python 3.8+ compatible)
+- **Type hints**: Preferred (Python 3.9+ compatible)
 - **Docstrings**: Google style for public APIs
 
 ### Example
@@ -229,20 +229,14 @@ These practices improve both type safety and code clarity while eliminating fals
 - **Coverage target**: 80%+ for new code
 - **Test types**: Unit, integration, end-to-end
 
-#### Python 3.8 Caveat for Pro-feature CLI integration tests
+#### Python 3.8 Caveat (obsolete since 0.5.0)
 
-`astunparse` (used on Python 3.8 as a fallback for `ast.unparse()`) produces intermittently-invalid generated code for certain AST shapes emitted by Pro transformers. End-to-end CLI tests that invoke `pyobfus ... --<pro-flag>` via `CliRunner().invoke` are flaky on macOS ARM64 / Windows Python 3.8 runners. Plain unit tests of the transformer classes (not going through `CliRunner`) are fine.
-
-**Rule**: when adding a new `CliRunner().invoke(main, [..., "--<pro-flag>", ...])`-style test, apply the `@requires_py39` decorator defined at the top of `tests/test_cli_pro_paths.py`:
-
-```python
-@requires_py39
-@patch("pyobfus.cli.is_trial_active", return_value=True)
-def test_my_new_pro_feature(self, mock, runner, simple_file, tmp_path):
-    ...
-```
-
-See [`docs/PYTHON38_COMPATIBILITY.md`](docs/PYTHON38_COMPATIBILITY.md) §8 for the full diagnostic signature and historical context.
+Python 3.8 was dropped in **0.5.0** (EOL 2024-10; `requires-python` is now
+`>=3.9`). The old `astunparse`-on-3.8 flakiness for Pro-feature CLI integration
+tests no longer applies, and the `@requires_py39` decorator in
+`tests/test_cli_pro_paths.py` is now a no-op (safe to remove during cleanup).
+[`docs/PYTHON38_COMPATIBILITY.md`](docs/PYTHON38_COMPATIBILITY.md) is retained as
+historical record only.
 
 #### Test Structure
 

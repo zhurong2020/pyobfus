@@ -29,7 +29,7 @@ PyArmor is the most established Python obfuscator. Here's how pyobfus compares:
 | **Native dependencies** | None | Requires `pytransform` runtime |
 | **Output format** | Pure `.py` files | `.py` + native libraries |
 | **Cross-platform output** | Yes (single output works everywhere) | Requires per-platform build |
-| **Python 3.8-3.14** | Yes | Yes |
+| **Python 3.9-3.14** | Yes | Yes |
 | **String encryption** | AES-256 (Pro) | AES (Pro) |
 | **Anti-debugging** | Yes (Pro) | Yes (Pro) |
 | **Control flow flattening** | Yes (Pro v0.3.0+) | Yes (Pro) |
@@ -70,7 +70,7 @@ Oxyry is an online Python obfuscation service.
 |---------|---------|-------|
 | **Deployment** | CLI tool (local) | Web service only |
 | **Privacy** | Code never leaves your machine | Code uploaded to server |
-| **Python versions** | 3.8 - 3.14 | 3.3 - 3.7 (outdated) |
+| **Python versions** | 3.9 - 3.14 | 3.3 - 3.7 (outdated) |
 | **Multi-file support** | Yes (cross-file) | Limited |
 | **Configuration** | YAML files | Web interface |
 | **CI/CD integration** | Yes | No |
@@ -78,7 +78,7 @@ Oxyry is an online Python obfuscation service.
 
 #### When to Choose pyobfus
 
-- You need **modern Python** (3.8+) support
+- You need **modern Python** (3.9+) support
 - You want code to **stay local** (privacy/compliance)
 - You need **CI/CD integration**
 - You're obfuscating **multi-file projects**
@@ -247,7 +247,7 @@ Nuitka compiles Python to standalone executables.
 
 3. **Benefits**:
    - Code stays on your machine
-   - Modern Python 3.8-3.14 support
+   - Modern Python 3.9-3.14 support
    - Batch processing for directories
 
 ---
@@ -279,7 +279,7 @@ This honest framing is part of why pyobfus is priced at $45 single-tier instead 
 - Open-source trust and auditability
 - Pure Python output without native dependencies
 - Cross-platform compatibility from a single build
-- Modern Python 3.8-3.14 support
+- Modern Python 3.9-3.14 support
 
 **Get started:**
 ```bash
