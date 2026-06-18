@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-06-18
+
+**Build-fusion release.** The v0.5 Pro mechanisms are now wired into the main
+`pyobfus` CLI as opt-in flags, composing correctly with Core name-mangling and
+string-encoding (the interleave validated by the 2026-06-18 design probe: vault
+runs as a PRE-pass; opacity and seal as POST-passes over the final mangled
+bytecode).
+
+### Added — Pro build flags (single-file / `--no-cross-file`, like existing Pro features)
+
+- **`--selective-opacity`** (P2-1) — AES-256-GCM-encrypt functions marked
+  `@opacity(Layer.ENCRYPTED)`; lazy `__code__` materialization at runtime.
+- **`--seal-code`** (P2-9) — bytecode integrity seal for `@seal_code` functions,
+  hashed against the final obfuscated bytecode (ciphertext for L3 functions).
+- **`--vault`** (P2-11) — rewrite `vault_secrets({...})` into an encrypted
+  runtime `Vault` (secrets never appear as plaintext in the output).
+- **`--scrub-traceback`** (P2-10) — install a production traceback-encrypting
+  excepthook; the RSA private key is written to a `<output>.scrub.key.pem`
+  sidecar for reversing error IDs with `pyobfus-unscrub`.
+- **`--fingerprint <buyer-id>`** (P2-7) — derive a per-buyer deterministic L3
+  key for forensic watermarking / piracy traceback.
+- **`--expire-hard <ISO-date>`** (P2-8 subset) — inject a module-top expiry
+  check that refuses to import past the date.
+
+Note: like the existing Pro AST features (CFF, string-AES, …), these run in
+single-file / `--no-cross-file` mode, not cross-file directory mode.
+
+### Deferred to 0.5.2
+
+- `--bind-device` (runtime device-key substitution) and `--period` (run-count
+  counter file) — the P2-8 device/period subset needs careful runtime-key AST
+  rewriting.
+- `--opacity-config` TOML pattern rules — needs name-map coupling so config
+  patterns match pre-mangle qualnames; the decorator channel ships now.
+
+### Changed
+
+- README long-description refreshed (the 0.5.0 PyPI page kept the pre-3.8-drop
+  text; this release surfaces the corrected Python ≥3.9 / 1016-test copy).
+
+### Testing
+
+- Test suite **1016 → 1024** (+8 end-to-end build-fusion CLI tests). Zero regressions.
+
 ## [0.5.0] - 2026-06-18
 
 **Patent milestone release.** The six v0.5 Pro mechanisms that were held back

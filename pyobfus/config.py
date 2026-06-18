@@ -90,6 +90,14 @@ class ObfuscationConfig:
     license_bind_machine: bool = False  # Bind to current machine fingerprint
     license_max_runs: int = 0  # Maximum run count (0 = unlimited)
 
+    # v0.5.1 patent-targeted Pro mechanisms (build-fusion; Pro only)
+    selective_opacity: bool = False  # P2-1: encrypt @opacity(Layer.ENCRYPTED) functions
+    seal_code: bool = False  # P2-9: bytecode integrity seal for @seal_code functions
+    vault: bool = False  # P2-11: encrypt vault_secrets({...}) into a runtime Vault
+    scrub_traceback: bool = False  # P2-10: encrypt production tracebacks
+    fingerprint: Optional[str] = None  # P2-7: per-buyer deterministic L3 key (buyer id)
+    expire_hard: Optional[str] = None  # P2-8 (subset): module-top expire_check(ISO date)
+
     # Performance options
     max_workers: Optional[int] = None  # None = auto (cpu_count), 1 = sequential
 

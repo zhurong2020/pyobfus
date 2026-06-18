@@ -41,6 +41,12 @@ except ImportError:
     pyobfus_pro = None  # type: ignore[assignment]
     PRO_AVAILABLE = False
 
+# v0.5.1 build-fusion helper (orchestrates the patent-targeted Pro source passes)
+try:
+    from pyobfus_pro import build_fusion as _build_fusion  # type: ignore[import]
+except ImportError:
+    _build_fusion = None  # type: ignore[assignment]
+
 
 @click.command()
 @click.argument("input_path", type=click.Path(exists=True), required=False)
@@ -163,6 +169,37 @@ except ImportError:
     type=int,
     default=0,
     help="Set maximum run count for obfuscated code (0=unlimited, Pro feature)",
+)
+@click.option(
+    "--selective-opacity",
+    is_flag=True,
+    help="Encrypt @opacity(Layer.ENCRYPTED) functions with AES-256-GCM (Pro, v0.5.1)",
+)
+@click.option(
+    "--seal-code",
+    is_flag=True,
+    help="Bytecode integrity seal for @seal_code functions (Pro, v0.5.1)",
+)
+@click.option(
+    "--vault",
+    "vault_flag",
+    is_flag=True,
+    help="Encrypt vault_secrets({...}) into a runtime String Vault (Pro, v0.5.1)",
+)
+@click.option(
+    "--scrub-traceback",
+    is_flag=True,
+    help="Encrypt production tracebacks; reverse with pyobfus-unscrub (Pro, v0.5.1)",
+)
+@click.option(
+    "--fingerprint",
+    type=str,
+    help="Per-buyer deterministic forensic watermark / L3 key (buyer id, Pro, v0.5.1)",
+)
+@click.option(
+    "--expire-hard",
+    type=str,
+    help="Module-top crypto-bound expiry check, ISO date (Pro, v0.5.1; distinct from --expire)",
 )
 @click.option(
     "--preset",
@@ -298,6 +335,12 @@ def main(
     expire: Optional[str],
     bind_machine: bool,
     max_runs: int,
+    selective_opacity: bool,
+    seal_code: bool,
+    vault_flag: bool,
+    scrub_traceback: bool,
+    fingerprint: Optional[str],
+    expire_hard: Optional[str],
     preset: Optional[str],
     list_presets: bool,
     stats: bool,
@@ -550,12 +593,21 @@ def main(
 
         # Handle Pro feature flags
         license_embedding_requested = expire or bind_machine or max_runs > 0
+        fusion_requested = (
+            selective_opacity
+            or seal_code
+            or vault_flag
+            or scrub_traceback
+            or fingerprint
+            or expire_hard
+        )
         pro_features_requested = (
             control_flow
             or string_encryption
             or anti_debug
             or dead_code
             or license_embedding_requested
+            or fusion_requested
         )
         if pro_features_requested:
             # Check if user has Pro access (license or trial)
@@ -611,6 +663,40 @@ def main(
                 config.license_max_runs = max_runs
                 if verbose:
                     click.echo(f"Enabled: Run Limit ({max_runs} runs)")
+
+            # v0.5.1 patent-targeted Pro mechanisms (build-fusion)
+            if selective_opacity:
+                config.selective_opacity = True
+                if verbose:
+                    click.echo("Enabled: Selective Opacity (P2-1)")
+            if seal_code:
+                config.seal_code = True
+                if verbose:
+                    click.echo("Enabled: @seal_code integrity (P2-9)")
+            if vault_flag:
+                config.vault = True
+                if verbose:
+                    click.echo("Enabled: Runtime String Vault (P2-11)")
+            if scrub_traceback:
+                config.scrub_traceback = True
+                if verbose:
+                    click.echo("Enabled: Traceback scrubbing (P2-10)")
+            if fingerprint:
+                config.fingerprint = fingerprint
+                if verbose:
+                    click.echo("Enabled: Forensic watermark (P2-7)")
+            if expire_hard:
+                config.expire_hard = expire_hard
+                if verbose:
+                    click.echo(f"Enabled: Hard expiry check ({expire_hard})")
+
+            if fusion_requested and cross_file and Path(input_path).is_dir():
+                click.echo(
+                    "Note: v0.5.1 Pro mechanisms run per-file and (like existing "
+                    "Pro features) are not applied in cross-file directory mode. "
+                    "Use --no-cross-file or a single file.",
+                    err=True,
+                )
 
         # Determine if input is file or directory
         input_path_obj = Path(input_path)
@@ -854,8 +940,18 @@ def _obfuscate_file(
     if verbose:
         click.echo(f"\nObfuscating: {input_file}")
 
-    # Parse file
-    tree = ASTParser.parse_file(input_file)
+    # Parse file. v0.5.1 Pro fusion: the vault PRE-pass must run on the source
+    # before Core touches it, so vault_secrets({...}) literals are encrypted to
+    # bytes before the string-encoder would otherwise mangle them.
+    _fusion = (
+        config.level == "pro" and _build_fusion is not None and _build_fusion.fusion_enabled(config)
+    )
+    if _fusion:
+        source_text = input_file.read_text(encoding="utf-8")
+        source_text = _build_fusion.apply_pre_passes(source_text, config)
+        tree = ASTParser.parse_string(source_text, filename=str(input_file))
+    else:
+        tree = ASTParser.parse_file(input_file)
 
     # Count lines for Community Edition limits
     line_count = ASTParser.count_lines(tree)
@@ -1031,12 +1127,37 @@ def _obfuscate_file(
     # Generate code
     obfuscated_code = CodeGenerator.generate(transformed_tree)
 
+    # v0.5.1 Pro fusion POST-passes: opacity (encrypt final mangled bytecode),
+    # seal (hash final bytecode / ciphertext for L3), scrub (excepthook), and
+    # the hard-expiry check. These run on the generated source, so they capture
+    # the fully-obfuscated output and their emitted infra is never re-mangled.
+    if _fusion:
+        scrub_key_path = output_file.with_suffix(output_file.suffix + ".scrub.key.pem")
+        obfuscated_code = _build_fusion.apply_post_passes(
+            obfuscated_code,
+            config,
+            module_qualname=input_file.stem,
+            scrub_key_path=scrub_key_path,
+        )
+        if verbose:
+            enc, _ = _build_fusion.assignments_summary(obfuscated_code)
+            if config.selective_opacity:
+                click.echo(f"  Selective Opacity: {enc} function(s) L3-encrypted")
+            if config.scrub_traceback:
+                click.echo(f"  Scrub keypair: {scrub_key_path} (keep private)")
+
     # Add header comment
     obfuscated_code = CodeGenerator.add_header_comment(obfuscated_code, str(input_file))
 
     # Write output
     if not dry_run:
-        CodeGenerator.generate_to_file(transformed_tree, output_file)
+        if _fusion:
+            # The fusion post-passes transformed the source string, so write it
+            # directly rather than regenerating from the (pre-fusion) tree.
+            output_file.parent.mkdir(parents=True, exist_ok=True)
+            output_file.write_text(obfuscated_code, encoding="utf-8")
+        else:
+            CodeGenerator.generate_to_file(transformed_tree, output_file)
         if verbose:
             click.echo(f"  Output: {output_file}")
     else:
