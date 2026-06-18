@@ -224,11 +224,15 @@ gh api repos/zhurong2020/pyobfus --jq '.topics' | tr ',' '\n' | grep -i pyarmor 
 > - **Estimated 申请号 receipt**: late May / early June 2026. **v0.5 public release earliest**: ~mid-June 2026 (after 申请号 + Path C 解禁 of `pyobfus-pro-dev` private code → public `pyobfus_pro/`).
 > - All patent draft content + tax certificates + ID card + session log are in `pyobfus-legal/` (off-repo, gitignored at workspace level, contains PII + Path C confidential). `~/.claude/projects/.../memory/patent_draft_v1_2026-05-10.md` carries forward state for future sessions.
 
-> **2026-06-05 update — FILED + ACCEPTED, now in formality correction**:
+> **2026-06-17 update — 🟢 PATENT GATE CLEARED, v0.5 release unblocked**:
+> - **初步审查合格通知书 issued 2026-06-17** (发文序号 2026061200904340, examiner 陈立英). The 2026-06-11 paragraph-numbering 补正 was accepted; the formality defect is resolved and the application status is clean. Per 专利法第 34 条 the application now proceeds to 18-month publication (≈2027-11).
+> - **The Path C public-release gate condition ("补正 resolved + application status clean") is MET.** Priority date (2026-05-22) is secured, so public disclosure of the 🔒 v0.5 mechanisms no longer risks the application. The 🔒 rows below are **unblocked** — they ship via the controlled Phase 5 merge (see `docs/V0.5_RELEASE_PLAN.md`).
+> - **Only remaining hard deadline**: substantive-examination request within 3 years of 申请日 (≈2029-05-22); the 实审费 375 is already paid, so this is low-pressure.
+> - Latest patent state for cold-start: off-repo `pyobfus-legal/patent/SESSION_LOG_20260617.md` + memory `patent_correction_notice_2026-06-01.md`.
+>
+> **2026-06-05 update — FILED + ACCEPTED, then in formality correction (historical)**:
 > - **Filed + accepted**: 申请号 **202610712171X** · 申请日 2026-05-22 (submitted 2026-05-22 via web, NOT CPC client). 受理通知书 issued. All fees paid in full (1610 yuan, verified via official 审查信息查询). Shared 2026 fee-reduction recordation `202600565835` approved (cac-plus-ip reuses it).
-> - 🔴 **One open hard deadline**: a 补正通知书 (formality correction, issued 2026-06-01) requires re-submitting the specification with system-generated paragraph numbers, **answer by ~2026-08-01 or the application is deemed withdrawn**. Root cause + workflow tracked off-repo + in memory `patent_correction_notice_2026-06-01.md`. Examiner-call planned 2026-06-08.
-> - ⚠️ **Path C gate TIGHTENED**: the "ship to public on 申请号 receipt" wording in the 🔒 rows below is **superseded** — 申请号 is now in hand, but the v0.5-mechanism public-release gate is now **"after the 补正 is resolved and the application status is clean"**, NOT merely 申请号 receipt. Do not push any v0.5 patent-gated mechanism public until then.
-> - Latest patent state for cold-start: off-repo `pyobfus-legal/patent/SESSION_LOG_20260605.md` + memory `patent_correction_notice_2026-06-01.md`.
+> - A 补正通知书 (formality correction, issued 2026-06-01) required re-submitting the specification with system-generated paragraph numbers; **answered 2026-06-11**, accepted per the 2026-06-17 update above.
 
 ### Already in `docs/ROADMAP.md` v0.5+ (still valid · re-prioritized · patent-gated marked 🔒)
 

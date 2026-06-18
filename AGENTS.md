@@ -74,14 +74,20 @@ cloudflare-worker/  # Pro license verification Worker
   hook blocks a fixed set of personal identifiers — keep them out of code,
   commits, and docs.
 
-## ⚠️ Patent gate — read before implementing v0.5 Pro mechanisms
+## 🟢 Patent gate — CLEARED 2026-06-17 (v0.5 Pro mechanisms now releasable)
 
-A subset of v0.5 Pro mechanisms is under an active patent application. **Do not
-implement or publicly commit those mechanisms in this repo** until the patent
-formality correction is resolved and the application status is clean. Naming a
-feature in `docs/ROADMAP.md` is fine; revealing its algorithmic mechanism in a
-public commit, branch, PR, or issue is not. See `docs/POST_V0.4_TODO.md` for the
-current gate status before touching anything marked 🔒.
+A subset of v0.5 Pro mechanisms was held back under an active patent application
+(申请号 202610712171X, priority date 2026-05-22). The gate condition — *patent
+formality correction resolved and application status clean* — **was met on
+2026-06-17** when CNIPA issued the 初步审查合格通知书 (preliminary examination
+passed). Priority is secured, so public disclosure of these mechanisms no longer
+risks the application.
+
+These mechanisms now ship to the public repo via a **controlled Phase 5 merge**
+(deliberate, one-time public disclosure) — see `docs/V0.5_RELEASE_PLAN.md`. Until
+that merge lands, still don't leak unreleased mechanism detail in incidental
+commits. The permanent rules remain: `pyobfus-legal/` never enters git (PII), and
+Pro/Core source stays separated. See `docs/POST_V0.4_TODO.md` § P1 for status.
 
 ## Where to look next
 

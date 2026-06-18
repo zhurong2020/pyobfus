@@ -12,29 +12,30 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 Snapshot 2026-05-07 (v0.4 distribution leg 完整闭环之后)。包含 30-second resume cheat sheet · 4 个 self-actionable P0 item（CI smoke test + PEP 740 attestation + server.json _meta + dev.to voice pass）· v0.5 work（含 3 个 2026-05 research 发现的新机会：PEP 750 t-string handler · FastMCP 3.0 升级 · `--target claude-skill` preset）· passive waiting items · do-not-do list · 3 周建议节奏。
 
-### 🔥 2026-06-05 active state — pyobfus v0.5 中国发明专利申请（补正阶段）
+### 🟢 2026-06-17 active state — 发明专利初步审查合格，v0.5 公开发布已解锁
 
-**当前最高优先级活动**：发明专利已**提交并缴费、受理通知书已下发**，现处于初审**形式补正**阶段，需在期限内答复补正通知书。
+**当前最高优先级活动**：发明专利**初步审查合格**，段号补正被认可、形式缺陷办结 → **Path C 公开发布 gate 已满足**，进入 **v0.5 公开发布准备（Phase 5）**。
 
 - ✅ 已提交并受理（申请号 `202610712171X` · 申请日/优先权日 2026-05-22 · 17 项权利要求）
-- ✅ 费用全部缴清（共 1610 元 · 2026-05-22 一次缴清 · 含申请费类 1235 与实审费 375 · 官方审查信息查询「费足」核实 · 7-22 缴费期限与 2029 实审费期限均关闭）
-- 🔴 **当前唯一硬期限 = 答复补正通知书**（发文 2026-06-01 · 说明书段号需系统自带 · **~2026-08-01 前答复，逾期申请视为撤回**）
-- 📋 流程：先电话审查员问清提交方式 → 重提合规说明书/补正书 → 补正办结、申请状态干净 → **方可解锁 Path C Phase 5（v0.5 公开 release）**
+- ✅ 费用全部缴清（共 1610 元 · 2026-05-22 一次缴清 · 含申请费类 1235 与实审费 375 · 官方审查信息查询「费足」核实）
+- ✅ **段号补正答复**（2026-06-11 提交）→ **初步审查合格通知书**（发文 2026-06-17 · 发文序号 2026061200904340 · 审查员 陈立英），据专利法第 34 条进入「申请日满 18 个月（≈2027-11）即行公布」轨道
+- ✅ **补正硬期限彻底关闭**；下一硬期限仅剩实审请求（申请日起 3 年 ≈2029-05-22，实审费 375 已缴）
+- 🚀 **当前任务 = v0.5 公开发布准备（Phase 5）**：把 `pyobfus-pro-dev/pyobfus_pro_v05/` 的 6 项专利机制并入公开 `pyobfus_pro/` → 版本 bump → 跨 Python 测试 → PyPI 发布（详见 [`docs/POST_V0.4_TODO.md`](docs/POST_V0.4_TODO.md) § P1 + `docs/V0.5_RELEASE_PLAN.md`）
 
-**Cold-start session 第一句话应问 user**：「补正答复办妥了吗？（说明书段号那件）」
+**Cold-start session 第一句话应问 user**：「v0.5 公开发布进行到哪一步了？（Pro 机制并入公开 repo / PyPI 发布）」
 
 **Cold-start 资料定位**（按读取优先级）：
 
 | 优先级 | 文件 | 用途 |
 |---|---|---|
-| 1 | `~/projects/pyobfus-legal/patent/SESSION_LOG_20260605.md` | 最新时间线 + 补正硬期限 + 费用全清 + next action（off-repo · 含完整 narrative）|
-| 2 | `~/.claude/projects/-mnt-c-onedrive-msft-OneDrive---MSFT-rong-3-job-program-pyobfus/memory/patent_correction_notice_2026-06-01.md` | 补正硬期限 + 根因 + 受理/费用状态 |
-| 3 | `~/projects/pyobfus-legal/patent/08_提交记录/` | 四份官方通知书正本（受理 / 收费减缴 / 电子回执 / 补正）|
-| 4 | `https://github.com/zhurong2020/pyobfus/blob/main/docs/POST_V0.4_TODO.md` § P1 | 公开版状态块 |
+| 1 | `~/projects/pyobfus-legal/patent/SESSION_LOG_20260617.md`（最新）+ `SESSION_LOG_20260611.md` | 最新时间线 + 初审合格 + next action（off-repo · 完整 narrative）|
+| 2 | `~/.claude/projects/-mnt-c-onedrive-msft-OneDrive---MSFT-rong-3-job-program-pyobfus/memory/patent_correction_notice_2026-06-01.md` | 初审合格结论 + 补正根因/历史 + 受理/费用状态 |
+| 3 | `~/projects/pyobfus-legal/patent/08_提交记录/` | 五份官方通知书正本（受理 / 收费减缴 / 电子回执 / 补正 / **初步审查合格**）|
+| 4 | `docs/V0.5_RELEASE_PLAN.md` + `https://github.com/zhurong2020/pyobfus/blob/main/docs/POST_V0.4_TODO.md` § P1 | v0.5 发布 checklist + 公开版状态块 |
 
 **跨项目联动**：cac-plus-ip 与本 pyobfus 共享同一个人申请人 + 同一 2026 年度费减备案；`~/projects/cac-plus-ip/CLAUDE.md` 含完整跨项目索引。详见 memory `ip_workflow_cross_project.md`。
 
-**Path C 红线**（**持续生效至 v0.5 公开发布，即补正办结后**；注意：申请号虽已到手，但 v0.5 mechanism 的公开限制不解除，直到正式 release）：pyobfus-legal/ 永不入 git；pyobfus-pro-dev v0.5 mechanism 永不 push 公开 repo；公开 commits 中不出现 v0.5 patent-gated 内部符号（命名清单与具体禁忌见 memory `pro_disclosure_finding_2026-05-09.md` + `pyobfus_patent_strategy.md`）。
+**Path C 红线（gate 解除后的残留约束）**：① `pyobfus-legal/` **永不入 git**（含 PII，永久有效）；② v0.5 Pro 机制的公开发布**走 Phase 5 受控合并**（一次性、刻意公开），合并前公开 commit 仍不得泄露未发布机制——但 gate 本身（"补正办结前不得公开 v0.5 机制"）**已于 2026-06-17 解除**。完整命名清单见 memory `pro_disclosure_finding_2026-05-09.md` + `pyobfus_patent_strategy.md`。
 
 ## 项目概述
 
