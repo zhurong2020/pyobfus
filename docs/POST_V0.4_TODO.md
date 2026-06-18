@@ -10,13 +10,11 @@
 
 **0.5.0 published to PyPI 2026-06-18** (6 v0.5 Pro mechanisms public, patent gate cleared 2026-06-17, Python 3.8 dropped). **0.5.1 (`pyobfus build --flag` fusion) is built + committed on branch `release/v0.5.1` but HELD — not pushed/tagged/published** (maintainer will pick the time). Open items, roughly in priority order:
 
-1. **Publish 0.5.1 when ready** — push `release/v0.5.1` → merge main → tag `v0.5.1` (triggers `release.yml` OIDC PyPI publish). This also refreshes the PyPI long-description (the 0.5.0 page is frozen on pre-3.8-drop text). 1024 tests green, `dist/` already twine-checked.
-2. **pyobfus-mcp adjustments (→ 0.3.1)** — *not strictly required to keep working*, but warranted now that 0.5.0 is public + the patent gate is cleared:
-   - Bump the `pyobfus` dependency floor `>=0.4.1` → `>=0.5.0` in `pyobfus_mcp/pyproject.toml` (align; pulls the new mechanisms).
-   - Refresh the **pro-funnel copy** in `pyobfus_mcp/pyobfus_mcp/tools.py` (`recommend_tier`, `start_pro_trial`, the string-encryption/anti-debug recommendation text): it currently only names the *old* Pro features (AES-256 string encryption, anti-debug). The patent-safe-copy gate (old §"0.4.1 announcement") is **now lifted** — the copy may openly describe Selective Opacity / forensic watermarking / Runtime Vault / `--scrub-traceback` / `@seal_code` as v0.5 Pro mechanisms (available via the `pyobfus_pro` API + `pyobfus-unscrub` now; as `pyobfus build` flags once 0.5.1 ships).
-   - `requires-python` is already `>=3.10` (≥ pyobfus's new 3.9 floor) — no change needed.
-   - No new MCP tools required; the existing 8 stay valid. (An `unscrub` tool is a poor fit — it needs the server-side private key.)
-   - Any of the above = content change → bump **pyobfus-mcp 0.3.0 → 0.3.1**, republish (`mcp-v0.3.1` tag → `release.yml`), then MCP Registry + Glama re-index (registry rejects same-version republish).
+1. **Publish 0.5.1 + MCP 0.3.1 when ready** (both built + held on `release/v0.5.1`):
+   - pyobfus 0.5.1: push `release/v0.5.1` → merge main → tag `v0.5.1` (→ `release.yml` OIDC PyPI publish). Also refreshes the frozen 0.5.0 long-description.
+   - **then** pyobfus-mcp 0.3.1: tag `mcp-v0.3.1` (→ same workflow) → MCP Registry + Glama re-index. **Order matters**: MCP 0.3.1 depends on `pyobfus>=0.5.1`, so 0.5.1 must hit PyPI first.
+   - 1024 core tests + 73 MCP tests green; both `dist/` twine-checked.
+2. ✅ **pyobfus-mcp 0.3.1 — DONE on `release/v0.5.1` (held)**: pro-funnel copy (`recommend_tier` / `start_pro_trial` / `check_obfuscation_risks`) now names the v0.5 mechanisms (patent-safe-copy gate lifted); dep floor `>=0.4.1` → `>=0.5.1`; version bumped in pyproject + server.json + `__init__`. No tool-surface change (8 tools). Just needs publishing (item 1).
 3. **0.5.2 — finish the P2-8 / opacity-config surface** (deferred from 0.5.1): `--bind-device` (runtime device-key substitution), `--period` (run-count counter file), `--opacity-config` TOML pattern rules (needs name-map coupling so patterns match pre-mangle qualnames). Design notes in `docs/V0.5_RELEASE_PLAN.md`.
 4. **Re-check PEP 740 attestations** — PyPI's `provenance` field read `False` on the 0.5.0 wheel despite `attestations: true` in `release.yml`. Verify on the 0.5.0/0.5.1 page; if genuinely missing, debug `gh-action-pypi-publish` config.
 5. **Distribution (Phase 5.6, now unblocked)** — JOSS submission (was gated on 申请号; cite "patent pending CN 202610712171X"); launch wave (HN/Reddit/dev.to/CN drafts in `_drafts/`, run through AI-detector gate first); GitHub Discussions v0.5 priority poll.
