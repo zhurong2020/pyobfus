@@ -24,7 +24,7 @@
 
 ## 30-Second Resume
 
-**Where we are**: pyobfus 0.4.1 + pyobfus-mcp 0.3.0 published (2026-06-11 · AI-native agent surface: protect_project / --trace-marker / next_tool / Claude skill / canonical AGENTS.md · OIDC + PEP 740 attestations · MCP Registry 0.3.0 isLatest) · Glama Quality A · 727 core + 73 MCP tests / 91% coverage / Python 3.8-3.14.
+**Where we are** (2026-06-18): **pyobfus 0.5.0 published to PyPI** (6 v0.5 patent-targeted Pro mechanisms now public · patent gate cleared 初审合格 2026-06-17 · Python 3.8 dropped, floor 3.9 · Beta→Production/Stable · 1016 tests / ~89% coverage / Python 3.9-3.14 × 3 OS). **Built + HELD on branch `release/v0.5.1`, not yet published**: pyobfus **0.5.1** (`pyobfus build --flag` fusion, 1024 tests), pyobfus-mcp **0.3.1** (pro-funnel copy names v0.5 mechanisms, dep `>=0.5.1`), and the **JOSS paper** draft (`paper/`). Publish order when ready: `v0.5.1` tag → then `mcp-v0.3.1` tag. Prior baseline (pre-session): 0.4.1 + mcp 0.3.0 · Glama Quality A.
 
 > **2026-06-05 Glama introspection — partial fix** (commit `bbeefb8`): Glama listing was stuck showing 5 tools and its API returned `tools:[]`. The 06-05 hypothesis was that `pyobfus_mcp/Dockerfile`'s pin (`0.1.1`→`0.2.0`) drove it. That repo-Dockerfile fix was correct to ship, but it was **NOT the operative lever** — see the 06-08 correction below.
 >

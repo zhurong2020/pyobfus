@@ -21,7 +21,8 @@ Snapshot 2026-05-07 (v0.4 distribution leg 完整闭环之后)。包含 30-secon
 - ✅ **段号补正答复**（2026-06-11 提交）→ **初步审查合格通知书**（发文 2026-06-17 · 发文序号 2026061200904340 · 审查员 陈立英），据专利法第 34 条进入「申请日满 18 个月（≈2027-11）即行公布」轨道
 - ✅ **补正硬期限彻底关闭**；下一硬期限仅剩实审请求（申请日起 3 年 ≈2029-05-22，实审费 375 已缴）
 - ✅ **v0.5.0 已发布**：6 项专利机制（P2-1/7/8/9/10/11）已并入公开 `pyobfus_pro/`，1016 测试 / 砍 3.8 / Beta→Production/Stable，tag `v0.5.0` 经 OIDC Trusted Publishing 发到 PyPI。机制经 `pyobfus_pro` API + `pyobfus-unscrub` CLI + standalone passes 可用
-- ⏭️ **下一步（0.5.1）**：`pyobfus build --flag` 融合（交错顺序设计见 `docs/V0.5_RELEASE_PLAN.md` 0.5.1 节）；分发项（JOSS 现已解锁 / launch wave）见 Phase 5.6；残留复核 = PyPI provenance/PEP740 attestation 是否真上链
+- ⏸️ **已构建·HELD 在 `release/v0.5.1`（未发布）**：① pyobfus **0.5.1**（`pyobfus build --flag` 融合,1024 测试,设计见 `docs/V0.5_RELEASE_PLAN.md` 0.5.1 节)② pyobfus-mcp **0.3.1**(pro-funnel 文案点名 v0.5 机制 · dep `>=0.5.1`)③ **JOSS 论文草稿** `paper/`(个人署名 · 已 de-AI)。发布顺序:`v0.5.1` tag → 再 `mcp-v0.3.1` tag。
+- ⏭️ **更后续**:0.5.2(`--bind-device`/`--period`/`--opacity-config`)· 分发(JOSS 投稿 / launch wave / Discussions poll)· 复核 PyPI PEP740 attestation(0.5.0 provenance=False)。详见 `docs/POST_V0.4_TODO.md` 顶部「Post-0.5.0 follow-ups」
 
 **Cold-start session 第一句话应问 user**：「0.5.0 之后想推进 0.5.1 融合，还是先做 launch / JOSS 分发？」
 
