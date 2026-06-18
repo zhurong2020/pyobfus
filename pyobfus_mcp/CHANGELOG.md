@@ -6,6 +6,24 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+## [0.3.1] — 2026-06-18
+
+### Changed
+
+- **Pro-funnel copy now names the v0.5 Pro mechanisms.** With pyobfus 0.5.0
+  published and the patent application past preliminary examination, the
+  patent-safe-copy constraint is lifted. `recommend_tier` and `start_pro_trial`
+  now surface Selective Opacity, forensic watermarking, the Runtime String
+  Vault, `@seal_code`, and `--scrub-traceback` (available as `pyobfus build`
+  flags in 0.5.1 and via the `pyobfus_pro` API), not just the older AES-256 /
+  anti-debug set. `check_obfuscation_risks` recommends the Runtime String Vault
+  alongside string encryption when sensitive literals are found.
+- **Dependency floor raised to `pyobfus>=0.5.1`** (was `>=0.4.1`), since the
+  copy references the 0.5.1 build-flag surface. Publish pyobfus 0.5.1 first.
+
+No tool surface change (still 8 tools); no MCP Registry server.json change
+beyond the version bump.
+
 ## [0.3.0] — 2026-06-11
 
 ### Added

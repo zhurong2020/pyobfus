@@ -8,13 +8,13 @@
     "source": "github",
     "subfolder": "pyobfus_mcp"
   },
-  "version": "0.3.0",
+  "version": "0.3.1",
   "packages": [
     {
       "registryType": "pypi",
       "registryBaseUrl": "https://pypi.org",
       "identifier": "pyobfus-mcp",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "transport": { "type": "stdio" }
     }
   ],

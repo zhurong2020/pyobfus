@@ -247,11 +247,13 @@ def _pro_value_for_scan(
     rationale_parts: List[str] = []
     if sensitive_literal_count > 0:
         applicable.append("string_encryption")
+        applicable.append("runtime_vault")
         rationale_parts.append(
             f"Found {sensitive_literal_count} likely-sensitive string "
             f"literal occurrence(s) (API keys, tokens, opaque bearer values). "
-            f"Pro's AES-256 string encryption would hide these from "
-            f"`strings`-style inspection of the obfuscated bytes."
+            f"Pro's AES-256 string encryption hides these from `strings`-style "
+            f"inspection; the v0.5 Runtime String Vault (vault_secrets({{...}})) "
+            f"goes further with lazy per-entry decryption."
         )
     if high_severity_findings > 0:
         applicable.append("anti_debugging")
@@ -620,7 +622,11 @@ def recommend_tier(path: str) -> Dict[str, Any]:
     }
     pro_action = {
         **_pro_unlock(),
-        "estimated_protection": "high (adds AES-256 string encryption + anti-debugging)",
+        "estimated_protection": (
+            "high (adds AES-256 string encryption + anti-debugging, plus the v0.5 "
+            "mechanisms: Selective Opacity, forensic watermarking, Runtime String "
+            "Vault, @seal_code, --scrub-traceback)"
+        ),
     }
 
     payload: Dict[str, Any] = {
@@ -634,8 +640,12 @@ def recommend_tier(path: str) -> Dict[str, Any]:
             "Reverse stack-trace mapping (--save-mapping + --unmap)",
         ],
         "pro_tier_capabilities": [
-            "AES-256 string encryption",
-            "Anti-debugging hooks",
+            "AES-256 string encryption, control-flow flattening, dead-code injection, anti-debugging",
+            "Selective Opacity (v0.5) — per-symbol AES-256-GCM encryption of chosen functions with lazy code materialization",
+            "Forensic watermarking (v0.5) — per-buyer deterministic builds for piracy traceback",
+            "Runtime String Vault (v0.5) — encrypted KV namespace for runtime secrets",
+            "@seal_code bytecode integrity + --scrub-traceback production traceback encryption (v0.5)",
+            "Available as `pyobfus build` flags (v0.5.1) and the `pyobfus_pro` API",
             "Unlimited files and lines of code",
         ],
         "free_action": free_action,
@@ -714,8 +724,11 @@ def start_pro_trial() -> Dict[str, Any]:
         "trial_command": unlock["trial_command"],
         "trial_duration_days": unlock["trial_duration_days"],
         "trial_features": [
-            "AES-256 string encryption",
-            "Anti-debugging hooks",
+            "AES-256 string encryption, control-flow flattening, dead-code injection, anti-debugging",
+            "Selective Opacity (v0.5) — per-symbol AES-256-GCM encryption of chosen functions",
+            "Forensic watermarking (v0.5) — per-buyer deterministic builds for piracy traceback",
+            "Runtime String Vault (v0.5) — encrypted KV namespace for runtime secrets",
+            "@seal_code bytecode integrity + --scrub-traceback production traceback encryption (v0.5)",
             "Unlimited files and lines of code",
         ],
         "post_trial_options": {
