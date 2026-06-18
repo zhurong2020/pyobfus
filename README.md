@@ -121,6 +121,21 @@ The following advanced features are available with a Pro license:
   - `--preset maximum` - Highest security with all protections
   - `--list-presets` - View all presets
 
+#### New in v0.5.0 — patent-targeted mechanisms (CN 202610712171X)
+
+Six mechanisms ship as the `pyobfus_pro` API, the `pyobfus-unscrub` CLI, and
+standalone build passes. The combined `pyobfus build --flag` integration lands
+in 0.5.1.
+
+- **Selective Opacity** — per-symbol protection layers (transparent / ai-readable / obfuscated / AES-256-GCM encrypted with lazy `__code__` materialization).
+- **Forensic watermarking** — per-buyer deterministic key derivation for piracy traceback.
+- **License binding combo** — device / expiry / run-count binding woven into the AES-GCM decryption path (no separate patchable license check).
+- **`@seal_code`** — build-time bytecode integrity hash; runtime in-memory-patch detection.
+- **`--scrub-traceback`** — production traceback encryption (RSA-2048 + AES-256-GCM); reverse error IDs with the new `pyobfus-unscrub` CLI.
+- **Runtime String Vault** — encrypted KV namespace for runtime secrets with lazy per-entry decryption.
+
+> Requires Python ≥ 3.9 as of v0.5.0 (3.8 dropped, EOL 2024-10).
+
 See [ROADMAP.md](docs/ROADMAP.md) for the full feature timeline.
 
 ## Try Pro Features FREE

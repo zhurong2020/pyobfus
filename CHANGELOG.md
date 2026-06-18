@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-06-18
+
+**Patent milestone release.** The six v0.5 Pro mechanisms that were held back
+under an active Chinese invention-patent application (CN 202610712171X, priority
+date 2026-05-22) are now public: the application passed preliminary examination
+(初步审查合格) on 2026-06-17, securing the priority date, so disclosure no longer
+risks the filing.
+
+### Added — Pro Edition mechanisms (patent-targeted)
+
+These ship as the `pyobfus_pro` API, the `pyobfus-unscrub` developer CLI, and
+standalone build passes. Fusing them into a single `pyobfus build --flag`
+combined run (alongside Core name-mangling) needs additional Core
+parameterization and lands in **0.5.1**.
+
+- **Selective Opacity (P2-1)** — per-symbol protection layers (transparent /
+  ai-readable / obfuscated / encrypted); L3 functions are AES-256-GCM encrypted
+  with lazy `__code__` materialization. `pyobfus_pro.opacity` + `transformers.opacity`.
+- **Forensic watermarking (P2-7)** — per-buyer deterministic key derivation
+  (`forensic_seed` / `WatermarkRNG` / `derive_layer_key`) for piracy traceback.
+- **License binding combo (P2-8)** — device / expiry / run-count binding woven
+  into the AES-GCM decryption path (`pyobfus_pro.license_binding`); the license
+  gate is the GCM tag check itself, with no separate patchable check.
+- **`@seal_code` integrity decorator (P2-9)** — build-time bytecode hash baked
+  in; runtime detection of in-memory patching, with layer-aware sealing for L3.
+- **`--scrub-traceback` (P2-10)** — production traceback encryption (hybrid
+  RSA-2048-OAEP + AES-256-GCM); developer reverses error IDs with the new
+  **`pyobfus-unscrub`** CLI.
+- **Runtime String Vault (P2-11)** — encrypted KV namespace for runtime secrets
+  with lazy per-entry decryption and schema-without-key queries.
+
+### Changed
+
+- **BREAKING: dropped Python 3.8** (EOL 2024-10). `requires-python` is now
+  `>=3.9`, removing the recurring `astunparse` CI flakes documented in
+  `docs/PYTHON38_COMPATIBILITY.md`.
+- Development Status classifier promoted **Beta → Production/Stable**.
+- `cryptography>=42.0`; added `tomli` backport for Python < 3.11 (opacity-config
+  TOML parser).
+
+### Testing
+
+- Test suite **727 → 1016** (+290 Pro-mechanism tests, 1 skip). Zero regressions.
+
 ## [0.4.1] - 2026-06-11
 
 ### Added — Core Features
