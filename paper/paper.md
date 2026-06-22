@@ -14,7 +14,7 @@ authors:
 affiliations:
   - name: Independent Researcher, Shanghai, China
     index: 1
-date: 18 June 2026
+date: 22 June 2026
 bibliography: paper.bib
 ---
 
