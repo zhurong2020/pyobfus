@@ -12,22 +12,23 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 Snapshot 2026-05-07 (v0.4 distribution leg 完整闭环之后)。包含 30-second resume cheat sheet · 4 个 self-actionable P0 item（CI smoke test + PEP 740 attestation + server.json _meta + dev.to voice pass）· v0.5 work（含 3 个 2026-05 research 发现的新机会：PEP 750 t-string handler · FastMCP 3.0 升级 · `--target claude-skill` preset）· passive waiting items · do-not-do list · 3 周建议节奏。
 
-### 🟢 2026-06-22 active state — pyobfus 0.5.1 + pyobfus-mcp 0.3.1 已发布到 PyPI
+### 🟢 2026-06-22 active state — pyobfus 0.5.2 + pyobfus-mcp 0.3.1 已发布到 PyPI
 
-**当前状态**：发明专利初审合格（2026-06-17，Path C gate 解除）→ v0.5.0（PyPI 2026-06-18）→ **0.5.1 + pyobfus-mcp 0.3.1 已发布（PyPI 2026-06-22）**，`release/v0.5.1` 已并入 main，无 held。本 session 另完成 **AI-agent 可发现性 Wave A**（见下）。
+**当前状态**：发明专利初审合格（2026-06-17，Path C gate 解除）→ v0.5.0（PyPI 2026-06-18）→ 0.5.1 + pyobfus-mcp 0.3.1（PyPI 2026-06-22）→ **0.5.2 已发布（PyPI 2026-06-22，PR #18）**，修两个 Py3.9/3.10 CI bug（见下），main 无 held。本 session 另完成 **AI-agent 可发现性 Wave A**（见下）。
 
 - ✅ 已提交并受理（申请号 `202610712171X` · 申请日/优先权日 2026-05-22 · 17 项权利要求）
 - ✅ 费用全部缴清（共 1610 元 · 2026-05-22 一次缴清 · 含申请费类 1235 与实审费 375 · 官方审查信息查询「费足」核实）
 - ✅ **段号补正答复**（2026-06-11 提交）→ **初步审查合格通知书**（发文 2026-06-17 · 发文序号 2026061200904340 · 审查员 陈立英），据专利法第 34 条进入「申请日满 18 个月（≈2027-11）即行公布」轨道
 - ✅ **补正硬期限彻底关闭**；下一硬期限仅剩实审请求（申请日起 3 年 ≈2029-05-22，实审费 375 已缴）
 - ✅ **v0.5.0 已发布**：6 项专利机制（P2-1/7/8/9/10/11）已并入公开 `pyobfus_pro/`，1016 测试 / 砍 3.8 / Beta→Production/Stable，tag `v0.5.0` 经 OIDC Trusted Publishing 发到 PyPI。机制经 `pyobfus_pro` API + `pyobfus-unscrub` CLI + standalone passes 可用
-- ✅ **0.5.1 已发布（2026-06-22）**：`pyobfus build --flag` 融合 6 机制,1024 测试,tag `v0.5.1` 经 OIDC + PEP 740 attestations 发 PyPI(run `27938471463`)。
+- ✅ **0.5.1 已发布（2026-06-22）**：`pyobfus build --flag` 融合 6 机制,tag `v0.5.1` 经 OIDC + PEP 740 attestations 发 PyPI(run `27938471463`)。
+- ✅ **0.5.2 已发布（2026-06-22，PR #18）**：修 0.5.1 build-fusion 两个 Py3.9/3.10 bug——① `--seal-code` 在 3.9/3.10 误报 `IntegrityError`(seal 哈希用 marshal 默认版本≥3,受字符串 interning 影响 → 钉到 marshal version 2);② `--vault` 在 3.9 抛 `zip() takes no keyword arguments`(`zip(strict=)` 是 3.10+ 才有 → 改普通 zip)。1025 测试,tag `v0.5.2` 经 OIDC + PEP 740 发 PyPI(release run `27963690396`,CI 全矩阵含 3.9/3.10 绿)。回归守卫 `tests/test_seal_runtime.py::TestMarshalVersionStability`。
 - ✅ **pyobfus-mcp 0.3.1 已发布（2026-06-22）**：pro-funnel 文案点名 v0.5 机制 · dep `>=0.5.1` · tag `mcp-v0.3.1` 发 PyPI + `mcp-publisher` 发 MCP Registry(0.3.1 isLatest)。
 - ✅ **AI-agent 可发现性 Wave A（2026-06-22）**：Smithery 经 **Skill 渠道** `zhurong2020/pyobfus-protect`（Smithery MCP 发布是远程网关、本地工具走不通,Skill 才对）+ mcp.so + `uvx` 零安装 + server.json 99 字描述(commit `826c576`/`49f4df3`)。报告:`docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`。
 - ✅ **JOSS 论文已投稿(2026-06-22)**:按 JOSS 2026 新 scope/format 重写(9 章节含 Research impact + AI usage disclosure · 1304 词)· 页面 `joss.theoj.org/papers/ef32f416f0f8789e388d955a69b2246d`(Software engineering · v0.5.1 · 财务 COI 已披露)· CI 编译过(`draft-pdf.yml`)· 等 editorialbot pre-review issue,后续答评审。详见 `docs/POST_V0.4_TODO.md` JOSS 段。
 - ⏭️ **更后续**:① **launch wave**(`_drafts/` · 按 AEO 结构写 · 过 AI 检测)② **0.5.2**(`--bind-device`/`--period`/`--opacity-config`)③ **3 个新功能机会**(ROADMAP P2-17/18/19:签名 provenance 清单 / LLM 反混淆抵抗 benchmark / `--preset ml`)④ ARD `ai-catalog.json` 早鸟 ⑤ 复核 PyPI PEP740 provenance ⑥ ~6/29 查 PulseMCP 是否自动收录。详见 `docs/POST_V0.4_TODO.md` 顶部「Forward TODO」。
 
-**Cold-start session 第一句话应问 user**：「0.5.1 + mcp 0.3.1 已发布、JOSS 论文已投稿(等 pre-review)。要做 launch wave、开 0.5.2 / 新功能(P2-17~19),还是有 JOSS 评审意见要处理?」
+**Cold-start session 第一句话应问 user**：「0.5.2 + mcp 0.3.1 已发布、JOSS 论文已投稿(等 pre-review)。要做 launch wave、开新功能(P2-17~19),还是有 JOSS 评审意见要处理?」
 
 **Cold-start 资料定位**（按读取优先级）：
 
@@ -46,7 +47,7 @@ Snapshot 2026-05-07 (v0.4 distribution leg 完整闭环之后)。包含 30-secon
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.9-3.14, AST, setuptools
-- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**v0.5.1，2026-06-22 发布** — 6 机制接进 `pyobfus build` flags · 1024 测试 · 0.5.0(06-18)首次公开机制 + 砍 3.8)
+- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**v0.5.2，2026-06-22 发布** — 修 Py3.9/3.10 的 `--seal-code`/`--vault` bug · 1025 测试 · 0.5.1 把 6 机制接进 `pyobfus build` flags · 0.5.0(06-18)首次公开机制 + 砍 3.8)
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**v0.3.1，2026-06-22 发布** — 8 tools: 6 community + 2 pro_funnel(`recommend_tier`/`start_pro_trial` · 文案点名 v0.5 机制) · dep `pyobfus>=0.5.1` · `uvx pyobfus-mcp` 零安装)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp` (active, isLatest=true · **0.3.1**)
 - **Smithery (Skill)**: https://smithery.ai/skills/zhurong2020/pyobfus-protect (2026-06-22 上线 · 本地工具走 Skill 渠道非 MCP 渠道) · **mcp.so**: 已收录
@@ -65,7 +66,7 @@ pyobfus/
 │   ├── transformers/   # AST 变换器
 │   └── cross_file/    # 跨文件混淆
 ├── pyobfus_pro/       # Pro Edition (商业许可)
-├── tests/             # 1024 测试用例 (90% coverage · 0.5.1 发布版)
+├── tests/             # 1025 测试用例 (90% coverage · 0.5.2 发布版)
 ├── examples/          # 示例代码
 ├── docs/              # 项目文档
 └── cloudflare-worker/ # 许可验证 Worker
