@@ -61,12 +61,18 @@ common cause of breakage in naive obfuscators. The JSON CLI and the MCP server
 expose these capabilities to agentic development workflows directly, rather than
 as a manual post-processing step.
 
-`pyobfus` was developed to protect a production cardiovascular-imaging research
-codebase, where the analysis pipeline had to be distributed to collaborators
-without exposing unpublished methods, and where the maintainers continued to
-debug the obfuscated build with AI assistance. That origin motivates its design
-as reusable infrastructure for protecting intellectual property in AI-assisted
-development workflows, rather than a single-purpose script.
+`pyobfus` originated in a concrete research-software need. A production
+cardiovascular-imaging analysis pipeline had to be shared with external
+collaborators, and later with reviewers, without disclosing methods that were
+unpublished and under patent review, while its maintainers continued to debug
+the distributed build with AI assistance. This situation recurs across
+computational research: a group must circulate runnable code so that others can
+reproduce or extend a result, yet cannot release the source outright because of
+embargo, competition, or intellectual-property constraints. `pyobfus` is built
+as reusable infrastructure for that need rather than a single-purpose script. It
+raises the cost of recovering unpublished methods from distributed Python while
+preserving the reproducibility and AI-assisted debuggability that the
+collaboration still depends on.
 
 # Functionality and implementation
 
