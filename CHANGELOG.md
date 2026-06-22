@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **`--seal-code` spurious `IntegrityError` on Python 3.9/3.10.** The integrity
+  seal hashed the function's code object with `marshal.dumps` at the default
+  version (>= 3), which encodes each string's *interned* status and shares
+  object references. The build-time code object (compiled from an in-memory
+  AST) and the runtime one (compiled by the import machinery) can differ in
+  those identity-level details — on Python 3.9/3.10 they did — so a sealed
+  function's runtime hash diverged from its build-time seal and raised a false
+  `IntegrityError`, most visibly when `--seal-code` was combined with the other
+  build-fusion passes. The seal is now pinned to marshal version 2, which
+  serializes by value only. No behavior change on 3.11+. Regression guard:
+  `tests/test_seal_runtime.py::TestMarshalVersionStability` plus the existing
+  end-to-end `test_build_fusion` suite running on the full 3.9–3.14 CI matrix.
+- **`--vault` `TypeError: zip() takes no keyword arguments` on Python 3.9.** The
+  vault build transformer used `zip(..., strict=True)`, but the `strict`
+  keyword was only added to `zip()` in Python 3.10, so every vault-dependent
+  path (the vault transformer, the combined build-fusion passes, device
+  binding, and the six-feature integration round-trip) raised on 3.9 — a
+  supported floor. Dropped to a plain `zip()`; the `strict` check was redundant
+  because an `ast.Dict` always has equal-length `keys`/`values` and the only
+  exception (`**`-unpacking) is already rejected upstream.
+
 ## [0.5.1] - 2026-06-22
 
 **Build-fusion release.** (Built 2026-06-18; published to PyPI 2026-06-22 via OIDC Trusted Publishing with PEP 740 attestations.) The v0.5 Pro mechanisms are now wired into the main
