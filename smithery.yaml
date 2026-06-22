@@ -1,0 +1,24 @@
+# Smithery configuration for pyobfus-mcp
+# https://smithery.ai/docs  —  listed as a LOCAL stdio server.
+#
+# pyobfus obfuscates the user's *local* Python source, so it must run on the
+# user's machine (a hosted/remote deployment cannot reach local files). It is
+# therefore listed as a local stdio server, not a Smithery-hosted deployment.
+#
+# The community tools require NO API key, so configSchema is empty.
+# Install first:  pip install pyobfus-mcp   (or zero-install: uvx pyobfus-mcp)
+
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties: {}
+    required: []
+    additionalProperties: false
+  commandFunction: |-
+    (config) => ({
+      command: 'pyobfus-mcp',
+      args: [],
+      env: {}
+    })
+  exampleConfig: {}
