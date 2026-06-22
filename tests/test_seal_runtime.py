@@ -197,3 +197,59 @@ class TestMarshalBasedHashing:
         assert f.__code__.co_code == g.__code__.co_code
         # But the marshal-based seals differ:
         assert _compute_seal(f) != _compute_seal(g)
+
+
+class TestMarshalVersionStability:
+    """Regression: the seal hash must be pinned to marshal version 2.
+
+    The default marshal version (>= 3) is FORBIDDEN here. It encodes each
+    string's *interned* status (TYPE_SHORT_ASCII vs TYPE_SHORT_ASCII_INTERNED)
+    and shares object references (FLAG_REF). The build-time code object
+    (compiled from an in-memory AST) and the runtime code object (compiled by
+    the import machinery) can legitimately differ in those identity-level
+    details -- on Python 3.9/3.10 they did -- which made a sealed function's
+    build hash diverge from its runtime hash and raised a SPURIOUS
+    ``IntegrityError`` whenever ``--seal-code`` was combined with the other
+    build-fusion passes. Version 2 serializes by value only, so build and
+    runtime agree on every supported Python.
+
+    See ``pyobfus_pro/runtime/seal.py::_hash_code`` and the end-to-end guard
+    ``tests/test_build_fusion.py::TestFusionRuntime::test_combined_runs_correctly``
+    (which exercises the real build -> import -> verify path on the full
+    3.9-3.14 CI matrix).
+    """
+
+    def _behavioral_hash(self, code, version):
+        import hashlib
+        import marshal
+        import types
+
+        consts = tuple(
+            _compute_seal(c) if isinstance(c, types.CodeType) else c for c in code.co_consts
+        )
+        behavioral = (
+            code.co_code,
+            consts,
+            code.co_names,
+            code.co_varnames,
+            code.co_freevars,
+            code.co_cellvars,
+            code.co_flags,
+            code.co_argcount,
+            code.co_posonlyargcount,
+            code.co_kwonlyargcount,
+            code.co_stacksize,
+            getattr(code, "co_exceptiontable", b""),
+        )
+        return hashlib.sha256(marshal.dumps(behavioral, version)).digest()
+
+    def test_hash_uses_marshal_version_2(self):
+        def target(value):
+            return helper(value) - 1  # noqa: F821 -- only the code object matters
+
+        code = target.__code__
+        # The seal must equal the version-2 projection ...
+        assert _compute_seal(target) == self._behavioral_hash(code, 2)
+        # ... and must NOT silently fall back to a >=3 (interning/ref-sharing)
+        # encoding, which is what reintroduced the 3.9/3.10 divergence.
+        assert _compute_seal(target) != self._behavioral_hash(code, 4)

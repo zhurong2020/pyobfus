@@ -96,7 +96,16 @@ def _hash_code(code: types.CodeType) -> bytes:
         # shape stays stable across Python versions.
         getattr(code, "co_exceptiontable", b""),
     )
-    return hashlib.sha256(marshal.dumps(behavioral)).digest()
+    # marshal version 2 (pre-FLAG_REF) is REQUIRED, not incidental: the default
+    # version (>=3) encodes each string's *interned* status (TYPE_SHORT_ASCII vs
+    # TYPE_SHORT_ASCII_INTERNED) and shares object references. The interned-state
+    # of identifier strings in co_names/co_varnames can legitimately differ
+    # between the build-time code object (compiled from an in-memory AST) and the
+    # runtime one (compiled by the import machinery) -- on Python 3.9/3.10 it
+    # does -- which made the seal hash diverge and raised a spurious
+    # IntegrityError. Version 2 serializes by value only (no interned distinction,
+    # no ref table), so build and runtime agree on every supported Python.
+    return hashlib.sha256(marshal.dumps(behavioral, 2)).digest()
 
 
 def _compute_seal(func_or_code: Any) -> bytes:
