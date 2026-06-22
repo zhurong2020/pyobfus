@@ -93,7 +93,7 @@ build on the `cryptography` library [@cryptography] rather than bespoke
 primitives.
 
 `pyobfus` is maintained as production software: it ships with more than
-1,000 automated tests at roughly 89% line coverage, runs continuous integration
+1,000 automated tests at roughly 90% line coverage, runs continuous integration
 across CPython 3.9 to 3.14 on Linux, macOS, and Windows, and holds an OpenSSF
 Best Practices passing badge [@openssf]. It is published on the Python Package
 Index as `pyobfus`, with the companion MCP server published as `pyobfus-mcp`.
