@@ -9,7 +9,7 @@ This document outlines **future plans** for pyobfus. For released version histor
 
 ## Current Status
 
-**Latest (2026-06-22)**: **pyobfus 0.5.1 + pyobfus-mcp 0.3.1 published to PyPI** (0.5.0 was 2026-06-18). 0.5.1 fuses the 6 v0.5 Pro mechanisms into `pyobfus build` flags (1024 core tests); mcp 0.3.1 names the v0.5 mechanisms in pro-funnel copy (dep `pyobfus>=0.5.1`); MCP Registry 0.3.1 isLatest; both via OIDC + PEP 740 attestations. Patent gate cleared 2026-06-17 (申请号 202610712171X). Ran the **agentic-discoverability Wave A** (Smithery Skill + mcp.so + `uvx` zero-install + sharpened server.json blurb) — see `docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`.
+**Latest (2026-06-22)**: **pyobfus 0.5.1 + pyobfus-mcp 0.3.1 published to PyPI** (0.5.0 was 2026-06-18). 0.5.1 fuses the 6 v0.5 Pro mechanisms into `pyobfus build` flags (1024 core tests); mcp 0.3.1 names the v0.5 mechanisms in pro-funnel copy (dep `pyobfus>=0.5.1`); MCP Registry 0.3.1 isLatest; both via OIDC + PEP 740 attestations. Patent gate cleared 2026-06-17 (申请号 202610712171X). Ran the **agentic-discoverability Wave A** (Smithery Skill + mcp.so + `uvx` zero-install + sharpened server.json blurb) — see `docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`. **JOSS paper submitted 2026-06-22** (restructured to the 2026 JOSS scope/format — 9 sections incl. Research impact + AI usage disclosure; `joss.theoj.org/papers/ef32f416f0f8789e388d955a69b2246d`; awaiting pre-review).
 
 ### Snapshot (2026-05-07, historical)
 

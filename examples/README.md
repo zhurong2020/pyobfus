@@ -78,6 +78,18 @@ pip install pyobfus[pro]
 
 **Usage**: Similar to basic examples, but produces more heavily obfuscated code.
 
+### 4. AI-assisted debugging / reverse mapping (`ai_debugging/`)
+
+**Purpose**: Demonstrates pyobfus's signature feature — reversing an obfuscated
+production stack trace back to the original names with `--unmap`.
+
+**What it does**: A buggy module is obfuscated with `--save-mapping`; the crash
+produces a traceback full of mangled names (`I5`, `I3`, …); `pyobfus --unmap`
+then translates that traceback back to the original identifiers, so a developer
+or an AI assistant can locate the bug without the de-obfuscation map ever being
+shipped to the recipient. See [`ai_debugging/README.md`](ai_debugging/README.md)
+for the full reproduce-it walkthrough.
+
 ## General Usage Pattern
 
 1. **Choose your example**: Start with `simple.py` for basic understanding

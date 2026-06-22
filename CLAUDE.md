@@ -24,9 +24,10 @@ Snapshot 2026-05-07 (v0.4 distribution leg 完整闭环之后)。包含 30-secon
 - ✅ **0.5.1 已发布（2026-06-22）**：`pyobfus build --flag` 融合 6 机制,1024 测试,tag `v0.5.1` 经 OIDC + PEP 740 attestations 发 PyPI(run `27938471463`)。
 - ✅ **pyobfus-mcp 0.3.1 已发布（2026-06-22）**：pro-funnel 文案点名 v0.5 机制 · dep `>=0.5.1` · tag `mcp-v0.3.1` 发 PyPI + `mcp-publisher` 发 MCP Registry(0.3.1 isLatest)。
 - ✅ **AI-agent 可发现性 Wave A（2026-06-22）**：Smithery 经 **Skill 渠道** `zhurong2020/pyobfus-protect`（Smithery MCP 发布是远程网关、本地工具走不通,Skill 才对）+ mcp.so + `uvx` 零安装 + server.json 99 字描述(commit `826c576`/`49f4df3`)。报告:`docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`。
-- ⏭️ **更后续**:① **JOSS 投稿**(`paper/` 已 de-AI · 0.5.1 已并 main · 投前核 CLASP arXiv 2510.11251)② **launch wave**(`_drafts/` · 按 AEO 结构写 · 过 AI 检测)③ **0.5.2**(`--bind-device`/`--period`/`--opacity-config`)④ **3 个新功能机会**(ROADMAP P2-17/18/19:签名 provenance 清单 / LLM 反混淆抵抗 benchmark / `--preset ml`)⑤ ARD `ai-catalog.json` 早鸟 ⑥ 复核 PyPI PEP740 provenance ⑦ ~6/29 查 PulseMCP 是否自动收录。详见 `docs/POST_V0.4_TODO.md` 顶部「Forward TODO」。
+- ✅ **JOSS 论文已投稿(2026-06-22)**:按 JOSS 2026 新 scope/format 重写(9 章节含 Research impact + AI usage disclosure · 1304 词)· 页面 `joss.theoj.org/papers/ef32f416f0f8789e388d955a69b2246d`(Software engineering · v0.5.1 · 财务 COI 已披露)· CI 编译过(`draft-pdf.yml`)· 等 editorialbot pre-review issue,后续答评审。详见 `docs/POST_V0.4_TODO.md` JOSS 段。
+- ⏭️ **更后续**:① **launch wave**(`_drafts/` · 按 AEO 结构写 · 过 AI 检测)② **0.5.2**(`--bind-device`/`--period`/`--opacity-config`)③ **3 个新功能机会**(ROADMAP P2-17/18/19:签名 provenance 清单 / LLM 反混淆抵抗 benchmark / `--preset ml`)④ ARD `ai-catalog.json` 早鸟 ⑤ 复核 PyPI PEP740 provenance ⑥ ~6/29 查 PulseMCP 是否自动收录。详见 `docs/POST_V0.4_TODO.md` 顶部「Forward TODO」。
 
-**Cold-start session 第一句话应问 user**：「0.5.1 + mcp 0.3.1 已发布。要做 launch / JOSS 分发,还是开 0.5.2 / 新功能(P2-17~19)?」
+**Cold-start session 第一句话应问 user**：「0.5.1 + mcp 0.3.1 已发布、JOSS 论文已投稿(等 pre-review)。要做 launch wave、开 0.5.2 / 新功能(P2-17~19),还是有 JOSS 评审意见要处理?」
 
 **Cold-start 资料定位**（按读取优先级）：
 
