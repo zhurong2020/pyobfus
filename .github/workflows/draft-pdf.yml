@@ -1,0 +1,35 @@
+name: Draft PDF
+
+# Compiles paper/paper.md into the JOSS-styled PDF on every change, so the paper
+# is known to compile before/at submission. Uses the same engine (openjournals
+# inara) that JOSS's editorialbot runs. Download the PDF from the run's artifacts.
+
+on:
+  push:
+    paths:
+      - 'paper/**'
+      - '.github/workflows/draft-pdf.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  paper:
+    runs-on: ubuntu-latest
+    name: Build draft PDF
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build draft PDF
+        uses: openjournals/openjournals-draft-action@master
+        with:
+          journal: joss
+          paper-path: paper/paper.md
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: paper
+          path: paper/paper.pdf

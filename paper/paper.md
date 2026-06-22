@@ -146,13 +146,16 @@ interfaces that together keep obfuscated research code debuggable.
 
 # AI usage disclosure
 
-`pyobfus` was developed with the assistance of AI coding tools, principally Claude
-Code, used under the author's direction for implementation, refactoring, and test
-generation. The problem framing, the architecture, the obfuscation approach, and
-the reverse-mapping design are the author's own. This paper was drafted with AI
-assistance and was edited and verified by the author. The reverse-mapping
-workflow that the software centres on was itself motivated by the author's
-practice of debugging obfuscated code with AI assistants.
+`pyobfus` was developed with the assistance of generative AI coding tools,
+principally Claude Code (Anthropic), across its 2025-2026 development history.
+Under the author's direction, these tools were used for code generation,
+refactoring, and test scaffolding in the software, and for drafting and
+copy-editing the documentation and this paper. The problem framing, the
+architecture, the obfuscation approach, and the reverse-mapping design are the
+author's own. The author reviewed, edited, and validated all AI-assisted outputs
+and made the core design decisions. The reverse-mapping workflow that the
+software centres on was itself motivated by the author's practice of debugging
+obfuscated code with AI assistants.
 
 # Ethics statement
 
