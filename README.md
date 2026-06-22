@@ -127,7 +127,7 @@ Six mechanisms, available both as the `pyobfus_pro` API and — as of **v0.5.1**
 as opt-in `pyobfus` build flags (single-file / `--no-cross-file` mode):
 `--selective-opacity`, `--seal-code`, `--vault`, `--scrub-traceback`,
 `--fingerprint <buyer-id>`, `--expire-hard <date>`. (`--bind-device` / `--period`
-and `--opacity-config` TOML rules land in 0.5.2.)
+and `--opacity-config` TOML rules land in 0.5.3.)
 
 - **Selective Opacity** — per-symbol protection layers (transparent / ai-readable / obfuscated / AES-256-GCM encrypted with lazy `__code__` materialization).
 - **Forensic watermarking** — per-buyer deterministic key derivation for piracy traceback.

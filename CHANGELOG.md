@@ -64,7 +64,7 @@ bytecode).
 Note: like the existing Pro AST features (CFF, string-AES, …), these run in
 single-file / `--no-cross-file` mode, not cross-file directory mode.
 
-### Deferred to 0.5.2
+### Deferred to 0.5.3 (renumbered — 0.5.2 became a Python 3.9/3.10 patch)
 
 - `--bind-device` (runtime device-key substitution) and `--period` (run-count
   counter file) — the P2-8 device/period subset needs careful runtime-key AST
