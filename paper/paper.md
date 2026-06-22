@@ -34,7 +34,7 @@ through a machine-readable JSON command-line interface and a Model Context
 Protocol [@mcp] server, letting agents such as Claude Code and Cursor invoke
 `pyobfus` directly inside a conversation. `pyobfus` follows an open-core model:
 the Community Edition described here is licensed under Apache-2.0, and a separate
-Professional Edition adds commercial protection features.
+Professional Edition adds further protection features.
 
 # Statement of need
 
@@ -55,28 +55,30 @@ plain Python and records a reversible identifier map, an obfuscated traceback ca
 be mapped back to meaningful names on demand (`--save-mapping` then `--unmap`),
 keeping the AI-assisted debugging loop intact while the shipped artifact stays
 protected; a worked example of this reverse-mapping loop ships in the repository
-(`examples/ai_debugging`). Framework-aware presets for FastAPI, Django, Flask, Pydantic, Click,
-and SQLAlchemy preserve the names that those frameworks resolve by reflection, a
-common cause of breakage in naive obfuscators. The JSON CLI and the MCP server
-expose these capabilities to agentic development workflows directly, rather than
-as a manual post-processing step.
+(`examples/ai_debugging`). Framework-aware presets for FastAPI, Django, Flask,
+Pydantic, Click, and SQLAlchemy preserve the names that those frameworks resolve
+by reflection, a common cause of breakage in naive obfuscators. The JSON CLI and
+the MCP server expose these capabilities to agentic development workflows
+directly, rather than as a manual post-processing step.
 
-`pyobfus` originated in a concrete research-software need. A production
-cardiovascular-imaging analysis pipeline had to be shared with a clinical
-research group's graduate students and collaborators, and later with reviewers,
-without disclosing methods that were unpublished and under patent review, while
-its maintainers continued to debug the distributed build with AI assistance. This situation recurs across
-computational research: a group must circulate runnable code so that others can
-reproduce or extend a result, yet cannot release the source outright because of
-embargo, competition, or intellectual-property constraints — as when a
-clinical-AI pipeline must be validated by a hospital or a third party without
-disclosing the model code. `pyobfus` is built as reusable infrastructure for
-that need rather than a single-purpose script. It
-increases the effort required to recover unpublished methods from distributed
-Python while preserving the reproducibility and AI-assisted debuggability that
-the collaboration still depends on.
+# State of the field
 
-# Functionality and implementation
+Several tools protect Python source used in research, but each occupies a
+different point in the design space. Compilers (Nuitka, Cython) and the
+runtime-based protector PyArmor trade pure-source output and source-level
+debuggability for binary or runtime protection. `pyobfus` keeps plain, debuggable
+Python and adds agent-facing interfaces; it is the only one of these tools that
+reverses an obfuscated traceback and that exposes its operations to AI agents
+through a JSON CLI and an MCP server.
+
+| Capability | pyobfus | PyArmor | Nuitka | Cython |
+| :------------------------------------------------ | :-----: | :-----: | :-----: | :-----: |
+| Pure-Python output (no native runtime or binary) | Yes | No | No | No |
+| Reverse traceback mapping for debugging | Yes | No | No | No |
+| Agent interface (JSON CLI + MCP server) | Yes | No | No | No |
+| Cross-platform source distribution | Yes | Partial | No | No |
+
+# Software design
 
 `pyobfus` operates entirely on the `ast` representation of a program. Multi-file
 projects are processed in two phases: a scan phase builds a global symbol table
@@ -88,11 +90,18 @@ literals, value-preserving numeric obfuscation, optional removal of
 AI-provenance markers, the framework presets, and the reverse-mapping tooling. A
 preflight risk scanner reports constructs that obfuscation can break, such as
 `eval`, dynamic attribute access, and framework reflection, and every command
-emits a stable JSON schema with a next-step hint for automated callers. The
-transform is fast: obfuscating Click (about 11,000 lines) and Rich (about 38,000
-lines) completes in two to three seconds, and the pure-Python output byte-compiles
-cleanly and is 17 to 19 percent smaller than the source, since docstrings and long
-identifiers are removed.
+emits a stable JSON schema with a next-step hint for automated callers.
+
+Two design choices distinguish the tool. First, it emits plain Python rather than
+a binary or a bytecode virtual machine: this keeps the output cross-platform and
+debuggable, accepting weaker protection than compilation in exchange for the
+reproducibility and maintainability that a research collaboration depends on.
+Second, it deliberately omits anti-analysis features such as anti-debugging and
+sandbox evasion, which would defeat debuggability and blur the line between a
+protection tool and malware tooling. The reverse-mapping abstraction — a
+build-time identifier map kept separate from, and never shipped inside, the
+distributed artifact — is the design decision that reconciles protection with
+debuggability, and it is what the JSON CLI and MCP interfaces are built around.
 
 The project adopts an open-core model. The Community Edition (Apache-2.0, and the
 subject of this paper) provides the core obfuscation features; a separately
@@ -106,25 +115,44 @@ suite without any Professional-Edition or patented component. Cryptographic
 operations throughout build on the `cryptography` library [@cryptography] rather
 than bespoke primitives.
 
-`pyobfus` is actively maintained and continuously tested: it ships with more than
-1,000 automated tests at roughly 90% line coverage, runs continuous integration
-across CPython 3.9 to 3.14 on Linux, macOS, and Windows, and holds an OpenSSF
-Best Practices passing badge [@openssf]. It is published on the Python Package
-Index as `pyobfus`, with the companion MCP server published as `pyobfus-mcp`.
+# Research impact
 
-# Comparison with existing tools
+`pyobfus` originated in a concrete research-software need. A production
+cardiovascular-imaging analysis pipeline had to be shared with a clinical
+research group's graduate students and collaborators, and later with reviewers,
+without disclosing methods that were unpublished and under patent review, while
+its maintainers continued to debug the distributed build with AI assistance. This
+situation recurs across computational research: a group must circulate runnable
+code so that others can reproduce or extend a result, yet cannot release the
+source outright because of embargo, competition, or intellectual-property
+constraints — as when a clinical-AI pipeline must be validated by a hospital or a
+third party without disclosing the model code.
 
-Compilers (Nuitka, Cython) and the runtime-based protector PyArmor trade
-pure-source output and source-level debuggability for binary or runtime
-protection. `pyobfus` keeps plain, debuggable Python and adds agent-facing
-interfaces.
+The software is ready for that reuse and the evidence is concrete rather than
+aspirational. It has been developed in the open through fifteen public releases
+since November 2025, ships more than 1,000 automated tests at roughly 90% line
+coverage, runs continuous integration across CPython 3.9 to 3.14 on Linux, macOS,
+and Windows, and holds an OpenSSF Best Practices passing badge [@openssf]. It is
+distributed on the Python Package Index as `pyobfus`, with the companion MCP
+server published as `pyobfus-mcp` and listed in the Model Context Protocol
+registry. Applied to real third-party packages, the transform is fast: obfuscating
+Click (about 11,000 lines) and Rich (about 38,000 lines) completes in two to three
+seconds, and the pure-Python output byte-compiles cleanly and is 17 to 19 percent
+smaller than the source. The reproducible reverse-mapping tutorial in
+`examples/ai_debugging` lets a reader confirm the AI-assisted debugging workflow
+end to end. The reusable scholarly contribution is not the AST renaming itself,
+which is well understood, but the reverse-mapping workflow and the agent-facing
+interfaces that together keep obfuscated research code debuggable.
 
-| Capability | pyobfus | PyArmor | Nuitka | Cython |
-| :------------------------------------------------ | :-----: | :-----: | :-----: | :-----: |
-| Pure-Python output (no native runtime or binary) | Yes | No | No | No |
-| Reverse traceback mapping for debugging | Yes | No | No | No |
-| Agent interface (JSON CLI + MCP server) | Yes | No | No | No |
-| Cross-platform source distribution | Yes | Partial | No | No |
+# AI usage disclosure
+
+`pyobfus` was developed with the assistance of AI coding tools, principally Claude
+Code, used under the author's direction for implementation, refactoring, and test
+generation. The problem framing, the architecture, the obfuscation approach, and
+the reverse-mapping design are the author's own. This paper was drafted with AI
+assistance and was edited and verified by the author. The reverse-mapping
+workflow that the software centres on was itself motivated by the author's
+practice of debugging obfuscated code with AI assistants.
 
 # Ethics statement
 
