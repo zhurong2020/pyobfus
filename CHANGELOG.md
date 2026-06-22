@@ -21,6 +21,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   serializes by value only. No behavior change on 3.11+. Regression guard:
   `tests/test_seal_runtime.py::TestMarshalVersionStability` plus the existing
   end-to-end `test_build_fusion` suite running on the full 3.9–3.14 CI matrix.
+- **`--vault` `TypeError: zip() takes no keyword arguments` on Python 3.9.** The
+  vault build transformer used `zip(..., strict=True)`, but the `strict`
+  keyword was only added to `zip()` in Python 3.10, so every vault-dependent
+  path (the vault transformer, the combined build-fusion passes, device
+  binding, and the six-feature integration round-trip) raised on 3.9 — a
+  supported floor. Dropped to a plain `zip()`; the `strict` check was redundant
+  because an `ast.Dict` always has equal-length `keys`/`values` and the only
+  exception (`**`-unpacking) is already rejected upstream.
 
 ## [0.5.1] - 2026-06-22
 

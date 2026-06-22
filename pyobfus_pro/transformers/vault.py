@@ -270,7 +270,12 @@ def _validate_literal_str_dict(vault_name: str, node: ast.Dict) -> dict[str, str
             f"vault_secrets({vault_name!r}) does not support **-unpacking " f"in the dict literal"
         )
     out: dict[str, str] = {}
-    for key_node, value_node in zip(node.keys, node.values, strict=True):
+    # Plain zip (no strict=): the kwarg was added in Python 3.10 and raises
+    # TypeError on 3.9 (a supported floor). It is also unnecessary here -- an
+    # ``ast.Dict`` always has ``len(keys) == len(values)``, and the only case
+    # that breaks that invariant (``**``-unpacking, which yields a None key) is
+    # already rejected by the guard above.
+    for key_node, value_node in zip(node.keys, node.values):
         if not (isinstance(key_node, ast.Constant) and isinstance(key_node.value, str)):
             raise VaultBuildError(
                 f"vault_secrets({vault_name!r}) entry key must be a string "
