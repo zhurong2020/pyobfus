@@ -70,9 +70,9 @@ computational research: a group must circulate runnable code so that others can
 reproduce or extend a result, yet cannot release the source outright because of
 embargo, competition, or intellectual-property constraints. `pyobfus` is built
 as reusable infrastructure for that need rather than a single-purpose script. It
-raises the cost of recovering unpublished methods from distributed Python while
-preserving the reproducibility and AI-assisted debuggability that the
-collaboration still depends on.
+increases the effort required to recover unpublished methods from distributed
+Python while preserving the reproducibility and AI-assisted debuggability that
+the collaboration still depends on.
 
 # Functionality and implementation
 
@@ -90,15 +90,17 @@ emits a stable JSON schema with a next-step hint for automated callers.
 
 The project adopts an open-core model. The Community Edition (Apache-2.0, and the
 subject of this paper) provides the core obfuscation features; a separately
-licensed Professional Edition adds commercial protection such as AES-256 string
-encryption, control-flow flattening, per-buyer forensic watermarking
+licensed Professional Edition adds further protection mechanisms such as AES-256
+string encryption, control-flow flattening, per-buyer forensic watermarking
 [@clasp], a runtime secret vault, and production-traceback encryption. A subset
 of these Professional mechanisms is the subject of a pending Chinese invention
-patent (application number 202610712171X). Cryptographic operations throughout
-build on the `cryptography` library [@cryptography] rather than bespoke
-primitives.
+patent (application number 202610712171X). The Community Edition described here
+is fully open source and self-contained: it builds, runs, and passes its test
+suite without any Professional-Edition or patented component. Cryptographic
+operations throughout build on the `cryptography` library [@cryptography] rather
+than bespoke primitives.
 
-`pyobfus` is maintained as production software: it ships with more than
+`pyobfus` is actively maintained and continuously tested: it ships with more than
 1,000 automated tests at roughly 90% line coverage, runs continuous integration
 across CPython 3.9 to 3.14 on Linux, macOS, and Windows, and holds an OpenSSF
 Best Practices passing badge [@openssf]. It is published on the Python Package
