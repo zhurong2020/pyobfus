@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-06-22
+
+**Patch release.** Fixes two Python-version-specific bugs in the 0.5.1
+build-fusion Pro passes that broke `--seal-code` and `--vault` on Python
+3.9/3.10. (Published to PyPI via OIDC Trusted Publishing with PEP 740
+attestations.)
+
 ### Fixed
 
 - **`--seal-code` spurious `IntegrityError` on Python 3.9/3.10.** The integrity
