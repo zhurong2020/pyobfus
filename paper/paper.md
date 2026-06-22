@@ -62,10 +62,10 @@ expose these capabilities to agentic development workflows directly, rather than
 as a manual post-processing step.
 
 `pyobfus` originated in a concrete research-software need. A production
-cardiovascular-imaging analysis pipeline had to be shared with external
-collaborators, and later with reviewers, without disclosing methods that were
-unpublished and under patent review, while its maintainers continued to debug
-the distributed build with AI assistance. This situation recurs across
+cardiovascular-imaging analysis pipeline had to be shared with a clinical
+research group's graduate students and collaborators, and later with reviewers,
+without disclosing methods that were unpublished and under patent review, while
+its maintainers continued to debug the distributed build with AI assistance. This situation recurs across
 computational research: a group must circulate runnable code so that others can
 reproduce or extend a result, yet cannot release the source outright because of
 embargo, competition, or intellectual-property constraints. `pyobfus` is built
@@ -103,6 +103,17 @@ primitives.
 across CPython 3.9 to 3.14 on Linux, macOS, and Windows, and holds an OpenSSF
 Best Practices passing badge [@openssf]. It is published on the Python Package
 Index as `pyobfus`, with the companion MCP server published as `pyobfus-mcp`.
+
+# Ethics statement
+
+Code obfuscation is dual-use: the same transformations that protect legitimate
+intellectual property can also conceal malicious code. `pyobfus` is built for
+authors who own the code they protect. It keeps a transparent, open-source core
+so that its behavior can be audited, preserves debuggability rather than
+defeating it, and deliberately omits anti-analysis features such as
+anti-debugging and sandbox evasion that primarily serve evasion rather than
+protection. Users remain responsible for applying it only to code they are
+authorized to distribute.
 
 # Acknowledgements
 
