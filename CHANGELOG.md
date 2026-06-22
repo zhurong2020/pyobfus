@@ -7,9 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.5.1] - 2026-06-18
+## [0.5.1] - 2026-06-22
 
-**Build-fusion release.** The v0.5 Pro mechanisms are now wired into the main
+**Build-fusion release.** (Built 2026-06-18; published to PyPI 2026-06-22 via OIDC Trusted Publishing with PEP 740 attestations.) The v0.5 Pro mechanisms are now wired into the main
 `pyobfus` CLI as opt-in flags, composing correctly with Core name-mangling and
 string-encoding (the interleave validated by the 2026-06-18 design probe: vault
 runs as a PRE-pass; opacity and seal as POST-passes over the final mangled

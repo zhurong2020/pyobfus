@@ -7,7 +7,11 @@ This document outlines **future plans** for pyobfus. For released version histor
 
 ---
 
-## Current Status (2026-05-07)
+## Current Status
+
+**Latest (2026-06-22)**: **pyobfus 0.5.1 + pyobfus-mcp 0.3.1 published to PyPI** (0.5.0 was 2026-06-18). 0.5.1 fuses the 6 v0.5 Pro mechanisms into `pyobfus build` flags (1024 core tests); mcp 0.3.1 names the v0.5 mechanisms in pro-funnel copy (dep `pyobfus>=0.5.1`); MCP Registry 0.3.1 isLatest; both via OIDC + PEP 740 attestations. Patent gate cleared 2026-06-17 (申请号 202610712171X). Ran the **agentic-discoverability Wave A** (Smithery Skill + mcp.so + `uvx` zero-install + sharpened server.json blurb) — see `docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`.
+
+### Snapshot (2026-05-07, historical)
 
 See [CHANGELOG.md](../CHANGELOG.md) for the latest release and version history.
 
@@ -120,6 +124,17 @@ Benefits: simpler test matrix (~15% faster CI), one less dependency, and elimina
 
 ---
 
+## Additions from 2026-06-22 competitive + agentic-discoverability scan
+
+Surfaced by a fresh scan against PyArmor 9.2 / Nuitka / SourceDefender / CodeEnigma plus arXiv 2025-2026 (2512.16538 LLM-vs-obfuscation, 2410.05797 CodeCipher) and the 2026 AI-agent tool-discovery landscape. All stay inside the AST + AI-native lane. Full analysis: `docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`.
+
+- [ ] **P2-17: Signed obfuscation provenance manifest (Pro/Core)** — `pyobfus build` emits a signed JSON manifest (files obfuscated, config hash, tool version, mapping digest; optional sigstore). Rides the 2026 SLSA/SBOM/provenance wave, reuses the existing PEP 740 muscle, and is something PyArmor's phone-home-on-build model structurally can't offer (no local-verifiable provenance). _Estimate: 3-5 days_
+- [ ] **P2-18: LLM-deobfuscation-resistance mode + benchmark** — a `--llm-resistant` preset and/or a published "LLM semantic-recovery rate X%" benchmark report. Uniquely on-brand for an AI-native obfuscator (no competitor can credibly quantify resistance *to AI*); strong launch-content story even as a benchmark-only first cut. _Estimate: benchmark 2-3 days; mode 1-2 weeks_
+- [ ] **P2-19: ML/model-serving preset (`--preset ml`)** — protect inference-wrapper code, route model-path / weight-file constants into the Runtime String Vault, surface pickle-safety guidance. Rides the HuggingFace pickle-RCE wave; near-zero architecture cost (the preset mechanism already exists). _Estimate: 3-5 days_
+- [~] **P2-20: Agentic discoverability (Wave A, mostly shipped 2026-06-22)** — be findable by AI agents across every discovery surface, not just human SEO. Done: Smithery via the **Skill** channel (`zhurong2020/pyobfus-protect`; Smithery's MCP-publish is remote-HTTP-only and a non-fit for a local-execution tool — the Skill channel is the right path), mcp.so listing, `uvx pyobfus-mcp` zero-install + a sharpened ≤100-char `server.json` blurb, `smithery.yaml`. Pending: PulseMCP (passive weekly ingest of the Official Registry; email fallback), ARD `ai-catalog.json` early-bird, and GEO/AEO content (answer-first openings, named-number facts, FAQ schema) folded into the launch wave.
+
+---
+
 ## v0.6.0+ Long-term (3-6 months)
 
 ### P3 - Experimental
@@ -182,5 +197,6 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.
 
 ---
 
-**Last Updated**: 2026-05-09 — Added P2-7..P2-10 to v0.5.0 (forensic watermarking, license binding, integrity seal, scrub-traceback) and a new v0.5.1 section with P2-11..P2-16 (string vault, scan_secrets MCP tool, PyInstaller cookbook, embed-data, anti-debug, requires_runtime). Expanded "What We Won't Do" with bytecode-VM virtualization, anti-VM detection, and standalone runtime folder model as explicit lane decisions. Source: 2026-05-09 competitive scan against PyArmor 9.2.x, Nuitka Commercial, Sourcedefender, vmp-protector 1.0.0, obfuscator-ai, plus arXiv 2025-2026 papers (2512.16538, 2510.11251).
-**Previous**: 2026-04-22 — Strategic reshape after AI-era competitive analysis.
+**Last Updated**: 2026-06-22 — Marked 0.5.1 + pyobfus-mcp 0.3.1 published; added the "Additions from 2026-06-22 scan" section: P2-17 (signed provenance manifest), P2-18 (LLM-deobfuscation-resistance mode + benchmark), P2-19 (`--preset ml`), and P2-20 (agentic discoverability, Wave A mostly shipped — Smithery Skill / mcp.so / uvx / server.json). Source: 2026-06-22 competitive + AI-agent-discoverability scan (see `docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`).
+**Previous**: 2026-05-09 — Added P2-7..P2-10 to v0.5.0 (forensic watermarking, license binding, integrity seal, scrub-traceback) and a v0.5.1 section with P2-11..P2-16. Expanded "What We Won't Do" with bytecode-VM virtualization, anti-VM detection, standalone runtime folder model. Source: 2026-05-09 competitive scan (PyArmor 9.2.x, Nuitka Commercial, Sourcedefender, vmp-protector 1.0.0, obfuscator-ai, arXiv 2512.16538/2510.11251).
+**Earlier**: 2026-04-22 — Strategic reshape after AI-era competitive analysis.
