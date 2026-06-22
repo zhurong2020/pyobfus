@@ -27,11 +27,28 @@ All tools return dicts with a `status` field, a free-text `ai_hint`, and a machi
 
 ## Install
 
+### Zero-install (recommended)
+
+If you have [`uv`](https://docs.astral.sh/uv/), no separate install step is needed — point your client at `uvx` and it fetches `pyobfus-mcp` (plus `pyobfus` and the MCP SDK) into an ephemeral environment on first run. **No API key required.**
+
+```json
+{
+  "mcpServers": {
+    "pyobfus": {
+      "command": "uvx",
+      "args": ["pyobfus-mcp"]
+    }
+  }
+}
+```
+
+### Or install with pip
+
 ```bash
 pip install pyobfus-mcp
 ```
 
-This pulls `pyobfus` and the MCP Python SDK automatically.
+This pulls `pyobfus` and the MCP Python SDK automatically. Then use `"command": "pyobfus-mcp"` in the per-client configs below.
 
 ## Configure
 
