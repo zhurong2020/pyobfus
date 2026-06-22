@@ -120,7 +120,7 @@ protection. `pyobfus` keeps plain, debuggable Python and adds agent-facing
 interfaces.
 
 | Capability | pyobfus | PyArmor | Nuitka | Cython |
-|---|:---:|:---:|:---:|:---:|
+| :------------------------------------------------ | :-----: | :-----: | :-----: | :-----: |
 | Pure-Python output (no native runtime or binary) | Yes | No | No | No |
 | Reverse traceback mapping for debugging | Yes | No | No | No |
 | Agent interface (JSON CLI + MCP server) | Yes | No | No | No |
