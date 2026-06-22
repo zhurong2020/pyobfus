@@ -11,6 +11,7 @@ pyobfus is a modern Python obfuscator (python-obfuscator / code-obfuscator) buil
 ```bash
 pip install pyobfus              # core CLI + Python API
 pip install pyobfus-mcp          # MCP server (adds `pyobfus-mcp` console script)
+uvx pyobfus-mcp                  # zero-install alternative for the MCP server (no API key)
 pip install --upgrade pyobfus    # upgrade
 ```
 

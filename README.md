@@ -24,7 +24,7 @@ This repository ships **two installable packages**:
 | Package | What it is | Install |
 |---|---|---|
 | [`pyobfus`](https://pypi.org/project/pyobfus/) | The Python obfuscator (CLI + library). | `pip install pyobfus` |
-| [`pyobfus-mcp`](https://pypi.org/project/pyobfus-mcp/) | A **Model Context Protocol (MCP) server** that exposes pyobfus's tools to AI coding agents. | `pip install pyobfus-mcp` |
+| [`pyobfus-mcp`](https://pypi.org/project/pyobfus-mcp/) | A **Model Context Protocol (MCP) server** that exposes pyobfus's tools to AI coding agents. | `uvx pyobfus-mcp` (zero-install) or `pip install pyobfus-mcp` |
 
 The MCP server lives in [`pyobfus_mcp/`](pyobfus_mcp/) and is built on the official [Model Context Protocol Python SDK](https://github.com/modelcontextprotocol/python-sdk) (FastMCP). It registers eight MCP tools so **Claude Desktop, Claude Code, Cursor, Windsurf, and Zed** can call pyobfus directly from agent conversations — no shelling out:
 
@@ -537,7 +537,7 @@ Add an additional layer of protection for commercial Python software.
 - **Python Support**: 3.9, 3.10, 3.11, 3.12, 3.13, 3.14
 - **Naming Scheme**: Index-based (I0, I1, I2...) - simple and effective
 - **Architecture**: Modular transformer pipeline with two-phase cross-file obfuscation
-- **Testing**: 1016 tests, 89% coverage, multi-OS CI/CD (Python 3.9-3.14 × Ubuntu / macOS / Windows)
+- **Testing**: 1024 tests, 90% coverage, multi-OS CI/CD (Python 3.9-3.14 × Ubuntu / macOS / Windows)
 
 ## Frequently Asked Questions
 

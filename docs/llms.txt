@@ -22,10 +22,11 @@
 pip install pyobfus
 ```
 
-Optional MCP server (Claude Desktop / Code / Cursor / Windsurf / Zed):
+Optional MCP server (Claude Desktop / Code / Cursor / Windsurf / Zed) — zero-install via `uv`, no API key:
 
 ```
-pip install pyobfus-mcp
+uvx pyobfus-mcp
+# or: pip install pyobfus-mcp
 ```
 
 ## Core commands
