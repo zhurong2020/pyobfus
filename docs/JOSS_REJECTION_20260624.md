@@ -58,7 +58,12 @@ Desk-reject = issue closed, cannot re-open or re-submit the same issue. JOSS poi
 
 **Recommendation (free path):** Zenodo DOI now (instant, unconditional, gives a real citation handle) + keep developing in the open so a later JOSS or pyOpenSci attempt can show genuine community history. Reserve SoftwareX/JORS only if an *indexed* journal credential is specifically needed.
 
-> ✅ **DONE 2026-06-25 — Zenodo DOI minted.** GitHub→Zenodo integration enabled; archived via the `zenodo-archive-v0.5.2` release (tagged outside `v*.*.*` so it did not trigger the PyPI publish workflow). **Concept DOI (cite this, all versions): `10.5281/zenodo.20846053`** · version DOI (this snapshot): `10.5281/zenodo.20846054`. Wired into `CITATION.cff` (`doi:`) and the README DOI badge. Future GitHub releases auto-archive under the same concept DOI.
+> ✅ **DONE 2026-06-25 — Zenodo DOI minted.** GitHub→Zenodo integration enabled; archived via the `zenodo-archive-v0.5.2` release (tagged outside `v*.*.*` so it did not trigger the PyPI publish workflow). **Concept DOI (cite this, all versions): `10.5281/zenodo.20846053`** · version DOI (this snapshot): `10.5281/zenodo.20846054`. Wired into `CITATION.cff` (`doi:`) and the README DOI badge. Record confirmed on the Zenodo page (ORCID linked, Apache-2.0, keywords, "Cite all versions" = concept DOI).
+>
+> **Operational notes for future sessions:**
+> - **MCP needs no separate Zenodo record.** `pyobfus-mcp` lives in this same repo (`pyobfus_mcp/`), so the archived zipball already contains it; the one concept DOI covers core + MCP. Cite the same DOI for both.
+> - **The integration auto-archives ANY future release on this repo** — including `mcp-v*.*.*` tags — each as a new version under the same concept DOI. So core and MCP releases share one Zenodo version line (harmless for citation; the concept DOI represents the whole repo). Be selective with releases if you don't want every MCP patch to mint a Zenodo version.
+> - **Optional polish:** the bootstrap record's Version field shows the tag `zenodo-archive-v0.5.2`; it can be edited on Zenodo (Edit → Version → `v0.5.2` → Save) without changing the DOI, for a cleaner APA citation.
 
 ## 5. Strategic note — open-core / patent tension surfaced
 
