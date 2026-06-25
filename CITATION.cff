@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using these metadata."
+title: "pyobfus: An AST-based Python obfuscator with reverse stack-trace mapping for AI-assisted development"
+abstract: >-
+  pyobfus is an open-source, source-to-source obfuscator for Python built on the
+  standard-library abstract syntax tree (ast). It renames identifiers, encodes
+  string and numeric literals, and rewrites imports consistently across a
+  multi-file project, emitting ordinary .py files that run on CPython 3.9-3.14
+  without a native runtime or bytecode VM. Its distinguishing feature is a
+  reverse mapping workflow that translates an obfuscated production stack trace
+  back to the original names, so a developer or an AI coding assistant can debug
+  shipped code without weakening protection. The same operations are exposed
+  through a JSON command-line interface and a Model Context Protocol server.
+type: software
+authors:
+  - family-names: Zhu
+    given-names: Rong
+    orcid: "https://orcid.org/0009-0008-6087-0581"
+    affiliation: "Independent Researcher, Shanghai, China"
+version: 0.5.2
+date-released: "2026-06-22"
+license: Apache-2.0
+repository-code: "https://github.com/zhurong2020/pyobfus"
+url: "https://github.com/zhurong2020/pyobfus"
+keywords:
+  - Python
+  - obfuscation
+  - software protection
+  - intellectual property
+  - AI-assisted development
+  - developer tools
+  - Model Context Protocol
+# After Zenodo mints the concept DOI, add it here so the GitHub "Cite this
+# repository" widget and downstream tools resolve to the archive:
+# doi: 10.5281/zenodo.XXXXXXX
