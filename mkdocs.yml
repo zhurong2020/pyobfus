@@ -16,6 +16,7 @@ nav:
   - License Activation: LICENSE_ACTIVATION_GUIDE.md
   - Project Structure: PROJECT_STRUCTURE.md
   - Integration Testing: INTEGRATION_TESTING.md
+  - How to Cite: CITATION.md
 
 markdown_extensions:
   - admonition

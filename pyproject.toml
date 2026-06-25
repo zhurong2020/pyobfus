@@ -69,6 +69,7 @@ Repository = "https://github.com/zhurong2020/pyobfus"
 "Changelog" = "https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md"
 "Discussions" = "https://github.com/zhurong2020/pyobfus/discussions"
 "Funding" = "https://www.buymeacoffee.com/zhurong052Q"
+"Citation" = "https://doi.org/10.5281/zenodo.20846053"
 "AI Integration Guide" = "https://github.com/zhurong2020/pyobfus/blob/main/docs/AI_INTEGRATION_STRATEGY.md"
 "Roadmap" = "https://github.com/zhurong2020/pyobfus/blob/main/docs/ROADMAP.md"
 

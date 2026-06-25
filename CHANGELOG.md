@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Citable DOI.** The project is archived on Zenodo with concept DOI
+  [10.5281/zenodo.20846053](https://doi.org/10.5281/zenodo.20846053) (resolves to
+  the latest version). Added `CITATION.cff` (powers GitHub's "Cite this
+  repository" widget), a README Citation section + DOI badge, a "How to cite"
+  docs page, and a `Citation` project URL on both `pyobfus` and `pyobfus-mcp`.
+
 ## [0.5.2] - 2026-06-22
 
 **Patch release.** Fixes two Python-version-specific bugs in the 0.5.1

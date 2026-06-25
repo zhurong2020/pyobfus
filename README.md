@@ -694,6 +694,29 @@ If you find pyobfus helpful, consider supporting its development:
 
 Your support helps maintain and improve pyobfus. Thank you!
 
+## Citation
+
+If you use pyobfus in academic work or want to reference it, please cite the archived release. The concept DOI below always resolves to the latest version:
+
+**APA**
+
+> Zhu, R. (2026). *pyobfus: An AST-based Python obfuscator with reverse stack-trace mapping for AI-assisted development*. Zenodo. https://doi.org/10.5281/zenodo.20846053
+
+**BibTeX**
+
+```bibtex
+@software{zhu_pyobfus,
+  author    = {Zhu, Rong},
+  title     = {pyobfus: An AST-based Python obfuscator with reverse stack-trace mapping for AI-assisted development},
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.20846053},
+  url       = {https://doi.org/10.5281/zenodo.20846053}
+}
+```
+
+Machine-readable metadata is in [`CITATION.cff`](CITATION.cff) (GitHub's "Cite this repository" widget reads it).
+
 ## Acknowledgments
 
 - Inspired by [Opy](https://github.com/QQuick/Opy)'s AST-based approach
