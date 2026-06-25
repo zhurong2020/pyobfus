@@ -58,6 +58,8 @@ Desk-reject = issue closed, cannot re-open or re-submit the same issue. JOSS poi
 
 **Recommendation (free path):** Zenodo DOI now (instant, unconditional, gives a real citation handle) + keep developing in the open so a later JOSS or pyOpenSci attempt can show genuine community history. Reserve SoftwareX/JORS only if an *indexed* journal credential is specifically needed.
 
+> ✅ **DONE 2026-06-25 — Zenodo DOI minted.** GitHub→Zenodo integration enabled; archived via the `zenodo-archive-v0.5.2` release (tagged outside `v*.*.*` so it did not trigger the PyPI publish workflow). **Concept DOI (cite this, all versions): `10.5281/zenodo.20846053`** · version DOI (this snapshot): `10.5281/zenodo.20846054`. Wired into `CITATION.cff` (`doi:`) and the README DOI badge. Future GitHub releases auto-archive under the same concept DOI.
+
 ## 5. Strategic note — open-core / patent tension surfaced
 
 The 06-17 patent gate (holding the v0.5 Pro mechanisms private until 初审合格, then releasing in one burst) is part of what produced the "private-then-public" commit shape JOSS rejected. The IP-protection strategy and the open-development credibility JOSS wants are in genuine tension; any future academic-credit path has to account for that, or route credit through a venue (Zenodo/arXiv) that does not gate on community-development optics.

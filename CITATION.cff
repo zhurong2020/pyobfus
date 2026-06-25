@@ -30,6 +30,6 @@ keywords:
   - AI-assisted development
   - developer tools
   - Model Context Protocol
-# After Zenodo mints the concept DOI, add it here so the GitHub "Cite this
-# repository" widget and downstream tools resolve to the archive:
-# doi: 10.5281/zenodo.XXXXXXX
+# Zenodo concept DOI (all versions — always resolves to the latest archive).
+# Version DOI for the zenodo-archive-v0.5.2 snapshot is 10.5281/zenodo.20846054.
+doi: 10.5281/zenodo.20846053

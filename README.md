@@ -12,6 +12,7 @@
 [![License](https://img.shields.io/badge/License-Dual%20(Apache%202.0%20%2B%20Proprietary)-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.9--3.14-blue.svg)](https://www.python.org/downloads/)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/12788/badge)](https://www.bestpractices.dev/projects/12788)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20846053.svg)](https://doi.org/10.5281/zenodo.20846053)
 [![pyobfus MCP server](https://glama.ai/mcp/servers/zhurong2020/pyobfus/badges/score.svg)](https://glama.ai/mcp/servers/zhurong2020/pyobfus)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
