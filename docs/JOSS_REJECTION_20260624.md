@@ -63,7 +63,7 @@ Desk-reject = issue closed, cannot re-open or re-submit the same issue. JOSS poi
 > **Operational notes for future sessions:**
 > - **MCP needs no separate Zenodo record.** `pyobfus-mcp` lives in this same repo (`pyobfus_mcp/`), so the archived zipball already contains it; the one concept DOI covers core + MCP. Cite the same DOI for both.
 > - **The integration auto-archives ANY future release on this repo** — including `mcp-v*.*.*` tags — each as a new version under the same concept DOI. So core and MCP releases share one Zenodo version line (harmless for citation; the concept DOI represents the whole repo). Be selective with releases if you don't want every MCP patch to mint a Zenodo version.
-> - **Optional polish:** the bootstrap record's Version field shows the tag `zenodo-archive-v0.5.2`; it can be edited on Zenodo (Edit → Version → `v0.5.2` → Save) without changing the DOI, for a cleaner APA citation.
+> - **Version label self-corrects — don't chase it.** The bootstrap record's Version field shows the tag `zenodo-archive-v0.5.2` (ugly in the APA citation). It need NOT be fixed: the concept DOI always resolves to the *latest* version, so the next normal release (`v0.5.3`) will archive as a clean version and become what the concept DOI shows. Only edit manually (Zenodo → My dashboard → Uploads → open record → orange **Edit** button top-right → Version → `v0.5.2` → Save → Publish; DOI unchanged) if a clean citation is needed *today* (e.g. for a CV). The zip filename stays tag-derived regardless.
 
 ## 5. Strategic note — open-core / patent tension surfaced
 
