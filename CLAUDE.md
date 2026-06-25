@@ -25,10 +25,10 @@ Snapshot 2026-05-07 (v0.4 distribution leg 完整闭环之后)。包含 30-secon
 - ✅ **0.5.2 已发布（2026-06-22，PR #18）**：修 0.5.1 build-fusion 两个 Py3.9/3.10 bug——① `--seal-code` 在 3.9/3.10 误报 `IntegrityError`(seal 哈希用 marshal 默认版本≥3,受字符串 interning 影响 → 钉到 marshal version 2);② `--vault` 在 3.9 抛 `zip() takes no keyword arguments`(`zip(strict=)` 是 3.10+ 才有 → 改普通 zip)。1025 测试,tag `v0.5.2` 经 OIDC + PEP 740 发 PyPI(release run `27963690396`,CI 全矩阵含 3.9/3.10 绿)。回归守卫 `tests/test_seal_runtime.py::TestMarshalVersionStability`。
 - ✅ **pyobfus-mcp 0.3.1 已发布（2026-06-22）**：pro-funnel 文案点名 v0.5 机制 · dep `>=0.5.1` · tag `mcp-v0.3.1` 发 PyPI + `mcp-publisher` 发 MCP Registry(0.3.1 isLatest)。
 - ✅ **AI-agent 可发现性 Wave A（2026-06-22）**：Smithery 经 **Skill 渠道** `zhurong2020/pyobfus-protect`（Smithery MCP 发布是远程网关、本地工具走不通,Skill 才对）+ mcp.so + `uvx` 零安装 + server.json 99 字描述(commit `826c576`/`49f4df3`)。报告:`docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`。
-- ✅ **JOSS 论文已投稿(2026-06-22)**:按 JOSS 2026 新 scope/format 重写(9 章节含 Research impact + AI usage disclosure · 1304 词)· 页面 `joss.theoj.org/papers/ef32f416f0f8789e388d955a69b2246d`(Software engineering · v0.5.1 · 财务 COI 已披露)· CI 编译过(`draft-pdf.yml`)· 等 editorialbot pre-review issue,后续答评审。详见 `docs/POST_V0.4_TODO.md` JOSS 段。
+- ❌ **JOSS 投稿被拒(2026-06-24)**:v0.5.1 投 JOSS(issue `openjournals/joss-reviews#10788`)被总编 desk-reject,理由=**scope/significance 非质量**("private-dev-then-public" + 无第三方复用)。→ 改走免费路径:✅ **Zenodo DOI `10.5281/zenodo.20846053`(concept)已拿到**,已接进 CITATION.cff + README 徽章 + `## Citation` + 两个 pyproject + RTD + ORCID + arong.eu.org/academic。完整记录+渠道对比见 `docs/JOSS_REJECTION_20260624.md`。
 - ⏭️ **更后续**:① **launch wave**(`_drafts/` · 按 AEO 结构写 · 过 AI 检测)② **0.5.3**(`--bind-device`/`--period`/`--opacity-config` · 0.5.2 已被 Py3.9/3.10 补丁占用,顺延)③ **3 个新功能机会**(ROADMAP P2-17/18/19:签名 provenance 清单 / LLM 反混淆抵抗 benchmark / `--preset ml`)④ ARD `ai-catalog.json` 早鸟 ⑤ 复核 PyPI PEP740 provenance ⑥ ~6/29 查 PulseMCP 是否自动收录。详见 `docs/POST_V0.4_TODO.md` 顶部「Forward TODO」。
 
-**Cold-start session 第一句话应问 user**：「0.5.2 + mcp 0.3.1 已发布、JOSS 论文已投稿(等 pre-review)。要做 launch wave、开新功能(P2-17~19),还是有 JOSS 评审意见要处理?」
+**Cold-start session 第一句话应问 user**：「0.5.2 + mcp 0.3.1 已发布、JOSS 已被拒(已转 Zenodo DOI)。要做 launch wave、开新功能(P2-17~19),还是推进 IP 商业化迁移(个人→旎嵘科技)?」
 
 **Cold-start 资料定位**（按读取优先级）：
 
