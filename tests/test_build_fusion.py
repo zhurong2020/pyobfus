@@ -61,6 +61,18 @@ def _compiles(path):
     return True
 
 
+def _load_module(path, name):
+    """exec the obfuscated module, restoring sys.excepthook afterward."""
+    saved = sys.excepthook
+    try:
+        spec = importlib.util.spec_from_file_location(name, str(path))
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        return m
+    finally:
+        sys.excepthook = saved
+
+
 @requires_pro
 class TestFusionStructural:
     def test_vault_strips_secret_and_emits_vault(self, runner, marked_file, tmp_path):
@@ -253,6 +265,91 @@ class TestOpacityConfig:
             sys.excepthook = saved
         assert m.secret_compute(5) == 16  # L3-encrypted, reads global MULT=3
         assert m.plain_helper(10) == 9
+
+
+@requires_pro
+class TestBindDevice:
+    """`--bind-device` rewrites the baked L3 `_LAYER_KEY` into a runtime
+    device-derived key, so decryption only succeeds on the bound device."""
+
+    def _src(self, tmp_path):
+        f = tmp_path / "mod.py"
+        f.write_text(
+            "from pyobfus_pro import opacity, Layer\n"
+            "MULT = 4\n\n"
+            "@opacity(Layer.ENCRYPTED)\n"
+            "def compute(x):\n"
+            "    return x * MULT + 2\n\n"
+            "def run():\n"
+            "    return compute(6)\n"
+        )
+        return f
+
+    def test_bind_device_rewrites_layer_key(self, runner, tmp_path):
+        src = self._src(tmp_path)
+        out = tmp_path / "o.py"
+        res = _invoke(runner, src, out, "--selective-opacity", "--bind-device")
+        assert res.exit_code == 0, res.output
+        text = out.read_text()
+        assert "_pyobfus_bind_device_key(" in text
+        assert "_pyobfus_build_salt" in text
+        # the raw key literal must be gone
+        assert "_LAYER_KEY = b'" not in text and '_LAYER_KEY = b"' not in text
+        assert _compiles(out)
+
+    def test_bind_device_runs_on_build_machine(self, runner, tmp_path):
+        src = self._src(tmp_path)
+        yaml_cfg = tmp_path / "pyobfus.yaml"
+        yaml_cfg.write_text("obfuscation:\n  exclude_names: [run]\n")
+        out = tmp_path / "o.py"
+        with patch("pyobfus.cli.is_trial_active", return_value=True):
+            res = runner.invoke(
+                main,
+                [
+                    str(src),
+                    "-o",
+                    str(out),
+                    "--level",
+                    "pro",
+                    "--config",
+                    str(yaml_cfg),
+                    "--selective-opacity",
+                    "--bind-device",
+                ],
+            )
+        assert res.exit_code == 0, res.output
+        m = _load_module(out, "bd_match")
+        # build machine == run machine -> re-derived key matches -> decrypts
+        assert m.run() == 26  # compute(6) = 6*4+2
+
+    def test_bind_device_wrong_device_fails(self, runner, tmp_path):
+        src = self._src(tmp_path)
+        yaml_cfg = tmp_path / "pyobfus.yaml"
+        yaml_cfg.write_text("obfuscation:\n  exclude_names: [run]\n")
+        out = tmp_path / "o.py"
+        with patch("pyobfus.cli.is_trial_active", return_value=True):
+            res = runner.invoke(
+                main,
+                [
+                    str(src),
+                    "-o",
+                    str(out),
+                    "--level",
+                    "pro",
+                    "--config",
+                    str(yaml_cfg),
+                    "--selective-opacity",
+                    "--bind-device-id",
+                    "not-this-machine-xyz",
+                ],
+            )
+        assert res.exit_code == 0, res.output
+        m = _load_module(out, "bd_mismatch")
+        from pyobfus_pro import OpacityRuntimeError
+
+        # ciphertext was keyed to a different device -> GCM tag fails on decrypt
+        with pytest.raises(OpacityRuntimeError):
+            m.run()
 
 
 @requires_pro

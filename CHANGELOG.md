@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`pyobfus build --bind-device` / `--bind-device-id <id>` — device-locked L3
+  encryption (Pro, 0.5.3).** Encrypts the Selective-Opacity L3 layer key with a
+  device fingerprint at build time (`bind_device_key(machine_id, salt)`), then
+  rewrites the emitted `_LAYER_KEY = b"..."` literal into a runtime
+  `bind_device_key(current_machine_id(), _pyobfus_build_salt)` re-derivation — so
+  the raw key never ships and decryption only succeeds on the bound device
+  (wrong device → derived key differs → AES-GCM tag fails → `OpacityRuntimeError`
+  when the L3 function is first called). Two modes: `--bind-device` binds to the
+  build machine (build-on-target); `--bind-device-id <machine-id>` binds to a
+  supplied customer device id (implies `--bind-device`). Needs an active L3 layer
+  (`--selective-opacity` / `--opacity-config`) to have a key to bind. This is the
+  build-fusion, patent-lane counterpart to the older license-embed
+  `--bind-machine` (P2-8 device axis).
 - **`pyobfus build --opacity-config opacity.toml` — pattern-driven Selective
   Opacity (Pro, 0.5.3).** Assign the ENCRYPTED (L3) layer to functions by glob
   patterns over their **original** qualnames (e.g. `pattern = "*.secret_*"`),

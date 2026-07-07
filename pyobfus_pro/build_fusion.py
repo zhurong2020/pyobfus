@@ -21,9 +21,11 @@ leaves them intact: ``@opacity(Layer.ENCRYPTED)`` (enum, not a string literal),
 adds ``--period`` (module-top run-counter guard via ``period_check`` +
 ``default_counter_path``) and ``--opacity-config`` (opacity.toml pattern rules,
 resolved PRE-mangle and applied by injecting ``@opacity(Layer.ENCRYPTED)`` so
-glob patterns match original qualnames without any mangled->original name-map).
-Still pending: ``--bind-device`` (runtime key substitution replacing the baked
-``_LAYER_KEY``).
+glob patterns match original qualnames without any mangled->original name-map)
+and ``--bind-device`` (encrypts the L3 layer key with a device fingerprint at
+build, then rewrites the emitted ``_LAYER_KEY`` literal into a runtime
+``bind_device_key(current_machine_id(), salt)`` re-derivation, so decryption only
+succeeds on the bound device — supplied ``--bind-device-id`` or the build machine).
 """
 
 from __future__ import annotations
@@ -39,6 +41,8 @@ from .transformers import scrub as _t_scrub
 from .transformers import seal as _t_seal
 from .transformers import vault as _t_vault
 
+_BUILD_SALT_SIZE = 32  # random salt per build for bind_device_key (>= 16 required)
+
 
 def fusion_enabled(config) -> bool:
     """True if any 0.5.1 Pro fusion flag is set on the config."""
@@ -50,6 +54,7 @@ def fusion_enabled(config) -> bool:
         or getattr(config, "expire_hard", None)
         or getattr(config, "period_max_runs", None)
         or getattr(config, "opacity_config", None)
+        or getattr(config, "bind_device", False)
     )
 
 
@@ -68,6 +73,81 @@ def _layer_key(config, module_qualname: str) -> Optional[bytes]:
     # a 0.5.2 refinement.
     module_hash = hashlib.sha256(module_qualname.encode("utf-8")).digest()
     return derive_layer_key(fp, module_hash)
+
+
+def _device_key_and_salt(config) -> tuple[Optional[bytes], Optional[bytes]]:
+    """``(device_key, build_salt)`` when ``--bind-device`` is set, else ``(None, None)``.
+
+    A fresh 32-byte salt is generated per build; the key is
+    ``bind_device_key(target_id, salt)`` where ``target_id`` is the supplied
+    ``--bind-device-id`` (bind to a specific customer device) or, absent that,
+    the build machine's own id (``current_machine_id()``; the build-on-target
+    model). The ciphertext gets encrypted with this key and the emitted
+    ``_LAYER_KEY`` literal is later rewritten to re-derive it at runtime.
+    """
+    if not getattr(config, "bind_device", False):
+        return None, None
+    import secrets
+
+    from .license_binding import bind_device_key, current_machine_id
+
+    salt = secrets.token_bytes(_BUILD_SALT_SIZE)
+    target_id = getattr(config, "bind_device_id", None) or current_machine_id()
+    return bind_device_key(target_id, salt), salt
+
+
+def _substitute_layer_key_binding(source: str, salt: bytes) -> str:
+    """Rewrite the opacity pass's ``_LAYER_KEY = b"..."`` into a runtime device
+    derivation, so the raw key never ships.
+
+    Replaces the baked constant with
+    ``_LAYER_KEY = bind_device_key(current_machine_id(), _pyobfus_build_salt)``
+    and inserts ``_pyobfus_build_salt`` + the import immediately before it. No-op
+    if the module has no ``_LAYER_KEY`` (``--bind-device`` alone, without an L3
+    layer active, has nothing to bind). Runtime decryption then only succeeds on
+    the device whose id was used at build.
+    """
+    tree = ast.parse(source)
+    idx = None
+    for i, node in enumerate(tree.body):
+        if (
+            isinstance(node, ast.Assign)
+            and len(node.targets) == 1
+            and isinstance(node.targets[0], ast.Name)
+            and node.targets[0].id == "_LAYER_KEY"
+        ):
+            idx = i
+            break
+    if idx is None:
+        return source
+
+    # Mutate the existing assignment's RHS in place (node identity survives the
+    # list-splice below, so the index shift doesn't matter).
+    tree.body[idx].value = ast.Call(  # type: ignore[attr-defined]
+        func=ast.Name(id="_pyobfus_bind_device_key", ctx=ast.Load()),
+        args=[
+            ast.Call(func=ast.Name(id="_pyobfus_machine_id", ctx=ast.Load()), args=[], keywords=[]),
+            ast.Name(id="_pyobfus_build_salt", ctx=ast.Load()),
+        ],
+        keywords=[],
+    )
+
+    imp = ast.ImportFrom(
+        module="pyobfus_pro",
+        names=[
+            ast.alias(name="bind_device_key", asname="_pyobfus_bind_device_key"),
+            ast.alias(name="current_machine_id", asname="_pyobfus_machine_id"),
+        ],
+        level=0,
+    )
+    salt_assign = ast.Assign(
+        targets=[ast.Name(id="_pyobfus_build_salt", ctx=ast.Store())],
+        value=ast.Constant(value=salt),
+    )
+    tree.body[idx:idx] = [imp, salt_assign]
+
+    ast.fix_missing_locations(tree)
+    return ast.unparse(tree)
 
 
 def apply_pre_passes(source: str, config, *, module_qualname: str = "") -> str:
@@ -196,18 +276,30 @@ def apply_post_passes(
     Order: opacity (encrypt final mangled bytecode) -> seal (hash final
     bytecode / ciphertext for L3) -> scrub (excepthook) -> expire check.
     """
+    # --bind-device: derive the L3 layer key from a device fingerprint. The
+    # ciphertext is encrypted at build with bind_device_key(target_id, salt), and
+    # the emitted `_LAYER_KEY = b"..."` literal is rewritten (below) into a
+    # runtime re-derivation, so the raw key never ships and decryption only
+    # succeeds on the matching device (P2-8).
+    device_key, device_salt = _device_key_and_salt(config)
+
     assignments = None
     if getattr(config, "selective_opacity", False) or getattr(config, "opacity_config", None):
         # Decorator-driven: both hand-written @opacity and the decorators the
         # opacity-config PRE-pass injected (by pre-mangle qualname) are consumed
         # here. Passing config=None keeps this pass purely decorator-based; the
         # TOML rules already did their work pre-mangle.
+        effective_key = (
+            device_key if device_key is not None else _layer_key(config, module_qualname)
+        )
         source, assignments = _t_opacity.transform_module(
             source,
             None,
             module_qualname=module_qualname,
-            layer_key=_layer_key(config, module_qualname),
+            layer_key=effective_key,
         )
+        if device_key is not None and device_salt is not None:
+            source = _substitute_layer_key_binding(source, device_salt)
 
     if getattr(config, "seal_code", False):
         source = _t_seal.transform_module(

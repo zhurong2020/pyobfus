@@ -215,6 +215,18 @@ except ImportError:
     "by pre-mangle qualname (Pro, v0.5.3; implies --selective-opacity)",
 )
 @click.option(
+    "--bind-device",
+    is_flag=True,
+    help="Bind L3 encryption to this build machine; decrypts only on it "
+    "(Pro, v0.5.3; needs --selective-opacity/--opacity-config; distinct from --bind-machine)",
+)
+@click.option(
+    "--bind-device-id",
+    type=str,
+    help="Bind L3 encryption to a supplied machine-id instead of the build "
+    "machine (Pro, v0.5.3; implies --bind-device)",
+)
+@click.option(
     "--preset",
     type=click.Choice(
         [
@@ -356,6 +368,8 @@ def main(
     expire_hard: Optional[str],
     period: int,
     opacity_config: Optional[str],
+    bind_device: bool,
+    bind_device_id: Optional[str],
     preset: Optional[str],
     list_presets: bool,
     stats: bool,
@@ -617,6 +631,8 @@ def main(
             or expire_hard
             or period > 0
             or opacity_config
+            or bind_device
+            or bind_device_id
         )
         pro_features_requested = (
             control_flow
@@ -715,6 +731,13 @@ def main(
                 config.selective_opacity = True
                 if verbose:
                     click.echo(f"Enabled: Opacity config rules ({opacity_config}, P2-1)")
+            if bind_device or bind_device_id:
+                config.bind_device = True
+                if bind_device_id:
+                    config.bind_device_id = bind_device_id
+                if verbose:
+                    _target = f"device {bind_device_id}" if bind_device_id else "build machine"
+                    click.echo(f"Enabled: Device binding ({_target}, P2-8)")
 
             if fusion_requested and cross_file and Path(input_path).is_dir():
                 click.echo(

@@ -101,6 +101,8 @@ class ObfuscationConfig:
     opacity_config: Optional[str] = (
         None  # P2-1: opacity.toml path -> pattern-driven layers (v0.5.3)
     )
+    bind_device: bool = False  # P2-8: runtime device-key substitution for L3 (v0.5.3)
+    bind_device_id: Optional[str] = None  # P2-8: target machine-id (None = build machine)
 
     # Performance options
     max_workers: Optional[int] = None  # None = auto (cpu_count), 1 = sequential
