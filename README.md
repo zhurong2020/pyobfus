@@ -18,6 +18,8 @@
 
 A Python code obfuscator built with AST-based transformations. **Supports Python 3.9 through 3.14**. Provides reliable name mangling, string encoding, control-flow flattening, AES-256 string encryption, and — unique to pyobfus — a reverse-mapping workflow that lets you (or your AI coding assistant) debug obfuscated stack traces without giving up the protection.
 
+> **🆕 What's new in v0.5.3** — the patent-targeted **Pro mechanisms** are now one-line `pyobfus build` flags: Selective Opacity (per-symbol AES-256 layers), forensic watermarking, Runtime String Vault, `@seal_code` integrity, and traceback scrubbing — plus, new in 0.5.3, **`--period`** (run-counter limit), **`--opacity-config`** (pattern-driven L3 encryption by original qualname), and **`--bind-device` / `--bind-device-id`** (device-locked encryption). Full details in the [CHANGELOG](CHANGELOG.md); see [Pro Edition](#-pro-edition-available-now) below.
+
 ## 🔌 Companion MCP server: [`pyobfus-mcp`](pyobfus_mcp/)
 
 This repository ships **two installable packages**:
@@ -53,7 +55,7 @@ This repo is also a **Claude Code plugin marketplace**. The `pyobfus-protect` sk
 
 See [`skills/`](skills/) for the skill and install details. (This is distinct from [`templates/ai-integration/`](templates/ai-integration/), which are copy-in rule files for *your* project.)
 
-### 🤖 New in v0.4.0 — AI-native features
+### 🤖 AI-native features
 
 - **`pyobfus --check src/`** — pre-flight risk scan: detects `eval`/`exec`, dynamic attribute access, and framework reflection points before you obfuscate. JSON output with an `ai_hint` telling your AI assistant what to run next.
 - **`pyobfus --init src/`** — zero-config onboarding: scans the project, detects FastAPI/Django/Pydantic/Click/SQLAlchemy, and writes a ready-to-use `pyobfus.yaml`.
