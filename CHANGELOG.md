@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.3] - 2026-07-07
+
+**Feature release.** Completes the three build-fusion Pro flags deferred from
+0.5.1 (0.5.2 was a Python 3.9/3.10 patch). Published to PyPI via OIDC Trusted
+Publishing with PEP 740 attestations. `pyobfus-mcp` is unchanged at 0.3.1 (no
+tool-surface change; its `pyobfus>=0.5.1` floor resolves to 0.5.3).
+
 ### Added
 
 - **`pyobfus build --bind-device` / `--bind-device-id <id>` — device-locked L3
