@@ -202,6 +202,13 @@ except ImportError:
     help="Module-top crypto-bound expiry check, ISO date (Pro, v0.5.1; distinct from --expire)",
 )
 @click.option(
+    "--period",
+    type=int,
+    default=0,
+    help="Module-top run-counter limit; refuses import after N runs "
+    "(Pro, v0.5.3; distinct from --max-runs)",
+)
+@click.option(
     "--preset",
     type=click.Choice(
         [
@@ -341,6 +348,7 @@ def main(
     scrub_traceback: bool,
     fingerprint: Optional[str],
     expire_hard: Optional[str],
+    period: int,
     preset: Optional[str],
     list_presets: bool,
     stats: bool,
@@ -600,6 +608,7 @@ def main(
             or scrub_traceback
             or fingerprint
             or expire_hard
+            or period > 0
         )
         pro_features_requested = (
             control_flow
@@ -689,6 +698,10 @@ def main(
                 config.expire_hard = expire_hard
                 if verbose:
                     click.echo(f"Enabled: Hard expiry check ({expire_hard})")
+            if period > 0:
+                config.period_max_runs = period
+                if verbose:
+                    click.echo(f"Enabled: Run-counter limit ({period} runs, P2-8)")
 
             if fusion_requested and cross_file and Path(input_path).is_dir():
                 click.echo(

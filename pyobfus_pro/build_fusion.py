@@ -17,8 +17,11 @@ Markers in user source must use import-surviving forms so Core's name-mangler
 leaves them intact: ``@opacity(Layer.ENCRYPTED)`` (enum, not a string literal),
 ``@seal_code``, and ``vault_secrets({...})`` (consumed by the pre-pass).
 
-Scoped for 0.5.1; ``--bind-device`` / ``--period`` (runtime key substitution +
-counter file) and ``--opacity-config`` TOML pattern rules are deferred to 0.5.2.
+0.5.1 shipped the vault/opacity/seal/scrub/expire/fingerprint passes; 0.5.3
+adds ``--period`` (module-top run-counter guard via ``period_check`` +
+``default_counter_path``). Still pending: ``--bind-device`` (runtime key
+substitution replacing the baked ``_LAYER_KEY``) and ``--opacity-config`` TOML
+pattern rules (needs pre-mangle qualname coupling).
 """
 
 from __future__ import annotations
@@ -42,6 +45,7 @@ def fusion_enabled(config) -> bool:
         or getattr(config, "seal_code", False)
         or getattr(config, "scrub_traceback", False)
         or getattr(config, "expire_hard", None)
+        or getattr(config, "period_max_runs", None)
     )
 
 
@@ -113,6 +117,10 @@ def apply_post_passes(
     if expire:
         source = _inject_expire_check(source, expire)
 
+    period = getattr(config, "period_max_runs", None)
+    if period:
+        source = _inject_period_check(source, module_qualname, int(period))
+
     return source
 
 
@@ -133,6 +141,29 @@ def _inject_expire_check(source: str, expire_iso: str) -> str:
     # Place after a leading shebang / encoding cookie / module docstring block
     # is unnecessary here: expire must run at import, and a plain module-top
     # statement is fine because Core has already emitted a clean module.
+    return header + source
+
+
+def _inject_period_check(source: str, module_qualname: str, max_runs: int) -> str:
+    """Inject a module-top ``period_check(default_counter_path(id), N)`` (P2-8 run-counter subset).
+
+    Refuses to import once the artifact's run counter exceeds ``max_runs``;
+    raises ``LicenseExpired`` from ``pyobfus_pro.license_binding``. The counter
+    path is resolved at *runtime* on the end-user's machine (never baked in at
+    build time) via ``default_counter_path``, keyed by a stable per-module
+    artifact id (truncated sha256 of the qualname), so distinct modules keep
+    independent counters. Idempotent on a marker comment.
+    """
+    marker = "# pyobfus:period"
+    if marker in source:
+        return source
+    artifact_id = hashlib.sha256((module_qualname or "module").encode("utf-8")).hexdigest()[:16]
+    header = (
+        f"{marker}\n"
+        "from pyobfus_pro import period_check as _pyobfus_period_check, "
+        "default_counter_path as _pyobfus_counter_path\n"
+        f"_pyobfus_period_check(_pyobfus_counter_path({artifact_id!r}), {int(max_runs)})\n"
+    )
     return header + source
 
 

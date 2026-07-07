@@ -33,6 +33,7 @@ from pyobfus_pro.license_binding.binding import (
     LicenseExpired,
     bind_device_key,
     current_machine_id,
+    default_counter_path,
     expire_check,
     period_check,
 )
@@ -42,6 +43,7 @@ __all__ = [
     "LicenseExpired",
     "bind_device_key",
     "current_machine_id",
+    "default_counter_path",
     "expire_check",
     "period_check",
 ]

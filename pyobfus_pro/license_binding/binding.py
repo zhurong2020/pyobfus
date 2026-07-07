@@ -262,7 +262,7 @@ def expire_check(expire_iso: str, *, now: _datetime.date | None = None) -> None:
         expire_date = _datetime.date.fromisoformat(expire_iso)
     except ValueError as exc:
         raise LicenseBindingError(
-            f"expire_iso must be ISO-8601 calendar date 'YYYY-MM-DD'; " f"got {expire_iso!r}: {exc}"
+            f"expire_iso must be ISO-8601 calendar date 'YYYY-MM-DD'; got {expire_iso!r}: {exc}"
         ) from exc
 
     today = now if now is not None else _datetime.date.today()
@@ -271,7 +271,7 @@ def expire_check(expire_iso: str, *, now: _datetime.date | None = None) -> None:
 
     if today > expire_date:
         raise LicenseExpired(
-            f"license expired on {expire_date.isoformat()}; today is " f"{today.isoformat()}"
+            f"license expired on {expire_date.isoformat()}; today is {today.isoformat()}"
         )
 
 
@@ -381,10 +381,46 @@ def period_check(
 
     if new_value > max_runs:
         raise LicenseExpired(
-            f"license run-counter exceeded: ran {new_value} times, " f"max allowed is {max_runs}"
+            f"license run-counter exceeded: ran {new_value} times, max allowed is {max_runs}"
         )
 
     return new_value
+
+
+_COUNTER_ENV_VAR = "PYOBFUS_COUNTER_DIR"
+
+
+def default_counter_path(artifact_id: str) -> Path:
+    """Resolve the run-counter file path for an artifact, at *runtime*.
+
+    The build orchestrator emits ``period_check(default_counter_path("<id>"), N)``
+    at module top so the counter path is resolved on the **end-user's** machine
+    at import time, never baked in at build time (a build-time absolute path
+    would point at the *builder's* home). Honors ``$PYOBFUS_COUNTER_DIR`` (for a
+    read-only ``$HOME`` or to relocate runtime state); otherwise defaults to
+    ``~/.cache/pyobfus/<artifact_id>/runs``.
+
+    Args:
+        artifact_id: Stable per-artifact identifier (the orchestrator uses a
+            truncated sha256 of the module qualname). Sanitized to a single
+            ``[A-Za-z0-9_]`` path segment before use, so a crafted value cannot
+            traverse out of the counter root.
+
+    Returns:
+        The ``Path`` to the counter file (its parent is created lazily by
+        :func:`period_check`).
+
+    Raises:
+        LicenseBindingError: if ``artifact_id`` is not a non-empty string.
+    """
+    if not isinstance(artifact_id, str) or not artifact_id:
+        raise LicenseBindingError("artifact_id must be a non-empty string")
+    # Reduce to a single safe path segment (alnum or underscore). This alone
+    # neutralizes '..' and path separators — no traversal reaches the FS.
+    safe = "".join(c if c.isalnum() else "_" for c in artifact_id)
+    base = os.environ.get(_COUNTER_ENV_VAR)
+    root = Path(base) if base else Path.home() / ".cache" / "pyobfus"
+    return root / safe / "runs"
 
 
 __all__ = [
@@ -392,6 +428,7 @@ __all__ = [
     "LicenseExpired",
     "bind_device_key",
     "current_machine_id",
+    "default_counter_path",
     "expire_check",
     "period_check",
 ]

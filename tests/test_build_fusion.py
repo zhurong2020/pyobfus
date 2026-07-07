@@ -102,6 +102,15 @@ class TestFusionStructural:
         assert "_pyobfus_expire_check(" in out.read_text()
         assert _compiles(out)
 
+    def test_period_injects_check(self, runner, marked_file, tmp_path):
+        out = tmp_path / "o.py"
+        res = _invoke(runner, marked_file, out, "--period", "5")
+        assert res.exit_code == 0, res.output
+        text = out.read_text()
+        assert "_pyobfus_period_check(" in text
+        assert "_pyobfus_counter_path(" in text
+        assert _compiles(out)
+
     def test_all_combined_compiles(self, runner, marked_file, tmp_path):
         out = tmp_path / "o.py"
         res = _invoke(
@@ -165,6 +174,37 @@ class TestFusionRuntime:
         # compute(5)=5*2+7=17 (L3-encrypted, reads global MULT); guard(10)=9
         assert m.run() == 26
         assert m.CFG.get("API_KEY") == "sk-secret-xyz"
+
+
+@requires_pro
+def test_period_runtime_enforces_limit(runner, tmp_path, monkeypatch):
+    """The injected run-counter raises LicenseExpired past the limit, and the
+    counter path is resolved at runtime via $PYOBFUS_COUNTER_DIR (not baked in
+    at build time)."""
+    src = tmp_path / "simple.py"
+    src.write_text("VALUE = 42\n")
+    out = tmp_path / "o.py"
+    res = _invoke(runner, src, out, "--period", "2")
+    assert res.exit_code == 0, res.output
+    assert "_pyobfus_period_check(" in out.read_text()
+
+    from pyobfus_pro.license_binding import LicenseExpired
+
+    counter_dir = tmp_path / "counters"
+    monkeypatch.setenv("PYOBFUS_COUNTER_DIR", str(counter_dir))
+
+    def _load():
+        spec = importlib.util.spec_from_file_location("period_mod", str(out))
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        return m
+
+    _load()  # run 1 -> counter 1, ok
+    _load()  # run 2 -> counter 2, ok
+    with pytest.raises(LicenseExpired):
+        _load()  # run 3 -> counter 3 > max 2
+    # counter file lives under the env-overridden dir, proving runtime resolution
+    assert list(counter_dir.rglob("runs"))
 
 
 class TestFusionGating:

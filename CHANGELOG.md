@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`pyobfus build --period N` — crypto-bound run-counter limit (Pro, 0.5.3).**
+  Injects a module-top `period_check(default_counter_path(<artifact-id>), N)`
+  guard that refuses to import once the artifact's run counter exceeds `N`,
+  raising `LicenseExpired`. The counter path is resolved at **runtime** on the
+  end-user's machine (never baked in at build time) via the new
+  `default_counter_path` helper, which honors `$PYOBFUS_COUNTER_DIR` and
+  otherwise defaults to `~/.cache/pyobfus/<artifact-id>/runs`; each module keeps
+  an independent counter keyed by a truncated sha256 of its qualname. This is
+  the build-fusion, patent-lane counterpart to the older license-embed
+  `--max-runs` (P2-8 run-counter subset). Composes with the other 0.5.1 fusion
+  flags. (`--bind-device` and `--opacity-config` remain the outstanding 0.5.3
+  items.)
 - **Citable DOI.** The project is archived on Zenodo with concept DOI
   [10.5281/zenodo.20846053](https://doi.org/10.5281/zenodo.20846053) (resolves to
   the latest version). Added `CITATION.cff` (powers GitHub's "Cite this

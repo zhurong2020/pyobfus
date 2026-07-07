@@ -97,6 +97,7 @@ class ObfuscationConfig:
     scrub_traceback: bool = False  # P2-10: encrypt production tracebacks
     fingerprint: Optional[str] = None  # P2-7: per-buyer deterministic L3 key (buyer id)
     expire_hard: Optional[str] = None  # P2-8 (subset): module-top expire_check(ISO date)
+    period_max_runs: Optional[int] = None  # P2-8 (subset): module-top run-counter limit (v0.5.3)
 
     # Performance options
     max_workers: Optional[int] = None  # None = auto (cpu_count), 1 = sequential
