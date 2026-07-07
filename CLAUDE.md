@@ -12,9 +12,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 Snapshot 2026-05-07 (v0.4 distribution leg 完整闭环之后)。包含 30-second resume cheat sheet · 4 个 self-actionable P0 item（CI smoke test + PEP 740 attestation + server.json _meta + dev.to voice pass）· v0.5 work（含 3 个 2026-05 research 发现的新机会：PEP 750 t-string handler · FastMCP 3.0 升级 · `--target claude-skill` preset）· passive waiting items · do-not-do list · 3 周建议节奏。
 
-### 🟢 2026-06-22 active state — pyobfus 0.5.2 + pyobfus-mcp 0.3.1 已发布到 PyPI
+### 🟢 2026-07-07 active state — pyobfus 0.5.3 + pyobfus-mcp 0.3.1 已发布到 PyPI
 
-**当前状态**：发明专利初审合格（2026-06-17，Path C gate 解除）→ v0.5.0（PyPI 2026-06-18）→ 0.5.1 + pyobfus-mcp 0.3.1（PyPI 2026-06-22）→ **0.5.2 已发布（PyPI 2026-06-22，PR #18）**，修两个 Py3.9/3.10 CI bug（见下），main 无 held。本 session 另完成 **AI-agent 可发现性 Wave A**（见下）。
+**当前状态**：发明专利初审合格（2026-06-17）→ v0.5.0→0.5.1→0.5.2（PyPI 2026-06）→ **0.5.3 已发布（2026-07-07）**，补齐 0.5.1 顺延的三个 build-fusion flag（`--period` / `--opacity-config` / `--bind-device`），1033 测试，main 无 held。mcp 仍 0.3.1（工具面无变化，dep `>=0.5.1` 自动解析到 0.5.3）。
 
 - ✅ 已提交并受理（申请号 `202610712171X` · 申请日/优先权日 2026-05-22 · 17 项权利要求）
 - ✅ 费用全部缴清（共 1610 元 · 2026-05-22 一次缴清 · 含申请费类 1235 与实审费 375 · 官方审查信息查询「费足」核实）
@@ -23,12 +23,13 @@ Snapshot 2026-05-07 (v0.4 distribution leg 完整闭环之后)。包含 30-secon
 - ✅ **v0.5.0 已发布**：6 项专利机制（P2-1/7/8/9/10/11）已并入公开 `pyobfus_pro/`，1016 测试 / 砍 3.8 / Beta→Production/Stable，tag `v0.5.0` 经 OIDC Trusted Publishing 发到 PyPI。机制经 `pyobfus_pro` API + `pyobfus-unscrub` CLI + standalone passes 可用
 - ✅ **0.5.1 已发布（2026-06-22）**：`pyobfus build --flag` 融合 6 机制,tag `v0.5.1` 经 OIDC + PEP 740 attestations 发 PyPI(run `27938471463`)。
 - ✅ **0.5.2 已发布（2026-06-22，PR #18）**：修 0.5.1 build-fusion 两个 Py3.9/3.10 bug——① `--seal-code` 在 3.9/3.10 误报 `IntegrityError`(seal 哈希用 marshal 默认版本≥3,受字符串 interning 影响 → 钉到 marshal version 2);② `--vault` 在 3.9 抛 `zip() takes no keyword arguments`(`zip(strict=)` 是 3.10+ 才有 → 改普通 zip)。1025 测试,tag `v0.5.2` 经 OIDC + PEP 740 发 PyPI(release run `27963690396`,CI 全矩阵含 3.9/3.10 绿)。回归守卫 `tests/test_seal_runtime.py::TestMarshalVersionStability`。
+- ✅ **0.5.3 已发布（2026-07-07）**：补齐 0.5.1 顺延的三个 build-fusion flag——`--period`(运行计数守卫,commit `dfe1dbd`)、`--opacity-config`(pre-mangle qualname 解析 + 注入 `@opacity` 装饰器,绕开 name-map,`34dcbc5`)、`--bind-device`/`--bind-device-id`(设备锁定 L3,重写 `_LAYER_KEY` 为运行时派生,`62646b6`)。1033 测试,tag `v0.5.3` 经 OIDC + PEP 740 发 PyPI。vault-key(`_VAULT_KEY_*`)设备绑定为 0.5.4 候选。
 - ✅ **pyobfus-mcp 0.3.1 已发布（2026-06-22）**：pro-funnel 文案点名 v0.5 机制 · dep `>=0.5.1` · tag `mcp-v0.3.1` 发 PyPI + `mcp-publisher` 发 MCP Registry(0.3.1 isLatest)。
 - ✅ **AI-agent 可发现性 Wave A（2026-06-22）**：Smithery 经 **Skill 渠道** `zhurong2020/pyobfus-protect`（Smithery MCP 发布是远程网关、本地工具走不通,Skill 才对）+ mcp.so + `uvx` 零安装 + server.json 99 字描述(commit `826c576`/`49f4df3`)。报告:`docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`。
 - ❌ **JOSS 投稿被拒(2026-06-24)**:v0.5.1 投 JOSS(issue `openjournals/joss-reviews#10788`)被总编 desk-reject,理由=**scope/significance 非质量**("private-dev-then-public" + 无第三方复用)。→ 改走免费路径:✅ **Zenodo DOI `10.5281/zenodo.20846053`(concept)已拿到**,已接进 CITATION.cff + README 徽章 + `## Citation` + 两个 pyproject + RTD + ORCID + arong.eu.org/academic。完整记录+渠道对比见 `docs/JOSS_REJECTION_20260624.md`。
-- ⏭️ **更后续**:① **launch wave**(`_drafts/` · 按 AEO 结构写 · 过 AI 检测)② **0.5.3**(`--bind-device`/`--period`/`--opacity-config` · 0.5.2 已被 Py3.9/3.10 补丁占用,顺延)③ **3 个新功能机会**(ROADMAP P2-17/18/19:签名 provenance 清单 / LLM 反混淆抵抗 benchmark / `--preset ml`)④ ARD `ai-catalog.json` 早鸟 ⑤ 复核 PyPI PEP740 provenance ⑥ ~6/29 查 PulseMCP 是否自动收录。详见 `docs/POST_V0.4_TODO.md` 顶部「Forward TODO」。
+- ⏭️ **更后续**:① **launch wave**(`_drafts/` · 按 AEO 结构写 · 过 AI 检测)② **0.5.4**:vault-key 设备绑定 + P2-18 LLM 反混淆 benchmark(2026-07-07 调研升为最高战略优先级 · 见 ROADMAP 2026-07-07 节)③ **其余新功能**(ROADMAP P2-17 签名 provenance / P2-19 `--preset ml` / P2-21 MCP 工具完整性 / P2-22 诚实对比)④ ARD `ai-catalog.json` 早鸟 ⑤ 复核 PyPI PEP740 provenance。详见 `docs/POST_V0.4_TODO.md` 顶部「Forward TODO」。
 
-**Cold-start session 第一句话应问 user**：「0.5.2 + mcp 0.3.1 已发布、JOSS 已被拒(已转 Zenodo DOI)。要做 launch wave、开新功能(P2-17~19),还是推进 IP 商业化迁移(个人→旎嵘科技)?」
+**Cold-start session 第一句话应问 user**：「0.5.3 + mcp 0.3.1 已发布、JOSS 已被拒(已转 Zenodo DOI)。要做 launch wave、0.5.4(vault-key 绑定 + P2-18 LLM 反混淆 benchmark),还是推进 IP 商业化迁移(个人→旎嵘科技)?」
 
 **Cold-start 资料定位**（按读取优先级）：
 
@@ -47,7 +48,7 @@ Snapshot 2026-05-07 (v0.4 distribution leg 完整闭环之后)。包含 30-secon
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.9-3.14, AST, setuptools
-- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**v0.5.2，2026-06-22 发布** — 修 Py3.9/3.10 的 `--seal-code`/`--vault` bug · 1025 测试 · 0.5.1 把 6 机制接进 `pyobfus build` flags · 0.5.0(06-18)首次公开机制 + 砍 3.8)
+- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**v0.5.3，2026-07-07 发布** — 补齐 `--period`/`--opacity-config`/`--bind-device` 三个 build-fusion flag · 1033 测试 · 0.5.2 修 Py3.9/3.10 · 0.5.1 把 6 机制接进 `pyobfus build` flags · 0.5.0(06-18)首次公开机制 + 砍 3.8)
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**v0.3.1，2026-06-22 发布** — 8 tools: 6 community + 2 pro_funnel(`recommend_tier`/`start_pro_trial` · 文案点名 v0.5 机制) · dep `pyobfus>=0.5.1` · `uvx pyobfus-mcp` 零安装)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp` (active, isLatest=true · **0.3.1**)
 - **Smithery (Skill)**: https://smithery.ai/skills/zhurong2020/pyobfus-protect (2026-06-22 上线 · 本地工具走 Skill 渠道非 MCP 渠道) · **mcp.so**: 已收录
@@ -66,7 +67,7 @@ pyobfus/
 │   ├── transformers/   # AST 变换器
 │   └── cross_file/    # 跨文件混淆
 ├── pyobfus_pro/       # Pro Edition (商业许可)
-├── tests/             # 1025 测试用例 (90% coverage · 0.5.2 发布版)
+├── tests/             # 1033 测试用例 (90% coverage · 0.5.3 发布版)
 ├── examples/          # 示例代码
 ├── docs/              # 项目文档
 └── cloudflare-worker/ # 许可验证 Worker
