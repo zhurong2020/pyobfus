@@ -136,6 +136,23 @@ Surfaced by a fresh scan against PyArmor 9.2 / Nuitka / SourceDefender / CodeEni
 
 ---
 
+## Additions from 2026-07-07 research scan
+
+A fresh external scan (web, July 2026) re-validated the 06-22 items and surfaced two new on-brand candidates. It confirms three 06-22 items are riding real, growing waves.
+
+**Re-validation of existing items:**
+
+- **P2-18 (LLM-deobfuscation-resistance) — strongly validated; promote to top strategic priority.** LLM code-deobfuscation went from fringe to a 2025-26 research hotspot: fine-tuned models now unwind up to 7 chained transforms and beat compiler-based deobfuscation, with systems in production at Google ([CISPA/Springer 2025](https://link.springer.com/content/pdf/10.1007/978-3-031-97620-9_15.pdf); [arXiv 2505.19887](https://arxiv.org/pdf/2505.19887)). Critically, **[Acoda (arXiv 2606.11755, 2026-06)](https://arxiv.org/pdf/2606.11755) is direct same-lane prior art** — "Adversarial Code Obfuscation for Defending against LLM-based Analysis" — to benchmark against and cite. Reconfirms the dual-track: a benchmark-only first cut (2-3 days) is both launch content and the seed for a *separate research paper* (SPRO/ESORICS/ACSAC or JSS/EMSE + arXiv cs.CR), independent of the desk-rejected JOSS software paper.
+- **P2-17 (signed provenance manifest) — validated; early-bird window open.** By 2026-03, 132K+ PyPI packages carry attestations (17% of uploads), but the **SLSA-provenance slot in PEP 740 still lacks mature tooling** ([PyPI Warehouse attestation-internals](https://warehouse.pypa.io/security/attestation-internals/)) — space to be early. Reuses our existing PEP 740 muscle; structurally impossible for PyArmor's phone-home-on-build model to match with locally-verifiable provenance.
+- **P2-19 (`--preset ml`) — unchanged; still low-cost / high-relevance** (HuggingFace pickle-RCE wave).
+
+**New candidates:**
+
+- [ ] **P2-21: pyobfus-mcp tool-description integrity (rug-pull resistance)** — the #1 MCP threat in the 2026 security baseline is tool poisoning / rug-pulls (a server silently mutating tool descriptions post-install); the defense is verifying tool metadata at install and every update ([OWASP MCP Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/MCP_Security_Cheat_Sheet.html); [Practical DevSecOps 2026](https://www.practical-devsecops.com/mcp-security-vulnerabilities/)). pyobfus-mcp can ship + self-verify a signed tool-description manifest so clients detect tampering — an on-brand meta-differentiator ("a security tool that secures itself"). Note: the 2026-spec OAuth 2.1 / incremental-consent items target *remote* servers; pyobfus-mcp is local stdio, so those are mostly N/A, and `protect_project`'s arbitrary-command path is already gated (`PYOBFUS_MCP_ALLOW_VERIFY_CMD`) + path-scoped from the mcp 0.2.0 hardening. _Estimate: 3-5 days._
+- [ ] **P2-22: honest-comparison content — "pure-Python AST vs statically-unpackable bytecode"** (docs / launch, not a code feature). PyArmor 8.0–9.2.x bytecode is now **statically** convertible back to disassembly / experimental source with no execution ([Lil-House/Pyarmor-Static-Unpack-1shot](https://github.com/Lil-House/Pyarmor-Static-Unpack-1shot)), and PyArmor is recurrently used to hide malware ([SANS ISC 2026-01](https://isc.sans.edu/diary/31840)). Material for `COMPARISON.md` + the launch wave + P2-18's benchmark framing, reinforcing pyobfus's defender-lane / AI-debuggable positioning. _Estimate: 1 day._
+
+---
+
 ## v0.6.0+ Long-term (3-6 months)
 
 ### P3 - Experimental
@@ -166,7 +183,7 @@ To maintain focus on core users (individual developers/small teams in the AI-ass
 
 - [x] `pyobfus --check` / `unmap` / `init` shipping and documented (P0-1, P0-2, P0-5)
 - [x] `pyobfus-mcp` server published, usable in Claude Desktop / Cursor / Claude Code (PyPI 0.1.2 + MCP Registry isLatest + Glama Quality A)
-- [ ] PyPI downloads: 324/month → **1,500+/month** (current: pyobfus ~337/month; launch posts pending in `_drafts/`)
+- [ ] PyPI downloads: 324/month → **1,500+/month** (2026-07-07: pyobfus ~1,180/mo, pyobfus-mcp ~400/mo — but largely CI/automated and daily rate has settled to ~25/day after the June 0.5.x release burst; still 0 GitHub stars; launch posts pending in `_drafts/`)
 - [ ] GitHub stars: 0 → **100+** (current: 0; same blocker — launch not yet executed)
 - [ ] First external (non-owner) GitHub issue opened
 - [ ] First Pro license sale
@@ -198,6 +215,7 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.
 
 ---
 
-**Last Updated**: 2026-06-22 — Marked 0.5.2 published (patch: `--seal-code`/`--vault` Python 3.9/3.10 fixes, PR #18); earlier same day 0.5.1 + pyobfus-mcp 0.3.1 published; added the "Additions from 2026-06-22 scan" section: P2-17 (signed provenance manifest), P2-18 (LLM-deobfuscation-resistance mode + benchmark), P2-19 (`--preset ml`), and P2-20 (agentic discoverability, Wave A mostly shipped — Smithery Skill / mcp.so / uvx / server.json). Source: 2026-06-22 competitive + AI-agent-discoverability scan (see `docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`).
+**Last Updated**: 2026-07-07 — added the "Additions from 2026-07-07 research scan" section: external re-validation of P2-17 (SLSA/attestation adoption + tooling gap), P2-18 (LLM-deobfuscation research explosion + Acoda prior art → promote to top strategic priority), P2-19; plus two new candidates P2-21 (pyobfus-mcp tool-description integrity / rug-pull resistance) and P2-22 (honest-comparison content vs statically-unpackable PyArmor bytecode). Refreshed download figures (~1,180/mo pyobfus + ~400/mo mcp). Fixed the Glama listing note (recurring manual Build-steps bump; bumped to 0.3.1 on 07-07).
+**Prior**: 2026-06-22 — Marked 0.5.2 published (patch: `--seal-code`/`--vault` Python 3.9/3.10 fixes, PR #18); earlier same day 0.5.1 + pyobfus-mcp 0.3.1 published; added the "Additions from 2026-06-22 scan" section: P2-17 (signed provenance manifest), P2-18 (LLM-deobfuscation-resistance mode + benchmark), P2-19 (`--preset ml`), and P2-20 (agentic discoverability, Wave A mostly shipped — Smithery Skill / mcp.so / uvx / server.json). Source: 2026-06-22 competitive + AI-agent-discoverability scan (see `docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`).
 **Previous**: 2026-05-09 — Added P2-7..P2-10 to v0.5.0 (forensic watermarking, license binding, integrity seal, scrub-traceback) and a v0.5.1 section with P2-11..P2-16. Expanded "What We Won't Do" with bytecode-VM virtualization, anti-VM detection, standalone runtime folder model. Source: 2026-05-09 competitive scan (PyArmor 9.2.x, Nuitka Commercial, Sourcedefender, vmp-protector 1.0.0, obfuscator-ai, arXiv 2512.16538/2510.11251).
 **Earlier**: 2026-04-22 — Strategic reshape after AI-era competitive analysis.
