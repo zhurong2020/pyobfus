@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`pyobfus build --opacity-config opacity.toml` — pattern-driven Selective
+  Opacity (Pro, 0.5.3).** Assign the ENCRYPTED (L3) layer to functions by glob
+  patterns over their **original** qualnames (e.g. `pattern = "*.secret_*"`),
+  without hand-annotating each with `@opacity(...)`. Rules are resolved in a
+  pre-mangle pass and applied by injecting `@opacity(Layer.ENCRYPTED)` on
+  matches, so patterns match original names while the existing (post-mangle)
+  opacity encryption pass does the work — no mangled→original name-map coupling
+  needed. Reuses the already-shipped `OpacityConfig`/`Resolver` TOML
+  infrastructure; implies `--selective-opacity`. Hand-written `@opacity(...)`
+  decorators still win over config rules. (In this fusion ordering only the
+  ENCRYPTED layer is materialized; transparent/ai-readable/obfuscated layers
+  fall through to Core's default mangling.)
 - **`pyobfus build --period N` — crypto-bound run-counter limit (Pro, 0.5.3).**
   Injects a module-top `period_check(default_counter_path(<artifact-id>), N)`
   guard that refuses to import once the artifact's run counter exceeds `N`,

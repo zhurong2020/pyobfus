@@ -209,6 +209,12 @@ except ImportError:
     "(Pro, v0.5.3; distinct from --max-runs)",
 )
 @click.option(
+    "--opacity-config",
+    type=click.Path(exists=True, dir_okay=False),
+    help="opacity.toml with pattern->layer rules; encrypts matching functions "
+    "by pre-mangle qualname (Pro, v0.5.3; implies --selective-opacity)",
+)
+@click.option(
     "--preset",
     type=click.Choice(
         [
@@ -349,6 +355,7 @@ def main(
     fingerprint: Optional[str],
     expire_hard: Optional[str],
     period: int,
+    opacity_config: Optional[str],
     preset: Optional[str],
     list_presets: bool,
     stats: bool,
@@ -609,6 +616,7 @@ def main(
             or fingerprint
             or expire_hard
             or period > 0
+            or opacity_config
         )
         pro_features_requested = (
             control_flow
@@ -702,6 +710,11 @@ def main(
                 config.period_max_runs = period
                 if verbose:
                     click.echo(f"Enabled: Run-counter limit ({period} runs, P2-8)")
+            if opacity_config:
+                config.opacity_config = opacity_config
+                config.selective_opacity = True
+                if verbose:
+                    click.echo(f"Enabled: Opacity config rules ({opacity_config}, P2-1)")
 
             if fusion_requested and cross_file and Path(input_path).is_dir():
                 click.echo(
@@ -961,7 +974,9 @@ def _obfuscate_file(
     )
     if _fusion:
         source_text = input_file.read_text(encoding="utf-8")
-        source_text = _build_fusion.apply_pre_passes(source_text, config)
+        source_text = _build_fusion.apply_pre_passes(
+            source_text, config, module_qualname=input_file.stem
+        )
         tree = ASTParser.parse_string(source_text, filename=str(input_file))
     else:
         tree = ASTParser.parse_file(input_file)

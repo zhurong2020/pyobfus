@@ -98,6 +98,9 @@ class ObfuscationConfig:
     fingerprint: Optional[str] = None  # P2-7: per-buyer deterministic L3 key (buyer id)
     expire_hard: Optional[str] = None  # P2-8 (subset): module-top expire_check(ISO date)
     period_max_runs: Optional[int] = None  # P2-8 (subset): module-top run-counter limit (v0.5.3)
+    opacity_config: Optional[str] = (
+        None  # P2-1: opacity.toml path -> pattern-driven layers (v0.5.3)
+    )
 
     # Performance options
     max_workers: Optional[int] = None  # None = auto (cpu_count), 1 = sequential

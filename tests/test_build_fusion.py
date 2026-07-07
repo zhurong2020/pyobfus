@@ -177,6 +177,85 @@ class TestFusionRuntime:
 
 
 @requires_pro
+class TestOpacityConfig:
+    """`--opacity-config opacity.toml` drives L3 encryption by pre-mangle qualname
+    (via decorator injection in the pre-pass), no name-map coupling needed."""
+
+    def _write_src(self, tmp_path):
+        f = tmp_path / "mod.py"
+        f.write_text(
+            "MULT = 3\n\n"
+            "def secret_compute(x):\n"
+            "    return x * MULT + 1\n\n"
+            "def plain_helper(y):\n"
+            "    return y - 1\n"
+        )
+        return f
+
+    def test_config_encrypts_only_matched(self, runner, tmp_path):
+        src = self._write_src(tmp_path)
+        cfg = tmp_path / "opacity.toml"
+        cfg.write_text(
+            'default_layer = "obfuscated"\n\n'
+            "[[rules]]\n"
+            'pattern = "*.secret_*"\n'
+            'layer = "encrypted"\n'
+        )
+        out = tmp_path / "o.py"
+        res = _invoke(runner, src, out, "--opacity-config", str(cfg))
+        assert res.exit_code == 0, res.output
+        text = out.read_text()
+        # exactly one function (secret_compute) got L3-encrypted; plain_helper did not
+        assert text.count("_l3_dispatch(") == 1
+        assert "_CIPHER_" in text
+        assert _compiles(out)
+
+    def test_config_no_match_is_noop(self, runner, tmp_path):
+        src = self._write_src(tmp_path)
+        cfg = tmp_path / "opacity.toml"
+        cfg.write_text('[[rules]]\npattern = "*.nonexistent_*"\nlayer = "encrypted"\n')
+        out = tmp_path / "o.py"
+        res = _invoke(runner, src, out, "--opacity-config", str(cfg))
+        assert res.exit_code == 0, res.output
+        assert "_l3_dispatch(" not in out.read_text()
+        assert _compiles(out)
+
+    def test_config_encrypted_runs_correctly(self, runner, tmp_path):
+        src = self._write_src(tmp_path)
+        cfg = tmp_path / "opacity.toml"
+        cfg.write_text('[[rules]]\npattern = "*.secret_*"\nlayer = "encrypted"\n')
+        yaml_cfg = tmp_path / "pyobfus.yaml"
+        yaml_cfg.write_text("obfuscation:\n  exclude_names: [secret_compute, plain_helper]\n")
+        out = tmp_path / "o.py"
+        with patch("pyobfus.cli.is_trial_active", return_value=True):
+            res = runner.invoke(
+                main,
+                [
+                    str(src),
+                    "-o",
+                    str(out),
+                    "--level",
+                    "pro",
+                    "--config",
+                    str(yaml_cfg),
+                    "--opacity-config",
+                    str(cfg),
+                ],
+            )
+        assert res.exit_code == 0, res.output
+        assert "_l3_dispatch(" in out.read_text()
+        saved = sys.excepthook
+        try:
+            spec = importlib.util.spec_from_file_location("opcfg_mod", str(out))
+            m = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(m)
+        finally:
+            sys.excepthook = saved
+        assert m.secret_compute(5) == 16  # L3-encrypted, reads global MULT=3
+        assert m.plain_helper(10) == 9
+
+
+@requires_pro
 def test_period_runtime_enforces_limit(runner, tmp_path, monkeypatch):
     """The injected run-counter raises LicenseExpired past the limit, and the
     counter path is resolved at runtime via $PYOBFUS_COUNTER_DIR (not baked in

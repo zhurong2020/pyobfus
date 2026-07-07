@@ -19,13 +19,16 @@ leaves them intact: ``@opacity(Layer.ENCRYPTED)`` (enum, not a string literal),
 
 0.5.1 shipped the vault/opacity/seal/scrub/expire/fingerprint passes; 0.5.3
 adds ``--period`` (module-top run-counter guard via ``period_check`` +
-``default_counter_path``). Still pending: ``--bind-device`` (runtime key
-substitution replacing the baked ``_LAYER_KEY``) and ``--opacity-config`` TOML
-pattern rules (needs pre-mangle qualname coupling).
+``default_counter_path``) and ``--opacity-config`` (opacity.toml pattern rules,
+resolved PRE-mangle and applied by injecting ``@opacity(Layer.ENCRYPTED)`` so
+glob patterns match original qualnames without any mangled->original name-map).
+Still pending: ``--bind-device`` (runtime key substitution replacing the baked
+``_LAYER_KEY``).
 """
 
 from __future__ import annotations
 
+import ast
 import hashlib
 from pathlib import Path
 from typing import Optional, Tuple
@@ -46,6 +49,7 @@ def fusion_enabled(config) -> bool:
         or getattr(config, "scrub_traceback", False)
         or getattr(config, "expire_hard", None)
         or getattr(config, "period_max_runs", None)
+        or getattr(config, "opacity_config", None)
     )
 
 
@@ -66,17 +70,118 @@ def _layer_key(config, module_qualname: str) -> Optional[bytes]:
     return derive_layer_key(fp, module_hash)
 
 
-def apply_pre_passes(source: str, config) -> str:
+def apply_pre_passes(source: str, config, *, module_qualname: str = "") -> str:
     """Source transforms that must run BEFORE the Core pipeline.
 
-    Only vault: it rewrites ``vault_secrets({...})`` into an encrypted
-    ``Vault(...)`` so the secret string literals never reach Core's
-    string-encoder (which would otherwise mangle them into ``_decode_str``
-    calls the vault pass can no longer recognise).
+    - **vault**: rewrites ``vault_secrets({...})`` into an encrypted
+      ``Vault(...)`` so the secret string literals never reach Core's
+      string-encoder (which would otherwise mangle them into ``_decode_str``
+      calls the vault pass can no longer recognise).
+    - **opacity-config**: resolves each top-level function's layer against the
+      ``opacity.toml`` rules using its *pre-mangle* qualname, then injects an
+      ``@opacity(Layer.ENCRYPTED)`` decorator on ENCRYPTED matches. Running here
+      (before Core mangles) is what lets glob patterns match original qualnames;
+      the injected decorator survives mangling and is consumed by the opacity
+      POST-pass exactly like a hand-written one. This sidesteps any
+      mangled->original name-map coupling.
     """
     if getattr(config, "vault", False):
         source, _schemas = _t_vault.transform_module(source)
+    if getattr(config, "opacity_config", None):
+        source = _apply_opacity_config_prepass(source, config, module_qualname)
     return source
+
+
+def _is_opacity_decorator_node(dec: ast.expr) -> bool:
+    """True for ``@opacity(...)`` / ``<x>.opacity(...)`` (mirrors the opacity pass)."""
+    if not isinstance(dec, ast.Call):
+        return False
+    func = dec.func
+    if isinstance(func, ast.Name):
+        return func.id == "opacity"
+    if isinstance(func, ast.Attribute):
+        return func.attr == "opacity"
+    return False
+
+
+def _apply_opacity_config_prepass(source: str, config, module_qualname: str) -> str:
+    """Inject ``@opacity(Layer.ENCRYPTED)`` on top-level functions the opacity
+    config resolves to the ENCRYPTED layer (matched by *pre-mangle* qualname).
+
+    Functions that already carry a hand-written ``@opacity(...)`` are left alone
+    (the explicit decorator wins). If no function resolves to ENCRYPTED the
+    source is returned unchanged. Emits ``from pyobfus_pro import opacity, Layer``
+    once when at least one decorator is injected. Non-ENCRYPTED layers are not
+    acted on here (in fusion ordering the opacity pass runs post-mangle and only
+    materialises L3 encryption; other layers fall through to Core's default
+    mangling).
+    """
+    from .opacity.config import OpacityConfig
+    from .opacity.layers import Layer
+    from .opacity.patterns import Resolver
+
+    cfg_path = getattr(config, "opacity_config", None)
+    if not cfg_path:  # defensive: apply_pre_passes only calls us when set
+        return source
+    opacity_cfg = OpacityConfig.from_toml(cfg_path)
+    resolver = Resolver(opacity_cfg)
+
+    tree = ast.parse(source)
+    injected = 0
+    for stmt in tree.body:
+        if not isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        if any(_is_opacity_decorator_node(d) for d in stmt.decorator_list):
+            continue  # hand-written @opacity wins; don't double-assign
+        qualname = f"{module_qualname}.{stmt.name}" if module_qualname else stmt.name
+        if resolver.resolve(qualname, decorator_layer=None) is Layer.ENCRYPTED:
+            stmt.decorator_list.insert(
+                0,
+                ast.Call(
+                    func=ast.Name(id="opacity", ctx=ast.Load()),
+                    args=[
+                        ast.Attribute(
+                            value=ast.Name(id="Layer", ctx=ast.Load()),
+                            attr="ENCRYPTED",
+                            ctx=ast.Load(),
+                        )
+                    ],
+                    keywords=[],
+                ),
+            )
+            injected += 1
+
+    if not injected:
+        return source
+
+    _ensure_opacity_imports(tree)
+    ast.fix_missing_locations(tree)
+    return ast.unparse(tree)
+
+
+def _ensure_opacity_imports(tree: ast.Module) -> None:
+    """Prepend ``from pyobfus_pro import opacity, Layer`` unless both names are
+    already imported. Inserted after any ``from __future__`` imports (which must
+    stay first)."""
+    have = set()
+    for node in tree.body:
+        if isinstance(node, ast.ImportFrom):
+            for alias in node.names:
+                have.add(alias.asname or alias.name)
+    if {"opacity", "Layer"} <= have:
+        return
+    imp = ast.ImportFrom(
+        module="pyobfus_pro",
+        names=[ast.alias(name="opacity", asname=None), ast.alias(name="Layer", asname=None)],
+        level=0,
+    )
+    insert_at = 0
+    for i, node in enumerate(tree.body):
+        if isinstance(node, ast.ImportFrom) and node.module == "__future__":
+            insert_at = i + 1
+        else:
+            break
+    tree.body.insert(insert_at, imp)
 
 
 def apply_post_passes(
@@ -92,10 +197,14 @@ def apply_post_passes(
     bytecode / ciphertext for L3) -> scrub (excepthook) -> expire check.
     """
     assignments = None
-    if getattr(config, "selective_opacity", False):
+    if getattr(config, "selective_opacity", False) or getattr(config, "opacity_config", None):
+        # Decorator-driven: both hand-written @opacity and the decorators the
+        # opacity-config PRE-pass injected (by pre-mangle qualname) are consumed
+        # here. Passing config=None keeps this pass purely decorator-based; the
+        # TOML rules already did their work pre-mangle.
         source, assignments = _t_opacity.transform_module(
             source,
-            None,  # decorator-driven; TOML config channel deferred to 0.5.2
+            None,
             module_qualname=module_qualname,
             layer_key=_layer_key(config, module_qualname),
         )
