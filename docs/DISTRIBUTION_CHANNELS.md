@@ -15,14 +15,14 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 
 ### PyPI — `pyobfus`
 - URL: https://pypi.org/project/pyobfus/
-- Current version: **0.4.0** (released 2026-04-22)
+- Current version: **0.5.3** (released 2026-07-07)
 - Pre-v0.4 baseline: ~324 downloads / month, ~30% real users (rest is mirror noise)
 - Tracker: `gh api repos/zhurong2020/pyobfus` + PePy
 
 ### PyPI — `pyobfus-mcp`
 - URL: https://pypi.org/project/pyobfus-mcp/
-- Current version: **0.2.0** (released 2026-05-08) · ships with PEP 740 sigstore attestations via OIDC trusted publishing
-- 0.2.0 contents: FastMCP 1.27 baseline + Pro funnel surfaces (`recommend_tier`, `start_pro_trial`) + 10-category MCP server security baseline (path scoping / rate limiting / audit logging) — total 7 tools registered (was 5 in 0.1.x)
+- Current version: **0.3.1** (released 2026-06-22) · ships with PEP 740 sigstore attestations via OIDC trusted publishing
+- 0.3.1 contents: FastMCP baseline + Pro funnel surfaces (`recommend_tier`, `start_pro_trial`, funnel copy naming the v0.5 Pro mechanisms) + 10-category MCP server security baseline (path scoping / rate limiting / audit logging) — total 8 tools registered (was 5 in 0.1.x)
 
 ### GitHub — `zhurong2020/pyobfus`
 - URL: https://github.com/zhurong2020/pyobfus

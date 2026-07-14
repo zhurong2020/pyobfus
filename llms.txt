@@ -60,6 +60,21 @@ uvx pyobfus-mcp
 - `--preset library` — public API preserved, internals encrypted
 - `--preset maximum` — CFF + DCI + AES + anti-debug + binding + run-count cap
 
+## Pro build-fusion mechanisms (require trial or license)
+
+The `pyobfus build` command composes six named Pro protection mechanisms via
+per-mechanism flags (0.5.1+), which stack on top of the base obfuscation:
+
+- `--selective-opacity` — Selective Opacity: opaque, per-layer-keyed wrappers around chosen callables
+- `--seal-code` — Seal-Code: tamper-evident code-object seal that aborts on modification
+- `--vault` — String Vault: per-vault-keyed at-rest encryption of string constants
+- `--scrub-traceback` — Scrub-Traceback: strips original identifiers from runtime tracebacks
+- `--fingerprint` — Fingerprint: embeds a forensic watermark for leak attribution
+- `--expire-hard` — Expire-Hard: hard build expiry that refuses to run past a deadline
+- `--period` (0.5.3) — run-count guard capping how many times a build may execute
+- `--opacity-config <toml>` (0.5.3) — target opacity by qualified name via a TOML config
+- `--bind-device` / `--bind-device-id` (0.5.3) — device-lock: derive the opacity layer key at runtime from the host
+
 ## AI agent tips
 
 - Always call `--check` before `--init` to see what breaks and what framework is detected.

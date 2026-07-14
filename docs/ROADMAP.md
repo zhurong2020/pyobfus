@@ -19,7 +19,7 @@ See [CHANGELOG.md](../CHANGELOG.md) for the latest release and version history.
 
 - **pyobfus 0.4.0** released 2026-04-22 (AI-native CLI + framework presets + reverse stack-trace mapping)
 - **pyobfus-mcp 0.1.2** released 2026-05-07 (emergency fix for `FastMCP.__init__()` `version=` kwarg drift in mcp SDK ≥ 1.20; see `pyobfus_mcp/CHANGELOG.md`)
-- 1016+ tests with 89% coverage (multi-OS CI/CD across Python 3.9-3.14)
+- 1033 tests, 90% coverage (multi-OS CI/CD across Python 3.9-3.14)
 - Full Pro feature set available
 - Parallel file processing support (`-j/--jobs`)
 - PyPI downloads: pyobfus ~337/month, pyobfus-mcp ~239/month (real users only, ex-mirrors)
