@@ -194,6 +194,36 @@ class TestRoundTrip:
             transform_module(src, vault_keys={"SECRETS": b"short"})
 
 
+class TestCollectVaultNames:
+    """``collect_vault_names`` lists vault names without encrypting -- the
+    entry point ``--bind-device`` uses to pre-derive per-vault device keys."""
+
+    def test_returns_names_in_source_order(self):
+        from pyobfus_pro.transformers.vault import collect_vault_names
+
+        src = _src("""
+            from pyobfus_pro import vault_secrets
+            ALPHA = vault_secrets({"K1": "v1"})
+            BETA = vault_secrets({"K2": "v2"})
+        """)
+        assert collect_vault_names(src) == ["ALPHA", "BETA"]
+
+    def test_empty_when_no_vaults(self):
+        from pyobfus_pro.transformers.vault import collect_vault_names
+
+        assert collect_vault_names("X = 1\n") == []
+
+    def test_validates_like_transform(self):
+        from pyobfus_pro.transformers.vault import collect_vault_names
+
+        src = _src("""
+            from pyobfus_pro import vault_secrets
+            BAD = vault_secrets({"K": 123})
+        """)
+        with pytest.raises(VaultBuildError):
+            collect_vault_names(src)
+
+
 # ---------------------------------------------------------------------------
 # Multiple vaults in one module
 # ---------------------------------------------------------------------------

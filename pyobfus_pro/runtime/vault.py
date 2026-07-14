@@ -202,10 +202,11 @@ def vault_secrets(plaintext_entries: Mapping[str, str]) -> Vault:
         SECRETS = Vault(_VAULT_BLOB_SECRETS, _VAULT_KEY_SECRETS)
 
     The build-baked key persists across process restarts so the same
-    obfuscated artifact decrypts the same secrets every run. (Future P2-8
-    ``--bind-device`` integration will replace the baked key with a
-    runtime-derived fingerprint key, eliminating the at-rest key constant
-    entirely.)
+    obfuscated artifact decrypts the same secrets every run. With P2-8
+    ``--bind-device`` (0.5.4) the baked ``_VAULT_KEY_<name>`` literal is
+    replaced with a runtime ``bind_device_key(current_machine_id(), salt)``
+    re-derivation, eliminating the at-rest key constant entirely so the vault
+    decrypts only on the bound device.
 
     Patent-relevant: this is the analogue of P2-1's ``@opacity("encrypted")``
     decorator for the *constant* materialization channel rather than the

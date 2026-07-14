@@ -198,6 +198,27 @@ def transform_module(
 # ---------------------------------------------------------------------------
 
 
+def collect_vault_names(source_code: str, *, filename: str = "<vault-pass>") -> list[str]:
+    """Return the vault attribute names in ``source_code``, in source order,
+    without encrypting anything.
+
+    Used by ``--bind-device`` to pre-derive a per-vault device key *before*
+    calling :func:`transform_module` with an explicit ``vault_keys`` mapping,
+    so the build can encrypt each vault with a device-bound key while the
+    emitted ``_VAULT_KEY_<name>`` literal is later rewritten into a runtime
+    re-derivation. Applies the same validation as the transform pass, so a
+    malformed ``vault_secrets({...})`` raises here exactly as it would there.
+
+    Raises:
+        VaultBuildError: on non-literal dict, non-string entries, or duplicate
+            vault names.
+        SyntaxError: when ``source_code`` is not valid Python.
+    """
+    tree = ast.parse(source_code, filename)
+    targets = _collect_vault_assignments(tree)
+    return [vault_name for vault_name, _plaintext in targets.values()]
+
+
 def _is_vault_secrets_call(node: ast.expr) -> bool:
     """Match ``vault_secrets(...)`` (bare) or ``<...>.vault_secrets(...)``."""
     if not isinstance(node, ast.Call):
@@ -328,4 +349,4 @@ def _ensure_vault_class_import(tree: ast.Module) -> None:
     tree.body.insert(insert_at, new_import)
 
 
-__all__: Iterable[str] = ("VaultBuildError", "transform_module")
+__all__: Iterable[str] = ("VaultBuildError", "collect_vault_names", "transform_module")
