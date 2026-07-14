@@ -1,0 +1,15 @@
+{
+  "description": "Luhn checksum validator: returns True iff a numeric string satisfies the Luhn mod-10 checksum used for credit-card and IMEI validation.",
+  "entrypoint": "luhn_valid",
+  "io_vectors": [
+    {"args": ["79927398713"], "expect": true},
+    {"args": ["79927398714"], "expect": false},
+    {"args": ["4532015112830366"], "expect": true},
+    {"args": ["1234567812345670"], "expect": true},
+    {"args": ["1234567812345678"], "expect": false},
+    {"args": [""], "expect": true}
+  ],
+  "c4_eligible": true,
+  "c4_target": "luhn_valid",
+  "c5_eligible": false
+}

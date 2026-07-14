@@ -1,0 +1,4 @@
+# Run outputs are reproducible from harness.py; don't commit them.
+# A published measurement run is copied out to docs/ deliberately, not from here.
+*
+!.gitignore

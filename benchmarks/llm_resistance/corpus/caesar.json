@@ -1,0 +1,14 @@
+{
+  "description": "Caesar cipher over ASCII letters: shifts each letter by n (mod 26), preserves case, passes non-letters through unchanged.",
+  "entrypoint": "caesar",
+  "io_vectors": [
+    {"args": ["abc", 1], "expect": "bcd"},
+    {"args": ["xyz", 3], "expect": "abc"},
+    {"args": ["Hello, World!", 5], "expect": "Mjqqt, Btwqi!"},
+    {"args": ["Mjqqt, Btwqi!", -5], "expect": "Hello, World!"},
+    {"args": ["ABC", 0], "expect": "ABC"}
+  ],
+  "c4_eligible": true,
+  "c4_target": "caesar",
+  "c5_eligible": false
+}

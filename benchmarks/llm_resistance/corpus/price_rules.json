@@ -1,0 +1,16 @@
+{
+  "description": "Tiered pricing engine: applies volume discounts (>=100/50/10 units -> 20/12/5% off) then an optional coupon (SAVE10 = 10% off, FREESHIP = flat 7.50 off floored at 0), rounded to cents.",
+  "entrypoint": "final_price",
+  "io_vectors": [
+    {"args": [1, 10.0, null], "expect": 10.0},
+    {"args": [10, 10.0, null], "expect": 95.0},
+    {"args": [50, 10.0, null], "expect": 440.0},
+    {"args": [100, 10.0, null], "expect": 800.0},
+    {"args": [100, 10.0, "SAVE10"], "expect": 720.0},
+    {"args": [1, 5.0, "FREESHIP"], "expect": 0.0},
+    {"args": [2, 5.0, "FREESHIP"], "expect": 2.5}
+  ],
+  "c4_eligible": true,
+  "c4_target": "final_price",
+  "c5_eligible": false
+}

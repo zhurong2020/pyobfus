@@ -1,0 +1,15 @@
+{
+  "description": "Integer-to-Roman-numeral converter for 1..3999 using a greedy value/symbol table.",
+  "entrypoint": "to_roman",
+  "io_vectors": [
+    {"args": [1], "expect": "I"},
+    {"args": [4], "expect": "IV"},
+    {"args": [9], "expect": "IX"},
+    {"args": [58], "expect": "LVIII"},
+    {"args": [1994], "expect": "MCMXCIV"},
+    {"args": [3888], "expect": "MMMDCCCLXXXVIII"}
+  ],
+  "c4_eligible": true,
+  "c4_target": "to_roman",
+  "c5_eligible": false
+}

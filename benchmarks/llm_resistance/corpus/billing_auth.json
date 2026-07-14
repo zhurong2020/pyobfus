@@ -1,0 +1,11 @@
+{
+  "description": "Billing-API auth helpers that read a bearer token and webhook signing secret from a module-level CREDENTIALS map; the protected semantics are the secret VALUES, not the control flow.",
+  "entrypoint": "auth_header",
+  "io_vectors": [
+    {"args": [], "expect": "Bearer sk_live_7f3d9a2b8c1e4f60"},
+    {"entrypoint": "signing_key_suffix", "args": [], "expect": "f5a9"}
+  ],
+  "c4_eligible": false,
+  "c5_eligible": true,
+  "c5_secret_var": "CREDENTIALS"
+}
