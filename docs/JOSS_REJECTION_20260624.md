@@ -3,6 +3,11 @@
 > Submission: pyobfus v0.5.1 → JOSS, pre-review issue `openjournals/joss-reviews#10788`.
 > Submitted 2026-06-22; desk-rejected 2026-06-24 by Managing EiC **Daniel S. Katz**.
 > Paper source: `paper/paper.md` + `paper/paper.bib`. Tracking: `docs/POST_V0.4_TODO.md` §Distribution.
+>
+> **2026-07-17 re-confirmed (no change)**: GitHub notification thread `#10788` closed (`stateReason=COMPLETED`,
+> "Paper rejected") — user marked it *done*. Status **unchanged**: rejected; Zenodo concept DOI
+> `10.5281/zenodo.20846053` stands as the citable artifact. No re-submission of the same software paper is
+> planned (JOSS rejection releases it for other venues per §3/§4; update the disclosure wording if ever re-submitting).
 
 ## 1. What happened (timeline of issue #10788)
 
