@@ -51,7 +51,6 @@ from pathlib import Path
 from threading import Lock
 from typing import Any, Callable, Dict, FrozenSet, Iterable, Iterator, List
 
-
 # ---------------------------------------------------------------------------
 # OpenTelemetry soft-import (Phase 2)
 # ---------------------------------------------------------------------------
@@ -182,8 +181,7 @@ class RateLimitExceeded(RuntimeError):
         self.tool_name = tool_name
         self.retry_after_seconds = retry_after_seconds
         super().__init__(
-            f"Rate limit exceeded for tool {tool_name!r}. "
-            f"Retry in {retry_after_seconds:.1f}s."
+            f"Rate limit exceeded for tool {tool_name!r}. " f"Retry in {retry_after_seconds:.1f}s."
         )
 
 
@@ -267,10 +265,7 @@ def audit_log(
             'trace' carrying potentially-sensitive log content).
     """
     redact_set = frozenset(redact_keys)
-    redacted = {
-        k: _redact_value(v) if k in redact_set else v
-        for k, v in params.items()
-    }
+    redacted = {k: _redact_value(v) if k in redact_set else v for k, v in params.items()}
     record = {
         "ts": round(time.time(), 3),
         "tool": tool_name,
@@ -319,9 +314,7 @@ def _disabled_tools() -> FrozenSet[str]:
 # ---------------------------------------------------------------------------
 
 
-def _bind_params(
-    func: Callable[..., Any], args: tuple, kwargs: dict
-) -> Dict[str, Any]:
+def _bind_params(func: Callable[..., Any], args: tuple, kwargs: dict) -> Dict[str, Any]:
     """Best-effort capture of (positional + keyword) call args as a name→value dict.
 
     Falls back to a flat representation if the call signature can't be bound
@@ -372,9 +365,7 @@ def secure_tool(
     """
     redact_keys: FrozenSet[str] = frozenset(redact_params)
 
-    def decorator(
-        func: Callable[..., Dict[str, Any]]
-    ) -> Callable[..., Dict[str, Any]]:
+    def decorator(func: Callable[..., Dict[str, Any]]) -> Callable[..., Dict[str, Any]]:
         tool_name = func.__name__
 
         @wraps(func)
@@ -453,9 +444,7 @@ def secure_tool(
                 # Success path.
                 duration_ms = (time.perf_counter() - t_start) * 1000
                 outcome = (
-                    str(result.get("status", "unknown"))
-                    if isinstance(result, dict)
-                    else "unknown"
+                    str(result.get("status", "unknown")) if isinstance(result, dict) else "unknown"
                 )
                 audit_log(
                     tool_name,

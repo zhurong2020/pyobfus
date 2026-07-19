@@ -21,7 +21,6 @@ import urllib.error
 
 from .fingerprint import get_device_fingerprint
 
-
 # Cloudflare Worker API for license verification
 LICENSE_API_URL = "https://pyobfus-license-server.zhurong0525.workers.dev/api/verify"
 
