@@ -101,9 +101,7 @@ class TestDirectoryObfuscation:
             pytest.skip("examples/multifile not present")
 
         output_dir = tmp_path / "out"
-        result = run_cli(
-            str(source_dir), "-o", str(output_dir), "--config", str(config), "-v"
-        )
+        result = run_cli(str(source_dir), "-o", str(output_dir), "--config", str(config), "-v")
         assert result.returncode == 0, result.stderr
         assert list(output_dir.rglob("*.py")), "no Python files were emitted"
 
