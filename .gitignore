@@ -170,8 +170,12 @@ obfuscated/
 local-testing/
 .test_env/
 
-# Integration tests with local paths (personal use only)
-integration_tests/
+# integration_tests/ used to hold personal scripts with hard-coded local paths
+# and was ignored wholesale. AGENTS.md meanwhile documents `pytest
+# integration_tests/` as a required test root, so the root silently did not
+# exist — CI collected zero tests there. It is tracked again as of 0.5.4 and
+# now holds portable end-to-end tests that resolve paths relative to the repo.
+# Keep anything machine-specific out of it, or ignore that file by name here.
 
 # Temporary scripts and utilities
 scripts/upload_pypi.py
