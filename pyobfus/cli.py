@@ -217,8 +217,9 @@ except ImportError:
 @click.option(
     "--bind-device",
     is_flag=True,
-    help="Bind L3 encryption to this build machine; decrypts only on it "
-    "(Pro, v0.5.3; needs --selective-opacity/--opacity-config; distinct from --bind-machine)",
+    help="Bind L3 opacity and/or --vault keys to this build machine; decrypts "
+    "only on it (Pro, v0.5.3; pairs with --selective-opacity/--opacity-config "
+    "and/or --vault; distinct from --bind-machine)",
 )
 @click.option(
     "--bind-device-id",

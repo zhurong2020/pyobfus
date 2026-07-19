@@ -26,6 +26,13 @@ and ``--bind-device`` (encrypts the L3 layer key with a device fingerprint at
 build, then rewrites the emitted ``_LAYER_KEY`` literal into a runtime
 ``bind_device_key(current_machine_id(), salt)`` re-derivation, so decryption only
 succeeds on the bound device — supplied ``--bind-device-id`` or the build machine).
+
+0.5.4 extends ``--bind-device`` to the String Vault: with ``--vault`` set, each
+vault's ``_VAULT_KEY_<name>`` is likewise encrypted with a per-vault
+device-derived key at build and rewritten into a runtime re-derivation, so vault
+keys no longer ship as at-rest literals either. This runs in the vault PRE-pass
+(see :func:`_apply_vault_device_binding`) because Core preserves the
+``_VAULT_KEY_<name>`` constant names and imported symbols through mangling.
 """
 
 from __future__ import annotations
@@ -150,6 +157,130 @@ def _substitute_layer_key_binding(source: str, salt: bytes) -> str:
     return ast.unparse(tree)
 
 
+_VAULT_KEY_PREFIX = "_VAULT_KEY_"
+
+
+def _apply_vault_device_binding(source: str, config) -> str:
+    """Run the vault PRE-pass with per-vault **device-derived** keys and rewrite
+    each emitted ``_VAULT_KEY_<name>`` literal into a runtime re-derivation.
+
+    Mirrors opacity's ``--bind-device`` handling for the *constant*
+    materialization channel: each vault gets a fresh 32-byte salt, its blob is
+    encrypted at build with ``bind_device_key(target_id, salt)`` (``target_id``
+    = ``--bind-device-id`` or the build machine), and the baked
+    ``_VAULT_KEY_<name> = b"..."`` is replaced with
+    ``_VAULT_KEY_<name> = bind_device_key(current_machine_id(), _pyobfus_vault_salt_<name>)``
+    so the raw key never ships and each vault decrypts only on the bound device.
+
+    Per-vault salts (not one shared salt) keep the vault keys mutually
+    independent, preserving the transformer's per-vault-key design under device
+    binding. No-op device binding when the module has no vaults.
+    """
+    import secrets
+
+    from .license_binding import bind_device_key, current_machine_id
+
+    names = _t_vault.collect_vault_names(source)
+    if not names:
+        # --bind-device --vault on a module with no vault_secrets({...}): the
+        # plain transform is a no-op too, but call it for parity / import shape.
+        transformed, _schemas = _t_vault.transform_module(source)
+        return transformed
+
+    salts = {name: secrets.token_bytes(_BUILD_SALT_SIZE) for name in names}
+    target_id = getattr(config, "bind_device_id", None) or current_machine_id()
+    vault_keys = {name: bind_device_key(target_id, salts[name]) for name in names}
+    transformed, _schemas = _t_vault.transform_module(source, vault_keys=vault_keys)
+    return _substitute_vault_key_bindings(transformed, salts)
+
+
+def _vault_key_target_name(node: ast.stmt) -> Optional[str]:
+    """Return ``<name>`` for a ``_VAULT_KEY_<name> = ...`` assignment, else None."""
+    if (
+        isinstance(node, ast.Assign)
+        and len(node.targets) == 1
+        and isinstance(node.targets[0], ast.Name)
+        and node.targets[0].id.startswith(_VAULT_KEY_PREFIX)
+    ):
+        return node.targets[0].id[len(_VAULT_KEY_PREFIX) :]
+    return None
+
+
+def _substitute_vault_key_bindings(source: str, salts: dict) -> str:
+    """Rewrite each ``_VAULT_KEY_<name> = b"..."`` into a device re-derivation.
+
+    For every vault named in ``salts`` the baked key literal becomes
+    ``bind_device_key(current_machine_id(), _pyobfus_vault_salt_<name>)`` and a
+    ``_pyobfus_vault_salt_<name> = b"..."`` assignment is inserted immediately
+    before it. A single import of the two runtime helpers is prepended once
+    (after any ``from __future__`` imports). No-op if no matching key literal is
+    present.
+    """
+    tree = ast.parse(source)
+    new_body: list[ast.stmt] = []
+    injected = False
+    for node in tree.body:
+        vault_name = _vault_key_target_name(node)
+        if vault_name is not None and vault_name in salts:
+            salt_name = f"_pyobfus_vault_salt_{vault_name}"
+            new_body.append(
+                ast.Assign(
+                    targets=[ast.Name(id=salt_name, ctx=ast.Store())],
+                    value=ast.Constant(value=salts[vault_name]),
+                )
+            )
+            node.value = ast.Call(  # type: ignore[attr-defined]
+                func=ast.Name(id="_pyobfus_bind_device_key", ctx=ast.Load()),
+                args=[
+                    ast.Call(
+                        func=ast.Name(id="_pyobfus_machine_id", ctx=ast.Load()),
+                        args=[],
+                        keywords=[],
+                    ),
+                    ast.Name(id=salt_name, ctx=ast.Load()),
+                ],
+                keywords=[],
+            )
+            injected = True
+        new_body.append(node)
+
+    if not injected:
+        return source
+
+    tree.body = new_body
+    _ensure_bind_device_import(tree)
+    ast.fix_missing_locations(tree)
+    return ast.unparse(tree)
+
+
+def _ensure_bind_device_import(tree: ast.Module) -> None:
+    """Prepend ``from pyobfus_pro import bind_device_key as _pyobfus_bind_device_key,
+    current_machine_id as _pyobfus_machine_id`` once, after any ``from __future__``
+    imports. Idempotent on the aliased names."""
+    have = set()
+    for node in tree.body:
+        if isinstance(node, ast.ImportFrom):
+            for alias in node.names:
+                have.add(alias.asname or alias.name)
+    if {"_pyobfus_bind_device_key", "_pyobfus_machine_id"} <= have:
+        return
+    imp = ast.ImportFrom(
+        module="pyobfus_pro",
+        names=[
+            ast.alias(name="bind_device_key", asname="_pyobfus_bind_device_key"),
+            ast.alias(name="current_machine_id", asname="_pyobfus_machine_id"),
+        ],
+        level=0,
+    )
+    insert_at = 0
+    for i, node in enumerate(tree.body):
+        if isinstance(node, ast.ImportFrom) and node.module == "__future__":
+            insert_at = i + 1
+        else:
+            break
+    tree.body.insert(insert_at, imp)
+
+
 def apply_pre_passes(source: str, config, *, module_qualname: str = "") -> str:
     """Source transforms that must run BEFORE the Core pipeline.
 
@@ -164,9 +295,20 @@ def apply_pre_passes(source: str, config, *, module_qualname: str = "") -> str:
       the injected decorator survives mangling and is consumed by the opacity
       POST-pass exactly like a hand-written one. This sidesteps any
       mangled->original name-map coupling.
+
+    When ``--bind-device`` is set the vault pass encrypts each vault with a
+    device-derived key and rewrites its emitted ``_VAULT_KEY_<name>`` literal
+    into a runtime re-derivation (see :func:`_apply_vault_device_binding`), so
+    the vault keys never ship as at-rest constants. The rewrite is done here in
+    the PRE-pass rather than the POST-pass because Core preserves both the
+    ``_VAULT_KEY_<name>`` constant names and imported symbols unchanged, so the
+    injected ``bind_device_key(...)`` derivation survives mangling intact.
     """
     if getattr(config, "vault", False):
-        source, _schemas = _t_vault.transform_module(source)
+        if getattr(config, "bind_device", False):
+            source = _apply_vault_device_binding(source, config)
+        else:
+            source, _schemas = _t_vault.transform_module(source)
     if getattr(config, "opacity_config", None):
         source = _apply_opacity_config_prepass(source, config, module_qualname)
     return source

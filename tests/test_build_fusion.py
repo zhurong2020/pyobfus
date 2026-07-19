@@ -353,6 +353,136 @@ class TestBindDevice:
 
 
 @requires_pro
+class TestVaultBindDevice:
+    """`--bind-device --vault` rewrites each baked `_VAULT_KEY_<name>` into a
+    runtime device-derived key, so vault decryption only succeeds on the bound
+    device. Per-vault salts keep the vault keys mutually independent."""
+
+    def _src(self, tmp_path):
+        f = tmp_path / "mod.py"
+        f.write_text(
+            'CFG = vault_secrets({"API_KEY": "sk-secret-xyz", "ENV": "prod"})\n'
+            'DB = vault_secrets({"DSN": "postgres://secret"})\n\n'
+            "def run():\n"
+            "    return CFG.get('API_KEY') + '|' + DB.get('DSN')\n"
+        )
+        return f
+
+    def _yaml(self, tmp_path):
+        y = tmp_path / "pyobfus.yaml"
+        y.write_text("obfuscation:\n  exclude_names: [run]\n")
+        return y
+
+    def test_bind_device_rewrites_vault_keys(self, runner, tmp_path):
+        src = self._src(tmp_path)
+        out = tmp_path / "o.py"
+        res = _invoke(runner, src, out, "--vault", "--bind-device")
+        assert res.exit_code == 0, res.output
+        text = out.read_text()
+        assert "_pyobfus_bind_device_key(" in text
+        # both vaults' raw key literals must be gone
+        assert "_VAULT_KEY_CFG = b'" not in text and '_VAULT_KEY_CFG = b"' not in text
+        assert "_VAULT_KEY_DB = b'" not in text and '_VAULT_KEY_DB = b"' not in text
+        assert _compiles(out)
+
+    def test_bind_device_runs_on_build_machine(self, runner, tmp_path):
+        src = self._src(tmp_path)
+        yaml_cfg = self._yaml(tmp_path)
+        out = tmp_path / "o.py"
+        with patch("pyobfus.cli.is_trial_active", return_value=True):
+            res = runner.invoke(
+                main,
+                [
+                    str(src),
+                    "-o",
+                    str(out),
+                    "--level",
+                    "pro",
+                    "--config",
+                    str(yaml_cfg),
+                    "--vault",
+                    "--bind-device",
+                ],
+            )
+        assert res.exit_code == 0, res.output
+        m = _load_module(out, "vbd_match")
+        # build machine == run machine -> both vaults re-derive their key -> decrypt
+        assert m.run() == "sk-secret-xyz|postgres://secret"
+
+    def test_bind_device_wrong_device_fails(self, runner, tmp_path):
+        src = self._src(tmp_path)
+        yaml_cfg = self._yaml(tmp_path)
+        out = tmp_path / "o.py"
+        with patch("pyobfus.cli.is_trial_active", return_value=True):
+            res = runner.invoke(
+                main,
+                [
+                    str(src),
+                    "-o",
+                    str(out),
+                    "--level",
+                    "pro",
+                    "--config",
+                    str(yaml_cfg),
+                    "--vault",
+                    "--bind-device-id",
+                    "not-this-machine-xyz",
+                ],
+            )
+        assert res.exit_code == 0, res.output
+        m = _load_module(out, "vbd_mismatch")
+        from pyobfus_pro.runtime.vault import VaultError
+
+        # ciphertext keyed to a different device -> GCM tag fails on decrypt
+        with pytest.raises(VaultError):
+            m.run()
+
+    def test_bind_device_no_vault_secrets_is_noop(self, runner, tmp_path):
+        # --vault --bind-device on a module with no vault_secrets({...}) must
+        # not crash and must not emit a device-binding import.
+        src = tmp_path / "mod.py"
+        src.write_text("VALUE = 41\n\ndef run():\n    return VALUE + 1\n")
+        out = tmp_path / "o.py"
+        res = _invoke(runner, src, out, "--vault", "--bind-device")
+        assert res.exit_code == 0, res.output
+        assert _compiles(out)
+        assert "_pyobfus_bind_device_key(" not in out.read_text()
+
+
+@requires_pro
+def test_vault_device_binding_uses_distinct_per_vault_salts():
+    """Each vault gets its own salt (checked pre-Core so names are unmangled),
+    so the two device-derived keys are independent."""
+    import ast
+
+    from pyobfus_pro import build_fusion
+
+    class _Cfg:
+        vault = True
+        bind_device = True
+        bind_device_id = "device-under-test"
+        opacity_config = None
+
+    src = 'CFG = vault_secrets({"A": "x"})\n' 'DB = vault_secrets({"B": "y"})\n'
+    out = build_fusion._apply_vault_device_binding(src, _Cfg())
+    assert "_pyobfus_bind_device_key(" in out
+    salts = [
+        node.value.value
+        for node in ast.walk(ast.parse(out))
+        if isinstance(node, ast.Assign)
+        and len(node.targets) == 1
+        and isinstance(node.targets[0], ast.Name)
+        and node.targets[0].id.startswith("_pyobfus_vault_salt_")
+        and isinstance(node.value, ast.Constant)
+    ]
+    assert len(salts) == 2
+    assert salts[0] != salts[1]
+    # raw key literals replaced, not baked
+    assert "_VAULT_KEY_CFG = b'" not in out
+    assert "_VAULT_KEY_DB = b'" not in out
+
+
+@requires_pro
 def test_period_runtime_enforces_limit(runner, tmp_path, monkeypatch):
     """The injected run-counter raises LicenseExpired past the limit, and the
     counter path is resolved at runtime via $PYOBFUS_COUNTER_DIR (not baked in
