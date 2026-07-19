@@ -2,13 +2,31 @@
 Trial Management System for pyobfus Professional Edition.
 
 This module implements a 5-day trial for Pro features without requiring
-registration or payment. Trial is device-bound and one-time only.
+registration or payment.
+
+Trust boundary — read before relying on this for enforcement
+------------------------------------------------------------
+The trial is a **convenience control, not a security boundary**. It records
+state in an unsigned JSON file under the user's home directory, and this
+module ships as readable Apache-2.0 source. A user who controls the machine
+can edit either the state file or ``TRIAL_DURATION`` below, and no
+client-side arrangement can prevent that: an open-source verifier is always
+patchable by the person running it.
+
+The device ID is therefore a *scoping* mechanism (it keeps a trial record
+from being copied between machines by accident), not an anti-tamper one.
+Deliberate bypass is expected and accepted; the trial exists to give honest
+evaluators a frictionless five days, not to stop determined ones.
+
+Making Pro enforcement a genuine boundary would require not shipping Pro as
+readable source in the public wheel — a distribution-model change, not a
+change to this file. See GitHub issues #20 and #21 for the full discussion.
 
 Design goals:
 - No registration required (reduce friction)
 - 5-day duration
-- Device-bound (one trial per machine)
-- Clear messaging about trial status
+- Per-machine trial record (scoping, not enforcement)
+- Clear, honest messaging about trial status
 """
 
 import hashlib
@@ -27,9 +45,11 @@ TRIAL_DURATION = timedelta(days=5)
 
 def get_device_id() -> str:
     """
-    Get a unique device identifier.
+    Get a device identifier used to scope a trial record to one machine.
 
     Uses a combination of hostname and MAC address to create a stable ID.
+    This is not a security control: both inputs are user-controllable, and
+    the value only decides whether an existing trial record applies here.
 
     Returns:
         str: 16-character hex device ID
@@ -59,8 +79,8 @@ def start_trial() -> Dict[str, Any]:
             - expires: str (ISO format date)
             - days_remaining: int
 
-    Raises:
-        TrialAlreadyUsedError: If trial was already used on this device
+    Never raises for an already-used trial; it returns ``success: False``
+    with an explanatory message instead.
     """
     # Check if trial already exists
     existing = get_trial_status()

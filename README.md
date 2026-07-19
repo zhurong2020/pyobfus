@@ -171,6 +171,14 @@ pyobfus input.py -o output.py --level pro
 
 After your trial, purchase a license to continue using Pro features.
 
+> **The trial runs on the honor system.** It stores its state in an unsigned
+> file in your home directory, and `pyobfus/trial.py` is readable Apache-2.0
+> source — so it is a convenience control, not a security boundary, and we
+> document it as such rather than claiming protection it cannot deliver. See
+> [SECURITY.md](SECURITY.md#trust-boundary-the-pro-trial-is-not-a-security-boundary).
+> Note that the **Community Edition has no file or line limits and needs no
+> trial at all** — the trial gates only the Pro mechanisms.
+
 ## Purchase Professional Edition
 
 **Pro Edition Features**:

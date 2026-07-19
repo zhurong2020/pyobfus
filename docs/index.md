@@ -162,8 +162,8 @@ def I0(I1, I2):
 Want to test Pro features before purchasing? Use the **5-day free trial**:
 
 ```bash
-# Start a free trial (no credit card required)
-pyobfus-trial start --email your@email.com
+# Start a free trial (no registration, no credit card required)
+pyobfus-trial start
 
 # Quick start with presets
 pyobfus src/ -o dist/ --preset commercial
@@ -179,6 +179,14 @@ pyobfus-trial status
 ```
 
 The trial includes all Pro features with full functionality for 5 days.
+
+!!! note "The trial is an honor-system control"
+    Trial state lives in an unsigned file in your home directory, and
+    `pyobfus/trial.py` ships as readable Apache-2.0 source, so the trial is a
+    convenience control rather than a security boundary. We document it that way
+    instead of claiming enforcement it cannot deliver — see the
+    [security policy](https://github.com/zhurong2020/pyobfus/blob/main/SECURITY.md).
+    The Community Edition has no file or line limits and requires no trial.
 
 ### How to Purchase
 

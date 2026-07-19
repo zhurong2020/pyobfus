@@ -4,6 +4,11 @@
 
 **Use as cold-start cheat sheet** when resuming work after a session break. This doc supersedes ad-hoc TODO scattered in chat; future Claude sessions should read this first.
 
+> **Current executable handoff (2026-07-19):** start with
+> [`RESUME_PLAN_2026-07-19.md`](RESUME_PLAN_2026-07-19.md). It reconciles the
+> live trial-bypass issues (#20/#21), PR #19, CI coverage gaps, and the ordered
+> path to 0.5.4. This file remains the longer historical backlog.
+
 ---
 
 ## 🔜 Forward TODO (updated 2026-06-22)

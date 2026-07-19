@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **The Pro trial is now documented as a convenience control, not a security
+  boundary** (reported in [#20](https://github.com/zhurong2020/pyobfus/issues/20)
+  and [#21](https://github.com/zhurong2020/pyobfus/issues/21) — thanks to
+  @CoderWhoUsesPython and @zcveo5). Trial state is an unsigned JSON file and
+  `TRIAL_DURATION` is a plain constant in readable Apache-2.0 source, so a user
+  who controls the machine can extend the trial. This was always true; the
+  defect was that `pyobfus/trial.py` claimed the trial was "device-bound and
+  one-time only," which promised enforcement the implementation cannot deliver.
+  No client-side check inside an open-source package can be tamper-proof, so
+  rather than add signing that only raises the bar for editing data while
+  leaving the verifier equally patchable, the boundary is now stated honestly
+  in `trial.py`, `SECURITY.md`, `README.md` and the docs site. Trial bypass is
+  explicitly out of scope for the security policy. The Community Edition
+  remains fully Apache-2.0 with no file or line limits and needs no trial.
+- `SECURITY.md` supported-versions table updated from the stale 0.4.x line to
+  0.5.x.
+
+### Fixed
+
+- Docs site showed `pyobfus-trial start --email your@email.com`; the CLI has no
+  `--email` option.
+- Removed a stale `Raises: TrialAlreadyUsedError` from `start_trial()`'s
+  docstring — no such exception exists; the function returns
+  `success: False` instead.
+
+### Added
+
+- `tests/test_trial.py::TestTrialTrustBoundary` — four tests that pin the
+  documented limitation by asserting tampering *succeeds*. If a future change
+  adds signing or server-issued entitlements these fail deliberately, forcing
+  the documented boundary to be updated with the implementation.
+
 ## [0.5.3] - 2026-07-07
 
 **Feature release.** Completes the three build-fusion Pro flags deferred from
