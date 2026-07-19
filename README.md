@@ -18,7 +18,7 @@
 
 A Python code obfuscator built with AST-based transformations. **Supports Python 3.9 through 3.14**. Provides reliable name mangling, string encoding, control-flow flattening, AES-256 string encryption, and — unique to pyobfus — a reverse-mapping workflow that lets you (or your AI coding assistant) debug obfuscated stack traces without giving up the protection.
 
-> **🆕 What's new in v0.5.3** — the patent-targeted **Pro mechanisms** are now one-line `pyobfus build` flags: Selective Opacity (per-symbol AES-256 layers), forensic watermarking, Runtime String Vault, `@seal_code` integrity, and traceback scrubbing — plus, new in 0.5.3, **`--period`** (run-counter limit), **`--opacity-config`** (pattern-driven L3 encryption by original qualname), and **`--bind-device` / `--bind-device-id`** (device-locked encryption). Full details in the [CHANGELOG](CHANGELOG.md); see [Pro Edition](#-pro-edition-available-now) below.
+> **🆕 What's new in v0.5.4** — **`--bind-device` now device-locks Runtime String Vault keys too**, not just Selective Opacity's L3 layer. Vault keys previously shipped as baked literals, so vault secrets decrypted on any machine; now each vault's key is re-derived at runtime from the bound device and a wrong machine is refused. The other patent-targeted **Pro mechanisms** remain one-line flags: Selective Opacity (per-symbol AES-256 layers), forensic watermarking, `@seal_code` integrity, traceback scrubbing, `--period` (run-counter limit) and `--opacity-config` (pattern-driven L3 encryption by original qualname). Pro flags are used as `pyobfus SRC -o OUT --level pro --<flag>`. Full details in the [CHANGELOG](CHANGELOG.md); see [Pro Edition](#-pro-edition-available-now) below.
 
 ## 🔌 Companion MCP server: [`pyobfus-mcp`](pyobfus_mcp/)
 

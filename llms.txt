@@ -73,7 +73,7 @@ per-mechanism flags (0.5.1+), which stack on top of the base obfuscation:
 - `--expire-hard` — Expire-Hard: hard build expiry that refuses to run past a deadline
 - `--period` (0.5.3) — run-count guard capping how many times a build may execute
 - `--opacity-config <toml>` (0.5.3) — target opacity by qualified name via a TOML config
-- `--bind-device` / `--bind-device-id` (0.5.3) — device-lock: derive the opacity layer key at runtime from the host
+- `--bind-device` / `--bind-device-id` (0.5.3; extended to Vault keys in 0.5.4) — device-lock: derive the opacity layer key AND each Runtime String Vault key at runtime from the host, so neither ships as a baked literal and a wrong machine is refused
 
 ## AI agent tips
 

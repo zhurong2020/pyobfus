@@ -77,8 +77,8 @@ pip install.
 | **C1** | core mangling | `pyobfus --preset aggressive` | identifiers, docstrings |
 | **C2** | + string encryption | `pyobfus --preset aggressive --string-encryption` | + string literals (AES) |
 | **C3** | + control-flow flattening | `pyobfus --preset aggressive --string-encryption --control-flow` | + control structure |
-| **C4** | Pro L3 opacity | `pyobfus build --preset maximum --selective-opacity` (marked fns) | **the function body itself** (ciphertext) |
-| **C5** | Pro L3 vault | `pyobfus build --preset maximum --vault` (marked secrets) | **string secrets** (ciphertext) |
+| **C4** | Pro L3 opacity | `pyobfus SRC -o OUT --level pro --preset maximum --selective-opacity` (marked fns) | **the function body itself** (ciphertext) |
+| **C5** | Pro L3 vault | `pyobfus SRC -o OUT --level pro --preset maximum --vault` (marked secrets) | **string secrets** (ciphertext) |
 
 C0–C3 are the "make it harder to read" ladder that Acoda-style semantic recovery
 attacks the strongest; C4–C5 are the "not there to read" step-change. The report

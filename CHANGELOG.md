@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.4] - 2026-07-19
+
+**Feature + honesty release.** Closes the last device-binding scope boundary
+(String Vault keys), makes CI enforce the three test roots that `AGENTS.md`
+documents, and corrects several places where the documentation promised more
+than the implementation delivers. Published to PyPI via OIDC Trusted Publishing
+with PEP 740 attestations. `pyobfus-mcp` is unchanged at 0.3.1 (no tool-surface
+change), so no Glama Build-steps re-pin is needed for this release.
+
+### Added
+
+- **`--bind-device` now also device-locks String Vault keys (Pro).** Previously
+  `--vault --bind-device` derived a device key but never used it for the vault:
+  only the Selective-Opacity L3 `_LAYER_KEY` was bound, while each
+  `_VAULT_KEY_<name>` shipped as a baked at-rest literal — so vault secrets
+  decrypted on *any* machine. Now each vault is encrypted at build with its own
+  device-derived key `bind_device_key(target_id, salt)` and the emitted literal
+  is rewritten into a runtime
+  `bind_device_key(current_machine_id(), _pyobfus_vault_salt_<name>)`
+  re-derivation. The raw key never ships; a wrong device raises `VaultError` on
+  first `.get()`. Per-vault salts keep vaults mutually independent.
+  `--bind-device-id <id>` binds to the supplied customer machine instead of the
+  build machine. No-op (not a crash) on a `--vault` module with no
+  `vault_secrets({...})`. Implemented in the vault PRE-pass, since Core
+  preserves the constant names and imported symbols through mangling.
+  (`pyobfus_pro/build_fusion.py`, `transformers/vault.py::collect_vault_names`.)
+- `tests/test_trial.py::TestTrialTrustBoundary` — four tests that pin the
+  trial's documented limitation by asserting tampering *succeeds*, so a future
+  change that adds signing fails loudly instead of silently contradicting the
+  docs.
+
 ### Changed
 
 - **The Pro trial is now documented as a convenience control, not a security
@@ -25,8 +56,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   remains fully Apache-2.0 with no file or line limits and needs no trial.
 - `SECURITY.md` supported-versions table updated from the stale 0.4.x line to
   0.5.x.
+- **CI now enforces all three documented test roots.** `pyobfus_mcp/tests/`
+  (73 tests) was never run in CI — only `_build_server()` was called — and
+  `integration_tests/` was an empty directory, so the documented
+  `pytest integration_tests/` root collected zero tests. Both are now real
+  jobs, and the former inline CLI smoke steps became collectible end-to-end
+  tests that execute the obfuscated output and compare its stdout against the
+  original. `black`/`ruff` coverage extended to `pyobfus_pro/`, the MCP package
+  and `integration_tests/`. The mypy baseline (8 errors) is tracked in #22.
+- Removed `--ignore=tests/test_pro_features.py` from pytest `addopts`; its
+  rationale ("pyobfus_pro is not in the public repo") stopped being true in
+  0.5.0 and the test passes.
 
 ### Fixed
+
+- **Documented command syntax that does not exist.** Release notes and docs
+  described the build-fusion flags as `pyobfus build --<flag>`, but there is no
+  `build` subcommand — `pyobfus` is a single command, so copying the documented
+  form produced `Error: Invalid value for '[INPUT_PATH]': Path 'build' does not
+  exist`. This affected the headline Pro flags for 0.5.1 through 0.5.3. The
+  correct form is `pyobfus SRC -o OUT --level pro --<flag>`.
 
 - Docs site showed `pyobfus-trial start --email your@email.com`; the CLI has no
   `--email` option.
@@ -50,7 +99,7 @@ tool-surface change; its `pyobfus>=0.5.1` floor resolves to 0.5.3).
 
 ### Added
 
-- **`pyobfus build --bind-device` / `--bind-device-id <id>` — device-locked L3
+- **`--bind-device` / `--bind-device-id <id>` (build fusion) — device-locked L3
   encryption (Pro, 0.5.3).** Encrypts the Selective-Opacity L3 layer key with a
   device fingerprint at build time (`bind_device_key(machine_id, salt)`), then
   rewrites the emitted `_LAYER_KEY = b"..."` literal into a runtime
@@ -63,7 +112,7 @@ tool-surface change; its `pyobfus>=0.5.1` floor resolves to 0.5.3).
   (`--selective-opacity` / `--opacity-config`) to have a key to bind. This is the
   build-fusion, patent-lane counterpart to the older license-embed
   `--bind-machine` (P2-8 device axis).
-- **`pyobfus build --opacity-config opacity.toml` — pattern-driven Selective
+- **`--opacity-config opacity.toml` (build fusion) — pattern-driven Selective
   Opacity (Pro, 0.5.3).** Assign the ENCRYPTED (L3) layer to functions by glob
   patterns over their **original** qualnames (e.g. `pattern = "*.secret_*"`),
   without hand-annotating each with `@opacity(...)`. Rules are resolved in a
@@ -75,7 +124,7 @@ tool-surface change; its `pyobfus>=0.5.1` floor resolves to 0.5.3).
   decorators still win over config rules. (In this fusion ordering only the
   ENCRYPTED layer is materialized; transparent/ai-readable/obfuscated layers
   fall through to Core's default mangling.)
-- **`pyobfus build --period N` — crypto-bound run-counter limit (Pro, 0.5.3).**
+- **`--period N` (build fusion) — crypto-bound run-counter limit (Pro, 0.5.3).**
   Injects a module-top `period_check(default_counter_path(<artifact-id>), N)`
   guard that refuses to import once the artifact's run counter exceeds `N`,
   raising `LicenseExpired`. The counter path is resolved at **runtime** on the
