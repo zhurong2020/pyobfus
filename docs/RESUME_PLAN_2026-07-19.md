@@ -1,5 +1,41 @@
 # pyobfus Resume Plan — 2026-07-19
 
+> **STATUS 2026-07-19 (end of session): P0.1, P0.2, P1.1, P1.2 and P1.3 are
+> DONE and 0.5.4 is published.** What actually happened, including what the
+> plan did not anticipate:
+>
+> - **P0.1 — done.** Both reporters thanked publicly; #20 and #21 answered with
+>   the reasoning that a client-side verifier in an open-source package cannot
+>   be made tamper-proof, so signing the state file would close #20 and leave
+>   #21 untouched. Chose the honest option: keep the trial as a convenience
+>   control and say so. Over-claims removed from `trial.py`, `SECURITY.md`,
+>   `README.md` and the docs site; trial bypass declared out of scope; four
+>   tests added that pin the limitation by asserting tampering *succeeds*.
+>   Issues relabeled off `bug` to `documentation` + `trial-boundary`.
+>   **Deviation from plan:** no private security advisory was opened, and the
+>   public threads were not locked. Neither report is a vulnerability — no user
+>   is harmed — and locking a working, accurate bypass guide would have been
+>   both misleading and a Streisand invitation. Handled fully in public.
+> - **P0.2 — done, and it found more than expected.** `pyobfus_mcp/tests/`
+>   (73 tests) had never run in CI. `integration_tests/` was worse than "an
+>   empty directory": `.gitignore` excluded it wholesale, so the root
+>   documented in `AGENTS.md` had never existed in any clone. Both are real
+>   jobs now. Also removed a stale `--ignore=tests/test_pro_features.py` from
+>   pytest `addopts`, and extended black/ruff to `pyobfus_pro/` and the MCP
+>   package. mypy stays non-blocking; the 8-error baseline is tracked in #22.
+> - **P1.1 — done.** PR #19 reviewed against the checklist and verified
+>   empirically (build-device decrypt, wrong-device `VaultError`,
+>   `--bind-device-id` binding to the supplied id rather than the builder,
+>   distinct per-vault salts, no-vault no-op). Squash-merged.
+> - **P1.2 — done.** 0.5.4 tagged and published via OIDC with attestations.
+>   `pyobfus-mcp` deliberately not bumped, so no Glama re-pin.
+> - **Unplanned find:** there is no `pyobfus build` subcommand. 0.5.1–0.5.3
+>   release notes documented the headline Pro flags with that syntax, so
+>   anyone copying them hit `Path 'build' does not exist`. Corrected.
+>
+> **Next up, in order:** P1.4 launch wave · #22 mypy gate · P2.1 benchmark
+> evidence. The P0 queue is clear, so P2 work is no longer blocked.
+
 **Purpose**: current, executable handoff for the next maintainer/agent session.
 Start here, then use [`POST_V0.4_TODO.md`](POST_V0.4_TODO.md) for the longer
 historical backlog and [`ROADMAP.md`](ROADMAP.md) for strategic candidates.

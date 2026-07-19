@@ -5,9 +5,15 @@
 **Use as cold-start cheat sheet** when resuming work after a session break. This doc supersedes ad-hoc TODO scattered in chat; future Claude sessions should read this first.
 
 > **Current executable handoff (2026-07-19):** start with
-> [`RESUME_PLAN_2026-07-19.md`](RESUME_PLAN_2026-07-19.md). It reconciles the
-> live trial-bypass issues (#20/#21), PR #19, CI coverage gaps, and the ordered
-> path to 0.5.4. This file remains the longer historical backlog.
+> [`RESUME_PLAN_2026-07-19.md`](RESUME_PLAN_2026-07-19.md), whose status header
+> records what shipped. This file remains the longer historical backlog.
+>
+> **0.5.4 published 2026-07-19.** Vault-key device binding landed (PR #19), so
+> the "vault keys still ship as baked literals" scope boundary below is CLOSED.
+> The trial-bypass reports #20/#21 are answered and the trial is now documented
+> as a convenience control, not a security boundary. CI enforces all three test
+> roots. Remaining open: #22 (mypy gate), the launch wave, P2-18 benchmark
+> evidence.
 
 ---
 
@@ -30,8 +36,10 @@
 
    1033 tests green (+8 for 0.5.3), ruff/format/mypy clean on all new code. ✅ **Released 2026-07-07 as v0.5.3** (version bumped, CHANGELOG finalized, tag `v0.5.3` → OIDC + PEP 740 PyPI publish). **pyobfus-mcp NOT bumped** (0.5.3 changes no tool surface; the mcp `pyobfus>=0.5.1` floor resolves to 0.5.3), so **no Glama Build-steps re-bump is needed this release** (Glama installs `pyobfus-mcp==0.3.1`, unchanged). Design notes in `docs/V0.5_RELEASE_PLAN.md`.
 
-   **↳ 0.5.4 (next feature release) — deferred follow-ups (recorded 2026-07-07):**
-   - **Vault-key device binding.** Extend `--bind-device` to ALSO rewrite each emitted `_VAULT_KEY_<name>` constant into a runtime device derivation (same technique as the opacity `_LAYER_KEY` rewrite in `62646b6` / `build_fusion._substitute_layer_key_binding`), so `--vault --bind-device` yields a FULLY device-locked artifact. **Today only opacity L3 is locked; vault keys still ship as baked literals, so vault secrets decrypt on ANY machine** — a documented scope boundary, not a bug. Implementation note: vault runs in the PRE-pass and emits PER-vault keys (not a single post-pass `_LAYER_KEY`), so the device key must be passed into `_t_vault.transform_module(..., vault_keys=...)` at build AND a post-substitution must rewrite each `_VAULT_KEY_*` — different plumbing from opacity's single point. Add vault device-match / device-mismatch runtime tests.
+   **↳ 0.5.4 — ✅ RELEASED 2026-07-19.** Vault-key device binding shipped via
+   PR #19; the scope boundary described below is closed. Kept for the design
+   rationale.
+   - ✅ **Vault-key device binding — DONE (PR #19, 0.5.4).** Extend `--bind-device` to ALSO rewrite each emitted `_VAULT_KEY_<name>` constant into a runtime device derivation (same technique as the opacity `_LAYER_KEY` rewrite in `62646b6` / `build_fusion._substitute_layer_key_binding`), so `--vault --bind-device` yields a FULLY device-locked artifact. **Today only opacity L3 is locked; vault keys still ship as baked literals, so vault secrets decrypt on ANY machine** — a documented scope boundary, not a bug. Implementation note: vault runs in the PRE-pass and emits PER-vault keys (not a single post-pass `_LAYER_KEY`), so the device key must be passed into `_t_vault.transform_module(..., vault_keys=...)` at build AND a post-substitution must rewrite each `_VAULT_KEY_*` — different plumbing from opacity's single point. Add vault device-match / device-mismatch runtime tests.
    - **Doc-sync sweep — surface the LATEST version, retire stale-prominent v0.4 framing** (user-flagged 2026-07-07: the public GitHub README still leads with "New in v0.4.0" while 0.5.x is buried). Concrete gaps:
      - ✅ **`README.md` — DONE 2026-07-07** (`docs:` commit, no version bump): demoted `### 🤖 New in v0.4.0 — AI-native features` → `### 🤖 AI-native features` (those are baseline now) and added a prominent near-top **"🆕 What's new in v0.5.3"** callout surfacing the 6 Pro mechanisms + the 0.5.3 flags (they were only a deep h4). llms.txt/llms-full.txt below still pending.
      - `llms-full.txt` `# pyobfus v0.4.0` (line 131) + "v0.4 introduces AI-native features" (line 274) — bump to 0.5.x; these feed AI crawlers, so they matter for the AI-native positioning.
