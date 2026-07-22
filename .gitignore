@@ -169,6 +169,7 @@ obfuscated/
 .local-testing/
 local-testing/
 .test_env/
+.workbuddy/
 
 # integration_tests/ used to hold personal scripts with hard-coded local paths
 # and was ignored wholesale. AGENTS.md meanwhile documents `pytest
