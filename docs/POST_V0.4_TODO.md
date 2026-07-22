@@ -4,7 +4,7 @@
 
 **Use as cold-start cheat sheet** when resuming work after a session break. This doc supersedes ad-hoc TODO scattered in chat; future Claude sessions should read this first.
 
-> **Current executable handoff (2026-07-20):** use the prioritized list below.
+> **Current executable handoff (2026-07-22):** use the prioritized list below.
 > [`RESUME_PLAN_2026-07-19.md`](RESUME_PLAN_2026-07-19.md) is a frozen record of
 > the 0.5.4 release session; its unchecked boxes are not current work.
 >
@@ -12,32 +12,40 @@
 > the "vault keys still ship as baked literals" scope boundary below is CLOSED.
 > The trial-bypass reports #20/#21 are answered and the trial is now documented
 > as a convenience control, not a security boundary. CI enforces all three test
-> roots. Remaining open: #22 (mypy gate), the launch wave, P2-18 benchmark
-> evidence.
+> roots. Issue #22 is closed after PR #23 merged with the blocking mypy gate.
+> The DEV launch article is live; remaining open: the rest of the launch wave
+> and P2-18 benchmark evidence.
 
-## Current prioritized TODO (2026-07-20)
+## Current prioritized TODO (2026-07-22)
 
 1. ✅ **Documentation truth sweep — completed 2026-07-20.** Active surfaces use
    the real `pyobfus SRC -o OUT --level pro --<flag>` syntax; 0.5.4 and the
    release-CI baseline are current; old release checklists are marked frozen.
-2. **Launch wave** — refresh and publish dev.to → Show HN → Reddit → Chinese
-   channels; open a GitHub feedback poll and record pre/post metrics.
-3. ✅ **Issue #22 / mypy gate — implemented locally 2026-07-20.** Core, Pro,
-   and MCP (72 source files) now report zero errors; mypy stays on the 1.20
-   line while Python 3.9 is supported; CI is blocking. Await remote CI before
-   closing the issue.
+2. **Launch wave — DEV published 2026-07-22.** The canonical article is live at
+   <https://dev.to/zhurong2020/i-built-a-python-obfuscator-that-keeps-production-traces-debuggable-1mp8>.
+   The HN account and submission form are functional, and the maintainer posted
+   a first independently written community comment on 2026-07-22. Next:
+   continue normal HN participation before the maintainer authors the Show HN
+   submission, then Reddit → Chinese channels → GitHub feedback poll; record
+   +24h/+7d/+30d metrics. AI-generated or AI-edited HN text is prohibited.
+3. ✅ **Issue #22 / mypy gate — completed 2026-07-22.** Core, Pro, and MCP (72
+   source files) report zero errors; mypy stays on the 1.20 line while Python
+   3.9 is supported. PR #23 passed the full remote CI matrix, merged, and
+   closed issue #22.
 4. **P2-18 benchmark-first evidence — harness hardened locally 2026-07-20.**
    The offline smoke job is blocking in CI and records model/date/artifact
    hashes. A credentialed real-model run is still required before publishing
    any resistance number; stub output is explicitly not evidence.
-5. **Discoverability and citation — repository work complete 2026-07-20.** DOI,
+5. ✅ **Discoverability and citation — deployed and verified 2026-07-22.** DOI,
    README/PyPI/Read the Docs citation surfaces are present. ARD metadata is
-   added and CI-validated; deployment still needs a Read the Docs root redirect
-   and header check. PulseMCP remains an external listing follow-up.
+   CI-validated and live at the Read the Docs well-known URL. PulseMCP remains
+   an external listing follow-up.
 6. **Next feature selection — evidence gate prepared.** The poll copy and
    [`NEXT_FEATURE_DECISION.md`](NEXT_FEATURE_DECISION.md) define the 14-day /
    10-vote trigger and decision rubric. Selection deliberately waits for real
-   launch feedback.
+   launch feedback. A Tools / Resources / Prompts separation is recorded in
+   [`MCP_PRIMITIVES_DESIGN.md`](MCP_PRIMITIVES_DESIGN.md) as a post-launch
+   research candidate, not committed scope.
 
 Large speculative features and a JOSS re-submission remain deferred until the
 project has demonstrated third-party adoption.

@@ -1,6 +1,6 @@
 ---
 title: "I built a Python obfuscator that keeps production traces debuggable"
-published: false
+published: true
 tags: python, opensource, security, claudecode
 canonical_url: https://github.com/zhurong2020/pyobfus
 ---
