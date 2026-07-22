@@ -32,6 +32,7 @@ import argparse
 import sys
 from collections.abc import Sequence
 from pathlib import Path
+from typing import cast
 
 from pyobfus_pro.runtime.scrub import ScrubError, unscrub_error_id
 
@@ -108,7 +109,8 @@ def _resolve_error_id(args: argparse.Namespace) -> str:
 
     if args.error_id_file is not None:
         try:
-            return args.error_id_file.read_text(encoding="utf-8").strip()
+            error_id_file = cast(Path, args.error_id_file)
+            return error_id_file.read_text(encoding="utf-8").strip()
         except OSError as exc:
             print(f"{_PROG_NAME}: error: cannot read --error-id-file: {exc}", file=sys.stderr)
             raise SystemExit(_EXIT_USAGE) from exc
@@ -123,7 +125,7 @@ def _resolve_error_id(args: argparse.Namespace) -> str:
         )
         raise SystemExit(_EXIT_USAGE)
 
-    return args.error_id.strip()
+    return cast(str, args.error_id).strip()
 
 
 def _read_private_key(path: Path) -> bytes:

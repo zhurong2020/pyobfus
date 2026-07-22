@@ -61,7 +61,6 @@ from __future__ import annotations
 
 import ast
 import secrets
-from collections.abc import Iterable
 
 from pyobfus_pro.runtime.vault import Vault
 
@@ -349,4 +348,4 @@ def _ensure_vault_class_import(tree: ast.Module) -> None:
     tree.body.insert(insert_at, new_import)
 
 
-__all__: Iterable[str] = ("VaultBuildError", "collect_vault_names", "transform_module")
+__all__ = ("VaultBuildError", "collect_vault_names", "transform_module")

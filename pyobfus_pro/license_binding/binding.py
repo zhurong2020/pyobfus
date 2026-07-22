@@ -43,6 +43,7 @@ import hashlib
 import os
 import platform
 import shutil
+from typing import cast
 import tempfile
 from pathlib import Path
 
@@ -228,7 +229,7 @@ def bind_device_key(
         salt=bytes(build_salt),
         iterations=iterations,
     )
-    return kdf.derive(machine_id.encode("utf-8"))
+    return cast(bytes, kdf.derive(machine_id.encode("utf-8")))
 
 
 # ---------------------------------------------------------------------------

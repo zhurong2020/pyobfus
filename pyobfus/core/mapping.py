@@ -90,7 +90,7 @@ class ObfuscationMapping:
         )
 
         # Duck-typed: global_table exposes .get_all_modules() and .get_module_exports(m)
-        modules = getattr(global_table, "get_all_modules", lambda: [])()
+        modules: Iterable[str] = getattr(global_table, "get_all_modules", lambda: [])()
         get_exports = getattr(global_table, "get_module_exports", None)
         if get_exports is None:
             return m

@@ -278,7 +278,7 @@ class CodeGenerator:
             import black
 
             mode = black.Mode(line_length=line_length)
-            return black.format_str(source_code, mode=mode)
+            return cast(str, black.format_str(source_code, mode=mode))
         except ImportError:
             # If black not available, return as-is
             return source_code

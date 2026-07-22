@@ -1682,7 +1682,7 @@ def _apply_trace_markers(output_path: Path, mapping_path: str) -> Optional[str]:
         marker_id = json.loads(mp.read_text(encoding="utf-8")).get("marker_id")
     except (OSError, ValueError):
         return None
-    if not marker_id:
+    if not isinstance(marker_id, str) or not marker_id:
         return None
 
     block = _trace_marker_block(marker_id, mp.name)

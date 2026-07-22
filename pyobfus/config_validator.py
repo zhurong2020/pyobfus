@@ -4,6 +4,7 @@ Configuration file validator.
 Validates pyobfus YAML configuration files and reports errors/warnings.
 """
 
+import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 import yaml
@@ -306,11 +307,11 @@ def find_config_file(
     # Check for pyproject.toml
     pyproject_path = start_path / "pyproject.toml"
     if pyproject_path.exists():
-        try:
+        if sys.version_info >= (3, 11):
             import tomllib
-        except ImportError:
+        else:
             try:
-                import tomli as tomllib  # type: ignore
+                import tomli as tomllib
             except ImportError:
                 return None, None
 

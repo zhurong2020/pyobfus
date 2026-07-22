@@ -1,0 +1,32 @@
+{
+  "specVersion": "1.0",
+  "host": {
+    "displayName": "pyobfus",
+    "identifier": "did:web:pyobfus.readthedocs.io"
+  },
+  "entries": [
+    {
+      "identifier": "urn:air:pyobfus.readthedocs.io:server:pyobfus-mcp",
+      "displayName": "pyobfus MCP Server",
+      "type": "application/mcp-server+json",
+      "url": "https://raw.githubusercontent.com/zhurong2020/pyobfus/main/pyobfus_mcp/server.json",
+      "capabilities": [
+        "scan_project",
+        "obfuscate_file",
+        "obfuscate_package",
+        "unmap_traceback",
+        "validate_config",
+        "protect_project",
+        "recommend_tier",
+        "start_pro_trial"
+      ],
+      "description": "Obfuscate Python projects and reverse-map protected stack traces through a local, no-phone-home MCP server.",
+      "representativeQueries": [
+        "scan this Python project for obfuscation risks",
+        "protect this FastAPI package and verify the result",
+        "obfuscate this Python file without breaking public APIs",
+        "map this obfuscated traceback back to the original source"
+      ]
+    }
+  ]
+}
