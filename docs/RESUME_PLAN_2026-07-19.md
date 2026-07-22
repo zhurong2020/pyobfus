@@ -35,10 +35,15 @@
 >
 > **Next up, in order:** P1.4 launch wave · #22 mypy gate · P2.1 benchmark
 > evidence. The P0 queue is clear, so P2 work is no longer blocked.
+>
+> **Archive note (2026-07-20):** the detailed checklists below are frozen
+> planning evidence from before 0.5.4 shipped. Their unchecked boxes do not
+> represent current work. The live ordered backlog is at the top of
+> `POST_V0.4_TODO.md`.
 
-**Purpose**: current, executable handoff for the next maintainer/agent session.
-Start here, then use [`POST_V0.4_TODO.md`](POST_V0.4_TODO.md) for the longer
-historical backlog and [`ROADMAP.md`](ROADMAP.md) for strategic candidates.
+**Purpose**: historical handoff from the 0.5.4 release session. Use
+[`POST_V0.4_TODO.md`](POST_V0.4_TODO.md) for the current ordered backlog and
+[`ROADMAP.md`](ROADMAP.md) for strategic candidates.
 
 **Security note**: this is a public-repository document. It records impact,
 decisions, and remediation work without reproducing copy-paste trial-bypass
@@ -292,4 +297,3 @@ not point elsewhere:
 5. Once CI coverage is real, perform the PR #19 human review.
 
 Do not begin P2 feature work while any P0 item above remains open.
-

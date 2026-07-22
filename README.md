@@ -550,7 +550,7 @@ Add an additional layer of protection for commercial Python software.
 - **Python Support**: 3.9, 3.10, 3.11, 3.12, 3.13, 3.14
 - **Naming Scheme**: Index-based (I0, I1, I2...) - simple and effective
 - **Architecture**: Modular transformer pipeline with two-phase cross-file obfuscation
-- **Testing**: 1033 tests, 90% coverage, multi-OS CI/CD (Python 3.9-3.14 × Ubuntu / macOS / Windows)
+- **Testing**: 1,000+ tests, 90% coverage, multi-OS CI/CD (Python 3.9-3.14 × Ubuntu / macOS / Windows)
 
 ## Frequently Asked Questions
 
@@ -580,7 +580,11 @@ pyobfus src/ -o dist/ --dry-run
 
 ### Will my code still work after obfuscation?
 
-Yes, pyobfus guarantees **100% functional equivalence**. The obfuscated code produces identical outputs to your original code. We use Python's AST (Abstract Syntax Tree) for syntax-aware transformations, ensuring syntactically correct output.
+pyobfus is designed to preserve program behavior for supported Python syntax and
+framework patterns, and its compatibility matrix is covered by automated tests.
+Obfuscation is still a source transformation: run your own test suite and verify
+the built artifact, especially when the project relies on dynamic imports,
+reflection, or generated code.
 
 ### Does obfuscated code run slower?
 
@@ -606,7 +610,9 @@ pyobfus src/ -o dist/ -c pyobfus.yaml
 
 ### What Python versions are supported?
 
-pyobfus supports **Python 3.9 through 3.14**. Generated code is compatible with all these versions regardless of which version you use to run pyobfus.
+pyobfus supports **Python 3.9 through 3.14**. Build and test the obfuscated
+artifact with the Python version used in production; cross-interpreter
+portability can depend on syntax, dependencies, and enabled transformations.
 
 ### PyArmor vs pyobfus: Which should I choose?
 
@@ -635,7 +641,11 @@ Yes — and for many projects this is the most cost-effective approach. Use pyob
 
 ### Can obfuscated code be reversed?
 
-Name mangling is **irreversible** - original variable names cannot be recovered. However, code logic remains intact (this is true for all obfuscators). For stronger protection, use Pro features:
+Name mangling removes the original identifiers from the emitted source and
+raises the cost of analysis, but it is not cryptographically irreversible: a
+determined analyst may infer names and behavior from context. Keep the optional
+mapping file private when you need reliable reverse mapping. For stronger
+protection, use Pro features:
 - **AES-256 encryption** for strings
 - **Anti-debugging** checks to prevent analysis
 

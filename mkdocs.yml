@@ -2,6 +2,11 @@ site_name: pyobfus Documentation
 site_url: https://pyobfus.readthedocs.io
 site_description: Modern Python Code Obfuscator
 
+# MkDocs excludes dot-directories by default. ARD requires this exact
+# well-known path, so opt it back into the generated site.
+exclude_docs: |
+  !/.well-known/
+
 repo_name: zhurong2020/pyobfus
 repo_url: https://github.com/zhurong2020/pyobfus
 
@@ -16,6 +21,8 @@ nav:
   - License Activation: LICENSE_ACTIVATION_GUIDE.md
   - Project Structure: PROJECT_STRUCTURE.md
   - Integration Testing: INTEGRATION_TESTING.md
+  - LLM Resistance Benchmark: LLM_RESISTANCE_BENCHMARK.md
+  - Next Feature Decision: NEXT_FEATURE_DECISION.md
   - How to Cite: CITATION.md
 
 markdown_extensions:

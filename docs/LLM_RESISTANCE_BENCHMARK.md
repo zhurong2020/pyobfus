@@ -99,7 +99,11 @@ For each (sample, condition, attacker) triple:
 
 1. The attacker returns a clean Python reimplementation.
 2. The harness **executes** that reimplementation against the sample's
-   ground-truth IO test vectors in an isolated subprocess (timeout + no network).
+   ground-truth IO test vectors. Real model output defaults to a locked-down
+   Docker container (no network, read-only filesystem, dropped capabilities,
+   CPU/memory/process limits, timeout). The ordinary host subprocess is used
+   only for the trusted offline stub unless an operator explicitly accepts the
+   unsafe override.
 3. **Recovered = passes ALL vectors** (functional equivalence). Partial credit is
    *not* given for the primary metric — semantic recovery is binary per sample.
 
@@ -143,8 +147,11 @@ secondary metric. **CS never overrides SRR** in the headline.
     into `results.json` so a run is fully reproducible.
   - (future) `OpenAIAttacker` / others — to reproduce Acoda's multi-model table.
 - Every run records: attacker class, model id, prompt hash, pyobfus version,
-  Python version, UTC date, per-sample seeds. No `Math.random`/wall-clock
-  nondeterminism in the harness itself.
+  Python version, UTC date, scoring executor/container image, and each generated
+  artifact's content hash. The
+  obfuscator intentionally uses cryptographic randomness, so byte-identical
+  artifacts are not expected; the functional metric and exact inputs remain
+  reproducible.
 
 ### Fairness rules (so the number is honest, not marketing)
 

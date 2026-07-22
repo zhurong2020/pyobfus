@@ -108,11 +108,19 @@ This is the explicit "AI 查询" the user named — being the tool Claude/ChatGP
 { "mcpServers": { "pyobfus": { "command": "uvx", "args": ["pyobfus-mcp"] } } }
 ```
 
-### 🟢 Gap 5 (emerging, early-bird) — ARD `ai-catalog.json`
+### ✅ Gap 5 (implemented locally 2026-07-20) — ARD `ai-catalog.json`
 
 **Agentic Resource Discovery (ARD)** — open spec from Google + a Linux Foundation working group, **announced late May 2026** (≈4 weeks ago). A provider hosts a machine-readable **`ai-catalog.json`** at a well-known path; it lists the provider's MCP servers, A2A agents, OpenAPI tools, etc. *"A static JSON file on a CDN is a valid ARD publisher — no proprietary SDK."*
 
 pyobfus has a docs domain (readthedocs) and a GitHub Pages-capable repo. Publishing an `ai-catalog.json` that points at `pyobfus-mcp` is a **2–3 hour, on-brand, first-mover** move: pyobfus gets to credibly say it supports the newest agent-discovery standard the same month it shipped. Spec: `agenticresourcediscovery.org/spec`, repo `github.com/ards-project/ard-spec` (Apache-2.0).
+
+**2026-07-20 update:** the ARD 1.0 manifest now lives at
+`docs/.well-known/ai-catalog.json`; `mkdocs.yml` explicitly includes the hidden
+directory and CI validates the JSON. Read the Docs versions content under
+`/en/latest/`, so publication is not complete until the project admin adds an
+exact redirect from `/.well-known/ai-catalog.json` to
+`/en/latest/.well-known/ai-catalog.json` and verifies HTTPS, JSON content type,
+CORS `*`, and the final body after the docs build deploys.
 
 ---
 
@@ -129,7 +137,8 @@ pyobfus has a docs domain (readthedocs) and a GitHub Pages-capable repo. Publish
 - [ ] Reuse PyArmor trial-limit + test-count facts as citable, sourced statistics (Gap 3)
 
 **Wave C — emerging bet (one afternoon):**
-- [ ] Publish `ai-catalog.json` per ARD spec at the docs domain (Gap 5)
+- [~] ARD manifest implemented and CI-validated; deploy + Read the Docs root
+  redirect/header verification remain admin actions (Gap 5)
 - [ ] (optional) `npx pyobfus-mcp` thin wrapper to also occupy the npm "room"
 
 ---

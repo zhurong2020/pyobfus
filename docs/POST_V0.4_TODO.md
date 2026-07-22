@@ -4,9 +4,9 @@
 
 **Use as cold-start cheat sheet** when resuming work after a session break. This doc supersedes ad-hoc TODO scattered in chat; future Claude sessions should read this first.
 
-> **Current executable handoff (2026-07-19):** start with
-> [`RESUME_PLAN_2026-07-19.md`](RESUME_PLAN_2026-07-19.md), whose status header
-> records what shipped. This file remains the longer historical backlog.
+> **Current executable handoff (2026-07-20):** use the prioritized list below.
+> [`RESUME_PLAN_2026-07-19.md`](RESUME_PLAN_2026-07-19.md) is a frozen record of
+> the 0.5.4 release session; its unchecked boxes are not current work.
 >
 > **0.5.4 published 2026-07-19.** Vault-key device binding landed (PR #19), so
 > the "vault keys still ship as baked literals" scope boundary below is CLOSED.
@@ -15,11 +15,38 @@
 > roots. Remaining open: #22 (mypy gate), the launch wave, P2-18 benchmark
 > evidence.
 
+## Current prioritized TODO (2026-07-20)
+
+1. ✅ **Documentation truth sweep — completed 2026-07-20.** Active surfaces use
+   the real `pyobfus SRC -o OUT --level pro --<flag>` syntax; 0.5.4 and the
+   release-CI baseline are current; old release checklists are marked frozen.
+2. **Launch wave** — refresh and publish dev.to → Show HN → Reddit → Chinese
+   channels; open a GitHub feedback poll and record pre/post metrics.
+3. ✅ **Issue #22 / mypy gate — implemented locally 2026-07-20.** Core, Pro,
+   and MCP (72 source files) now report zero errors; mypy stays on the 1.20
+   line while Python 3.9 is supported; CI is blocking. Await remote CI before
+   closing the issue.
+4. **P2-18 benchmark-first evidence — harness hardened locally 2026-07-20.**
+   The offline smoke job is blocking in CI and records model/date/artifact
+   hashes. A credentialed real-model run is still required before publishing
+   any resistance number; stub output is explicitly not evidence.
+5. **Discoverability and citation — repository work complete 2026-07-20.** DOI,
+   README/PyPI/Read the Docs citation surfaces are present. ARD metadata is
+   added and CI-validated; deployment still needs a Read the Docs root redirect
+   and header check. PulseMCP remains an external listing follow-up.
+6. **Next feature selection — evidence gate prepared.** The poll copy and
+   [`NEXT_FEATURE_DECISION.md`](NEXT_FEATURE_DECISION.md) define the 14-day /
+   10-vote trigger and decision rubric. Selection deliberately waits for real
+   launch feedback.
+
+Large speculative features and a JOSS re-submission remain deferred until the
+project has demonstrated third-party adoption.
+
 ---
 
-## 🔜 Forward TODO (updated 2026-06-22)
+## Historical execution record (frozen; not the current TODO)
 
-**Published to PyPI**: 0.5.0 (2026-06-18) → 0.5.1 + pyobfus-mcp 0.3.1 (2026-06-22) → 0.5.2 (2026-06-22, patch) → **0.5.3 (2026-07-07)** — the three deferred build-fusion flags (`--period` / `--opacity-config` / `--bind-device`). Patent gate cleared 2026-06-17 (申请号 202610712171X). Python 3.8 dropped (floor 3.9). Merged to main; nothing is held anymore. Open items, roughly in priority order:
+**Release history**: 0.5.0 (2026-06-18) → 0.5.1 + pyobfus-mcp 0.3.1 (2026-06-22) → 0.5.2 (2026-06-22, patch) → 0.5.3 (2026-07-07) → **0.5.4 (2026-07-19)**. Patent gate cleared 2026-06-17 (申请号 202610712171X). Python 3.8 dropped (floor 3.9). The numbered material below preserves the decisions and evidence from those releases; it is not an executable checklist.
 
 1. ✅ **DONE 2026-06-22 — published 0.5.1 + pyobfus-mcp 0.3.1.** pyobfus 0.5.1 (`pyobfus build --flag` fusion) merged to main + tagged `v0.5.1` → OIDC PyPI publish (wheel+sdist live, PEP 740 attestations; release run `27938471463`). Then `mcp-v0.3.1` → pyobfus-mcp 0.3.1 to PyPI (run `27939165475`) + `mcp-publisher publish` → MCP Registry 0.3.1 isLatest. Glama auto re-indexes. Order honored (mcp dep `pyobfus>=0.5.1`).
 

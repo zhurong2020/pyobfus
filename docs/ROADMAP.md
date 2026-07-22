@@ -9,9 +9,9 @@ This document outlines **future plans** for pyobfus. For released version histor
 
 ## Current Status
 
-**Latest (2026-07-07)**: **pyobfus 0.5.3 released** — completes the 0.5.3 build-fusion surface deferred from 0.5.1: `--period <N>` (crypto-bound run-counter), `--opacity-config <opacity.toml>` (pattern-driven L3 encryption resolved by *pre-mangle* qualname via decorator injection — no name-map coupling), and `--bind-device` / `--bind-device-id` (device-locked L3: the emitted `_LAYER_KEY` is rewritten into a runtime `bind_device_key(current_machine_id(), salt)` re-derivation, so decryption only succeeds on the bound device). 1033 tests; via OIDC + PEP 740 attestations. **pyobfus-mcp stays 0.3.1** (no tool-surface change; its `pyobfus>=0.5.1` floor resolves to 0.5.3). Vault-key (`_VAULT_KEY_*`) device binding is the open 0.5.4 follow-up.
+**Latest (2026-07-19)**: **pyobfus 0.5.4 released** — `--bind-device` now derives both Selective Opacity L3 keys and every Runtime String Vault key from the bound machine, closing the remaining baked-Vault-key scope boundary. The release CI recorded **1046 passed / 1 skipped / 90% coverage** in the core suite; Core, MCP, and end-to-end roots run as separate jobs across Python 3.9-3.14 and three operating systems. Published through OIDC with PEP 740 attestations. **pyobfus-mcp stays 0.3.1** because the MCP tool surface did not change.
 
-**Prior (2026-06-22)**: **pyobfus 0.5.2 + pyobfus-mcp 0.3.1 published to PyPI** (0.5.0 was 2026-06-18; 0.5.1 same day). 0.5.1 fused the 6 v0.5 Pro mechanisms into `pyobfus build` flags; **0.5.2 is a patch fixing `--seal-code`/`--vault` on Python 3.9/3.10** (seal hash pinned to marshal v2; `zip(strict=)` dropped from the vault pass; 1025 core tests). mcp 0.3.1 names the v0.5 mechanisms in pro-funnel copy (dep `pyobfus>=0.5.1`); MCP Registry 0.3.1 isLatest; all via OIDC + PEP 740 attestations. Patent gate cleared 2026-06-17 (申请号 202610712171X). Ran the **agentic-discoverability Wave A** (Smithery Skill + mcp.so + `uvx` zero-install + sharpened server.json blurb) — see `docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`. **JOSS paper desk-rejected 2026-06-24** (issue `openjournals/joss-reviews#10788`; grounds = scope/significance, not quality: "private-dev-then-public" + no demonstrated third-party reuse). Pivoted to the free path: **Zenodo concept DOI `10.5281/zenodo.20846053`** now minted and propagated (CITATION.cff, README badge, ORCID, arong.eu.org). See `docs/JOSS_REJECTION_20260624.md`.
+**Prior (2026-06-22)**: **pyobfus 0.5.2 + pyobfus-mcp 0.3.1 published to PyPI** (0.5.0 was 2026-06-18; 0.5.1 same day). 0.5.1 fused the 6 v0.5 Pro mechanisms into flags on the normal obfuscation command; **0.5.2 is a patch fixing `--seal-code`/`--vault` on Python 3.9/3.10** (seal hash pinned to marshal v2; `zip(strict=)` dropped from the vault pass; 1025 core tests). mcp 0.3.1 names the v0.5 mechanisms in pro-funnel copy (dep `pyobfus>=0.5.1`); MCP Registry 0.3.1 isLatest; all via OIDC + PEP 740 attestations. Patent gate cleared 2026-06-17 (申请号 202610712171X). Ran the **agentic-discoverability Wave A** (Smithery Skill + mcp.so + `uvx` zero-install + sharpened server.json blurb) — see `docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`. **JOSS paper desk-rejected 2026-06-24** (issue `openjournals/joss-reviews#10788`; grounds = scope/significance, not quality: "private-dev-then-public" + no demonstrated third-party reuse). Pivoted to the free path: **Zenodo concept DOI `10.5281/zenodo.20846053`** now minted and propagated (CITATION.cff, README badge, ORCID, arong.eu.org). See `docs/JOSS_REJECTION_20260624.md`.
 
 ### Snapshot (2026-05-07, historical)
 
@@ -19,7 +19,7 @@ See [CHANGELOG.md](../CHANGELOG.md) for the latest release and version history.
 
 - **pyobfus 0.4.0** released 2026-04-22 (AI-native CLI + framework presets + reverse stack-trace mapping)
 - **pyobfus-mcp 0.1.2** released 2026-05-07 (emergency fix for `FastMCP.__init__()` `version=` kwarg drift in mcp SDK ≥ 1.20; see `pyobfus_mcp/CHANGELOG.md`)
-- 1033 tests, 90% coverage (multi-OS CI/CD across Python 3.9-3.14)
+- At the current 0.5.4 baseline: 1046 core tests passed, 1 skipped, 90% coverage (multi-OS CI/CD across Python 3.9-3.14)
 - Full Pro feature set available
 - Parallel file processing support (`-j/--jobs`)
 - PyPI downloads: pyobfus ~337/month, pyobfus-mcp ~239/month (real users only, ex-mirrors)
@@ -49,28 +49,28 @@ The previous v0.4.0 plan (Enhanced Key Obfuscation, Code Compression) has been d
 
 Core functionality that unblocks real user scenarios and becomes the foundation for AI integration.
 
-- [ ] **P0-1: `pyobfus --check` pre-flight mode** — Scan project for `eval`/`exec`/`getattr`/dynamic attribute access, framework reflection points, `__all__` exports. Output JSON risk report with `ai-hint` field suggesting next command. _Estimate: 1 week_
-- [ ] **P0-2: `pyobfus unmap` reverse mapping command** — Input error stacktrace + mapping.json → output original variable-name trace. Unlocks "AI can still debug obfuscated code". _Estimate: 3-5 days_
-- [ ] **P0-3: Framework presets** — `--preset fastapi|django|flask|pydantic|click` with built-in exclusion rules for each framework's reflection points. _Estimate: 1 week_
-- [ ] **P0-4: AI-friendly CLI** — Global `--json` output mode, structured error messages with `ai-hint` field, machine-readable exit codes. _Estimate: 2-3 days_
-- [ ] **P0-5: `pyobfus init`** — Scan project → detect framework → generate `pyobfus.yaml` with auto-exclude list. One-command onboarding. _Estimate: 3-5 days_
+- [x] **P0-1: `pyobfus --check` pre-flight mode** — Scan project for `eval`/`exec`/`getattr`/dynamic attribute access, framework reflection points, `__all__` exports. Output JSON risk report with `ai-hint` field suggesting next command. _Shipped 0.4.0._
+- [x] **P0-2: `pyobfus unmap` reverse mapping command** — Input error stacktrace + mapping.json → output original variable-name trace. Unlocks "AI can still debug obfuscated code". _Shipped 0.4.0._
+- [x] **P0-3: Framework presets** — `--preset fastapi|django|flask|pydantic|click` with built-in exclusion rules for each framework's reflection points. _Shipped 0.4.0._
+- [x] **P0-4: AI-friendly CLI** — Global `--json` output mode, structured error messages with `ai_hint` field, machine-readable exit codes. _Shipped 0.4.0._
+- [x] **P0-5: `pyobfus init`** — Scan project → detect framework → generate `pyobfus.yaml` with auto-exclude list. One-command onboarding. _Shipped 0.4.0._
 
 ### P1 - AI Ecosystem Integration (Weeks 4-6)
 
 Builds on top of P0 primitives to make pyobfus appear natively in the AI-assisted workflow.
 
-- [ ] **P1-1: `pyobfus-mcp` server** (separate package) — Expose P0 tools as Model Context Protocol server for Claude Desktop / Claude Code / Cursor / Windsurf. _Estimate: 1 week_
-- [ ] **P1-2: `llms.txt` + `llms-full.txt`** — Deploy at repo root and docs site. _Estimate: 2 hours_
-- [ ] **P1-3: AI integration templates** — `templates/ai-integration/` with CLAUDE.md, .cursorrules, AGENTS.md, windsurfrules.md. _Estimate: 1 day_
-- [ ] **P1-4: PyPI metadata overhaul** — New keyword-dense description, Project-URL additions (MCP Server, AI Guide), Development Status → Beta. _Estimate: 1 hour_
-- [ ] **P1-5: Incremental obfuscation** — AST hash caching, only process changed files. Enables CI/CD embedding. _Estimate: 1-2 weeks_
+- [x] **P1-1: `pyobfus-mcp` server** (separate package) — Expose P0 tools as Model Context Protocol server for Claude Desktop / Claude Code / Cursor / Windsurf. _Shipped; current package 0.3.1._
+- [x] **P1-2: `llms.txt` + `llms-full.txt`** — Deploy at repo root and docs site. _Shipped._
+- [x] **P1-3: AI integration templates** — `templates/ai-integration/` with CLAUDE.md, .cursorrules, AGENTS.md, windsurfrules.md. _Shipped._
+- [x] **P1-4: PyPI metadata overhaul** — New keyword-dense description, Project-URL additions (MCP Server, AI Guide), Development Status → Production/Stable. _Shipped._
+- [x] **P1-5: Incremental obfuscation** — Project-level AST/config hash cache behind `--incremental`, reusing an unchanged successful build. _Shipped._
 
 ### Branding & Discoverability (Parallel, Week 1)
 
 - [ ] Reserve PyPI alias packages: `python-obfuscator`, `pyobfuscator`, `py-obfuscator` (if available)
 - [ ] Add GitHub topics: `python-obfuscator`, `code-obfuscator`, `ast-obfuscation`, `mcp-server`, `claude-code`, `cursor`, `llm-tools`
-- [ ] README: add pronunciation / alias line: "pyobfus — the Python obfuscator"
-- [ ] Upgrade classifier: `Development Status :: 3 - Alpha` → `4 - Beta`
+- [x] README: add pronunciation / alias line: "pyobfus — the Python obfuscator"
+- [x] Upgrade classifier: Core is now `Development Status :: 5 - Production/Stable`; MCP remains Beta
 
 ---
 
@@ -80,7 +80,7 @@ Builds on top of P0 primitives to make pyobfus appear natively in the AI-assiste
 
 ### P2 - Differentiation Layer
 
-- [x] **P2-1: Selective Opacity (Layered Protection)** — per-symbol layers (transparent / ai-readable / obfuscated / encrypted); L3 = AES-256-GCM with lazy `__code__` materialization. _Shipped 0.5.0 2026-06-18 (mechanism + API; combined `pyobfus build` flag fusion in 0.5.1)._
+- [x] **P2-1: Selective Opacity (Layered Protection)** — per-symbol layers (transparent / ai-readable / obfuscated / encrypted); L3 = AES-256-GCM with lazy `__code__` materialization. _Shipped 0.5.0 2026-06-18 (mechanism + API; combined Pro-flag fusion in 0.5.1)._
 - [ ] **P2-2: VSCode Extension** — Right-click obfuscate + yaml IntelliSense + status bar. Marketplace as a new distribution channel. _Estimate: 1-2 weeks_
 - [x] **P2-3: `--strip-ai-artifacts` mode** — Removes AI provenance markers (`Generated by Claude`, `Co-Authored-By: Claude`, `🤖 Generated with`, ...) from docstrings + attribution dunders (`__author__` etc.). Conservative attribution-only matching; arbitrary string literals untouched; comments already dropped by the AST round-trip. Community-tier, 27 tests. _Shipped 2026-06-06 (branch `feat/strip-ai-artifacts`)._
 - [ ] **P2-4: Import obfuscation (Pro)** — Top-level imports → runtime `importlib` + encrypted strings. Closes gap with PyArmor Pro. _Estimate: 1-2 weeks_
@@ -94,7 +94,7 @@ The four items below were surfaced by a competitive feature scan against PyArmor
 - [x] **P2-7: Forensic watermarking / `--fingerprint <buyer-id>` (Pro)** — per-buyer deterministic key derivation (`forensic_seed` / `WatermarkRNG` / `derive_layer_key`) for piracy traceback. _Shipped 0.5.0 2026-06-18 (Pro-layer key watermarking + API; Core rename-RNG single-seed integration in 0.5.1)._
 - [x] **P2-8: Hardware / time / period license binding (Pro)** — device / expiry / run-count binding woven into the AES-GCM decryption path (`pyobfus_pro.license_binding`): the license gate is the GCM tag check itself, no separate patchable check. _Shipped 0.5.0 2026-06-18 (mechanism + API; `--bind-device` / `--expire-hard` / `--period` build flags in 0.5.1)._
 - [x] **P2-9: `@seal_code` integrity decorator (Pro)** — build-time bytecode hash baked in; runtime detection of in-memory patching, with layer-aware sealing for L3 functions. _Shipped 0.5.0 2026-06-18 (decorator + build pass; combined-flag fusion in 0.5.1)._
-- [x] **P2-10: `--scrub-traceback` production traceback encryption (Pro)** — hybrid RSA-2048-OAEP + AES-256-GCM error-ID encryption; developer reverses with the new **`pyobfus-unscrub`** CLI. _Shipped 0.5.0 2026-06-18 (`pyobfus-unscrub` CLI + build pass; `pyobfus build --scrub-traceback` fusion in 0.5.1)._
+- [x] **P2-10: `--scrub-traceback` production traceback encryption (Pro)** — hybrid RSA-2048-OAEP + AES-256-GCM error-ID encryption; developer reverses with the new **`pyobfus-unscrub`** CLI. _Shipped 0.5.0 2026-06-18 (`pyobfus-unscrub` CLI + build pass; `--scrub-traceback` fusion in 0.5.1)._
 
 ---
 
@@ -130,11 +130,11 @@ Benefits: simpler test matrix (~15% faster CI), one less dependency, and elimina
 
 Surfaced by a fresh scan against PyArmor 9.2 / Nuitka / SourceDefender / CodeEnigma plus arXiv 2025-2026 (2512.16538 LLM-vs-obfuscation, 2410.05797 CodeCipher) and the 2026 AI-agent tool-discovery landscape. All stay inside the AST + AI-native lane. Full analysis: `docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`.
 
-- [ ] **P2-17: Signed obfuscation provenance manifest (Pro/Core)** — `pyobfus build` emits a signed JSON manifest (files obfuscated, config hash, tool version, mapping digest; optional sigstore). Rides the 2026 SLSA/SBOM/provenance wave, reuses the existing PEP 740 muscle, and is something PyArmor's phone-home-on-build model structurally can't offer (no local-verifiable provenance). _Estimate: 3-5 days_
-- [ ] **P2-18: LLM-deobfuscation-resistance mode + benchmark** — a `--llm-resistant` preset and/or a published "LLM semantic-recovery rate X%" benchmark report. Uniquely on-brand for an AI-native obfuscator (no competitor can credibly quantify resistance *to AI*); strong launch-content story even as a benchmark-only first cut. _Estimate: benchmark 2-3 days; mode 1-2 weeks_
+- [ ] **P2-17: Signed obfuscation provenance manifest (Pro/Core)** — a normal pyobfus invocation emits a signed JSON manifest (files obfuscated, config hash, tool version, mapping digest; optional sigstore). Rides the 2026 SLSA/SBOM/provenance wave, reuses the existing PEP 740 muscle, and is something PyArmor's phone-home-on-build model structurally can't offer (no local-verifiable provenance). _Estimate: 3-5 days_
+- [~] **P2-18: LLM-deobfuscation-resistance mode + benchmark** — the benchmark harness, five-sample corpus, functional scorer, reproducibility metadata, locked-down real-output executor, and blocking offline CI smoke job are implemented. A credentialed real-model run and reviewed public result remain; stub output is not evidence. A `--llm-resistant` preset stays deferred until the benchmark justifies it. _Estimate: measurement + review 1 day; mode 1-2 weeks if justified_
   - **Publication dual-track**: the JOSS paper (`paper/`) is the *software-description* paper (free, low novelty bar). This benchmark is the seed for a *separate research* paper with a novel contribution — target a software-protection / security venue (SPRO, ESORICS, ACSAC, AsiaCCS) or JSS/EMSE, with an arXiv cs.CR preprint for visibility. The two papers don't conflict (different artifacts) and the research paper drives traffic back to the tool. Do NOT submit the same software paper to both JOSS and SoftwareX (dual-publication); SoftwareX (~€2.5k APC, SCIE IF~3) is the only "indexed upgrade" alternative *instead of* JOSS for this paper.
 - [ ] **P2-19: ML/model-serving preset (`--preset ml`)** — protect inference-wrapper code, route model-path / weight-file constants into the Runtime String Vault, surface pickle-safety guidance. Rides the HuggingFace pickle-RCE wave; near-zero architecture cost (the preset mechanism already exists). _Estimate: 3-5 days_
-- [~] **P2-20: Agentic discoverability (Wave A, mostly shipped 2026-06-22)** — be findable by AI agents across every discovery surface, not just human SEO. Done: Smithery via the **Skill** channel (`zhurong2020/pyobfus-protect`; Smithery's MCP-publish is remote-HTTP-only and a non-fit for a local-execution tool — the Skill channel is the right path), mcp.so listing, `uvx pyobfus-mcp` zero-install + a sharpened ≤100-char `server.json` blurb, `smithery.yaml`. Pending: PulseMCP (passive weekly ingest of the Official Registry; email fallback), ARD `ai-catalog.json` early-bird, and GEO/AEO content (answer-first openings, named-number facts, FAQ schema) folded into the launch wave.
+- [~] **P2-20: Agentic discoverability (Wave A, mostly shipped 2026-06-22; ARD repo work 2026-07-20)** — be findable by AI agents across every discovery surface, not just human SEO. Done: Smithery via the **Skill** channel (`zhurong2020/pyobfus-protect`; Smithery's MCP-publish is remote-HTTP-only and a non-fit for a local-execution tool — the Skill channel is the right path), mcp.so listing, `uvx pyobfus-mcp` zero-install + a sharpened ≤100-char `server.json` blurb, `smithery.yaml`, and an ARD 1.0 manifest included in the verified MkDocs build. Pending: Read the Docs root redirect/header verification, PulseMCP external follow-up, and GEO/AEO launch content.
 
 ---
 
@@ -217,7 +217,8 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.
 
 ---
 
-**Last Updated**: 2026-07-07 — added the "Additions from 2026-07-07 research scan" section: external re-validation of P2-17 (SLSA/attestation adoption + tooling gap), P2-18 (LLM-deobfuscation research explosion + Acoda prior art → promote to top strategic priority), P2-19; plus two new candidates P2-21 (pyobfus-mcp tool-description integrity / rug-pull resistance) and P2-22 (honest-comparison content vs statically-unpackable PyArmor bytecode). Refreshed download figures (~1,180/mo pyobfus + ~400/mo mcp). Fixed the Glama listing note (recurring manual Build-steps bump; bumped to 0.3.1 on 07-07).
-**Prior**: 2026-06-22 — Marked 0.5.2 published (patch: `--seal-code`/`--vault` Python 3.9/3.10 fixes, PR #18); earlier same day 0.5.1 + pyobfus-mcp 0.3.1 published; added the "Additions from 2026-06-22 scan" section: P2-17 (signed provenance manifest), P2-18 (LLM-deobfuscation-resistance mode + benchmark), P2-19 (`--preset ml`), and P2-20 (agentic discoverability, Wave A mostly shipped — Smithery Skill / mcp.so / uvx / server.json). Source: 2026-06-22 competitive + AI-agent-discoverability scan (see `docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`).
-**Previous**: 2026-05-09 — Added P2-7..P2-10 to v0.5.0 (forensic watermarking, license binding, integrity seal, scrub-traceback) and a v0.5.1 section with P2-11..P2-16. Expanded "What We Won't Do" with bytecode-VM virtualization, anti-VM detection, standalone runtime folder model. Source: 2026-05-09 competitive scan (PyArmor 9.2.x, Nuitka Commercial, Sourcedefender, vmp-protector 1.0.0, obfuscator-ai, arXiv 2512.16538/2510.11251).
-**Earlier**: 2026-04-22 — Strategic reshape after AI-era competitive analysis.
+**Last Updated**: 2026-07-22 — synchronized the post-0.5.4 execution state: the blocking mypy gate and hardened P2-18 benchmark harness are prepared for remote CI; ARD discovery metadata and launch drafts are ready; next-feature work remains gated on launch feedback.
+**Prior**: 2026-07-07 — added the "Additions from 2026-07-07 research scan" section: external re-validation of P2-17 (SLSA/attestation adoption + tooling gap), P2-18 (LLM-deobfuscation research explosion + Acoda prior art → promote to top strategic priority), P2-19; plus two new candidates P2-21 (pyobfus-mcp tool-description integrity / rug-pull resistance) and P2-22 (honest-comparison content vs statically-unpackable PyArmor bytecode). Refreshed download figures (~1,180/mo pyobfus + ~400/mo mcp). Fixed the Glama listing note (recurring manual Build-steps bump; bumped to 0.3.1 on 07-07).
+**Previous**: 2026-06-22 — Marked 0.5.2 published (patch: `--seal-code`/`--vault` Python 3.9/3.10 fixes, PR #18); earlier same day 0.5.1 + pyobfus-mcp 0.3.1 published; added the "Additions from 2026-06-22 scan" section: P2-17 (signed provenance manifest), P2-18 (LLM-deobfuscation-resistance mode + benchmark), P2-19 (`--preset ml`), and P2-20 (agentic discoverability, Wave A mostly shipped — Smithery Skill / mcp.so / uvx / server.json). Source: 2026-06-22 competitive + AI-agent-discoverability scan (see `docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`).
+**Earlier**: 2026-05-09 — Added P2-7..P2-10 to v0.5.0 (forensic watermarking, license binding, integrity seal, scrub-traceback) and a v0.5.1 section with P2-11..P2-16. Expanded "What We Won't Do" with bytecode-VM virtualization, anti-VM detection, standalone runtime folder model. Source: 2026-05-09 competitive scan (PyArmor 9.2.x, Nuitka Commercial, Sourcedefender, vmp-protector 1.0.0, obfuscator-ai, arXiv 2512.16538/2510.11251).
+**Original reshape**: 2026-04-22 — Strategic reshape after AI-era competitive analysis.
