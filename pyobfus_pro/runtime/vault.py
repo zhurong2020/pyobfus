@@ -33,6 +33,7 @@ from __future__ import annotations
 import os
 import secrets as _secrets
 from collections.abc import Mapping
+from typing import cast
 
 from cryptography.exceptions import InvalidTag
 from cryptography.hazmat.primitives import hashes
@@ -139,7 +140,7 @@ class Vault:
             salt=salt,
             iterations=iterations,
         )
-        return kdf.derive(passphrase.encode("utf-8"))
+        return cast(bytes, kdf.derive(passphrase.encode("utf-8")))
 
     def get(self, name: str) -> str:
         """Decrypt and return the value for ``name``.
@@ -156,7 +157,8 @@ class Vault:
         nonce = blob[:_NONCE_SIZE]
         ciphertext = blob[_NONCE_SIZE:]
         try:
-            return self._aesgcm.decrypt(nonce, ciphertext, associated_data=None).decode("utf-8")
+            plaintext = cast(bytes, self._aesgcm.decrypt(nonce, ciphertext, associated_data=None))
+            return plaintext.decode("utf-8")
         except InvalidTag as exc:
             raise VaultError(
                 f"unable to decrypt entry {name!r} " f"(wrong master key or tampered blob)"

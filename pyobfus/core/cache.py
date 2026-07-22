@@ -27,7 +27,7 @@ import json
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Tuple, cast
 
 from pyobfus import __version__ as PYOBFUS_VERSION
 
@@ -154,7 +154,7 @@ class BuildCache:
             return None
         if data.get("version") != MANIFEST_VERSION:
             return None
-        return data
+        return cast(Dict[str, Any], data)
 
     def save_manifest(self, signature: Dict, output_files: List[str]) -> None:
         """Persist the manifest after a successful full build."""

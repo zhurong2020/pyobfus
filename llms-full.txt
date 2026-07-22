@@ -271,7 +271,7 @@ Same JSON shape as the CLI: `status`, `error_type`, `ai_hint`, etc.
 
 ## Versioning
 
-pyobfus follows semver. AI-native features (preflight, init, unmap, JSON CLI, MCP server) are baseline. v0.5 adds the `pyobfus build` Pro fusion flags (`--selective-opacity --seal-code --vault --scrub-traceback --fingerprint --expire-hard`, plus `--period --opacity-config --bind-device` in 0.5.3) that compose the six Pro protection mechanisms. Breaking changes to JSON schemas are flagged with a `version` field bump.
+pyobfus follows semver. AI-native features (preflight, init, unmap, JSON CLI, MCP server) are baseline. v0.5 adds composable Pro flags (`--selective-opacity --seal-code --vault --scrub-traceback --fingerprint --expire-hard`, plus `--period --opacity-config --bind-device` in 0.5.3) to the normal `pyobfus SRC -o OUT --level pro --<flag>` command. There is no `build` subcommand. Breaking changes to JSON schemas are flagged with a `version` field bump.
 
 ## Links
 

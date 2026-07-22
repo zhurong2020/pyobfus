@@ -176,15 +176,17 @@ def transform_module(
             new_body.append(stmt)
             continue
 
-        layer = next((lyr for node, lyr in target_layers if node is stmt), None)
-        if layer is None:
+        resolved_layer: Layer | None = next(
+            (candidate for node, candidate in target_layers if node is stmt), None
+        )
+        if resolved_layer is None:
             new_body.append(stmt)
             continue
 
         # Strip the @opacity(...) decorator on every layer.
         stmt.decorator_list = [d for d in stmt.decorator_list if not _is_opacity_decorator(d)]
 
-        if layer is Layer.ENCRYPTED:
+        if resolved_layer is Layer.ENCRYPTED:
             cipher_const_name = f"{_CIPHER_PREFIX}{stmt.name}"
             cipher_assign = ast.Assign(
                 targets=[ast.Name(id=cipher_const_name, ctx=ast.Store())],

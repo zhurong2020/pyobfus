@@ -44,7 +44,7 @@ import functools
 import marshal
 import secrets
 import types
-from typing import Callable, TypeVar
+from typing import Callable, TypeVar, cast
 
 from cryptography.exceptions import InvalidTag
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
@@ -109,7 +109,7 @@ def _encrypt_code(code: types.CodeType, key: bytes | bytearray) -> bytes:
     plaintext = marshal.dumps(code)
     nonce = secrets.token_bytes(_NONCE_SIZE)
     aesgcm = AESGCM(bytes(key))
-    ciphertext_with_tag = aesgcm.encrypt(nonce, plaintext, associated_data=None)
+    ciphertext_with_tag = cast(bytes, aesgcm.encrypt(nonce, plaintext, associated_data=None))
     return nonce + ciphertext_with_tag
 
 

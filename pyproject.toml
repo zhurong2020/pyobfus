@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pyobfus"
 version = "0.5.4"
-description = "pyobfus — the Python obfuscator. AST-based name mangling + framework presets (FastAPI/Django/Pydantic/Click/SQLAlchemy) + reverse stack-trace mapping for AI debugging in Claude Code / Cursor. The modern PyArmor alternative: same protection, traces stay debuggable. Apache-2.0."
+description = "pyobfus — the Python obfuscator. AST-based name mangling + framework presets (FastAPI/Django/Pydantic/Click/SQLAlchemy) + reverse stack-trace mapping for AI debugging in Claude Code / Cursor. A transparent PyArmor alternative: AST-level protection with debuggable traces. Apache-2.0."
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.9"
 license = {text = "Apache-2.0"}
@@ -56,7 +56,13 @@ dev = [
     "pytest>=7.0",
     "pytest-cov>=4.0",
     "black>=22.0",
-    "mypy>=1.0",
+    # mypy 2.x no longer accepts python_version=3.9, while mypy 1.20+ itself
+    # requires Python 3.10. Allow 1.19.x on the Python 3.9 runtime jobs.
+    "mypy>=1.19,<2.0",
+    "types-PyYAML>=6.0",
+    # CI runs on 3.11+ but mypy targets 3.9, where config validation imports
+    # the tomllib backport.
+    "tomli>=2.0",
     "ruff>=0.1.0",
 ]
 
@@ -102,7 +108,7 @@ python_version = "3.9"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = false
-ignore_missing_imports = true
+follow_imports = "skip"
 
 [tool.ruff]
 line-length = 100

@@ -50,7 +50,7 @@ pyobfus/
 │   ├── wrangler.toml     # Worker configuration
 │   └── README.md         # Worker management guide
 │
-├── tests/                # Test suite (1033 tests, 90% coverage)
+├── tests/                # Core test suite (1,000+ tests, 90% coverage)
 │   ├── test_core/        # Tests for core modules
 │   ├── test_transformers/# Tests for transformers
 │   ├── integration/      # Integration tests

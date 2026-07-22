@@ -62,8 +62,9 @@ uvx pyobfus-mcp
 
 ## Pro build-fusion mechanisms (require trial or license)
 
-The `pyobfus build` command composes six named Pro protection mechanisms via
-per-mechanism flags (0.5.1+), which stack on top of the base obfuscation:
+The normal obfuscation command composes six named Pro protection mechanisms via
+per-mechanism flags (0.5.1+), which stack on top of the base obfuscation. Use
+`pyobfus SRC -o OUT --level pro --<flag>`; there is no `build` subcommand:
 
 - `--selective-opacity` — Selective Opacity: opaque, per-layer-keyed wrappers around chosen callables
 - `--seal-code` — Seal-Code: tamper-evident code-object seal that aborts on modification

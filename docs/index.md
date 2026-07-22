@@ -43,7 +43,7 @@ title: pyobfus - Modern Python Code Obfuscator
     <li style="margin: 0.5em 0;">🔐 <strong>AES-256 String Encryption</strong>: Military-grade encryption for strings</li>
     <li style="margin: 0.5em 0;">🛡️ <strong>Anti-Debugging Checks</strong>: Detect and prevent debugging attempts</li>
     <li style="margin: 0.5em 0;">📅 <strong>License Embedding</strong>: Expiration dates, machine binding, run limits</li>
-    <li style="margin: 0.5em 0;">🧱 <strong>v0.5 build-fusion mechanisms</strong> (compose via <code>pyobfus build</code>): Selective Opacity, Seal-Code, String Vault, Scrub-Traceback, Fingerprint, Expire-Hard</li>
+    <li style="margin: 0.5em 0;">🧱 <strong>v0.5 build-fusion mechanisms</strong> (compose via <code>pyobfus SRC -o OUT --level pro --&lt;flag&gt;</code>): Selective Opacity, Seal-Code, String Vault, Scrub-Traceback, Fingerprint, Expire-Hard</li>
     <li style="margin: 0.5em 0;">⚡ <strong>Configuration Presets</strong>: One-command setup (trial, commercial, library)</li>
     <li style="margin: 0.5em 0;">🔄 <strong>Lifetime Updates</strong>: All future Pro features included</li>
     <li style="margin: 0.5em 0;">💻 <strong>Up to 3 Devices</strong>: Use on multiple machines</li>

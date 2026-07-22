@@ -79,7 +79,7 @@ def _extract_code(response: str) -> tuple[str, str]:
 @dataclass
 class AnthropicAttacker(Attacker):
     name: str = "anthropic"
-    model: str = "claude-sonnet-5"
+    model: str = ""
     max_tokens: int = 4096
     _prompt_path: Path = field(default=_PROMPTS / "attacker_v1.md", repr=False)
 
@@ -87,6 +87,8 @@ class AnthropicAttacker(Attacker):
         return self._prompt_path.read_text(encoding="utf-8")
 
     def deobfuscate(self, obfuscated_src: str, entrypoints: list[dict]) -> AttackResult:
+        if not self.model:
+            raise ValueError("AnthropicAttacker requires an explicit model id")
         import anthropic  # lazy: only needed for real runs
 
         prompt = (
@@ -116,7 +118,7 @@ class AnthropicAttacker(Attacker):
         }
 
 
-def make_anthropic_judge(model: str = "claude-sonnet-5"):
+def make_anthropic_judge(model: str):
     """Return a ``(explanation, ground_truth) -> int 0..3`` judge callable."""
     template = (_PROMPTS / "judge_v1.md").read_text(encoding="utf-8")
 

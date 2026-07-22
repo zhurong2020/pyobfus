@@ -168,12 +168,14 @@ class AIArtifactStripper(BaseTransformer):
             )
         # __author__: str = "..."
         if isinstance(stmt, ast.AnnAssign):
-            value = stmt.value
-            if value is None:
+            annotated_value = stmt.value
+            if annotated_value is None:
                 return False
-            if not (isinstance(value, ast.Constant) and isinstance(value.value, str)):
+            if not (
+                isinstance(annotated_value, ast.Constant) and isinstance(annotated_value.value, str)
+            ):
                 return False
-            if not _is_ai_marker(value.value):
+            if not _is_ai_marker(annotated_value.value):
                 return False
             return isinstance(stmt.target, ast.Name) and stmt.target.id in _ATTRIBUTION_DUNDERS
         return False

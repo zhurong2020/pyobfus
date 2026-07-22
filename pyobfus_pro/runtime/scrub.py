@@ -31,6 +31,7 @@ import base64
 import os
 import sys
 import traceback as _traceback
+from typing import cast
 
 from cryptography.exceptions import InvalidTag
 from cryptography.hazmat.primitives import hashes, serialization
@@ -138,7 +139,7 @@ def _unscrub_payload(error_id: str, private_key_pem: bytes) -> bytes:
         raise ScrubError(f"unable to decrypt AES key (wrong private key?): {exc}") from exc
 
     try:
-        return AESGCM(aes_key).decrypt(nonce, ciphertext, associated_data=None)
+        return cast(bytes, AESGCM(aes_key).decrypt(nonce, ciphertext, associated_data=None))
     except InvalidTag as exc:
         raise ScrubError(f"unable to decrypt payload (corrupted blob): {exc}") from exc
 

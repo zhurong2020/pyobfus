@@ -45,7 +45,8 @@ def build_report(data: dict) -> str:
         f"**Attacker**: `{att.get('attacker')}` ({att_desc}) · "
         f"**pyobfus** {meta.get('pyobfus_version')} · "
         f"**Python** {meta.get('python')} · "
-        f"**samples**: {meta['sample_count']}"
+        f"**samples**: {meta['sample_count']} · "
+        f"**run (UTC)**: {meta.get('run_utc', 'not recorded')}"
     )
     lines.append("")
     lines.append(
@@ -60,7 +61,9 @@ def build_report(data: dict) -> str:
     for cid in meta["conditions"]:
         a = agg.get(cid)
         if not a or a["eligible"] == 0:
-            lines.append(f"| {cid} {a['name'] if a else ''} | 0 | — | — | — | (no eligible samples) |")
+            lines.append(
+                f"| {cid} {a['name'] if a else ''} | 0 | — | — | — | (no eligible samples) |"
+            )
             continue
         srr = a["recovered"] / a["eligible"]
         resistance = 1 - srr

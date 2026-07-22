@@ -30,8 +30,9 @@ def _rows_for(data, sample):
 
 
 def test_stub_pipeline_discriminates():
-    # limit=1 -> just luhn (c4-eligible, not c5), keeps the subprocess count low.
-    data = harness.run(StubAttacker(), judge=None, limit=1)
+    # Select luhn explicitly. ``limit=1`` used to depend on luhn sorting first,
+    # which stopped being true when billing_auth was added.
+    data = harness.run(StubAttacker(), judge=None, sample_names={"luhn"})
     rows = _rows_for(data, "luhn")
 
     # Control recovers (echoed source == original); the sanity gate in the design.

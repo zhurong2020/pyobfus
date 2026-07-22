@@ -34,7 +34,7 @@ classifiers = [
 
 dependencies = [
     # >=0.5.1: the pro-funnel copy references the v0.5 Pro mechanisms and their
-    # `pyobfus build` flags (Selective Opacity / watermarking / Vault /
+    # composable flags (Selective Opacity / watermarking / Vault /
     # --scrub-traceback / @seal_code), which land in pyobfus 0.5.1. Publish
     # pyobfus 0.5.1 before this MCP release.
     "pyobfus>=0.5.1",
