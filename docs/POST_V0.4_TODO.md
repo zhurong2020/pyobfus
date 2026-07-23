@@ -21,17 +21,28 @@
 1. ✅ **Documentation truth sweep — completed 2026-07-20.** Active surfaces use
    the real `pyobfus SRC -o OUT --level pro --<flag>` syntax; 0.5.4 and the
    release-CI baseline are current; old release checklists are marked frozen.
-2. **Launch wave — DEV published 2026-07-22.** The canonical article is live at
+2. **Launch wave — DEV published 2026-07-22; r/Python posted 2026-07-23.** The
+   canonical article is live at
    <https://dev.to/zhurong2020/i-built-a-python-obfuscator-that-keeps-production-traces-debuggable-1mp8>.
    The HN account and submission form are functional, and the maintainer posted
    a first independently written community comment on 2026-07-22. A reply to
    that thread was drafted 2026-07-23 but not yet posted: `news.ycombinator.com`
    returned HTTP 429 on `/login` for the maintainer that day (site-side rate
-   limit, not an account problem) — retry once it clears. Next: post the
-   drafted reply, continue normal HN participation before the maintainer
-   authors the Show HN submission, then Reddit → Chinese channels → GitHub
-   feedback poll; record +24h/+7d/+30d metrics. AI-generated or AI-edited HN
-   text is prohibited.
+   limit, not an account problem) — retry once it clears. Given the HN blocker,
+   the maintainer posted the r/Python showcase comment
+   (`_drafts/launch-v0.5.4/reddit-python.md`, de-AI'd 2026-07-23 — disclosure
+   moved to the opening sentence, closing triplet sentence broken up) ahead of
+   Show HN, out of the original sequence; it went live with no AutoModerator
+   removal/hold, at
+   <https://www.reddit.com/r/Python/comments/1unctej/showcase_thread/>. That
+   thread recycles monthly, so the URL will not be valid for a future post.
+   The maintainer's Reddit account (`u/No_Emphasis8994`, 2-year account age,
+   0 prior karma/contributions before this comment) posted successfully via
+   the direct route without a pre-warm-up period. Next: post the drafted HN
+   reply once the 429 clears, continue normal HN participation before the
+   maintainer authors the Show HN submission, watch the r/Python comment for
+   real replies, then Chinese channels → GitHub feedback poll; record
+   +24h/+7d/+30d metrics. AI-generated or AI-edited HN text is prohibited.
 3. ✅ **Issue #22 / mypy gate — completed 2026-07-22.** Core, Pro, and MCP (72
    source files) report zero errors; mypy stays on the 1.20 line while Python
    3.9 is supported. PR #23 passed the full remote CI matrix, merged, and
