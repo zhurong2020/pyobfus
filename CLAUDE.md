@@ -29,9 +29,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - ✅ **pyobfus-mcp 0.3.1 已发布（2026-06-22）**：pro-funnel 文案点名 v0.5 机制 · dep `>=0.5.1` · tag `mcp-v0.3.1` 发 PyPI + `mcp-publisher` 发 MCP Registry(0.3.1 isLatest)。
 - ✅ **AI-agent 可发现性 Wave A（2026-06-22）**：Smithery 经 **Skill 渠道** `zhurong2020/pyobfus-protect`（Smithery MCP 发布是远程网关、本地工具走不通,Skill 才对）+ mcp.so + `uvx` 零安装 + server.json 99 字描述(commit `826c576`/`49f4df3`)。报告:`docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`。
 - ❌ **JOSS 投稿被拒(2026-06-24)**:v0.5.1 投 JOSS(issue `openjournals/joss-reviews#10788`)被总编 desk-reject,理由=**scope/significance 非质量**("private-dev-then-public" + 无第三方复用)。→ 改走免费路径:✅ **Zenodo DOI `10.5281/zenodo.20846053`(concept)已拿到**,已接进 CITATION.cff + README 徽章 + `## Citation` + 两个 pyproject + RTD + ORCID + arong.eu.org/academic。完整记录+渠道对比见 `docs/JOSS_REJECTION_20260624.md`。
-- ⏭️ **更后续**（当前最大杠杆 = launch wave；完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:① **launch wave 进行中**——dev.to 已发,HN 正常参与中,自己的 Show HN 待发,之后 Reddit → CN 三件套 → GitHub 反馈投票 ② **P2-18 LLM 反混淆 benchmark**——离线 smoke 已进 CI,真实模型验证待 Codex CLI 每周额度重置后跑单样本 C0/C1 pilot ③ 下一个新功能选型故意等 launch 真实反馈(14天/10票门槛,`NEXT_FEATURE_DECISION.md`)④ IP 商业化迁移(个人→旎嵘科技)。
+- ⏭️ **更后续**（当前最大杠杆 = launch wave；完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:① **launch wave 进行中**——dev.to + r/Python showcase 已发,HN 因站方 429 限流暂卡(已起草回复待发),之后自己的 Show HN → CN(有心工坊长文已写好待审,V2EX 因新号需邀请码/Solana 暂缓,知乎待定)→ GitHub 反馈投票 ② **P2-18 LLM 反混淆 benchmark**——离线 smoke 已进 CI,真实模型验证待 Codex 周额度 2026-07-29 06:54 重置后跑单样本 C0/C1 pilot ③ 下一个新功能选型故意等 launch 真实反馈(14天/10票门槛,`NEXT_FEATURE_DECISION.md`)④ IP 商业化迁移(个人→旎嵘科技)。
 
-**Cold-start session 第一句话应问 user**：「0.5.4 + mcp 0.3.1 已发布、issue #22 mypy gate 已关。launch wave 进行中(dev.to 已发,HN 正常参与中,自己的 Show HN 待发)——继续跟进 launch、跑 P2-18 benchmark pilot,还是推进 IP 商业化迁移(个人→旎嵘科技)?」
+**Cold-start session 第一句话应问 user**：「0.5.4 + mcp 0.3.1 已发布、issue #22 mypy gate 已关。launch wave 进行中——dev.to 已发,r/Python showcase 评论已发(2026-07-23,未被 AutoMod 拦),HN 因 429 限流卡住(应已自行解除,待发已起草的回复+自己的 Show HN),CN 稿(有心工坊"系列第三篇")已写好在 findata `content/drafts/pyobfus-six-mechanisms-now-public.md` 等审——继续跟进 launch、等 07-29 06:54 后跑 P2-18 benchmark pilot,还是推进 IP 商业化迁移(个人→旎嵘科技)?」
 
 **Cold-start 资料定位**（按读取优先级）：
 
