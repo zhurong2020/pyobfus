@@ -24,16 +24,20 @@
 2. **Launch wave — DEV published 2026-07-22.** The canonical article is live at
    <https://dev.to/zhurong2020/i-built-a-python-obfuscator-that-keeps-production-traces-debuggable-1mp8>.
    The HN account and submission form are functional, and the maintainer posted
-   a first independently written community comment on 2026-07-22. Next:
-   continue normal HN participation before the maintainer authors the Show HN
-   submission, then Reddit → Chinese channels → GitHub feedback poll; record
-   +24h/+7d/+30d metrics. AI-generated or AI-edited HN text is prohibited.
+   a first independently written community comment on 2026-07-22. A reply to
+   that thread was drafted 2026-07-23 but not yet posted: `news.ycombinator.com`
+   returned HTTP 429 on `/login` for the maintainer that day (site-side rate
+   limit, not an account problem) — retry once it clears. Next: post the
+   drafted reply, continue normal HN participation before the maintainer
+   authors the Show HN submission, then Reddit → Chinese channels → GitHub
+   feedback poll; record +24h/+7d/+30d metrics. AI-generated or AI-edited HN
+   text is prohibited.
 3. ✅ **Issue #22 / mypy gate — completed 2026-07-22.** Core, Pro, and MCP (72
    source files) report zero errors; mypy stays on the 1.20 line while Python
    3.9 is supported. PR #23 passed the full remote CI matrix, merged, and
    closed issue #22.
-4. **P2-18 benchmark-first evidence — no-API Windows pilot path ready locally
-   2026-07-22.**
+4. **P2-18 benchmark-first evidence — blocked on Codex weekly allowance until
+   2026-07-29 06:54.**
    The offline smoke job is blocking in CI and records model/date/artifact
    hashes. A credentialed real-model run is still required before publishing
    any resistance number; stub output is explicitly not evidence. The
@@ -51,9 +55,13 @@
    CLI 0.145.0 does not recognize `/setup-default-sandbox`, but no setup is
    needed for this route: direct `codex sandbox` smoke tests and an offline
    stub-through-sandbox integration run passed. Real Codex invocations require
-   explicit sample and condition selections. Next owner action: wait for the
-   weekly Codex allowance to reset, then run the documented one-sample C0/C1
-   pilot (two model calls). Do not execute model output directly on the host.
+   explicit sample and condition selections. **2026-07-23 attempt**: ran the
+   documented one-sample pilot (`--sample luhn --condition C0 --condition C1`)
+   against Windows Codex CLI 0.145.0 (logged in via ChatGPT) — it failed before
+   any generation with `ERROR: You've hit your usage limit. ... try again at
+   Jul 29th, 2026 6:54 AM`, so the call was rejected pre-generation and did not
+   spend meaningful allowance. Next owner action: after 2026-07-29 06:54, rerun
+   the same command verbatim. Do not execute model output directly on the host.
    Before publication, disclose or close the current native-sandbox limitation:
    unlike Docker, this path does not yet set explicit CPU, memory, or process
    caps beyond the outer timeout.
