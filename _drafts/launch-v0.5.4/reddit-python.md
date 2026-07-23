@@ -22,7 +22,7 @@ Repository: <https://github.com/zhurong2020/pyobfus>
 
 **What My Project Does**
 
-pyobfus is an AST-based Python obfuscator. It renames identifiers, preserves
+I maintain pyobfus, an AST-based Python obfuscator. It renames identifiers, preserves
 reflection-sensitive APIs through FastAPI, Django, Flask, Pydantic, Click, and
 SQLAlchemy presets, and can save a private mapping that restores original names
 in an obfuscated production traceback.
@@ -78,6 +78,6 @@ For an MCP client, the local stdio server command is:
 uvx pyobfus-mcp
 ```
 
-I maintain the project. The most useful feedback would be a reproducible
-framework compatibility failure, a weakness in the stated threat model, or a
-missing integration in a real Python packaging or agent workflow.
+Most useful feedback: a framework compatibility failure I can reproduce, or a
+spot where the threat model above doesn't hold up. If there's an integration
+missing from your actual packaging or agent workflow, say which one.
