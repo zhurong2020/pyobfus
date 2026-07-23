@@ -48,6 +48,7 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+.pytest-tmp/
 
 # Translations
 *.mo
@@ -164,6 +165,7 @@ docs/internal/
 *_obfuscated.py
 output/
 obfuscated/
+benchmarks/llm_resistance/results/
 
 # Local testing documentation (author's personal use)
 .local-testing/

@@ -2,8 +2,9 @@
 
 Primary metric (objective): Semantic-Recovery -- execute the attacker's
 reimplementation against the sample's ground-truth IO vectors. Real model
-output uses a locked-down Docker executor; the host executor is only for
-trusted fixtures. Recovered iff ALL vectors pass (functional equivalence).
+output uses a locked-down Docker executor or the native Codex Windows sandbox;
+the host executor is only for trusted fixtures. Recovered iff ALL vectors pass
+(functional equivalence).
 Timeouts, exceptions, and empty outputs count as NOT recovered.
 
 Secondary metric (subjective, optional): Comprehension -- an auxiliary judge
@@ -16,11 +17,17 @@ See ``docs/LLM_RESISTANCE_BENCHMARK.md``.
 from __future__ import annotations
 
 import json
+import hashlib
+import os
 import shutil
 import subprocess
 import sys
 import tempfile
+import zipfile
 from pathlib import Path
+
+PYTHON_EMBED_VERSION = "3.11.9"
+PYTHON_EMBED_SHA256 = "009d6bf7e3b2ddca3d784fa09f90fe54336d5b60f0e0f305c37f400bf83cfd3b"
 
 # Driver executed in a subprocess: imports the reimplementation, runs each
 # vector, prints a JSON list of {"ok": bool, "got": repr|null, "error": str|null}.
@@ -60,6 +67,8 @@ def score_recovery(
     timeout: float = 10.0,
     executor: str = "host",
     docker_image: str | None = None,
+    sandbox_python_zip: str | None = None,
+    codex_command: str | None = None,
 ) -> dict:
     """Run the attacker's reimplementation against the sample's IO vectors.
 
@@ -92,6 +101,13 @@ def score_recovery(
                 proc = _run_on_host(driver, reimpl, vectors_file, timeout)
             elif executor == "docker":
                 proc = _run_in_docker(work, timeout, docker_image)
+            elif executor == "codex-windows":
+                proc = _run_in_codex_windows_sandbox(
+                    work,
+                    timeout,
+                    sandbox_python_zip,
+                    codex_command=codex_command,
+                )
             else:
                 raise ValueError(f"unknown benchmark executor: {executor}")
         except subprocess.TimeoutExpired:
@@ -172,6 +188,73 @@ def _run_in_docker(
             "/work/driver.py",
             "/work/reimpl.py",
             "/work/vectors.json",
+        ],
+        capture_output=True,
+        text=True,
+        timeout=timeout + 5,
+    )
+
+
+def _run_in_codex_windows_sandbox(
+    work: Path,
+    timeout: float,
+    runtime_zip: str | None,
+    *,
+    codex_command: str | None = None,
+) -> subprocess.CompletedProcess[str]:
+    """Execute untrusted output with Codex's native read-only Windows sandbox."""
+    if os.name != "nt":
+        raise RuntimeError("the codex-windows executor is available only on Windows")
+    if not runtime_zip:
+        raise RuntimeError("--sandbox-python-zip is required for codex-windows")
+
+    archive = Path(runtime_zip).expanduser().resolve()
+    if not archive.is_file():
+        raise RuntimeError(f"sandbox Python archive does not exist: {archive}")
+    digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+    if digest != PYTHON_EMBED_SHA256:
+        raise RuntimeError(
+            "sandbox Python archive SHA-256 mismatch; expected the pinned "
+            f"Python {PYTHON_EMBED_VERSION} embeddable package"
+        )
+
+    runtime = work / "python-runtime"
+    runtime.mkdir()
+    with zipfile.ZipFile(archive) as zf:
+        root = runtime.resolve()
+        for info in zf.infolist():
+            target = (runtime / info.filename).resolve()
+            if target != root and root not in target.parents:
+                raise RuntimeError("unsafe path in sandbox Python archive")
+        zf.extractall(runtime)
+
+    python_exe = runtime / "python.exe"
+    if not python_exe.is_file():
+        raise RuntimeError("sandbox Python archive has no python.exe")
+
+    codex = codex_command or shutil.which("codex.cmd") or shutil.which("codex")
+    if not codex:
+        raise RuntimeError("Codex CLI was not found for the codex-windows executor")
+
+    # :read-only is essential for benchmark integrity: candidate code cannot
+    # rewrite driver.py or vectors.json to forge a passing result. The profile
+    # also blocks direct network access. The portable interpreter lives inside
+    # the same temporary root, so no personal Python installation is exposed.
+    return subprocess.run(
+        [
+            codex,
+            "sandbox",
+            "-P",
+            ":read-only",
+            "-C",
+            str(work),
+            str(python_exe),
+            "-I",
+            "-B",
+            "-S",
+            str(work / "driver.py"),
+            str(work / "reimpl.py"),
+            str(work / "vectors.json"),
         ],
         capture_output=True,
         text=True,

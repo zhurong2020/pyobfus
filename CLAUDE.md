@@ -10,11 +10,11 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 **Single source of truth for forward TODO**: [`docs/POST_V0.4_TODO.md`](docs/POST_V0.4_TODO.md) — 重启 session 第一份必读
 
-Snapshot 2026-05-07 (v0.4 distribution leg 完整闭环之后)。包含 30-second resume cheat sheet · 4 个 self-actionable P0 item（CI smoke test + PEP 740 attestation + server.json _meta + dev.to voice pass）· v0.5 work（含 3 个 2026-05 research 发现的新机会：PEP 750 t-string handler · FastMCP 3.0 升级 · `--target claude-skill` preset）· passive waiting items · do-not-do list · 3 周建议节奏。
+该文档顶部是活的「Current prioritized TODO」（随每次发布/里程碑刷新日期），下方是冻结的历史执行记录——**只读顶部，别被下面的历史小节带偏**。
 
-### 🟢 2026-07-07 active state — pyobfus 0.5.3 + pyobfus-mcp 0.3.1 已发布到 PyPI
+### 🟢 2026-07-22 active state — pyobfus 0.5.4 已发布，launch wave 进行中
 
-**当前状态**：发明专利初审合格（2026-06-17）→ v0.5.0→0.5.1→0.5.2（PyPI 2026-06）→ **0.5.3 已发布（2026-07-07）**，补齐 0.5.1 顺延的三个 build-fusion flag（`--period` / `--opacity-config` / `--bind-device`），1033 测试，main 无 held。mcp 仍 0.3.1（工具面无变化，dep `>=0.5.1` 自动解析到 0.5.3）。
+**当前状态**：发明专利初审合格（2026-06-17）→ v0.5.0→0.5.1→0.5.2→0.5.3（PyPI 2026-06~07-07）→ **0.5.4 已发布（2026-07-19，PR #19 vault-key 设备绑定）**→ **issue #22 mypy gate 已关闭（2026-07-22，PR #23）**。dev.to launch 文章已发布（2026-07-22），HN 账号 `znhskzj` 正在做发帖前的正常社区参与（已与另一 Show HN 作者有一次真实双向交流），自己的 Show HN 尚未提交。mcp 仍 0.3.1（工具面无变化，dep `>=0.5.1` 自动解析到当前版本）。
 
 - ✅ 已提交并受理（申请号 `202610712171X` · 申请日/优先权日 2026-05-22 · 17 项权利要求）
 - ✅ 费用全部缴清（共 1610 元 · 2026-05-22 一次缴清 · 含申请费类 1235 与实审费 375 · 官方审查信息查询「费足」核实）
@@ -23,13 +23,15 @@ Snapshot 2026-05-07 (v0.4 distribution leg 完整闭环之后)。包含 30-secon
 - ✅ **v0.5.0 已发布**：6 项专利机制（P2-1/7/8/9/10/11）已并入公开 `pyobfus_pro/`，1016 测试 / 砍 3.8 / Beta→Production/Stable，tag `v0.5.0` 经 OIDC Trusted Publishing 发到 PyPI。机制经 `pyobfus_pro` API + `pyobfus-unscrub` CLI + standalone passes 可用
 - ✅ **0.5.1 已发布（2026-06-22）**：`pyobfus build --flag` 融合 6 机制,tag `v0.5.1` 经 OIDC + PEP 740 attestations 发 PyPI(run `27938471463`)。
 - ✅ **0.5.2 已发布（2026-06-22，PR #18）**：修 0.5.1 build-fusion 两个 Py3.9/3.10 bug——① `--seal-code` 在 3.9/3.10 误报 `IntegrityError`(seal 哈希用 marshal 默认版本≥3,受字符串 interning 影响 → 钉到 marshal version 2);② `--vault` 在 3.9 抛 `zip() takes no keyword arguments`(`zip(strict=)` 是 3.10+ 才有 → 改普通 zip)。1025 测试,tag `v0.5.2` 经 OIDC + PEP 740 发 PyPI(release run `27963690396`,CI 全矩阵含 3.9/3.10 绿)。回归守卫 `tests/test_seal_runtime.py::TestMarshalVersionStability`。
-- ✅ **0.5.3 已发布（2026-07-07）**：补齐 0.5.1 顺延的三个 build-fusion flag——`--period`(运行计数守卫,commit `dfe1dbd`)、`--opacity-config`(pre-mangle qualname 解析 + 注入 `@opacity` 装饰器,绕开 name-map,`34dcbc5`)、`--bind-device`/`--bind-device-id`(设备锁定 L3,重写 `_LAYER_KEY` 为运行时派生,`62646b6`)。1033 测试,tag `v0.5.3` 经 OIDC + PEP 740 发 PyPI。vault-key(`_VAULT_KEY_*`)设备绑定为 0.5.4 候选。
+- ✅ **0.5.3 已发布（2026-07-07）**：补齐 0.5.1 顺延的三个 build-fusion flag——`--period`(运行计数守卫,commit `dfe1dbd`)、`--opacity-config`(pre-mangle qualname 解析 + 注入 `@opacity` 装饰器,绕开 name-map,`34dcbc5`)、`--bind-device`/`--bind-device-id`(设备锁定 L3,重写 `_LAYER_KEY` 为运行时派生,`62646b6`)。1033 测试,tag `v0.5.3` 经 OIDC + PEP 740 发 PyPI。
+- ✅ **0.5.4 已发布（2026-07-19，PR #19）**：`--bind-device` 扩展到 vault key(`_VAULT_KEY_*`)设备绑定,与 opacity L3 用同一套运行时派生技术。首批外部 issue #20/#21(trial 绕过报告)按「诚实记录边界、不加固客户端」处置并关闭。
+- ✅ **issue #22 mypy gate 已关闭（2026-07-22，PR #23）**：Core/Pro/MCP 共 72 个源文件 mypy 零错误,CI 全矩阵绿后合并。
 - ✅ **pyobfus-mcp 0.3.1 已发布（2026-06-22）**：pro-funnel 文案点名 v0.5 机制 · dep `>=0.5.1` · tag `mcp-v0.3.1` 发 PyPI + `mcp-publisher` 发 MCP Registry(0.3.1 isLatest)。
 - ✅ **AI-agent 可发现性 Wave A（2026-06-22）**：Smithery 经 **Skill 渠道** `zhurong2020/pyobfus-protect`（Smithery MCP 发布是远程网关、本地工具走不通,Skill 才对）+ mcp.so + `uvx` 零安装 + server.json 99 字描述(commit `826c576`/`49f4df3`)。报告:`docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`。
 - ❌ **JOSS 投稿被拒(2026-06-24)**:v0.5.1 投 JOSS(issue `openjournals/joss-reviews#10788`)被总编 desk-reject,理由=**scope/significance 非质量**("private-dev-then-public" + 无第三方复用)。→ 改走免费路径:✅ **Zenodo DOI `10.5281/zenodo.20846053`(concept)已拿到**,已接进 CITATION.cff + README 徽章 + `## Citation` + 两个 pyproject + RTD + ORCID + arong.eu.org/academic。完整记录+渠道对比见 `docs/JOSS_REJECTION_20260624.md`。
-- ⏭️ **更后续**:① **launch wave**(`_drafts/` · 按 AEO 结构写 · 过 AI 检测)② **0.5.4**:vault-key 设备绑定 + P2-18 LLM 反混淆 benchmark(2026-07-07 调研升为最高战略优先级 · 见 ROADMAP 2026-07-07 节)③ **其余新功能**(ROADMAP P2-17 签名 provenance / P2-19 `--preset ml` / P2-21 MCP 工具完整性 / P2-22 诚实对比)④ ARD `ai-catalog.json` 早鸟 ⑤ 复核 PyPI PEP740 provenance。详见 `docs/POST_V0.4_TODO.md` 顶部「Forward TODO」。
+- ⏭️ **更后续**（当前最大杠杆 = launch wave；完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:① **launch wave 进行中**——dev.to 已发,HN 正常参与中,自己的 Show HN 待发,之后 Reddit → CN 三件套 → GitHub 反馈投票 ② **P2-18 LLM 反混淆 benchmark**——离线 smoke 已进 CI,真实模型验证待 Codex CLI 每周额度重置后跑单样本 C0/C1 pilot ③ 下一个新功能选型故意等 launch 真实反馈(14天/10票门槛,`NEXT_FEATURE_DECISION.md`)④ IP 商业化迁移(个人→旎嵘科技)。
 
-**Cold-start session 第一句话应问 user**：「0.5.3 + mcp 0.3.1 已发布、JOSS 已被拒(已转 Zenodo DOI)。要做 launch wave、0.5.4(vault-key 绑定 + P2-18 LLM 反混淆 benchmark),还是推进 IP 商业化迁移(个人→旎嵘科技)?」
+**Cold-start session 第一句话应问 user**：「0.5.4 + mcp 0.3.1 已发布、issue #22 mypy gate 已关。launch wave 进行中(dev.to 已发,HN 正常参与中,自己的 Show HN 待发)——继续跟进 launch、跑 P2-18 benchmark pilot,还是推进 IP 商业化迁移(个人→旎嵘科技)?」
 
 **Cold-start 资料定位**（按读取优先级）：
 

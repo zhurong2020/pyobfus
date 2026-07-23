@@ -14,6 +14,7 @@ CLI + pyobfus_pro as a subprocess).
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -22,7 +23,7 @@ if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
 
 import harness  # noqa: E402
-from attacker import StubAttacker  # noqa: E402
+from attacker import CodexCliAttacker, StubAttacker  # noqa: E402
 
 
 def _rows_for(data, sample):
@@ -56,3 +57,61 @@ def test_report_renders():
     data = harness.run(StubAttacker(), judge=None, limit=1)
     md = report.build_report(data)
     assert "Resistance" in md and "C0" in md and "C4" in md
+
+
+def test_codex_cli_attacker_uses_structured_output_without_api_keys(tmp_path, monkeypatch):
+    fake_cli = tmp_path / "fake_codex.py"
+    fake_cli.write_text(
+        """
+import json
+import os
+import sys
+from pathlib import Path
+
+if "--version" in sys.argv:
+    print("codex-cli test-0")
+    raise SystemExit(0)
+
+prompt = sys.stdin.read()
+assert "required_fn(arg1)" in prompt
+assert "def hidden" in prompt
+assert not any(os.environ.get(k) for k in (
+    "OPENAI_API_KEY", "CODEX_API_KEY", "ANTHROPIC_API_KEY"
+))
+output = Path(sys.argv[sys.argv.index("--output-last-message") + 1])
+output.write_text(json.dumps({
+    "reimplementation": "def required_fn(arg1):\\n    return arg1 + 1\\n",
+    "explanation": "Adds one.",
+}), encoding="utf-8")
+""".strip(),
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("OPENAI_API_KEY", "must-not-reach-child")
+    monkeypatch.setenv("CODEX_API_KEY", "must-not-reach-child")
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "must-not-reach-child")
+
+    attacker = CodexCliAttacker(model="test-model", command=(sys.executable, str(fake_cli)))
+    result = attacker.deobfuscate(
+        "def hidden(x): return x + 1", [{"name": "required_fn", "arity": 1}]
+    )
+
+    assert result.reimplementation.startswith("def required_fn")
+    assert result.explanation == "Adds one."
+    assert json.loads(result.raw_response)["explanation"] == "Adds one."
+    descriptor = attacker.descriptor()
+    assert descriptor["model"] == "test-model"
+    assert descriptor["codex_cli"] == "codex-cli test-0"
+
+
+def test_sample_selection_applies_before_limit():
+    data = harness.run(
+        StubAttacker(),
+        judge=None,
+        sample_names={"luhn"},
+        condition_ids={"C0", "C1"},
+        limit=1,
+    )
+    assert data["meta"]["sample_count"] == 1
+    assert data["meta"]["conditions"] == ["C0", "C1"]
+    assert {row["sample"] for row in data["rows"]} == {"luhn"}
+    assert {row["condition"] for row in data["rows"]} == {"C0", "C1"}

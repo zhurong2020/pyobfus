@@ -32,7 +32,8 @@
    source files) report zero errors; mypy stays on the 1.20 line while Python
    3.9 is supported. PR #23 passed the full remote CI matrix, merged, and
    closed issue #22.
-4. **P2-18 benchmark-first evidence — harness hardened locally 2026-07-20.**
+4. **P2-18 benchmark-first evidence — no-API Windows pilot path ready locally
+   2026-07-22.**
    The offline smoke job is blocking in CI and records model/date/artifact
    hashes. A credentialed real-model run is still required before publishing
    any resistance number; stub output is explicitly not evidence. The
@@ -43,20 +44,26 @@
    CLI 0.145.0 is now installed and reports ChatGPT authentication; a minimal
    `codex exec` call succeeded with `gpt-5.6-sol`. That tiny call still used
    15,018 tokens including fixed context, so use Plus for a small pilot rather
-   than the full planned matrix. The harness still needs a `CodexCliAttacker`
-   plus a Codex native-Windows-sandbox scoring executor. The CLI's preferred
-   elevated Windows sandbox is not initialized yet, while the unelevated
-   backend correctly refuses read-only access to the existing Python runtime.
-   Next owner action: run `/setup-default-sandbox` in an interactive Codex CLI
-   session, approve its administrator setup, then re-run the sandbox smoke
-   test. Do not fall back to executing model-generated code directly on the
-   host.
+   than the full planned matrix. A `CodexCliAttacker` and native-Windows-sandbox
+   scorer are now implemented: the adapter strips provider API-key variables,
+   and the scorer verifies a pinned official Python 3.11.9 embeddable ZIP before
+   running generated code in the Codex read-only/network-blocked sandbox. The
+   CLI 0.145.0 does not recognize `/setup-default-sandbox`, but no setup is
+   needed for this route: direct `codex sandbox` smoke tests and an offline
+   stub-through-sandbox integration run passed. Real Codex invocations require
+   explicit sample and condition selections. Next owner action: wait for the
+   weekly Codex allowance to reset, then run the documented one-sample C0/C1
+   pilot (two model calls). Do not execute model output directly on the host.
+   Before publication, disclose or close the current native-sandbox limitation:
+   unlike Docker, this path does not yet set explicit CPU, memory, or process
+   caps beyond the outer timeout.
 5. ✅ **Discoverability and citation — deployed and verified 2026-07-22.** DOI,
    README/PyPI/Read the Docs citation surfaces are present. ARD metadata is
    CI-validated and live at the Read the Docs well-known URL. PulseMCP exact
    search returned 0 results on 2026-07-22. Its submission page says Registry
    entries are ingested daily and processed weekly, and directs maintainers to
-   `hello@pulsemcp.com` after a week; email follow-up is now due.
+   `hello@pulsemcp.com` after a week; the maintainer sent that follow-up on
+   2026-07-22, so this is now passive monitoring.
 6. **Next feature selection — evidence gate prepared.** The poll copy and
    [`NEXT_FEATURE_DECISION.md`](NEXT_FEATURE_DECISION.md) define the 14-day /
    10-vote trigger and decision rubric. Selection deliberately waits for real

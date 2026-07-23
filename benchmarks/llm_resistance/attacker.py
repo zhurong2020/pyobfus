@@ -8,6 +8,10 @@ The ``Attacker`` interface is model-agnostic. Two implementations ship:
 - ``AnthropicAttacker`` -- the real analyst via the Anthropic API. Fixed model,
   temperature 0, a frozen prompt (``prompts/attacker_v1.md``) hashed into every
   result for reproducibility. Requires ``anthropic`` + ``ANTHROPIC_API_KEY``.
+- ``CodexCliAttacker`` -- invokes ``codex exec`` with saved ChatGPT
+  authentication. It deliberately removes API-key variables from the child
+  environment so a run cannot silently switch from subscription usage to API
+  billing.
 
 See ``docs/LLM_RESISTANCE_BENCHMARK.md``.
 """
@@ -15,7 +19,12 @@ See ``docs/LLM_RESISTANCE_BENCHMARK.md``.
 from __future__ import annotations
 
 import hashlib
+import json
+import os
 import re
+import shutil
+import subprocess
+import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -74,6 +83,128 @@ def _extract_code(response: str) -> tuple[str, str]:
     code = m.group(1)
     explanation = (response[: m.start()] + response[m.end() :]).strip()
     return code, explanation
+
+
+def _default_codex_command() -> tuple[str, ...]:
+    """Return the installed Codex CLI command without invoking it."""
+    candidates = ("codex.cmd", "codex") if os.name == "nt" else ("codex",)
+    for candidate in candidates:
+        resolved = shutil.which(candidate)
+        if resolved:
+            return (resolved,)
+    raise RuntimeError("Codex CLI was not found; install @openai/codex and run `codex login`")
+
+
+@dataclass
+class CodexCliAttacker(Attacker):
+    """Real attacker backed by ``codex exec`` and ChatGPT authentication.
+
+    ``command`` is injectable so offline tests can use a fake CLI. Production
+    runs leave it unset and discover the installed ``codex`` command.
+    """
+
+    name: str = "codex-cli"
+    model: str = ""
+    timeout: float = 600.0
+    command: tuple[str, ...] | None = field(default=None, repr=False)
+    _prompt_path: Path = field(default=_PROMPTS / "attacker_codex_v1.md", repr=False)
+    _schema_path: Path = field(default=_PROMPTS / "attack_result.schema.json", repr=False)
+
+    def _template(self) -> str:
+        return self._prompt_path.read_text(encoding="utf-8")
+
+    def _resolved_command(self) -> tuple[str, ...]:
+        return self.command or _default_codex_command()
+
+    def deobfuscate(self, obfuscated_src: str, entrypoints: list[dict]) -> AttackResult:
+        if not self.model:
+            raise ValueError("CodexCliAttacker requires an explicit model id")
+
+        prompt = (
+            self._template()
+            .replace("{ENTRYPOINTS}", _entrypoints_block(entrypoints))
+            .replace("{OBFUSCATED}", obfuscated_src)
+        )
+        env = os.environ.copy()
+        # Subscription authentication is the point of this adapter. Never let
+        # a developer shell's API key silently turn the measurement into a
+        # billable API run.
+        for key in ("OPENAI_API_KEY", "CODEX_API_KEY", "ANTHROPIC_API_KEY"):
+            env.pop(key, None)
+
+        with tempfile.TemporaryDirectory(prefix="pyobfus-codex-attacker-") as td:
+            output_path = Path(td) / "attack-result.json"
+            cmd = [
+                *self._resolved_command(),
+                "exec",
+                "--ephemeral",
+                "--ignore-user-config",
+                "--ignore-rules",
+                "--skip-git-repo-check",
+                "--sandbox",
+                "read-only",
+                "--model",
+                self.model,
+                "-c",
+                'model_reasoning_effort="low"',
+                "--output-schema",
+                str(self._schema_path.resolve()),
+                "--output-last-message",
+                str(output_path),
+                "-",
+            ]
+            proc = subprocess.run(
+                cmd,
+                input=prompt,
+                capture_output=True,
+                text=True,
+                timeout=self.timeout,
+                cwd=td,
+                env=env,
+            )
+            if proc.returncode != 0:
+                detail = proc.stderr.strip().splitlines()[-1:] or ["no stderr"]
+                raise RuntimeError(f"codex exec failed: {detail[0][:300]}")
+            if not output_path.exists():
+                raise RuntimeError("codex exec produced no structured output file")
+            try:
+                payload = json.loads(output_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError) as exc:
+                raise RuntimeError("codex exec returned invalid structured output") from exc
+
+        code = str(payload.get("reimplementation", ""))
+        explanation = str(payload.get("explanation", ""))
+        # Be tolerant if a model includes a fence despite the schema guidance.
+        fenced_code, trailing = _extract_code(code)
+        if fenced_code:
+            code = fenced_code
+            explanation = explanation or trailing
+        raw = json.dumps(payload, ensure_ascii=False, sort_keys=True)
+        return AttackResult(
+            reimplementation=code,
+            explanation=explanation,
+            raw_response=raw,
+        )
+
+    def descriptor(self) -> dict:
+        prompt_hash = hashlib.sha256(self._template().encode("utf-8")).hexdigest()[:16]
+        command = self._resolved_command()
+        try:
+            proc = subprocess.run(
+                [*command, "--version"], capture_output=True, text=True, timeout=15
+            )
+            cli_version = (proc.stdout or proc.stderr).strip().splitlines()[-1]
+        except (OSError, subprocess.SubprocessError, IndexError):
+            cli_version = "unknown"
+        return {
+            "attacker": self.name,
+            "model": self.model,
+            "reasoning_effort": "low",
+            "auth": "saved ChatGPT login (API-key variables removed)",
+            "codex_cli": cli_version,
+            "prompt": self._prompt_path.name,
+            "prompt_sha256_16": prompt_hash,
+        }
 
 
 @dataclass

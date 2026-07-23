@@ -99,11 +99,15 @@ For each (sample, condition, attacker) triple:
 
 1. The attacker returns a clean Python reimplementation.
 2. The harness **executes** that reimplementation against the sample's
-   ground-truth IO test vectors. Real model output defaults to a locked-down
+   ground-truth IO test vectors. Real model output uses either a locked-down
    Docker container (no network, read-only filesystem, dropped capabilities,
-   CPU/memory/process limits, timeout). The ordinary host subprocess is used
-   only for the trusted offline stub unless an operator explicitly accepts the
-   unsafe override.
+   CPU/memory/process limits, timeout) or, for the no-Docker Windows pilot, the
+   Codex CLI native read-only sandbox with blocked network access, isolated
+   Python flags, and an outer timeout. The native Windows path does not yet add
+   Docker-equivalent CPU, memory, or process-count caps, which must be disclosed
+   with pilot results. The ordinary host subprocess is used only for the
+   trusted offline stub unless an operator explicitly accepts the unsafe
+   override.
 3. **Recovered = passes ALL vectors** (functional equivalence). Partial credit is
    *not* given for the primary metric — semantic recovery is binary per sample.
 
@@ -145,7 +149,12 @@ secondary metric. **CS never overrides SRR** in the headline.
   - `AnthropicAttacker` — the real analyst, via the Anthropic API. Fixed model
     id, temperature 0, a frozen prompt (stored in `prompts/`), logged verbatim
     into `results.json` so a run is fully reproducible.
-  - (future) `OpenAIAttacker` / others — to reproduce Acoda's multi-model table.
+  - `CodexCliAttacker` — the no-API Windows pilot. It reuses a saved ChatGPT
+    login, removes provider API-key variables from its child environment, uses
+    a frozen structured-output prompt/schema, and requires an explicit model.
+    The CLI also requires explicit sample and condition selections so a pilot
+    cannot accidentally expand into a subscription-consuming full matrix.
+  - (future) other model families — to reproduce Acoda's multi-model table.
 - Every run records: attacker class, model id, prompt hash, pyobfus version,
   Python version, UTC date, scoring executor/container image, and each generated
   artifact's content hash. The
@@ -171,7 +180,7 @@ secondary metric. **CS never overrides SRR** in the headline.
 benchmarks/llm_resistance/
   README.md            # how to run (stub + real), how to read results
   conditions.py        # C0-C5 as real pyobfus CLI invocations
-  attacker.py          # Attacker ABC + StubAttacker + AnthropicAttacker
+  attacker.py          # Attacker ABC + Stub/Anthropic/Codex CLI adapters
   scorer.py            # functional-equivalence executor + comprehension judge
   harness.py           # orchestrator: corpus x conditions x attacker -> results
   report.py            # results.json -> report.md (+ optional PNG)
@@ -185,7 +194,9 @@ benchmarks/llm_resistance/
 ## Roadmap after v0
 
 1. **v0 (this cut)**: harness + scorer + stub proof + 4–6 seed samples +
-   `AnthropicAttacker` interface. End-to-end green with the stub.
+   Anthropic API and Codex CLI attacker interfaces. End-to-end green with the
+   stub; Codex generation and Windows scoring are available for a bounded
+   no-API/no-Docker pilot.
 2. **Measurement run**: expand corpus to ~30 samples across categories, run
    `AnthropicAttacker` (and ≥1 other family for the multi-model table), publish
    `report.md` with real numbers → launch content.
