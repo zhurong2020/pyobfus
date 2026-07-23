@@ -43,6 +43,28 @@
    maintainer authors the Show HN submission, watch the r/Python comment for
    real replies, then Chinese channels → GitHub feedback poll; record
    +24h/+7d/+30d metrics. AI-generated or AI-edited HN text is prohibited.
+   **Chinese channel status (2026-07-23)**: `cn.md`'s 长文版 and V2EX 短版 were
+   de-AI'd (self-evaluative framing removed, one "不是A而是B" contrastive
+   rewritten). The 长文版 destination, arong.eu.org (brand header currently
+   reads "嵘说"; the site also carries older "阿嵘的云生活" / "有心言者"
+   taglines on different sections), already carries two prior pyobfus posts —
+   "别让你的Python代码'裸奔'了" (2025-12-27) and "pyobfus — 一个让 AI 还能读懂
+   崩溃日志的 Python 代码混淆器" (2026-05-21) — so the 0.5.4 draft is a third
+   post continuing an established series, not a new channel; frame it as an
+   update (lead with what's new in 0.5.4) rather than re-pitching pyobfus from
+   scratch, since at least the May post already covers the mapping.json/AI-
+   debugging story. V2EX is now blocked, and for a structural reason unrelated
+   to content rules: the maintainer's freshly Google-registered account
+   requires either an invite code from an existing V2EX member or binding a
+   Solana address holding ≥10,000 $V2EX tokens to activate — buying crypto for
+   one forum post is not worth it, so this channel is deferred until an invite
+   code is obtained through a normal contact, not chased. If it does go out,
+   the target is the dedicated **开源软件** node (`v2ex.com/go/opensource`,
+   not the generic 分享创造 node), which explicitly welcomes personal
+   open-source project posts with real substance (not bare links) — the
+   drafted short version already qualifies. A separate 知乎 piece was in the
+   pre-0.5.4 "CN trio" plan but is not in the current `_drafts/launch-v0.5.4/`
+   scope; not drafted unless requested.
 3. ✅ **Issue #22 / mypy gate — completed 2026-07-22.** Core, Pro, and MCP (72
    source files) report zero errors; mypy stays on the 1.20 line while Python
    3.9 is supported. PR #23 passed the full remote CI matrix, merged, and

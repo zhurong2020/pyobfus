@@ -31,10 +31,16 @@ votes, named third-party uses, and repeated feature requests.
 2. After normal HN participation, the maintainer independently writes and
    submits the Show HN on a weekday and remains available for the first 90
    minutes. There is no account-age, karma, or elapsed-time target to optimize.
-3. Add `reddit-python.md` to the current r/Python monthly showcase thread;
-   current rules do not support the old standalone-showcase plan.
-4. Publish `cn.md` to the maintainer-controlled Chinese channel, then adapt its
-   short block for V2EX only if current forum rules permit project promotion.
+3. ✅ Added `reddit-python.md` to the current r/Python monthly showcase thread
+   on 2026-07-23, ahead of Show HN because of an HN 429; no AutoModerator
+   removal. See publication record below.
+4. Publish `cn.md`'s 长文版 to arong.eu.org, which already carries two prior
+   pyobfus posts (2025-12-27, 2026-05-21) — frame as a third, update-style
+   post, not a fresh pitch. V2EX is blocked as of 2026-07-23: the maintainer's
+   new Google-registered account needs an invite code or a ≥10,000 $V2EX
+   Solana holding to activate, neither of which is worth chasing for one post;
+   deferred until an invite code turns up normally. If unblocked, target the
+   `开源软件` node specifically, not `分享创造`.
 5. Open `github-poll.md` as a GitHub Discussions poll after traffic begins.
 
 Never ask friends to upvote, coordinate engagement, or cross-post the same text
