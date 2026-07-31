@@ -13,8 +13,9 @@
 > The trial-bypass reports #20/#21 are answered and the trial is now documented
 > as a convenience control, not a security boundary. CI enforces all three test
 > roots. Issue #22 is closed after PR #23 merged with the blocking mypy gate.
-> The DEV launch article is live; remaining open: the rest of the launch wave
-> and P2-18 benchmark evidence.
+> The DEV launch article is live; remaining open: the rest of the launch wave.
+> **P2-18 got its first real (non-stub) pilot run 2026-08-01** — see below;
+> a *credible public* result (larger corpus, ≥2 model families) is still open.
 
 ## Current prioritized TODO (2026-07-22)
 
@@ -69,35 +70,57 @@
    source files) report zero errors; mypy stays on the 1.20 line while Python
    3.9 is supported. PR #23 passed the full remote CI matrix, merged, and
    closed issue #22.
-4. **P2-18 benchmark-first evidence — blocked on Codex weekly allowance until
-   2026-07-29 06:54.**
-   The offline smoke job is blocking in CI and records model/date/artifact
-   hashes. A credentialed real-model run is still required before publishing
-   any resistance number; stub output is explicitly not evidence. The
-   maintainer will not use an Anthropic API account or Docker Desktop. A
-   2026-07-22 feasibility check confirmed that the $20 ChatGPT Plus plan
-   includes Codex CLI and that `codex exec` can reuse saved ChatGPT sign-in,
-   so model generation can avoid API billing. The standalone `@openai/codex`
-   CLI 0.145.0 is now installed and reports ChatGPT authentication; a minimal
-   `codex exec` call succeeded with `gpt-5.6-sol`. That tiny call still used
-   15,018 tokens including fixed context, so use Plus for a small pilot rather
-   than the full planned matrix. A `CodexCliAttacker` and native-Windows-sandbox
-   scorer are now implemented: the adapter strips provider API-key variables,
-   and the scorer verifies a pinned official Python 3.11.9 embeddable ZIP before
-   running generated code in the Codex read-only/network-blocked sandbox. The
-   CLI 0.145.0 does not recognize `/setup-default-sandbox`, but no setup is
-   needed for this route: direct `codex sandbox` smoke tests and an offline
-   stub-through-sandbox integration run passed. Real Codex invocations require
-   explicit sample and condition selections. **2026-07-23 attempt**: ran the
-   documented one-sample pilot (`--sample luhn --condition C0 --condition C1`)
-   against Windows Codex CLI 0.145.0 (logged in via ChatGPT) — it failed before
-   any generation with `ERROR: You've hit your usage limit. ... try again at
-   Jul 29th, 2026 6:54 AM`, so the call was rejected pre-generation and did not
-   spend meaningful allowance. Next owner action: after 2026-07-29 06:54, rerun
-   the same command verbatim. Do not execute model output directly on the host.
-   Before publication, disclose or close the current native-sandbox limitation:
-   unlike Docker, this path does not yet set explicit CPU, memory, or process
-   caps beyond the outer timeout.
+4. **P2-18 benchmark-first evidence — unblocked; first real pilot run
+   2026-08-01.** The Codex weekly allowance reset on schedule (2026-07-29
+   06:54) and a full-ladder pilot ran on Windows Codex CLI 0.145.0
+   (`gpt-5.6-sol`, saved ChatGPT login, `codex-windows` sandbox executor)
+   across 2 corpus samples (`luhn`, `billing_auth`) × all 6 conditions:
+   `harness.py --attacker codex-cli --model gpt-5.6-sol --sample luhn
+   --sample billing_auth --condition C0 --condition C1 --condition C2
+   --condition C3 --condition C4 --condition C5 --executor codex-windows
+   --sandbox-python-zip <pinned 3.11.9 embeddable ZIP>`. This is real
+   evidence, not stub output — but still just a 2-sample pilot, not yet the
+   "credible public result" the Roadmap/benchmark doc require (larger corpus
+   + ≥2 model families, see below).
+
+   **A corpus-quality bug surfaced during the pilot and was fixed the same
+   session, in the harness itself rather than by hand-picking samples**:
+   `luhn`/`caesar`/`roman` are all well-known public-domain algorithms (Luhn
+   checksum, Caesar cipher, Roman numerals) — an attacker can recall the
+   correct implementation from the function name/signature alone without
+   engaging the obfuscation, so a `recovered=true` on them is not evidence a
+   layer failed. Separately, `luhn` has no string literals, so
+   `--string-encryption` (C2) was a byte-for-byte no-op on it, silently
+   diluting the C2 aggregate — the first pilot run reported C2 resistance as
+   50% (in reality: 1 real result + 1 meaningless no-op averaged together).
+   Fix: `conditions.py` now tags C2/C3 with `builds_on` (the rung each
+   additively builds on); `harness.py` compares the new artifact's hash
+   against that rung *before* spending an attacker call and records a
+   `skip_reason: "noop"` row instead of scoring it. Corpus samples also carry
+   a new `public_knowledge` flag (set on `luhn`/`caesar`/`roman`); `report.md`
+   prints an explicit caveat naming them whenever they appear in a run. Full
+   design rationale in `docs/LLM_RESISTANCE_BENCHMARK.md`. After the fix, a
+   pilot rerun correctly reported C2 resistance as 100% (1/1 eligible — `luhn`
+   excluded as a no-op) and spent one fewer real attacker call than the first
+   attempt.
+
+   **Real signal from the fixed pilot**: C0/C1 fully recovered on both
+   samples (core mangling alone ≈0% resistance — expected, matches the
+   documented positioning that only L2 encryption / L3 opacity+vault count as
+   "protection" against an LLM). `billing_auth` (custom secrets, not public
+   knowledge) held at C2/C3/C5 — 0% SRR / 100% resistance. Neither L3
+   condition yet has a *clean* (non-public-knowledge) data point: `luhn`
+   (the only C4-eligible sample run so far) is public-knowledge-tainted, and
+   `billing_auth` is not C4-eligible. That is a corpus gap, not a finding
+   about the opacity mechanism.
+
+   Remaining before a publishable result: (a) run C4 against a
+   non-public-knowledge target — `price_rules` is already `c4_eligible` with
+   custom logic and real string literals and has not been exercised yet; (b)
+   expand beyond 2 of the 5 corpus samples (`caesar`/`price_rules`/`roman`
+   unused so far); (c) a second model family — blocked on the maintainer's
+   standing preference against an Anthropic API account/Docker Desktop (a
+   policy constraint, not a technical one).
 5. ✅ **Discoverability and citation — deployed and verified 2026-07-22.** DOI,
    README/PyPI/Read the Docs citation surfaces are present. ARD metadata is
    CI-validated and live at the Read the Docs well-known URL. PulseMCP exact
