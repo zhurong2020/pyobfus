@@ -11,5 +11,6 @@
   ],
   "c4_eligible": true,
   "c4_target": "luhn_valid",
-  "c5_eligible": false
+  "c5_eligible": false,
+  "public_knowledge": true
 }

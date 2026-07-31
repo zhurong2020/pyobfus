@@ -29,18 +29,26 @@ class Condition:
     preset: str
     # "core" (plain command) vs the Pro L3 markers this condition requires.
     requires: str  # "" | "opacity" | "vault"
+    # cid of the condition this one additively builds on, or "" if it doesn't
+    # (C4/C5 use a different preset entirely, so they are not comparable to
+    # C3). Used to auto-detect a no-op transform (e.g. --string-encryption on
+    # a sample with no string literals) before spending an attacker call.
+    builds_on: str = ""
 
 
 CONDITIONS: tuple[Condition, ...] = (
     Condition("C0", "plaintext (control)", (), "", ""),
     Condition("C1", "core mangling", (), "aggressive", ""),
-    Condition("C2", "+ string encryption", ("--string-encryption",), "aggressive", ""),
+    Condition(
+        "C2", "+ string encryption", ("--string-encryption",), "aggressive", "", builds_on="C1"
+    ),
     Condition(
         "C3",
         "+ control-flow flattening",
         ("--string-encryption", "--control-flow"),
         "aggressive",
         "",
+        builds_on="C2",
     ),
     Condition("C4", "Pro L3 opacity", ("--selective-opacity",), "maximum", "opacity"),
     Condition("C5", "Pro L3 vault", ("--vault",), "maximum", "vault"),

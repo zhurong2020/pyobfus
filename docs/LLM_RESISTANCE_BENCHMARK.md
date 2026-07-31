@@ -89,6 +89,14 @@ plots recovery rate across the ladder so the C3→C4 cliff is the headline figur
 > C4/C5-eligible; ineligible samples are scored only on C0–C3 and excluded from
 > the C4/C5 aggregates (reported honestly, never silently dropped).
 
+> Note: C2 and C3 additively build on the previous rung (C2 = C1 +
+> `--string-encryption`, C3 = C2 + `--control-flow`). If a sample has nothing
+> for a flag to act on (e.g. no string literals for `--string-encryption`),
+> the harness compares the new artifact's hash to the previous rung's *before*
+> calling the attacker; an identical hash skips the attacker call and is
+> reported as a no-op, never silently folded into the recovered/resistant
+> counts (see `harness.py`'s `builds_on` check).
+
 ---
 
 ## Metrics
@@ -187,7 +195,8 @@ benchmarks/llm_resistance/
   prompts/             # frozen attacker + judge prompts (hashed into results)
   corpus/
     <sample>.py        # self-contained module under test
-    <sample>.json      # {description, entrypoint, io_vectors, c4_eligible, ...}
+    <sample>.json      # {description, entrypoint, io_vectors, c4_eligible,
+                       #  c5_eligible, public_knowledge, ...}
   results/             # gitignored run outputs (results.json, report.md)
 ```
 
@@ -215,3 +224,10 @@ benchmarks/llm_resistance/
 - The primary number is functional-equivalence-based, not LLM-judge-based.
 - Do not claim resistance the artifact does not have: L3 defends *source
   recovery*, not a running process — say so in the report.
+- Flag corpus samples that implement a well-known public-domain algorithm
+  (`public_knowledge: true` — e.g. Luhn checksum, Caesar cipher, Roman
+  numerals) in the report. An attacker can recall the correct implementation
+  from the function name/signature alone, so a `recovered=true` result on
+  such a sample is not evidence a protection layer failed — the credible
+  signal comes from samples with custom, non-public logic (e.g. a
+  domain-specific pricing rule or a literal secret value).

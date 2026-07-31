@@ -95,13 +95,48 @@ def build_report(data: dict) -> str:
             lines.append(f"- {cid}: {', '.join(sorted(names))}")
         lines.append("")
 
+    # No-op transforms, if any: the condition's flag found nothing eligible to
+    # change on that sample (e.g. --string-encryption on a sample with no
+    # string literals). Not an error — the attacker call was deliberately
+    # skipped rather than spent measuring a transform that never ran.
+    noops = [r for r in rows if r.get("skip_reason") == "noop"]
+    if noops:
+        lines.append("**No-op transforms (attacker call not spent):**")
+        lines.append("")
+        for r in noops:
+            lines.append(f"- {r['sample']} / {r['condition']}: {r.get('note', '?')}")
+        lines.append("")
+
     # Obfuscation errors, if any.
-    errors = [r for r in rows if r.get("recovered") is None and r.get("eligible") is True]
+    errors = [
+        r
+        for r in rows
+        if r.get("recovered") is None
+        and r.get("eligible") is True
+        and r.get("skip_reason") != "noop"
+    ]
     if errors:
         lines.append("**Run errors (not counted as recovered or resistant):**")
         lines.append("")
         for r in errors:
             lines.append(f"- {r['sample']} / {r['condition']}: {r.get('note', '?')}")
+        lines.append("")
+
+    # Public-domain algorithms, if any are in this run: an attacker may
+    # reconstruct correct output from the function name/signature alone
+    # (prior training knowledge), without engaging the obfuscation at all.
+    # Their recovered=true results are not evidence that a layer failed.
+    pk_samples = sorted({r["sample"] for r in rows if r.get("public_knowledge")})
+    if pk_samples:
+        lines.append(
+            f"**Caveat — public-domain algorithm(s) in this run**: "
+            f"{', '.join(pk_samples)}. An attacker may recall the correct "
+            "implementation from the function name/signature alone, without "
+            "engaging the obfuscation. Treat recovered=true results for these "
+            "samples as inconclusive for C2+, not evidence a layer failed; "
+            "weight non-public samples (e.g. custom business logic) as the "
+            "credible signal."
+        )
         lines.append("")
 
     lines.append("---")

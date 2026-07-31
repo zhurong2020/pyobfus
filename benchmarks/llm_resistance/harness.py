@@ -93,6 +93,8 @@ def run(
     rows = []
     for meta in samples:
         eps = entrypoints_for(meta)
+        pk = bool(meta.get("public_knowledge", False))
+        prev_artifact: dict[str, str] = {}
         for cond in conditions:
             if not C.eligible(cond, meta):
                 rows.append(
@@ -104,6 +106,7 @@ def run(
                         "recovered": None,
                         "comprehension": None,
                         "note": "ineligible for this condition",
+                        "public_knowledge": pk,
                     }
                 )
                 continue
@@ -120,8 +123,31 @@ def run(
                         "recovered": None,
                         "comprehension": None,
                         "note": f"obfuscation error: {e}",
+                        "public_knowledge": pk,
                     }
                 )
+                continue
+
+            if cond.builds_on and prev_artifact.get(cond.builds_on) == obf:
+                rows.append(
+                    {
+                        "sample": meta["name"],
+                        "condition": cond.cid,
+                        "condition_name": cond.name,
+                        "eligible": True,
+                        "recovered": None,
+                        "comprehension": None,
+                        "note": (
+                            f"no-op vs {cond.builds_on}: transform produced an identical "
+                            "artifact for this sample; attacker call skipped"
+                        ),
+                        "skip_reason": "noop",
+                        "artifact_chars": len(obf),
+                        "artifact_sha256_16": hashlib.sha256(obf.encode("utf-8")).hexdigest()[:16],
+                        "public_knowledge": pk,
+                    }
+                )
+                prev_artifact[cond.cid] = obf
                 continue
 
             result = attacker.deobfuscate(obf, eps)
@@ -145,8 +171,10 @@ def run(
                     "comprehension": comp["comprehension"],
                     "artifact_chars": len(obf),
                     "artifact_sha256_16": hashlib.sha256(obf.encode("utf-8")).hexdigest()[:16],
+                    "public_knowledge": pk,
                 }
             )
+            prev_artifact[cond.cid] = obf
 
     return {
         "meta": {
