@@ -23,8 +23,12 @@
 > two model families (Codex + Claude), clean cross-model C4 data point,
 > decision made that a third model family isn't needed. Reviewed writeup:
 > `docs/LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md`. See item 4 below.
-> **Next open decision: item 6, feature selection** — the launch-feedback
-> poll gate needs revisiting since real engagement came back thin.
+> **P2-17 + P2-19 merged and released as pyobfus 0.5.5, 2026-08-02** — PRs
+> #26/#27 both reviewed, merged, live on PyPI. See item 6 below.
+> **Next open decision: issue #25** (`preserve_param_names=True` doesn't
+> preserve parameter identifiers end-to-end for any framework preset) —
+> flagged during the P2-19 review, cross-preset blast radius, not yet
+> scheduled.
 
 ## Current prioritized TODO (2026-08-01)
 
@@ -126,10 +130,11 @@
    source files) report zero errors; mypy stays on the 1.20 line while Python
    3.9 is supported. PR #23 passed the full remote CI matrix, merged, and
    closed issue #22.
-4. **⭐ CURRENT TOP PRIORITY (decided 2026-08-01) — P2-18 benchmark-first
-   evidence.** The launch wave is complete and now passive-monitoring only
-   (see item 2); this is where active work concentrates until a *credible
-   public* result ships, then the next feature (item 6).
+4. ✅ **P2-18 benchmark-first evidence — closed out 2026-08-01, fed item 6.**
+   The launch wave is complete and now passive-monitoring only (see item 2);
+   this was the active-work item until a *credible public* result shipped,
+   which then unblocked feature selection (item 6, now also done — current
+   priority is issue #25, see the handoff note above).
 
    Unblocked; first real pilot run 2026-08-01. The Codex weekly allowance
    reset on schedule (2026-07-29
@@ -293,9 +298,27 @@
    fastapi test for this claim was a false positive (its assertion matched a
    surviving string dict key, not the actual renamed identifier).
 
-   **Next**: review/merge decision on PRs #26 and #27 (both ready), then
-   issue #25 is the next candidate worth prioritizing given its
-   cross-preset blast radius.
+   **✅ Both merged and released as pyobfus 0.5.5, 2026-08-02.** PR #26
+   fast-forward merged first; PR #27 needed a manual merge (both touched
+   `CHANGELOG.md`'s `[Unreleased]` section and one adjacent `README.md`
+   bullet — non-overlapping content, resolved by keeping both). Before
+   merging #26, one more overclaim was caught and fixed: the `--preset ml`
+   docstring/CHANGELOG entry said the preset "preserves parameter names" as
+   a working feature, contradicting the issue #25 finding two paragraphs
+   above — corrected to state plainly that the flag doesn't currently do
+   anything (commit `630840e`), and PR #26's own description had the same
+   contradiction, fixed via `gh pr edit`. Version bumped 0.5.4 → 0.5.5
+   (pattern-matched to the existing 0.5.1–0.5.4 cadence of stacking
+   additive CLI features under the 0.5.x line rather than a semver-strict
+   0.6.0); tag `v0.5.5` pushed, OIDC release workflow green, live on PyPI
+   (verified via the JSON API). `pyobfus-mcp` unchanged at 0.3.1 (no
+   tool-surface change), so no Glama Build-steps re-pin needed.
+
+   **Next**: issue #25 (`preserve_param_names=True` doesn't work end-to-end
+   for any of the six existing presets or the new `ml` preset) is the next
+   candidate worth prioritizing given its cross-preset blast radius — every
+   framework preset's README/docstring compatibility promise currently
+   overstates what the flag delivers.
 
    A Tools / Resources / Prompts separation is recorded in
    [`MCP_PRIMITIVES_DESIGN.md`](MCP_PRIMITIVES_DESIGN.md) as a post-launch

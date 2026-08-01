@@ -12,19 +12,15 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 该文档顶部是活的「Current prioritized TODO」（随每次发布/里程碑刷新日期），下方是冻结的历史执行记录——**只读顶部，别被下面的历史小节带偏**。
 
-### 🟢 2026-08-01 active state — P2-17 + P2-19 已各自开 PR，待 merge 决定
+### 🟢 2026-08-02 active state — pyobfus 0.5.5 已发布，issue #25 是下一优先级
 
-**当前状态**：launch wave 五渠道已收工 + P2-18 benchmark 内部证据已完成（详见 `docs/POST_V0.4_TODO.md`）。**P2-17（签名溯源清单)/P2-19(`--preset ml`)** 由 Codex 实现、Claude review 后拆成两条独立分支已开 PR：
-- [PR #27](https://github.com/zhurong2020/pyobfus/pull/27) `codex/p2-17-provenance-manifest`
-- [PR #26](https://github.com/zhurong2020/pyobfus/pull/26) `codex/p2-19-ml-preset`
+**当前状态**：P2-17（本地溯源清单 `--provenance-manifest`）+ P2-19（`--preset ml`）由 Codex 实现、Claude review 后分两条独立分支开 PR（[#27](https://github.com/zhurong2020/pyobfus/pull/27)/[#26](https://github.com/zhurong2020/pyobfus/pull/26)），**均已合并进 main 并发布为 pyobfus 0.5.5（2026-08-02，tag `v0.5.5`，OIDC 已发 PyPI 并核实 latest=0.5.5）**。mcp 仍 0.3.1（工具面无变化，无需 Glama 重 pin）。
 
-Review 改了几处：把过度宣称的"signature"改名成诚实的"integrity digest"、收窄了 `--preset ml` 过宽的 `exclude_names`、修了一个 preflight 死分支 bug、修了真实的 mypy/black 问题（Codex 环境没装这两个工具）。两条分支各自 black/ruff/mypy/三个测试根全绿，可任意顺序合并。
+**⚠️ Review 中顺带发现一个更大的既有 bug，已单开 [issue #25](https://github.com/zhurong2020/pyobfus/issues/25)，未修**：`preserve_param_names=True` 实际不生效（`fastapi` 等六个既有 preset + 新的 `ml` preset 全受影响），且现有的 fastapi 测试是假阳性（断言命中了字符串字典 key，不是真的变量名）。**这是下一个优先级**。
 
-**⚠️ 顺带发现一个更大的既有 bug，已单开 issue #25，未修**：`preserve_param_names=True` 实际不生效（`fastapi` 等六个既有 preset 都受影响，不只是新的 ml preset），且现有的 fastapi 测试是假阳性（断言命中了字符串字典 key，不是真的变量名）。这个优先级排在两个 PR 合并决定之后。
+**Cold-start 先查**：`gh issue view 25` 看有没有人已经开始修；别重新做 P2-17/P2-19（已完工）。
 
-**Cold-start 先查**：`gh pr list` / `gh pr view 26,27` 看有没有新进展或需要跟进合并，别重新做这两个功能。
-
-渠道明细见 `_drafts/launch-v0.5.4/README.md`；完整 TODO 见 `docs/POST_V0.4_TODO.md`。mcp 仍 0.3.1（工具面无变化）。
+完整时间线/细节见 `docs/POST_V0.4_TODO.md` § item 6。
 
 - ✅ 已提交并受理（申请号 `202610712171X` · 申请日/优先权日 2026-05-22 · 17 项权利要求）
 - ✅ 费用全部缴清（共 1610 元 · 2026-05-22 一次缴清 · 含申请费类 1235 与实审费 375 · 官方审查信息查询「费足」核实）
@@ -40,9 +36,10 @@ Review 改了几处：把过度宣称的"signature"改名成诚实的"integrity 
 - ✅ **AI-agent 可发现性 Wave A（2026-06-22）**：Smithery 经 **Skill 渠道** `zhurong2020/pyobfus-protect`（Smithery MCP 发布是远程网关、本地工具走不通,Skill 才对）+ mcp.so + `uvx` 零安装 + server.json 99 字描述(commit `826c576`/`49f4df3`)。报告:`docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`。
 - ❌ **JOSS 投稿被拒(2026-06-24)**:v0.5.1 投 JOSS(issue `openjournals/joss-reviews#10788`)被总编 desk-reject,理由=**scope/significance 非质量**("private-dev-then-public" + 无第三方复用)。→ 改走免费路径:✅ **Zenodo DOI `10.5281/zenodo.20846053`(concept)已拿到**,已接进 CITATION.cff + README 徽章 + `## Citation` + 两个 pyproject + RTD + ORCID + arong.eu.org/academic。完整记录+渠道对比见 `docs/JOSS_REJECTION_20260624.md`。
 - ✅ **P2-18 内部证据完成（2026-08-01）**：5 样本 × Codex+Claude 全跑完，`price_rules` 拿到第一个干净跨模型 C4 数据点，决定不加第三个模型家族。评审版报告 `docs/LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md`；过程中顺带修了 3 个既有 plumbing bug（语料库 no-op 稀释统计、`--json-schema` 不认 `$schema` meta key、docker 打分沙箱 temp dir 权限导致此前从未真实跑通），细节见 `docs/POST_V0.4_TODO.md` § P2-18。
-- ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:**当前重心 = PR #26/#27 的 merge 决定**，其次 **issue #25**（`preserve_param_names` 跨 preset 失效，优先级高但排在 merge 决定之后）。之后是 P2-13/P2-22 这类零代码内容型候选（PyInstaller cookbook / PyArmor 对比页）。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
+- ✅ **pyobfus 0.5.5 已发布（2026-08-02，PR #26 + #27）**：`--preset ml`（P2-19，社区版模型服务 preset）+ `--provenance-manifest`（P2-17，本地 JSON 构建溯源清单，非加密签名）。Review 顺带发现 issue #25（见上）并诚实标注在 CHANGELOG/docstring 里，不是掩盖。
+- ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:**当前重心 = issue #25**（`preserve_param_names` 跨 preset 失效）。之后是 P2-13/P2-22 这类零代码内容型候选（PyInstaller cookbook / PyArmor 对比页）。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
 
-**Cold-start session 第一句话应问 user**：「PR #26（P2-19 ml preset）和 #27（P2-17 溯源清单）都已 review 完、CI 全绿、可以合并了——现在合并,还是先看一眼 diff?另外顺带发现的 issue #25（`preserve_param_names` 六个 preset 都不生效）要不要接着修?」
+**Cold-start session 第一句话应问 user**：「pyobfus 0.5.5 已发布（`--preset ml` + `--provenance-manifest`）。要接着修 issue #25（`preserve_param_names` 六个 preset 都不生效），还是做别的？」
 
 **Cold-start 资料定位**（按读取优先级）：
 
