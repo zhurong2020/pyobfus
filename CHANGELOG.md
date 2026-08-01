@@ -13,10 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   wrappers. Preserves the framework-dispatched method names external code
   actually calls by exact name (`predict`/`predict_proba`/`fit`/`transform`/
   `forward`/`generate`/`encode` — sklearn, PyTorch's `nn.Module.__call__`,
-  HuggingFace conventions), preserves parameter names, excludes
-  model/checkpoint/weight artifact paths, and pairs with new `--check`
-  guidance for unsafe pickle/`torch.load`/model loading plus Runtime String
-  Vault routing hints for model-path literals.
+  HuggingFace conventions), excludes model/checkpoint/weight artifact
+  paths, and pairs with new `--check` guidance for unsafe pickle/
+  `torch.load`/model loading plus Runtime String Vault routing hints for
+  model-path literals. Sets `preserve_param_names=True` for consistency
+  with every other framework preset, though that flag does not currently
+  preserve parameter identifiers end-to-end for any preset (issue #25).
 
 ## [0.5.4] - 2026-07-19
 

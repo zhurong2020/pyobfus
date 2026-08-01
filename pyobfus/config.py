@@ -602,10 +602,16 @@ class ObfuscationConfig:
         """ML/model-serving preset: protects inference wrappers safely.
 
         - Based on preset_safe (docstrings preserved)
-        - preserve_param_names=True (serving frameworks and tensor adapters
-          frequently call wrappers by keyword; this already covers parameter
-          names like `inputs`/`device`/`batch_size` — they don't also need to
-          be in exclude_names)
+        - preserve_param_names=True, matching every other framework preset's
+          convention for serving frameworks/tensor adapters that call
+          wrappers by keyword. NOTE: as of this writing, preserve_param_names
+          does not actually preserve parameter identifiers end-to-end through
+          the CLI for ANY preset that sets it (tracked in issue #25,
+          reproduced against --preset fastapi too — it is a pre-existing,
+          cross-preset gap, not specific to this preset). Once #25 is fixed
+          this flag will start doing what its name says; left set here for
+          forward-compatibility and consistency with the other presets, not
+          because it currently delivers on that promise.
         - exclude_names covers only method names external code dispatches by
           exact string (sklearn's `predict`/`fit`/`transform`, PyTorch's
           `forward` via `nn.Module.__call__`, HuggingFace's `generate`/
