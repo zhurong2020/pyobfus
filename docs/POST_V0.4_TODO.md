@@ -262,15 +262,40 @@
    **P2-19 `--preset ml`**, both flagged low-cost/high-relevance in the
    2026-07-07 research scan.
 
-   **Workflow**: Codex CLI implements each on its own branch
-   (`codex/p2-17-provenance-manifest`, `codex/p2-19-ml-preset`) as a separate
-   PR against `main` — same pattern as the existing `codex/follow-up-delivery`
-   → PR #23 precedent. Claude Code reviews each PR (correctness, test
-   coverage, doc/CHANGELOG updates, scope boundaries — Pro logic must stay in
-   `pyobfus_pro/`, not leak into Apache-2.0 core) before merge; Codex does not
-   merge or publish its own work. **A future cold-start session should check
-   for open Codex PRs and treat reviewing them as the active task, not
-   re-implement these features from scratch.**
+   **✅ Both PRs open and reviewed, 2026-08-01** — Codex's environment lacked
+   `black`/`mypy`, so Codex delivered both features combined, uncommitted, on
+   `main`'s working tree with a self-reported "1 test failure" (missing `mcp`
+   SDK locally — not reproducible with a complete environment, confirmed
+   during review: all 73 MCP tests pass). Claude Code reviewed, fixed, split
+   into two independent branches, and opened:
+   - [**PR #27**](https://github.com/zhurong2020/pyobfus/pull/27) —
+     `codex/p2-17-provenance-manifest`
+   - [**PR #26**](https://github.com/zhurong2020/pyobfus/pull/26) —
+     `codex/p2-19-ml-preset`
+
+   Review found and fixed: an overclaimed "signature" (it's a
+   self-consistency digest, not a cryptographic signature — renamed
+   throughout), an overly broad `exclude_names` list in `--preset ml` that
+   would have left common non-ML business-logic identifiers needlessly
+   readable, a dead-branch bug in the per-ML-library exclude-glob suggestion,
+   a real mypy type error, and a real `black` formatting failure (neither
+   catchable in Codex's incomplete environment). Both branches are
+   independently green (`black`/`ruff`/`mypy`/all three test roots) and can
+   merge in either order.
+
+   Also found, but explicitly deferred rather than fixed inline (per
+   maintainer decision) since it's pre-existing and affects six *existing*
+   presets, not just the new one: **`preserve_param_names=True` does not
+   actually preserve parameter identifiers end-to-end through the CLI** —
+   filed as [**issue #25**](https://github.com/zhurong2020/pyobfus/issues/25)
+   with two reproductions (`--preset ml` and, showing it predates this work
+   entirely, `--preset fastapi`) and an explanation of why the existing
+   fastapi test for this claim was a false positive (its assertion matched a
+   surviving string dict key, not the actual renamed identifier).
+
+   **Next**: review/merge decision on PRs #26 and #27 (both ready), then
+   issue #25 is the next candidate worth prioritizing given its
+   cross-preset blast radius.
 
    A Tools / Resources / Prompts separation is recorded in
    [`MCP_PRIMITIVES_DESIGN.md`](MCP_PRIMITIVES_DESIGN.md) as a post-launch

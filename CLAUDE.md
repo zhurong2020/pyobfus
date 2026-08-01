@@ -12,11 +12,17 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 该文档顶部是活的「Current prioritized TODO」（随每次发布/里程碑刷新日期），下方是冻结的历史执行记录——**只读顶部，别被下面的历史小节带偏**。
 
-### 🔵 2026-08-01 active state — P2-17 + P2-19 交给 Codex 实现，Claude 负责代码审核
+### 🟢 2026-08-01 active state — P2-17 + P2-19 已各自开 PR，待 merge 决定
 
-**当前状态**：launch wave 五渠道已收工（互动基本为零，2 个真实 star）+ P2-18 benchmark 内部证据已完成（5 样本 × Codex+Claude 全跑完，`price_rules` 拿到干净跨模型 C4 数据点，不加第三模型家族；评审版结果 `docs/LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md`）。**下一个功能已决定（2026-08-01）**：**P2-17 签名溯源清单** + **P2-19 `--preset ml`**——不再等 launch 投票门槛，直接从 ROADMAP 已验证候选里选定。
+**当前状态**：launch wave 五渠道已收工 + P2-18 benchmark 内部证据已完成（详见 `docs/POST_V0.4_TODO.md`）。**P2-17（签名溯源清单)/P2-19(`--preset ml`)** 由 Codex 实现、Claude review 后拆成两条独立分支已开 PR：
+- [PR #27](https://github.com/zhurong2020/pyobfus/pull/27) `codex/p2-17-provenance-manifest`
+- [PR #26](https://github.com/zhurong2020/pyobfus/pull/26) `codex/p2-19-ml-preset`
 
-**⚠️ 工作流分工，cold-start 必读**：这两个功能由 **Codex CLI 实现**（各自独立分支 `codex/p2-17-provenance-manifest` / `codex/p2-19-ml-preset`，仿照已有的 `codex/follow-up-delivery` → PR #23 先例），**Claude Code 负责 review 后再合并**，Codex 不自己合并/发布。**如果 cold-start 时发现有开着的 Codex PR，当前任务是 review 它，不是重新实现这两个功能**——先 `gh pr list` 查有没有 `codex/p2-17-*`/`codex/p2-19-*` 分支的 PR。两个功能的规格見 `docs/ROADMAP.md` P2-17/P2-19 条目 + `docs/POST_V0.4_TODO.md` § item 6。
+Review 改了几处：把过度宣称的"signature"改名成诚实的"integrity digest"、收窄了 `--preset ml` 过宽的 `exclude_names`、修了一个 preflight 死分支 bug、修了真实的 mypy/black 问题（Codex 环境没装这两个工具）。两条分支各自 black/ruff/mypy/三个测试根全绿，可任意顺序合并。
+
+**⚠️ 顺带发现一个更大的既有 bug，已单开 issue #25，未修**：`preserve_param_names=True` 实际不生效（`fastapi` 等六个既有 preset 都受影响，不只是新的 ml preset），且现有的 fastapi 测试是假阳性（断言命中了字符串字典 key，不是真的变量名）。这个优先级排在两个 PR 合并决定之后。
+
+**Cold-start 先查**：`gh pr list` / `gh pr view 26,27` 看有没有新进展或需要跟进合并，别重新做这两个功能。
 
 渠道明细见 `_drafts/launch-v0.5.4/README.md`；完整 TODO 见 `docs/POST_V0.4_TODO.md`。mcp 仍 0.3.1（工具面无变化）。
 
@@ -34,9 +40,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - ✅ **AI-agent 可发现性 Wave A（2026-06-22）**：Smithery 经 **Skill 渠道** `zhurong2020/pyobfus-protect`（Smithery MCP 发布是远程网关、本地工具走不通,Skill 才对）+ mcp.so + `uvx` 零安装 + server.json 99 字描述(commit `826c576`/`49f4df3`)。报告:`docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`。
 - ❌ **JOSS 投稿被拒(2026-06-24)**:v0.5.1 投 JOSS(issue `openjournals/joss-reviews#10788`)被总编 desk-reject,理由=**scope/significance 非质量**("private-dev-then-public" + 无第三方复用)。→ 改走免费路径:✅ **Zenodo DOI `10.5281/zenodo.20846053`(concept)已拿到**,已接进 CITATION.cff + README 徽章 + `## Citation` + 两个 pyproject + RTD + ORCID + arong.eu.org/academic。完整记录+渠道对比见 `docs/JOSS_REJECTION_20260624.md`。
 - ✅ **P2-18 内部证据完成（2026-08-01）**：5 样本 × Codex+Claude 全跑完，`price_rules` 拿到第一个干净跨模型 C4 数据点，决定不加第三个模型家族。评审版报告 `docs/LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md`；过程中顺带修了 3 个既有 plumbing bug（语料库 no-op 稀释统计、`--json-schema` 不认 `$schema` meta key、docker 打分沙箱 temp dir 权限导致此前从未真实跑通），细节见 `docs/POST_V0.4_TODO.md` § P2-18。
-- ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:**当前重心 = review Codex 交付的 P2-17/P2-19 PR**（不是重新实现,见上方工作流分工）。Codex 完工前,可以做的:P2-13/P2-22 这类零代码内容型候选提前构思(PyInstaller cookbook / PyArmor 对比页)。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
+- ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:**当前重心 = PR #26/#27 的 merge 决定**，其次 **issue #25**（`preserve_param_names` 跨 preset 失效，优先级高但排在 merge 决定之后）。之后是 P2-13/P2-22 这类零代码内容型候选（PyInstaller cookbook / PyArmor 对比页）。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
 
-**Cold-start session 第一句话应问 user**：「先查一下 `gh pr list` 有没有 Codex 交的 `codex/p2-17-provenance-manifest` 或 `codex/p2-19-ml-preset` PR——如果有,当前任务是帮你 review;如果还没有,是 Codex 还没开始还是需要我先做点别的准备?」
+**Cold-start session 第一句话应问 user**：「PR #26（P2-19 ml preset）和 #27（P2-17 溯源清单）都已 review 完、CI 全绿、可以合并了——现在合并,还是先看一眼 diff?另外顺带发现的 issue #25（`preserve_param_names` 六个 preset 都不生效）要不要接着修?」
 
 **Cold-start 资料定位**（按读取优先级）：
 
