@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import json
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
@@ -157,7 +158,27 @@ print(json.dumps(payload))
     assert descriptor["tool_access"] == 'none (--allowedTools "")'
 
 
-@pytest.mark.skipif(shutil.which("docker") is None, reason="docker not available")
+def _docker_image_available(image: str) -> bool:
+    docker = shutil.which("docker")
+    if docker is None:
+        return False
+    try:
+        return (
+            subprocess.run(
+                [docker, "image", "inspect", image], capture_output=True, timeout=10
+            ).returncode
+            == 0
+        )
+    except (OSError, subprocess.SubprocessError):
+        return False
+
+
+@pytest.mark.skipif(
+    not _docker_image_available("python:3.12-alpine"),
+    reason="docker (or the pinned python:3.12-alpine image) not available locally -- "
+    "the scorer refuses an implicit network pull, and this job intentionally never "
+    "pulls one, so this regression check only runs where an operator already has it",
+)
 def test_docker_executor_can_read_mounted_temp_dir():
     # Regression guard: tempfile.TemporaryDirectory() defaults to mode 0700,
     # unreadable by the container's unprivileged --user 65534:65534, which
