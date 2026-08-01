@@ -252,22 +252,29 @@
    entries are ingested daily and processed weekly, and directs maintainers to
    `hello@pulsemcp.com` after a week; the maintainer sent that follow-up on
    2026-07-22, so this is now passive monitoring.
-6. **⭐ CURRENT OPEN DECISION (since 2026-08-01) — next feature selection.**
-   With P2-18 closed out (item 4) and the launch wave done (item 2), this is
-   the next thing to resolve. The original plan
-   ([`NEXT_FEATURE_DECISION.md`](NEXT_FEATURE_DECISION.md)) gated selection on
-   a GitHub Discussions poll reaching 14 days or 10 votes — but the launch
-   wave's real engagement came back essentially flat (see item 2's
-   checkpoint), so that poll was deliberately not opened, and if it were,
-   it likely would not reach 10 votes on its own. **This gate needs revisiting
-   with the maintainer** rather than assumed still-operative: either open the
-   poll anyway and accept a longer/looser timeline, pick from the
-   already-scanned ROADMAP candidates directly (P2-17 signed provenance
-   manifest and P2-19 `--preset ml` are both flagged low-cost/high-relevance
-   in the 2026-07-07 research scan), or use some other signal. A Tools /
-   Resources / Prompts separation is recorded in
+6. **⭐ DECIDED (2026-08-01) — next features: P2-17 + P2-19, implemented by
+   Codex, reviewed by Claude Code.** The launch-feedback poll gate
+   (`NEXT_FEATURE_DECISION.md`, 14-day/10-vote trigger) is **overridden by
+   direct maintainer decision** — real launch engagement came back too thin
+   for that poll to have meant much anyway (see item 2's checkpoint), so
+   selection did not wait for it. Picked directly from the already-scanned
+   ROADMAP candidates: **P2-17 signed obfuscation provenance manifest** and
+   **P2-19 `--preset ml`**, both flagged low-cost/high-relevance in the
+   2026-07-07 research scan.
+
+   **Workflow**: Codex CLI implements each on its own branch
+   (`codex/p2-17-provenance-manifest`, `codex/p2-19-ml-preset`) as a separate
+   PR against `main` — same pattern as the existing `codex/follow-up-delivery`
+   → PR #23 precedent. Claude Code reviews each PR (correctness, test
+   coverage, doc/CHANGELOG updates, scope boundaries — Pro logic must stay in
+   `pyobfus_pro/`, not leak into Apache-2.0 core) before merge; Codex does not
+   merge or publish its own work. **A future cold-start session should check
+   for open Codex PRs and treat reviewing them as the active task, not
+   re-implement these features from scratch.**
+
+   A Tools / Resources / Prompts separation is recorded in
    [`MCP_PRIMITIVES_DESIGN.md`](MCP_PRIMITIVES_DESIGN.md) as a post-launch
-   research candidate, not committed scope.
+   research candidate, not committed scope — unrelated to this decision.
 
 Large speculative features and a JOSS re-submission remain deferred until the
 project has demonstrated third-party adoption.

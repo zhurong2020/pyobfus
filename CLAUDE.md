@@ -12,9 +12,13 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 该文档顶部是活的「Current prioritized TODO」（随每次发布/里程碑刷新日期），下方是冻结的历史执行记录——**只读顶部，别被下面的历史小节带偏**。
 
-### 🟡 2026-08-01 active state — launch wave 收工 + P2-18 内部证据已完成，待选下一个功能
+### 🔵 2026-08-01 active state — P2-17 + P2-19 交给 Codex 实现，Claude 负责代码审核
 
-**当前状态**：0.5.4 已发布（2026-07-19）+ issue #22 mypy gate 已关（2026-07-22）。**Launch wave 五渠道已于 2026-08-01 全部发完并收工**——公开互动基本为零，唯一正向信号是 2 个真实 GitHub star（`helenkwok`/`SWFDtf`），已决定不再推。**P2-18 benchmark 内部证据已完成（2026-08-01）**：5 个语料库样本 × Codex+Claude 两个模型家族全跑完，两个非公开知识样本在 C2 及以上全部扛住、两个模型一致，含项目第一个干净的跨模型 C4 数据点（`price_rules`）；已决定不加第三个模型家族（Codex+Claude 已是当前最强、结论一致）。评审版结果见 `docs/LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md`。**当前重心转向：选下一个具体功能**——原定的"等 launch 投票"门槛(`NEXT_FEATURE_DECISION.md`)因互动太薄需要重新跟你确认怎么走,候选见 ROADMAP P2-17(签名溯源清单)/P2-19(`--preset ml`)等。渠道明细见 `_drafts/launch-v0.5.4/README.md`；完整 TODO 见 `docs/POST_V0.4_TODO.md`。mcp 仍 0.3.1（工具面无变化）。
+**当前状态**：launch wave 五渠道已收工（互动基本为零，2 个真实 star）+ P2-18 benchmark 内部证据已完成（5 样本 × Codex+Claude 全跑完，`price_rules` 拿到干净跨模型 C4 数据点，不加第三模型家族；评审版结果 `docs/LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md`）。**下一个功能已决定（2026-08-01）**：**P2-17 签名溯源清单** + **P2-19 `--preset ml`**——不再等 launch 投票门槛，直接从 ROADMAP 已验证候选里选定。
+
+**⚠️ 工作流分工，cold-start 必读**：这两个功能由 **Codex CLI 实现**（各自独立分支 `codex/p2-17-provenance-manifest` / `codex/p2-19-ml-preset`，仿照已有的 `codex/follow-up-delivery` → PR #23 先例），**Claude Code 负责 review 后再合并**，Codex 不自己合并/发布。**如果 cold-start 时发现有开着的 Codex PR，当前任务是 review 它，不是重新实现这两个功能**——先 `gh pr list` 查有没有 `codex/p2-17-*`/`codex/p2-19-*` 分支的 PR。两个功能的规格見 `docs/ROADMAP.md` P2-17/P2-19 条目 + `docs/POST_V0.4_TODO.md` § item 6。
+
+渠道明细见 `_drafts/launch-v0.5.4/README.md`；完整 TODO 见 `docs/POST_V0.4_TODO.md`。mcp 仍 0.3.1（工具面无变化）。
 
 - ✅ 已提交并受理（申请号 `202610712171X` · 申请日/优先权日 2026-05-22 · 17 项权利要求）
 - ✅ 费用全部缴清（共 1610 元 · 2026-05-22 一次缴清 · 含申请费类 1235 与实审费 375 · 官方审查信息查询「费足」核实）
@@ -30,9 +34,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - ✅ **AI-agent 可发现性 Wave A（2026-06-22）**：Smithery 经 **Skill 渠道** `zhurong2020/pyobfus-protect`（Smithery MCP 发布是远程网关、本地工具走不通,Skill 才对）+ mcp.so + `uvx` 零安装 + server.json 99 字描述(commit `826c576`/`49f4df3`)。报告:`docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`。
 - ❌ **JOSS 投稿被拒(2026-06-24)**:v0.5.1 投 JOSS(issue `openjournals/joss-reviews#10788`)被总编 desk-reject,理由=**scope/significance 非质量**("private-dev-then-public" + 无第三方复用)。→ 改走免费路径:✅ **Zenodo DOI `10.5281/zenodo.20846053`(concept)已拿到**,已接进 CITATION.cff + README 徽章 + `## Citation` + 两个 pyproject + RTD + ORCID + arong.eu.org/academic。完整记录+渠道对比见 `docs/JOSS_REJECTION_20260624.md`。
 - ✅ **P2-18 内部证据完成（2026-08-01）**：5 样本 × Codex+Claude 全跑完，`price_rules` 拿到第一个干净跨模型 C4 数据点，决定不加第三个模型家族。评审版报告 `docs/LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md`；过程中顺带修了 3 个既有 plumbing bug（语料库 no-op 稀释统计、`--json-schema` 不认 `$schema` meta key、docker 打分沙箱 temp dir 权限导致此前从未真实跑通），细节见 `docs/POST_V0.4_TODO.md` § P2-18。
-- ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:**P2-18 已收尾,当前重心 = 选下一个具体功能**（候选见 ROADMAP P2-17 签名溯源清单 / P2-19 `--preset ml` 等,2026-07-07 scan 已标为低成本高相关）。原定"等 launch 投票"门槛因互动太薄需要重新确认怎么走(继续等/直接选/换个信号)。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
+- ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:**当前重心 = review Codex 交付的 P2-17/P2-19 PR**（不是重新实现,见上方工作流分工）。Codex 完工前,可以做的:P2-13/P2-22 这类零代码内容型候选提前构思(PyInstaller cookbook / PyArmor 对比页)。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
 
-**Cold-start session 第一句话应问 user**：「launch wave 已收工、P2-18 内部证据已完成并写成正式报告(`docs/LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md`,不加第三个模型家族),当前唯一待定的是下一个具体功能——想好要做哪个了吗,还是需要先聊聊候选(ROADMAP P2-17/P2-19 等)?」
+**Cold-start session 第一句话应问 user**：「先查一下 `gh pr list` 有没有 Codex 交的 `codex/p2-17-provenance-manifest` 或 `codex/p2-19-ml-preset` PR——如果有,当前任务是帮你 review;如果还没有,是 Codex 还没开始还是需要我先做点别的准备?」
 
 **Cold-start 资料定位**（按读取优先级）：
 
