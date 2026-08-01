@@ -173,11 +173,9 @@
    `billing_auth` is not C4-eligible. That is a corpus gap, not a finding
    about the opacity mechanism.
 
-   Remaining before a publishable result: (a) run C4 against a
-   non-public-knowledge target — `price_rules` is already `c4_eligible` with
-   custom logic and real string literals and has not been exercised yet; (b)
-   expand beyond 2 of the 5 corpus samples (`caesar`/`price_rules`/`roman`
-   unused so far).
+   (Remaining-before-publishable gaps (a) run C4 against a non-public-knowledge
+   target and (b) expand beyond 2 of the 5 corpus samples were both closed
+   the same day — see the full-corpus run below.)
 
    **(c) ✅ Second model family run 2026-08-01** — `ClaudeCodeCliAttacker`
    (`--attacker claude-code-cli`) shells out to `claude -p` with saved Claude
@@ -199,15 +197,47 @@
    end-to-end with real content before. Both fixed in `scorer.py`/`attacker.py`
    with a docker-gated regression test added.
 
-   **Real signal, cross-model comparison**: on `billing_auth` (the only
-   non-public-knowledge sample), Claude Sonnet reproduced the *exact same
-   pattern* as the Codex/`gpt-5.6-sol` pilot — recovered at C0/C1 (no
-   protection), held at C2/C3/C5 (0% SRR / 100% resistance each). `luhn`
-   (public-knowledge-tainted) was recovered at C0/C1/C3/C4 as expected and
-   is excluded from the credible signal. This is real corroborating evidence
-   across two model families on the one clean sample available — but C4 still
-   has no clean (non-public-knowledge) data point from *either* model family,
-   which remains gap (a) above, not a finding about the opacity mechanism.
+   **Real signal, cross-model comparison (luhn/billing_auth pilot)**: on
+   `billing_auth` (the only non-public-knowledge sample in this first pair),
+   Claude Sonnet reproduced the *exact same pattern* as the
+   Codex/`gpt-5.6-sol` pilot — recovered at C0/C1 (no protection), held at
+   C2/C3/C5 (0% SRR / 100% resistance each). `luhn` (public-knowledge-tainted)
+   was recovered at C0/C1/C3/C4 as expected and is excluded from the credible
+   signal.
+
+   **✅ Full-corpus run, both model families, 2026-08-01 — the clean C4 data
+   point closes gaps (a) and (b).** Ran `caesar` + `roman` + `price_rules`
+   (the three previously-unused samples) × all 6 conditions, once each with
+   `--attacker codex-cli --model gpt-5.6-sol` and once with `--attacker
+   claude-code-cli --model sonnet`, both via `--executor docker
+   --docker-image python:3.12-alpine` (this machine has both `codex` and
+   `claude` CLIs installed with saved subscription logins, and docker, so no
+   separate Windows machine was needed this time). **Both model families
+   produced the identical per-sample pattern**: `caesar` and `roman`
+   (public-knowledge, Caesar cipher / Roman numerals) were recovered at
+   C0/C1/C2/C3/C4 — expected and inconclusive, an attacker can recall a
+   named public algorithm without engaging the obfuscation at all.
+   **`price_rules` (custom tiered-pricing business logic, not public
+   knowledge, `c4_eligible: true` / `c5_eligible: false`) was NOT recovered at
+   C2, C3, or C4 by either model** — 0% SRR / 100% resistance at every one of
+   those rungs, for both Codex and Claude, independently.
+
+   This is the project's first clean, cross-model-validated C4 data point:
+   two different model families both failed to statically recover a
+   non-public-knowledge sample protected by Pro L3 Selective Opacity. Full
+   corpus coverage is now: `luhn`/`caesar`/`roman` (public-knowledge, always
+   recovered, inconclusive above C1) and `billing_auth`/`price_rules`
+   (non-public-knowledge, both held at every rung from C2 up, both model
+   families) — a 2-of-2 clean-sample record, not a single lucky case.
+
+   Remaining before this becomes a *published, reviewed* result (as opposed
+   to an internally-verified one): write up the methodology + numbers as the
+   P2-18 benchmark report proper (`docs/LLM_RESISTANCE_BENCHMARK.md` already
+   has the design; the actual results.json/report.md are gitignored and need
+   a deliberate, reviewed copy into a versioned location per that doc's own
+   "Reported artifacts" section) and decide whether a third model family is
+   worth adding before publishing, or whether 2 is sufficient given both
+   already agree.
 5. ✅ **Discoverability and citation — deployed and verified 2026-07-22.** DOI,
    README/PyPI/Read the Docs citation surfaces are present. ARD metadata is
    CI-validated and live at the Read the Docs well-known URL. PulseMCP exact
