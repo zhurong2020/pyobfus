@@ -13,11 +13,18 @@
 > The trial-bypass reports #20/#21 are answered and the trial is now documented
 > as a convenience control, not a security boundary. CI enforces all three test
 > roots. Issue #22 is closed after PR #23 merged with the blocking mypy gate.
-> The DEV launch article is live; remaining open: the rest of the launch wave.
-> **P2-18 got its first real (non-stub) pilot run 2026-08-01** — see below;
-> a *credible public* result (larger corpus, ≥2 model families) is still open.
+> **Launch wave complete 2026-08-01** (DEV/r-Python/Show HN/CN long-form/
+> GitHub Discussions, all five channels) — engagement came back essentially
+> flat everywhere except two real GitHub stars; decision made to stop
+> pushing it and shift active work to P2-18 + subsequent features (item 4
+> is now the current top priority). Passive monitoring continues (+7d/+30d
+> checkpoints), it just isn't blocking anything.
+> **P2-18 got its first real (non-stub) pilots from two model families
+> (Codex + Claude) 2026-08-01** — see item 4 below; a *credible public*
+> result (larger corpus, a clean non-public-knowledge C4 data point) is
+> still open and is where session time should concentrate now.
 
-## Current prioritized TODO (2026-07-22)
+## Current prioritized TODO (2026-08-01)
 
 1. ✅ **Documentation truth sweep — completed 2026-07-20.** Active surfaces use
    the real `pyobfus SRC -o OUT --level pro --<flag>` syntax; 0.5.4 and the
@@ -85,12 +92,45 @@
    drafted short version already qualifies. A separate 知乎 piece was in the
    pre-0.5.4 "CN trio" plan but is not in the current `_drafts/launch-v0.5.4/`
    scope; not drafted unless requested.
+
+   **✅ Launch wave complete — 2026-08-01.** All five channels published: DEV
+   (2026-07-22), r/Python (2026-07-23), Show HN (2026-08-01,
+   `item?id=49130416`), CN long-form (2026-08-01, via findata's canonical
+   draft, WP #1706 + Discord — see `_drafts/launch-v0.5.4/README.md`), and
+   GitHub Discussions (the 9-month-unanswered Q&A #2 answered, a new
+   Announcement #24 covering 0.5.0-0.5.4's patent-unlock arc). V2EX stays
+   deferred (account-activation blocker, unrelated to content).
+
+   **Engagement checkpoint, ~10-12h after Show HN (2026-08-01)**: essentially
+   flat across every broadcast channel — HN 2 points / 1 comment (the
+   maintainer's own, no new external replies), r/Python 2 views / 1
+   self-upvote / 0 replies, DEV 0 reactions / 0 comments / <25 views (flatter
+   than the May post's 4/1/42). The one unambiguous positive signal: **two
+   named GitHub accounts starred the repo** (`helenkwok`, `SWFDtf`), a
+   deliberate action unlike a passive view, consistent with GitHub Insights'
+   organic-search-referrer traffic (Google/Bing/DuckDuckGo) — people are
+   quietly evaluating without leaving public comments, which is the normal
+   pattern, not a launch failure.
+
+   **Decision (2026-08-01): stop pushing the launch wave, shift focus to
+   P2-18 and subsequent feature work.** With comment/reply engagement at
+   effectively zero everywhere, further posting or re-bumping would look like
+   chasing attention, not community building — against the project's own
+   no-solicitation principle. Continue passive monitoring only (+7d/+30d
+   checkpoints per channel, reply to anything real that shows up); do not
+   treat this as blocking further work. See item 4 (P2-18) below for the new
+   active priority.
 3. ✅ **Issue #22 / mypy gate — completed 2026-07-22.** Core, Pro, and MCP (72
    source files) report zero errors; mypy stays on the 1.20 line while Python
    3.9 is supported. PR #23 passed the full remote CI matrix, merged, and
    closed issue #22.
-4. **P2-18 benchmark-first evidence — unblocked; first real pilot run
-   2026-08-01.** The Codex weekly allowance reset on schedule (2026-07-29
+4. **⭐ CURRENT TOP PRIORITY (decided 2026-08-01) — P2-18 benchmark-first
+   evidence.** The launch wave is complete and now passive-monitoring only
+   (see item 2); this is where active work concentrates until a *credible
+   public* result ships, then the next feature (item 6).
+
+   Unblocked; first real pilot run 2026-08-01. The Codex weekly allowance
+   reset on schedule (2026-07-29
    06:54) and a full-ladder pilot ran on Windows Codex CLI 0.145.0
    (`gpt-5.6-sol`, saved ChatGPT login, `codex-windows` sandbox executor)
    across 2 corpus samples (`luhn`, `billing_auth`) × all 6 conditions:
