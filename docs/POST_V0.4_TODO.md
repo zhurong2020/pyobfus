@@ -25,10 +25,13 @@
 > `docs/LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md`. See item 4 below.
 > **P2-17 + P2-19 merged and released as pyobfus 0.5.5, 2026-08-02** — PRs
 > #26/#27 both reviewed, merged, live on PyPI. See item 6 below.
-> **Next open decision: issue #25** (`preserve_param_names=True` doesn't
-> preserve parameter identifiers end-to-end for any framework preset) —
-> flagged during the P2-19 review, cross-preset blast radius, not yet
-> scheduled.
+> **Root cause of issue #25 diagnosed 2026-08-02, not yet fixed — see item
+> 7.** It's bigger than originally filed: the same one-line bug in
+> `cli.py`'s CLI-options-override block also silently strips docstrings
+> under `--preset safe` and everything built on it, contradicting
+> `preset_safe`'s entire reason to exist. Fix plan (exact file:line, click
+> pattern, test rewrites) is fully written up in item 7 — should be
+> immediately actionable cold-start, no re-diagnosis needed.
 
 ## Current prioritized TODO (2026-08-01)
 
@@ -314,15 +317,114 @@
    (verified via the JSON API). `pyobfus-mcp` unchanged at 0.3.1 (no
    tool-surface change), so no Glama Build-steps re-pin needed.
 
-   **Next**: issue #25 (`preserve_param_names=True` doesn't work end-to-end
-   for any of the six existing presets or the new `ml` preset) is the next
-   candidate worth prioritizing given its cross-preset blast radius — every
-   framework preset's README/docstring compatibility promise currently
-   overstates what the flag delivers.
-
    A Tools / Resources / Prompts separation is recorded in
    [`MCP_PRIMITIVES_DESIGN.md`](MCP_PRIMITIVES_DESIGN.md) as a post-launch
    research candidate, not committed scope — unrelated to this decision.
+7. **⭐ CURRENT TOP PRIORITY (root cause diagnosed 2026-08-02, not yet
+   fixed) — issue #25 fix, and it's bigger than originally filed.**
+
+   **Root cause found and empirically confirmed** (not just a hunch — both
+   repros below were actually run against current `main`):
+   [`pyobfus/cli.py:621-626`](https://github.com/zhurong2020/pyobfus/blob/main/pyobfus/cli.py#L621),
+   the "Override config with CLI options" block, runs *after* the preset is
+   loaded (`config = ObfuscationConfig.get_preset(preset.lower())` at line
+   519) and unconditionally does:
+   ```python
+   config.remove_docstrings = remove_docstrings     # line 623
+   config.remove_comments = remove_comments         # line 624
+   config.preserve_param_names = preserve_param_names  # line 626
+   ```
+   where the right-hand variables are the raw Click option values —
+   `preserve_param_names` defaults to `False` (`is_flag=True`, no way to
+   express "not passed"), and `remove_docstrings`/`remove_comments` default
+   to `True` (`--remove-docstrings/--keep-docstrings`, `default=True`).
+   Any preset that sets a *different* value for one of these fields gets
+   silently clobbered back to the CLI default the moment the user doesn't
+   also pass the matching flag explicitly — which is the normal, documented
+   way every preset is used (`pyobfus src/ -o dist/ --preset fastapi`, no
+   extra flags).
+
+   **Empirical confirmation, both reproduced against current `main`
+   (2026-08-02)**:
+   - `pyobfus serve.py -o out.py --preset fastapi` on
+     `def predict(inputs, batch_size=8): return inputs[:batch_size]`
+     → `def I2(I1, I0=8): return I1[:I0]` (params mangled — this is
+     issue #25 as originally filed). Adding `--preserve-param-names`
+     explicitly on top of `--preset fastapi` *does* preserve them —
+     confirming the clobber, not a deeper mechanism failure.
+   - **New, more severe finding**: `pyobfus docstest.py -o out.py --preset
+     safe` on a function with a docstring strips the docstring, even
+     though `preset_safe()` ([`pyobfus/config.py:194-197`](https://github.com/zhurong2020/pyobfus/blob/main/pyobfus/config.py#L194))
+     explicitly sets `config.remove_docstrings = False` with the comment
+     `# Keep docstrings`, and `preset_safe` is `preset_safe()`'s entire
+     reason to exist ("Preserves docstrings for documentation" — its own
+     docstring). **Every framework preset is built on `preset_safe`**
+     (`fastapi`/`django`/`flask`/`pydantic`/`click`/`sqlalchemy`/`ml` all
+     say "Based on preset_safe (docstrings preserved)" in their own
+     docstrings) — so this isn't a `preserve_param_names`-only bug, it's
+     the whole "CLI silently overrides preset intent" pattern, and
+     docstring preservation is arguably the more load-bearing promise
+     since every doc/README describes `--preset safe` and its descendants
+     that way. `--remove-comments` is not currently observed broken (no
+     preset sets `remove_comments=False`), but shares the same
+     unconditional-override code shape and should get the same fix on
+     principle.
+
+   **Proposed fix** (matches a pattern already used two lines below in the
+   same function — `numeric_obfuscation`/`strip_ai_artifacts` at ~line 627
+   only override when the CLI flag is truthy, i.e. "only touch the preset's
+   value if the user actually asked for something"):
+   1. Convert `--preserve-param-names` from a one-way `is_flag=True` into a
+      tri-state boolean pair:
+      `--preserve-param-names/--no-preserve-param-names`, `default=None`.
+      Click then yields `None` when the user passed neither flag, `True`/
+      `False` when they explicitly passed one.
+   2. `--remove-docstrings/--keep-docstrings` and
+      `--remove-comments/--keep-comments` already use the flag-pair *syntax*
+      but with `default=True` (a concrete value, not tri-state) — change
+      their `default` to `None` too, for the same reason.
+   3. At the override site (cli.py:621-626), only assign when the CLI value
+      is not `None`:
+      ```python
+      if preserve_param_names is not None:
+          config.preserve_param_names = preserve_param_names
+      if remove_docstrings is not None:
+          config.remove_docstrings = remove_docstrings
+      if remove_comments is not None:
+          config.remove_comments = remove_comments
+      ```
+      When the user doesn't pass any of these flags, the preset's own
+      choice now survives; when they do pass one, it still overrides the
+      preset exactly as before (explicit user intent should win).
+   4. Check whether `ObfuscationConfig.from_file()`'s YAML-config code path
+      (not just `--preset`) has the same interaction with these three CLI
+      options, since `config_path`/`from_file` also loads a config object
+      before the same override block runs.
+   5. Existing tests are false positives and need rewriting, not just
+      re-running: `test_cli_fastapi_preset_preserves_param_names` (and the
+      django/flask/pydantic/click/sqlalchemy equivalents, if they exist)
+      assert against a *string dict key* (`'user_id'`) that survives
+      regardless of whether the actual parameter identifier does — see
+      issue #25's own writeup for the exact false-positive mechanism. Use
+      `tests/test_framework_presets.py::test_cli_ml_preset_preserves_dispatch_method_name`
+      (added in PR #26) as the template for a real assertion (bare
+      identifier survives unmangled, not a string literal). Also add a
+      docstring-preservation regression test at the CLI level for
+      `--preset safe` (and at least one framework preset), since the
+      existing bug was invisible to unit tests that construct
+      `ObfuscationConfig` directly (those never touch the cli.py override
+      block at all — the bug only exists on the CLI code path).
+   6. After the fix lands: revert the "does not currently work" honesty
+      caveats added in 0.5.5 (`pyobfus/config.py` `preset_ml` docstring,
+      `CHANGELOG.md`'s 0.5.5 entry) back to a positive claim, close issue
+      #25 referencing the fix commit, and decide whether to broaden #25's
+      title/scope to cover the docstring-clobber finding or file it as a
+      companion issue (a scope call worth 30 seconds of human judgment,
+      not made unilaterally this session since it changes what "closing
+      #25" means).
+   7. Version bump: next patch in the established 0.5.x cadence (0.5.6),
+      release-commit pattern documented in this file's own 0.5.5 entry
+      above and in memory `pyobfus_0_5_5_release_2026-08-02.md`.
 
 Large speculative features and a JOSS re-submission remain deferred until the
 project has demonstrated third-party adoption.

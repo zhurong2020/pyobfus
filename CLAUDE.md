@@ -12,15 +12,13 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 该文档顶部是活的「Current prioritized TODO」（随每次发布/里程碑刷新日期），下方是冻结的历史执行记录——**只读顶部，别被下面的历史小节带偏**。
 
-### 🟢 2026-08-02 active state — pyobfus 0.5.5 已发布，issue #25 是下一优先级
+### 🔴 2026-08-02 active state — issue #25 根因已查明未修，下次 session 直接动手
 
-**当前状态**：P2-17（本地溯源清单 `--provenance-manifest`）+ P2-19（`--preset ml`）由 Codex 实现、Claude review 后分两条独立分支开 PR（[#27](https://github.com/zhurong2020/pyobfus/pull/27)/[#26](https://github.com/zhurong2020/pyobfus/pull/26)），**均已合并进 main 并发布为 pyobfus 0.5.5（2026-08-02，tag `v0.5.5`，OIDC 已发 PyPI 并核实 latest=0.5.5）**。mcp 仍 0.3.1（工具面无变化，无需 Glama 重 pin）。
+**pyobfus 0.5.5 已发布**（`--preset ml` P2-19 + `--provenance-manifest` P2-17，PR [#26](https://github.com/zhurong2020/pyobfus/pull/26)/[#27](https://github.com/zhurong2020/pyobfus/pull/27) 已合并，tag `v0.5.5` 经 OIDC 发 PyPI，核实 latest=0.5.5）。mcp 仍 0.3.1。
 
-**⚠️ Review 中顺带发现一个更大的既有 bug，已单开 [issue #25](https://github.com/zhurong2020/pyobfus/issues/25)，未修**：`preserve_param_names=True` 实际不生效（`fastapi` 等六个既有 preset + 新的 `ml` preset 全受影响），且现有的 fastapi 测试是假阳性（断言命中了字符串字典 key，不是真的变量名）。**这是下一个优先级**。
+**⭐ 当前最高优先级：issue #25 根因已诊断清楚（2026-08-02 晚，含两次真实 CLI 复现，非猜测），比原先报告的范围更大**：`pyobfus/cli.py:621-626`「Override config with CLI options」代码块在 preset 加载**之后**无条件执行 `config.preserve_param_names = preserve_param_names`（Click 默认 `False`）+ `config.remove_docstrings = remove_docstrings`（Click 默认 `True`）——只要用户没有额外手动加对应 flag（正常用法就是不加），就会把 preset 自己设的值悄悄冲掉。已实测：① `--preset fastapi` 参数名照样被改名（issue #25 原报告）；② **新发现更严重**——`--preset safe` docstring 照样被删，而 `preset_safe()` 的存在意义就是"保留 docstring"，且全部 7 个 framework preset 都基于 `preset_safe`。**完整修复方案（精确到 file:line、Click tri-state 写法、测试改写清单、issue 收尾步骤）已写入 `docs/POST_V0.4_TODO.md` § item 7，冷启动直接照做，不需要重新诊断。**
 
-**Cold-start 先查**：`gh issue view 25` 看有没有人已经开始修；别重新做 P2-17/P2-19（已完工）。
-
-完整时间线/细节见 `docs/POST_V0.4_TODO.md` § item 6。
+完整时间线见 `docs/POST_V0.4_TODO.md` § item 6（0.5.5 发布经过）+ § item 7（issue #25 修复方案）。
 
 - ✅ 已提交并受理（申请号 `202610712171X` · 申请日/优先权日 2026-05-22 · 17 项权利要求）
 - ✅ 费用全部缴清（共 1610 元 · 2026-05-22 一次缴清 · 含申请费类 1235 与实审费 375 · 官方审查信息查询「费足」核实）
@@ -37,9 +35,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - ❌ **JOSS 投稿被拒(2026-06-24)**:v0.5.1 投 JOSS(issue `openjournals/joss-reviews#10788`)被总编 desk-reject,理由=**scope/significance 非质量**("private-dev-then-public" + 无第三方复用)。→ 改走免费路径:✅ **Zenodo DOI `10.5281/zenodo.20846053`(concept)已拿到**,已接进 CITATION.cff + README 徽章 + `## Citation` + 两个 pyproject + RTD + ORCID + arong.eu.org/academic。完整记录+渠道对比见 `docs/JOSS_REJECTION_20260624.md`。
 - ✅ **P2-18 内部证据完成（2026-08-01）**：5 样本 × Codex+Claude 全跑完，`price_rules` 拿到第一个干净跨模型 C4 数据点，决定不加第三个模型家族。评审版报告 `docs/LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md`；过程中顺带修了 3 个既有 plumbing bug（语料库 no-op 稀释统计、`--json-schema` 不认 `$schema` meta key、docker 打分沙箱 temp dir 权限导致此前从未真实跑通），细节见 `docs/POST_V0.4_TODO.md` § P2-18。
 - ✅ **pyobfus 0.5.5 已发布（2026-08-02，PR #26 + #27）**：`--preset ml`（P2-19，社区版模型服务 preset）+ `--provenance-manifest`（P2-17，本地 JSON 构建溯源清单，非加密签名）。Review 顺带发现 issue #25（见上）并诚实标注在 CHANGELOG/docstring 里，不是掩盖。
-- ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:**当前重心 = issue #25**（`preserve_param_names` 跨 preset 失效）。之后是 P2-13/P2-22 这类零代码内容型候选（PyInstaller cookbook / PyArmor 对比页）。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
+- ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:**当前重心 = issue #25 修复**（根因已查明，见 § item 7，直接动手不用重新诊断）。之后是 P2-13/P2-22 这类零代码内容型候选（PyInstaller cookbook / PyArmor 对比页）。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
 
-**Cold-start session 第一句话应问 user**：「pyobfus 0.5.5 已发布（`--preset ml` + `--provenance-manifest`）。要接着修 issue #25（`preserve_param_names` 六个 preset 都不生效），还是做别的？」
+**Cold-start session 第一句话应问 user**：「issue #25 根因已经查清楚了（`pyobfus/cli.py:621-626` 的 CLI-options-override 代码块在 preset 加载后无条件覆盖，不仅影响 `preserve_param_names`，还会让 `--preset safe` 的 docstring 保留承诺失效）。现在开始按 `docs/POST_V0.4_TODO.md` § item 7 的方案修吗？」
 
 **Cold-start 资料定位**（按读取优先级）：
 
