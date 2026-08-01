@@ -63,7 +63,14 @@ dev = [
     # CI runs on 3.11+ but mypy targets 3.9, where config validation imports
     # the tomllib backport.
     "tomli>=2.0",
-    "ruff>=0.1.0",
+    # No [tool.ruff.lint] select in this file, so ruff lints with its
+    # version's default rule set. 0.16 expanded that default set (RUF100,
+    # TRY004, PERF102, import-sort, ...) and surfaced 774 findings across
+    # already-shipped code with zero source changes (2026-08-01 CI break on
+    # commit defc5d2). Cap below that until the codebase is deliberately
+    # brought up to the new defaults (or a select= list pins the rule set
+    # explicitly so upgrades stop being silent).
+    "ruff>=0.1.0,<0.16",
 ]
 
 [project.urls]
