@@ -97,7 +97,15 @@ No credential is stored in this repository.
   production stays obfuscated. Independently written by the maintainer.
 - Immediate baseline (~21 minutes after submission): 1 point, 1 comment (the
   maintainer's own).
+- **+9h checkpoint**: karma ticked from 1 to 2 (one incremental signal, source
+  not distinguishable — could be the submission or the comment). No comments
+  from anyone other than the maintainer visible on the thread yet; the item
+  has not surfaced on the front page (expected — front-page ranking needs far
+  more points than this within the first few hours; a Show HN not reaching
+  the front page is the median outcome, not a failure signal). Confirmed via
+  the maintainer's own `/threads` page: the comment is correctly attached, no
+  `[flagged]`/`[dead]` marker.
 - Next measurements: +24 hours, +7 days, and +30 days using the fields listed
   under "Baseline before publication". Maintainer stays available to reply to
-  incoming comments for the first ~90 minutes; no vote solicitation, no
-  simultaneous cross-posting of the same text.
+  incoming comments; no vote solicitation, no simultaneous cross-posting of
+  the same text.
