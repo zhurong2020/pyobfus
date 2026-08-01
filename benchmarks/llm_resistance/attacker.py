@@ -12,6 +12,12 @@ The ``Attacker`` interface is model-agnostic. Two implementations ship:
   authentication. It deliberately removes API-key variables from the child
   environment so a run cannot silently switch from subscription usage to API
   billing.
+- ``ClaudeCodeCliAttacker`` -- invokes ``claude -p`` with saved Claude
+  subscription authentication (same env-stripping discipline as the Codex
+  adapter) and ``--allowedTools ""`` so the session has no file/shell/network
+  tool access at all -- the model can only reason over the prompt text, which
+  is this benchmark's static-analysis threat model enforced at the tool layer,
+  not just requested in the prompt.
 
 See ``docs/LLM_RESISTANCE_BENCHMARK.md``.
 """
@@ -202,6 +208,133 @@ class CodexCliAttacker(Attacker):
             "reasoning_effort": "low",
             "auth": "saved ChatGPT login (API-key variables removed)",
             "codex_cli": cli_version,
+            "prompt": self._prompt_path.name,
+            "prompt_sha256_16": prompt_hash,
+        }
+
+
+def _default_claude_command() -> tuple[str, ...]:
+    """Return the installed Claude Code CLI command without invoking it."""
+    candidates = ("claude.cmd", "claude") if os.name == "nt" else ("claude",)
+    for candidate in candidates:
+        resolved = shutil.which(candidate)
+        if resolved:
+            return (resolved,)
+    raise RuntimeError("Claude Code CLI was not found; install it and run `claude login`")
+
+
+@dataclass
+class ClaudeCodeCliAttacker(Attacker):
+    """Real attacker backed by ``claude -p`` and saved Claude subscription auth.
+
+    Mirrors :class:`CodexCliAttacker`'s discipline: strip API-key env vars so
+    the run cannot silently switch from subscription usage to API billing,
+    and constrain the session so it can only reason over the prompt text.
+    Unlike the Codex CLI's ``--sandbox read-only``, Claude Code has no
+    sandbox flag; the equivalent control here is ``--allowedTools ""``, which
+    grants zero tools (no Bash/Read/Write/etc.), verified empirically to stop
+    the model from touching the filesystem or attempting execution rather
+    than merely asking it not to in the prompt.
+    """
+
+    name: str = "claude-code-cli"
+    model: str = ""
+    timeout: float = 600.0
+    command: tuple[str, ...] | None = field(default=None, repr=False)
+    _prompt_path: Path = field(default=_PROMPTS / "attacker_claude_v1.md", repr=False)
+    _schema_path: Path = field(default=_PROMPTS / "attack_result.schema.json", repr=False)
+
+    def _template(self) -> str:
+        return self._prompt_path.read_text(encoding="utf-8")
+
+    def _resolved_command(self) -> tuple[str, ...]:
+        return self.command or _default_claude_command()
+
+    def deobfuscate(self, obfuscated_src: str, entrypoints: list[dict]) -> AttackResult:
+        if not self.model:
+            raise ValueError("ClaudeCodeCliAttacker requires an explicit model id")
+
+        prompt = (
+            self._template()
+            .replace("{ENTRYPOINTS}", _entrypoints_block(entrypoints))
+            .replace("{OBFUSCATED}", obfuscated_src)
+        )
+        schema = self._schema_path.read_text(encoding="utf-8")
+        env = os.environ.copy()
+        # Subscription authentication is the point of this adapter. Never let
+        # a developer shell's API key silently turn the measurement into a
+        # billable API run.
+        env.pop("ANTHROPIC_API_KEY", None)
+
+        with tempfile.TemporaryDirectory(prefix="pyobfus-claude-attacker-") as td:
+            cmd = [
+                *self._resolved_command(),
+                "-p",
+                "--output-format",
+                "json",
+                "--json-schema",
+                schema,
+                "--model",
+                self.model,
+                "--allowedTools",
+                "",
+            ]
+            proc = subprocess.run(
+                cmd,
+                input=prompt,
+                capture_output=True,
+                text=True,
+                timeout=self.timeout,
+                cwd=td,
+                env=env,
+            )
+            if proc.returncode != 0:
+                detail = proc.stderr.strip().splitlines()[-1:] or ["no stderr"]
+                raise RuntimeError(f"claude -p failed: {detail[0][:300]}")
+            try:
+                payload = json.loads(proc.stdout)
+            except json.JSONDecodeError as exc:
+                raise RuntimeError("claude -p returned invalid JSON on stdout") from exc
+
+        if payload.get("is_error"):
+            raise RuntimeError(f"claude -p reported an error: {payload.get('result', '')[:300]}")
+
+        structured = payload.get("structured_output")
+        if structured is None:
+            # Fall back to parsing `result`, which --json-schema documents as
+            # a JSON-encoded string mirroring structured_output.
+            try:
+                structured = json.loads(payload.get("result", ""))
+            except json.JSONDecodeError as exc:
+                raise RuntimeError(
+                    "claude -p produced no structured_output or parseable result"
+                ) from exc
+
+        code = str(structured.get("reimplementation", ""))
+        explanation = str(structured.get("explanation", ""))
+        fenced_code, trailing = _extract_code(code)
+        if fenced_code:
+            code = fenced_code
+            explanation = explanation or trailing
+        raw = json.dumps(payload, ensure_ascii=False, sort_keys=True)
+        return AttackResult(reimplementation=code, explanation=explanation, raw_response=raw)
+
+    def descriptor(self) -> dict:
+        prompt_hash = hashlib.sha256(self._template().encode("utf-8")).hexdigest()[:16]
+        command = self._resolved_command()
+        try:
+            proc = subprocess.run(
+                [*command, "--version"], capture_output=True, text=True, timeout=15
+            )
+            cli_version = (proc.stdout or proc.stderr).strip().splitlines()[-1]
+        except (OSError, subprocess.SubprocessError, IndexError):
+            cli_version = "unknown"
+        return {
+            "attacker": self.name,
+            "model": self.model,
+            "auth": "saved Claude subscription login (API-key variables removed)",
+            "tool_access": 'none (--allowedTools "")',
+            "claude_cli": cli_version,
             "prompt": self._prompt_path.name,
             "prompt_sha256_16": prompt_hash,
         }

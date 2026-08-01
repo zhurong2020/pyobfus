@@ -9,11 +9,14 @@ Usage::
     python benchmarks/llm_resistance/harness.py --attacker anthropic --judge
     python benchmarks/llm_resistance/harness.py --attacker codex-cli \
         --sample luhn --condition C0 --condition C1
+    python benchmarks/llm_resistance/harness.py --attacker claude-code-cli \
+        --model sonnet --sample luhn --condition C0 --condition C1
     python benchmarks/llm_resistance/harness.py --attacker stub --limit 2
 
 The default ``stub`` attacker runs offline (no API key) and exists to prove the
-pipeline end-to-end; ``anthropic`` runs the real measurement. See
-``docs/LLM_RESISTANCE_BENCHMARK.md``.
+pipeline end-to-end; ``anthropic``/``codex-cli``/``claude-code-cli`` run the
+real measurement (the latter two via subscription CLI auth, no API account
+required). See ``docs/LLM_RESISTANCE_BENCHMARK.md``.
 """
 
 from __future__ import annotations
@@ -35,6 +38,7 @@ import report as R  # noqa: E402
 import scorer as S  # noqa: E402
 from attacker import (  # noqa: E402
     AnthropicAttacker,
+    ClaudeCodeCliAttacker,
     CodexCliAttacker,
     StubAttacker,
     make_anthropic_judge,
@@ -216,7 +220,11 @@ def _pyobfus_version() -> str:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="LLM-deobfuscation-resistance benchmark")
-    ap.add_argument("--attacker", choices=["stub", "anthropic", "codex-cli"], default="stub")
+    ap.add_argument(
+        "--attacker",
+        choices=["stub", "anthropic", "codex-cli", "claude-code-cli"],
+        default="stub",
+    )
     ap.add_argument(
         "--model",
         default=os.environ.get("ANTHROPIC_MODEL"),
@@ -258,6 +266,11 @@ def main() -> int:
         help="explicit codex executable path (normally auto-detected)",
     )
     ap.add_argument(
+        "--claude-command",
+        default=os.environ.get("PYOBFUS_BENCHMARK_CLAUDE_COMMAND"),
+        help="explicit claude executable path (normally auto-detected)",
+    )
+    ap.add_argument(
         "--unsafe-host-execution",
         action="store_true",
         help="allow real model-generated code to execute on this host (not recommended)",
@@ -272,7 +285,7 @@ def main() -> int:
             ap.error("--model is required for the anthropic attacker")
         attacker = AnthropicAttacker(model=args.model)
         judge = make_anthropic_judge(args.model) if args.judge else None
-    else:
+    elif args.attacker == "codex-cli":
         if not args.model:
             ap.error("--model is required for the codex-cli attacker")
         if args.judge:
@@ -284,6 +297,19 @@ def main() -> int:
             )
         command = (args.codex_command,) if args.codex_command else None
         attacker = CodexCliAttacker(model=args.model, command=command)
+        judge = None
+    else:
+        if not args.model:
+            ap.error("--model is required for the claude-code-cli attacker")
+        if args.judge:
+            ap.error("--judge is not implemented for claude-code-cli; omit it for the pilot")
+        if not args.sample or not args.condition:
+            ap.error(
+                "claude-code-cli requires explicit --sample and --condition selections "
+                "to prevent an accidental full-matrix subscription run"
+            )
+        command = (args.claude_command,) if args.claude_command else None
+        attacker = ClaudeCodeCliAttacker(model=args.model, command=command)
         judge = None
 
     known_conditions = {condition.cid for condition in C.CONDITIONS}

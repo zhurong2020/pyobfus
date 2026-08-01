@@ -137,9 +137,17 @@
    non-public-knowledge target — `price_rules` is already `c4_eligible` with
    custom logic and real string literals and has not been exercised yet; (b)
    expand beyond 2 of the 5 corpus samples (`caesar`/`price_rules`/`roman`
-   unused so far); (c) a second model family — blocked on the maintainer's
-   standing preference against an Anthropic API account/Docker Desktop (a
-   policy constraint, not a technical one).
+   unused so far); (c) ✅ **second model family unblocked 2026-08-01** —
+   `ClaudeCodeCliAttacker` (`--attacker claude-code-cli`) shells out to
+   `claude -p` with saved Claude subscription authentication, the same
+   no-API-account discipline as `CodexCliAttacker`, so it does not require the
+   Anthropic API account/Docker Desktop that blocked this item. Static-analysis
+   containment is enforced via `--allowedTools ""` (verified empirically to
+   stop tool use, not just a prompt request) since Claude Code has no
+   `--sandbox` flag. Smoke-tested offline against a fake CLI
+   (`test_claude_code_cli_attacker_uses_structured_output_without_api_keys`);
+   not yet run as a real pilot — that is the next actionable step for a
+   *credible public* P2-18 result, alongside (a) and (b) above.
 5. ✅ **Discoverability and citation — deployed and verified 2026-07-22.** DOI,
    README/PyPI/Read the Docs citation surfaces are present. ARD metadata is
    CI-validated and live at the Read the Docs well-known URL. PulseMCP exact

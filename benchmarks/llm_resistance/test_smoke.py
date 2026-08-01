@@ -23,7 +23,7 @@ if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
 
 import harness  # noqa: E402
-from attacker import CodexCliAttacker, StubAttacker  # noqa: E402
+from attacker import ClaudeCodeCliAttacker, CodexCliAttacker, StubAttacker  # noqa: E402
 
 
 def _rows_for(data, sample):
@@ -101,6 +101,56 @@ output.write_text(json.dumps({
     descriptor = attacker.descriptor()
     assert descriptor["model"] == "test-model"
     assert descriptor["codex_cli"] == "codex-cli test-0"
+
+
+def test_claude_code_cli_attacker_uses_structured_output_without_api_keys(tmp_path, monkeypatch):
+    fake_cli = tmp_path / "fake_claude.py"
+    fake_cli.write_text(
+        """
+import json
+import os
+import sys
+
+if "--version" in sys.argv:
+    print("2.1.220 (Claude Code)")
+    raise SystemExit(0)
+
+prompt = sys.stdin.read()
+assert "required_fn(arg1)" in prompt
+assert "def hidden" in prompt
+assert not os.environ.get("ANTHROPIC_API_KEY")
+assert "--allowedTools" in sys.argv
+assert sys.argv[sys.argv.index("--allowedTools") + 1] == ""
+assert "--json-schema" in sys.argv
+payload = {
+    "is_error": False,
+    "result": json.dumps({
+        "reimplementation": "def required_fn(arg1):\\n    return arg1 + 1\\n",
+        "explanation": "Adds one.",
+    }),
+    "structured_output": {
+        "reimplementation": "def required_fn(arg1):\\n    return arg1 + 1\\n",
+        "explanation": "Adds one.",
+    },
+}
+print(json.dumps(payload))
+""".strip(),
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "must-not-reach-child")
+
+    attacker = ClaudeCodeCliAttacker(model="test-model", command=(sys.executable, str(fake_cli)))
+    result = attacker.deobfuscate(
+        "def hidden(x): return x + 1", [{"name": "required_fn", "arity": 1}]
+    )
+
+    assert result.reimplementation.startswith("def required_fn")
+    assert result.explanation == "Adds one."
+    assert json.loads(result.raw_response)["structured_output"]["explanation"] == "Adds one."
+    descriptor = attacker.descriptor()
+    assert descriptor["model"] == "test-model"
+    assert descriptor["claude_cli"] == "2.1.220 (Claude Code)"
+    assert descriptor["tool_access"] == 'none (--allowedTools "")'
 
 
 def test_sample_selection_applies_before_limit():

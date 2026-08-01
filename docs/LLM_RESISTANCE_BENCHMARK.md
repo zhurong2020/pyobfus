@@ -162,7 +162,18 @@ secondary metric. **CS never overrides SRR** in the headline.
     a frozen structured-output prompt/schema, and requires an explicit model.
     The CLI also requires explicit sample and condition selections so a pilot
     cannot accidentally expand into a subscription-consuming full matrix.
-  - (future) other model families — to reproduce Acoda's multi-model table.
+  - `ClaudeCodeCliAttacker` — the second model family, added 2026-08-01. Same
+    no-API-account discipline as the Codex adapter: invokes `claude -p` with
+    saved Claude subscription authentication, strips `ANTHROPIC_API_KEY` from
+    the child environment, and requires an explicit model and explicit sample
+    + condition selections. Since Claude Code has no `--sandbox` flag (unlike
+    Codex), the static-analysis constraint is enforced instead via
+    `--allowedTools ""` — zero tools granted, verified empirically to stop the
+    model from touching the filesystem or attempting execution rather than
+    merely asking it not to in the prompt. Structured output comes back
+    directly as `structured_output` in the CLI's `--output-format json`
+    envelope (no temp-file indirection needed, unlike Codex's
+    `--output-last-message`).
 - Every run records: attacker class, model id, prompt hash, pyobfus version,
   Python version, UTC date, scoring executor/container image, and each generated
   artifact's content hash. The
