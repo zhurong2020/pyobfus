@@ -2,36 +2,22 @@
 
 ## 长文版
 
-### 我做了一个不会让生产报错变成乱码的 Python 混淆器
+### pyobfus 0.5.4：给 Pro String Vault 的密钥也补上设备绑定
 
-代码混淆有一个经常被忽略的问题：类名和函数名变成 `I0`、`I1` 以后，
-外部的人不容易直接读代码了，但开发者自己收到的生产报错也可能失去意义，
-Claude Code、Cursor 之类的工具同样不知道这些名字原来是什么。
+这是 pyobfus 系列的第三篇（前两篇：《别让你的 Python 代码"裸奔"了》
+2025-12-27、《一个让 AI 还能读懂崩溃日志的 Python 代码混淆器》2026-05-21）。
+`I0`/`I1` 命名混淆之后生产报错和 AI 工具都读不懂、靠 `mapping.json` +
+`--unmap` 本地反解的那套方案，5 月那篇已经讲过，这里不重复，直接说
+0.5.4 新补上的东西。
 
-这正是我做 [pyobfus](https://github.com/zhurong2020/pyobfus) 的出发点。
-它是一个基于 Python AST 的代码混淆器。Community Edition 使用 Apache-2.0，
-支持 FastAPI、Django、Flask、Pydantic、Click 和 SQLAlchemy 的框架预设，
-也提供稳定的 JSON CLI 与 MCP server。
+`--bind-device` 这个机制之前只覆盖了 Selective Opacity 的 L3 key。混淆产物
+绑定到构建机器或指定设备后，密钥要在运行时重新派生才能解密，换一台机器就
+解不出来。但 Pro String Vault（保护常量字符串的那层）的密钥之前不在这个机制
+里，仍然作为普通常量写进产物，意味着 vault 加密的内容其实能在任意机器上解开。
+这是一个已经写进文档的已知边界，不是掩盖起来的 bug，但确实是个缺口。
 
-它可以在构建时单独保存名称映射：
-
-```bash
-pip install pyobfus
-pyobfus --check src/ --json
-pyobfus src/ -o dist/ --save-mapping mapping.json
-```
-
-客户拿到混淆后的代码，开发者自己安全保存 `mapping.json`。收到生产环境堆栈后：
-
-```bash
-pyobfus --unmap --trace error.log --mapping mapping.json --json
-```
-
-原始名称恢复以后，既可以自己排查，也可以继续交给 AI 编程助手分析。
-
-刚发布的 0.5.4 还补上了一个 Pro 设备绑定缺口。此前 `--bind-device` 已经
-保护 Selective Opacity 的 L3 key，但 String Vault 的 key 仍可能作为常量写入
-产物。现在每个 Vault 都有独立 salt，并在运行时根据绑定设备派生 key：
+0.5.4 把这个缺口补上了：每个 Vault 现在都有独立 salt，密钥在运行时根据绑定
+设备重新派生，跟 opacity L3 用的是同一套技术：
 
 ```bash
 pyobfus src/ -o dist/ --level pro --vault --bind-device
