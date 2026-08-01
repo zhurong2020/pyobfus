@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`--provenance-manifest PATH`** — writes a local JSON provenance manifest
+  for obfuscation runs: obfuscated files, effective config hash, pyobfus
+  version, mapping digest when `--save-mapping` is used, and a canonical
+  SHA-256 integrity digest (self-consistency check, not a cryptographic
+  signature — real signing via sigstore is future work). No new dependency
+  or phone-home service is required.
+
 ## [0.5.4] - 2026-07-19
 
 **Feature + honesty release.** Closes the last device-binding scope boundary

@@ -293,6 +293,13 @@ except ImportError:
     "Use with `pyobfus --unmap` to reverse obfuscated stack traces.",
 )
 @click.option(
+    "--provenance-manifest",
+    "provenance_manifest_path",
+    type=click.Path(),
+    help="Write a local JSON provenance manifest (with an integrity digest, "
+    "not a cryptographic signature) for this obfuscation run.",
+)
+@click.option(
     "--trace-marker/--no-trace-marker",
     "trace_marker",
     default=False,
@@ -378,6 +385,7 @@ def main(
     check_mode: bool,
     json_output: bool,
     save_mapping_path: Optional[str],
+    provenance_manifest_path: Optional[str],
     trace_marker: bool,
     unmap_mode: bool,
     trace_path: Optional[str],
@@ -794,6 +802,7 @@ def main(
                         dry_run=dry_run,
                         stats=obfuscation_stats,
                         mapping_path=save_mapping_path,
+                        provenance_manifest_path=None,
                     )
                     return
                 # Fall through to normal text success path below by
@@ -875,6 +884,39 @@ def main(
                     err=True,
                 )
 
+        written_manifest_path: Optional[str] = None
+        if provenance_manifest_path and not dry_run:
+            from pyobfus.core.provenance import (
+                build_provenance_manifest,
+                save_provenance_manifest,
+            )
+
+            if input_path_obj.is_file():
+                manifest_files = [input_path_obj]
+                manifest_mode = "single_file"
+            else:
+                manifest_files = filter_python_files(input_path_obj, config.exclude_patterns)
+                manifest_mode = "cross_file" if cross_file else "directory"
+            manifest = build_provenance_manifest(
+                input_root=input_path_obj,
+                output_root=output_path_obj,
+                config=config,
+                files=manifest_files,
+                mapping_path=save_mapping_path,
+                preset=preset.lower() if preset else None,
+                mode=manifest_mode,
+            )
+            save_provenance_manifest(manifest, provenance_manifest_path)
+            written_manifest_path = provenance_manifest_path
+            if verbose:
+                click.echo(f"  Wrote provenance manifest: {provenance_manifest_path}")
+        elif provenance_manifest_path and dry_run:
+            if not json_output:
+                click.echo(
+                    "Warning: --provenance-manifest is skipped in --dry-run mode.",
+                    err=True,
+                )
+
         if json_output:
             sys.stdout = _saved_stdout
             _emit_obfuscate_success_json(
@@ -885,6 +927,7 @@ def main(
                 dry_run=dry_run,
                 stats=obfuscation_stats,
                 mapping_path=save_mapping_path,
+                provenance_manifest_path=written_manifest_path,
                 trace_marker_id=trace_marker_id,
             )
             return
@@ -1708,6 +1751,7 @@ def _emit_obfuscate_success_json(
     dry_run: bool,
     stats: Dict[str, int],
     mapping_path: Optional[str],
+    provenance_manifest_path: Optional[str] = None,
     trace_marker_id: Optional[str] = None,
 ) -> None:
     """Emit the obfuscation success summary as JSON."""
@@ -1716,6 +1760,10 @@ def _emit_obfuscate_success_json(
         ai_hint = (
             f"Obfuscation complete. To reverse a production traceback: "
             f"pyobfus --unmap --trace error.log --mapping {mapping_path}"
+        )
+    elif provenance_manifest_path:
+        ai_hint = (
+            f"Obfuscation complete. Provenance manifest written to {provenance_manifest_path}."
         )
     elif dry_run:
         ai_hint = "Dry run complete — no files written. Remove --dry-run to persist output."
@@ -1735,6 +1783,7 @@ def _emit_obfuscate_success_json(
         "dry_run": dry_run,
         "stats": stats,
         "mapping": mapping_path,
+        "provenance_manifest": provenance_manifest_path,
         "trace_marker_id": trace_marker_id,
         "ai_hint": ai_hint,
     }
