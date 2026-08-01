@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`--preset ml`** — community-tier model-serving preset for inference
+  wrappers. Preserves the framework-dispatched method names external code
+  actually calls by exact name (`predict`/`predict_proba`/`fit`/`transform`/
+  `forward`/`generate`/`encode` — sklearn, PyTorch's `nn.Module.__call__`,
+  HuggingFace conventions), preserves parameter names, excludes
+  model/checkpoint/weight artifact paths, and pairs with new `--check`
+  guidance for unsafe pickle/`torch.load`/model loading plus Runtime String
+  Vault routing hints for model-path literals.
+
 ## [0.5.4] - 2026-07-19
 
 **Feature + honesty release.** Closes the last device-binding scope boundary

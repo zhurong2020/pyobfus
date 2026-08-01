@@ -175,10 +175,10 @@ class TestListPresets:
         assert "balanced" in presets
         assert "aggressive" in presets
         # Framework-aware presets (added in v0.4.0 P0-3)
-        for fw in ("fastapi", "django", "flask", "pydantic", "click", "sqlalchemy"):
+        for fw in ("fastapi", "django", "flask", "pydantic", "click", "sqlalchemy", "ml"):
             assert fw in presets
-        # 3 community + 6 framework + 4 Pro = 13
-        assert len(presets) == 13
+        # 3 community + 7 framework + 4 Pro = 14
+        assert len(presets) == 14
 
 
 class TestPresetLimits:

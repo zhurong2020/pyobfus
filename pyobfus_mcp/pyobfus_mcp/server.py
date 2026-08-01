@@ -115,9 +115,9 @@ def _build_server() -> Any:
         name="check_obfuscation_risks",
         description=(
             "Scan a Python project for patterns that may break obfuscation "
-            "(eval/exec, dynamic attribute access, framework reflection). "
+            "(eval/exec, dynamic attribute access, framework reflection, unsafe model loading). "
             "Returns severity counts, detected frameworks (FastAPI/Django/"
-            "Flask/Pydantic/Click/SQLAlchemy), and a suggested preset."
+            "Flask/Pydantic/Click/SQLAlchemy/ML), and a suggested preset."
         ),
         meta=dict(_META_COMMUNITY),
     )

@@ -15,7 +15,9 @@ from pyobfus.core.preflight import (
     CAT_ENTRY_POINT,
     CAT_FRAMEWORK,  # noqa: F401  (imported for category registry completeness)
     CAT_INTROSPECTION,
+    CAT_MODEL_ARTIFACT_LITERAL,
     CAT_NAME_STRING,
+    CAT_UNSAFE_DESERIALIZATION,
     PreflightChecker,
     SEVERITY_HIGH,
     SEVERITY_MEDIUM,
@@ -187,6 +189,106 @@ def test_framework_priority_fastapi_over_pydantic(tmp_path: Path) -> None:
     )
     report = PreflightChecker().check_path(f)
     assert report.suggested_preset == "fastapi"
+
+
+def test_framework_ml_suggests_ml_preset(tmp_path: Path) -> None:
+    f = _write(
+        tmp_path,
+        "serve.py",
+        """
+        import torch
+        def predict(x):
+            return torch.load("weights/model.pt")
+        """,
+    )
+    report = PreflightChecker().check_path(f)
+    assert any(fw.name == "ML/model-serving" for fw in report.frameworks)
+    assert report.suggested_preset == "ml"
+    assert "**/checkpoints/**" in report.suggested_excludes
+
+
+def test_framework_sklearn_only_suggests_models_exclude_not_torch_checkpoints(
+    tmp_path: Path,
+) -> None:
+    # Regression guard: torch/tensorflow/keras/transformers/sklearn/joblib all
+    # share the "ML/model-serving" display name, so a project that imports
+    # ONLY sklearn (no torch at all) must still get sklearn's own
+    # **/models/** suggestion, not torch's **/checkpoints/** by coincidence of
+    # dict-iteration order.
+    f = _write(
+        tmp_path,
+        "serve.py",
+        """
+        import sklearn
+        def predict(x):
+            return x
+        """,
+    )
+    report = PreflightChecker().check_path(f)
+    assert any(fw.name == "ML/model-serving" for fw in report.frameworks)
+    assert report.suggested_preset == "ml"
+    assert "**/models/**" in report.suggested_excludes
+    assert "**/checkpoints/**" not in report.suggested_excludes
+
+
+def test_framework_torch_and_sklearn_together_suggest_both_excludes(tmp_path: Path) -> None:
+    f = _write(
+        tmp_path,
+        "serve.py",
+        """
+        import torch
+        import sklearn
+        def predict(x):
+            return x
+        """,
+    )
+    report = PreflightChecker().check_path(f)
+    assert "**/checkpoints/**" in report.suggested_excludes
+    assert "**/models/**" in report.suggested_excludes
+
+
+# ---------------------------------------------------------------------------
+# ML/model-serving safety
+# ---------------------------------------------------------------------------
+
+
+def test_detects_pickle_load_as_unsafe_deserialization(tmp_path: Path) -> None:
+    f = _write(
+        tmp_path,
+        "model.py",
+        """
+        import pickle
+        with open("model.pkl", "rb") as fh:
+            model = pickle.load(fh)
+        """,
+    )
+    report = PreflightChecker().check_path(f)
+    assert any(r.category == CAT_UNSAFE_DESERIALIZATION for r in report.risks)
+    assert report.exit_code() == 1
+
+
+def test_detects_torch_load_without_weights_only(tmp_path: Path) -> None:
+    f = _write(
+        tmp_path,
+        "model.py",
+        """
+        import torch
+        model = torch.load("checkpoint.pth")
+        safe_weights = torch.load("weights.pth", weights_only=True)
+        """,
+    )
+    report = PreflightChecker().check_path(f)
+    risks = [r for r in report.risks if r.category == CAT_UNSAFE_DESERIALIZATION]
+    assert len(risks) == 1
+    assert "weights_only=True" in risks[0].message
+
+
+def test_detects_model_artifact_literal_with_vault_hint(tmp_path: Path) -> None:
+    f = _write(tmp_path, "model.py", 'MODEL_PATH = "models/classifier.safetensors"\n')
+    report = PreflightChecker().check_path(f)
+    risks = [r for r in report.risks if r.category == CAT_MODEL_ARTIFACT_LITERAL]
+    assert len(risks) == 1
+    assert "vault_secrets" in risks[0].suggestion
 
 
 # ---------------------------------------------------------------------------
