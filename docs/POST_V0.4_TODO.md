@@ -137,17 +137,37 @@
    non-public-knowledge target — `price_rules` is already `c4_eligible` with
    custom logic and real string literals and has not been exercised yet; (b)
    expand beyond 2 of the 5 corpus samples (`caesar`/`price_rules`/`roman`
-   unused so far); (c) ✅ **second model family unblocked 2026-08-01** —
-   `ClaudeCodeCliAttacker` (`--attacker claude-code-cli`) shells out to
-   `claude -p` with saved Claude subscription authentication, the same
-   no-API-account discipline as `CodexCliAttacker`, so it does not require the
-   Anthropic API account/Docker Desktop that blocked this item. Static-analysis
-   containment is enforced via `--allowedTools ""` (verified empirically to
-   stop tool use, not just a prompt request) since Claude Code has no
-   `--sandbox` flag. Smoke-tested offline against a fake CLI
-   (`test_claude_code_cli_attacker_uses_structured_output_without_api_keys`);
-   not yet run as a real pilot — that is the next actionable step for a
-   *credible public* P2-18 result, alongside (a) and (b) above.
+   unused so far).
+
+   **(c) ✅ Second model family run 2026-08-01** — `ClaudeCodeCliAttacker`
+   (`--attacker claude-code-cli`) shells out to `claude -p` with saved Claude
+   subscription authentication, the same no-API-account discipline as
+   `CodexCliAttacker`, so it does not require an Anthropic API account.
+   Static-analysis containment is enforced via `--allowedTools ""` (verified
+   empirically to stop tool use, not just a prompt request) since Claude Code
+   has no `--sandbox` flag. First real pilot: `--model sonnet`, same 2 samples
+   and all 6 conditions as the Codex pilot, `--executor docker
+   --docker-image python:3.12-alpine` (this machine has no Windows/codex-windows
+   sandbox). Two pre-existing plumbing bugs surfaced and were fixed the same
+   session (neither specific to this attacker): Claude Code's `--json-schema`
+   rejects the shared schema file's `$schema` meta key (no network access to
+   resolve it) — strip it before passing; and the docker executor's scoring
+   temp dir defaulted to mode 0700, unreadable by the container's unprivileged
+   `--user 65534:65534`, so every row silently scored not-recovered regardless
+   of attacker/condition/sample — this would have hit *any* real attacker on
+   the docker executor, the path had evidently never been exercised
+   end-to-end with real content before. Both fixed in `scorer.py`/`attacker.py`
+   with a docker-gated regression test added.
+
+   **Real signal, cross-model comparison**: on `billing_auth` (the only
+   non-public-knowledge sample), Claude Sonnet reproduced the *exact same
+   pattern* as the Codex/`gpt-5.6-sol` pilot — recovered at C0/C1 (no
+   protection), held at C2/C3/C5 (0% SRR / 100% resistance each). `luhn`
+   (public-knowledge-tainted) was recovered at C0/C1/C3/C4 as expected and
+   is excluded from the credible signal. This is real corroborating evidence
+   across two model families on the one clean sample available — but C4 still
+   has no clean (non-public-knowledge) data point from *either* model family,
+   which remains gap (a) above, not a finding about the opacity mechanism.
 5. ✅ **Discoverability and citation — deployed and verified 2026-07-22.** DOI,
    README/PyPI/Read the Docs citation surfaces are present. ARD metadata is
    CI-validated and live at the Read the Docs well-known URL. PulseMCP exact
