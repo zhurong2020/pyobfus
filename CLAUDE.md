@@ -12,9 +12,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 该文档顶部是活的「Current prioritized TODO」（随每次发布/里程碑刷新日期），下方是冻结的历史执行记录——**只读顶部，别被下面的历史小节带偏**。
 
-### 🟡 2026-08-01 active state — launch wave 收工，重心转 P2-18 + 后续功能开发
+### 🟡 2026-08-01 active state — launch wave 收工 + P2-18 内部证据已完成，待选下一个功能
 
-**当前状态**：0.5.4 已发布（2026-07-19，PR #19 vault-key 设备绑定）+ issue #22 mypy gate 已关（2026-07-22，PR #23）。**Launch wave 五渠道（dev.to/r-Python/Show HN/CN 长文/GitHub Discussions）已于 2026-08-01 全部发完并收工**——公开互动基本为零（HN 2 points/1 comment 全是自己的、Reddit/dev.to 同样冷清），唯一无歧义的正向信号是 2 个真实 GitHub star（`helenkwok`/`SWFDtf`），PyPI 下载量也还没跟着涨。**已决定不再推 launch，转向 P2-18 benchmark + 后续功能开发为当前重心**（被动监测 +7d/+30d checkpoint 即可，不阻塞后续工作）。渠道明细见 `_drafts/launch-v0.5.4/README.md`；当前 TODO（P2-18 已标为 current top priority）见 `docs/POST_V0.4_TODO.md`。mcp 仍 0.3.1（工具面无变化）。
+**当前状态**：0.5.4 已发布（2026-07-19）+ issue #22 mypy gate 已关（2026-07-22）。**Launch wave 五渠道已于 2026-08-01 全部发完并收工**——公开互动基本为零，唯一正向信号是 2 个真实 GitHub star（`helenkwok`/`SWFDtf`），已决定不再推。**P2-18 benchmark 内部证据已完成（2026-08-01）**：5 个语料库样本 × Codex+Claude 两个模型家族全跑完，两个非公开知识样本在 C2 及以上全部扛住、两个模型一致，含项目第一个干净的跨模型 C4 数据点（`price_rules`）；已决定不加第三个模型家族（Codex+Claude 已是当前最强、结论一致）。评审版结果见 `docs/LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md`。**当前重心转向：选下一个具体功能**——原定的"等 launch 投票"门槛(`NEXT_FEATURE_DECISION.md`)因互动太薄需要重新跟你确认怎么走,候选见 ROADMAP P2-17(签名溯源清单)/P2-19(`--preset ml`)等。渠道明细见 `_drafts/launch-v0.5.4/README.md`；完整 TODO 见 `docs/POST_V0.4_TODO.md`。mcp 仍 0.3.1（工具面无变化）。
 
 - ✅ 已提交并受理（申请号 `202610712171X` · 申请日/优先权日 2026-05-22 · 17 项权利要求）
 - ✅ 费用全部缴清（共 1610 元 · 2026-05-22 一次缴清 · 含申请费类 1235 与实审费 375 · 官方审查信息查询「费足」核实）
@@ -29,10 +29,10 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - ✅ **pyobfus-mcp 0.3.1 已发布（2026-06-22）**：pro-funnel 文案点名 v0.5 机制 · dep `>=0.5.1` · tag `mcp-v0.3.1` 发 PyPI + `mcp-publisher` 发 MCP Registry(0.3.1 isLatest)。
 - ✅ **AI-agent 可发现性 Wave A（2026-06-22）**：Smithery 经 **Skill 渠道** `zhurong2020/pyobfus-protect`（Smithery MCP 发布是远程网关、本地工具走不通,Skill 才对）+ mcp.so + `uvx` 零安装 + server.json 99 字描述(commit `826c576`/`49f4df3`)。报告:`docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`。
 - ❌ **JOSS 投稿被拒(2026-06-24)**:v0.5.1 投 JOSS(issue `openjournals/joss-reviews#10788`)被总编 desk-reject,理由=**scope/significance 非质量**("private-dev-then-public" + 无第三方复用)。→ 改走免费路径:✅ **Zenodo DOI `10.5281/zenodo.20846053`(concept)已拿到**,已接进 CITATION.cff + README 徽章 + `## Citation` + 两个 pyproject + RTD + ORCID + arong.eu.org/academic。完整记录+渠道对比见 `docs/JOSS_REJECTION_20260624.md`。
-- ✅ **P2-18 两个模型家族的首批真实(非 stub)pilot 都已跑完（2026-08-01）**：Codex CLI/`gpt-5.6-sol`(luhn+billing_auth × C0-C5)先跑,过程中发现并修复一个语料库方法论 bug——`luhn`/`caesar`/`roman` 是公开知名算法,攻击者靠训练常识就能还原,不代表混淆被攻破;`luhn` 对 `--string-encryption`(C2)是 byte-for-byte no-op,曾把 C2 统计悄悄稀释成假 50%(修复见 `conditions.py`/`harness.py` 的 `builds_on`+`skip_reason: noop`)。同一天新增 **`ClaudeCodeCliAttacker`**(`claude -p` 走订阅登录,不需要 Anthropic API 账号,解除了原先卡住第二模型家族的政策性顾虑)并跑了同样的 luhn+billing_auth × C0-C5,过程中又修了两个跟 attacker 无关的既有 plumbing bug——`--json-schema` 不认 schema 文件里的 `$schema` meta key、docker 打分沙箱的 temp dir 默认 0700 权限导致容器内 nobody 用户读不到文件(此前 docker executor 从没被真实跑通过,任何 attacker 走这条路都会中招)。**跨模型信号一致**:两个模型在 `billing_auth`(唯一非公开知识样本)上表现完全一样——C0/C1 全还原、C2/C3/C5 全扛住(0% SRR/100% resistance)。**同一天(2026-08-01)接着跑了 caesar/roman/price_rules × C0-C5 × 两个模型家族**(这台机器 codex CLI + claude CLI + docker 都现成,不需要另找 Windows 机器)——`caesar`/`roman`(公开知名算法)两个模型都全还原,不算数;**`price_rules`(自定义定价逻辑,非公开知识,c4_eligible)在 C2/C3/C4 两个模型都没能还原**,这是项目**第一个干净的、跨模型验证过的 C4 数据点**。至此 5 个样本全跑完:2 个非公开知识样本(`billing_auth`/`price_rules`)在 C2 及以上全部扛住、两个模型家族一致,不是孤例。离"发表评审过的公开结果"还差:把方法论+数字写成正式 report(`results.json`/`report.md` 按设计不进 git,需要挑一份写进版本化文档)+ 决定要不要加第三个模型家族。详见 `docs/POST_V0.4_TODO.md` § P2-18。
-- ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:**P2-18 语料库/跨模型阶段已完成**（5 样本全跑完,干净 C4 数据点已拿到,详见上一条）。剩两件事:① 把方法论+数字写成正式版本化 report(`docs/LLM_RESISTANCE_BENCHMARK.md` 已有设计,`results.json`/`report.md` 按设计不进 git)② 决定要不要加第三个模型家族才发表,还是两个已经够。之后就是选下一个具体功能(候选见 ROADMAP P2-17/P2-19 等)。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推),GitHub 功能投票暂不开。IP 商业化迁移(个人→旎嵘科技)排在更后面。
+- ✅ **P2-18 内部证据完成（2026-08-01）**：5 样本 × Codex+Claude 全跑完，`price_rules` 拿到第一个干净跨模型 C4 数据点，决定不加第三个模型家族。评审版报告 `docs/LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md`；过程中顺带修了 3 个既有 plumbing bug（语料库 no-op 稀释统计、`--json-schema` 不认 `$schema` meta key、docker 打分沙箱 temp dir 权限导致此前从未真实跑通），细节见 `docs/POST_V0.4_TODO.md` § P2-18。
+- ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:**P2-18 已收尾,当前重心 = 选下一个具体功能**（候选见 ROADMAP P2-17 签名溯源清单 / P2-19 `--preset ml` 等,2026-07-07 scan 已标为低成本高相关）。原定"等 launch 投票"门槛因互动太薄需要重新确认怎么走(继续等/直接选/换个信号)。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
 
-**Cold-start session 第一句话应问 user**：「launch wave 已收工、P2-18 语料库+跨模型验证也做完了(5 样本全跑完,`price_rules` 在两个模型家族的 C4 上都拿到了干净的抗性数据),接下来是把这份结果写成正式 report,还是已经想好下一个具体功能要做了?」
+**Cold-start session 第一句话应问 user**：「launch wave 已收工、P2-18 内部证据已完成并写成正式报告(`docs/LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md`,不加第三个模型家族),当前唯一待定的是下一个具体功能——想好要做哪个了吗,还是需要先聊聊候选(ROADMAP P2-17/P2-19 等)?」
 
 **Cold-start 资料定位**（按读取优先级）：
 

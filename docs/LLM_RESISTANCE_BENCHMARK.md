@@ -1,6 +1,9 @@
 # LLM-Deobfuscation-Resistance Benchmark (P2-18)
 
-**Status**: design + first-cut harness (v0, benchmark-only). Roadmap item P2-18.
+**Status**: harness implemented and validated with real pilots (Codex CLI +
+Claude Code CLI, 2026-08-01) across the full 5-sample corpus. Results:
+[`docs/LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md`](LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md).
+Roadmap item P2-18.
 
 **One-line goal**: publish a reproducible *semantic-recovery rate* — the fraction
 of obfuscated code samples whose original behavior an LLM can reconstruct — for

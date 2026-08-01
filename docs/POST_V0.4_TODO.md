@@ -17,12 +17,14 @@
 > GitHub Discussions, all five channels) — engagement came back essentially
 > flat everywhere except two real GitHub stars; decision made to stop
 > pushing it and shift active work to P2-18 + subsequent features (item 4
-> is now the current top priority). Passive monitoring continues (+7d/+30d
+> is now closed out, see below). Passive monitoring continues (+7d/+30d
 > checkpoints), it just isn't blocking anything.
-> **P2-18 got its first real (non-stub) pilots from two model families
-> (Codex + Claude) 2026-08-01** — see item 4 below; a *credible public*
-> result (larger corpus, a clean non-public-knowledge C4 data point) is
-> still open and is where session time should concentrate now.
+> **P2-18 internal evidence complete 2026-08-01** — full 5-sample corpus ×
+> two model families (Codex + Claude), clean cross-model C4 data point,
+> decision made that a third model family isn't needed. Reviewed writeup:
+> `docs/LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md`. See item 4 below.
+> **Next open decision: item 6, feature selection** — the launch-feedback
+> poll gate needs revisiting since real engagement came back thin.
 
 ## Current prioritized TODO (2026-08-01)
 
@@ -230,14 +232,19 @@
    (non-public-knowledge, both held at every rung from C2 up, both model
    families) — a 2-of-2 clean-sample record, not a single lucky case.
 
-   Remaining before this becomes a *published, reviewed* result (as opposed
-   to an internally-verified one): write up the methodology + numbers as the
-   P2-18 benchmark report proper (`docs/LLM_RESISTANCE_BENCHMARK.md` already
-   has the design; the actual results.json/report.md are gitignored and need
-   a deliberate, reviewed copy into a versioned location per that doc's own
-   "Reported artifacts" section) and decide whether a third model family is
-   worth adding before publishing, or whether 2 is sufficient given both
-   already agree.
+   **✅ Closed out 2026-08-01.** Methodology + full per-sample tables written
+   up in [`docs/LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md`](LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md)
+   — the deliberate, reviewed copy `benchmarks/llm_resistance/README.md`
+   calls for before treating a run as evidence. **Decision: no third model
+   family** — Codex and Claude are two of the current leading model families
+   for code understanding and independently agree on every non-public-
+   knowledge sample/condition, so 2 is sufficient; revisit only if a future
+   publication reviewer specifically asks for a third. What's still open (low
+   priority, no urgency): the *published* research-paper track this internal
+   result would seed (see `docs/LLM_RESISTANCE_BENCHMARK.md`'s Roadmap
+   section), and a larger per-condition sample count if that publication
+   effort ever starts — 5 samples demonstrates the method, it isn't enough
+   for a statistical confidence interval.
 5. ✅ **Discoverability and citation — deployed and verified 2026-07-22.** DOI,
    README/PyPI/Read the Docs citation surfaces are present. ARD metadata is
    CI-validated and live at the Read the Docs well-known URL. PulseMCP exact
@@ -245,10 +252,20 @@
    entries are ingested daily and processed weekly, and directs maintainers to
    `hello@pulsemcp.com` after a week; the maintainer sent that follow-up on
    2026-07-22, so this is now passive monitoring.
-6. **Next feature selection — evidence gate prepared.** The poll copy and
-   [`NEXT_FEATURE_DECISION.md`](NEXT_FEATURE_DECISION.md) define the 14-day /
-   10-vote trigger and decision rubric. Selection deliberately waits for real
-   launch feedback. A Tools / Resources / Prompts separation is recorded in
+6. **⭐ CURRENT OPEN DECISION (since 2026-08-01) — next feature selection.**
+   With P2-18 closed out (item 4) and the launch wave done (item 2), this is
+   the next thing to resolve. The original plan
+   ([`NEXT_FEATURE_DECISION.md`](NEXT_FEATURE_DECISION.md)) gated selection on
+   a GitHub Discussions poll reaching 14 days or 10 votes — but the launch
+   wave's real engagement came back essentially flat (see item 2's
+   checkpoint), so that poll was deliberately not opened, and if it were,
+   it likely would not reach 10 votes on its own. **This gate needs revisiting
+   with the maintainer** rather than assumed still-operative: either open the
+   poll anyway and accept a longer/looser timeline, pick from the
+   already-scanned ROADMAP candidates directly (P2-17 signed provenance
+   manifest and P2-19 `--preset ml` are both flagged low-cost/high-relevance
+   in the 2026-07-07 research scan), or use some other signal. A Tools /
+   Resources / Prompts separation is recorded in
    [`MCP_PRIMITIVES_DESIGN.md`](MCP_PRIMITIVES_DESIGN.md) as a post-launch
    research candidate, not committed scope.
 
