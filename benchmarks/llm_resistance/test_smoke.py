@@ -15,14 +15,18 @@ CLI + pyobfus_pro as a subprocess).
 from __future__ import annotations
 
 import json
+import shutil
 import sys
 from pathlib import Path
+
+import pytest
 
 _HERE = Path(__file__).resolve().parent
 if str(_HERE) not in sys.path:
     sys.path.insert(0, str(_HERE))
 
 import harness  # noqa: E402
+import scorer  # noqa: E402
 from attacker import ClaudeCodeCliAttacker, CodexCliAttacker, StubAttacker  # noqa: E402
 
 
@@ -151,6 +155,22 @@ print(json.dumps(payload))
     assert descriptor["model"] == "test-model"
     assert descriptor["claude_cli"] == "2.1.220 (Claude Code)"
     assert descriptor["tool_access"] == 'none (--allowedTools "")'
+
+
+@pytest.mark.skipif(shutil.which("docker") is None, reason="docker not available")
+def test_docker_executor_can_read_mounted_temp_dir():
+    # Regression guard: tempfile.TemporaryDirectory() defaults to mode 0700,
+    # unreadable by the container's unprivileged --user 65534:65534, which
+    # surfaced as every row silently scoring not-recovered (2026-08-01, first
+    # real end-to-end docker-executor pilot run -- see scorer.py's fix).
+    meta = {"entrypoint": "add_one", "io_vectors": [{"args": [1], "expect": 2}]}
+    result = scorer.score_recovery(
+        "def add_one(x):\n    return x + 1\n",
+        meta,
+        executor="docker",
+        docker_image="python:3.12-alpine",
+    )
+    assert result["recovered"] is True, result["note"]
 
 
 def test_sample_selection_applies_before_limit():

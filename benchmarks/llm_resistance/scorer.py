@@ -148,6 +148,17 @@ def _run_in_docker(
     if not image:
         raise RuntimeError("an explicit --docker-image is required for reproducibility")
 
+    # tempfile.TemporaryDirectory() defaults to mode 0700 (owner-only). The
+    # container runs as the unprivileged --user 65534:65534 below, which
+    # cannot even traverse an 0700 directory it doesn't own, regardless of the
+    # (already world-readable, 0644) file permissions inside it -- surfaces as
+    # a driver "Permission denied" with every row scored not-recovered. The
+    # bind mount is already read-only and network-isolated, so widening this
+    # to world-readable/-traversable does not weaken the sandbox.
+    os.chmod(work, 0o755)
+    for entry in work.iterdir():
+        os.chmod(entry, 0o644)
+
     # Refuse an implicit network pull during a measurement. The operator must
     # pull and inspect the chosen image beforehand, then record that exact tag
     # (preferably a digest) in the run metadata.

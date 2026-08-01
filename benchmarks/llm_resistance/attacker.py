@@ -259,7 +259,13 @@ class ClaudeCodeCliAttacker(Attacker):
             .replace("{ENTRYPOINTS}", _entrypoints_block(entrypoints))
             .replace("{OBFUSCATED}", obfuscated_src)
         )
-        schema = self._schema_path.read_text(encoding="utf-8")
+        # Claude Code's --json-schema validator has no network access to
+        # resolve a live $schema URI and rejects the field outright ("no
+        # schema with key or ref ..."); the shared schema file carries one
+        # for standalone JSON Schema tooling, so strip it for this adapter.
+        schema_obj = json.loads(self._schema_path.read_text(encoding="utf-8"))
+        schema_obj.pop("$schema", None)
+        schema = json.dumps(schema_obj)
         env = os.environ.copy()
         # Subscription authentication is the point of this adapter. Never let
         # a developer shell's API key silently turn the measurement into a
