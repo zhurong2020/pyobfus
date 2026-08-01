@@ -4,7 +4,7 @@
 
 **Use as cold-start cheat sheet** when resuming work after a session break. This doc supersedes ad-hoc TODO scattered in chat; future Claude sessions should read this first.
 
-> **Current executable handoff (2026-07-22):** use the prioritized list below.
+> **Current executable handoff (2026-08-01):** use the prioritized list below.
 > [`RESUME_PLAN_2026-07-19.md`](RESUME_PLAN_2026-07-19.md) is a frozen record of
 > the 0.5.4 release session; its unchecked boxes are not current work.
 >
