@@ -32,19 +32,22 @@ votes, named third-party uses, and repeated feature requests.
 3. ✅ Added `reddit-python.md` to the current r/Python monthly showcase thread
    on 2026-07-23, ahead of Show HN because of an HN 429; no AutoModerator
    removal. See publication record below.
-4. Publish the CN long-form to arong.eu.org, which already carries two prior
-   pyobfus posts (2025-12-27, 2026-05-21) — frame as a third, update-style
-   post, not a fresh pitch. **Canonical draft is
-   `findata/content/drafts/pyobfus-six-mechanisms-now-public.md`** (a separate
-   repo's publish-ready format: WordPress frontmatter, SEO fields, multi-channel
-   distribution copy for wechat/x/discord/wecom; leads with the patent-unlock
-   story and includes the JOSS-rejection/Zenodo-DOI narrative). This repo's own
-   `cn.md` 长文版 is a superseded parallel draft — see the note at its top; do
-   not use it as the publish source. V2EX is blocked as of 2026-07-23: the
-   maintainer's new Google-registered account needs an invite code or a
-   ≥10,000 $V2EX Solana holding to activate, neither of which is worth chasing
-   for one post; deferred until an invite code turns up normally. If
-   unblocked, target the `开源软件` node specifically, not `分享创造`.
+4. ✅ **Published the CN long-form to arong.eu.org on 2026-08-01** —
+   <https://www.arong.eu.org/pyobfus-six-mechanisms-now-public/> (WP #1706,
+   开源应用 category, source
+   `findata/content/drafts/pyobfus-six-mechanisms-now-public.md`, run via
+   `publish.py` full pipeline in one shot; Discord notified). Leads with the
+   patent-unlock story (CN 202610712171X passed preliminary examination
+   2026-06-17) and includes the JOSS-rejection/Zenodo-DOI narrative — the
+   third post in the series, after the two prior pyobfus posts (2025-12-27,
+   2026-05-21). WeChat deliberately skipped this time (maintainer judged the
+   content too technical for that channel); this repo's own `cn.md` 长文版
+   stayed superseded/reference-only, not used as the publish source. V2EX is
+   blocked as of 2026-07-23: the maintainer's new Google-registered account
+   needs an invite code or a ≥10,000 $V2EX Solana holding to activate,
+   neither of which is worth chasing for one post; deferred until an invite
+   code turns up normally. If unblocked, target the `开源软件` node
+   specifically, not `分享创造`.
 5. Open `github-poll.md` as a GitHub Discussions poll after traffic begins.
 
 Never ask friends to upvote, coordinate engagement, or cross-post the same text
@@ -115,3 +118,24 @@ No credential is stored in this repository.
   under "Baseline before publication". Maintainer stays available to reply to
   incoming comments; no vote solicitation, no simultaneous cross-posting of
   the same text.
+
+### CN long-form (arong.eu.org) — 2026-08-01
+
+- Public URL: <https://www.arong.eu.org/pyobfus-six-mechanisms-now-public/>
+  (WP #1706, 开源应用 category)
+- Source: `findata/content/drafts/pyobfus-six-mechanisms-now-public.md` (a
+  separate private repo's publish-ready format — WordPress frontmatter, SEO
+  fields, multi-channel distribution copy). This repo's own `cn.md` 长文版
+  was a superseded parallel draft; the patent-application-number detail it
+  had was merged into the findata draft, then this repo's copy was marked
+  reference-only.
+- Published via `publish.py`'s full pipeline in one run (validate → images →
+  html → post → distribution texts → wechat guide → discord), not split into
+  separate steps — avoids the known html/post-desync failure mode from a
+  prior incident. Verified live content byte length via the WP REST API
+  after publishing (6,915 bytes), not just a 200 status.
+- Discord notification sent (message id `1533108678155178078`).
+- WeChat deliberately skipped: the maintainer judged this piece too
+  technical for that channel. Recorded as an intentional skip, not a gap.
+- English version, X/LinkedIn/Weibo/Zhihu distribution: not configured for
+  this piece (frontmatter doesn't set them).
