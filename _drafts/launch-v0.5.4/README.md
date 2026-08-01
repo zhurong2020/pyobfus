@@ -32,13 +32,19 @@ votes, named third-party uses, and repeated feature requests.
 3. ✅ Added `reddit-python.md` to the current r/Python monthly showcase thread
    on 2026-07-23, ahead of Show HN because of an HN 429; no AutoModerator
    removal. See publication record below.
-4. Publish `cn.md`'s 长文版 to arong.eu.org, which already carries two prior
+4. Publish the CN long-form to arong.eu.org, which already carries two prior
    pyobfus posts (2025-12-27, 2026-05-21) — frame as a third, update-style
-   post, not a fresh pitch. V2EX is blocked as of 2026-07-23: the maintainer's
-   new Google-registered account needs an invite code or a ≥10,000 $V2EX
-   Solana holding to activate, neither of which is worth chasing for one post;
-   deferred until an invite code turns up normally. If unblocked, target the
-   `开源软件` node specifically, not `分享创造`.
+   post, not a fresh pitch. **Canonical draft is
+   `findata/content/drafts/pyobfus-six-mechanisms-now-public.md`** (a separate
+   repo's publish-ready format: WordPress frontmatter, SEO fields, multi-channel
+   distribution copy for wechat/x/discord/wecom; leads with the patent-unlock
+   story and includes the JOSS-rejection/Zenodo-DOI narrative). This repo's own
+   `cn.md` 长文版 is a superseded parallel draft — see the note at its top; do
+   not use it as the publish source. V2EX is blocked as of 2026-07-23: the
+   maintainer's new Google-registered account needs an invite code or a
+   ≥10,000 $V2EX Solana holding to activate, neither of which is worth chasing
+   for one post; deferred until an invite code turns up normally. If
+   unblocked, target the `开源软件` node specifically, not `分享创造`.
 5. Open `github-poll.md` as a GitHub Discussions poll after traffic begins.
 
 Never ask friends to upvote, coordinate engagement, or cross-post the same text

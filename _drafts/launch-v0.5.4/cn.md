@@ -2,6 +2,13 @@
 
 ## 长文版
 
+> **⚠️ 2026-08-01: superseded.** The actual publish-ready long-form draft is
+> `findata/content/drafts/pyobfus-six-mechanisms-now-public.md` (a separate
+> repo, WordPress frontmatter + distribution copy, patent-focused, already
+> merged with the application-number detail from this draft). This section
+> is kept for reference only; do not publish from here. The V2EX short
+> version below is unaffected (no equivalent exists in findata).
+
 ### 专利申请过了初审，pyobfus 把压着的 6 个机制全部公开了
 
 这是 pyobfus 系列的第三篇（前两篇：《别让你的 Python 代码"裸奔"了》
