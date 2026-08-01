@@ -40,6 +40,8 @@ CAT_NAME_STRING = "name_string_reference"
 CAT_ALL_EXPORT = "all_export"
 CAT_FRAMEWORK = "framework_reflection"
 CAT_ENTRY_POINT = "entry_point"
+CAT_UNSAFE_DESERIALIZATION = "unsafe_deserialization"
+CAT_MODEL_ARTIFACT_LITERAL = "model_artifact_literal"
 
 
 @dataclass
@@ -80,6 +82,13 @@ class PreflightReport:
     suggested_preset: Optional[str] = None
     suggested_excludes: List[str] = field(default_factory=list)
     ai_hint: str = ""
+    # Internal bookkeeping only -- not part of the public to_dict() contract.
+    # Several _FRAMEWORK_SIGNATURES entries can share one display name (e.g.
+    # torch/tensorflow/keras/transformers/sklearn/joblib all map to "ml"), so
+    # `frameworks` dedupes by display name and loses which specific module(s)
+    # actually triggered detection. Track the raw signature keys here so
+    # _finalize can recover the correct per-module exclude glob(s).
+    _preset_signature_keys: Dict[str, Set[str]] = field(default_factory=dict, repr=False)
 
     # ---- summaries ---------------------------------------------------
 
@@ -144,7 +153,27 @@ _FRAMEWORK_SIGNATURES: Dict[str, Tuple[str, str, str]] = {
     "pydantic": ("Pydantic", "pydantic", "**/models/**"),
     "click": ("Click CLI", "click", ""),
     "sqlalchemy": ("SQLAlchemy", "sqlalchemy", "**/models/**"),
+    "torch": ("ML/model-serving", "ml", "**/checkpoints/**"),
+    "tensorflow": ("ML/model-serving", "ml", "**/models/**"),
+    "keras": ("ML/model-serving", "ml", "**/models/**"),
+    "transformers": ("ML/model-serving", "ml", "**/models/**"),
+    "sklearn": ("ML/model-serving", "ml", "**/models/**"),
+    "joblib": ("ML/model-serving", "ml", "**/models/**"),
 }
+
+_MODEL_ARTIFACT_SUFFIXES = (
+    ".pt",
+    ".pth",
+    ".pkl",
+    ".pickle",
+    ".joblib",
+    ".onnx",
+    ".safetensors",
+    ".h5",
+    ".keras",
+    ".ckpt",
+    ".bin",
+)
 
 
 class _RiskVisitor(ast.NodeVisitor):
@@ -258,6 +287,12 @@ class _RiskVisitor(ast.NodeVisitor):
                 f"{name}() — runtime introspection exposes obfuscated names.",
                 "Review output carefully; obfuscated names will leak through.",
             )
+        elif name == "load" and self._imported("pickle"):
+            self._add_unsafe_deserialization(node, "pickle.load()")
+        elif name == "loads" and self._imported("pickle"):
+            self._add_unsafe_deserialization(node, "pickle.loads()")
+        elif name == "load" and self._imported("joblib"):
+            self._add_unsafe_deserialization(node, "joblib.load()")
 
     def _check_attr_call(self, func: ast.Attribute, node: ast.Call) -> None:
         # importlib.import_module, importlib.__import__
@@ -279,6 +314,32 @@ class _RiskVisitor(ast.NodeVisitor):
                 f"inspect.{func.attr}() — runtime reflection.",
                 "Review if the reflected names need preservation.",
             )
+        if isinstance(func.value, ast.Name):
+            owner = func.value.id
+            if owner == "pickle" and func.attr in {"load", "loads"}:
+                self._add_unsafe_deserialization(node, f"pickle.{func.attr}()")
+            elif owner == "joblib" and func.attr == "load":
+                self._add_unsafe_deserialization(node, "joblib.load()")
+            elif (
+                owner == "torch"
+                and func.attr == "load"
+                and not _has_true_keyword(node, "weights_only")
+            ):
+                self._add_unsafe_deserialization(node, "torch.load() without weights_only=True")
+            elif owner in {"tensorflow", "keras"} and func.attr == "load_model":
+                self._add_unsafe_deserialization(node, f"{owner}.load_model()")
+
+    def visit_Constant(self, node: ast.Constant) -> None:
+        if isinstance(node.value, str) and _looks_like_model_artifact(node.value):
+            self._add(
+                CAT_MODEL_ARTIFACT_LITERAL,
+                SEVERITY_LOW,
+                node,
+                "Model artifact path literal detected.",
+                "For Pro builds, wrap model/weight paths with vault_secrets({...}) "
+                "and enable --vault so paths route through the Runtime String Vault.",
+            )
+        self.generic_visit(node)
 
     # ---- name-string references ----------------------------------------
 
@@ -313,6 +374,19 @@ class _RiskVisitor(ast.NodeVisitor):
             )
         )
 
+    def _add_unsafe_deserialization(self, node: ast.Call, call_name: str) -> None:
+        self._add(
+            CAT_UNSAFE_DESERIALIZATION,
+            SEVERITY_HIGH,
+            node,
+            f"{call_name} can execute code when loading untrusted model artifacts.",
+            "Prefer safetensors or ONNX where possible; for torch.load use "
+            "weights_only=True and validate artifact provenance before loading.",
+        )
+
+    def _imported(self, module: str) -> bool:
+        return module in self.imports
+
 
 def _is_main_guard(test: ast.expr) -> bool:
     """Detect `__name__ == "__main__"` in any argument order."""
@@ -340,6 +414,20 @@ def _first_arg_is_constant_string(node: ast.Call) -> bool:
         return False
     arg = node.args[1]
     return isinstance(arg, ast.Constant) and isinstance(arg.value, str)
+
+
+def _has_true_keyword(node: ast.Call, keyword_name: str) -> bool:
+    for kw in node.keywords:
+        if kw.arg == keyword_name and isinstance(kw.value, ast.Constant) and kw.value.value is True:
+            return True
+    return False
+
+
+def _looks_like_model_artifact(value: str) -> bool:
+    lowered = value.lower()
+    return lowered.endswith(_MODEL_ARTIFACT_SUFFIXES) or any(
+        part in lowered for part in ("/models/", "/checkpoints/", "\\models\\", "\\checkpoints\\")
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -392,10 +480,12 @@ class PreflightChecker:
 
         # Fold framework detection into the aggregate report.
         for mod in visitor.imports:
-            sig = _FRAMEWORK_SIGNATURES.get(mod.lower())
+            mod_key = mod.lower()
+            sig = _FRAMEWORK_SIGNATURES.get(mod_key)
             if not sig:
                 continue
-            name, _preset, _exclude = sig
+            name, preset, _exclude = sig
+            report._preset_signature_keys.setdefault(preset, set()).add(mod_key)
             existing = next((f for f in report.frameworks if f.name == name), None)
             if existing:
                 if str(file_path) not in existing.files:
@@ -409,15 +499,34 @@ class PreflightChecker:
 
     def _finalize(self, report: PreflightReport) -> None:
         # Framework-driven preset suggestion (first detected wins, highest priority first)
-        priority = ["fastapi", "django", "flask", "pydantic", "click", "sqlalchemy"]
+        priority = ["fastapi", "django", "flask", "pydantic", "click", "sqlalchemy", "ml"]
         # Map framework display name -> preset key via _FRAMEWORK_SIGNATURES
-        # ("FastAPI" -> "fastapi", "Click CLI" -> "click", ...)
+        # ("FastAPI" -> "fastapi", "Click CLI" -> "click", ...). Several
+        # signature entries can share one display name (all six ML libraries
+        # map to "ML/model-serving"), so `frameworks` (deduped by display
+        # name) only tells us the preset, not which module(s) actually
+        # triggered it — read that back from report._preset_signature_keys
+        # (populated per-module during scanning) instead of matching the
+        # first _FRAMEWORK_SIGNATURES entry with the same display name, which
+        # would always resolve to whichever entry happens to be inserted
+        # first regardless of what was really imported.
         framework_keys: Dict[str, FrameworkHit] = {}
+        framework_excludes: Dict[str, List[str]] = {}
         for fw in report.frameworks:
-            for key, (name, _p, _e) in _FRAMEWORK_SIGNATURES.items():
+            for name, preset, _e in _FRAMEWORK_SIGNATURES.values():
                 if fw.name == name:
-                    framework_keys[key] = fw
+                    framework_keys[preset] = fw
                     break
+        for preset, mod_keys in report._preset_signature_keys.items():
+            globs = sorted(
+                {
+                    _FRAMEWORK_SIGNATURES[mod_key][2]
+                    for mod_key in mod_keys
+                    if _FRAMEWORK_SIGNATURES[mod_key][2]
+                }
+            )
+            if globs:
+                framework_excludes[preset] = globs
 
         for key in priority:
             if key in framework_keys:
@@ -427,10 +536,10 @@ class PreflightChecker:
         # Suggested excludes based on detected frameworks
         seen_excludes: Set[str] = set()
         for key in framework_keys:
-            _name, _preset, exclude_glob = _FRAMEWORK_SIGNATURES[key]
-            if exclude_glob and exclude_glob not in seen_excludes:
-                report.suggested_excludes.append(exclude_glob)
-                seen_excludes.add(exclude_glob)
+            for exclude_glob in framework_excludes.get(key, []):
+                if exclude_glob not in seen_excludes:
+                    report.suggested_excludes.append(exclude_glob)
+                    seen_excludes.add(exclude_glob)
 
         # AI hint: the single next command the user (or an AI agent) should run.
         counts = report.severity_counts()
@@ -451,8 +560,7 @@ class PreflightChecker:
             )
         elif report.suggested_preset:
             report.ai_hint = (
-                f"Low risk. Run: "
-                f"pyobfus {report.root} -o dist/ --preset {report.suggested_preset}"
+                f"Low risk. Run: pyobfus {report.root} -o dist/ --preset {report.suggested_preset}"
             )
         else:
             report.ai_hint = f"Low risk. Run: pyobfus {report.root} -o dist/ --preset balanced"

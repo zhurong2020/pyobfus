@@ -242,6 +242,7 @@ except ImportError:
             "pydantic",
             "click",
             "sqlalchemy",
+            "ml",
             # Pro
             "trial",
             "commercial",
@@ -251,7 +252,7 @@ except ImportError:
         case_sensitive=False,
     ),
     help="Use a preset configuration. Community: safe/balanced/aggressive. "
-    "Framework-aware: fastapi/django/flask/pydantic/click/sqlalchemy. "
+    "Framework-aware: fastapi/django/flask/pydantic/click/sqlalchemy/ml. "
     "Pro: trial/commercial/library/maximum.",
 )
 @click.option(
@@ -1580,6 +1581,11 @@ def _handle_list_presets() -> None:
     click.echo("    Preserves ORM columns, relationships, session API")
     click.echo("    Auto-excludes alembic/, migrations/")
     click.echo("    Usage: pyobfus src/ -o dist/ --preset sqlalchemy")
+
+    click.echo("\n  ml")
+    click.echo("    Preserves model-serving wrapper APIs and model artifact paths")
+    click.echo("    Auto-excludes models/, checkpoints/, common weight files")
+    click.echo("    Usage: pyobfus src/ -o dist/ --preset ml")
 
     click.echo("\n  PRO PRESETS (Requires Pro license or trial)")
     click.echo("  " + "-" * 30)

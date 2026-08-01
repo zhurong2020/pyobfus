@@ -598,6 +598,57 @@ class ObfuscationConfig:
         return config
 
     @classmethod
+    def preset_ml(cls) -> "ObfuscationConfig":
+        """ML/model-serving preset: protects inference wrappers safely.
+
+        - Based on preset_safe (docstrings preserved)
+        - preserve_param_names=True, matching every other framework preset's
+          convention for serving frameworks/tensor adapters that call
+          wrappers by keyword. NOTE: as of this writing, preserve_param_names
+          does not actually preserve parameter identifiers end-to-end through
+          the CLI for ANY preset that sets it (tracked in issue #25,
+          reproduced against --preset fastapi too — it is a pre-existing,
+          cross-preset gap, not specific to this preset). Once #25 is fixed
+          this flag will start doing what its name says; left set here for
+          forward-compatibility and consistency with the other presets, not
+          because it currently delivers on that promise.
+        - exclude_names covers only method names external code dispatches by
+          exact string (sklearn's `predict`/`fit`/`transform`, PyTorch's
+          `forward` via `nn.Module.__call__`, HuggingFace's `generate`/
+          tokenizer `encode`) — generic variable-name words like `model` or
+          `pipeline` are deliberately NOT blanket-excluded here, since
+          exclude_names matches that exact identifier anywhere in the whole
+          codebase, not just inside a wrapper's parameter list, and doing so
+          would leave unrelated business logic needlessly readable too
+        - Excludes model artifact directories that should not be rewritten
+
+        Runtime String Vault routing for model paths remains an opt-in Pro
+        source marker (`vault_secrets({...})`); preflight surfaces guidance for
+        unsafe model deserialization and artifact literals.
+        """
+        config = cls.preset_safe()
+        config.preserve_param_names = True
+        config.exclude_names = config.exclude_names | {
+            "predict",
+            "predict_proba",
+            "fit",
+            "transform",
+            "forward",
+            "generate",
+            "encode",
+        }
+        config.exclude_patterns = list(config.exclude_patterns) + [
+            "**/models/**",
+            "**/checkpoints/**",
+            "**/weights/**",
+            "**/*.pt",
+            "**/*.pth",
+            "**/*.onnx",
+            "**/*.safetensors",
+        ]
+        return config
+
+    @classmethod
     def get_preset(cls, name: str) -> "ObfuscationConfig":
         """
         Get a preset configuration by name.
@@ -605,7 +656,7 @@ class ObfuscationConfig:
         Args:
             name: Preset name. Available:
                 - Community: safe, balanced, aggressive
-                - Framework: fastapi, django, flask, pydantic, click, sqlalchemy
+                - Framework: fastapi, django, flask, pydantic, click, sqlalchemy, ml
                 - Pro: trial, commercial, library, maximum
 
         Returns:
@@ -626,6 +677,7 @@ class ObfuscationConfig:
             "pydantic": cls.preset_pydantic,
             "click": cls.preset_click,
             "sqlalchemy": cls.preset_sqlalchemy,
+            "ml": cls.preset_ml,
             # Pro
             "trial": cls.preset_trial,
             "commercial": cls.preset_commercial,
@@ -660,6 +712,7 @@ class ObfuscationConfig:
             "pydantic",
             "click",
             "sqlalchemy",
+            "ml",
             # Pro
             "trial",
             "commercial",
@@ -668,7 +721,9 @@ class ObfuscationConfig:
         ]
 
     # Framework presets are community-tier (no Pro license required)
-    FRAMEWORK_PRESETS = frozenset({"fastapi", "django", "flask", "pydantic", "click", "sqlalchemy"})
+    FRAMEWORK_PRESETS = frozenset(
+        {"fastapi", "django", "flask", "pydantic", "click", "sqlalchemy", "ml"}
+    )
 
     def add_exclude_pattern(self, pattern: str) -> None:
         """Add a file pattern to exclude."""

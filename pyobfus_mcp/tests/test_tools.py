@@ -207,7 +207,7 @@ def test_list_presets_groups_correctly() -> None:
     for p in ("safe", "balanced", "aggressive"):
         assert p in result["community"]
     # Framework
-    for p in ("fastapi", "django", "flask", "pydantic", "click", "sqlalchemy"):
+    for p in ("fastapi", "django", "flask", "pydantic", "click", "sqlalchemy", "ml"):
         assert p in result["framework"]
     # Pro
     for p in ("trial", "commercial", "library", "maximum"):
@@ -296,13 +296,13 @@ def test_build_server_attaches_meta_to_each_tool() -> None:
         # mcp SDK exposes the meta dict via `.meta` on the Tool object.
         meta = getattr(tool, "meta", None)
         assert meta is not None, f"{tool.name} has no meta dict"
-        assert (
-            meta.get("version") == "1"
-        ), f"{tool.name} meta.version={meta.get('version')!r}, expected '1'"
+        assert meta.get("version") == "1", (
+            f"{tool.name} meta.version={meta.get('version')!r}, expected '1'"
+        )
         expected_tier = "pro_funnel" if tool.name in expected_pro_funnel else "community"
-        assert (
-            meta.get("tier") == expected_tier
-        ), f"{tool.name} meta.tier={meta.get('tier')!r}, expected {expected_tier!r}"
+        assert meta.get("tier") == expected_tier, (
+            f"{tool.name} meta.tier={meta.get('tier')!r}, expected {expected_tier!r}"
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -326,9 +326,9 @@ def test_check_obfuscation_risks_no_pro_value_on_clean_project(tmp_path: Path) -
     _write(tmp_path, "a.py", "def greet(name): return f'hi {name}'\n")
     result = check_obfuscation_risks(str(tmp_path))
     assert result["status"] == "success"
-    assert (
-        "pro_value" not in result
-    ), f"clean project should not get pro_value; got {result.get('pro_value')!r}"
+    assert "pro_value" not in result, (
+        f"clean project should not get pro_value; got {result.get('pro_value')!r}"
+    )
 
 
 def test_check_obfuscation_risks_pro_value_on_sensitive_literals(

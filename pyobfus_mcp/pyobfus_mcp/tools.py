@@ -478,7 +478,7 @@ def list_presets() -> Dict[str, Any]:
         "ai_hint": (
             "Framework presets are free and the recommended starting point "
             "when your project imports fastapi/django/flask/pydantic/click/"
-            "sqlalchemy. Fall back to 'balanced' otherwise."
+            "sqlalchemy or ML/model-serving libraries. Fall back to 'balanced' otherwise."
         ),
         "next_tool": _next_tool("explain_preset", "inspect a specific preset before applying it"),
     }
