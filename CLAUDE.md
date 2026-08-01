@@ -12,9 +12,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 该文档顶部是活的「Current prioritized TODO」（随每次发布/里程碑刷新日期），下方是冻结的历史执行记录——**只读顶部，别被下面的历史小节带偏**。
 
-### 🟢 2026-07-22 active state — pyobfus 0.5.4 已发布，launch wave 进行中
+### 🟢 2026-08-01 active state — pyobfus 0.5.4 已发布，Show HN 已提交
 
-**当前状态**：发明专利初审合格（2026-06-17）→ v0.5.0→0.5.1→0.5.2→0.5.3（PyPI 2026-06~07-07）→ **0.5.4 已发布（2026-07-19，PR #19 vault-key 设备绑定）**→ **issue #22 mypy gate 已关闭（2026-07-22，PR #23）**。dev.to launch 文章已发布（2026-07-22），HN 账号 `znhskzj` 正在做发帖前的正常社区参与（已与另一 Show HN 作者有一次真实双向交流），自己的 Show HN 尚未提交。mcp 仍 0.3.1（工具面无变化，dep `>=0.5.1` 自动解析到当前版本）。
+**当前状态**：发明专利初审合格（2026-06-17）→ v0.5.0→0.5.1→0.5.2→0.5.3（PyPI 2026-06~07-07）→ **0.5.4 已发布（2026-07-19，PR #19 vault-key 设备绑定）**→ **issue #22 mypy gate 已关闭（2026-07-22，PR #23）**。dev.to launch 文章已发布（2026-07-22），r/Python showcase 评论已发（2026-07-23）→ **Show HN 已提交（2026-08-01）**：<https://news.ycombinator.com/item?id=49130416>（标题 "Show HN: I built a Python obfuscator that keeps production traces debuggable"，链接指向 GitHub repo 非 dev.to；首条评论由维护者自己撰写，说明 `I0`/`I1` mangled name 对人和 AI 工具都不可读的问题 + `--save-mapping`/`--unmap` 本地 reverse-mapping 的解法；提交后 ~21 分钟基线 1 point / 1 comment）。记录见 `_drafts/launch-v0.5.4/README.md`。mcp 仍 0.3.1（工具面无变化，dep `>=0.5.1` 自动解析到当前版本）。
 
 - ✅ 已提交并受理（申请号 `202610712171X` · 申请日/优先权日 2026-05-22 · 17 项权利要求）
 - ✅ 费用全部缴清（共 1610 元 · 2026-05-22 一次缴清 · 含申请费类 1235 与实审费 375 · 官方审查信息查询「费足」核实）
@@ -30,9 +30,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - ✅ **AI-agent 可发现性 Wave A（2026-06-22）**：Smithery 经 **Skill 渠道** `zhurong2020/pyobfus-protect`（Smithery MCP 发布是远程网关、本地工具走不通,Skill 才对）+ mcp.so + `uvx` 零安装 + server.json 99 字描述(commit `826c576`/`49f4df3`)。报告:`docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`。
 - ❌ **JOSS 投稿被拒(2026-06-24)**:v0.5.1 投 JOSS(issue `openjournals/joss-reviews#10788`)被总编 desk-reject,理由=**scope/significance 非质量**("private-dev-then-public" + 无第三方复用)。→ 改走免费路径:✅ **Zenodo DOI `10.5281/zenodo.20846053`(concept)已拿到**,已接进 CITATION.cff + README 徽章 + `## Citation` + 两个 pyproject + RTD + ORCID + arong.eu.org/academic。完整记录+渠道对比见 `docs/JOSS_REJECTION_20260624.md`。
 - ✅ **P2-18 首个真实(非 stub)pilot 已跑完（2026-08-01）**：Codex CLI/`gpt-5.6-sol`,luhn+billing_auth 两样本 × C0-C5 全条件。过程中发现并当场修复一个语料库方法论 bug——`luhn`/`caesar`/`roman` 是公开知名算法,攻击者靠训练常识就能还原,不代表混淆被攻破;`luhn` 对 `--string-encryption`(C2)是 byte-for-byte no-op(没有字符串字面量),曾把 C2 的统计悄悄稀释成假 50%。修复:`conditions.py` 加 `builds_on`,`harness.py` 在花真实调用前先比对上一级产物哈希,相同则记 `skip_reason: noop` 跳过;corpus 加 `public_knowledge` 标记,`report.md` 自动列警示。真实信号:C0/C1 两样本全被还原(符合预期,Core 层从不宣称防 LLM);`billing_auth`(自定义、非公开逻辑)在 C2/C3/C5 全部扛住。离可发布的公开结果还差:扩大语料库(`caesar`/`price_rules`/`roman` 尚未跑)+ 换一个非公开知识的 C4 目标(`price_rules` 现成可用)+ 第二个模型家族(卡在不想用 Anthropic API 账号,政策性非技术性)。详见 `docs/POST_V0.4_TODO.md` § P2-18。
-- ⏭️ **更后续**（当前最大杠杆 = launch wave；完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:① **launch wave 进行中**——dev.to + r/Python showcase 已发,HN 因站方 429 限流暂卡(已起草回复待发),之后自己的 Show HN → CN(有心工坊长文已写好待审,V2EX 因新号需邀请码/Solana 暂缓,知乎待定)→ GitHub 反馈投票 ② P2-18 benchmark 继续扩语料库/模型家族(见上一条)③ 下一个新功能选型故意等 launch 真实反馈(14天/10票门槛,`NEXT_FEATURE_DECISION.md`)④ IP 商业化迁移(个人→旎嵘科技)。
+- ⏭️ **更后续**（当前最大杠杆 = launch wave；完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:① **launch wave 进行中**——dev.to + r/Python showcase + Show HN 均已发(Show HN 2026-08-01,见上)→ 接下来盯 Show HN 评论区/回复 → CN(有心工坊长文已写好待审,V2EX 因新号需邀请码/Solana 暂缓,知乎待定)→ GitHub 反馈投票 ② P2-18 benchmark 继续扩语料库/模型家族(见上一条)③ 下一个新功能选型故意等 launch 真实反馈(14天/10票门槛,`NEXT_FEATURE_DECISION.md`)④ IP 商业化迁移(个人→旎嵘科技)。
 
-**Cold-start session 第一句话应问 user**：「0.5.4 + mcp 0.3.1 已发布、issue #22 mypy gate 已关、P2-18 首个真实 pilot 已跑完(过程中修了一个语料库方法论 bug,细节见 POST_V0.4_TODO.md)。launch wave 进行中——dev.to 已发,r/Python showcase 评论已发(2026-07-23,未被 AutoMod 拦),HN 因 429 限流卡住(应已自行解除,待发已起草的回复+自己的 Show HN),CN 稿(有心工坊"系列第三篇")已写好在 findata `content/drafts/pyobfus-six-mechanisms-now-public.md` 等审——继续跟进 launch、扩 P2-18 benchmark 语料库,还是推进 IP 商业化迁移(个人→旎嵘科技)?」
+**Cold-start session 第一句话应问 user**：「0.5.4 + mcp 0.3.1 已发布、issue #22 mypy gate 已关、P2-18 首个真实 pilot 已跑完(过程中修了一个语料库方法论 bug,细节见 POST_V0.4_TODO.md)。launch wave 推进到 Show HN——dev.to 已发,r/Python showcase 评论已发(2026-07-23,未被 AutoMod 拦),**Show HN 已提交(2026-08-01)**(见上,待观察评论区反馈),CN 稿(有心工坊"系列第三篇")已写好在 findata `content/drafts/pyobfus-six-mechanisms-now-public.md` 等审——继续跟进 launch(CN 稿发布/盯 HN 评论)、扩 P2-18 benchmark 语料库,还是推进 IP 商业化迁移(个人→旎嵘科技)?」
 
 **Cold-start 资料定位**（按读取优先级）：
 

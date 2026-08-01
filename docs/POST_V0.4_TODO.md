@@ -22,7 +22,8 @@
 1. ✅ **Documentation truth sweep — completed 2026-07-20.** Active surfaces use
    the real `pyobfus SRC -o OUT --level pro --<flag>` syntax; 0.5.4 and the
    release-CI baseline are current; old release checklists are marked frozen.
-2. **Launch wave — DEV published 2026-07-22; r/Python posted 2026-07-23.** The
+2. **Launch wave — DEV published 2026-07-22; r/Python posted 2026-07-23; Show
+   HN submitted 2026-08-01.** The
    canonical article is live at
    <https://dev.to/zhurong2020/i-built-a-python-obfuscator-that-keeps-production-traces-debuggable-1mp8>.
    The HN account and submission form are functional, and the maintainer posted
@@ -39,11 +40,29 @@
    thread recycles monthly, so the URL will not be valid for a future post.
    The maintainer's Reddit account (`u/No_Emphasis8994`, 2-year account age,
    0 prior karma/contributions before this comment) posted successfully via
-   the direct route without a pre-warm-up period. Next: post the drafted HN
-   reply once the 429 clears, continue normal HN participation before the
-   maintainer authors the Show HN submission, watch the r/Python comment for
-   real replies, then Chinese channels → GitHub feedback poll; record
-   +24h/+7d/+30d metrics. AI-generated or AI-edited HN text is prohibited.
+   the direct route without a pre-warm-up period.
+
+   **✅ Show HN — submitted 2026-08-01.** The 429 cleared on its own; the
+   maintainer independently wrote and submitted
+   <https://news.ycombinator.com/item?id=49130416> ("Show HN: I built a Python
+   obfuscator that keeps production traces debuggable", 76 chars, linking to
+   the GitHub repo rather than the DEV article). Left the submission `text`
+   field blank and posted the explanation as the first top-level comment
+   instead — states the mangled-identifier readability problem for both
+   developers reading a production traceback and AI coding tools (Claude
+   Code/Cursor), then the `--save-mapping` / `--unmap` local reverse-mapping
+   mechanism that keeps debugging local while production stays obfuscated.
+   Independently written by the maintainer, no AI drafting/editing. Baseline
+   ~21 minutes after submission: 1 point, 1 comment (the maintainer's own).
+   Full record in `_drafts/launch-v0.5.4/README.md`. The maintainer's earlier
+   drafted reply to the MCP Show HN thread (`item?id=49001279`) may still be
+   unposted — not confirmed either way this session, check before assuming.
+
+   Next: watch the Show HN thread and reply to incoming comments (own words,
+   no vote solicitation), watch the r/Python comment for real replies, then
+   Chinese channels → GitHub feedback poll; record +24h/+7d/+30d metrics on
+   both Show HN and the overall launch. AI-generated or AI-edited HN text is
+   prohibited.
    **Chinese channel status (2026-07-23)**: `cn.md`'s 长文版 and V2EX 短版 were
    de-AI'd (self-evaluative framing removed, one "不是A而是B" contrastive
    rewritten). The 长文版 destination, arong.eu.org (brand header currently

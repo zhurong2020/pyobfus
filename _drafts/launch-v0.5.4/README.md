@@ -28,9 +28,7 @@ votes, named third-party uses, and repeated feature requests.
 1. ✅ Published `devto.md` as the canonical long-form explanation on
    2026-07-22 at
    <https://dev.to/zhurong2020/i-built-a-python-obfuscator-that-keeps-production-traces-debuggable-1mp8>.
-2. After normal HN participation, the maintainer independently writes and
-   submits the Show HN on a weekday and remains available for the first 90
-   minutes. There is no account-age, karma, or elapsed-time target to optimize.
+2. ✅ Submitted the Show HN on 2026-08-01. See publication record below.
 3. ✅ Added `reddit-python.md` to the current r/Python monthly showcase thread
    on 2026-07-23, ahead of Show HN because of an HN 429; no AutoModerator
    removal. See publication record below.
@@ -84,3 +82,22 @@ No credential is stored in this repository.
   AI-edited text.
 - Never copy HN `auth=` query parameters, account email, or other session data
   into this repository.
+
+### Show HN — 2026-08-01
+
+- Submitted title: "Show HN: I built a Python obfuscator that keeps
+  production traces debuggable" (76 chars, under the 80-char HN title limit),
+  linking to <https://github.com/zhurong2020/pyobfus> (not the DEV article).
+- Public URL: <https://news.ycombinator.com/item?id=49130416>
+- The maintainer left the submission `text` field blank and posted the
+  explanation as the first top-level comment instead — states the mangled-name
+  readability problem (both for the developer reading a production traceback
+  and for AI coding tools like Claude Code/Cursor), then the `--save-mapping`
+  / `--unmap` reverse-mapping mechanism that keeps debuggability local while
+  production stays obfuscated. Independently written by the maintainer.
+- Immediate baseline (~21 minutes after submission): 1 point, 1 comment (the
+  maintainer's own).
+- Next measurements: +24 hours, +7 days, and +30 days using the fields listed
+  under "Baseline before publication". Maintainer stays available to reply to
+  incoming comments for the first ~90 minutes; no vote solicitation, no
+  simultaneous cross-posting of the same text.
