@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.5] - 2026-08-02
+
+**Feature release.** Two new capabilities implemented by Codex CLI and
+reviewed/finished by Claude Code, plus one honesty fix and one new bug report
+surfaced along the way. `pyobfus-mcp` is unchanged at 0.3.1 (no tool-surface
+change), so no Glama Build-steps re-pin is needed for this release.
+
 ### Added
 
 - **`--preset ml`** — community-tier model-serving preset for inference
