@@ -87,6 +87,7 @@ def _extract_config_fields(config: object) -> Dict:
         "strip_ai_artifacts",
         "preserve_param_names",
         "string_encryption",
+        "import_obfuscation",
         "anti_debug",
         "control_flow_flattening",
         "dead_code_injection",

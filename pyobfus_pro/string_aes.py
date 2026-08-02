@@ -251,8 +251,9 @@ class StringAESEncryptor(BaseTransformer):
         # Decryption function
         decrypt_function = self._create_decrypt_function()
 
-        # Prepend to module body
-        tree.body = [key_node, decrypt_function] + tree.body
+        # Insert after the module docstring and any `from __future__` imports.
+        insert_at = _module_header_end(tree)
+        tree.body[insert_at:insert_at] = [key_node, decrypt_function]
 
         return tree
 
@@ -351,3 +352,24 @@ class StringAESEncryptor(BaseTransformer):
             "total_bytes": sum(len(enc) for enc in self.encrypted_strings.values()),
             "skipped_fstrings": self._skipped_fstring_count,
         }
+
+
+def _module_header_end(tree: ast.Module) -> int:
+    """Return insertion index after module docstring and future imports."""
+    idx = 0
+    if (
+        tree.body
+        and isinstance(tree.body[0], ast.Expr)
+        and isinstance(tree.body[0].value, ast.Constant)
+        and isinstance(tree.body[0].value.value, str)
+    ):
+        idx = 1
+
+    while idx < len(tree.body):
+        node = tree.body[idx]
+        if isinstance(node, ast.ImportFrom) and node.module == "__future__":
+            idx += 1
+            continue
+        break
+
+    return idx

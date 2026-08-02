@@ -214,9 +214,10 @@ obfuscation:
 # Show detailed output
 verbose: false
 
-# Note: For Pro features (AES encryption, anti-debugging), use:
+# Note: For Pro features (AES encryption, import obfuscation, anti-debugging), use:
 #   level: pro
 #   string_encryption: true
+#   import_obfuscation: true
 #   anti_debug: true
 """,
 }

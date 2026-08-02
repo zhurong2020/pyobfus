@@ -44,6 +44,11 @@ VALID_SCHEMA = {
                 "default": False,
                 "requires_level": "pro",
             },
+            "import_obfuscation": {
+                "type": "bool",
+                "default": False,
+                "requires_level": "pro",
+            },
             "anti_debug": {
                 "type": "bool",
                 "default": False,
@@ -87,6 +92,7 @@ COMMON_TYPOS = {
     "exclude_name": "exclude_names",
     "string_encode": "string_encoding",
     "string_encrypt": "string_encryption",
+    "import_obfuscate": "import_obfuscation",
     "remove_docstring": "remove_docstrings",
     "remove_comment": "remove_comments",
     "obfuscate": "obfuscation",
@@ -260,6 +266,8 @@ def _check_pro_requirements(config: Dict[str, Any], result: ValidationResult) ->
     pro_features = []
     if obf.get("string_encryption"):
         pro_features.append("string_encryption")
+    if obf.get("import_obfuscation"):
+        pro_features.append("import_obfuscation")
     if obf.get("anti_debug"):
         pro_features.append("anti_debug")
 

@@ -81,6 +81,7 @@ class ObfuscationConfig:
 
     # Pro Edition features
     string_encryption: bool = False  # AES-256 encryption (Pro only)
+    import_obfuscation: bool = False  # Runtime importlib imports + encrypted import strings
     anti_debug: bool = False  # Anti-debugging checks (Pro only)
     control_flow_flattening: bool = False  # Control flow flattening (Pro only)
     dead_code_injection: bool = False  # Dead code injection (Pro only)

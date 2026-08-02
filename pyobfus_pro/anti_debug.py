@@ -125,7 +125,8 @@ class AntiDebugInjector(BaseTransformer):
             ast.Module: Module with check function prepended
         """
         check_function = self._create_check_function()
-        tree.body.insert(0, check_function)
+        insert_at = _module_header_end(tree)
+        tree.body.insert(insert_at, check_function)
         return tree
 
     def _create_check_function(self) -> ast.FunctionDef:
@@ -218,3 +219,24 @@ class AntiDebugInjector(BaseTransformer):
         return {
             "injected_functions": self.injected_functions,
         }
+
+
+def _module_header_end(tree: ast.Module) -> int:
+    """Return insertion index after module docstring and future imports."""
+    idx = 0
+    if (
+        tree.body
+        and isinstance(tree.body[0], ast.Expr)
+        and isinstance(tree.body[0].value, ast.Constant)
+        and isinstance(tree.body[0].value.value, str)
+    ):
+        idx = 1
+
+    while idx < len(tree.body):
+        node = tree.body[idx]
+        if isinstance(node, ast.ImportFrom) and node.module == "__future__":
+            idx += 1
+            continue
+        break
+
+    return idx

@@ -19,6 +19,7 @@ except PackageNotFoundError:
 __license__ = "Proprietary"
 
 from .string_aes import StringAESEncryptor
+from .import_obfuscation import ImportObfuscator
 from .anti_debug import AntiDebugInjector
 from .control_flow import ControlFlowFlattener, StateMachine, State
 from .dead_code import DeadCodeInjector, DCIConfig
@@ -87,6 +88,7 @@ def seal_code(func):
 
 __all__ = [
     "StringAESEncryptor",
+    "ImportObfuscator",
     "AntiDebugInjector",
     "ControlFlowFlattener",
     "StateMachine",

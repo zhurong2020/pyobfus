@@ -142,12 +142,15 @@ obfuscation:
 obfuscation:
   level: community
   string_encryption: true
+  import_obfuscation: true
 """)
             result = validate_config_file(config_path)
             # Should have warning about Pro features
             assert len(result.warnings) > 0
             all_warnings = " ".join(result.warnings)
-            assert "pro" in all_warnings.lower() or "string_encryption" in all_warnings
+            assert "pro" in all_warnings.lower()
+            assert "string_encryption" in all_warnings
+            assert "import_obfuscation" in all_warnings
 
     def test_validate_nonexistent_file(self):
         """Test validation handles nonexistent file."""

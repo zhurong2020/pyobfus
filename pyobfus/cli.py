@@ -146,6 +146,11 @@ except ImportError:
     help="Enable AES-256 string encryption (Pro feature)",
 )
 @click.option(
+    "--import-obfuscation",
+    is_flag=True,
+    help="Rewrite top-level imports to runtime importlib calls and encrypt import strings (Pro feature)",
+)
+@click.option(
     "--anti-debug",
     is_flag=True,
     help="Enable anti-debugging protection (Pro feature)",
@@ -365,6 +370,7 @@ def main(
     upgrade: bool,
     control_flow: bool,
     string_encryption: bool,
+    import_obfuscation: bool,
     anti_debug: bool,
     dead_code: bool,
     expire: Optional[str],
@@ -654,6 +660,7 @@ def main(
         pro_features_requested = (
             control_flow
             or string_encryption
+            or import_obfuscation
             or anti_debug
             or dead_code
             or license_embedding_requested
@@ -691,6 +698,12 @@ def main(
                 config.string_encryption = True
                 if verbose:
                     click.echo("Enabled: AES-256 String Encryption")
+            if import_obfuscation:
+                config.import_obfuscation = True
+                config.string_encryption = True
+                if verbose:
+                    click.echo("Enabled: Import Obfuscation")
+                    click.echo("Enabled: AES-256 String Encryption (for import strings)")
             if anti_debug:
                 config.anti_debug = True
                 if verbose:
@@ -778,6 +791,7 @@ def main(
             "total_names_obfuscated": 0,
             "strings_encoded": 0,
             "strings_encrypted": 0,
+            "imports_obfuscated": 0,
             "control_flow_applied": 0,
             "dead_code_injected": 0,
             "anti_debug_checks": 0,
@@ -1034,6 +1048,7 @@ def _obfuscate_file(
         "ai_docstrings_stripped": 0,
         "ai_attributions_stripped": 0,
         "strings_encrypted": 0,
+        "imports_obfuscated": 0,
         "control_flow_applied": 0,
         "dead_code_injected": 0,
         "anti_debug_checks": 0,
@@ -1155,6 +1170,18 @@ def _obfuscate_file(
 
                 if verbose:
                     click.echo("  Control flow flattening: Applied")
+
+            # Import obfuscation (runtime importlib + encrypted import strings)
+            if config.import_obfuscation:
+                from pyobfus_pro.import_obfuscation import ImportObfuscator
+
+                import_obfuscator = ImportObfuscator()
+                transformed_tree = import_obfuscator.transform(transformed_tree)
+                import_stats = import_obfuscator.get_statistics()
+                file_stats["imports_obfuscated"] = import_stats.get("imports_obfuscated", 0)
+
+                if verbose:
+                    click.echo(f"  Imports obfuscated: {import_stats['imports_obfuscated']}")
 
             # String encryption (AES-256)
             if config.string_encryption:
@@ -2033,6 +2060,8 @@ def _display_stats(stats: dict, config: ObfuscationConfig) -> None:
     if config.level == "pro":
         if stats.get("strings_encrypted", 0) > 0:
             click.echo(f"  Strings encrypted:    {stats['strings_encrypted']}")
+        if stats.get("imports_obfuscated", 0) > 0:
+            click.echo(f"  Imports obfuscated:   {stats['imports_obfuscated']}")
         if stats.get("control_flow_applied", 0) > 0:
             click.echo(f"  Control flow files:   {stats['control_flow_applied']}")
         if stats.get("dead_code_injected", 0) > 0:
