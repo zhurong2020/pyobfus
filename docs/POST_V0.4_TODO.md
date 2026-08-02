@@ -51,20 +51,28 @@
 > defense-in-depth) with no shared group, so reading file *contents*
 > requires the world-read bit; dismissed with a documented `won't fix`
 > rationale via the code-scanning API rather than left silently open.
-> **README/MCP/ROADMAP doc-staleness audit researched AND fixed,
-> 2026-08-02 — see item 8.** The maintainer asked 11 pointed questions
-> after reviewing the post-0.5.6 README; all 5 mechanical fixes are done
-> and pushed (`docs/ROADMAP.md` synced to 0.5.5/0.5.6 with P2-17/P2-19
-> flipped from in-progress to shipped, MCP static metadata + a tool
-> docstring now name the `ml` preset, Codex added to ~5 supported-client
-> mentions repo-wide, README's stale `v0.1.6+`-era version tags and
-> "(Available Now)"/"New in v0.5.0" framing cleaned up, and the
-> plugin-marketplace-directory open question resolved via WebSearch —
-> `anthropics/claude-plugins-community` exists and pyobfus isn't in it
-> yet). Two items are left as open maintainer decisions on purpose (MCP
-> 0.3.2 republish, plugin-directory submission) plus one open discussion
-> (does the recent community-focused release run still highlight Pro
-> Edition enough) — see item 8 for detail.
+> **README/MCP/ROADMAP doc-staleness audit — fixed across two same-day
+> sessions, 2026-08-02 — see item 8.** Session 1: 5 mechanical fixes
+> (`docs/ROADMAP.md` synced to 0.5.5/0.5.6 with P2-17/P2-19 flipped to
+> shipped, MCP static metadata + a docstring now name the `ml` preset,
+> Codex added to ~5 supported-client mentions, README's stale
+> `v0.1.6+`-era tags and "(Available Now)"/"New in v0.5.0" framing
+> cleaned up, plugin-marketplace-directory question resolved via
+> WebSearch). Session 2: **pyobfus-mcp 0.3.2 released** (PyPI + MCP
+> Registry both confirmed `isLatest`) closing the "MCP republish"
+> decision; plugin-submission process fully researched and local
+> `claude plugin validate` passes (actual submission needs the
+> maintainer's own browser session — flagged, not done); Pro-Edition
+> positioning discussed and the maintainer agreed with the proposed
+> direction. **Next session's punch list — write-up complete, ready to
+> execute with no re-research** lives in
+> `docs/DOC_SYNC_AUDIT_2026-08-02.md`'s "Session 2 ... next-session
+> punch list" section: (1) fix a broken `#-pro-edition-available-now`
+> anchor link this session's own heading rename created, (2) add the
+> agreed persistent Pro-Edition anchor line near the README intro
+> (exact draft copy + placement + rationale already written), (3)
+> maintainer's own remaining actions (plugin submission, Glama Dockerfile
+> re-pin for 0.3.2).
 
 ## Current prioritized TODO (2026-08-01)
 

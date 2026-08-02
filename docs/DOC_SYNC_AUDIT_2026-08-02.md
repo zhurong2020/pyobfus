@@ -294,3 +294,94 @@ Updated" trailer entry per the doc's own existing convention.
 5. **Q4 (verify plugin-marketplace directory question)** — one `WebSearch`, resolves an open question either way.
 6. **Q6 (Pro-Edition positioning)** — bring findings to the maintainer as a discussion, not a unilateral edit.
 7. **Q2, Q5, Q10** — no action needed; already resolved by this audit or already tracked elsewhere.
+
+---
+
+## Session 2 (same day) — status update + next-session punch list
+
+Items 1-5 above were all fixed and pushed in-session (commits `a426ab0`,
+`767ba2b`, `1ab95b7`, `07ce053`, `27bfb79`). **pyobfus-mcp 0.3.2 also shipped**
+(PyPI + MCP Registry both confirmed `isLatest`) — that wasn't in the original
+plan but followed naturally from Q3's "decide the version-bump question."
+Plugin-marketplace submission process was fully researched (see the updated
+Q4 above) and local validation passes, but the actual submission needs the
+maintainer's own browser session — not something Claude Code can do via
+CLI/API. The Pro-Edition discussion (Q6) happened; maintainer agreed with the
+proposed direction. **Everything below is written up for a cold-start session
+to execute directly — no re-research needed.**
+
+### 1. Fix a broken anchor link this session's own edit introduced
+
+`README.md:21`'s "What's new" banner links to `[Pro Edition](#-pro-edition-available-now)`.
+That anchor slug matched the *old* heading text `### 🔒 Pro Edition (Available Now)`
+— but this session's Q7 fix (commit `07ce053`) renamed the heading to
+`### 🔒 Pro Edition`, changing GitHub's auto-generated slug. Working out
+GitHub's slug algorithm from the *old* anchor (`#-pro-edition-available-now`
+for `🔒 Pro Edition (Available Now)`): the leading emoji is stripped entirely
+(leaving a leading space), the rest is lowercased with spaces → hyphens and
+parens dropped. Applying that to the new heading `🔒 Pro Edition` gives
+**`#-pro-edition`**. Fix: change the link target at `README.md:21` from
+`#-pro-edition-available-now` to `#-pro-edition`. (Verify by rendering the
+README on GitHub after pushing — anchor slugs are worth a visual sanity check
+since the algorithm isn't 100% guaranteed from this derivation alone.)
+
+### 2. Add a persistent Pro-Edition anchor line (Q6 outcome, maintainer agreed)
+
+**Agreed direction**: don't cram Pro mentions into unrelated release notes
+(that reads as marketing fluff, against this project's consistently honest,
+non-hyped voice — see the trial's "not a security boundary" framing and the
+0.5.5 caveats about `preserve_param_names` as precedent for that voice).
+Instead, add one small **structural, non-rotating** anchor near the top —
+separate from the "What's new" banner (which stays honest/specific to each
+release and will keep rotating through whatever actually shipped, Pro or
+not) — so a reader lands on evidence Pro hasn't gone stale even during a
+Community-focused release run.
+
+**Why the underlying worry checks out as smaller than it first looked**:
+this session cross-checked 0.5.4-0.5.6's actual content against two axes —
+Pro's 6 patent mechanisms are all about *protection strength* (anti-piracy,
+encryption, watermarking); 0.5.5's Community additions (`--preset ml`,
+`--provenance-manifest`) are about *developer experience / audit tooling*.
+Different axes — the new free features aren't cannibalizing what Pro sells,
+so the Free/Pro differentiation logic is still coherent. The `### 🔒 Pro
+Edition` section itself is also unconditionally present on every page load,
+right after Free Edition — it never "disappeared." The real gap is just that
+nothing near the *top* of the page reminds a skimming reader Pro exists,
+since that job was being done incidentally by "What's new" banners that
+happened to be about Pro in 0.5.0-0.5.4 and stopped being incidental once
+three releases in a row were Community-focused.
+
+**Concrete fix**: insert a new line in `README.md` between the intro
+paragraph (currently line 19, "A Python code obfuscator built with...") and
+the "What's new" banner (currently line 21), so it reads as a stable fact
+about the product rather than dated news:
+
+```markdown
+> **🔒 Pro Edition available** — 6 patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator, $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
+```
+
+Notes on this draft, so the next session can adjust with the same reasoning
+rather than re-deriving it from scratch:
+- "$45 one-time, no subscription" is intentional — it's pyobfus's actual
+  differentiator per `pricing_strategy.md`'s single-tier positioning (vs.
+  PyArmor's $89 Pro and vs. subscription-based competitors), not filler.
+  **Do not turn this into a pricing-tier discussion** — the memory is
+  explicit that multi-tier pricing was already proposed and rejected once.
+- "6 patent-targeted" matches the exact count and framing already used at
+  `README.md:132`'s section body — consistent, not a new claim.
+- Uses the anchor `#-pro-edition` (see item 1 above — fix that link first,
+  then this new line's `(#-pro-edition)` target will already be correct).
+- This is ONE line, not a redesign of the intro. Resist the urge to bundle
+  additional Pro copy in while touching this area — that's exactly the
+  "marketing fluff creep" the agreed direction was meant to avoid.
+
+### 3. Still pending — maintainer's own action, not Claude Code's
+
+- **Plugin-marketplace submission**: `platform.claude.com/plugins/submit`
+  (individual-author Console form). Local `claude plugin validate ./` already
+  passes. ~2 minutes of manual form-filling; needs the maintainer's own
+  authenticated session.
+- **Glama admin Dockerfile Build-steps field**: per the existing `CLAUDE.md`
+  Glama note, this needs a manual web-UI version-string bump after every
+  MCP release (0.3.1 → 0.3.2 now) — not CLI-scriptable. Check whether this
+  was done for 0.3.2; if not, it's a ~1-minute admin-panel edit.

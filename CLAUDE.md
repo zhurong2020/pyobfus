@@ -22,7 +22,11 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 完整时间线 + 修复细节见 `docs/POST_V0.4_TODO.md` 顶部 handoff note + § item 7。
 
-**✅ README/MCP/ROADMAP 陈旧内容审计 + 修复均已完成（2026-08-02）**：user 看完 0.5.6 后的 README 提了 11 个问题，全部调研 + 5 项机械修复已完成并 push（`docs/ROADMAP.md` 同步到 0.5.5/0.5.6，P2-17/P2-19 从进行中改成已发布 · MCP 静态元数据 + 一处工具文档字符串补上 `ml` preset · Codex 补进全仓库约 5 处"支持客户端"提及 · README 清理老版本号标签 + "(Available Now)"/"New in v0.5.0" 过时表述 · plugin marketplace 目录问题已用 WebSearch 查清——`anthropics/claude-plugins-community` 确实存在，pyobfus 尚未提交）。**两项刻意留作维护者决定、未擅自执行**：MCP 是否要正式发 0.3.2、是否要提交 pyobfus 到 plugin 目录。完整记录 `docs/DOC_SYNC_AUDIT_2026-08-02.md` + `docs/POST_V0.4_TODO.md` § item 8。
+**✅ README/MCP/ROADMAP 陈旧内容审计 + 修复，两轮 session 都做完了（2026-08-02）**：第一轮 5 项机械修复（ROADMAP.md 同步、MCP 元数据补 `ml` preset、Codex 补进全仓库、README 清理老版本号、plugin 目录问题 WebSearch 查清）。第二轮：**pyobfus-mcp 0.3.2 已发布**（PyPI + MCP Registry 均确认 isLatest，`mcp-publisher` 已跑）；plugin marketplace 提交流程查清 + 本地 `claude plugin validate` 已通过（实际提交需 user 自己登录网页操作，Claude Code 做不到）；Pro Edition 定位已讨论，user 认可方向。
+
+**🔴 下次 session 直接执行清单（已写好草稿，不用重新调研）**，见 `docs/DOC_SYNC_AUDIT_2026-08-02.md`「Session 2 ... next-session punch list」：① 修一个本 session 自己改坏的锚点链接（`README.md:21` 的 `#-pro-edition-available-now` 因改标题失效，应改成 `#-pro-edition`）② 按 Q6 讨论结果，在 README intro 段后加一行常驻 Pro Edition 提示（具体文案已写好）③ user 自己的两个待办（plugin 提交表单、Glama 后台 Dockerfile 版本号手动改到 0.3.2）。
+
+完整时间线 + 修复细节见 `docs/POST_V0.4_TODO.md` 顶部 handoff note + § item 7-8。
 
 - ✅ 已提交并受理（申请号 `202610712171X` · 申请日/优先权日 2026-05-22 · 17 项权利要求）
 - ✅ 费用全部缴清（共 1610 元 · 2026-05-22 一次缴清 · 含申请费类 1235 与实审费 375 · 官方审查信息查询「费足」核实）
@@ -35,15 +39,16 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - ✅ **0.5.4 已发布（2026-07-19，PR #19）**：`--bind-device` 扩展到 vault key(`_VAULT_KEY_*`)设备绑定,与 opacity L3 用同一套运行时派生技术。首批外部 issue #20/#21(trial 绕过报告)按「诚实记录边界、不加固客户端」处置并关闭。
 - ✅ **issue #22 mypy gate 已关闭（2026-07-22，PR #23）**：Core/Pro/MCP 共 72 个源文件 mypy 零错误,CI 全矩阵绿后合并。
 - ✅ **pyobfus-mcp 0.3.1 已发布（2026-06-22）**：pro-funnel 文案点名 v0.5 机制 · dep `>=0.5.1` · tag `mcp-v0.3.1` 发 PyPI + `mcp-publisher` 发 MCP Registry(0.3.1 isLatest)。
+- ✅ **pyobfus-mcp 0.3.2 已发布（2026-08-02）**：纯文档/元数据修复,补 `ml` preset + `codex` client,tag `mcp-v0.3.2` 发 PyPI + Registry(0.3.2 isLatest)。Glama 后台 Dockerfile 版本号需 user 手动改(未验证是否已做)。
 - ✅ **AI-agent 可发现性 Wave A（2026-06-22）**：Smithery 经 **Skill 渠道** `zhurong2020/pyobfus-protect`（Smithery MCP 发布是远程网关、本地工具走不通,Skill 才对）+ mcp.so + `uvx` 零安装 + server.json 99 字描述(commit `826c576`/`49f4df3`)。报告:`docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`。
 - ❌ **JOSS 投稿被拒(2026-06-24)**:v0.5.1 投 JOSS(issue `openjournals/joss-reviews#10788`)被总编 desk-reject,理由=**scope/significance 非质量**("private-dev-then-public" + 无第三方复用)。→ 改走免费路径:✅ **Zenodo DOI `10.5281/zenodo.20846053`(concept)已拿到**,已接进 CITATION.cff + README 徽章 + `## Citation` + 两个 pyproject + RTD + ORCID + arong.eu.org/academic。完整记录+渠道对比见 `docs/JOSS_REJECTION_20260624.md`。
 - ✅ **P2-18 内部证据完成（2026-08-01）**：5 样本 × Codex+Claude 全跑完，`price_rules` 拿到第一个干净跨模型 C4 数据点，决定不加第三个模型家族。评审版报告 `docs/LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md`；过程中顺带修了 3 个既有 plumbing bug（语料库 no-op 稀释统计、`--json-schema` 不认 `$schema` meta key、docker 打分沙箱 temp dir 权限导致此前从未真实跑通），细节见 `docs/POST_V0.4_TODO.md` § P2-18。
 - ✅ **pyobfus 0.5.5 已发布（2026-08-02，PR #26 + #27）**：`--preset ml`（P2-19，社区版模型服务 preset）+ `--provenance-manifest`（P2-17，本地 JSON 构建溯源清单，非加密签名）。Review 顺带发现 issue #25 并诚实标注在 CHANGELOG/docstring 里，不是掩盖。
 - ✅ **pyobfus 0.5.6 已发布（2026-08-02）**：issue #25 修复（见上）+ CodeQL 高危告警清零（见上）。
 - ✅ **README/MCP/ROADMAP 陈旧内容审计 + 修复（2026-08-02）**：见上，5 commits 全绿。
-- ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:三个待维护者决策的小项(MCP 0.3.2 republish / plugin marketplace 提交 / Pro Edition 定位讨论)。之后是 P2-13/P2-22 这类零代码内容型候选（PyInstaller cookbook / PyArmor 对比页）。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
+- ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:P2-13/P2-22 这类零代码内容型候选（PyInstaller cookbook / PyArmor 对比页）。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
 
-**Cold-start session 第一句话应问 user**：「README/MCP/ROADMAP 审计已修完。要现在决定那 3 个留白项（MCP 0.3.2 republish / plugin marketplace 提交 / Pro Edition 定位），还是转去做 P2-13/P2-22 内容型候选，或 IP 商业化迁移？」
+**Cold-start session 第一句话应问 user**：「上次审计的 next-session punch list 已经写好（锚点链接修复 + Pro Edition 常驻提示行，草稿都在 `docs/DOC_SYNC_AUDIT_2026-08-02.md`）。现在开始按那份执行吗？」
 
 **Cold-start 资料定位**（按读取优先级）：
 
