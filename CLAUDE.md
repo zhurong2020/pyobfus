@@ -24,7 +24,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 **✅ README/MCP/ROADMAP 陈旧内容审计 + 修复，两轮 session 都做完了（2026-08-02）**：第一轮 5 项机械修复（ROADMAP.md 同步、MCP 元数据补 `ml` preset、Codex 补进全仓库、README 清理老版本号、plugin 目录问题 WebSearch 查清）。第二轮：**pyobfus-mcp 0.3.2 已发布**（PyPI + MCP Registry 均确认 isLatest，`mcp-publisher` 已跑）；plugin marketplace 提交流程查清 + 本地 `claude plugin validate` 已通过（实际提交需 user 自己登录网页操作，Claude Code 做不到）；Pro Edition 定位已讨论，user 认可方向。
 
-**🔴 下次 session 直接执行清单（已写好草稿，不用重新调研）**，见 `docs/DOC_SYNC_AUDIT_2026-08-02.md`「Session 2 ... next-session punch list」：① 修一个本 session 自己改坏的锚点链接（`README.md:21` 的 `#-pro-edition-available-now` 因改标题失效，应改成 `#-pro-edition`）② 按 Q6 讨论结果，在 README intro 段后加一行常驻 Pro Edition 提示（具体文案已写好）③ user 自己的两个待办（plugin 提交表单、Glama 后台 Dockerfile 版本号手动改到 0.3.2）。
+**✅ Plugin marketplace 提交已完成（2026-08-02）**：Console 表单提交成功，显示"Plugin submitted for review"——状态是**待 Anthropic 审核**，不是已上线；`Link to plugin` 字段一度报 `must not contain spaces or control characters`（复制粘贴带入隐藏字符，手动重新输入后解决）。后续查审核结果看 `github.com/anthropics/claude-plugins-community`（审核通过后隔夜同步）或 Console 里的"View submissions"。
+
+**🔴 下次 session 直接执行清单（已写好草稿，不用重新调研）**，见 `docs/DOC_SYNC_AUDIT_2026-08-02.md`「Session 2 ... next-session punch list」：① 修一个本 session 自己改坏的锚点链接（`README.md:21` 的 `#-pro-edition-available-now` 因改标题失效，应改成 `#-pro-edition`）② 按 Q6 讨论结果，在 README intro 段后加一行常驻 Pro Edition 提示（具体文案已写好）③ Glama 后台 Dockerfile 版本号手动改到 0.3.2（唯一还没做的 user 待办）。
 
 完整时间线 + 修复细节见 `docs/POST_V0.4_TODO.md` 顶部 handoff note + § item 7-8。
 

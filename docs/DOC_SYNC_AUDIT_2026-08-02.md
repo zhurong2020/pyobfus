@@ -375,13 +375,24 @@ rather than re-deriving it from scratch:
   additional Pro copy in while touching this area — that's exactly the
   "marketing fluff creep" the agreed direction was meant to avoid.
 
-### 3. Still pending — maintainer's own action, not Claude Code's
+### 3. Maintainer's own actions
 
-- **Plugin-marketplace submission**: `platform.claude.com/plugins/submit`
-  (individual-author Console form). Local `claude plugin validate ./` already
-  passes. ~2 minutes of manual form-filling; needs the maintainer's own
-  authenticated session.
-- **Glama admin Dockerfile Build-steps field**: per the existing `CLAUDE.md`
-  Glama note, this needs a manual web-UI version-string bump after every
-  MCP release (0.3.1 → 0.3.2 now) — not CLI-scriptable. Check whether this
-  was done for 0.3.2; if not, it's a ~1-minute admin-panel edit.
+- **✅ Plugin-marketplace submission — done 2026-08-02.** Submitted via the
+  Console form (`platform.claude.com/plugins/submit`), guided field-by-field
+  in the same session's chat log. Confirmation page: "Plugin submitted for
+  review." **Status is "submitted for review," not "live"** — Anthropic's
+  review team evaluates it, may follow up for more info, and per the form's
+  own text "submitting this form does not guarantee inclusion." One
+  submission hiccup worth remembering: the `Link to plugin` field first
+  rejected the pasted GitHub URL with `plugin_url: must not contain spaces
+  or control characters` — a copy-paste artifact (invisible whitespace/
+  control char from the chat UI), fixed by retyping the URL manually rather
+  than pasting. No further action needed on this item until/unless
+  Anthropic follows up; check back later for approval status at
+  `github.com/anthropics/claude-plugins-community` (syncs nightly after
+  approval) or via "View submissions" in the Console.
+- **⏳ Glama admin Dockerfile Build-steps field** — still open. Per the
+  existing `CLAUDE.md` Glama note, this needs a manual web-UI version-string
+  bump after every MCP release (0.3.1 → 0.3.2 now) — not CLI-scriptable.
+  Not confirmed done for 0.3.2 yet; ~1-minute admin-panel edit when picked
+  up.
