@@ -26,7 +26,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 **✅ Plugin marketplace 提交已完成（2026-08-02）**：Console 表单提交成功，显示"Plugin submitted for review"——状态是**待 Anthropic 审核**，不是已上线；`Link to plugin` 字段一度报 `must not contain spaces or control characters`（复制粘贴带入隐藏字符，手动重新输入后解决）。后续查审核结果看 `github.com/anthropics/claude-plugins-community`（审核通过后隔夜同步）或 Console 里的"View submissions"。
 
-**🔴 下次 session 直接执行清单（已写好草稿，不用重新调研）**，见 `docs/DOC_SYNC_AUDIT_2026-08-02.md`「Session 2 ... next-session punch list」：① 修一个本 session 自己改坏的锚点链接（`README.md:21` 的 `#-pro-edition-available-now` 因改标题失效，应改成 `#-pro-edition`）② 按 Q6 讨论结果，在 README intro 段后加一行常驻 Pro Edition 提示（具体文案已写好）③ Glama 后台 Dockerfile 版本号手动改到 0.3.2（唯一还没做的 user 待办）。
+**⏳ Glama 后台 Dockerfile 版本号更新——尝试过，被 Glama 自己的 UI bug 卡住，user 改天再试**：user 能进后台管理页（`.../admin`，能看到 Profile/Analytics/Repository/Dockerfile 四个 tab），但点 Dockerfile tab 不跳转、又弹回 Profile 页，F12 有报错但没抓到具体错误文本。不是 user 操作问题，像是 Glama 前端路由 bug 或临时故障。**下次重试时先截报错原文**——这是唯一缺的信息，抓到就能真正定位，不然就是重试运气。详见 `docs/DOC_SYNC_AUDIT_2026-08-02.md` 第 3 节。
+
+**🔴 下次 session 直接执行清单（已写好草稿，不用重新调研）**，见 `docs/DOC_SYNC_AUDIT_2026-08-02.md`「Session 2 ... next-session punch list」：① 修一个本 session 自己改坏的锚点链接（`README.md:21` 的 `#-pro-edition-available-now` 因改标题失效，应改成 `#-pro-edition`）② 按 Q6 讨论结果，在 README intro 段后加一行常驻 Pro Edition 提示（具体文案已写好）③ Glama 后台 Dockerfile 版本号手动改到 0.3.2（被 UI bug 卡住，见上）。**极小尾巴**：plugin marketplace 提交描述里有个笔误"protected_project"应为"protect_project"，不影响功能，Anthropic 若跟进补充信息时顺手改。
 
 完整时间线 + 修复细节见 `docs/POST_V0.4_TODO.md` 顶部 handoff note + § item 7-8。
 

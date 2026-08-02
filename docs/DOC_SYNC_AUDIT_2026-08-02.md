@@ -391,8 +391,28 @@ rather than re-deriving it from scratch:
   Anthropic follows up; check back later for approval status at
   `github.com/anthropics/claude-plugins-community` (syncs nightly after
   approval) or via "View submissions" in the Console.
-- **⏳ Glama admin Dockerfile Build-steps field** — still open. Per the
-  existing `CLAUDE.md` Glama note, this needs a manual web-UI version-string
-  bump after every MCP release (0.3.1 → 0.3.2 now) — not CLI-scriptable.
-  Not confirmed done for 0.3.2 yet; ~1-minute admin-panel edit when picked
-  up.
+- **⏳ Glama admin Dockerfile Build-steps field — attempted 2026-08-02,
+  blocked by a Glama-side UI issue, deferred.** Per the existing `CLAUDE.md`
+  Glama note, this needs a manual web-UI version-string bump after every MCP
+  release (0.3.1 → 0.3.2 now) — not CLI-scriptable. Maintainer reached the
+  admin panel (`https://glama.ai/mcp/servers/zhurong2020/pyobfus/admin`) and
+  the tab bar (Profile / Analytics / Repository / Dockerfile) is visible,
+  but **clicking the "Dockerfile" tab doesn't navigate — it reloads back to
+  the "Profile" tab**, with a browser-console (F12) error the maintainer
+  didn't capture the text of. Not a maintainer error; looks like a
+  client-side routing bug or transient Glama issue, not the credentials/
+  navigation-path problem the original 2026-06 note was about (that one's
+  root cause — Glama's build config living in its own admin, not the repo —
+  is still believed correct; this is a *new*, different blocker on top of
+  it). Maintainer deferred to retry another day. **When retried**: capture
+  the actual F12 console error text before troubleshooting further (hard
+  refresh, incognito/different browser, or check Glama's status page /
+  support if it recurs) — that error string is the one piece of missing
+  information that would turn this from "try again and hope" into an actual
+  diagnosis.
+- **Minor, low-priority**: the plugin-marketplace submission's description
+  (see above) has a typo — "protected_project" instead of the real tool
+  name `protect_project` — introduced during manual retyping to work around
+  the `plugin_url` paste-artifact issue on a different field. Cosmetic, not
+  a functional problem; fix opportunistically if Anthropic follows up on
+  the submission, not worth a dedicated resubmission on its own.
