@@ -28,7 +28,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 **⏳ Glama 后台 Dockerfile 版本号更新——尝试过，被 Glama 自己的 UI bug 卡住，user 改天再试**：user 能进后台管理页（`.../admin`，能看到 Profile/Analytics/Repository/Dockerfile 四个 tab），但点 Dockerfile tab 不跳转、又弹回 Profile 页，F12 有报错但没抓到具体错误文本。不是 user 操作问题，像是 Glama 前端路由 bug 或临时故障。**下次重试时先截报错原文**——这是唯一缺的信息，抓到就能真正定位，不然就是重试运气。详见 `docs/DOC_SYNC_AUDIT_2026-08-02.md` 第 3 节。
 
-**🔴 下次 session 直接执行清单（已写好草稿，不用重新调研）**，见 `docs/DOC_SYNC_AUDIT_2026-08-02.md`「Session 2 ... next-session punch list」：① 修一个本 session 自己改坏的锚点链接（`README.md:21` 的 `#-pro-edition-available-now` 因改标题失效，应改成 `#-pro-edition`）② 按 Q6 讨论结果，在 README intro 段后加一行常驻 Pro Edition 提示（具体文案已写好）③ Glama 后台 Dockerfile 版本号手动改到 0.3.2（被 UI bug 卡住，见上）。**极小尾巴**：plugin marketplace 提交描述里有个笔误"protected_project"应为"protect_project"，不影响功能，Anthropic 若跟进补充信息时顺手改。
+**✅ 已回填（2026-08-02 验证，原「下次 session 直接执行清单」①②两项其实早已完成）**：`docs/DOC_SYNC_AUDIT_2026-08-02.md`「Session 2 punch list」①② 两项实测 `README.md` 均已完成——① 锚点链接已是 `#-pro-edition`（README.md:21，非损坏的旧版 `#-pro-edition-available-now`）② Pro Edition 常驻提示行已在 README.md 第 21 行（`> **🔒 Pro Edition available** — 6 patent-targeted...`）。**仍待**：③ Glama 后台 Dockerfile 版本号手动更新（目标应是当前最新 **0.3.3**，非原草稿写的 0.3.2；仍被 Glama 自己的 UI bug 卡住，见上一条）。**极小尾巴仍待**：plugin marketplace 提交描述里有个笔误"protected_project"应为"protect_project"，不影响功能，Anthropic 若跟进补充信息时顺手改。
 
 完整时间线 + 修复细节见 `docs/POST_V0.4_TODO.md` 顶部 handoff note + § item 7-8。
 
@@ -43,7 +43,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 2. 核对「上次记录以来的修订」是否已同步进所有相关文档——不只 README/ROADMAP/POST_V0.4_TODO，**本文件自己的 cold-start 区块也是易漂移对象**（见下方一处已验证的活例子）。
 3. 文档修复按主题拆开分别 commit，不要合并成一个大 commit（本 session `b9b5150`/`f6a70f1` 各自单一主题一个 commit 是范例）。
 
-**已验证的一处活例子（留给下次执行任务 2 时顺手修，本轮按 user 要求只记录不动手）**：本节前面「下次 session 直接执行清单」①②两项（README 锚点链接 + Pro Edition 常驻提示行）写的是「待办」，但实测 `README.md` 当前内容两项都已完成（`#-pro-edition` 锚点正确、常驻提示行已在第 21 行）——`docs/DOC_SYNC_AUDIT_2026-08-02.md`「Session 2」自己也记了 ✅ done，只是没回填进本文件，导致本文件与实际仓库状态脱节。
+**已回填（2026-08-02，同一天）**：上面提到的活例子已经处理——本节原「下次 session 直接执行清单」①②两项已改标为 ✅ 已回填（见下方），user 当场要求就手，没有拖到下次 session。
 
 - ✅ 已提交并受理（申请号 `202610712171X` · 申请日/优先权日 2026-05-22 · 17 项权利要求）
 - ✅ 费用全部缴清（共 1610 元 · 2026-05-22 一次缴清 · 含申请费类 1235 与实审费 375 · 官方审查信息查询「费足」核实）
@@ -67,7 +67,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - ✅ **pyobfus-mcp 0.3.3 已发布（2026-08-02）**：`recommend_tier`/`start_pro_trial` 补 `--import-obfuscation` 到硬编码 Pro 机制清单（同 0.3.2 那类内容漂移修复）。tag `mcp-v0.3.3` 发 PyPI + Registry（isLatest），GitHub Release 附 wheel+sdist。
 - ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:P2-13/P2-22 这类零代码内容型候选（PyInstaller cookbook / PyArmor 对比页）。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
 
-**Cold-start session 第一句话应问 user**：「上次审计的 next-session punch list 已经写好（README 锚点链接修复 + Pro Edition 常驻提示行，草稿都在 `docs/DOC_SYNC_AUDIT_2026-08-02.md`）。另外 Glama 后台 Dockerfile 版本号那次被 UI bug 卡住了，要不要先截个 F12 报错原文再重试？先做哪个？」
+**Cold-start session 第一句话应问 user**：「Glama 后台 Dockerfile 版本号那次被 UI bug 卡住了（目标现在是 0.3.3），要不要先截个 F12 报错原文再重试？另外 plugin marketplace 提交描述里那个"protected_project"笔误要不要顺手改掉？」
 
 **Cold-start 资料定位**（按读取优先级）：
 
