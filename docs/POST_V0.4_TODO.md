@@ -51,6 +51,17 @@
 > defense-in-depth) with no shared group, so reading file *contents*
 > requires the world-read bit; dismissed with a documented `won't fix`
 > rationale via the code-scanning API rather than left silently open.
+> **README/MCP/ROADMAP doc-staleness audit done 2026-08-02, not yet
+> fixed — see item 8.** The maintainer asked 11 pointed questions after
+> reviewing the post-0.5.6 README (missing Codex mentions, a PyPI-badge
+> false alarm, MCP metadata that never absorbed the `ml` preset,
+> whether the Claude Code plugin marketplace needs external
+> registration, stale `v0.1.6+`-era version tags, a "New in v0.5.0"
+> heading that's now 6 versions behind, and — the sharpest catch —
+> `docs/ROADMAP.md` still showing P2-17/P2-19 as in-progress when
+> they've actually shipped). Full findings + a prioritized fix order are
+> in `docs/DOC_SYNC_AUDIT_2026-08-02.md`, written specifically so a
+> cold-start session can act without re-researching.
 
 ## Current prioritized TODO (2026-08-01)
 
@@ -447,6 +458,51 @@
    7. Version bump: next patch in the established 0.5.x cadence (0.5.6),
       release-commit pattern documented in this file's own 0.5.5 entry
       above and in memory `pyobfus_0_5_5_release_2026-08-02.md`.
+8. **⭐ CURRENT TOP PRIORITY — README/MCP/ROADMAP doc-staleness fixes
+   (researched 2026-08-02, not yet fixed).** Full findings, file:line
+   references, and a recommended fix order are all in
+   [`docs/DOC_SYNC_AUDIT_2026-08-02.md`](DOC_SYNC_AUDIT_2026-08-02.md) —
+   read that file first, it's written so a cold-start session can act
+   directly. Short version of the recommended order:
+   1. `docs/ROADMAP.md` — "Current Status" stops at 0.5.4 (doesn't
+      mention 0.5.5/0.5.6), and P2-17/P2-19 are still checkbox-marked
+      `[~]` in-progress even though both shipped in 0.5.5. This is the
+      sharpest finding (a public roadmap actively contradicting the
+      actual release state).
+   2. `pyobfus_mcp/` hardcoded lists that never absorbed the `ml`
+      preset (0.5.5): `tools.py`'s `generate_pyobfus_config` docstring,
+      and `server.json`'s `_meta.framework_presets` +
+      `_meta.target_clients` arrays (the latter also missing `codex` —
+      see next item). Decide whether this warrants an MCP 0.3.2
+      docs-only patch bump (precedent: 0.3.1 did the same for the
+      v0.5.0 Pro mechanisms).
+   3. Codex is missing from ~5 "supported clients" mentions across
+      `README.md`, `pyobfus_mcp/README.md`, and
+      `pyobfus_mcp/pyproject.toml`'s description line, despite already
+      being a first-class client via the `AGENTS.md` template and the
+      Smithery Skill listing — this is a wording gap, not missing
+      integration work.
+   4. README Free/Pro Edition feature-list cleanup, bundled as one
+      pass: fold in the preset/`--check`/`--unmap`/`--provenance-manifest`
+      features (done 2026-08-02 already — verify still current), drop
+      the now-stale `v0.1.6+`/`v0.2.0+`/`v0.3.0+` per-feature version
+      tags (27 version mentions total in README, most add changelog
+      trivia rather than decision-relevant info), reframe "New in
+      v0.5.0 — patent-targeted mechanisms" (now 6 versions behind), and
+      consider dropping "(Available Now)" from the Pro Edition heading
+      (traced to the v0.2.0-era README, when Pro had just shipped and
+      needed the disclaimer — no longer true 8 months and ~12 releases
+      later).
+   5. One `WebSearch`: does an Anthropic-curated directory of
+      third-party Claude Code plugin marketplaces exist yet (the
+      MCP-Registry equivalent)? Not verified this session — the
+      self-hosted `.claude-plugin/marketplace.json` mechanism itself
+      needs no external registration, but a curated directory (if one
+      exists) would be a distribution channel worth joining.
+   6. Bring Q6 (does the recent 0.5.4-0.5.6 run still highlight Pro
+      Edition's value, given the last three "What's new" banners were
+      all Community/bugfix-focused) to the maintainer as a discussion
+      — it's a positioning call, not a mechanical doc fix.
 
 Large speculative features and a JOSS re-submission remain deferred until the
 project has demonstrated third-party adoption.

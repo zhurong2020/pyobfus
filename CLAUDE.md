@@ -22,6 +22,8 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 完整时间线 + 修复细节见 `docs/POST_V0.4_TODO.md` 顶部 handoff note + § item 7。
 
+**🔍 README/MCP/ROADMAP 陈旧内容审计已做完（2026-08-02，未修）**：user 看完 0.5.6 后的 README 提了 11 个问题（Codex 未提及、PyPI 徽标误报缓存问题、MCP 元数据没跟上 `ml` preset、Claude Code plugin marketplace 是否需要外部注册、`v0.1.6+` 老版本号是否该清理、"New in v0.5.0" 标题已过时 6 个版本、**最锐利的发现**——`docs/ROADMAP.md` 仍把已发布的 P2-17/P2-19 标成进行中）。完整发现 + 建议修复顺序在 `docs/DOC_SYNC_AUDIT_2026-08-02.md`（专门写成冷启动可直接照做，不用重新调研）+ `docs/POST_V0.4_TODO.md` § item 8。
+
 - ✅ 已提交并受理（申请号 `202610712171X` · 申请日/优先权日 2026-05-22 · 17 项权利要求）
 - ✅ 费用全部缴清（共 1610 元 · 2026-05-22 一次缴清 · 含申请费类 1235 与实审费 375 · 官方审查信息查询「费足」核实）
 - ✅ **段号补正答复**（2026-06-11 提交）→ **初步审查合格通知书**（发文 2026-06-17 · 发文序号 2026061200904340 · 审查员 陈立英），据专利法第 34 条进入「申请日满 18 个月（≈2027-11）即行公布」轨道
@@ -40,7 +42,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - ✅ **pyobfus 0.5.6 已发布（2026-08-02）**：issue #25 修复（见上）+ CodeQL 高危告警清零（见上）。
 - ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:P2-13/P2-22 这类零代码内容型候选（PyInstaller cookbook / PyArmor 对比页）。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
 
-**Cold-start session 第一句话应问 user**：「0.5.6 已发、issue #25 已关、CodeQL 已清零。要做 P2-13/P2-22 这类内容型候选，还是推进 IP 商业化迁移(个人→旎嵘科技)?」
+**Cold-start session 第一句话应问 user**：「README/MCP/ROADMAP 陈旧内容审计已经做完，`docs/DOC_SYNC_AUDIT_2026-08-02.md` 里有完整发现和建议修复顺序（最优先：ROADMAP.md 把已发布功能标成进行中）。现在开始按那份计划修吗？」
 
 **Cold-start 资料定位**（按读取优先级）：
 
