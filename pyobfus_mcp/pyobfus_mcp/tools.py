@@ -625,7 +625,7 @@ def recommend_tier(path: str) -> Dict[str, Any]:
         "estimated_protection": (
             "high (adds AES-256 string encryption + anti-debugging, plus the v0.5 "
             "mechanisms: Selective Opacity, forensic watermarking, Runtime String "
-            "Vault, @seal_code, --scrub-traceback)"
+            "Vault, @seal_code, --scrub-traceback, and v0.5.7's --import-obfuscation)"
         ),
     }
 
@@ -645,6 +645,7 @@ def recommend_tier(path: str) -> Dict[str, Any]:
             "Forensic watermarking (v0.5) — per-buyer deterministic builds for piracy traceback",
             "Runtime String Vault (v0.5) — encrypted KV namespace for runtime secrets",
             "@seal_code bytecode integrity + --scrub-traceback production traceback encryption (v0.5)",
+            "--import-obfuscation (v0.5.7) — rewrites top-level imports into runtime importlib/__import__ calls with automatic AES string encryption of module/symbol names",
             "Available as `pyobfus build` flags (v0.5.1) and the `pyobfus_pro` API",
             "Unlimited files and lines of code",
         ],
@@ -729,6 +730,7 @@ def start_pro_trial() -> Dict[str, Any]:
             "Forensic watermarking (v0.5) — per-buyer deterministic builds for piracy traceback",
             "Runtime String Vault (v0.5) — encrypted KV namespace for runtime secrets",
             "@seal_code bytecode integrity + --scrub-traceback production traceback encryption (v0.5)",
+            "--import-obfuscation (v0.5.7) — rewrites top-level imports into runtime importlib/__import__ calls with automatic AES string encryption of module/symbol names",
             "Unlimited files and lines of code",
         ],
         "post_trial_options": {

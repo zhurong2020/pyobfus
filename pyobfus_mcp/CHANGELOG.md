@@ -6,13 +6,25 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+## [0.3.3] - 2026-08-02
+
+**Docs/content-only release** (same pattern as 0.3.2). No tool code,
+signatures, or wire behavior changed — pyobfus 0.5.5's `--preset ml` and
+0.5.6's preset/config-override fix required no MCP-side change (dynamic +
+wire-behavior-only, respectively), but 0.5.7's `--import-obfuscation` (Pro,
+P2-4) was missing from the three tools that describe Pro's mechanism set to
+the calling agent as a static string/list rather than deriving it
+dynamically — the same class of drift `ml` had before 0.3.2.
+
 ### Changed
 
-- Documentation now notes the companion `pyobfus` 0.5.5-0.5.7 line: the MCP
-  tools already pick up `--preset ml` dynamically through `pyobfus>=0.5.1`,
-  pyobfus 0.5.6's preset/config override fix requires no MCP wire change, and
-  pyobfus 0.5.7's `--import-obfuscation` is a CLI-side Pro feature rather than
-  a new MCP tool surface. No tool signatures or response shapes changed.
+- **`recommend_tier` and `start_pro_trial`'s hardcoded Pro-mechanism lists
+  now include `--import-obfuscation` (pyobfus 0.5.7)** — `pro_action.
+  estimated_protection` and `pro_tier_capabilities` in `recommend_tier`, and
+  `trial_features` in `start_pro_trial`, previously enumerated only the four
+  v0.5.0-0.5.4 mechanisms (Selective Opacity, forensic watermarking, Runtime
+  String Vault, @seal_code/--scrub-traceback). An agent calling either tool
+  today would get a stale answer for "what does Pro include."
 
 ## [0.3.2] — 2026-08-02
 

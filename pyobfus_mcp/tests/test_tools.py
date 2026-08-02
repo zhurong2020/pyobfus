@@ -438,6 +438,8 @@ def test_recommend_tier_sensitive_secrets_recommends_pro(tmp_path: Path) -> None
     assert result["pro_action"]["price_usd"] == 45
     assert "buy.stripe.com" in result["pro_action"]["checkout_url"]
     assert result["tier_context"]["tool_tier"] == "pro_funnel"
+    capabilities_blob = " ".join(result["pro_tier_capabilities"])
+    assert "--import-obfuscation" in capabilities_blob  # v0.5.7 mechanism surfaced
 
 
 def test_recommend_tier_path_not_found(tmp_path: Path) -> None:
@@ -466,6 +468,7 @@ def test_start_pro_trial_returns_structured_guidance() -> None:
     features_blob = " ".join(result["trial_features"])
     assert "AES-256 string encryption" in features_blob
     assert "Selective Opacity" in features_blob  # v0.5 mechanisms surfaced
+    assert "--import-obfuscation" in features_blob  # v0.5.7 mechanism surfaced
     assert result["post_trial_options"]["price_usd"] == 45
     assert "buy.stripe.com" in result["post_trial_options"]["checkout_url"]
     assert result["tier_context"]["tool_tier"] == "pro_funnel"
