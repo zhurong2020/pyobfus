@@ -341,7 +341,7 @@ def generate_pyobfus_config(
         path: Root of the Python project to scan.
         preset_override: Optional preset name to force (safe, balanced,
             aggressive, fastapi, django, flask, pydantic, click,
-            sqlalchemy). Default: auto-detected.
+            sqlalchemy, ml). Default: auto-detected.
         write: If True, writes the generated file to disk.
 
     Returns:

@@ -6,6 +6,17 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+### Changed
+
+- **`server.json`'s `_meta` and `generate_pyobfus_config`'s docstring now
+  name the `ml` framework preset** (pyobfus 0.5.5), and `_meta.target_clients`
+  now includes `codex`. Docs-only fix — `list_presets()`/`explain_preset()`
+  already returned `ml` correctly at runtime (they read
+  `ObfuscationConfig.FRAMEWORK_PRESETS` dynamically under the existing
+  `pyobfus>=0.5.1` dependency floor); only the static metadata arrays had
+  drifted. Not yet republished to PyPI/MCP Registry as a version bump —
+  tracked in `docs/DOC_SYNC_AUDIT_2026-08-02.md`.
+
 ## [0.3.1] — 2026-06-22
 
 _(Published to PyPI 2026-06-22 via OIDC; MCP Registry updated to 0.3.1 isLatest the same day.)_
