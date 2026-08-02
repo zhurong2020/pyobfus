@@ -115,10 +115,35 @@ surfaces — official repo, community repo, and the independent
 `claudepluginhub.com`/`claudemarketplaces.com` directories — zero hits). This is
 the same "registry breadth" gap already documented for MCP servers in
 `docs/AGENTIC_DISCOVERABILITY_2026-06-22.md` Gap 1, just for the plugin-directory
-ecosystem instead. **Action** (not taken this session — an external submission
-representing the project should get an explicit go-ahead, same reasoning as not
-unilaterally re-publishing pyobfus-mcp in Q3): submit `pyobfus`'s marketplace via
-`clau.de/plugin-directory-submission` for the community-marketplace tier.
+ecosystem instead.
+
+**Submission process confirmed 2026-08-02** (fetched
+`code.claude.com/docs/en/plugins#submit-your-plugin-to-the-official-marketplace`):
+- The official marketplace (`claude-plugins-official`) has **no application
+  process** — Anthropic decides at its discretion; the submission form does
+  not add plugins there. Not a path available to us.
+- The community marketplace (`claude-plugins-community`) accepts submissions
+  via an **in-app web form**, not a GitHub PR: for a Team/Enterprise org,
+  `claude.ai/admin-settings/directory/submissions/plugins/new`; for an
+  **individual author** (pyobfus's case), the Console form at
+  **`platform.claude.com/plugins/submit`**.
+- Before submitting, `claude plugin validate ./your-plugin` must pass — the
+  review pipeline runs the identical check. **Already run against this repo,
+  passed**: `claude plugin validate ./` → `✔ Validation passed` (validates
+  `.claude-plugin/marketplace.json`; the plugin manifest
+  `.claude-plugin/plugin.json` — name/version/description/author/homepage/
+  repository/license/keywords — is already complete and didn't need changes).
+- Approved plugins get pinned to a commit SHA in the public catalog; CI
+  auto-bumps the pin on new pushes. The catalog syncs **nightly**, so expect
+  a delay between approval and the plugin appearing in
+  `anthropics/claude-plugins-community`'s `marketplace.json`.
+
+**Not completed this session — requires the maintainer's own authenticated
+browser session.** Filling out `platform.claude.com/plugins/submit` needs a
+logged-in Console account; this is not something achievable via CLI/API the
+way the PyPI/MCP Registry publishes were. Local validation is the one
+pre-check that *could* be automated, and it's done and passing — the
+remaining step is a ~2-minute manual form submission.
 
 `marketplace.json`'s own `metadata.version` is pinned at
 `"0.1.0"` and has never moved since creation; check whether that's meant to track
