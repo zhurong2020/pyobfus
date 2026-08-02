@@ -86,6 +86,10 @@ The following features are **fully implemented and available** in the current ve
 - **File Filtering**: Exclude files using glob patterns (test files, config files, etc.)
 - **Configuration Files**: YAML-based configuration for repeatable builds
 - **Selective Obfuscation**: Preserve specific names (builtins, magic methods, custom exclusions)
+- **Configuration Presets**: `--preset safe | balanced | aggressive` for quick obfuscation-strength tradeoffs, plus **framework-aware presets** — `--preset fastapi | django | flask | pydantic | click | sqlalchemy | ml` — with built-in exclusions for dispatch methods, decorators, ORM fields, migrations, and dependency-injection parameters. `--list-presets` shows them all
+- **Pre-flight Risk Scanning** (`--check`): detects `eval`/`exec`, dynamic attribute access, and framework reflection points before you obfuscate
+- **Reverse Stack-Trace Mapping** (`--unmap`): reverse obfuscated identifiers in a production stack trace, so you (or an AI coding assistant) can debug without un-obfuscating the shipped code
+- **Build Provenance** (`--provenance-manifest`, v0.5.5): local JSON manifest of an obfuscation run — output file hashes, config hash, pyobfus version, mapping digest — for offline build provenance, no network calls
 
 ### 🔒 Pro Edition (Available Now)
 
@@ -133,7 +137,11 @@ as opt-in `pyobfus` build flags (single-file / `--no-cross-file` mode):
 `--fingerprint <buyer-id>`, `--expire-hard <date>`. **v0.5.3** adds
 `--period <N>` (run-counter limit), `--opacity-config <opacity.toml>`
 (pattern-driven L3 encryption by original qualname), and `--bind-device` /
-`--bind-device-id <id>` (device-locked L3 encryption).
+`--bind-device-id <id>` (device-locked L3 encryption). **v0.5.4** extends
+`--bind-device` to Runtime String Vault keys too — previously only the
+Selective Opacity L3 layer was device-locked, so vault secrets decrypted on
+any machine; now each vault key is independently re-derived at runtime from
+the bound device.
 
 - **Selective Opacity** — per-symbol protection layers (transparent / ai-readable / obfuscated / AES-256-GCM encrypted with lazy `__code__` materialization).
 - **Forensic watermarking** — per-buyer deterministic key derivation for piracy traceback.
@@ -623,7 +631,7 @@ portability can depend on syntax, dependencies, and enabled transformations.
 | **Free tier** | Clear limits (5 files/1000 LOC) | Vague "trial" limitations |
 | **Open source** | Yes (Core: Apache 2.0, Pro: Proprietary) | No |
 | **Native dependencies** | None (pure Python output) | Requires runtime library |
-| **Python 3.12 support** | Yes | Yes |
+| **Python 3.9-3.14 support** | Yes | Yes |
 
 **Choose pyobfus if:** You want transparent pricing, open-source trust, and simpler deployment without native dependencies.
 
