@@ -154,8 +154,14 @@ def _run_in_docker(
     # (already world-readable, 0644) file permissions inside it -- surfaces as
     # a driver "Permission denied" with every row scored not-recovered. The
     # bind mount is already read-only and network-isolated, so widening this
-    # to world-readable/-traversable does not weaken the sandbox.
-    os.chmod(work, 0o755)
+    # does not weaken the sandbox -- but grant the minimum needed rather than
+    # a blanket world-readable directory: the driver only ever opens
+    # driver.py/reimpl.py/vectors.json by their known, hardcoded paths (see
+    # score_recovery above), it never lists the directory, so 0o711 (execute
+    # -- traverse -- for group/other, no read bit) is enough to open those
+    # files without also making the directory's contents enumerable to any
+    # other local user on a shared host.
+    os.chmod(work, 0o711)
     for entry in work.iterdir():
         os.chmod(entry, 0o644)
 
