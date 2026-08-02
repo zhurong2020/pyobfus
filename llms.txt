@@ -65,7 +65,7 @@ uvx pyobfus-mcp
 ## Pro feature flags (require trial or license)
 
 - `--string-encryption` — AES string encryption for string literals
-- `--import-obfuscation` (unreleased) — rewrite top-level imports to runtime `importlib` / `__import__` calls and encrypt import strings
+- `--import-obfuscation` (0.5.7) — rewrite top-level imports to runtime `importlib` / `__import__` calls and encrypt import strings
 - `--control-flow` — control-flow flattening
 - `--dead-code` — dead-code injection
 - `--anti-debug` — debugger checks

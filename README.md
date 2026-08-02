@@ -20,7 +20,7 @@ A Python code obfuscator built with AST-based transformations. **Supports Python
 
 > **🔒 Pro Edition available** — 6 patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator, $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
 
-> **🔧 What's new in v0.5.6** — Fixed a CLI bug where running any preset the normal, documented way (`--preset fastapi/django/flask/pydantic/click/sqlalchemy/ml/safe`, no extra flags) could silently override the preset's own choices: parameter names got mangled despite `preserve_param_names=True`, and docstrings got stripped despite `--preset safe`'s core promise to keep them. Both now behave as documented. Full details in the [CHANGELOG](CHANGELOG.md); see [Pro Edition](#-pro-edition) below.
+> **🔧 What's new in v0.5.7** — Pro builds now support `--import-obfuscation`, rewriting top-level imports to runtime `importlib` / `__import__` calls and encrypting the import strings. The comparison guide also now states the honest AST-vs-bytecode tradeoff for PyArmor alternatives. Full details in the [CHANGELOG](CHANGELOG.md); see [Pro Edition](#-pro-edition) below.
 
 ## 🔌 Companion MCP server: [`pyobfus-mcp`](pyobfus_mcp/)
 

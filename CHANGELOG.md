@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.7] - 2026-08-02
+
+**Feature + positioning release.** Adds Pro import obfuscation and the matching
+comparison copy for the PyArmor-alternative story. `pyobfus-mcp` is unchanged at
+0.3.2 (no MCP tool-surface change), so no MCP Registry publish or Glama
+Build-steps re-pin is needed for this release.
+
 ### Added
 
 - **`--import-obfuscation` (Pro, P2-4)** — rewrites top-level

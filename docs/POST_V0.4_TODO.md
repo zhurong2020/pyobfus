@@ -79,9 +79,14 @@
 > `protect_project`) in the plugin-marketplace submission's description,
 > fix opportunistically if Anthropic follows up.
 > **2026-08-02 follow-up**: P2-4 is implemented and committed for the 0.5.7
-> train; P2-22 is now done in `docs/COMPARISON.md` with README/CHANGELOG/
-> ROADMAP sync; `pyobfus_mcp/CHANGELOG.md` also records the companion-package
-> no-wire-change status for pyobfus 0.5.5-0.5.7.
+> train; P2-22 is done in `docs/COMPARISON.md` with README/CHANGELOG/ROADMAP
+> sync; `pyobfus_mcp/CHANGELOG.md` records the companion-package no-wire-change
+> status for pyobfus 0.5.5-0.5.7. **0.5.7 release prep is now in progress**:
+> `pyproject.toml` version bumped, CHANGELOG promoted to `[0.5.7]`, README
+> "What's new" and llms surfaces updated. Final local gate passed (core/MCP/
+> integration pytest roots, black/ruff/mypy, `python -m build`, `twine check`).
+> Remaining before publish after this release-prep commit lands: tag `v0.5.7`,
+> push tag, verify PyPI.
 
 ## Current prioritized TODO (2026-08-01)
 
