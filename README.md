@@ -71,7 +71,7 @@ See [`skills/`](skills/) for the skill and install details. (This is distinct fr
 
 The following features are **fully implemented and available** in the current version:
 
-- **🆕 Cross-File Obfuscation** (v0.2.0): Consistent name obfuscation across multiple files
+- **Cross-File Obfuscation**: Consistent name obfuscation across multiple files
   - Automatic import statement rewriting
   - `__all__` list updates with obfuscated names
   - Global symbol table with collision detection
@@ -91,45 +91,45 @@ The following features are **fully implemented and available** in the current ve
 - **Reverse Stack-Trace Mapping** (`--unmap`): reverse obfuscated identifiers in a production stack trace, so you (or an AI coding assistant) can debug without un-obfuscating the shipped code
 - **Build Provenance** (`--provenance-manifest`, v0.5.5): local JSON manifest of an obfuscation run — output file hashes, config hash, pyobfus version, mapping digest — for offline build provenance, no network calls
 
-### 🔒 Pro Edition (Available Now)
+### 🔒 Pro Edition
 
 The following advanced features are available with a Pro license:
 
-- **String Encryption** (v0.1.6+)
+- **String Encryption**
   - AES-256 encryption for strings
   - Runtime decryption with injected decoder
   - Automatic key generation
 
-- **Anti-Debugging** (v0.1.6+)
+- **Anti-Debugging**
   - Debugger detection checks injected into functions
   - Multiple detection methods (sys.gettrace, sys.settrace)
   - Configurable behavior
 
-- **Control Flow Flattening** (v0.3.0+)
+- **Control Flow Flattening**
   - State machine transformation for if/else/elif
   - For/while loop flattening
   - Nested structure support
   - CLI: `--control-flow`
 
-- **Dead Code Injection** (v0.3.0+)
+- **Dead Code Injection**
   - Insertion of unreachable code paths
   - Four strategies: after-return, false branches, opaque predicates, decoy functions
   - CLI: `--dead-code`
 
-- **License Embedding** (v0.3.0+)
+- **License Embedding**
   - Embed expiration dates: `--expire 2025-12-31`
   - Machine binding: `--bind-machine`
   - Run count limits: `--max-runs 100`
   - Offline verification - no external dependencies
 
-- **Configuration Presets** (v0.3.0+)
+- **Configuration Presets**
   - `--preset trial` - 30-day time-limited version
   - `--preset commercial` - Maximum protection with machine binding
   - `--preset library` - For pip-distributable libraries
   - `--preset maximum` - Highest security with all protections
   - `--list-presets` - View all presets
 
-#### New in v0.5.0 — patent-targeted mechanisms (CN 202610712171X)
+#### Patent-targeted mechanisms (CN 202610712171X, introduced v0.5.0)
 
 Six mechanisms, available both as the `pyobfus_pro` API and — as of **v0.5.1** —
 as opt-in `pyobfus` build flags (single-file / `--no-cross-file` mode):
@@ -191,12 +191,12 @@ After your trial, purchase a license to continue using Pro features.
 ## Purchase Professional Edition
 
 **Pro Edition Features**:
-- 🔀 Control Flow Flattening (v0.3.0+)
-- 🧩 Dead Code Injection (v0.3.0+)
+- 🔀 Control Flow Flattening
+- 🧩 Dead Code Injection
 - 🔐 AES-256 String Encryption
 - 🛡️ Anti-Debugging Checks
-- 📅 License Embedding (v0.3.0+) - Expiration, machine binding, run limits
-- ⚡ Configuration Presets (v0.3.0+) - One-command setup
+- 📅 License Embedding - Expiration, machine binding, run limits
+- ⚡ Configuration Presets - One-command setup
 - 🔄 Lifetime Updates
 - 💻 Up to 3 devices per license
 - 📧 Priority Email Support
