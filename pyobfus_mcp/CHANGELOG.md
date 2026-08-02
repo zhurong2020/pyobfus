@@ -6,16 +6,22 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+## [0.3.2] — 2026-08-02
+
+**Docs/metadata-only release.** No tool code, signatures, or wire behavior
+changed — `list_presets()`/`explain_preset()` already returned pyobfus
+0.5.5's `ml` preset correctly at runtime (they read
+`ObfuscationConfig.FRAMEWORK_PRESETS` dynamically under the existing
+`pyobfus>=0.5.1` dependency floor). This release syncs the *static*
+metadata that had drifted, per `docs/DOC_SYNC_AUDIT_2026-08-02.md`.
+
 ### Changed
 
 - **`server.json`'s `_meta` and `generate_pyobfus_config`'s docstring now
   name the `ml` framework preset** (pyobfus 0.5.5), and `_meta.target_clients`
-  now includes `codex`. Docs-only fix — `list_presets()`/`explain_preset()`
-  already returned `ml` correctly at runtime (they read
-  `ObfuscationConfig.FRAMEWORK_PRESETS` dynamically under the existing
-  `pyobfus>=0.5.1` dependency floor); only the static metadata arrays had
-  drifted. Not yet republished to PyPI/MCP Registry as a version bump —
-  tracked in `docs/DOC_SYNC_AUDIT_2026-08-02.md`.
+  plus `pyproject.toml`'s keywords/description now include `codex` — already
+  a first-class client via the `AGENTS.md` template and the Smithery Skill
+  listing, just missing from this package's own metadata.
 
 ## [0.3.1] — 2026-06-22
 
