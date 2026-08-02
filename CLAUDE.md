@@ -12,13 +12,15 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 该文档顶部是活的「Current prioritized TODO」（随每次发布/里程碑刷新日期），下方是冻结的历史执行记录——**只读顶部，别被下面的历史小节带偏**。
 
-### 🟡 2026-08-02 active state — issue #25 已修复未发布，下次 session 直接发版
+### ✅ 2026-08-02 — pyobfus 0.5.6 已发布，issue #25 已关闭，CodeQL 已清零
 
-**pyobfus 0.5.5 已发布**（`--preset ml` P2-19 + `--provenance-manifest` P2-17，PR [#26](https://github.com/zhurong2020/pyobfus/pull/26)/[#27](https://github.com/zhurong2020/pyobfus/pull/27) 已合并，tag `v0.5.5` 经 OIDC 发 PyPI，核实 latest=0.5.5）。mcp 仍 0.3.1。
+**pyobfus 0.5.6 已发布**（issue #25 修复 + benchmark 沙箱权限加固，commit `4f53c2e`/`8ec8abc`，tag `v0.5.6` 经 OIDC 发 PyPI，核实 latest=0.5.6）。mcp 仍 0.3.1（本次未涉及 tool surface 变化）。
 
-**✅ issue #25 已修复**：`pyobfus/cli.py` 的 3 个 flag（`--preserve-param-names`、`--remove-docstrings/--keep-docstrings`、`--remove-comments/--keep-comments`）改成 tri-state（`default=None`），"Override config with CLI options" 代码块只在用户显式传参时才覆盖 preset/config 的选择。两条原始复现（`--preset fastapi` 参数名、`--preset safe` docstring）+ 一条 YAML config 复现均已重跑验证通过；`tests/test_framework_presets.py` 里原先的假阳性测试（断言字符串 dict key 而非真实标识符）已重写，新增 8 个回归测试（含显式 flag 仍能覆盖 preset 的双向验证）。三个测试根全绿（1074+73+7）+ black/ruff/mypy 全过。`pyproject.toml` 已升到 0.5.6，`CHANGELOG.md` 已加 `[0.5.6]` 条目。**剩余步骤**：commit → push → 决定是否 tag `v0.5.6`（release workflow 只在 tag push 时触发，push main 不会自动发版）→ OIDC 发布后关闭 issue #25。
+**issue #25**（`preserve_param_names`/`remove_docstrings`/`remove_comments` 被 CLI 默认值静默覆盖，且波及全部 7 个 framework preset 的 docstring 保留承诺）：`pyobfus/cli.py` 3 个 flag 改成 tri-state（`default=None`），"Override config with CLI options" 代码块只在用户显式传参时才覆盖 preset/config 选择。三个测试根全绿（1074+73+7）+ black/ruff/mypy 全过，8 个新回归测试。**已关闭**（issue 评论总结 + 引用 commit）。
 
-完整时间线 + 修复细节见 `docs/POST_V0.4_TODO.md` § item 6（0.5.5 发布经过）+ § item 7（issue #25 诊断与修复全过程）。
+**同 session 顺带清零 2 条 open CodeQL 告警**（High/CWE-732 `py/overly-permissive-file`，`benchmarks/llm_resistance/scorer.py` 的 Docker 打分沙箱 temp dir chmod）：目录权限 `0o755`→`0o711`（仅 traverse 不可 list，driver 只按已知硬编码路径开 3 个文件、从不 list 目录），真实 Docker 沙箱验证通过，下次扫描自动 fixed。逐文件 `0o644` 是功能性必需（容器跑不受信任 LLM 输出，用与 host 无关的 UID `65534:65534` 防御纵深，与文件属主无共同 group，跨 UID 读内容只能靠 world-read bit）——已用 `gh api` 记录 `won't fix` 理由正式 dismiss，非静默放置。
+
+完整时间线 + 修复细节见 `docs/POST_V0.4_TODO.md` 顶部 handoff note + § item 7。
 
 - ✅ 已提交并受理（申请号 `202610712171X` · 申请日/优先权日 2026-05-22 · 17 项权利要求）
 - ✅ 费用全部缴清（共 1610 元 · 2026-05-22 一次缴清 · 含申请费类 1235 与实审费 375 · 官方审查信息查询「费足」核实）
@@ -34,10 +36,11 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - ✅ **AI-agent 可发现性 Wave A（2026-06-22）**：Smithery 经 **Skill 渠道** `zhurong2020/pyobfus-protect`（Smithery MCP 发布是远程网关、本地工具走不通,Skill 才对）+ mcp.so + `uvx` 零安装 + server.json 99 字描述(commit `826c576`/`49f4df3`)。报告:`docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`。
 - ❌ **JOSS 投稿被拒(2026-06-24)**:v0.5.1 投 JOSS(issue `openjournals/joss-reviews#10788`)被总编 desk-reject,理由=**scope/significance 非质量**("private-dev-then-public" + 无第三方复用)。→ 改走免费路径:✅ **Zenodo DOI `10.5281/zenodo.20846053`(concept)已拿到**,已接进 CITATION.cff + README 徽章 + `## Citation` + 两个 pyproject + RTD + ORCID + arong.eu.org/academic。完整记录+渠道对比见 `docs/JOSS_REJECTION_20260624.md`。
 - ✅ **P2-18 内部证据完成（2026-08-01）**：5 样本 × Codex+Claude 全跑完，`price_rules` 拿到第一个干净跨模型 C4 数据点，决定不加第三个模型家族。评审版报告 `docs/LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md`；过程中顺带修了 3 个既有 plumbing bug（语料库 no-op 稀释统计、`--json-schema` 不认 `$schema` meta key、docker 打分沙箱 temp dir 权限导致此前从未真实跑通），细节见 `docs/POST_V0.4_TODO.md` § P2-18。
-- ✅ **pyobfus 0.5.5 已发布（2026-08-02，PR #26 + #27）**：`--preset ml`（P2-19，社区版模型服务 preset）+ `--provenance-manifest`（P2-17，本地 JSON 构建溯源清单，非加密签名）。Review 顺带发现 issue #25（见上）并诚实标注在 CHANGELOG/docstring 里，不是掩盖。
-- ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:**当前重心 = issue #25 修复**（根因已查明，见 § item 7，直接动手不用重新诊断）。之后是 P2-13/P2-22 这类零代码内容型候选（PyInstaller cookbook / PyArmor 对比页）。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
+- ✅ **pyobfus 0.5.5 已发布（2026-08-02，PR #26 + #27）**：`--preset ml`（P2-19，社区版模型服务 preset）+ `--provenance-manifest`（P2-17，本地 JSON 构建溯源清单，非加密签名）。Review 顺带发现 issue #25 并诚实标注在 CHANGELOG/docstring 里，不是掩盖。
+- ✅ **pyobfus 0.5.6 已发布（2026-08-02）**：issue #25 修复（见上）+ CodeQL 高危告警清零（见上）。
+- ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:P2-13/P2-22 这类零代码内容型候选（PyInstaller cookbook / PyArmor 对比页）。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
 
-**Cold-start session 第一句话应问 user**：「issue #25 修复已经在工作区做完并全绿（tri-state flag + 测试重写，未提交）。现在提交并发 0.5.6 版吗？」
+**Cold-start session 第一句话应问 user**：「0.5.6 已发、issue #25 已关、CodeQL 已清零。要做 P2-13/P2-22 这类内容型候选，还是推进 IP 商业化迁移(个人→旎嵘科技)?」
 
 **Cold-start 资料定位**（按读取优先级）：
 

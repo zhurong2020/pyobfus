@@ -25,21 +25,32 @@
 > `docs/LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md`. See item 4 below.
 > **P2-17 + P2-19 merged and released as pyobfus 0.5.5, 2026-08-02** — PRs
 > #26/#27 both reviewed, merged, live on PyPI. See item 6 below.
-> **Issue #25 fixed 2026-08-02, not yet released — see item 7.** The
-> tri-state-flag fix landed in the working tree (`cli.py`'s three
+> **Issue #25 fixed, closed, and released as pyobfus 0.5.6 — 2026-08-02.**
+> The tri-state-flag fix (`cli.py`'s three
 > `--preserve-param-names`/`--remove-docstrings`/`--remove-comments`
 > options now default to `None` and only override a preset/config choice
-> when the user explicitly passes them) and is verified both by an
-> empirical re-run of the original repro commands and by new/rewritten
-> tests in `tests/test_framework_presets.py` (the old
+> when the user explicitly passes them) is verified by an empirical re-run
+> of the original repro commands plus new/rewritten tests in
+> `tests/test_framework_presets.py` (the old
 > `test_cli_fastapi_preset_preserves_param_names` was itself a false
 > positive — it asserted against a surviving string dict key, not the
-> renamed identifier). All three test roots (1074+73+7) plus
-> black/ruff/mypy are green. `pyproject.toml` bumped to 0.5.6 and
-> `CHANGELOG.md` has a dated `[0.5.6]` entry. Remaining: commit, push,
-> then decide separately whether to tag `v0.5.6` (the release workflow
-> only triggers on a tag push, not on pushing to main) and close issue #25
-> once it's live on PyPI.
+> renamed identifier). Commit `4f53c2e` on `main`; tag `v0.5.6` pushed,
+> release workflow green, PyPI JSON API confirms `0.5.6` is latest.
+> Issue #25 closed with a summary comment.
+> **Same session: 2 open CodeQL alerts on `main` also closed out** (High/
+> CWE-732 `py/overly-permissive-file` in `benchmarks/llm_resistance/
+> scorer.py`, the Docker-executor temp-dir chmod for the P2-18 benchmark
+> sandbox). The directory chmod was tightened `0o755` → `0o711`
+> (traverse-only, no listing — the driver only ever opens 3 known
+> hardcoded paths, never lists the dir) in commit `8ec8abc`, verified
+> against the real Docker sandbox
+> (`test_docker_executor_can_read_mounted_temp_dir`), which auto-resolved
+> that alert on the next scan. The per-file `0o644` chmod is functionally
+> unavoidable — the container runs as an unrelated UID (`65534:65534`,
+> chosen over the host UID specifically for escape-blast-radius
+> defense-in-depth) with no shared group, so reading file *contents*
+> requires the world-read bit; dismissed with a documented `won't fix`
+> rationale via the code-scanning API rather than left silently open.
 
 ## Current prioritized TODO (2026-08-01)
 
@@ -328,11 +339,11 @@
    A Tools / Resources / Prompts separation is recorded in
    [`MCP_PRIMITIVES_DESIGN.md`](MCP_PRIMITIVES_DESIGN.md) as a post-launch
    research candidate, not committed scope — unrelated to this decision.
-7. **✅ FIXED 2026-08-02, not yet released — issue #25 fix, and it turned out
-   bigger than originally filed.** The fix, verification, and new tests
-   described below are all done and passing locally (uncommitted); what's
-   left is committing, bumping to 0.5.6, tagging, and the OIDC release —
-   tracked as a fresh item once this session's work is committed.
+7. **✅ FIXED, RELEASED as pyobfus 0.5.6, issue closed — 2026-08-02.** It
+   turned out bigger than originally filed (see below). Commit `4f53c2e`,
+   tag `v0.5.6` pushed, OIDC release green, confirmed latest on PyPI's JSON
+   API. Also swept 2 open CodeQL alerts in the same session — see the
+   handoff note at the top of this file for the security fix.
 
    **Root cause found and empirically confirmed** (not just a hunch — both
    repros below were actually run against current `main`):
