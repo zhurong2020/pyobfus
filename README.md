@@ -18,7 +18,9 @@
 
 A Python code obfuscator built with AST-based transformations. **Supports Python 3.9 through 3.14**. Provides reliable name mangling, string encoding, control-flow flattening, AES-256 string encryption, and — unique to pyobfus — a reverse-mapping workflow that lets you (or your AI coding assistant) debug obfuscated stack traces without giving up the protection.
 
-> **🔧 What's new in v0.5.6** — Fixed a CLI bug where running any preset the normal, documented way (`--preset fastapi/django/flask/pydantic/click/sqlalchemy/ml/safe`, no extra flags) could silently override the preset's own choices: parameter names got mangled despite `preserve_param_names=True`, and docstrings got stripped despite `--preset safe`'s core promise to keep them. Both now behave as documented. Full details in the [CHANGELOG](CHANGELOG.md); see [Pro Edition](#-pro-edition-available-now) below.
+> **🔒 Pro Edition available** — 6 patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator, $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
+
+> **🔧 What's new in v0.5.6** — Fixed a CLI bug where running any preset the normal, documented way (`--preset fastapi/django/flask/pydantic/click/sqlalchemy/ml/safe`, no extra flags) could silently override the preset's own choices: parameter names got mangled despite `preserve_param_names=True`, and docstrings got stripped despite `--preset safe`'s core promise to keep them. Both now behave as documented. Full details in the [CHANGELOG](CHANGELOG.md); see [Pro Edition](#-pro-edition) below.
 
 ## 🔌 Companion MCP server: [`pyobfus-mcp`](pyobfus_mcp/)
 
@@ -194,6 +196,7 @@ After your trial, purchase a license to continue using Pro features.
 - 🔀 Control Flow Flattening
 - 🧩 Dead Code Injection
 - 🔐 AES-256 String Encryption
+- 📦 Import Obfuscation - runtime `importlib` imports with encrypted import strings
 - 🛡️ Anti-Debugging Checks
 - 📅 License Embedding - Expiration, machine binding, run limits
 - ⚡ Configuration Presets - One-command setup
@@ -237,6 +240,7 @@ After your trial, purchase a license to continue using Pro features.
 
    # Individual features
    pyobfus input.py -o output.py --string-encryption
+   pyobfus input.py -o output.py --import-obfuscation
    pyobfus input.py -o output.py --anti-debug
    pyobfus input.py -o output.py --control-flow
    pyobfus input.py -o output.py --dead-code
@@ -245,7 +249,7 @@ After your trial, purchase a license to continue using Pro features.
    pyobfus src/ -o dist/ --expire 2025-12-31 --bind-machine --max-runs 100
 
    # All Pro features
-   pyobfus input.py -o output.py --string-encryption --anti-debug --control-flow --dead-code
+   pyobfus input.py -o output.py --string-encryption --import-obfuscation --anti-debug --control-flow --dead-code
    ```
 
 **Support**: If you encounter any issues, contact zhurong0525@gmail.com with your license key.

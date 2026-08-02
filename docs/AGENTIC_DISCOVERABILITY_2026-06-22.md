@@ -122,6 +122,12 @@ exact redirect from `/.well-known/ai-catalog.json` to
 `/en/latest/.well-known/ai-catalog.json` and verifies HTTPS, JSON content type,
 CORS `*`, and the final body after the docs build deploys.
 
+**2026-08-02 verification:** the versioned path is live:
+`https://pyobfus.readthedocs.io/en/latest/.well-known/ai-catalog.json` returns
+HTTP 200, `content-type: application/json`, and `access-control-allow-origin: *`.
+The root well-known path still returns HTTP 404, so the remaining work is only the
+Read the Docs root redirect/admin step.
+
 ---
 
 ## 4. Prioritized action plan
@@ -137,8 +143,8 @@ CORS `*`, and the final body after the docs build deploys.
 - [ ] Reuse PyArmor trial-limit + test-count facts as citable, sourced statistics (Gap 3)
 
 **Wave C — emerging bet (one afternoon):**
-- [~] ARD manifest implemented and CI-validated; deploy + Read the Docs root
-  redirect/header verification remain admin actions (Gap 5)
+- [~] ARD manifest implemented, CI-validated, and live at the Read the Docs
+  versioned path; root well-known redirect remains an admin action (Gap 5)
 - [ ] (optional) `npx pyobfus-mcp` thin wrapper to also occupy the npm "room"
 
 ---

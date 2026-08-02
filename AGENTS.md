@@ -24,6 +24,11 @@ from the Apache-2.0 core.
 
 ## Setup
 
+Use the repository-local **`venv/`** on WSL/Linux. Do **not** use `.venv/`:
+that directory is a Windows-side legacy environment and WSL cannot reliably run
+its executables. Either activate `venv/` first, or call tools through
+`venv/bin/...` directly.
+
 ```bash
 python -m venv venv && source venv/bin/activate
 pip install -e ".[dev]"
@@ -33,12 +38,12 @@ git config core.hooksPath .githooks   # once per clone — enables the PII pre-c
 ## Build / test / lint — run before every commit
 
 ```bash
-pytest tests/                 # core suite (run this and the two below separately)
-pytest pyobfus_mcp/tests/     # MCP server suite
-pytest integration_tests/     # end-to-end CLI
-black pyobfus/                # format
-ruff check pyobfus/           # lint
-mypy pyobfus/                 # type check
+venv/bin/pytest tests/                 # core suite (run this and the two below separately)
+venv/bin/pytest pyobfus_mcp/tests/     # MCP server suite
+venv/bin/pytest integration_tests/     # end-to-end CLI
+venv/bin/black pyobfus/                # format
+venv/bin/ruff check pyobfus/           # lint
+venv/bin/mypy pyobfus/                 # type check
 ```
 
 Note: the core and MCP test roots are collected as **separate** pytest

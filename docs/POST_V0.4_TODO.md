@@ -69,16 +69,13 @@
 > blocked**: the maintainer reached the admin panel but clicking the
 > "Dockerfile" tab reloads back to "Profile" instead of navigating,
 > with an uncaptured browser-console error — looks like a Glama-side UI
-> bug, not a maintainer or credentials problem. Deferred; next attempt
-> should capture the actual console error text first. **Next session's
-> punch list — write-up complete, ready to execute with no re-research**
-> lives in `docs/DOC_SYNC_AUDIT_2026-08-02.md`'s "Session 2 ...
-> next-session punch list" section: (1) fix a broken
-> `#-pro-edition-available-now` anchor link this session's own heading
-> rename created, (2) add the agreed persistent Pro-Edition anchor line
-> near the README intro (exact draft copy + placement + rationale
-> already written), (3) retry the Glama re-pin with the console error
-> captured, (4) minor: a "protected_project" typo (should be
+> bug, not a maintainer or credentials problem. Retested by the maintainer
+> later the same day and still not working; next attempt should capture the
+> actual console error text first. **Next session's punch list status**:
+> README's broken `#-pro-edition-available-now` anchor and the agreed
+> persistent Pro-Edition intro line are now fixed; remaining items are
+> (1) retry the Glama re-pin with the console error captured, and (2)
+> minor: a "protected_project" typo (should be
 > `protect_project`) in the plugin-marketplace submission's description,
 > fix opportunistically if Anthropic follows up.
 
@@ -302,10 +299,14 @@
    section), and a larger per-condition sample count if that publication
    effort ever starts — 5 samples demonstrates the method, it isn't enough
    for a statistical confidence interval.
-5. ✅ **Discoverability and citation — deployed and verified 2026-07-22.** DOI,
-   README/PyPI/Read the Docs citation surfaces are present. ARD metadata is
-   CI-validated and live at the Read the Docs well-known URL. PulseMCP exact
-   search returned 0 results on 2026-07-22. Its submission page says Registry
+5. ✅ **Discoverability and citation — deployed and verified 2026-07-22; ARD
+   rechecked 2026-08-02.** DOI, README/PyPI/Read the Docs citation surfaces
+   are present. ARD metadata is CI-validated and live at the Read the Docs
+   versioned path (`/en/latest/.well-known/ai-catalog.json`, HTTP 200, JSON
+   content type, CORS `*`); the root `/.well-known/ai-catalog.json` path still
+   returns 404 and needs the Read the Docs admin redirect. PulseMCP exact
+   search returned 0 results on 2026-07-22 and still has no confirmed pyobfus
+   listing from the 2026-08-02 recheck. Its submission page says Registry
    entries are ingested daily and processed weekly, and directs maintainers to
    `hello@pulsemcp.com` after a week; the maintainer sent that follow-up on
    2026-07-22, so this is now passive monitoring.
@@ -834,7 +835,7 @@ gh api repos/zhurong2020/pyobfus --jq '.topics' | tr ',' '\n' | grep -i pyarmor 
 |---|---|---|---|
 | **P2-1** 🔒 | Selective Opacity (layered AES protection) | **W3 + W3-A + W3-B DONE-PRIVATE 2026-05-09** (design doc + opacity/ scaffolding + 4-layer lattice + 3-channel API + L3 lazy-materialization runtime + build-pass AST transformer with per-layer dispatch / per-build `_LAYER_KEY` / per-function `_CIPHER_<name>` / `(qualname → Layer)` orchestrator interface · 88 P2-1 tests + 218 total · 9 patent findings · end-to-end round-trip working · **P2-1 ↔ P2-9 + P2-1 ↔ P2-11 coupling contracts both fulfilled** via P2-9.1 layer-aware seal + W3-C constant-materialization Vault) | Patent target. Core philosophical differentiator. Main combination claim core. Implementation lives in private repo per Path C; ship to public on 申请号 receipt. |
 | **P2-3** | `--strip-ai-artifacts` mode | ✅ **DONE 2026-06-06** (PR #17, merged to main · `transformers/ai_artifact_stripper.py` · removes AI provenance markers from docstrings + attribution dunders · conservative attribution-only · 27 tests · unreleased, in CHANGELOG `[Unreleased]`) | Pairs naturally with new N3 (claude-skill preset); both serve "ship AI-generated code as IP" segment. Public-OK (Core feature, not patent-gated). |
-| **P2-4** | Import obfuscation (Pro) | TODO | Keep · closes PyArmor Pro feature gap. Public-OK (existing public Pro module category). |
+| **P2-4** | Import obfuscation (Pro) | ✅ **DONE 2026-08-02** (`--import-obfuscation` · `pyobfus_pro/import_obfuscation.py` · top-level `import ...` and absolute `from ... import ...` → runtime `importlib` / `__import__` calls · import strings encrypted via auto-enabled AES · relative / `__future__` / star imports deliberately preserved · full core/MCP/integration suites + black/ruff/mypy passed locally) | Keep · closes PyArmor Pro feature gap. Public-OK (existing public Pro module category). |
 | **P2-5** | Numeric / constant obfuscation | ✅ **DONE 2026-06-06** (PR #16, merged to main · `transformers/numeric_obfuscator.py` · `--numeric-obfuscation` · int→XOR/add/sub, float→`float.fromhex` · 37 tests · unreleased, in CHANGELOG `[Unreleased]`) | Keep · small effort, fills gap. Public-OK (Core feature). |
 | **P2-2** | VSCode extension | TODO · **demoted** | VSCode marketplace is slower-growing channel than launch posts; revisit after launch data. Public-OK. |
 | **drop-3.8** | Drop Python 3.8 support | TODO | Both new competitors require `>=3.10`; we're paying 3.8 cost for shrinking userbase. Public-OK. |

@@ -310,7 +310,7 @@ CLI/API. The Pro-Edition discussion (Q6) happened; maintainer agreed with the
 proposed direction. **Everything below is written up for a cold-start session
 to execute directly — no re-research needed.**
 
-### 1. Fix a broken anchor link this session's own edit introduced
+### 1. Fix a broken anchor link this session's own edit introduced — ✅ done
 
 `README.md:21`'s "What's new" banner links to `[Pro Edition](#-pro-edition-available-now)`.
 That anchor slug matched the *old* heading text `### 🔒 Pro Edition (Available Now)`
@@ -325,7 +325,7 @@ parens dropped. Applying that to the new heading `🔒 Pro Edition` gives
 README on GitHub after pushing — anchor slugs are worth a visual sanity check
 since the algorithm isn't 100% guaranteed from this derivation alone.)
 
-### 2. Add a persistent Pro-Edition anchor line (Q6 outcome, maintainer agreed)
+### 2. Add a persistent Pro-Edition anchor line (Q6 outcome, maintainer agreed) — ✅ done
 
 **Agreed direction**: don't cram Pro mentions into unrelated release notes
 (that reads as marketing fluff, against this project's consistently honest,

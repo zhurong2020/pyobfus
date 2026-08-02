@@ -62,6 +62,14 @@ uvx pyobfus-mcp
 - `--preset library` — public API preserved, internals encrypted
 - `--preset maximum` — CFF + DCI + AES + anti-debug + binding + run-count cap
 
+## Pro feature flags (require trial or license)
+
+- `--string-encryption` — AES string encryption for string literals
+- `--import-obfuscation` (unreleased) — rewrite top-level imports to runtime `importlib` / `__import__` calls and encrypt import strings
+- `--control-flow` — control-flow flattening
+- `--dead-code` — dead-code injection
+- `--anti-debug` — debugger checks
+
 ## Pro build-fusion mechanisms (require trial or license)
 
 The normal obfuscation command composes six named Pro protection mechanisms via

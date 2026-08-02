@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`--import-obfuscation` (Pro, P2-4)** — rewrites top-level
+  `import ...` and absolute `from ... import ...` statements into runtime
+  `importlib` / `__import__` calls, then automatically enables AES string
+  encryption so module and imported-symbol names do not remain as plaintext
+  string literals in the generated output. Relative imports, `from __future__`
+  imports, and star imports are deliberately left unchanged in this first pass.
+
 ## [0.5.6] - 2026-08-02
 
 **Bugfix release.** Closes issue #25, which turned out bigger than
