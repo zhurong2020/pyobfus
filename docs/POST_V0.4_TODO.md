@@ -51,17 +51,20 @@
 > defense-in-depth) with no shared group, so reading file *contents*
 > requires the world-read bit; dismissed with a documented `won't fix`
 > rationale via the code-scanning API rather than left silently open.
-> **README/MCP/ROADMAP doc-staleness audit done 2026-08-02, not yet
-> fixed — see item 8.** The maintainer asked 11 pointed questions after
-> reviewing the post-0.5.6 README (missing Codex mentions, a PyPI-badge
-> false alarm, MCP metadata that never absorbed the `ml` preset,
-> whether the Claude Code plugin marketplace needs external
-> registration, stale `v0.1.6+`-era version tags, a "New in v0.5.0"
-> heading that's now 6 versions behind, and — the sharpest catch —
-> `docs/ROADMAP.md` still showing P2-17/P2-19 as in-progress when
-> they've actually shipped). Full findings + a prioritized fix order are
-> in `docs/DOC_SYNC_AUDIT_2026-08-02.md`, written specifically so a
-> cold-start session can act without re-researching.
+> **README/MCP/ROADMAP doc-staleness audit researched AND fixed,
+> 2026-08-02 — see item 8.** The maintainer asked 11 pointed questions
+> after reviewing the post-0.5.6 README; all 5 mechanical fixes are done
+> and pushed (`docs/ROADMAP.md` synced to 0.5.5/0.5.6 with P2-17/P2-19
+> flipped from in-progress to shipped, MCP static metadata + a tool
+> docstring now name the `ml` preset, Codex added to ~5 supported-client
+> mentions repo-wide, README's stale `v0.1.6+`-era version tags and
+> "(Available Now)"/"New in v0.5.0" framing cleaned up, and the
+> plugin-marketplace-directory open question resolved via WebSearch —
+> `anthropics/claude-plugins-community` exists and pyobfus isn't in it
+> yet). Two items are left as open maintainer decisions on purpose (MCP
+> 0.3.2 republish, plugin-directory submission) plus one open discussion
+> (does the recent community-focused release run still highlight Pro
+> Edition enough) — see item 8 for detail.
 
 ## Current prioritized TODO (2026-08-01)
 
@@ -458,12 +461,20 @@
    7. Version bump: next patch in the established 0.5.x cadence (0.5.6),
       release-commit pattern documented in this file's own 0.5.5 entry
       above and in memory `pyobfus_0_5_5_release_2026-08-02.md`.
-8. **⭐ CURRENT TOP PRIORITY — README/MCP/ROADMAP doc-staleness fixes
-   (researched 2026-08-02, not yet fixed).** Full findings, file:line
-   references, and a recommended fix order are all in
-   [`docs/DOC_SYNC_AUDIT_2026-08-02.md`](DOC_SYNC_AUDIT_2026-08-02.md) —
-   read that file first, it's written so a cold-start session can act
-   directly. Short version of the recommended order:
+8. **✅ DONE — README/MCP/ROADMAP doc-staleness fixes, 2026-08-02.** All 5
+   mechanical items from the recommended order below are fixed and pushed
+   (commits `a426ab0`, `767ba2b`, `1ab95b7`, `07ce053`, `27bfb79`; CI green
+   on all). Full findings still in
+   [`docs/DOC_SYNC_AUDIT_2026-08-02.md`](DOC_SYNC_AUDIT_2026-08-02.md) as a
+   historical record. **Two items intentionally left as open
+   maintainer decisions, not auto-executed**: (a) whether to actually
+   version-bump pyobfus-mcp to 0.3.2 and republish (the metadata content
+   fix is done; the release action is not), and (b) whether to submit
+   pyobfus to `clau.de/plugin-directory-submission` for the
+   `anthropics/claude-plugins-community` marketplace directory (confirmed
+   absent from it). Q6 (does the recent 0.5.4-0.5.6 run still highlight
+   Pro Edition's value) also remains an open discussion item, not a
+   mechanical fix. Short version of what was fixed:
    1. `docs/ROADMAP.md` — "Current Status" stops at 0.5.4 (doesn't
       mention 0.5.5/0.5.6), and P2-17/P2-19 are still checkbox-marked
       `[~]` in-progress even though both shipped in 0.5.5. This is the
