@@ -43,6 +43,8 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 2. 核对「上次记录以来的修订」是否已同步进所有相关文档——不只 README/ROADMAP/POST_V0.4_TODO，**本文件自己的 cold-start 区块也是易漂移对象**（见下方一处已验证的活例子）。
 3. 文档修复按主题拆开分别 commit，不要合并成一个大 commit（本 session `b9b5150`/`f6a70f1` 各自单一主题一个 commit 是范例）。
 
+**📊 下载量基线（2026-08-02 首次记录，任务①的起点，下次 cold-start 与此对比）**：pypistats.org `recent` 端点——**pyobfus** last_day 88 / last_week 210 / last_month 1016；**pyobfus-mcp** last_day 0 / last_week 12 / last_month 176。⚠️ pypistats 数据源（PyPI BigQuery 公开数据集）有 ~1-2 天延迟，上面的 `last_day` 实际反映的是 08-01 甚至更早，**不是**今天刚发的 0.5.7/mcp-0.3.3 的下载数——今天发布的下载量要等 1-2 天后才会体现在 `last_day`/`last_week` 里，下次查询时注意别把这份基线误读成"发布当天的即时反馈"。
+
 **已回填（2026-08-02，同一天）**：上面提到的活例子已经处理——本节原「下次 session 直接执行清单」①②两项已改标为 ✅ 已回填（见下方），user 当场要求就手，没有拖到下次 session。
 
 - ✅ 已提交并受理（申请号 `202610712171X` · 申请日/优先权日 2026-05-22 · 17 项权利要求）
