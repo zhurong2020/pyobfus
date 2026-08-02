@@ -32,6 +32,19 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 完整时间线 + 修复细节见 `docs/POST_V0.4_TODO.md` 顶部 handoff note + § item 7-8。
 
+### ✅ 2026-08-02 又一轮 — pyobfus 0.5.7 + pyobfus-mcp 0.3.3 已发布
+
+**pyobfus 0.5.7**：`--import-obfuscation`（Pro，P2-4，运行时 import 重写为 `importlib`/`__import__` + 自动开 AES 字符串加密）+ P2-22 诚实字节码对比内容（`docs/COMPARISON.md` 扩写 + README FAQ 指向）。tag `v0.5.7` 经 OIDC + PEP 740 attestations 发 PyPI（`pip download` 已核实可拉到），GitHub Release 已建（notes-only，同 v0.5.3/v0.5.4 惯例，无附件）。
+
+**pyobfus-mcp 0.3.3**：纯内容修复（同 0.3.2 那类，非 tool 签名变化）——`recommend_tier`/`start_pro_trial` 硬编码的 Pro 机制清单此前只列 v0.5.0-0.5.4 那 4 项（Selective Opacity/watermarking/Vault/@seal_code），漏了 0.5.7 的 `--import-obfuscation`，同 `ml` preset 在 0.3.2 之前漏同步的同一类漂移。73 测试全绿，tag `mcp-v0.3.3` 发 PyPI + `mcp-publisher publish` 发 MCP Registry（两边都核实 isLatest），GitHub Release 附 wheel+sdist（同 mcp-v0.3.0 惯例）。
+
+**🔁 新记录的后续任务（user 2026-08-02 要求，每次 cold-start 切换进本项目都例行做）**：
+1. 查 pyobfus + pyobfus-mcp 的 PyPI 下载量（`pypistats recent pyobfus pyobfus-mcp` 或 `https://pypistats.org/api/packages/<pkg>/recent`）。
+2. 核对「上次记录以来的修订」是否已同步进所有相关文档——不只 README/ROADMAP/POST_V0.4_TODO，**本文件自己的 cold-start 区块也是易漂移对象**（见下方一处已验证的活例子）。
+3. 文档修复按主题拆开分别 commit，不要合并成一个大 commit（本 session `b9b5150`/`f6a70f1` 各自单一主题一个 commit 是范例）。
+
+**已验证的一处活例子（留给下次执行任务 2 时顺手修，本轮按 user 要求只记录不动手）**：本节前面「下次 session 直接执行清单」①②两项（README 锚点链接 + Pro Edition 常驻提示行）写的是「待办」，但实测 `README.md` 当前内容两项都已完成（`#-pro-edition` 锚点正确、常驻提示行已在第 21 行）——`docs/DOC_SYNC_AUDIT_2026-08-02.md`「Session 2」自己也记了 ✅ done，只是没回填进本文件，导致本文件与实际仓库状态脱节。
+
 - ✅ 已提交并受理（申请号 `202610712171X` · 申请日/优先权日 2026-05-22 · 17 项权利要求）
 - ✅ 费用全部缴清（共 1610 元 · 2026-05-22 一次缴清 · 含申请费类 1235 与实审费 375 · 官方审查信息查询「费足」核实）
 - ✅ **段号补正答复**（2026-06-11 提交）→ **初步审查合格通知书**（发文 2026-06-17 · 发文序号 2026061200904340 · 审查员 陈立英），据专利法第 34 条进入「申请日满 18 个月（≈2027-11）即行公布」轨道
@@ -50,6 +63,8 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - ✅ **pyobfus 0.5.5 已发布（2026-08-02，PR #26 + #27）**：`--preset ml`（P2-19，社区版模型服务 preset）+ `--provenance-manifest`（P2-17，本地 JSON 构建溯源清单，非加密签名）。Review 顺带发现 issue #25 并诚实标注在 CHANGELOG/docstring 里，不是掩盖。
 - ✅ **pyobfus 0.5.6 已发布（2026-08-02）**：issue #25 修复（见上）+ CodeQL 高危告警清零（见上）。
 - ✅ **README/MCP/ROADMAP 陈旧内容审计 + 修复（2026-08-02）**：见上，5 commits 全绿。
+- ✅ **pyobfus 0.5.7 已发布（2026-08-02）**：`--import-obfuscation`（Pro，P2-4）+ P2-22 诚实对比内容。tag `v0.5.7` 经 OIDC + PEP 740 发 PyPI，GitHub Release 已建。
+- ✅ **pyobfus-mcp 0.3.3 已发布（2026-08-02）**：`recommend_tier`/`start_pro_trial` 补 `--import-obfuscation` 到硬编码 Pro 机制清单（同 0.3.2 那类内容漂移修复）。tag `mcp-v0.3.3` 发 PyPI + Registry（isLatest），GitHub Release 附 wheel+sdist。
 - ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:P2-13/P2-22 这类零代码内容型候选（PyInstaller cookbook / PyArmor 对比页）。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
 
 **Cold-start session 第一句话应问 user**：「上次审计的 next-session punch list 已经写好（README 锚点链接修复 + Pro Edition 常驻提示行，草稿都在 `docs/DOC_SYNC_AUDIT_2026-08-02.md`）。另外 Glama 后台 Dockerfile 版本号那次被 UI bug 卡住了，要不要先截个 F12 报错原文再重试？先做哪个？」
