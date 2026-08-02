@@ -33,6 +33,7 @@ PyArmor is the most established Python obfuscator. Here's how pyobfus compares:
 | **String encryption** | AES-256 (Pro) | AES (Pro) |
 | **Anti-debugging** | Yes (Pro) | Yes (Pro) |
 | **Control flow flattening** | Yes (Pro v0.3.0+) | Yes (Pro) |
+| **Import obfuscation** | Yes (Pro, runtime importlib + encrypted import strings) | Yes (Pro) |
 | **License binding** | Per-device (3 devices) | Per-device |
 | **Future Python support** | Community-driven | "Can't guarantee" (per docs) |
 
@@ -45,6 +46,37 @@ Based on GitHub issues and community feedback, common PyArmor frustrations inclu
 3. **Environment issues**: Doesn't work in MSYS, no warning given
 4. **Future compatibility**: License may not work with future PyArmor versions
 5. **Complex deployment**: Requires distributing native `pytransform` libraries
+
+#### Bytecode Protection Is Not Magic
+
+PyArmor's native runtime and bytecode-oriented protection are stronger than
+plain AST rewriting against casual inspection. That does not make protected
+bytecode irreversible. Public research tooling now exists that targets PyArmor
+8.0-9.2.x output and can statically convert protected scripts back to bytecode
+disassembly and experimental source without executing the protected program:
+[Pyarmor-Static-Unpack-1shot](https://github.com/Lil-House/Pyarmor-Static-Unpack-1shot).
+The tool's own README is careful about limits: disassembly can be accurate while
+decompiled source may be incomplete or incorrect.
+
+That matters for how to choose a tool. If your threat model is "stop a curious
+customer from reading ordinary source," PyArmor's bytecode layer is useful. If
+your threat model includes a determined reverser with public unpacking tooling,
+neither PyArmor nor pyobfus should be described as cryptographic protection for
+client-side Python. The more reliable question is operational: which failure
+mode do you want?
+
+- **PyArmor's tradeoff**: harder first look, native runtime dependency, and a
+  less transparent debugging/deployment story.
+- **pyobfus's tradeoff**: intentionally pure-Python AST output, easier to
+  inspect by a determined attacker, but predictable builds, readable failure
+  modes, and reverse stack-trace mapping for AI-assisted debugging.
+
+This is also why pyobfus stays in the "defender-lane" rather than hiding
+malware behind opaque bytecode. PyArmor is recurrently seen in malicious Python
+samples, including the SANS ISC write-up
+[Obfuscated Malicious Python Scripts with PyArmor](https://isc.sans.edu/diary/31840).
+pyobfus is designed for legitimate code owners who still need to debug what
+they ship.
 
 #### When to Choose pyobfus
 
@@ -161,6 +193,7 @@ Nuitka compiles Python to standalone executables.
 | Anti-debugging | No | **Yes** | Yes | No |
 | Control flow flattening | No | **Yes** | Yes | No |
 | Dead code injection | No | **Yes** | No | No |
+| Import obfuscation | No | **Yes** | Yes | No |
 | License embedding | No | **Yes** | Yes | No |
 | Configuration presets | No | **Yes** | No | No |
 
@@ -267,6 +300,12 @@ A layered approach that fits the 2026 ecosystem:
 **Why pyobfus is the always-on default layer**: it's the only tool in this space that doesn't break AI-assisted debugging in production. PyArmor's bytecode encryption and Nuitka's compilation are both one-way — once a stack trace comes back from production, neither tool can map it back to readable identifiers without losing the protection. pyobfus's `--save-mapping` + `--unmap` workflow is purpose-built for this: the obfuscated artifact ships to customers, the mapping stays in your secure storage, and you can hand a reversed trace to Claude Code or Cursor without giving up the obfuscation.
 
 **Why pyobfus alone may not be enough for the crown jewels**: pyobfus's protection is AST-level, which means a determined attacker with time can reverse most of the structure. If a single algorithm module is the company's crown jewel, stacking PyArmor Pro's bytecode encryption or Nuitka's native compilation on top of that one module is rational. We don't pretend otherwise.
+
+**Why bytecode encryption alone may not be enough either**: public static-unpack
+tools for PyArmor 8.0-9.2.x show that "encrypted bytecode" should be treated as
+a speed bump, not a guarantee that client-side Python cannot be inspected.
+Stacking tools can make sense, but it does not remove the need for server-side
+boundaries around truly secret algorithms, credentials, or licensing decisions.
 
 This honest framing is part of why pyobfus is priced at $45 single-tier instead of competing with PyArmor's enterprise track — pyobfus is the tool you reach for first, not necessarily the only tool in the toolbox.
 

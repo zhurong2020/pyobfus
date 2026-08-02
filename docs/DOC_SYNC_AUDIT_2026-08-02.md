@@ -2,8 +2,8 @@
 
 **Purpose**: research-and-plan handoff for a *future* session (requested explicitly —
 not executed this session due to conversation length). Answers 11 questions the
-maintainer raised after reviewing the post-0.5.6 README. Nothing in this doc has
-been fixed yet; it's the punch list for next time.
+maintainer raised after reviewing the post-0.5.6 README. This started as a
+punch list; resolved items are marked in place as follow-up work lands.
 
 **Context at time of writing**: pyobfus **0.5.6** live on PyPI (issue #25 fix +
 CodeQL sweep), pyobfus-mcp still **0.3.1** (no MCP-side release since 0.5.4). This
@@ -76,7 +76,7 @@ change either — the MCP tools call the CLI's real behavior, not a cached copy 
 | `pyobfus_mcp/pyobfus_mcp/tools.py:342-344` | `generate_pyobfus_config`'s docstring: "safe, balanced, aggressive, fastapi, django, flask, pydantic, click, sqlalchemy" | Missing `ml` (added 0.5.5). This is the parameter doc for `preset_override` — an agent reading it via introspection won't know `ml` is a valid value. |
 | `pyobfus_mcp/server.json`'s `_meta.framework_presets` | `["fastapi", "django", "flask", "pydantic", "click", "sqlalchemy"]` | Missing `ml`. Static metadata array, doesn't auto-update. |
 | `pyobfus_mcp/server.json`'s `_meta.target_clients` | `["claude-desktop", "claude-code", "cursor", "windsurf", "zed"]` | Missing `codex` (see Q1). |
-| `pyobfus_mcp/CHANGELOG.md` `[Unreleased]` | Empty | No entry acknowledging that pyobfus 0.5.5/0.5.6 changed what the MCP tools can now do (ml preset, provenance-manifest, issue #25 fix) even though pyobfus-mcp's own code/version is unchanged. Worth at least a documentation-only note, mirroring how 0.3.1's changelog entry named the v0.5.0 Pro mechanisms. |
+| `pyobfus_mcp/CHANGELOG.md` `[Unreleased]` | ✅ synced 2026-08-02 | Now acknowledges the pyobfus 0.5.5-0.5.7 line without implying any MCP tool-signature or wire-behavior change. |
 
 **Should pyobfus-mcp get a version bump (e.g. 0.3.2)?** Borderline call for the
 maintainer, not mechanically obvious — the tool *surface* (8 tools, their

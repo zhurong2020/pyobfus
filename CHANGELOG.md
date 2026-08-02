@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   encryption so module and imported-symbol names do not remain as plaintext
   string literals in the generated output. Relative imports, `from __future__`
   imports, and star imports are deliberately left unchanged in this first pass.
+- **P2-22 honest comparison content** — expands `docs/COMPARISON.md` with the
+  pure-Python AST vs bytecode-encryption tradeoff, including why public
+  static-unpack tooling means client-side bytecode protection should be treated
+  as a stronger speed bump rather than irreversible cryptography. The README FAQ
+  now points readers to that framing.
 
 ## [0.5.6] - 2026-08-02
 

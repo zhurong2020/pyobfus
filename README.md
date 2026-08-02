@@ -643,7 +643,7 @@ See our [detailed comparison](docs/COMPARISON.md) for more information.
 
 ### Can I use pyobfus alongside PyArmor or Nuitka?
 
-Yes — and for many projects this is the most cost-effective approach. Use pyobfus as your always-on default layer (every module gets AST mangling + mapping for AI-debug compatibility), then stack PyArmor Pro's bytecode encryption or Nuitka's native compilation on the small set of modules that genuinely need stronger protection. See [Layered Deployment Strategy in COMPARISON.md](docs/COMPARISON.md#layered-deployment-strategy) for the full reasoning.
+Yes — and for many projects this is the most cost-effective approach. Use pyobfus as your always-on default layer (every module gets AST mangling + mapping for AI-debug compatibility), then stack PyArmor Pro's bytecode encryption or Nuitka's native compilation on the small set of modules that genuinely need stronger protection. The comparison now also covers why bytecode encryption should be treated as a stronger speed bump, not as irreversible cryptographic protection for client-side Python. See [Layered Deployment Strategy in COMPARISON.md](docs/COMPARISON.md#layered-deployment-strategy) for the full reasoning.
 
 ### What if obfuscation breaks my code?
 

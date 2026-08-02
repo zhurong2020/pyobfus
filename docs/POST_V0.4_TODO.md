@@ -78,6 +78,10 @@
 > minor: a "protected_project" typo (should be
 > `protect_project`) in the plugin-marketplace submission's description,
 > fix opportunistically if Anthropic follows up.
+> **2026-08-02 follow-up**: P2-4 is implemented and committed for the 0.5.7
+> train; P2-22 is now done in `docs/COMPARISON.md` with README/CHANGELOG/
+> ROADMAP sync; `pyobfus_mcp/CHANGELOG.md` also records the companion-package
+> no-wire-change status for pyobfus 0.5.5-0.5.7.
 
 ## Current prioritized TODO (2026-08-01)
 

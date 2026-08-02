@@ -6,6 +6,14 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+### Changed
+
+- Documentation now notes the companion `pyobfus` 0.5.5-0.5.7 line: the MCP
+  tools already pick up `--preset ml` dynamically through `pyobfus>=0.5.1`,
+  pyobfus 0.5.6's preset/config override fix requires no MCP wire change, and
+  pyobfus 0.5.7's `--import-obfuscation` is a CLI-side Pro feature rather than
+  a new MCP tool surface. No tool signatures or response shapes changed.
+
 ## [0.3.2] — 2026-08-02
 
 **Docs/metadata-only release.** No tool code, signatures, or wire behavior
