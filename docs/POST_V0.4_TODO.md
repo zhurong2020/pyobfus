@@ -60,19 +60,27 @@
 > cleaned up, plugin-marketplace-directory question resolved via
 > WebSearch). Session 2: **pyobfus-mcp 0.3.2 released** (PyPI + MCP
 > Registry both confirmed `isLatest`) closing the "MCP republish"
-> decision; plugin-submission process fully researched and local
-> `claude plugin validate` passes (actual submission needs the
-> maintainer's own browser session — flagged, not done); Pro-Edition
-> positioning discussed and the maintainer agreed with the proposed
-> direction. **Next session's punch list — write-up complete, ready to
-> execute with no re-research** lives in
-> `docs/DOC_SYNC_AUDIT_2026-08-02.md`'s "Session 2 ... next-session
-> punch list" section: (1) fix a broken `#-pro-edition-available-now`
-> anchor link this session's own heading rename created, (2) add the
-> agreed persistent Pro-Edition anchor line near the README intro
-> (exact draft copy + placement + rationale already written), (3)
-> maintainer's own remaining actions (plugin submission, Glama Dockerfile
-> re-pin for 0.3.2).
+> decision; **plugin-marketplace submission done** — submitted via the
+> Console form, confirmed "Submitted and pending review" on the
+> Console's own submissions page (not yet approved/live, that's a
+> separate later check); Pro-Edition positioning discussed and the
+> maintainer agreed with the proposed direction. **Glama admin
+> Dockerfile Build-steps re-pin (0.3.1 to 0.3.2) attempted but
+> blocked**: the maintainer reached the admin panel but clicking the
+> "Dockerfile" tab reloads back to "Profile" instead of navigating,
+> with an uncaptured browser-console error — looks like a Glama-side UI
+> bug, not a maintainer or credentials problem. Deferred; next attempt
+> should capture the actual console error text first. **Next session's
+> punch list — write-up complete, ready to execute with no re-research**
+> lives in `docs/DOC_SYNC_AUDIT_2026-08-02.md`'s "Session 2 ...
+> next-session punch list" section: (1) fix a broken
+> `#-pro-edition-available-now` anchor link this session's own heading
+> rename created, (2) add the agreed persistent Pro-Edition anchor line
+> near the README intro (exact draft copy + placement + rationale
+> already written), (3) retry the Glama re-pin with the console error
+> captured, (4) minor: a "protected_project" typo (should be
+> `protect_project`) in the plugin-marketplace submission's description,
+> fix opportunistically if Anthropic follows up.
 
 ## Current prioritized TODO (2026-08-01)
 
@@ -469,20 +477,26 @@
    7. Version bump: next patch in the established 0.5.x cadence (0.5.6),
       release-commit pattern documented in this file's own 0.5.5 entry
       above and in memory `pyobfus_0_5_5_release_2026-08-02.md`.
-8. **✅ DONE — README/MCP/ROADMAP doc-staleness fixes, 2026-08-02.** All 5
-   mechanical items from the recommended order below are fixed and pushed
-   (commits `a426ab0`, `767ba2b`, `1ab95b7`, `07ce053`, `27bfb79`; CI green
-   on all). Full findings still in
+8. **✅ DONE — README/MCP/ROADMAP doc-staleness fixes, 2026-08-02, across
+   two same-day sessions.** Session 1's 5 mechanical items are fixed and
+   pushed (commits `a426ab0`, `767ba2b`, `1ab95b7`, `07ce053`, `27bfb79`;
+   CI green on all). Session 2 closed out both items that had been left
+   as open maintainer decisions: **(a) pyobfus-mcp 0.3.2 released**
+   (commits `b9ebf4c` code, tag `mcp-v0.3.2`, PyPI + MCP Registry both
+   confirmed `isLatest`), and **(b) pyobfus submitted to the Claude Code
+   community plugin directory** via the Console form, confirmed
+   "Submitted and pending review" (not yet approved/live — check back
+   separately). Also attempted the Glama admin Dockerfile Build-steps
+   re-pin for 0.3.2, but that's blocked by an apparent Glama-side UI bug
+   (the "Dockerfile" tab doesn't navigate) — deferred, see the top
+   handoff note above for detail. Q6 (does the recent 0.5.4-0.5.6 run
+   still highlight Pro Edition's value) was discussed and the maintainer
+   agreed with a proposed direction (a persistent intro-line anchor,
+   not folded into rotating release notes) — drafted but not yet
+   written into README, see `docs/DOC_SYNC_AUDIT_2026-08-02.md`'s
+   Session 2 punch list. Full findings still in
    [`docs/DOC_SYNC_AUDIT_2026-08-02.md`](DOC_SYNC_AUDIT_2026-08-02.md) as a
-   historical record. **Two items intentionally left as open
-   maintainer decisions, not auto-executed**: (a) whether to actually
-   version-bump pyobfus-mcp to 0.3.2 and republish (the metadata content
-   fix is done; the release action is not), and (b) whether to submit
-   pyobfus to `clau.de/plugin-directory-submission` for the
-   `anthropics/claude-plugins-community` marketplace directory (confirmed
-   absent from it). Q6 (does the recent 0.5.4-0.5.6 run still highlight
-   Pro Edition's value) also remains an open discussion item, not a
-   mechanical fix. Short version of what was fixed:
+   historical record. Short version of Session 1's fixes:
    1. `docs/ROADMAP.md` — "Current Status" stops at 0.5.4 (doesn't
       mention 0.5.5/0.5.6), and P2-17/P2-19 are still checkbox-marked
       `[~]` in-progress even though both shipped in 0.5.5. This is the
