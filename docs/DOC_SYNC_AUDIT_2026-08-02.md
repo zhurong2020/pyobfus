@@ -101,11 +101,26 @@ self-service: there is no separate "submit for approval" or central-registry ste
 analogous to the MCP Registry or VS Code Marketplace. Having a valid
 `marketplace.json` at the repo root *is* being "registered."
 
-**Open question, not resolved this session**: whether an Anthropic-curated
-*directory* of third-party plugin marketplaces exists yet (the equivalent of
-awesome-mcp-servers for MCP, or PulseMCP) that pyobfus should additionally submit
-to. This wasn't verified — flag for a `WebSearch` at the top of next session rather
-than assuming either way. `marketplace.json`'s own `metadata.version` is pinned at
+**Resolved 2026-08-02, via WebSearch**: yes, an Anthropic-curated directory exists
+— the equivalent of awesome-mcp-servers/PulseMCP for MCP. Two distinct tiers:
+- **`anthropics/claude-plugins-official`** — Anthropic-managed, 200+ curated
+  first-party + reviewed partner plugins, auto-registered.
+- **`anthropics/claude-plugins-community`** — the reviewed community
+  marketplace, added manually with an `@claude-community` suffix. Its own
+  GitHub description states it's a **"read-only mirror — submit plugins at
+  `clau.de/plugin-directory-submission`."**
+
+**pyobfus is confirmed absent from both** (searched "pyobfus" against all three
+surfaces — official repo, community repo, and the independent
+`claudepluginhub.com`/`claudemarketplaces.com` directories — zero hits). This is
+the same "registry breadth" gap already documented for MCP servers in
+`docs/AGENTIC_DISCOVERABILITY_2026-06-22.md` Gap 1, just for the plugin-directory
+ecosystem instead. **Action** (not taken this session — an external submission
+representing the project should get an explicit go-ahead, same reasoning as not
+unilaterally re-publishing pyobfus-mcp in Q3): submit `pyobfus`'s marketplace via
+`clau.de/plugin-directory-submission` for the community-marketplace tier.
+
+`marketplace.json`'s own `metadata.version` is pinned at
 `"0.1.0"` and has never moved since creation; check whether that's meant to track
 anything (probably the marketplace-listing schema itself, not the pyobfus release
 train, but confirm before touching it).
