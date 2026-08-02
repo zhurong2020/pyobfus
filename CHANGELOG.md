@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.6] - 2026-08-02
+
+**Bugfix release.** Closes issue #25, which turned out bigger than
+originally filed — a one-line CLI bug was silently overriding preset and
+config-file choices for three fields, including `preset_safe`'s docstring
+preservation. `pyobfus-mcp` is unchanged at 0.3.1 (no tool-surface change),
+so no Glama Build-steps re-pin is needed for this release.
+
+### Fixed
+
+- **`preserve_param_names`/`remove_docstrings`/`remove_comments` no longer
+  silently clobber preset/config choices (issue #25).** `cli.py`'s
+  "Override config with CLI options" block ran unconditionally after preset
+  or config-file loading, so any preset field these three CLI options also
+  control got reset to the CLI's own default the moment a user ran the
+  normal, documented invocation (`--preset fastapi`, no extra flags) — not
+  just for `--preset ml`/`--preset fastapi`'s `preserve_param_names=True`
+  as originally filed, but also for `--preset safe` (and all six framework
+  presets built on it)'s `remove_docstrings=False`, silently deleting
+  docstrings despite `preset_safe`'s entire reason to exist being to keep
+  them. `--preserve-param-names`, `--remove-docstrings/--keep-docstrings`,
+  and `--remove-comments/--keep-comments` are now tri-state (`None` when
+  the user passes neither flag), so the CLI only overrides a preset's or
+  config file's choice when the user explicitly asks it to. Fixes the
+  `--preset ml` caveat noted in 0.5.5 below — `preserve_param_names=True`
+  now actually preserves parameter identifiers end-to-end for every preset
+  that sets it.
+
 ## [0.5.5] - 2026-08-02
 
 **Feature release.** Two new capabilities implemented by Codex CLI and

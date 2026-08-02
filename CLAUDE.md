@@ -12,13 +12,13 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 该文档顶部是活的「Current prioritized TODO」（随每次发布/里程碑刷新日期），下方是冻结的历史执行记录——**只读顶部，别被下面的历史小节带偏**。
 
-### 🔴 2026-08-02 active state — issue #25 根因已查明未修，下次 session 直接动手
+### 🟡 2026-08-02 active state — issue #25 已修复未发布，下次 session 直接发版
 
 **pyobfus 0.5.5 已发布**（`--preset ml` P2-19 + `--provenance-manifest` P2-17，PR [#26](https://github.com/zhurong2020/pyobfus/pull/26)/[#27](https://github.com/zhurong2020/pyobfus/pull/27) 已合并，tag `v0.5.5` 经 OIDC 发 PyPI，核实 latest=0.5.5）。mcp 仍 0.3.1。
 
-**⭐ 当前最高优先级：issue #25 根因已诊断清楚（2026-08-02 晚，含两次真实 CLI 复现，非猜测），比原先报告的范围更大**：`pyobfus/cli.py:621-626`「Override config with CLI options」代码块在 preset 加载**之后**无条件执行 `config.preserve_param_names = preserve_param_names`（Click 默认 `False`）+ `config.remove_docstrings = remove_docstrings`（Click 默认 `True`）——只要用户没有额外手动加对应 flag（正常用法就是不加），就会把 preset 自己设的值悄悄冲掉。已实测：① `--preset fastapi` 参数名照样被改名（issue #25 原报告）；② **新发现更严重**——`--preset safe` docstring 照样被删，而 `preset_safe()` 的存在意义就是"保留 docstring"，且全部 7 个 framework preset 都基于 `preset_safe`。**完整修复方案（精确到 file:line、Click tri-state 写法、测试改写清单、issue 收尾步骤）已写入 `docs/POST_V0.4_TODO.md` § item 7，冷启动直接照做，不需要重新诊断。**
+**✅ issue #25 已修复**：`pyobfus/cli.py` 的 3 个 flag（`--preserve-param-names`、`--remove-docstrings/--keep-docstrings`、`--remove-comments/--keep-comments`）改成 tri-state（`default=None`），"Override config with CLI options" 代码块只在用户显式传参时才覆盖 preset/config 的选择。两条原始复现（`--preset fastapi` 参数名、`--preset safe` docstring）+ 一条 YAML config 复现均已重跑验证通过；`tests/test_framework_presets.py` 里原先的假阳性测试（断言字符串 dict key 而非真实标识符）已重写，新增 8 个回归测试（含显式 flag 仍能覆盖 preset 的双向验证）。三个测试根全绿（1074+73+7）+ black/ruff/mypy 全过。`pyproject.toml` 已升到 0.5.6，`CHANGELOG.md` 已加 `[0.5.6]` 条目。**剩余步骤**：commit → push → 决定是否 tag `v0.5.6`（release workflow 只在 tag push 时触发，push main 不会自动发版）→ OIDC 发布后关闭 issue #25。
 
-完整时间线见 `docs/POST_V0.4_TODO.md` § item 6（0.5.5 发布经过）+ § item 7（issue #25 修复方案）。
+完整时间线 + 修复细节见 `docs/POST_V0.4_TODO.md` § item 6（0.5.5 发布经过）+ § item 7（issue #25 诊断与修复全过程）。
 
 - ✅ 已提交并受理（申请号 `202610712171X` · 申请日/优先权日 2026-05-22 · 17 项权利要求）
 - ✅ 费用全部缴清（共 1610 元 · 2026-05-22 一次缴清 · 含申请费类 1235 与实审费 375 · 官方审查信息查询「费足」核实）
@@ -37,7 +37,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - ✅ **pyobfus 0.5.5 已发布（2026-08-02，PR #26 + #27）**：`--preset ml`（P2-19，社区版模型服务 preset）+ `--provenance-manifest`（P2-17，本地 JSON 构建溯源清单，非加密签名）。Review 顺带发现 issue #25（见上）并诚实标注在 CHANGELOG/docstring 里，不是掩盖。
 - ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:**当前重心 = issue #25 修复**（根因已查明，见 § item 7，直接动手不用重新诊断）。之后是 P2-13/P2-22 这类零代码内容型候选（PyInstaller cookbook / PyArmor 对比页）。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
 
-**Cold-start session 第一句话应问 user**：「issue #25 根因已经查清楚了（`pyobfus/cli.py:621-626` 的 CLI-options-override 代码块在 preset 加载后无条件覆盖，不仅影响 `preserve_param_names`，还会让 `--preset safe` 的 docstring 保留承诺失效）。现在开始按 `docs/POST_V0.4_TODO.md` § item 7 的方案修吗？」
+**Cold-start session 第一句话应问 user**：「issue #25 修复已经在工作区做完并全绿（tri-state flag + 测试重写，未提交）。现在提交并发 0.5.6 版吗？」
 
 **Cold-start 资料定位**（按读取优先级）：
 

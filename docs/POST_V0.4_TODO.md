@@ -25,13 +25,21 @@
 > `docs/LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md`. See item 4 below.
 > **P2-17 + P2-19 merged and released as pyobfus 0.5.5, 2026-08-02** — PRs
 > #26/#27 both reviewed, merged, live on PyPI. See item 6 below.
-> **Root cause of issue #25 diagnosed 2026-08-02, not yet fixed — see item
-> 7.** It's bigger than originally filed: the same one-line bug in
-> `cli.py`'s CLI-options-override block also silently strips docstrings
-> under `--preset safe` and everything built on it, contradicting
-> `preset_safe`'s entire reason to exist. Fix plan (exact file:line, click
-> pattern, test rewrites) is fully written up in item 7 — should be
-> immediately actionable cold-start, no re-diagnosis needed.
+> **Issue #25 fixed 2026-08-02, not yet released — see item 7.** The
+> tri-state-flag fix landed in the working tree (`cli.py`'s three
+> `--preserve-param-names`/`--remove-docstrings`/`--remove-comments`
+> options now default to `None` and only override a preset/config choice
+> when the user explicitly passes them) and is verified both by an
+> empirical re-run of the original repro commands and by new/rewritten
+> tests in `tests/test_framework_presets.py` (the old
+> `test_cli_fastapi_preset_preserves_param_names` was itself a false
+> positive — it asserted against a surviving string dict key, not the
+> renamed identifier). All three test roots (1074+73+7) plus
+> black/ruff/mypy are green. `pyproject.toml` bumped to 0.5.6 and
+> `CHANGELOG.md` has a dated `[0.5.6]` entry. Remaining: commit, push,
+> then decide separately whether to tag `v0.5.6` (the release workflow
+> only triggers on a tag push, not on pushing to main) and close issue #25
+> once it's live on PyPI.
 
 ## Current prioritized TODO (2026-08-01)
 
@@ -320,8 +328,11 @@
    A Tools / Resources / Prompts separation is recorded in
    [`MCP_PRIMITIVES_DESIGN.md`](MCP_PRIMITIVES_DESIGN.md) as a post-launch
    research candidate, not committed scope — unrelated to this decision.
-7. **⭐ CURRENT TOP PRIORITY (root cause diagnosed 2026-08-02, not yet
-   fixed) — issue #25 fix, and it's bigger than originally filed.**
+7. **✅ FIXED 2026-08-02, not yet released — issue #25 fix, and it turned out
+   bigger than originally filed.** The fix, verification, and new tests
+   described below are all done and passing locally (uncommitted); what's
+   left is committing, bumping to 0.5.6, tagging, and the OIDC release —
+   tracked as a fresh item once this session's work is committed.
 
    **Root cause found and empirically confirmed** (not just a hunch — both
    repros below were actually run against current `main`):

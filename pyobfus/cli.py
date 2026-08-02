@@ -84,13 +84,13 @@ except ImportError:
 )
 @click.option(
     "--remove-docstrings/--keep-docstrings",
-    default=True,
-    help="Remove docstrings (default: remove)",
+    default=None,
+    help="Remove docstrings (default: remove, unless a preset/config says otherwise)",
 )
 @click.option(
     "--remove-comments/--keep-comments",
-    default=True,
-    help="Remove comments (default: remove)",
+    default=None,
+    help="Remove comments (default: remove, unless a preset/config says otherwise)",
 )
 @click.option(
     "--name-prefix",
@@ -98,9 +98,10 @@ except ImportError:
     help="Prefix for obfuscated names (default: I)",
 )
 @click.option(
-    "--preserve-param-names",
-    is_flag=True,
-    help="Preserve parameter names to allow keyword arguments after obfuscation",
+    "--preserve-param-names/--no-preserve-param-names",
+    default=None,
+    help="Preserve parameter names to allow keyword arguments after obfuscation "
+    "(default: off, unless a preset/config says otherwise)",
 )
 @click.option(
     "--numeric-obfuscation",
@@ -352,10 +353,10 @@ def main(
     init_config_template: Optional[str],
     validate_config_path: Optional[str],
     level: str,
-    remove_docstrings: bool,
-    remove_comments: bool,
+    remove_docstrings: Optional[bool],
+    remove_comments: Optional[bool],
     name_prefix: str,
-    preserve_param_names: bool,
+    preserve_param_names: Optional[bool],
     numeric_obfuscation: bool,
     strip_ai_artifacts: bool,
     verbose: bool,
@@ -618,12 +619,18 @@ def main(
             else:
                 config = ObfuscationConfig.community_edition()
 
-        # Override config with CLI options
+        # Override config with CLI options. The three flags below are
+        # tri-state (None = not passed) so an explicit preset/config choice
+        # (e.g. preset_safe's remove_docstrings=False) survives when the
+        # user doesn't also pass the matching CLI flag. See issue #25.
         config.level = level
-        config.remove_docstrings = remove_docstrings
-        config.remove_comments = remove_comments
+        if remove_docstrings is not None:
+            config.remove_docstrings = remove_docstrings
+        if remove_comments is not None:
+            config.remove_comments = remove_comments
         config.name_prefix = name_prefix
-        config.preserve_param_names = preserve_param_names
+        if preserve_param_names is not None:
+            config.preserve_param_names = preserve_param_names
         if numeric_obfuscation:
             config.numeric_obfuscation = True
         if strip_ai_artifacts:

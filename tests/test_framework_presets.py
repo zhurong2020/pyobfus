@@ -221,9 +221,31 @@ def test_cli_fastapi_preset_preserves_param_names(tmp_path) -> None:
     result = CliRunner().invoke(main, [str(src), "-o", str(out), "--preset", "fastapi"])
     assert result.exit_code == 0, result.output
     code = out.read_text(encoding="utf-8")
-    # preserve_param_names=True -> user_id and limit must remain
-    assert "user_id" in code
-    assert "limit" in code
+    # Assert against the `def` line specifically, not "anywhere in code": the
+    # function body also contains the string literals 'user_id'/'limit' as
+    # dict keys, and `"user_id" in code` would pass on those alone even if
+    # the actual parameter identifiers got renamed (issue #25's false
+    # positive -- the original version of this test asserted on whole-file
+    # text and missed that the CLI was clobbering preserve_param_names).
+    sig_line = next(line for line in code.splitlines() if line.strip().startswith("def "))
+    assert "user_id" in sig_line
+    assert "limit" in sig_line
+
+
+def test_cli_preset_explicit_flag_still_overrides_preset(tmp_path) -> None:
+    # Tri-state flags: the CLI flag should still win when the user passes it
+    # explicitly, even though --preset fastapi normally preserves param names.
+    src = tmp_path / "api.py"
+    src.write_text("def handler(user_id: int):\n    return user_id\n", encoding="utf-8")
+    out = tmp_path / "out.py"
+    result = CliRunner().invoke(
+        main,
+        [str(src), "-o", str(out), "--preset", "fastapi", "--no-preserve-param-names"],
+    )
+    assert result.exit_code == 0, result.output
+    code = out.read_text(encoding="utf-8")
+    sig_line = next(line for line in code.splitlines() if line.strip().startswith("def "))
+    assert "user_id" not in sig_line
 
 
 def test_list_presets_shows_frameworks() -> None:
@@ -236,12 +258,8 @@ def test_list_presets_shows_frameworks() -> None:
 
 
 def test_cli_ml_preset_preserves_dispatch_method_name(tmp_path) -> None:
-    # NOTE: preserve_param_names=True does not currently preserve parameter
-    # identifiers end-to-end through the CLI (tracked separately -- see the
-    # project issue tracker; reproduced against --preset fastapi too, so it
-    # is a pre-existing, cross-preset gap, not specific to --preset ml).
-    # This test sticks to what actually works today: exclude_names keeps the
-    # framework-dispatched method name itself unmangled.
+    # `predict` survives via exclude_names (dispatch methods sklearn/PyTorch/
+    # HuggingFace call by exact string), independent of preserve_param_names.
     src = tmp_path / "serve.py"
     src.write_text(
         "def predict(inputs, batch_size=8):\n    return inputs[:batch_size]\n",
@@ -252,6 +270,95 @@ def test_cli_ml_preset_preserves_dispatch_method_name(tmp_path) -> None:
     assert result.exit_code == 0, result.output
     code = out.read_text(encoding="utf-8")
     assert "def predict(" in code
+
+
+def test_cli_ml_preset_preserves_param_names(tmp_path) -> None:
+    # Regression test for issue #25: --preset ml also sets
+    # preserve_param_names=True, and until the CLI-options-override fix that
+    # was silently clobbered back to False for any preset used through the
+    # normal `pyobfus src -o dst --preset ml` invocation.
+    src = tmp_path / "serve.py"
+    src.write_text(
+        "def transform(feature_vector, threshold=0.5):\n    return feature_vector\n",
+        encoding="utf-8",
+    )
+    out = tmp_path / "out.py"
+    result = CliRunner().invoke(main, [str(src), "-o", str(out), "--preset", "ml"])
+    assert result.exit_code == 0, result.output
+    code = out.read_text(encoding="utf-8")
+    sig_line = next(line for line in code.splitlines() if line.strip().startswith("def "))
+    assert "feature_vector" in sig_line
+    assert "threshold" in sig_line
+
+
+def test_cli_preset_safe_preserves_docstrings_end_to_end(tmp_path) -> None:
+    # Regression test for issue #25's second finding: the CLI-options-override
+    # block unconditionally set config.remove_docstrings from the
+    # --remove-docstrings/--keep-docstrings CLI default, clobbering
+    # preset_safe's remove_docstrings=False the moment a user ran the
+    # documented invocation (`--preset safe`, no extra flags). Every
+    # framework preset is built on preset_safe and inherits the same promise.
+    src = tmp_path / "lib.py"
+    src.write_text(
+        'def greet(name):\n    """Say hello to name."""\n    return f"hello {name}"\n',
+        encoding="utf-8",
+    )
+    out = tmp_path / "out.py"
+    result = CliRunner().invoke(main, [str(src), "-o", str(out), "--preset", "safe"])
+    assert result.exit_code == 0, result.output
+    code = out.read_text(encoding="utf-8")
+    assert "Say hello to name." in code
+
+
+@pytest.mark.parametrize(
+    "preset_name", ["fastapi", "django", "flask", "pydantic", "click", "sqlalchemy", "ml"]
+)
+def test_cli_framework_preset_preserves_docstrings_end_to_end(preset_name: str, tmp_path) -> None:
+    src = tmp_path / "lib.py"
+    src.write_text(
+        'def greet(name):\n    """Say hello to name."""\n    return f"hello {name}"\n',
+        encoding="utf-8",
+    )
+    out = tmp_path / "out.py"
+    result = CliRunner().invoke(main, [str(src), "-o", str(out), "--preset", preset_name])
+    assert result.exit_code == 0, result.output
+    code = out.read_text(encoding="utf-8")
+    assert "Say hello to name." in code
+
+
+def test_cli_preset_explicit_remove_docstrings_still_overrides(tmp_path) -> None:
+    # Tri-state flags: an explicit --remove-docstrings should still win over
+    # preset_safe's remove_docstrings=False.
+    src = tmp_path / "lib.py"
+    src.write_text(
+        'def greet(name):\n    """Say hello to name."""\n    return f"hello {name}"\n',
+        encoding="utf-8",
+    )
+    out = tmp_path / "out.py"
+    result = CliRunner().invoke(
+        main, [str(src), "-o", str(out), "--preset", "safe", "--remove-docstrings"]
+    )
+    assert result.exit_code == 0, result.output
+    code = out.read_text(encoding="utf-8")
+    assert "Say hello to name." not in code
+
+
+def test_cli_yaml_config_preset_preserves_docstrings_end_to_end(tmp_path) -> None:
+    # Same clobber as --preset, reached via -c/--config's YAML `preset:` key
+    # (ObfuscationConfig.from_file loads the preset, then cli.py's override
+    # block ran unconditionally regardless of which path built `config`).
+    src = tmp_path / "lib.py"
+    src.write_text(
+        'def greet(name):\n    """Say hello to name."""\n    return f"hello {name}"\n',
+        encoding="utf-8",
+    )
+    cfg_path = tmp_path / "pyobfus.yaml"
+    cfg_path.write_text("obfuscation:\n  preset: safe\n", encoding="utf-8")
+    out = tmp_path / "out.py"
+    result = CliRunner().invoke(main, [str(src), "-o", str(out), "-c", str(cfg_path)])
+    assert result.exit_code == 0, result.output
+    code = out.read_text(encoding="utf-8")
+    assert "Say hello to name." in code
 
 
 def test_unknown_preset_is_rejected() -> None:
