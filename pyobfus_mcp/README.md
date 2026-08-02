@@ -2,7 +2,7 @@
 
 <!-- mcp-name: io.github.zhurong2020/pyobfus-mcp -->
 
-**pyobfus-mcp** exposes [pyobfus](https://github.com/zhurong2020/pyobfus) — the Python obfuscator — to any MCP-capable AI coding agent: **Claude Desktop, Claude Code, Cursor, Windsurf, Zed**, and anything else that speaks the [Model Context Protocol](https://modelcontextprotocol.io/).
+**pyobfus-mcp** exposes [pyobfus](https://github.com/zhurong2020/pyobfus) — the Python obfuscator — to any MCP-capable AI coding agent: **Claude Desktop, Claude Code, Cursor, Windsurf, Zed, Codex**, and anything else that speaks the [Model Context Protocol](https://modelcontextprotocol.io/).
 
 Once configured, you can say:
 

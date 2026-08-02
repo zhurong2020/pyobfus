@@ -4,7 +4,7 @@
   <img src="https://raw.githubusercontent.com/zhurong2020/pyobfus/main/docs/assets/logo.jpeg" alt="pyobfus Logo" width="200">
 </p>
 
-**pyobfus** (pronounced as "Python obfuscator") is a modern, AST-based **python-obfuscator / code-obfuscator** with framework-aware presets, reverse stack-trace mapping for AI-assisted debugging, and a machine-readable JSON CLI designed for [Claude Code](https://claude.com/claude-code), [Cursor](https://cursor.com/), and MCP agents. A transparent, open-source alternative to PyArmor.
+**pyobfus** (pronounced as "Python obfuscator") is a modern, AST-based **python-obfuscator / code-obfuscator** with framework-aware presets, reverse stack-trace mapping for AI-assisted debugging, and a machine-readable JSON CLI designed for [Claude Code](https://claude.com/claude-code), [Cursor](https://cursor.com/), [Codex](https://openai.com/codex/), and MCP agents. A transparent, open-source alternative to PyArmor.
 
 [![PyPI version](https://img.shields.io/pypi/v/pyobfus.svg)](https://pypi.org/project/pyobfus/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/pyobfus.svg)](https://pypi.org/project/pyobfus/)
@@ -29,7 +29,7 @@ This repository ships **two installable packages**:
 | [`pyobfus`](https://pypi.org/project/pyobfus/) | The Python obfuscator (CLI + library). | `pip install pyobfus` |
 | [`pyobfus-mcp`](https://pypi.org/project/pyobfus-mcp/) | A **Model Context Protocol (MCP) server** that exposes pyobfus's tools to AI coding agents. | `uvx pyobfus-mcp` (zero-install) or `pip install pyobfus-mcp` |
 
-The MCP server lives in [`pyobfus_mcp/`](pyobfus_mcp/) and is built on the official [Model Context Protocol Python SDK](https://github.com/modelcontextprotocol/python-sdk) (FastMCP). It registers eight MCP tools so **Claude Desktop, Claude Code, Cursor, Windsurf, and Zed** can call pyobfus directly from agent conversations — no shelling out:
+The MCP server lives in [`pyobfus_mcp/`](pyobfus_mcp/) and is built on the official [Model Context Protocol Python SDK](https://github.com/modelcontextprotocol/python-sdk) (FastMCP). It registers eight MCP tools so **Claude Desktop, Claude Code, Cursor, Windsurf, Zed, and Codex** can call pyobfus directly from agent conversations — no shelling out:
 
 | MCP tool | Implementation | Purpose |
 |---|---|---|
