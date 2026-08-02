@@ -18,7 +18,7 @@
 
 A Python code obfuscator built with AST-based transformations. **Supports Python 3.9 through 3.14**. Provides reliable name mangling, string encoding, control-flow flattening, AES-256 string encryption, and — unique to pyobfus — a reverse-mapping workflow that lets you (or your AI coding assistant) debug obfuscated stack traces without giving up the protection.
 
-> **🆕 What's new in v0.5.5** — **`--preset ml`**, a community-tier preset for model-serving/inference wrappers (sklearn `predict`/`fit`/`transform`, PyTorch `forward`, HuggingFace `generate`/`encode` stay unmangled by exact name; `--check` flags unsafe `pickle`/`torch.load` deserialization and model-path literals for the Runtime String Vault), and **`--provenance-manifest PATH`**, a local JSON manifest of an obfuscation run (output file hashes, config hash, pyobfus version, mapping digest) for offline build provenance — no network calls. Full details in the [CHANGELOG](CHANGELOG.md); see [Pro Edition](#-pro-edition-available-now) below.
+> **🔧 What's new in v0.5.6** — Fixed a CLI bug where running any preset the normal, documented way (`--preset fastapi/django/flask/pydantic/click/sqlalchemy/ml/safe`, no extra flags) could silently override the preset's own choices: parameter names got mangled despite `preserve_param_names=True`, and docstrings got stripped despite `--preset safe`'s core promise to keep them. Both now behave as documented. Full details in the [CHANGELOG](CHANGELOG.md); see [Pro Edition](#-pro-edition-available-now) below.
 
 ## 🔌 Companion MCP server: [`pyobfus-mcp`](pyobfus_mcp/)
 
