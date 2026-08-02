@@ -43,7 +43,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - ✅ **0.5.4 已发布（2026-07-19，PR #19）**：`--bind-device` 扩展到 vault key(`_VAULT_KEY_*`)设备绑定,与 opacity L3 用同一套运行时派生技术。首批外部 issue #20/#21(trial 绕过报告)按「诚实记录边界、不加固客户端」处置并关闭。
 - ✅ **issue #22 mypy gate 已关闭（2026-07-22，PR #23）**：Core/Pro/MCP 共 72 个源文件 mypy 零错误,CI 全矩阵绿后合并。
 - ✅ **pyobfus-mcp 0.3.1 已发布（2026-06-22）**：pro-funnel 文案点名 v0.5 机制 · dep `>=0.5.1` · tag `mcp-v0.3.1` 发 PyPI + `mcp-publisher` 发 MCP Registry(0.3.1 isLatest)。
-- ✅ **pyobfus-mcp 0.3.2 已发布（2026-08-02）**：纯文档/元数据修复,补 `ml` preset + `codex` client,tag `mcp-v0.3.2` 发 PyPI + Registry(0.3.2 isLatest)。Glama 后台 Dockerfile 版本号需 user 手动改(未验证是否已做)。
+- ✅ **pyobfus-mcp 0.3.2 已发布（2026-08-02）**：纯文档/元数据修复,补 `ml` preset + `codex` client,tag `mcp-v0.3.2` 发 PyPI + Registry(0.3.2 isLatest)。Glama 后台 Dockerfile 版本号手动改到 0.3.2 已尝试但被 Glama 自己的 UI bug 卡住(见上,已改天再试)。
 - ✅ **AI-agent 可发现性 Wave A（2026-06-22）**：Smithery 经 **Skill 渠道** `zhurong2020/pyobfus-protect`（Smithery MCP 发布是远程网关、本地工具走不通,Skill 才对）+ mcp.so + `uvx` 零安装 + server.json 99 字描述(commit `826c576`/`49f4df3`)。报告:`docs/AGENTIC_DISCOVERABILITY_2026-06-22.md`。
 - ❌ **JOSS 投稿被拒(2026-06-24)**:v0.5.1 投 JOSS(issue `openjournals/joss-reviews#10788`)被总编 desk-reject,理由=**scope/significance 非质量**("private-dev-then-public" + 无第三方复用)。→ 改走免费路径:✅ **Zenodo DOI `10.5281/zenodo.20846053`(concept)已拿到**,已接进 CITATION.cff + README 徽章 + `## Citation` + 两个 pyproject + RTD + ORCID + arong.eu.org/academic。完整记录+渠道对比见 `docs/JOSS_REJECTION_20260624.md`。
 - ✅ **P2-18 内部证据完成（2026-08-01）**：5 样本 × Codex+Claude 全跑完，`price_rules` 拿到第一个干净跨模型 C4 数据点，决定不加第三个模型家族。评审版报告 `docs/LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md`；过程中顺带修了 3 个既有 plumbing bug（语料库 no-op 稀释统计、`--json-schema` 不认 `$schema` meta key、docker 打分沙箱 temp dir 权限导致此前从未真实跑通），细节见 `docs/POST_V0.4_TODO.md` § P2-18。
@@ -52,7 +52,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - ✅ **README/MCP/ROADMAP 陈旧内容审计 + 修复（2026-08-02）**：见上，5 commits 全绿。
 - ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:P2-13/P2-22 这类零代码内容型候选（PyInstaller cookbook / PyArmor 对比页）。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
 
-**Cold-start session 第一句话应问 user**：「上次审计的 next-session punch list 已经写好（锚点链接修复 + Pro Edition 常驻提示行，草稿都在 `docs/DOC_SYNC_AUDIT_2026-08-02.md`）。现在开始按那份执行吗？」
+**Cold-start session 第一句话应问 user**：「上次审计的 next-session punch list 已经写好（README 锚点链接修复 + Pro Edition 常驻提示行，草稿都在 `docs/DOC_SYNC_AUDIT_2026-08-02.md`）。另外 Glama 后台 Dockerfile 版本号那次被 UI bug 卡住了，要不要先截个 F12 报错原文再重试？先做哪个？」
 
 **Cold-start 资料定位**（按读取优先级）：
 
