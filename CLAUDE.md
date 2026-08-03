@@ -28,7 +28,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 **⏳ Glama 后台 Dockerfile 版本号更新——尝试过，被 Glama 自己的 UI bug 卡住，user 改天再试**：user 能进后台管理页（`.../admin`，能看到 Profile/Analytics/Repository/Dockerfile 四个 tab），但点 Dockerfile tab 不跳转、又弹回 Profile 页，F12 有报错但没抓到具体错误文本。不是 user 操作问题，像是 Glama 前端路由 bug 或临时故障。**下次重试时先截报错原文**——这是唯一缺的信息，抓到就能真正定位，不然就是重试运气。详见 `docs/DOC_SYNC_AUDIT_2026-08-02.md` 第 3 节。
 
-**✅ 已回填（2026-08-02 验证，原「下次 session 直接执行清单」①②两项其实早已完成）**：`docs/DOC_SYNC_AUDIT_2026-08-02.md`「Session 2 punch list」①② 两项实测 `README.md` 均已完成——① 锚点链接已是 `#-pro-edition`（README.md:21，非损坏的旧版 `#-pro-edition-available-now`）② Pro Edition 常驻提示行已在 README.md 第 21 行（`> **🔒 Pro Edition available** — 6 patent-targeted...`）。**仍待**：③ Glama 后台 Dockerfile 版本号手动更新（目标应是当前最新 **0.3.3**，非原草稿写的 0.3.2；仍被 Glama 自己的 UI bug 卡住，见上一条）。**极小尾巴仍待**：plugin marketplace 提交描述里有个笔误"protected_project"应为"protect_project"，不影响功能，Anthropic 若跟进补充信息时顺手改。
+**✅ 已回填（2026-08-02 验证，原「下次 session 直接执行清单」①②两项其实早已完成）**：`docs/DOC_SYNC_AUDIT_2026-08-02.md`「Session 2 punch list」①② 两项实测 `README.md` 均已完成——① 锚点链接已是 `#-pro-edition`（README.md:21，非损坏的旧版 `#-pro-edition-available-now`）② Pro Edition 常驻提示行已在 README.md 第 21 行（`> **🔒 Pro Edition available** — 6 patent-targeted...`）。**仍待**：③ Glama 后台 Dockerfile 版本号手动更新（目标应是当前最新 **0.3.3**）。**2026-08-03 复查**：Dockerfile tab 不跳转的 UI bug 看起来自愈了（能正常打开、看到 Configuration 表单），但 user 反映"还是有问题"（具体报错未截取），且决定性的 **Build steps** 字段实际内容（是否还写死旧版本号）当场没能确认——**user 决定过几天再看**，下次重试先截 Build steps 字段的实际 JSON 内容 + 任何报错原文。**极小尾巴仍待**：plugin marketplace 提交描述里有个笔误"protected_project"应为"protect_project"，不影响功能，Anthropic 若跟进补充信息时顺手改。
 
 完整时间线 + 修复细节见 `docs/POST_V0.4_TODO.md` 顶部 handoff note + § item 7-8。
 
@@ -43,7 +43,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 2. 核对「上次记录以来的修订」是否已同步进所有相关文档——不只 README/ROADMAP/POST_V0.4_TODO，**本文件自己的 cold-start 区块也是易漂移对象**（见下方一处已验证的活例子）。
 3. 文档修复按主题拆开分别 commit，不要合并成一个大 commit（本 session `b9b5150`/`f6a70f1` 各自单一主题一个 commit 是范例）。
 
-**📊 下载量基线（2026-08-02 首次记录，任务①的起点，下次 cold-start 与此对比）**：pypistats.org `recent` 端点——**pyobfus** last_day 88 / last_week 210 / last_month 1016；**pyobfus-mcp** last_day 0 / last_week 12 / last_month 176。⚠️ pypistats 数据源（PyPI BigQuery 公开数据集）有 ~1-2 天延迟，上面的 `last_day` 实际反映的是 08-01 甚至更早，**不是**今天刚发的 0.5.7/mcp-0.3.3 的下载数——今天发布的下载量要等 1-2 天后才会体现在 `last_day`/`last_week` 里，下次查询时注意别把这份基线误读成"发布当天的即时反馈"。
+**📊 下载量基线（2026-08-02 首次记录，任务①的起点）**：pypistats.org `recent` 端点——**pyobfus** last_day 88 / last_week 210 / last_month 1016；**pyobfus-mcp** last_day 0 / last_week 12 / last_month 176。⚠️ pypistats 数据源（PyPI BigQuery 公开数据集）有 ~1-2 天延迟，上面的 `last_day` 实际反映的是 08-01 甚至更早，**不是**当天刚发的 0.5.7/mcp-0.3.3 的下载数。
+
+**📊 第二次快照（2026-08-03）**：**pyobfus** last_day 232 / last_week 421 / last_month 1232；**pyobfus-mcp** last_day 178 / last_week 186 / last_month 348。pyobfus-mcp 从 0→178/天的跳变很显眼，但仍在 0.5.7/mcp-0.3.3（08-02 发布）的 1-2 天 BigQuery 延迟窗口内，大概率是发布流程本身（CI 校验/镜像同步/依赖解析）产生的下载，**不代表自然用户增长确认**——下次快照（08-04 之后）若仍维持高位才能算真实信号，不要提前当作发布反馈来解读。
 
 **已回填（2026-08-02，同一天）**：上面提到的活例子已经处理——本节原「下次 session 直接执行清单」①②两项已改标为 ✅ 已回填（见下方），user 当场要求就手，没有拖到下次 session。
 
