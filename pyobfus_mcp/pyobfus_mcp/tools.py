@@ -15,9 +15,12 @@ primitives and the env vars that tune them
 `PYOBFUS_MCP_AUDIT_LOG`, `PYOBFUS_MCP_DISABLED_TOOLS`).
 
 Phase 3 (Pro funnel via MCP) adds:
-  - `pro_value` field on `check_obfuscation_risks` when the scan finds
-    likely sensitive string literals (Pro's AES-256 string encryption
-    would protect them).
+  - `pro_value` field on `check_obfuscation_risks` (and `protect_project`)
+    when the scan finds likely sensitive string literals (Pro's AES-256
+    string encryption would protect them) and/or likely-PII literals
+    (P2-12: emails / IPv4 / GUIDs / home-directory paths naming a real
+    user -- `sensitive_literal_count` and `pii_literal_count` are reported
+    as separate counts since the remediation story differs).
   - Structured `pro_unlock` field on `explain_preset` Pro-preset path,
     replacing the pre-Phase-3 CLI-only hint with full ROI framing.
   - `recommend_tier(path)` — analyzes a project, recommends free vs Pro
@@ -181,15 +184,46 @@ _SENSITIVE_LITERAL_PATTERNS = (
     re.compile(r"""['"][A-Za-z0-9_\-]{40,}['"]"""),
 )
 
+# PII-shape regex set (P2-12) — a distinct signal class from
+# _SENSITIVE_LITERAL_PATTERNS above: these are personally-identifiable-data
+# shapes (who a person is / where they are), not credential shapes (what
+# lets you authenticate as them). Kept as a separate pattern set + separate
+# count so callers can tell "this project leaks secrets" from "this project
+# leaks PII" — the Pro remediation story differs (encryption vs. redaction/
+# data minimization).
+_PII_LITERAL_PATTERNS = (
+    # Email addresses.
+    re.compile(r"""['"][A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}['"]"""),
+    # IPv4 addresses (quoted string literal; deliberately not IPv6 -- IPv6
+    # literal shapes collide too easily with hex/hash literals to be a
+    # reliable heuristic without much more careful boundary matching).
+    re.compile(r"""['"](?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)['"]"""),
+    # GUID / UUID (any version).
+    re.compile(
+        r"""['"][0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}['"]"""
+    ),
+    # Filesystem paths that embed a real username (home-directory leak) --
+    # deliberately narrow: a bare "/tmp/foo" or "src/utils.py" is not PII,
+    # but "/home/jsmith/..." or "C:\Users\jsmith\..." names a real person.
+    re.compile(
+        r"""['"](?:/home/[A-Za-z0-9_.-]+|/Users/[A-Za-z0-9_.-]+|"""
+        r"""[A-Za-z]:\\{1,2}Users\\{1,2}[A-Za-z0-9_.-]+)"""
+    ),
+)
 
-def _count_sensitive_literals(
-    target: Path, *, max_files: int = 200, max_bytes_per_file: int = 200_000
+
+def _count_pattern_matches(
+    target: Path,
+    patterns: tuple,
+    *,
+    max_files: int = 200,
+    max_bytes_per_file: int = 200_000,
 ) -> int:
-    """Count likely-sensitive string-literal occurrences in `.py` files under target.
+    """Count regex-pattern occurrences across `.py` files under target.
 
-    Heuristic-only — false positives expected (e.g. a long random hash literal
-    in a test fixture might count). Caps file count and per-file byte read so
-    the scan stays bounded on monorepos.
+    Shared by `_count_sensitive_literals` and `_count_pii_literals` --
+    heuristic-only, caps file count and per-file byte read so the scan
+    stays bounded on monorepos.
     """
     if target.is_file():
         files: List[Path] = [target] if target.suffix == ".py" else []
@@ -204,27 +238,63 @@ def _count_sensitive_literals(
             text = f.read_text(encoding="utf-8", errors="ignore")[:max_bytes_per_file]
         except OSError:
             continue
-        for pat in _SENSITIVE_LITERAL_PATTERNS:
+        for pat in patterns:
             total += len(pat.findall(text))
     return total
 
 
+def _count_sensitive_literals(
+    target: Path, *, max_files: int = 200, max_bytes_per_file: int = 200_000
+) -> int:
+    """Count likely-sensitive (credential-shaped) string-literal occurrences.
+
+    Heuristic-only — false positives expected (e.g. a long random hash literal
+    in a test fixture might count).
+    """
+    return _count_pattern_matches(
+        target,
+        _SENSITIVE_LITERAL_PATTERNS,
+        max_files=max_files,
+        max_bytes_per_file=max_bytes_per_file,
+    )
+
+
+def _count_pii_literals(
+    target: Path, *, max_files: int = 200, max_bytes_per_file: int = 200_000
+) -> int:
+    """Count likely-PII (email / IPv4 / GUID / home-directory-path) occurrences.
+
+    A distinct signal class from `_count_sensitive_literals` -- see
+    `_PII_LITERAL_PATTERNS` for the rationale. Heuristic-only.
+    """
+    return _count_pattern_matches(
+        target,
+        _PII_LITERAL_PATTERNS,
+        max_files=max_files,
+        max_bytes_per_file=max_bytes_per_file,
+    )
+
+
 def _pro_value_for_scan(
-    sensitive_literal_count: int, high_severity_findings: int
+    sensitive_literal_count: int,
+    high_severity_findings: int,
+    pii_literal_count: int = 0,
 ) -> Optional[Dict[str, Any]]:
     """Compute the `pro_value` envelope for a `check_obfuscation_risks` scan.
 
-    Returns `None` when the project doesn't surface a Pro upsell signal
-    (no sensitive literals, no high-severity findings). Returns a structured
-    recommendation dict otherwise. Strength tiers:
+    Returns `None` when the project doesn't surface a Pro upsell signal (no
+    sensitive literals, no PII literals, no high-severity findings). Returns
+    a structured recommendation dict otherwise. Strength tiers:
 
     - Sensitive literals: 1-3 = low / 4-15 = medium / 16+ = high
+    - PII literals: 1-3 = low / 4-15 = medium / 16+ = high (same bands --
+      both are "how many string literals of this shape" counts)
     - High-severity findings: 1-2 = low / 3-5 = medium / 6+ = high
 
-    The stronger of the two signals wins. We err on the soft-upsell side —
-    the field is a hint to the AI, not a license-required gate.
+    The strongest of the three signals wins. We err on the soft-upsell
+    side — the field is a hint to the AI, not a license-required gate.
     """
-    if sensitive_literal_count == 0 and high_severity_findings == 0:
+    if sensitive_literal_count == 0 and pii_literal_count == 0 and high_severity_findings == 0:
         return None
 
     def _strength(count: int, low: int, mid: int) -> str:
@@ -237,11 +307,12 @@ def _pro_value_for_scan(
         return "none"
 
     lit_strength = _strength(sensitive_literal_count, low=1, mid=16)
+    pii_strength = _strength(pii_literal_count, low=1, mid=16)
     sev_strength = _strength(high_severity_findings, low=1, mid=6)
 
-    # Pick the stronger signal.
+    # Pick the strongest signal.
     rank = {"none": 0, "low": 1, "medium": 2, "high": 3}
-    overall = lit_strength if rank[lit_strength] >= rank[sev_strength] else sev_strength
+    overall = max((lit_strength, pii_strength, sev_strength), key=lambda s: rank[s])
 
     applicable: List[str] = []
     rationale_parts: List[str] = []
@@ -255,6 +326,16 @@ def _pro_value_for_scan(
             f"inspection; the v0.5 Runtime String Vault (vault_secrets({{...}})) "
             f"goes further with lazy per-entry decryption."
         )
+    if pii_literal_count > 0:
+        applicable.append("string_encryption")
+        rationale_parts.append(
+            f"Found {pii_literal_count} likely-PII string literal "
+            f"occurrence(s) (emails, IPv4 addresses, GUIDs, or home-directory "
+            f"paths naming a real user). Consider whether these belong in "
+            f"source at all (data minimization) before reaching for "
+            f"encryption; if they must ship, Pro's AES-256 string encryption "
+            f"applies here too."
+        )
     if high_severity_findings > 0:
         applicable.append("anti_debugging")
         rationale_parts.append(
@@ -263,10 +344,14 @@ def _pro_value_for_scan(
             f"engineering measurably harder."
         )
 
+    # de-dupe while preserving order (string_encryption can be added twice above)
+    applicable = list(dict.fromkeys(applicable))
+
     return {
         "applicable_features": applicable,
         "rationale": " ".join(rationale_parts),
         "sensitive_literal_count": sensitive_literal_count,
+        "pii_literal_count": pii_literal_count,
         "high_severity_findings": high_severity_findings,
         "recommendation_strength": overall,
         **_pro_unlock(),
@@ -311,9 +396,12 @@ def check_obfuscation_risks(path: str) -> Dict[str, Any]:
 
     # Phase 3: surface Pro funnel signal when the scan finds patterns Pro
     # features (AES-256 string encryption, anti-debugging) would protect.
+    # P2-12: also scan for PII-shaped literals (emails/IPv4/GUIDs/home-dir
+    # paths) -- a distinct signal class from credential-shaped literals.
     sensitive_count = _count_sensitive_literals(target)
+    pii_count = _count_pii_literals(target)
     high_sev = int((payload.get("severity_counts") or {}).get("high", 0))
-    pro_value = _pro_value_for_scan(sensitive_count, high_sev)
+    pro_value = _pro_value_for_scan(sensitive_count, high_sev, pii_count)
     if pro_value is not None:
         payload["pro_value"] = pro_value
     payload["tier_context"] = _tier_context(tool_tier="community")
@@ -1085,7 +1173,9 @@ def protect_project(
 
     # --- assemble payload --------------------------------------------------
     stats = obf.get("stats") or {}
-    pro_value = _pro_value_for_scan(_count_sensitive_literals(target), high_sev)
+    pro_value = _pro_value_for_scan(
+        _count_sensitive_literals(target), high_sev, _count_pii_literals(target)
+    )
 
     if verify and not verified:
         status = "warnings"

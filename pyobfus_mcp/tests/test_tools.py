@@ -296,13 +296,13 @@ def test_build_server_attaches_meta_to_each_tool() -> None:
         # mcp SDK exposes the meta dict via `.meta` on the Tool object.
         meta = getattr(tool, "meta", None)
         assert meta is not None, f"{tool.name} has no meta dict"
-        assert meta.get("version") == "1", (
-            f"{tool.name} meta.version={meta.get('version')!r}, expected '1'"
-        )
+        assert (
+            meta.get("version") == "1"
+        ), f"{tool.name} meta.version={meta.get('version')!r}, expected '1'"
         expected_tier = "pro_funnel" if tool.name in expected_pro_funnel else "community"
-        assert meta.get("tier") == expected_tier, (
-            f"{tool.name} meta.tier={meta.get('tier')!r}, expected {expected_tier!r}"
-        )
+        assert (
+            meta.get("tier") == expected_tier
+        ), f"{tool.name} meta.tier={meta.get('tier')!r}, expected {expected_tier!r}"
 
 
 # ---------------------------------------------------------------------------
@@ -326,9 +326,9 @@ def test_check_obfuscation_risks_no_pro_value_on_clean_project(tmp_path: Path) -
     _write(tmp_path, "a.py", "def greet(name): return f'hi {name}'\n")
     result = check_obfuscation_risks(str(tmp_path))
     assert result["status"] == "success"
-    assert "pro_value" not in result, (
-        f"clean project should not get pro_value; got {result.get('pro_value')!r}"
-    )
+    assert (
+        "pro_value" not in result
+    ), f"clean project should not get pro_value; got {result.get('pro_value')!r}"
 
 
 def test_check_obfuscation_risks_pro_value_on_sensitive_literals(
@@ -364,6 +364,72 @@ def test_check_obfuscation_risks_pro_value_on_sensitive_literals(
     assert pv["price_usd"] == 45
     assert pv["trial_command"] == "pyobfus-trial start"
     assert pv["checkout_url"].startswith("https://buy.stripe.com/")
+
+
+def test_check_obfuscation_risks_pro_value_on_pii_literals(tmp_path: Path) -> None:
+    """P2-12: scanning code with PII-shaped string literals (email / IPv4 /
+    GUID / home-directory path) surfaces pro_value with a pii_literal_count
+    distinct from sensitive_literal_count.
+
+    Fixture values are deliberately non-secret-shaped (a documentation-range
+    IP per RFC 5737, an example.com email, a placeholder username) so they
+    can't be mistaken for real credentials.
+    """
+    _write(
+        tmp_path,
+        "pii.py",
+        """
+        SUPPORT_EMAIL = "test.user@example.com"
+        SERVER_IP = "192.0.2.1"
+        SESSION_ID = "550e8400-e29b-41d4-a716-446655440000"
+        LOG_DIR = "/home/testuser/logs"
+        """,
+    )
+    result = check_obfuscation_risks(str(tmp_path))
+    assert "pro_value" in result, "PII literals should trigger pro_value"
+    pv = result["pro_value"]
+    assert pv["pii_literal_count"] >= 3
+    assert "string_encryption" in pv["applicable_features"]
+    assert "PII" in pv["rationale"]
+    assert pv["recommendation_strength"] in {"low", "medium", "high"}
+
+
+def test_check_obfuscation_risks_pro_value_counts_are_independent(tmp_path: Path) -> None:
+    """sensitive_literal_count and pii_literal_count are reported separately
+    even when a project has both -- not merged into one number."""
+    _write(
+        tmp_path,
+        "mixed.py",
+        """
+        API_KEY = "totally_fake_long_alphanumeric_test_value_xxxxxxxx_yyyy"
+        CONTACT = "test.user@example.com"
+        """,
+    )
+    result = check_obfuscation_risks(str(tmp_path))
+    pv = result["pro_value"]
+    assert pv["sensitive_literal_count"] >= 1
+    assert pv["pii_literal_count"] >= 1
+
+
+def test_check_obfuscation_risks_generic_paths_are_not_pii(tmp_path: Path) -> None:
+    """The home-directory-path PII pattern is deliberately narrow: a bare
+    '/tmp/foo' or relative 'src/utils.py' does not name a real person and
+    must not count as PII (avoids noisy false positives on ordinary path
+    literals, which are extremely common in real code)."""
+    _write(
+        tmp_path,
+        "paths.py",
+        """
+        TEMP_DIR = "/tmp/cache"
+        RELATIVE = "src/utils.py"
+        DATA_DIR = "/var/lib/myapp/data"
+        """,
+    )
+    result = check_obfuscation_risks(str(tmp_path))
+    assert "pro_value" not in result, (
+        f"generic (non-username) paths should not trigger pro_value; "
+        f"got {result.get('pro_value')!r}"
+    )
 
 
 def test_explain_preset_pro_returns_structured_pro_unlock() -> None:

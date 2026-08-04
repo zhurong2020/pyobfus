@@ -6,6 +6,28 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+## [0.3.4] - 2026-08-04
+
+**Feature release (P2-12).** `check_obfuscation_risks` and `protect_project`
+now also scan for PII-shaped string literals — emails, IPv4 addresses,
+GUIDs, and home-directory paths that name a real user (`/home/<user>/`,
+`/Users/<user>/`, `C:\Users\<user>\`) — a distinct signal class from the
+existing credential-shaped detection (API keys, Stripe/AWS key formats,
+opaque bearer tokens). The two counts are reported separately in the
+`pro_value` response field (`sensitive_literal_count` vs.
+`pii_literal_count`) since the remediation story differs: credentials call
+for encryption, PII calls for asking whether the value belongs in source at
+all. Folded into the existing `pro_value` envelope rather than shipped as a
+new standalone tool, so the MCP tool count stays at 8 (the roadmap's
+original "new `scan_secrets` tool" framing was reconsidered after finding
+credential-shape detection already existed here — see
+`docs/ROADMAP.md`'s P2-12 entry for the full reasoning). 3 new tests.
+
+### Changed
+
+- `pro_value.pii_literal_count` — new field alongside the existing
+  `pro_value.sensitive_literal_count`.
+
 ## [0.3.3] - 2026-08-02
 
 **Docs/content-only release** (same pattern as 0.3.2). No tool code,
