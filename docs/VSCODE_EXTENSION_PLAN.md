@@ -128,15 +128,17 @@ could echo the malicious listing's old name.
   (`tests/test_trial_cli.py::TestTrialStatusJson`,
   `tests/test_license_cli.py`). Does not block M1.
 - **M1** (`vscode-extension/` v0.1.0, first Marketplace publish) — ✅
-  code-complete 2026-08-04, held for release. Scaffolding +
-  `cli/locate.ts` (interpreter resolution, incl. a `PYOBFUS_PYTHON_PATH`
-  env-var source added after a real CI failure) + `cli/runner.ts` (execFile
-  + JSON parse) + diagnostics provider + reverse-trace command. Demoable
-  standalone: open a file with `eval()`, see the squiggle; reverse a
-  mangled trace with one command. 13/13 tests green in real CI
-  (`.github/workflows/vscode-extension-ci.yml`), including a contract test
-  against an actually-installed pyobfus, not a mock. `vsce package`
-  produces a real installable 32KB `.vsix`.
+  **published 2026-08-04** as `pyobfus` v0.1.0, publisher `zhurong2020` —
+  https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus.
+  Scaffolding + `cli/locate.ts` (interpreter resolution, incl. a
+  `PYOBFUS_PYTHON_PATH` env-var source added after a real CI failure) +
+  `cli/runner.ts` (execFile + JSON parse) + diagnostics provider +
+  reverse-trace command. Demoable standalone: open a file with `eval()`,
+  see the squiggle; reverse a mangled trace with one command. 13/13 tests
+  green in real CI (`.github/workflows/vscode-extension-ci.yml`), including
+  a contract test against an actually-installed pyobfus, not a mock.
+  Published via manual `.vsix` web upload, not `vsce publish` — see
+  "Marketplace publishing note" above.
 - **M2** (v0.2.0) — status bar, trial/pro funnel commands (consumes M0's
   `--json`), right-click obfuscate, generate-config command.
 - **M3** (v0.3.0) — YAML IntelliSense: `scripts/generate-schema.py`
