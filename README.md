@@ -57,6 +57,10 @@ This repo is also a **Claude Code plugin marketplace**. The `pyobfus-protect` sk
 
 See [`skills/`](skills/) for the skill and install details. (This is distinct from [`templates/ai-integration/`](templates/ai-integration/), which are copy-in rule files for *your* project.)
 
+### 🧑‍💻 VS Code extension
+
+pyobfus is also on the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus) (publisher `zhurong2020`) — the **first** obfuscation-focused extension in this category, since no competitor (PyArmor, Nuitka, Sourcedefender) has one. Inline obfuscation-risk diagnostics (`pyobfus --check` findings rendered via VS Code's native `DiagnosticCollection` API — squiggles + Problems panel, no separate linter to configure) plus a "Reverse Stack Trace" command. Source and design rationale in [`vscode-extension/`](vscode-extension/) and [`docs/VSCODE_EXTENSION_PLAN.md`](docs/VSCODE_EXTENSION_PLAN.md).
+
 ### 🤖 AI-native features
 
 - **`pyobfus --check src/`** — pre-flight risk scan: detects `eval`/`exec`, dynamic attribute access, and framework reflection points before you obfuscate. JSON output with an `ai_hint` telling your AI assistant what to run next.
