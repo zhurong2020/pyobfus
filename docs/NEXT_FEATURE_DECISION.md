@@ -1,7 +1,19 @@
 # Next Feature Decision
 
-**Status:** waiting for launch feedback. Do not start a large feature merely to
-fill the gap while the poll is running.
+**Status (updated 2026-08-04): superseded for this cycle, not currently active.**
+The launch wave (2026-08-01) came back with essentially flat engagement
+everywhere (see `docs/POST_V0.4_TODO.md` item 2's checkpoint) — too thin for
+this poll mechanism to have meant much — so the maintainer made a **direct
+decision 2026-08-01** overriding the poll gate and picked **P2-17 (provenance
+manifest) + P2-19 (`--preset ml`)** straight from the already-scanned ROADMAP
+candidates instead. **Both shipped in pyobfus 0.5.5, 2026-08-02** (PRs #26/#27;
+see `docs/POST_V0.4_TODO.md` § item 6). The poll was never actually opened —
+the sections below describe the mechanism as designed, not something
+currently in flight. Re-activate this process only if a future launch
+generates enough real engagement to make polling meaningful again; until
+then, next-feature selection is a direct maintainer call from the ROADMAP
+candidate list (see `docs/ROADMAP.md`'s open P2-2/P2-6/P2-12 through P2-16/
+P2-21 items).
 
 ## Decision window
 
@@ -39,8 +51,13 @@ opening date, closing trigger, links, and raw counts below.
 
 ## Decision record
 
-- Poll opened: pending external publication
-- Review trigger reached: pending
-- Selected candidate: pending evidence
-- First bounded experiment: pending
-- Rationale/link: pending
+- Poll opened: never opened — superseded by direct maintainer decision, see
+  Status above
+- Review trigger reached: N/A
+- Selected candidate: P2-17 (provenance manifest) + P2-19 (`--preset ml`),
+  chosen directly from ROADMAP, 2026-08-01
+- First bounded experiment: both fully implemented and shipped as pyobfus
+  0.5.5 (2026-08-02), not a bounded experiment — the maintainer judged the
+  candidates low-risk/high-relevance enough to ship outright
+- Rationale/link: `docs/POST_V0.4_TODO.md` § item 6; `docs/ROADMAP.md`
+  "Additions from 2026-06-22 competitive + agentic-discoverability scan"
