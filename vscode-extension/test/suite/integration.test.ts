@@ -1,53 +1,71 @@
 import * as assert from "node:assert";
 import * as path from "node:path";
 import * as vscode from "vscode";
+import { resolveInterpreter } from "../../src/cli/locate";
+import { runJsonCommand } from "../../src/cli/runner";
+import { CheckReport } from "../../src/cli/types";
 import { DiagnosticsProvider } from "../../src/diagnostics/diagnosticsProvider";
 
-// Real contract test: runs the DiagnosticsProvider against an actually-
-// installed `pyobfus` (whatever interpreter is on PATH in the test
-// environment -- CI installs pyobfus from the parent repo before running
-// this suite; see .github/workflows/vscode-extension-ci.yml). This is the
-// test that would catch pyobfus's `--check --json` output shape silently
-// drifting out from under this extension.
+// Real contract test: runs against an actually-installed `pyobfus` (CI
+// installs it from the parent repo before running this suite; see
+// .github/workflows/vscode-extension-ci.yml). This is the test that would
+// catch pyobfus's `--check --json` output shape silently drifting out
+// from under this extension.
 //
-// Skips gracefully (rather than failing) if pyobfus isn't importable by
-// the interpreter this test environment resolves, so a contributor running
-// `npm test` without pyobfus installed still sees the rest of the suite
-// pass -- this suite is the one exception that needs the real CLI.
+// Deliberately calls runJsonCommand directly (not through
+// DiagnosticsProvider, which swallows every error into a single
+// `undefined` return so a real UI never crashes on a bad environment) --
+// that swallowing previously made this test silently skip in CI with zero
+// diagnostic information about *why*, across two failed debugging
+// iterations (2026-08-04). Only a genuine ENOENT (interpreter truly not
+// found) is treated as a skip; every other failure surfaces with a full
+// error message/stack in the Mocha report.
 
-suite("integration: DiagnosticsProvider against a real pyobfus", () => {
-  const fixtureFile = path.join(
-    __dirname,
-    "..",
-    "fixtures",
-    "sample_project",
-    "risky.py",
-  );
+suite("integration: real pyobfus contract", () => {
+  const fixtureFile = path.join(__dirname, "..", "fixtures", "sample_project", "risky.py");
 
-  test("publishes a high-severity diagnostic for the fixture's eval() call", async function () {
+  test("pyobfus --check --json produces the documented shape for the fixture's eval()", async function () {
     this.timeout(20_000);
 
-    const outputChannel = vscode.window.createOutputChannel("pyobfus-test");
-    const provider = new DiagnosticsProvider(outputChannel);
+    const interpreter = await resolveInterpreter(vscode.Uri.file(fixtureFile));
+    console.log(`[integration test] resolved interpreter: ${interpreter.pythonPath} (source: ${interpreter.source})`);
+
+    let report: CheckReport;
     try {
-      const report = await provider.checkAndPublish(vscode.Uri.file(fixtureFile), "file");
-      if (!report) {
-        // checkAndPublish returns undefined on a resolution/spawn failure
-        // (e.g. pyobfus not installed for the resolved interpreter in this
-        // environment) -- treat as a skip, not a failure, since this
-        // suite's job is to catch *output-shape drift* in an environment
-        // that does have pyobfus, not to enforce that every environment
-        // running `npm test` has it.
+      report = await runJsonCommand<CheckReport>(
+        interpreter.pythonPath,
+        ["-m", "pyobfus", "--check", fixtureFile, "--json"],
+        { allowNonZeroExit: true },
+      );
+    } catch (err) {
+      const nodeErr = err as NodeJS.ErrnoException;
+      if (nodeErr?.code === "ENOENT") {
+        console.log(
+          `[integration test] skipping: interpreter not found (${interpreter.pythonPath}). ` +
+            `Set PYOBFUS_PYTHON_PATH or install pyobfus for a resolvable interpreter to run this test.`,
+        );
         this.skip();
         return;
       }
+      // Anything else (JSON parse failure, non-ENOENT spawn error,
+      // pyobfus itself erroring) is a real signal -- let it fail loudly
+      // rather than silently skipping.
+      throw err;
+    }
 
-      assert.ok(report.risks.length >= 1, "expected at least one risk finding");
-      const evalRisk = report.risks.find((r) => r.category === "dynamic_exec");
-      assert.ok(evalRisk, "expected a dynamic_exec finding for the eval() call");
-      assert.strictEqual(evalRisk!.severity, "high");
-      assert.ok(evalRisk!.line > 0);
+    assert.ok(report.risks.length >= 1, "expected at least one risk finding");
+    const evalRisk = report.risks.find((r) => r.category === "dynamic_exec");
+    assert.ok(evalRisk, `expected a dynamic_exec finding; got categories: ${report.risks.map((r) => r.category).join(", ")}`);
+    assert.strictEqual(evalRisk!.severity, "high");
+    assert.ok(evalRisk!.line > 0);
 
+    // Also confirm DiagnosticsProvider correctly turns this real report
+    // into a real published vscode.Diagnostic.
+    const outputChannel = vscode.window.createOutputChannel("pyobfus-test");
+    const provider = new DiagnosticsProvider(outputChannel);
+    try {
+      const publishedReport = await provider.checkAndPublish(vscode.Uri.file(fixtureFile), "file");
+      assert.ok(publishedReport, "DiagnosticsProvider.checkAndPublish should succeed once runJsonCommand did");
       const diagnostics = vscode.languages.getDiagnostics(vscode.Uri.file(fixtureFile));
       assert.ok(diagnostics.length >= 1, "expected the finding published as a real Diagnostic");
       assert.strictEqual(diagnostics[0].severity, vscode.DiagnosticSeverity.Error);
