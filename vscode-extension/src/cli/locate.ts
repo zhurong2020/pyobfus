@@ -5,8 +5,21 @@
  *
  * Resolution order:
  *   1. `pyobfus.pythonPath` setting (explicit escape hatch)
- *   2. ms-python.python's exported environments API (via @vscode/python-extension)
- *   3. bare `python3`/`python` on PATH
+ *   2. `PYOBFUS_PYTHON_PATH` env var (CI/testing escape hatch -- see below)
+ *   3. ms-python.python's exported environments API (via @vscode/python-extension)
+ *   4. bare `python3`/`python` on PATH
+ *
+ * Why an env var too, not just the setting: the integration test suite
+ * (test/suite/integration.test.ts) runs inside a real Extension Host
+ * process launched by @vscode/test-electron, and empirically (see the
+ * 2026-08-04 CI run) that subprocess's inherited PATH does not reliably
+ * resolve `python3` to the same interpreter `actions/setup-python`
+ * configured for the rest of the job -- `pip install -e .` and the test's
+ * `python3` can end up pointing at two different interpreters, so the
+ * install is invisible to the resolved-and-invoked one. An env var read
+ * directly by this module, set explicitly by CI, sidesteps that PATH
+ * ambiguity rather than trying to fight it. Also generally useful for any
+ * CI/testing setup pinning a specific interpreter, not just this repo's own.
  *
  * We always invoke via `<interpreter> -m pyobfus.<module>` rather than
  * hunting for separate `pyobfus`/`pyobfus-trial`/`pyobfus-license` console
@@ -22,7 +35,7 @@ export interface ResolvedInterpreter {
   /** Absolute path to the Python executable to invoke. */
   pythonPath: string;
   /** How the path was resolved -- surfaced in error messages/telemetry-free logging. */
-  source: "setting" | "ms-python" | "path-fallback";
+  source: "setting" | "env-var" | "ms-python" | "path-fallback";
 }
 
 let cachedInterpreter: ResolvedInterpreter | undefined;
@@ -59,13 +72,19 @@ async function resolveInterpreterUncached(
     return { pythonPath: configured.trim(), source: "setting" };
   }
 
-  // 2. ms-python.python's environments API.
+  // 2. CI/testing env var escape hatch.
+  const envPath = process.env.PYOBFUS_PYTHON_PATH;
+  if (envPath && envPath.trim().length > 0) {
+    return { pythonPath: envPath.trim(), source: "env-var" };
+  }
+
+  // 3. ms-python.python's environments API.
   const fromMsPython = await tryResolveFromMsPython(resource);
   if (fromMsPython) {
     return { pythonPath: fromMsPython, source: "ms-python" };
   }
 
-  // 3. Bare interpreter on PATH. `python3` first (POSIX convention), then
+  // 4. Bare interpreter on PATH. `python3` first (POSIX convention), then
   // `python` (the only name reliably present on Windows).
   return { pythonPath: process.platform === "win32" ? "python" : "python3", source: "path-fallback" };
 }

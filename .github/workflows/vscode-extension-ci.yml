@@ -72,7 +72,16 @@ jobs:
         run: npm run pretest
 
       - name: Run tests (headless via xvfb)
+        # PYOBFUS_PYTHON_PATH pins the integration test to the exact
+        # interpreter `pip install -e .` above targeted -- the Extension
+        # Host subprocess @vscode/test-electron launches does not reliably
+        # inherit setup-python's PATH modification for a bare `python3`
+        # lookup (confirmed empirically 2026-08-04: pyobfus installed fine,
+        # but the integration test still skipped, resolving a different
+        # interpreter). See src/cli/locate.ts's module docstring.
         run: xvfb-run -a npm test
+        env:
+          PYOBFUS_PYTHON_PATH: ${{ env.pythonLocation }}/bin/python
 
   package-check:
     name: Package (vsce dry run)
