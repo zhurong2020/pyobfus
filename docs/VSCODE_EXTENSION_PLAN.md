@@ -7,11 +7,19 @@ via manual `.vsix` web upload, ~4 days ahead of the original 2026-08-08
 gate (see "Marketplace publishing note" below for why). M1's full test
 suite (13 tests, including a real contract test against actually-installed
 pyobfus) passed in real CI (`.github/workflows/vscode-extension-ci.yml`)
-before publish. M0 (pyobfus core `--json` prerequisites) is still
-code-complete-but-held, on its own separate PyPI release-spacing gate (see
-`docs/ROADMAP.md`'s P2-2 entry / `CLAUDE.md` for the exact date) — M1's
-early publish doesn't pull M0 forward, since M0 is a pyobfus-core PyPI
-release and the gate exists to space out *that* package's release traffic.
+before publish. **M2 code-complete 2026-08-04** (status bar, generate-config
+command, right-click obfuscate, Pro trial/unlock funnel commands), held for
+release — eligible from **2026-08-06** (2 days after M1's actual publish
+date, spacing Marketplace releases from each other the same way PyPI
+releases are spaced). 24/24 tests pass locally against the real installed
+pyobfus (`PYOBFUS_PYTHON_PATH=venv/bin/python3 npm test`), including 4 new
+real-contract tests (trial/license status, `--init --json`, real obfuscate
+`--json --dry-run`) and 8 new pure-logic tests for `deriveTier`. M0
+(pyobfus core `--json` prerequisites) is still code-complete-but-held, on
+its own separate PyPI release-spacing gate (see `docs/ROADMAP.md`'s P2-2
+entry / `CLAUDE.md` for the exact date) — M1/M2's early Marketplace
+publishing doesn't pull M0 forward, since M0 is a pyobfus-core PyPI release
+and the gate exists to space out *that* package's release traffic.
 **Recorded**: 2026-08-04
 
 ## Marketplace publishing note (2026-08-04)
@@ -139,8 +147,27 @@ could echo the malicious listing's old name.
   a contract test against an actually-installed pyobfus, not a mock.
   Published via manual `.vsix` web upload, not `vsce publish` — see
   "Marketplace publishing note" above.
-- **M2** (v0.2.0) — status bar, trial/pro funnel commands (consumes M0's
-  `--json`), right-click obfuscate, generate-config command.
+- **M2** (v0.2.0) — ✅ **code-complete 2026-08-04**, held for release
+  (eligible 2026-08-06). Status bar (`statusBar/statusBarController.ts` +
+  `status/tierStatus.ts`'s pure `deriveTier()`) showing tier + last-check
+  summary, consuming M0's `pyobfus-trial status --json` /
+  `pyobfus-license status --json`; a QuickPick menu (`commands/showMenu.ts`)
+  gated by current tier; "Generate pyobfus.yaml" (`commands/
+  generateConfig.ts`, wraps `--init --json`); "Obfuscate with pyobfus"
+  (`commands/obfuscateFile.ts`, Explorer + editor context menus, wraps the
+  main obfuscate command's `--json` success/error shapes, newly typed in
+  `cli/types.ts` as `ObfuscateSuccessResult`/`ObfuscateErrorResult`); Pro
+  trial/unlock funnel commands (`commands/proFunnel.ts`, copy manually
+  synced from `pyobfus/constants.py` — see that file's `DOCS_TO_UPDATE`
+  comment, which now names this TS file). A new shared
+  `cli/errorReporting.ts` factors out the ENOENT-with-actionable-buttons
+  handling these four new commands all need, rather than growing a third
+  and fourth near-copy of what M1 already had twice (DiagnosticsProvider
+  vs. unmapTrace.ts) — M1's two originals were left untouched. 12 new
+  tests: 8 pure-logic (`deriveTier`, every tier-precedence case) + 4 new
+  real-contract integration tests (trial/license status, `--init --json`,
+  real obfuscate `--json --dry-run`), all passing locally against the
+  actual installed pyobfus.
 - **M3** (v0.3.0) — YAML IntelliSense: `scripts/generate-schema.py`
   introspects `ObfuscationConfig` → `schemas/pyobfus.schema.json`, CI check
   for schema drift. **Note**: `pyobfus/config_validator.py`'s
