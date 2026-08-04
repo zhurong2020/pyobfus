@@ -1,0 +1,15 @@
+.vscode/**
+.vscode-test/**
+src/**
+test/**
+out/**
+node_modules/**
+.gitignore
+.eslintrc*
+eslint.config.js
+esbuild.js
+tsconfig.json
+.vscode-test.mjs
+**/*.map
+**/.eslintcache
+docs/VSCODE_EXTENSION_PLAN.md

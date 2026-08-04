@@ -1,0 +1,96 @@
+{
+  "name": "pyobfus",
+  "displayName": "pyobfus — Python Code Obfuscator",
+  "description": "Inline risk diagnostics + reverse-mapped stack traces for pyobfus, the open-source AST-based Python obfuscator. Open source, OpenSSF Best Practices verified, PEP 740 attested releases.",
+  "version": "0.1.0",
+  "publisher": "zhurong2020",
+  "license": "Apache-2.0",
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.105.0"
+  },
+  "categories": [
+    "Linters",
+    "Other"
+  ],
+  "keywords": [
+    "python",
+    "obfuscator",
+    "obfuscation",
+    "code-protection",
+    "security",
+    "pyarmor-alternative"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zhurong2020/pyobfus.git",
+    "directory": "vscode-extension"
+  },
+  "homepage": "https://github.com/zhurong2020/pyobfus/tree/main/vscode-extension",
+  "bugs": "https://github.com/zhurong2020/pyobfus/issues",
+  "activationEvents": [
+    "onLanguage:python"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "pyobfus.checkWorkspace",
+        "title": "pyobfus: Check Workspace for Obfuscation Risks",
+        "category": "pyobfus"
+      },
+      {
+        "command": "pyobfus.checkFile",
+        "title": "pyobfus: Check Current File for Obfuscation Risks",
+        "category": "pyobfus"
+      },
+      {
+        "command": "pyobfus.unmapTrace",
+        "title": "pyobfus: Reverse Stack Trace",
+        "category": "pyobfus"
+      }
+    ],
+    "configuration": {
+      "title": "pyobfus",
+      "properties": {
+        "pyobfus.pythonPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to a Python interpreter with pyobfus installed. Leave empty to auto-detect via the ms-python.python extension, falling back to a bare 'pyobfus' on PATH."
+        },
+        "pyobfus.checkOnSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Run 'pyobfus --check' on every .py file save and show findings as diagnostics."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "node esbuild.js",
+    "watch": "node esbuild.js --watch",
+    "package": "node esbuild.js --production",
+    "vscode:prepublish": "npm run package",
+    "typecheck": "tsc --noEmit -p ./",
+    "compile-tests": "tsc -p ./",
+    "lint": "eslint src test",
+    "pretest": "npm run compile && npm run compile-tests",
+    "test": "vscode-test",
+    "vsce-package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.105.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "@vscode/python-extension": "^1.0.5",
+    "@vscode/test-cli": "^0.0.15",
+    "@vscode/test-electron": "^2.4.0",
+    "@vscode/vsce": "^3.0.0",
+    "esbuild": "^0.28.0",
+    "eslint": "^9.0.0",
+    "mocha": "^11.0.0",
+    "typescript": "^5.5.0"
+  }
+}

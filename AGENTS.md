@@ -50,6 +50,22 @@ Note: the core and MCP test roots are collected as **separate** pytest
 invocations (CI runs them as separate jobs) — don't point one `pytest` at both
 roots at once.
 
+**4th test root — `vscode-extension/`** (Node/npm, not pytest; independent
+package, see `docs/VSCODE_EXTENSION_PLAN.md`):
+
+```bash
+cd vscode-extension
+npm ci
+npm run lint          # eslint
+npm run typecheck     # tsc --noEmit
+npm run pretest       # esbuild + compile tests to out/
+npm test              # xvfb-run needed on headless Linux -- @vscode/test-electron launches a real VS Code instance
+```
+
+CI runs this as a separate, path-filtered workflow
+(`.github/workflows/vscode-extension-ci.yml`), not as part of the Python
+`ci.yml` jobs above.
+
 Targets: Python **3.9–3.14** must all pass. (Python 3.8 was dropped in 0.5.0 —
 EOL 2024-10 — which removed the old `astunparse`/`@requires_py39` flakiness;
 `docs/PYTHON38_COMPATIBILITY.md` is retained only as historical record.)

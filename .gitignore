@@ -193,3 +193,10 @@ pyobfus_mcp/*.egg-info/
 # CN software copyright filing materials (PII: applicant name, address, spouse info, ID card refs).
 # Keep filing materials in a sibling directory (../pyobfus-legal/), never in the public repo.
 docs/legal/software_copyright/
+
+# vscode-extension (Node/TypeScript, independent package -- see vscode-extension/package.json)
+vscode-extension/node_modules/
+vscode-extension/dist/
+vscode-extension/out/
+vscode-extension/.vscode-test/
+vscode-extension/*.vsix
