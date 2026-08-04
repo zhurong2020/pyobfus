@@ -20,7 +20,7 @@ A Python code obfuscator built with AST-based transformations. **Supports Python
 
 > **🔒 Pro Edition available** — 6 patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator, $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
 
-> **🔧 What's new in v0.5.10** — Pro builds now support `--embed-data <path>`, AES-256-GCM encrypting a resource file at build time and embedding it base85-encoded with a generated `get_embedded_data()` accessor — closes the Nuitka Commercial "Protect Data Files" / PyArmor `--bind-data` gap. The companion `pyobfus-mcp` package separately shipped 0.3.4 the same day, adding PII-shape detection (emails/IPv4/GUIDs/home-directory paths) to its risk scan. v0.5.9 added `--requires-os` / `--requires-python-min` / `--requires-arch` platform restrictions. Full details in the [CHANGELOG](CHANGELOG.md); see [Pro Edition](#-pro-edition) below.
+> **🔧 What's new in v0.5.11** — `--anti-debug` now checks three more signals beyond the original `sys.gettrace()`: TracerPid (Linux native debuggers), WinAPI `IsDebuggerPresent()` (Windows), and a timing-skew check that catches single-stepping on any platform. v0.5.10 added `--embed-data <path>` (AES-256-GCM resource-file embedding) and, separately, `pyobfus-mcp` 0.3.4 added PII-shape detection to its risk scan. v0.5.9 added `--requires-os` / `--requires-python-min` / `--requires-arch` platform restrictions. Full details in the [CHANGELOG](CHANGELOG.md); see [Pro Edition](#-pro-edition) below.
 
 ## 🔌 Companion MCP server: [`pyobfus-mcp`](pyobfus_mcp/)
 
@@ -104,8 +104,9 @@ The following advanced features are available with a Pro license:
 
 - **Anti-Debugging**
   - Debugger detection checks injected into functions
-  - Multiple detection methods (sys.gettrace, sys.settrace)
-  - Configurable behavior
+  - Four detection methods (v0.5.11): `sys.gettrace()` (Python-level tracers/debuggers), TracerPid via `/proc/self/status` (native debuggers on Linux — gdb, strace), WinAPI `IsDebuggerPresent()` (native debuggers on Windows), and a timing-skew check (catches single-stepping regardless of platform)
+  - Default OFF to protect AI-debuggability; opt-in via `--anti-debug`
+  - Heuristic, not a security boundary — documented in the [CHANGELOG](CHANGELOG.md)
 
 - **Control Flow Flattening**
   - State machine transformation for if/else/elif

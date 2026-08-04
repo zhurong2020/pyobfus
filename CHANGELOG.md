@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.11] - 2026-08-04
+
+**Feature release.** Extends `--anti-debug` (P2-15, Pro) with three new
+detection methods beyond the original `sys.gettrace()`-only check: TracerPid
+(reads `/proc/self/status` — catches native debuggers like gdb/strace on
+Linux, which `sys.gettrace()` can't see since it only observes the CPython
+trace hook, not OS-level ptrace attachment), WinAPI `IsDebuggerPresent()`
+via `ctypes` (Windows native debuggers), and a timing-skew check (times a
+trivial tight loop — a debugger single-stepping or evaluating breakpoints
+per line adds overhead orders of magnitude above normal execution; the
+threshold is deliberately generous to avoid false-positive-killing a
+legitimate customer process under CPU throttling or heavy load). Default
+stays OFF, opt-in via `--anti-debug`, same as before. Heuristic, not a
+security boundary — documented as such, matching this project's existing
+license/trial mechanism disclosures. Also fixed a pre-existing README
+overclaim ("sys.gettrace, sys.settrace" as two detection methods —
+`sys.settrace` sets a trace function, it was never actually a detection
+check the code performed). 6 new tests, each exercising the real injected
+runtime logic via mocks (TracerPid nonzero/zero, IsDebuggerPresent
+true/false, simulated timing slowdown), not just checking the generated
+source text looks right. `pyobfus-mcp` unchanged, no Glama re-pin needed.
+
 ## [0.5.10] - 2026-08-04
 
 **Feature release.** Adds `--embed-data <path>` (P2-14, Pro) — AES-256-GCM

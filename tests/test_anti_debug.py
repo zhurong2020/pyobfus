@@ -6,6 +6,8 @@ and work correctly to detect debuggers.
 """
 
 import sys
+from unittest import mock
+
 import pytest
 from typing import TYPE_CHECKING
 
@@ -133,6 +135,102 @@ def sample():
         assert "sys.gettrace()" in obfuscated_code
         assert "is not None" in obfuscated_code or "!= None" in obfuscated_code
         assert "sys.exit" in obfuscated_code
+
+    def test_p2_15_detection_methods_present_in_source(self):
+        """P2-15: TracerPid / IsDebuggerPresent / timing-skew all appear in
+        the generated _check_debugger, not just the original sys.gettrace()."""
+        code = "def sample():\n    return 42\n"
+        config = ObfuscationConfig()
+        config.anti_debug = True
+
+        tree = ASTParser.parse_string(code)
+        analyzer = SymbolAnalyzer(config)
+        analyzer.analyze(tree)
+
+        injector = AntiDebugInjector(config, analyzer)
+        obfuscated_code = CodeGenerator.generate(injector.transform(tree))
+
+        assert "TracerPid" in obfuscated_code
+        assert "IsDebuggerPresent" in obfuscated_code
+        assert "perf_counter" in obfuscated_code
+
+    def _get_check_debugger(self):
+        """Obfuscate a trivial module with --anti-debug and return the
+        live _check_debugger function object from the executed namespace."""
+        code = "def sample():\n    return 42\n"
+        config = ObfuscationConfig()
+        config.anti_debug = True
+        tree = ASTParser.parse_string(code)
+        analyzer = SymbolAnalyzer(config)
+        analyzer.analyze(tree)
+        injector = AntiDebugInjector(config, analyzer)
+        obfuscated_code = CodeGenerator.generate(injector.transform(tree))
+        namespace: dict = {}
+        exec(obfuscated_code, namespace)
+        return namespace["_check_debugger"]
+
+    def test_tracer_pid_nonzero_triggers_exit(self):
+        """A nonzero TracerPid (native debugger attached) raises SystemExit.
+        platform.system is force-mocked to 'Linux' so this test is
+        deterministic regardless of the actual CI host OS."""
+        check_fn = self._get_check_debugger()
+        with (
+            mock.patch("platform.system", return_value="Linux"),
+            mock.patch(
+                "builtins.open",
+                mock.mock_open(read_data="Name:\tpython\nTracerPid:\t1234\n"),
+            ),
+        ):
+            with pytest.raises(SystemExit):
+                check_fn()
+
+    def test_tracer_pid_zero_does_not_trigger(self):
+        """TracerPid: 0 (no debugger attached) must not raise."""
+        check_fn = self._get_check_debugger()
+        with (
+            mock.patch("platform.system", return_value="Linux"),
+            mock.patch(
+                "builtins.open",
+                mock.mock_open(read_data="Name:\tpython\nTracerPid:\t0\n"),
+            ),
+        ):
+            check_fn()  # must not raise
+
+    def test_is_debugger_present_true_triggers_exit(self):
+        """WinAPI IsDebuggerPresent()==True raises SystemExit. ctypes.windll
+        is patched with create=True since it only natively exists on
+        Windows -- this keeps the test portable across the CI OS matrix."""
+        check_fn = self._get_check_debugger()
+        fake_windll = mock.MagicMock()
+        fake_windll.kernel32.IsDebuggerPresent.return_value = True
+        with (
+            mock.patch("platform.system", return_value="Windows"),
+            mock.patch("ctypes.windll", fake_windll, create=True),
+        ):
+            with pytest.raises(SystemExit):
+                check_fn()
+
+    def test_is_debugger_present_false_does_not_trigger(self):
+        check_fn = self._get_check_debugger()
+        fake_windll = mock.MagicMock()
+        fake_windll.kernel32.IsDebuggerPresent.return_value = False
+        with (
+            mock.patch("platform.system", return_value="Windows"),
+            mock.patch("ctypes.windll", fake_windll, create=True),
+        ):
+            check_fn()  # must not raise
+
+    def test_timing_skew_triggers_on_simulated_slowdown(self):
+        """A simulated huge elapsed time between the two perf_counter()
+        calls (as a debugger single-stepping through the loop would cause)
+        raises SystemExit. Runs the real gettrace/TracerPid/IsDebuggerPresent
+        checks unmocked -- fine, since no real debugger is attached during
+        the test run, so they pass through without raising."""
+        check_fn = self._get_check_debugger()
+        readings = iter([0.0, 999.0])
+        with mock.patch("time.perf_counter", side_effect=lambda: next(readings)):
+            with pytest.raises(SystemExit):
+                check_fn()
 
     def test_small_functions_skipped(self):
         """Test that very small functions are not injected (< 2 statements)."""
