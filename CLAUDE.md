@@ -26,6 +26,8 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 **✅ Plugin marketplace 提交已完成（2026-08-02）**：Console 表单提交成功，显示"Plugin submitted for review"——状态是**待 Anthropic 审核**，不是已上线；`Link to plugin` 字段一度报 `must not contain spaces or control characters`（复制粘贴带入隐藏字符，手动重新输入后解决）。后续查审核结果看 `github.com/anthropics/claude-plugins-community`（审核通过后隔夜同步）或 Console 里的"View submissions"。
 
+**✅ 2026-08-04 找到确切查询入口 + 状态确认**：权威地址是 **`https://platform.claude.com/plugins/submissions`**（Claude Console → Plugin submissions，需登录 user 自己的 Console 账号 `Rong / Shanghai Nirong Technology Co., Ltd.`）。页面显示 pyobfus 状态仍是 **"Submitted and pending review"**（提交于 2 天前，与 08-02 提交时间吻合，尚无 approve/reject 结论）。顺带核实了那个"protected_project"笔误确实还留在已提交的描述文案里（"One-call protected_project workflow..."一句）——继续维持"机会性修复"处置，不主动改，除非 Anthropic 跟进要求补充信息。公开旁证渠道（`claude-plugins-community` 仓库 `.claude-plugin/marketplace.json`，2298 个插件里搜 `pyobfus`）2026-08-04 同步核实：尚未出现，与 Console 状态一致。
+
 **⏳ Glama 后台 Dockerfile 版本号更新——尝试过，被 Glama 自己的 UI bug 卡住，user 改天再试**：user 能进后台管理页（`.../admin`，能看到 Profile/Analytics/Repository/Dockerfile 四个 tab），但点 Dockerfile tab 不跳转、又弹回 Profile 页，F12 有报错但没抓到具体错误文本。不是 user 操作问题，像是 Glama 前端路由 bug 或临时故障。**下次重试时先截报错原文**——这是唯一缺的信息，抓到就能真正定位，不然就是重试运气。详见 `docs/DOC_SYNC_AUDIT_2026-08-02.md` 第 3 节。
 
 **✅ 已回填（2026-08-02 验证，原「下次 session 直接执行清单」①②两项其实早已完成）**：`docs/DOC_SYNC_AUDIT_2026-08-02.md`「Session 2 punch list」①② 两项实测 `README.md` 均已完成——① 锚点链接已是 `#-pro-edition`（README.md:21，非损坏的旧版 `#-pro-edition-available-now`）② Pro Edition 常驻提示行已在 README.md 第 21 行（`> **🔒 Pro Edition available** — 6 patent-targeted...`）。**仍待**：③ Glama 后台 Dockerfile 版本号手动更新（目标应是当前最新 **0.3.3**）。**2026-08-03 复查**：Dockerfile tab 不跳转的 UI bug 看起来自愈了（能正常打开、看到 Configuration 表单），但 user 反映"还是有问题"（具体报错未截取），且决定性的 **Build steps** 字段实际内容（是否还写死旧版本号）当场没能确认——**user 决定过几天再看**，下次重试先截 Build steps 字段的实际 JSON 内容 + 任何报错原文。**极小尾巴仍待**：plugin marketplace 提交描述里有个笔误"protected_project"应为"protect_project"，不影响功能，Anthropic 若跟进补充信息时顺手改。
@@ -77,7 +79,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - ✅ **pyobfus-mcp 0.3.3 已发布（2026-08-02）**：`recommend_tier`/`start_pro_trial` 补 `--import-obfuscation` 到硬编码 Pro 机制清单（同 0.3.2 那类内容漂移修复）。tag `mcp-v0.3.3` 发 PyPI + Registry（isLatest），GitHub Release 附 wheel+sdist。
 - ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:P2-13/P2-22 这类零代码内容型候选（PyInstaller cookbook / PyArmor 对比页）。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
 
-**Cold-start session 第一句话应问 user**：「plugin marketplace 提交描述里那个"protected_project"笔误（应为 protect_project）要不要顺手改掉？另外查一下 plugin marketplace 审核结果出了没有。」（Glama Build-steps 已于 2026-08-04 确认改到 0.3.3 并保存生效，不用再问）
+**Cold-start session 第一句话应问 user**：「plugin marketplace 审核（`https://platform.claude.com/plugins/submissions`）08-04 查还是 pending review，要不要再查一次有没有变化？描述里那个"protected_project"笔误还留着，要不要现在就去改？」（Glama Build-steps 已于 2026-08-04 确认改到 0.3.3 并保存生效，不用再问）
 
 **Cold-start 资料定位**（按读取优先级）：
 

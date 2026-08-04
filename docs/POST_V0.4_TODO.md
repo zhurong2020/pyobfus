@@ -97,6 +97,16 @@
 > Recent Tests, confirming the save actually triggered a rebuild this time.
 > Remaining tail: the `protected_project` typo, still opportunistic
 > (unchanged from above).
+> **Plugin marketplace review — status confirmed 2026-08-04.** Authoritative
+> check URL is `https://platform.claude.com/plugins/submissions` (Claude
+> Console → Plugin submissions, requires login). Status: still "Submitted
+> and pending review" (submitted 2 days ago, consistent with the 2026-08-02
+> submission date). The console page's visible description text confirms
+> the `protected_project` typo is indeed still present in what was
+> submitted — disposition unchanged, fix opportunistically only if
+> Anthropic follows up. Cross-checked against the public
+> `claude-plugins-community` marketplace.json (2298 listed plugins, no
+> `pyobfus` match) — consistent with pending-review status.
 
 ## Current prioritized TODO (2026-08-01)
 
