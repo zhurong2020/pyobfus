@@ -645,6 +645,10 @@ See our [detailed comparison](docs/COMPARISON.md) for more information.
 
 Yes — and for many projects this is the most cost-effective approach. Use pyobfus as your always-on default layer (every module gets AST mangling + mapping for AI-debug compatibility), then stack PyArmor Pro's bytecode encryption or Nuitka's native compilation on the small set of modules that genuinely need stronger protection. The comparison now also covers why bytecode encryption should be treated as a stronger speed bump, not as irreversible cryptographic protection for client-side Python. See [Layered Deployment Strategy in COMPARISON.md](docs/COMPARISON.md#layered-deployment-strategy) for the full reasoning.
 
+### Can I ship a single-file executable, like with Nuitka?
+
+Yes, at a fraction of Nuitka Commercial's cost: obfuscate first, then bundle the obfuscated output with the free [PyInstaller](https://pyinstaller.org/). The two tools solve different problems (name mangling vs. bundling a Python interpreter into one file) and compose cleanly — see the [PyInstaller Cookbook](docs/PYINSTALLER_COOKBOOK.md) for a full worked example, including verification that the original identifier names never reach the compiled binary and that `pyobfus --unmap` still reverses a traceback captured from the bundled exe.
+
 ### What if obfuscation breaks my code?
 
 1. **Use `--dry-run`** to preview changes before writing files

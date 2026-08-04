@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.8] - 2026-08-04
+
+**Content release, no code changes.** Adds a PyInstaller integration
+cookbook (P2-13 from the roadmap) for teams that want a single-file
+executable but don't need Nuitka Commercial's price or compile times:
+obfuscate first, then bundle the obfuscated output with the free,
+MIT-licensed PyInstaller. `examples/pyinstaller/` is a verified end-to-end
+reproduction (not just described) — including confirming the original
+identifier names never reach the compiled binary, and that `pyobfus
+--unmap` still reverses a traceback captured from the bundled executable.
+New RTD page `docs/PYINSTALLER_COOKBOOK.md`, cross-linked from
+`docs/COMPARISON.md`'s Nuitka section and a new README FAQ entry.
+`pyobfus-mcp` is unchanged (no tool-surface change), so no MCP Registry
+publish or Glama Build-steps re-pin is needed for this release.
+
 ## [0.5.7] - 2026-08-02
 
 **Feature + positioning release.** Adds Pro import obfuscation and the matching

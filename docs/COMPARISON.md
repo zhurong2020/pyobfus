@@ -177,6 +177,13 @@ Nuitka compiles Python to standalone executables.
 - Users shouldn't need Python installed
 - You want **maximum binary protection**
 
+> **Want a standalone executable without Nuitka's price or compile times?**
+> pyobfus pairs with the free, MIT-licensed [PyInstaller](https://pyinstaller.org/)
+> to ship a single-file binary with mangled identifiers — obfuscate first,
+> then bundle. See the [PyInstaller Cookbook](PYINSTALLER_COOKBOOK.md) for a
+> full worked example, including verification that the original names never
+> reach the compiled binary.
+
 ---
 
 ## Feature Matrix

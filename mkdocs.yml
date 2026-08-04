@@ -16,6 +16,7 @@ theme:
 nav:
   - Home: index.md
   - Comparison: COMPARISON.md
+  - PyInstaller Cookbook: PYINSTALLER_COOKBOOK.md
   - Roadmap: ROADMAP.md
   - Python 3.8 Compatibility: PYTHON38_COMPATIBILITY.md
   - License Activation: LICENSE_ACTIVATION_GUIDE.md

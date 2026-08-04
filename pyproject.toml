@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyobfus"
-version = "0.5.7"
+version = "0.5.8"
 description = "pyobfus — the Python obfuscator. AST-based name mangling + framework presets (FastAPI/Django/Pydantic/Click/SQLAlchemy) + reverse stack-trace mapping for AI debugging in Claude Code / Cursor. A transparent PyArmor alternative: AST-level protection with debuggable traces. Apache-2.0."
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.9"
