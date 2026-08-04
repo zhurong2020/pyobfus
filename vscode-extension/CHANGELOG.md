@@ -4,7 +4,36 @@ All notable changes to this extension are documented here. Follows [Keep a Chang
 
 Independent version/release cadence from the main `pyobfus` and `pyobfus-mcp` PyPI packages — see `../CHANGELOG.md` and `../pyobfus_mcp/CHANGELOG.md` for those.
 
-## [0.1.0] - 2026-08-04
+## [Unreleased]
+
+**M2 (v0.2.0), code-complete 2026-08-04.** Held for release per the
+release-spacing gate — eligible from **2026-08-06** (2 days after M1's
+actual publish date), so Marketplace releases stay spaced the same way
+PyPI releases do. Full design rationale in
+[`docs/VSCODE_EXTENSION_PLAN.md`](../docs/VSCODE_EXTENSION_PLAN.md).
+
+### Added
+
+- Status bar item: current tier (Community/Trial/Pro, from the M0
+  `pyobfus-trial status --json` / `pyobfus-license status --json`
+  endpoints) + last-check summary (clean / N findings). Click opens a
+  QuickPick menu (Check Workspace / Generate Config / Start Trial / Unlock
+  Pro — trial and unlock items hidden once already on that tier).
+- "pyobfus: Generate pyobfus.yaml" command, wrapping `--init --json`.
+- "Obfuscate with pyobfus" command (Explorer context menu on `.py`
+  files/folders, editor context menu, and Command Palette) — runs the real
+  `pyobfus <input> -o <output> --json` obfuscation with an editable
+  default output path, surfaces stats on success, and offers a "Start Free
+  Trial" action when a Community-tier `LimitExceededError` is hit.
+- "pyobfus: Start 5-Day Pro Trial" / "pyobfus: Unlock Pro Edition"
+  commands — reuse `pyobfus/constants.py`'s Stripe link / price / trial
+  duration and the MCP server's funnel tone verbatim, not new copy.
+
+### Changed
+
+- Refactored the on-save/manual check commands to report their
+  `CheckReport` back to the status bar via an `onReport` callback, so the
+  status bar's summary updates the same way the Problems panel does.
 
 **M1, first Marketplace release.** Published as `pyobfus` (publisher
 `zhurong2020`) on the VS Code Marketplace via manual `.vsix` upload

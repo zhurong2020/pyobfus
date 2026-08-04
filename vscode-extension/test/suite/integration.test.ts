@@ -1,10 +1,20 @@
 import * as assert from "node:assert";
+import * as os from "node:os";
 import * as path from "node:path";
+import { randomUUID } from "node:crypto";
 import * as vscode from "vscode";
 import { resolveInterpreter } from "../../src/cli/locate";
 import { runJsonCommand } from "../../src/cli/runner";
-import { CheckReport } from "../../src/cli/types";
+import {
+  CheckReport,
+  InitResult,
+  LicenseStatusResult,
+  ObfuscateErrorResult,
+  ObfuscateSuccessResult,
+  TrialStatusResult,
+} from "../../src/cli/types";
 import { DiagnosticsProvider } from "../../src/diagnostics/diagnosticsProvider";
+import { deriveTier } from "../../src/status/tierStatus";
 
 // Real contract test: runs against an actually-installed `pyobfus` (CI
 // installs it from the parent repo before running this suite; see
@@ -75,3 +85,114 @@ suite("integration: real pyobfus contract", () => {
     }
   });
 });
+
+// M2 real-contract tests: the status bar (tierStatus.ts), "Generate
+// pyobfus.yaml" (--init --json), and "Obfuscate with pyobfus" (the main
+// obfuscate command's --json success/error shapes) all depend on CLI
+// contracts that were verified live 2026-08-04 but never exercised in CI
+// before now. Same ENOENT-only-skip discipline as the suite above.
+
+suite("integration: M2 real pyobfus contracts", () => {
+  const fixtureFile = path.join(__dirname, "..", "fixtures", "sample_project", "risky.py");
+
+  test("pyobfus.trial_cli status --json and pyobfus_pro.cli status --json feed deriveTier without throwing", async function () {
+    this.timeout(20_000);
+
+    const interpreter = await resolveInterpreter(vscode.Uri.file(fixtureFile));
+    let trial: TrialStatusResult | undefined;
+    let license: LicenseStatusResult | undefined;
+    try {
+      trial = await runJsonCommand<TrialStatusResult>(
+        interpreter.pythonPath,
+        ["-m", "pyobfus.trial_cli", "status", "--json"],
+        { allowNonZeroExit: true },
+      );
+      license = await runJsonCommand<LicenseStatusResult>(
+        interpreter.pythonPath,
+        ["-m", "pyobfus_pro.cli", "status", "--json"],
+        { allowNonZeroExit: true },
+      );
+    } catch (err) {
+      if (skipOnEnoent(this, err, interpreter.pythonPath)) {
+        return;
+      }
+      throw err;
+    }
+
+    assert.strictEqual(trial.version, 1);
+    assert.strictEqual(license.version, 1);
+    assert.ok(license.device.fingerprint.length > 0);
+    // A fresh CI runner has no trial/license state -- both should report
+    // absent (null), which deriveTier must turn into "community" without
+    // throwing, not an untested edge case.
+    const status = deriveTier(license, trial);
+    assert.strictEqual(status.tier, "community");
+  });
+
+  test("pyobfus --init --json produces the documented shape", async function () {
+    this.timeout(20_000);
+
+    const tmpDir = path.join(os.tmpdir(), `pyobfus-init-test-${randomUUID()}`);
+    await vscode.workspace.fs.createDirectory(vscode.Uri.file(tmpDir));
+    await vscode.workspace.fs.writeFile(
+      vscode.Uri.file(path.join(tmpDir, "app.py")),
+      Buffer.from("def foo():\n    return 1\n", "utf-8"),
+    );
+
+    const interpreter = await resolveInterpreter(vscode.Uri.file(tmpDir));
+    let result: InitResult;
+    try {
+      result = await runJsonCommand<InitResult>(
+        interpreter.pythonPath,
+        ["-m", "pyobfus", "--init", tmpDir, "--json"],
+        { cwd: tmpDir, allowNonZeroExit: true },
+      );
+    } catch (err) {
+      if (skipOnEnoent(this, err, interpreter.pythonPath)) {
+        return;
+      }
+      throw err;
+    }
+
+    assert.strictEqual(result.version, 1);
+    assert.strictEqual(result.written, true);
+    assert.ok(result.config_path.endsWith("pyobfus.yaml"));
+  });
+
+  test("pyobfus --json (real obfuscate, --dry-run) produces the documented success shape", async function () {
+    this.timeout(20_000);
+
+    const interpreter = await resolveInterpreter(vscode.Uri.file(fixtureFile));
+    let result: ObfuscateSuccessResult | ObfuscateErrorResult;
+    try {
+      result = await runJsonCommand<ObfuscateSuccessResult | ObfuscateErrorResult>(
+        interpreter.pythonPath,
+        ["-m", "pyobfus", fixtureFile, "-o", path.join(os.tmpdir(), `pyobfus-obf-test-${randomUUID()}.py`), "--json", "--dry-run"],
+        { allowNonZeroExit: true },
+      );
+    } catch (err) {
+      if (skipOnEnoent(this, err, interpreter.pythonPath)) {
+        return;
+      }
+      throw err;
+    }
+
+    assert.strictEqual(result.status, "success", `expected success, got: ${JSON.stringify(result)}`);
+    const success = result as ObfuscateSuccessResult;
+    assert.strictEqual(success.dry_run, true);
+    assert.ok(success.stats.files_processed >= 1);
+  });
+});
+
+function skipOnEnoent(ctx: Mocha.Context, err: unknown, interpreterPath: string): boolean {
+  const nodeErr = err as NodeJS.ErrnoException;
+  if (nodeErr?.code === "ENOENT") {
+    console.log(
+      `[integration test] skipping: interpreter not found (${interpreterPath}). ` +
+        `Set PYOBFUS_PYTHON_PATH or install pyobfus for a resolvable interpreter to run this test.`,
+    );
+    ctx.skip();
+    return true;
+  }
+  return false;
+}

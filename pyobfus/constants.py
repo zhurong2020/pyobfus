@@ -53,5 +53,7 @@ LICENSE_API_URL = "https://pyobfus-license-server.zhurong0525.workers.dev/api/ve
 #     "README.md (line ~96)",
 #     "docs/index.md (lines ~43, ~141)",
 #     "CHANGELOG.md (line ~204)",
+#     "vscode-extension/src/commands/proFunnel.ts (STRIPE_PAYMENT_LINK/PRICE_USD/"
+#     "MONEY_BACK_DAYS/TRIAL_DAYS constants -- TS can't import this module directly)",
 # ]
 # =============================================================================

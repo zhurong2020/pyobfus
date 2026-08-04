@@ -2,7 +2,13 @@ import * as vscode from "vscode";
 import { DiagnosticsProvider } from "./diagnostics/diagnosticsProvider";
 import { registerCheckCommands } from "./commands/checkWorkspace";
 import { registerUnmapTraceCommand } from "./commands/unmapTrace";
+import { registerGenerateConfigCommand } from "./commands/generateConfig";
+import { registerObfuscateFileCommand } from "./commands/obfuscateFile";
+import { registerProFunnelCommands } from "./commands/proFunnel";
+import { registerShowMenuCommand } from "./commands/showMenu";
+import { StatusBarController } from "./statusBar/statusBarController";
 import { clearInterpreterCache } from "./cli/locate";
+import { CheckReport } from "./cli/types";
 
 const ON_SAVE_DEBOUNCE_MS = 500;
 
@@ -13,11 +19,21 @@ export function activate(context: vscode.ExtensionContext): void {
   const diagnostics = new DiagnosticsProvider(outputChannel);
   context.subscriptions.push(diagnostics);
 
-  registerCheckCommands(context, diagnostics);
-  registerUnmapTraceCommand(context, outputChannel);
+  const statusBar = new StatusBarController();
+  context.subscriptions.push(statusBar);
+  const onReport = (report: CheckReport | undefined) => statusBar.setLastReport(report);
 
-  registerCheckOnSave(context, diagnostics);
-  registerInterpreterChangeListener(context);
+  registerCheckCommands(context, diagnostics, onReport);
+  registerUnmapTraceCommand(context, outputChannel);
+  registerGenerateConfigCommand(context, outputChannel);
+  registerObfuscateFileCommand(context, outputChannel);
+  registerProFunnelCommands(context);
+  registerShowMenuCommand(context, statusBar);
+
+  registerCheckOnSave(context, diagnostics, onReport);
+  registerInterpreterChangeListener(context, statusBar);
+
+  void statusBar.refreshTier(vscode.workspace.workspaceFolders?.[0]?.uri);
 
   outputChannel.appendLine("pyobfus extension activated.");
 }
@@ -30,6 +46,7 @@ export function deactivate(): void {
 function registerCheckOnSave(
   context: vscode.ExtensionContext,
   diagnostics: DiagnosticsProvider,
+  onReport: (report: CheckReport | undefined) => void,
 ): void {
   let debounceTimer: NodeJS.Timeout | undefined;
 
@@ -48,7 +65,7 @@ function registerCheckOnSave(
         clearTimeout(debounceTimer);
       }
       debounceTimer = setTimeout(() => {
-        void diagnostics.checkAndPublish(document.uri, "file");
+        void diagnostics.checkAndPublish(document.uri, "file").then(onReport);
       }, ON_SAVE_DEBOUNCE_MS);
     }),
   );
@@ -60,7 +77,10 @@ function registerCheckOnSave(
  * interpreter cache so the next check picks up the new one, rather than
  * silently continuing to run against a stale interpreter path.
  */
-function registerInterpreterChangeListener(context: vscode.ExtensionContext): void {
+function registerInterpreterChangeListener(
+  context: vscode.ExtensionContext,
+  statusBar: StatusBarController,
+): void {
   const pythonExtension = vscode.extensions.getExtension("ms-python.python");
   if (!pythonExtension) {
     return;
@@ -72,6 +92,10 @@ function registerInterpreterChangeListener(context: vscode.ExtensionContext): vo
       context.subscriptions.push(
         pythonApi.environments.onDidChangeActiveEnvironmentPath(() => {
           clearInterpreterCache();
+          // The new interpreter may have a different pyobfus install (or
+          // none), which changes trial/license visibility -- refresh
+          // rather than showing a stale tier for the previous interpreter.
+          void statusBar.refreshTier(vscode.workspace.workspaceFolders?.[0]?.uri);
         }),
       );
     } catch {

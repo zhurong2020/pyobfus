@@ -127,3 +127,42 @@ export interface JsonErrorEnvelope {
   error_type: string;
   message: string;
 }
+
+export interface ObfuscateStats {
+  files_processed: number;
+  files_skipped: number;
+  total_names_obfuscated: number;
+  strings_encoded: number;
+  strings_encrypted: number;
+  imports_obfuscated: number;
+  control_flow_applied: number;
+  dead_code_injected: number;
+  anti_debug_checks: number;
+}
+
+/** `pyobfus <input> -o <output> --json` (success) -- see pyobfus/cli.py _emit_obfuscate_success_json() */
+export interface ObfuscateSuccessResult {
+  version: number;
+  status: "success";
+  input: string;
+  output: string;
+  preset: string | null;
+  level: string;
+  dry_run: boolean;
+  stats: ObfuscateStats;
+  mapping: string | null;
+  provenance_manifest: string | null;
+  trace_marker_id: string | null;
+  ai_hint: string;
+}
+
+/** `pyobfus <input> ... --json` (error) -- see pyobfus/cli.py _emit_error_json() */
+export interface ObfuscateErrorResult {
+  version: number;
+  status: "error";
+  error_type: string;
+  message: string;
+  suggestion: string;
+  ai_hint: string;
+  exit_code: number;
+}

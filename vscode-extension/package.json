@@ -2,7 +2,7 @@
   "name": "pyobfus",
   "displayName": "pyobfus — Python Code Obfuscator",
   "description": "Inline risk diagnostics + reverse-mapped stack traces for pyobfus, the open-source AST-based Python obfuscator. Open source, OpenSSF Best Practices verified, PEP 740 attested releases.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "zhurong2020",
   "license": "Apache-2.0",
   "icon": "icon.png",
@@ -48,8 +48,49 @@
         "command": "pyobfus.unmapTrace",
         "title": "pyobfus: Reverse Stack Trace",
         "category": "pyobfus"
+      },
+      {
+        "command": "pyobfus.generateConfig",
+        "title": "pyobfus: Generate pyobfus.yaml",
+        "category": "pyobfus"
+      },
+      {
+        "command": "pyobfus.obfuscateFile",
+        "title": "Obfuscate with pyobfus",
+        "category": "pyobfus"
+      },
+      {
+        "command": "pyobfus.startTrial",
+        "title": "pyobfus: Start 5-Day Pro Trial",
+        "category": "pyobfus"
+      },
+      {
+        "command": "pyobfus.unlockPro",
+        "title": "pyobfus: Unlock Pro Edition",
+        "category": "pyobfus"
+      },
+      {
+        "command": "pyobfus.showMenu",
+        "title": "pyobfus: Show Menu",
+        "category": "pyobfus"
       }
     ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "pyobfus.obfuscateFile",
+          "when": "resourceExtname == .py || explorerResourceIsFolder",
+          "group": "7_modification"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "pyobfus.obfuscateFile",
+          "when": "resourceLangId == python",
+          "group": "7_modification"
+        }
+      ]
+    },
     "configuration": {
       "title": "pyobfus",
       "properties": {

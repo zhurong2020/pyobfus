@@ -5,10 +5,12 @@
  */
 import * as vscode from "vscode";
 import { DiagnosticsProvider } from "../diagnostics/diagnosticsProvider";
+import { CheckReport } from "../cli/types";
 
 export function registerCheckCommands(
   context: vscode.ExtensionContext,
   diagnostics: DiagnosticsProvider,
+  onReport?: (report: CheckReport | undefined) => void,
 ): void {
   context.subscriptions.push(
     vscode.commands.registerCommand("pyobfus.checkFile", async () => {
@@ -17,7 +19,7 @@ export function registerCheckCommands(
         void vscode.window.showWarningMessage("pyobfus: open a Python file first.");
         return;
       }
-      await runCheckWithProgress(diagnostics, editor.document.uri, "file", "Checking file...");
+      await runCheckWithProgress(diagnostics, editor.document.uri, "file", "Checking file...", onReport);
     }),
     vscode.commands.registerCommand("pyobfus.checkWorkspace", async () => {
       const folder = vscode.workspace.workspaceFolders?.[0];
@@ -30,6 +32,7 @@ export function registerCheckCommands(
         folder.uri,
         "workspace",
         "Checking workspace for obfuscation risks...",
+        onReport,
       );
     }),
   );
@@ -40,9 +43,11 @@ async function runCheckWithProgress(
   target: vscode.Uri,
   scope: "file" | "workspace",
   title: string,
+  onReport?: (report: CheckReport | undefined) => void,
 ): Promise<void> {
   await vscode.window.withProgress({ location: vscode.ProgressLocation.Notification, title }, async () => {
     const report = await diagnostics.checkAndPublish(target, scope);
+    onReport?.(report);
     if (!report) {
       return; // error already surfaced by DiagnosticsProvider
     }
