@@ -1,0 +1,228 @@
+{
+  "digest": "5cf4c902d460706ede83b68ca636b77bdb11d03fb027036dfa025bd5e3d4f7ba",
+  "tools": [
+    {
+      "description": "Scan a Python project for patterns that may break obfuscation (eval/exec, dynamic attribute access, framework reflection, unsafe model loading). Returns severity counts, detected frameworks (FastAPI/Django/Flask/Pydantic/Click/SQLAlchemy/ML), and a suggested preset.",
+      "input_schema": {
+        "properties": {
+          "path": {
+            "title": "Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "title": "_checkArguments",
+        "type": "object"
+      },
+      "meta": {
+        "tier": "community",
+        "version": "1"
+      },
+      "name": "check_obfuscation_risks"
+    },
+    {
+      "description": "Describe what a named preset changes: exclude names count, exclude patterns, preserve_param_names, docstring handling. For Pro presets, returns full pro_unlock metadata (trial command, checkout URL, price, money-back guarantee).",
+      "input_schema": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "_explainArguments",
+        "type": "object"
+      },
+      "meta": {
+        "tier": "community",
+        "version": "1"
+      },
+      "name": "explain_preset"
+    },
+    {
+      "description": "Generate a pyobfus.yaml for a Python project. Auto-detects frameworks and applies the matching preset. By default returns the YAML text without writing to disk; set write=true to persist.",
+      "input_schema": {
+        "properties": {
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "preset_override": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Preset Override"
+          },
+          "write": {
+            "default": false,
+            "title": "Write",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "title": "_initArguments",
+        "type": "object"
+      },
+      "meta": {
+        "tier": "community",
+        "version": "1"
+      },
+      "name": "generate_pyobfus_config"
+    },
+    {
+      "description": "List every pyobfus preset available, grouped by tier (community / framework-aware / Pro).",
+      "input_schema": {
+        "properties": {},
+        "title": "_listArguments",
+        "type": "object"
+      },
+      "meta": {
+        "tier": "community",
+        "version": "1"
+      },
+      "name": "list_presets"
+    },
+    {
+      "description": "One call to protect a Python project end-to-end AND verify it still works: scans risks, picks a framework-aware preset, obfuscates, then byte-compiles + import-smoke-tests the output in isolated subprocesses and returns verified:true/false. Writes a private de-obfuscation mapping alongside (not inside) the output. Use this when the user wants to 'protect/obfuscate before shipping' and expects a green check, not just a transform.",
+      "input_schema": {
+        "properties": {
+          "output_dir": {
+            "default": "dist",
+            "title": "Output Dir",
+            "type": "string"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "preset": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Preset"
+          },
+          "save_mapping": {
+            "default": true,
+            "title": "Save Mapping",
+            "type": "boolean"
+          },
+          "timeout": {
+            "default": 120,
+            "title": "Timeout",
+            "type": "integer"
+          },
+          "trace_marker": {
+            "default": true,
+            "title": "Trace Marker",
+            "type": "boolean"
+          },
+          "verify": {
+            "default": true,
+            "title": "Verify",
+            "type": "boolean"
+          },
+          "verify_cmd": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Verify Cmd"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "title": "_protect_projectArguments",
+        "type": "object"
+      },
+      "meta": {
+        "tier": "community",
+        "version": "1"
+      },
+      "name": "protect_project"
+    },
+    {
+      "description": "Analyze a Python project and recommend pyobfus tier (community vs Pro) with reasons. Combines a preflight scan with a sensitive-string-literal heuristic. Returns free_action and pro_action with concrete next-step commands.",
+      "input_schema": {
+        "properties": {
+          "path": {
+            "title": "Path",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "title": "_recommend_tierArguments",
+        "type": "object"
+      },
+      "meta": {
+        "tier": "pro_funnel",
+        "version": "1"
+      },
+      "name": "recommend_tier"
+    },
+    {
+      "description": "Return structured guidance for starting the 5-day pyobfus Pro trial. Does NOT invoke the side effect \u2014 the user runs `pyobfus-trial start` in their shell. Detects whether a trial is already active and surfaces the appropriate next step plus post-trial purchase URL.",
+      "input_schema": {
+        "properties": {},
+        "title": "_start_pro_trialArguments",
+        "type": "object"
+      },
+      "meta": {
+        "tier": "pro_funnel",
+        "version": "1"
+      },
+      "name": "start_pro_trial"
+    },
+    {
+      "description": "Reverse obfuscated identifiers in a stack trace using a pyobfus mapping.json. Accepts the trace as plain text and the path to a mapping file produced by --save-mapping.",
+      "input_schema": {
+        "properties": {
+          "mapping_path": {
+            "title": "Mapping Path",
+            "type": "string"
+          },
+          "trace": {
+            "title": "Trace",
+            "type": "string"
+          }
+        },
+        "required": [
+          "trace",
+          "mapping_path"
+        ],
+        "title": "_unmapArguments",
+        "type": "object"
+      },
+      "meta": {
+        "tier": "community",
+        "version": "1"
+      },
+      "name": "unmap_stack_trace"
+    }
+  ]
+}

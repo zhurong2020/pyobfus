@@ -6,6 +6,44 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+## [0.3.5] - 2026-08-04
+
+**Feature release (P2-21): tool-description integrity, rug-pull
+resistance.** New `pyobfus-mcp-verify` CLI entry point (a standalone
+script, not an MCP tool — the tool count stays at 8) compares the
+currently-installed package's actually-registered tool
+name/description/input-schema/meta against `tool_manifest.json`, a
+manifest frozen at release time via `pyobfus-mcp-verify --generate`. A
+SHA-256 self-consistency digest over the canonical manifest lets a user
+(or CI) detect drift between what a release documents and what it
+actually ships — the realistic threat for a PyPI-distributed local-stdio
+server, as opposed to a live remote server mutating mid-session.
+
+Deliberately shipped as a standalone CLI, not an MCP tool: the real
+threat model here is pre-session/external verification (a user or CI
+checking before trusting an install), which a model calling a tool
+mid-conversation can't meaningfully provide anyway — and it avoids any
+MCP tool-surface churn (still 8 tools, no Glama/Registry re-pin needed
+beyond the routine version bump this release already requires for other
+reasons).
+
+Honesty note: explicitly documented as a self-consistency digest, not a
+cryptographic signature — matches the same correction the P2-17
+provenance-manifest review already made (no private key or third-party
+trust anchor involved). A user wanting stronger assurance is pointed to
+the digest published in each GitHub Release's notes.
+
+### Added
+
+- `pyobfus_mcp/tool_manifest.py` — `compute_live_manifest()`,
+  `verify_integrity()`, `load_shipped_manifest()`, and the
+  `pyobfus-mcp-verify` CLI entry point.
+- `pyobfus_mcp/tool_manifest.json` — the shipped manifest (regenerated
+  before each release).
+- 13 new tests, including a real regression guard: the test suite fails
+  if a tool's description/schema/meta changes without regenerating the
+  manifest.
+
 ## [0.3.4] - 2026-08-04
 
 **Feature release (P2-12).** `check_obfuscation_risks` and `protect_project`

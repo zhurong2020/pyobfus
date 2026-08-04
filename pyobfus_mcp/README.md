@@ -152,6 +152,27 @@ Agent: [invokes unmap_stack_trace(trace, "path/to/mapping.json")]
        a typo in the method call site…
 ```
 
+## Verifying tool integrity
+
+Tool poisoning / "rug-pulls" — a server's tool descriptions silently
+changing after you've reviewed and trusted them — are the #1 threat in
+the 2026 MCP security baseline. `pyobfus-mcp-verify` checks the
+currently-installed package's tool descriptions/schemas against a
+manifest frozen at release time:
+
+```bash
+pyobfus-mcp-verify
+# OK: tool descriptions match the shipped manifest (digest 5cf4c902d460...).
+```
+
+A mismatch (exit code 1) means the installed tools differ from what the
+release shipped — worth investigating before trusting the server. This
+is a self-consistency digest, not a cryptographic signature: it proves
+the package matches its own shipped manifest, not that a specific party
+signed it. For stronger assurance, compare the printed digest against
+the one published in the [GitHub Release notes](https://github.com/zhurong2020/pyobfus/releases)
+for the version you installed.
+
 ## License
 
 Apache-2.0. Same as the main pyobfus package. The pyobfus Pro features remain license-gated; this MCP server only wraps the community-tier tools.
