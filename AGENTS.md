@@ -59,11 +59,23 @@ npm ci
 npm run lint          # eslint
 npm run typecheck     # tsc --noEmit
 npm run pretest       # esbuild + compile tests to out/
-npm test              # xvfb-run needed on headless Linux -- @vscode/test-electron launches a real VS Code instance
+PYOBFUS_PYTHON_PATH="$(cd .. && pwd)/venv/bin/python3" npm test
 ```
 
+`npm test` needs a **resolvable interpreter with pyobfus actually
+installed** for the real-contract integration tests (`test/suite/
+integration.test.ts`) — without `PYOBFUS_PYTHON_PATH` set, interpreter
+resolution falls back to a bare `python3`/`python` on PATH (the
+`ms-python.python` extension isn't active inside the plain
+`@vscode/test-electron` test profile), which on a fresh machine likely
+doesn't have pyobfus installed and fails 4 of the tests with a "no module
+named pyobfus" error — not a real bug, just a missing env var. WSLg (or
+any real X server) is required for `@vscode/test-electron` to launch;
+`xvfb-run -a npm test` works too if there's no display available.
+
 CI runs this as a separate, path-filtered workflow
-(`.github/workflows/vscode-extension-ci.yml`), not as part of the Python
+(`.github/workflows/vscode-extension-ci.yml`, sets the same env var to
+`${{ env.pythonLocation }}/bin/python`), not as part of the Python
 `ci.yml` jobs above.
 
 Targets: Python **3.9–3.14** must all pass. (Python 3.8 was dropped in 0.5.0 —
