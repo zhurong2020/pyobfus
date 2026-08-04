@@ -87,6 +87,16 @@
 > integration pytest roots, black/ruff/mypy, `python -m build`, `twine check`).
 > Remaining before publish after this release-prep commit lands: tag `v0.5.7`,
 > push tag, verify PyPI.
+> **Glama Build-steps re-pin — confirmed fixed 2026-08-04.** The routing bug
+> is gone (admin panel navigates normally now); the Build steps field was
+> still pinned at the original `pyobfus-mcp==0.3.1` (the 0.3.2 attempt never
+> actually saved, per the blocked-navigation note above), bumped to `0.3.3`
+> and saved by the maintainer. Verified: the Dockerfile preview's `RUN`
+> line now reads `pyobfus-mcp==0.3.3`, and a new "Make Release" test
+> (`019fcb2e-4fbc-726b-b1f3-0064598f2e75`, 2026-08-04 13:10) appears in
+> Recent Tests, confirming the save actually triggered a rebuild this time.
+> Remaining tail: the `protected_project` typo, still opportunistic
+> (unchanged from above).
 
 ## Current prioritized TODO (2026-08-01)
 

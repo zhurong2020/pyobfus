@@ -30,7 +30,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 **✅ 已回填（2026-08-02 验证，原「下次 session 直接执行清单」①②两项其实早已完成）**：`docs/DOC_SYNC_AUDIT_2026-08-02.md`「Session 2 punch list」①② 两项实测 `README.md` 均已完成——① 锚点链接已是 `#-pro-edition`（README.md:21，非损坏的旧版 `#-pro-edition-available-now`）② Pro Edition 常驻提示行已在 README.md 第 21 行（`> **🔒 Pro Edition available** — 6 patent-targeted...`）。**仍待**：③ Glama 后台 Dockerfile 版本号手动更新（目标应是当前最新 **0.3.3**）。**2026-08-03 复查**：Dockerfile tab 不跳转的 UI bug 看起来自愈了（能正常打开、看到 Configuration 表单），但 user 反映"还是有问题"（具体报错未截取），且决定性的 **Build steps** 字段实际内容（是否还写死旧版本号）当场没能确认——**user 决定过几天再看**，下次重试先截 Build steps 字段的实际 JSON 内容 + 任何报错原文。**极小尾巴仍待**：plugin marketplace 提交描述里有个笔误"protected_project"应为"protect_project"，不影响功能，Anthropic 若跟进补充信息时顺手改。
 
-**✅ 2026-08-04 UI bug 确认自愈 + Build steps 字段内容已拿到**：user 贴出完整 admin Dockerfile 页面，Profile/Analytics/Repository/Dockerfile 四个 tab 均正常可点，Configuration 表单完整显示，之前的路由 bug 不再复现（不需要再截 F12 报错）。**Build steps 字段实测写死 `["uv pip install --system --break-system-packages pyobfus-mcp==0.3.1"]`**——落后当前 PyPI latest 两个版本（0.3.1，应为 0.3.3），与此前记录一致：之前每次改到 0.3.2 的尝试都被那个路由 UI bug 卡住、从未真正提交成功，所以字段停留在最早的 0.3.1 原值，不是"改过又被覆盖"。Pinned commit SHA 显示 `b216665`、旁注"Current head commit: b216665 (sync)"，即该字段只是跟随 repo HEAD 自动同步、与 mcp 包版本号无关，**不用动**。改法：把 Build steps 数组里的 `pyobfus-mcp==0.3.1` 手动改成 `pyobfus-mcp==0.3.3`，保存后右侧 Dockerfile 预览里的 `RUN (uv pip install ...)` 那行应同步刷新为 0.3.3；Recent Tests 面板通常会因配置变更自动跑一次新测试，可用来确认。**待 user 实际保存生效后回填确认**（含验证新版本号是否真的持久化，不要重演 0.3.2 那次"改了但没存住"的情况）。
+**✅ 2026-08-04 UI bug 确认自愈 + Build steps 字段内容已拿到**：user 贴出完整 admin Dockerfile 页面，Profile/Analytics/Repository/Dockerfile 四个 tab 均正常可点，Configuration 表单完整显示，之前的路由 bug 不再复现（不需要再截 F12 报错）。**Build steps 字段实测写死 `["uv pip install --system --break-system-packages pyobfus-mcp==0.3.1"]`**——落后当前 PyPI latest 两个版本（0.3.1，应为 0.3.3），与此前记录一致：之前每次改到 0.3.2 的尝试都被那个路由 UI bug 卡住、从未真正提交成功，所以字段停留在最早的 0.3.1 原值，不是"改过又被覆盖"。Pinned commit SHA 显示 `b216665`、旁注"Current head commit: b216665 (sync)"，即该字段只是跟随 repo HEAD 自动同步、与 mcp 包版本号无关，**不用动**。改法：把 Build steps 数组里的 `pyobfus-mcp==0.3.1` 手动改成 `pyobfus-mcp==0.3.3`，保存后右侧 Dockerfile 预览里的 `RUN (uv pip install ...)` 那行应同步刷新为 0.3.3；Recent Tests 面板通常会因配置变更自动跑一次新测试，可用来确认。
+
+**✅ 已确认保存生效（2026-08-04 同日）**：user 保存后贴出的页面截图核实——Build steps 字段与 Dockerfile 预览里的 `RUN` 行均已是 `pyobfus-mcp==0.3.3`；Recent Tests 新增一条 "Make Release"（`019fcb2e-4fbc-726b-b1f3-0064598f2e75`，2026-08-04 13:10），证明这次真的触发了重新构建，不是像 0.3.2 那次"改了没存住"。**Glama 版本同步任务本轮彻底收尾**，不用再问。
 
 完整时间线 + 修复细节见 `docs/POST_V0.4_TODO.md` 顶部 handoff note + § item 7-8。
 
@@ -75,7 +77,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - ✅ **pyobfus-mcp 0.3.3 已发布（2026-08-02）**：`recommend_tier`/`start_pro_trial` 补 `--import-obfuscation` 到硬编码 Pro 机制清单（同 0.3.2 那类内容漂移修复）。tag `mcp-v0.3.3` 发 PyPI + Registry（isLatest），GitHub Release 附 wheel+sdist。
 - ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:P2-13/P2-22 这类零代码内容型候选（PyInstaller cookbook / PyArmor 对比页）。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
 
-**Cold-start session 第一句话应问 user**：「Glama 后台 Build steps 字段（08-04 已确认停在 0.3.1）改成 0.3.3 保存生效了吗？另外 plugin marketplace 提交描述里那个"protected_project"笔误要不要顺手改掉？」
+**Cold-start session 第一句话应问 user**：「plugin marketplace 提交描述里那个"protected_project"笔误（应为 protect_project）要不要顺手改掉？另外查一下 plugin marketplace 审核结果出了没有。」（Glama Build-steps 已于 2026-08-04 确认改到 0.3.3 并保存生效，不用再问）
 
 **Cold-start 资料定位**（按读取优先级）：
 
