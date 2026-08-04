@@ -1,6 +1,10 @@
 # VS Code extension design plan (ROADMAP P2-2)
 
-**Status**: M0 code-complete, held for release. `vscode-extension/` scaffold not yet started (M1).
+**Status**: M0 and M1 both code-complete 2026-08-04, held for release per
+the release-spacing gate (see `docs/ROADMAP.md`'s P2-2 entry / `CLAUDE.md`
+for exact dates). M1's full test suite (13 tests, including a real contract
+test against actually-installed pyobfus) passes in real CI
+(`.github/workflows/vscode-extension-ci.yml`) — not just typechecked.
 **Recorded**: 2026-08-04
 
 This is the design doc behind `docs/ROADMAP.md`'s P2-2 entry — same "satellite
@@ -88,11 +92,16 @@ could echo the malicious listing's old name.
   implementation cost. 12 new tests
   (`tests/test_trial_cli.py::TestTrialStatusJson`,
   `tests/test_license_cli.py`). Does not block M1.
-- **M1** (`vscode-extension/` v0.1.0, first Marketplace publish) — not
-  started. Scaffolding + `cli/locate.ts` (interpreter resolution) +
-  `cli/runner.ts` (execFile + JSON parse) + diagnostics provider +
-  reverse-trace command. Demoable standalone: open a file with `eval()`, see
-  the squiggle; reverse a mangled trace with one command.
+- **M1** (`vscode-extension/` v0.1.0, first Marketplace publish) — ✅
+  code-complete 2026-08-04, held for release. Scaffolding +
+  `cli/locate.ts` (interpreter resolution, incl. a `PYOBFUS_PYTHON_PATH`
+  env-var source added after a real CI failure) + `cli/runner.ts` (execFile
+  + JSON parse) + diagnostics provider + reverse-trace command. Demoable
+  standalone: open a file with `eval()`, see the squiggle; reverse a
+  mangled trace with one command. 13/13 tests green in real CI
+  (`.github/workflows/vscode-extension-ci.yml`), including a contract test
+  against an actually-installed pyobfus, not a mock. `vsce package`
+  produces a real installable 32KB `.vsix`.
 - **M2** (v0.2.0) — status bar, trial/pro funnel commands (consumes M0's
   `--json`), right-click obfuscate, generate-config command.
 - **M3** (v0.3.0) — YAML IntelliSense: `scripts/generate-schema.py`
