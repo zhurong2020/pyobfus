@@ -6,6 +6,14 @@ name: Release
 # Both jobs use PyPI Trusted Publishing (OIDC) and emit PEP 740 sigstore
 # attestations automatically via pypa/gh-action-pypi-publish.
 #
+# vscode-v*.*.* tags (vscode-extension/, a separate npm/Marketplace package,
+# no PyPI publish job here) are explicitly excluded below. They incidentally
+# matched 'v*.*.*' once (2026-08-04, tag vscode-v0.1.0) since the glob only
+# checks for a leading "v" + two dots, not a leading "v" immediately followed
+# by a digit — that run tried to re-upload the unchanged pyproject.toml
+# version to PyPI and was harmlessly rejected with 400 "File already exists",
+# but don't rely on PyPI's dedup as the safety net twice.
+#
 # Prerequisite (one-time, PyPI side):
 #   Register two Trusted Publishers under https://pypi.org/manage/account/publishing/
 #     1. project=pyobfus      · owner=zhurong2020 · repo=pyobfus · workflow=release.yml
@@ -17,6 +25,7 @@ on:
     tags:
       - 'v*.*.*'
       - 'mcp-v*.*.*'
+      - '!vscode-v*.*.*'
   workflow_dispatch:
     inputs:
       target:
