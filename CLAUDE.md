@@ -79,7 +79,18 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - ✅ **pyobfus-mcp 0.3.3 已发布（2026-08-02）**：`recommend_tier`/`start_pro_trial` 补 `--import-obfuscation` 到硬编码 Pro 机制清单（同 0.3.2 那类内容漂移修复）。tag `mcp-v0.3.3` 发 PyPI + Registry（isLatest），GitHub Release 附 wheel+sdist。
 - ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:P2-13/P2-22 这类零代码内容型候选（PyInstaller cookbook / PyArmor 对比页）。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
 
-**Cold-start session 第一句话应问 user**：「plugin marketplace 审核（`https://platform.claude.com/plugins/submissions`）08-04 查还是 pending review，要不要再查一次有没有变化？描述里那个"protected_project"笔误还留着，要不要现在就去改？」（Glama Build-steps 已于 2026-08-04 确认改到 0.3.3 并保存生效，不用再问）
+### ✅ 2026-08-04 又一轮 — Tier 1 六项全部发布 + 采用「间隔发布」节奏
+
+**Tier 1 六项一次性做完并发布**（同一 session）：v0.5.8(P2-13 PyInstaller cookbook)→v0.5.9(P2-16 `--requires-os/-python-min/-arch`)→mcp-v0.3.4(P2-12 PII 检测)→v0.5.10(P2-14 `--embed-data`)→v0.5.11(P2-15 原生反调试)→mcp-v0.3.5(P2-21 工具描述完整性)。事前先核对代码现状（而非直接照单实现），发现 P2-6 其实早已发布（checkbox 没勾）、P2-12/P2-15 是部分实现——省下不少工作量，3 周预估压缩到一个 session。MCP Registry 补发布(mcp-0.3.4+0.3.5 → isLatest=0.3.5)走了 GitHub device-code 登录（教训：`mcp-publisher login github` **每次调用都生成新的一次性设备码**，别把旧码和新码搞混，只信最后一次实际在跑的那个进程输出的码）。
+
+**🔁 用户明确要求：往后发布改成"间隔 1-2 天"节奏，不再合并批量发布**（今天这批 6 个是特例，已做完不用回滚）。机制沿用本项目自己 `docs/POST_V0.4_TODO.md` 一直在用的"等 N 天、下次冷启动查日期"套路，不建额外调度基础设施（`CronCreate` 只在单个对话 session 内有效，跨天不可靠，已排除）。**实操**：功能正常实现+测试+提交到 main，CHANGELOG 改动写在 `[Unreleased]` 段（不提前建版本号小节），version/tag/PyPI 发布留到 gate 日期到了再做。当前生效的 gate 见下方 P2-2 VSCode 插件条目。
+
+**⭐ 下一优先方向：P2-2 VSCode 插件**——用户要求先查同类产品/竞品功能/网上热点趋势再设计，不要凭空写。已完成真实调研（非训练记忆）：竞品(PyArmor/Nuitka/Sourcedefender)都没有 VSCode 插件；查到一个真实的信任风险——2025-04 一个真叫"Python Obfuscator for VSCode"的恶意插件（XMRig 挖矿木马，30万+安装量才被下架），"python obfuscator"这个类目在 Marketplace 名声已被污染，pyobfus 的 listing 要明确亮出 OpenSSF/PEP740/provenance/tool-integrity 这些真实信任基建，不能只暗示；查到 2026 年 VSCode 插件最大的采纳驱动是"内联诊断"(Error Lens 模式)，且 Error Lens 本身不生成诊断、只是把已有的原生 `DiagnosticCollection` API 结果重新渲染——`pyobfus --check --json` 已经有现成的 line/col/severity 数据，接入原生 Diagnostics API 零核心代码改动，比"右键混淆"这种任何竞品都能抄的功能差异化强得多。完整方案（含分期里程碑、技术选型、已验证的 CLI JSON 契约）见 `docs/VSCODE_EXTENSION_PLAN.md`。
+
+- ✅ **M0 已完成代码（2026-08-04），按 gate 暂缓发布**：`pyobfus-trial status --json` + `pyobfus-license status --json`（同 `--check`/`--unmap --json` 的既有模式），是 VSCode 插件读取 trial/license 状态的前置依赖（避免像 MCP server 那样绕开 CLI 直接 shell 进 Python 内部函数）。12 个新测试，三个测试根全绿。**发布 gate：earliest 2026-08-06**（今天最后一次实际发布 mcp-v0.3.5 之后 2 天）——冷启动到这天或之后，且 M0 仍是 code-complete，就把 CHANGELOG `[Unreleased]` 段落提升成版本号、bump `pyproject.toml`、打 tag、发布，不用再问。
+- ⏳ **M1（vscode-extension/ 脚手架 + 诊断 + 反解 stack trace，v0.1.0 首次 Marketplace 发布）未开始**。**发布 gate：earliest 2026-08-08**（M0 实际发布日 +2 天，不是从今天算）——同时受限于 M1 本身的实现工作量 + 用户需要并行注册 VSCode Marketplace publisher 账号（写代码/本地测试完全不需要这个账号，只有最后 `vsce publish` 那一步需要）。
+
+**Cold-start session 第一句话应问 user**：「今天是不是到 2026-08-06 了？到了的话我就把 M0（trial/license `--json`）发布掉。另外 VSCode Marketplace publisher 账号（配 Azure DevOps 组织）注册了吗，方便 M1 做完就能发。」附带常规检查：plugin marketplace 审核（`https://platform.claude.com/plugins/submissions`）查一下有没有新进展，那个"protected_project"笔误要不要顺手改掉。
 
 **Cold-start 资料定位**（按读取优先级）：
 

@@ -4,6 +4,7 @@ Command-line interface for pyobfus Pro trial management.
 Provides commands to start and check the status of the 5-day Pro trial.
 """
 
+import json as json_module
 import sys
 
 import click
@@ -90,19 +91,31 @@ def start() -> None:
 
 
 @cli.command()
-def status() -> None:
+@click.option(
+    "--json",
+    "json_output",
+    is_flag=True,
+    help="Emit machine-readable JSON output (for editor/IDE integrations, e.g. the pyobfus "
+    "VSCode extension's status bar).",
+)
+def status(json_output: bool) -> None:
     """
     Check the status of your Pro trial.
 
     \b
     Example:
       pyobfus-trial status
+      pyobfus-trial status --json
     """
+    trial_status = get_trial_status()
+
+    if json_output:
+        click.echo(json_module.dumps({"version": 1, "trial_status": trial_status}))
+        return
+
     click.echo("\n" + "=" * 60)
     click.echo("  pyobfus Professional Edition - Trial Status")
     click.echo("=" * 60)
-
-    trial_status = get_trial_status()
 
     if not trial_status:
         click.echo("")

@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+**M0 for the upcoming VSCode extension (ROADMAP P2-2)**: `pyobfus-trial status`
+and `pyobfus-license status` now support `--json`, returning
+`get_trial_status()` / `get_license_status(masked=True)` as structured JSON
+(same pattern as `pyobfus --check --json` / `pyobfus --unmap --json`), plus
+`--verify` results and structured error envelopes for the license command.
+Previously text-only (ANSI-colored `click.echo`), which meant any editor/IDE
+integration would have had to scrape colored text — the VSCode extension's
+status bar needs a real contract. Text-mode output is unchanged. 12 new
+tests. Held for release per the project's release-spacing convention
+(see `docs/ROADMAP.md`'s P2-2 entry / `CLAUDE.md` for the eligible date) —
+not yet version-bumped or tagged.
+
 ## [0.5.11] - 2026-08-04
 
 **Feature release.** Extends `--anti-debug` (P2-15, Pro) with three new

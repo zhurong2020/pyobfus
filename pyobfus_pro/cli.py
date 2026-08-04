@@ -4,6 +4,7 @@ Command-line interface for pyobfus Pro license management.
 Provides commands to register, check, and manage pyobfus Professional Edition licenses.
 """
 
+import json as json_module
 import sys
 
 import click
@@ -86,7 +87,14 @@ def register(license_key: str, verify: bool) -> None:
 
 @cli.command()
 @click.option("--verify/--no-verify", default=False, help="Re-verify license online")
-def status(verify: bool) -> None:
+@click.option(
+    "--json",
+    "json_output",
+    is_flag=True,
+    help="Emit machine-readable JSON output (for editor/IDE integrations, e.g. the pyobfus "
+    "VSCode extension's status bar).",
+)
+def status(verify: bool, json_output: bool) -> None:
     """
     Check the status of your registered license.
 
@@ -94,20 +102,36 @@ def status(verify: bool) -> None:
     Example:
       pyobfus-license status
       pyobfus-license status --verify
+      pyobfus-license status --json
     """
     try:
         from pyobfus_pro.fingerprint import get_device_info
 
-        # Get device info
         device = get_device_info()
+        license_info = get_license_status(masked=True)
+
+        if json_output:
+            payload: dict = {"version": 1, "device": device, "license_status": license_info}
+            exit_code = 0
+            if not license_info:
+                exit_code = 1
+            elif license_info["expired"]:
+                exit_code = 1
+            if verify and license_info:
+                full_license_info = get_license_status(masked=False)
+                if full_license_info:
+                    result = verify_license(full_license_info["key"])
+                    payload["verify_result"] = result
+                    if not result["valid"]:
+                        exit_code = 1
+            click.echo(json_module.dumps(payload))
+            sys.exit(exit_code)
 
         click.echo("Device Information:")
         click.echo(f"  ID: {device['fingerprint']}")
         click.echo(f"  Name: {device['name']}")
         click.echo(f"  OS: {device['system']} {device['release']}")
         click.echo()
-
-        license_info = get_license_status(masked=True)
 
         if not license_info:
             click.echo("No license key registered.")
@@ -155,10 +179,34 @@ def status(verify: bool) -> None:
                     sys.exit(1)
 
     except LicenseError as e:
-        click.echo(f"✗ Error: {e}", err=True)
+        if json_output:
+            click.echo(
+                json_module.dumps(
+                    {
+                        "version": 1,
+                        "status": "error",
+                        "error_type": "LicenseError",
+                        "message": str(e),
+                    }
+                )
+            )
+        else:
+            click.echo(f"✗ Error: {e}", err=True)
         sys.exit(1)
     except Exception as e:
-        click.echo(f"✗ Unexpected error: {e}", err=True)
+        if json_output:
+            click.echo(
+                json_module.dumps(
+                    {
+                        "version": 1,
+                        "status": "error",
+                        "error_type": type(e).__name__,
+                        "message": str(e),
+                    }
+                )
+            )
+        else:
+            click.echo(f"✗ Unexpected error: {e}", err=True)
         sys.exit(1)
 
 
