@@ -3,6 +3,7 @@
 src/**
 test/**
 out/**
+scripts/**
 node_modules/**
 .gitignore
 .eslintrc*
