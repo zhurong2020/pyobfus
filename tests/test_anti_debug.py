@@ -172,9 +172,22 @@ def sample():
     def test_tracer_pid_nonzero_triggers_exit(self):
         """A nonzero TracerPid (native debugger attached) raises SystemExit.
         platform.system is force-mocked to 'Linux' so this test is
-        deterministic regardless of the actual CI host OS."""
+        deterministic regardless of the actual CI host OS.
+
+        sys.gettrace is force-mocked to None: this test suite normally runs
+        under `pytest --cov`, and coverage.py itself installs a trace
+        function via sys.settrace() -- so sys.gettrace() is non-None during
+        *any* coverage-instrumented test run, which would trip the
+        check function's very first (pre-existing, gettrace-based) branch
+        before ever reaching the TracerPid logic this test targets. Without
+        this mock the test still "passes" (SystemExit is still raised) but
+        for the wrong reason, silently not exercising the TracerPid logic
+        at all -- caught via a real CI failure on 2026-08-04 (this test and
+        its sibling below failed under `--cov` on macOS/py3.9, since local
+        `--no-cov` runs during development never surfaced it)."""
         check_fn = self._get_check_debugger()
         with (
+            mock.patch("sys.gettrace", return_value=None),
             mock.patch("platform.system", return_value="Linux"),
             mock.patch(
                 "builtins.open",
@@ -185,9 +198,12 @@ def sample():
                 check_fn()
 
     def test_tracer_pid_zero_does_not_trigger(self):
-        """TracerPid: 0 (no debugger attached) must not raise."""
+        """TracerPid: 0 (no debugger attached) must not raise. See
+        test_tracer_pid_nonzero_triggers_exit's docstring for why
+        sys.gettrace must be force-mocked here too."""
         check_fn = self._get_check_debugger()
         with (
+            mock.patch("sys.gettrace", return_value=None),
             mock.patch("platform.system", return_value="Linux"),
             mock.patch(
                 "builtins.open",
@@ -199,11 +215,14 @@ def sample():
     def test_is_debugger_present_true_triggers_exit(self):
         """WinAPI IsDebuggerPresent()==True raises SystemExit. ctypes.windll
         is patched with create=True since it only natively exists on
-        Windows -- this keeps the test portable across the CI OS matrix."""
+        Windows -- this keeps the test portable across the CI OS matrix.
+        sys.gettrace is force-mocked to None for the same reason as
+        test_tracer_pid_nonzero_triggers_exit."""
         check_fn = self._get_check_debugger()
         fake_windll = mock.MagicMock()
         fake_windll.kernel32.IsDebuggerPresent.return_value = True
         with (
+            mock.patch("sys.gettrace", return_value=None),
             mock.patch("platform.system", return_value="Windows"),
             mock.patch("ctypes.windll", fake_windll, create=True),
         ):
@@ -211,10 +230,13 @@ def sample():
                 check_fn()
 
     def test_is_debugger_present_false_does_not_trigger(self):
+        """See test_tracer_pid_nonzero_triggers_exit's docstring for why
+        sys.gettrace must be force-mocked here."""
         check_fn = self._get_check_debugger()
         fake_windll = mock.MagicMock()
         fake_windll.kernel32.IsDebuggerPresent.return_value = False
         with (
+            mock.patch("sys.gettrace", return_value=None),
             mock.patch("platform.system", return_value="Windows"),
             mock.patch("ctypes.windll", fake_windll, create=True),
         ):
@@ -223,12 +245,20 @@ def sample():
     def test_timing_skew_triggers_on_simulated_slowdown(self):
         """A simulated huge elapsed time between the two perf_counter()
         calls (as a debugger single-stepping through the loop would cause)
-        raises SystemExit. Runs the real gettrace/TracerPid/IsDebuggerPresent
-        checks unmocked -- fine, since no real debugger is attached during
-        the test run, so they pass through without raising."""
+        raises SystemExit. sys.gettrace is force-mocked to None (see
+        test_tracer_pid_nonzero_triggers_exit's docstring) so this test
+        genuinely exercises the timing-skew branch rather than incidentally
+        passing because coverage instrumentation's own trace function trips
+        the earlier gettrace check first. TracerPid/IsDebuggerPresent are
+        left unmocked and run for real -- fine, since no real debugger is
+        attached during the test run, so they pass through without raising,
+        leaving the timing mock as the only thing that can trigger exit."""
         check_fn = self._get_check_debugger()
         readings = iter([0.0, 999.0])
-        with mock.patch("time.perf_counter", side_effect=lambda: next(readings)):
+        with (
+            mock.patch("sys.gettrace", return_value=None),
+            mock.patch("time.perf_counter", side_effect=lambda: next(readings)),
+        ):
             with pytest.raises(SystemExit):
                 check_fn()
 
