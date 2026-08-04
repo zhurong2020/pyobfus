@@ -24,6 +24,12 @@ and the gate exists to space out *that* package's release traffic.
 
 ## Marketplace publishing note (2026-08-04)
 
+**Full step-by-step registration process + troubleshooting log**:
+[`docs/VSCODE_MARKETPLACE_PUBLISHER_SETUP.md`](VSCODE_MARKETPLACE_PUBLISHER_SETUP.md)
+— what was tried against Azure DevOps org creation (exact errors, both
+sign-ins tried, both subscriptions confirmed valid, both attempted fixes),
+and the exact manual-upload steps that worked. Summary:
+
 CLI/PAT-based `vsce publish` needs a VS Code Marketplace publisher backed
 by an Azure DevOps organization. Azure DevOps org creation hit an
 unresolved "no subscription found" error against two valid subscriptions
