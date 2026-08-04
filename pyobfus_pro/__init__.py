@@ -71,6 +71,7 @@ from .runtime.scrub import (
     install_scrub_excepthook,
     unscrub_error_id,
 )
+from .runtime.embedded_data import EmbeddedDataError, encrypt_data_file, get_embedded_data
 from .runtime.seal import IntegrityError, _verify_seal
 from .runtime.vault import Vault, VaultError, vault_secrets
 from .runtime_policy import RuntimePolicyError, requires_runtime
@@ -132,9 +133,12 @@ __all__ = [
     "current_machine_id",
     "default_counter_path",
     "derive_layer_key",
+    "EmbeddedDataError",
+    "encrypt_data_file",
     "expire_check",
     "forensic_seed",
     "generate_keypair",
+    "get_embedded_data",
     "install_scrub_excepthook",
     "opacity",
     "period_check",

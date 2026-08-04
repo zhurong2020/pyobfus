@@ -39,16 +39,25 @@ part of the patent-gated combination claims) inject a module-top
 ``requires_runtime(...)`` guard, the same POST-pass shape as ``--expire-hard``/
 ``--period``: refuse to import unless the running OS / Python version /
 CPU architecture satisfy build-time constraints.
+
+``--embed-data <path>`` (P2-14, not patent-gated) AES-256-GCM encrypts a
+resource file at build time (same cipher construction as the Runtime String
+Vault) and emits it base85-encoded as a module constant plus a generated
+``get_embedded_data()`` accessor, closing the Nuitka Commercial "Protect
+Data Files" / PyArmor ``--bind-data`` gap in pure Python.
 """
 
 from __future__ import annotations
 
 import ast
+import base64
 import hashlib
+import secrets
 from pathlib import Path
 from typing import Optional, Tuple
 
 from .forensic import derive_layer_key
+from .runtime.embedded_data import encrypt_data_file as _encrypt_data_file
 from .transformers import opacity as _t_opacity
 from .transformers import scrub as _t_scrub
 from .transformers import seal as _t_seal
@@ -71,6 +80,7 @@ def fusion_enabled(config) -> bool:
         or getattr(config, "requires_os", None)
         or getattr(config, "requires_python_min", None)
         or getattr(config, "requires_arch", None)
+        or getattr(config, "embed_data", None)
     )
 
 
@@ -484,6 +494,10 @@ def apply_post_passes(
             arch_allowed=requires_arch,
         )
 
+    embed_data_path = getattr(config, "embed_data", None)
+    if embed_data_path:
+        source = _inject_embedded_data(source, embed_data_path)
+
     return source
 
 
@@ -563,6 +577,41 @@ def _inject_runtime_policy_check(
         f"{marker}\n"
         "from pyobfus_pro import requires_runtime as _pyobfus_requires_runtime\n"
         f"_pyobfus_requires_runtime({', '.join(kwargs)})\n"
+    )
+    return header + source
+
+
+def _inject_embedded_data(source: str, data_path: str) -> str:
+    """Inject an AES-256-GCM-encrypted resource file + accessor (P2-14).
+
+    Reads ``data_path`` at build time, encrypts its raw bytes with a fresh
+    random 32-byte AES key, base85-encodes the result, and emits both as
+    module-level constants plus a generated ``get_embedded_data()``
+    function that decrypts on call (not at import). Idempotent on a marker
+    comment -- a second ``--embed-data`` on an already-processed source is
+    a no-op rather than double-embedding.
+
+    Raises:
+        FileNotFoundError: if ``data_path`` does not exist.
+    """
+    marker = "# pyobfus:embed-data"
+    if marker in source:
+        return source
+
+    raw = Path(data_path).read_bytes()
+    key = secrets.token_bytes(32)
+    blob = _encrypt_data_file(raw, key)
+    blob_b85 = base64.b85encode(blob).decode("ascii")
+
+    header = (
+        f"{marker}\n"
+        f"_EMBED_DATA_KEY = {key!r}\n"
+        f"_EMBED_DATA_BLOB = {blob_b85!r}\n"
+        "from pyobfus_pro import get_embedded_data as _pyobfus_get_embedded_data\n"
+        "\n"
+        "\n"
+        "def get_embedded_data():\n"
+        "    return _pyobfus_get_embedded_data(_EMBED_DATA_BLOB, _EMBED_DATA_KEY)\n"
     )
     return header + source
 

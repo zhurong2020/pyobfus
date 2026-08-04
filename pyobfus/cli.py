@@ -252,6 +252,12 @@ except ImportError:
     "(Pro, v0.5.9)",
 )
 @click.option(
+    "--embed-data",
+    type=click.Path(exists=True, dir_okay=False),
+    help="AES-256-GCM encrypt a resource file, embed it base85-encoded, and "
+    "generate a get_embedded_data() accessor (Pro, v0.5.10)",
+)
+@click.option(
     "--preset",
     type=click.Choice(
         [
@@ -407,6 +413,7 @@ def main(
     requires_os: Optional[str],
     requires_python_min: Optional[str],
     requires_arch: Optional[str],
+    embed_data: Optional[str],
     preset: Optional[str],
     list_presets: bool,
     stats: bool,
@@ -680,6 +687,7 @@ def main(
             or requires_os
             or requires_python_min
             or requires_arch
+            or embed_data
         )
         pro_features_requested = (
             control_flow
@@ -804,6 +812,10 @@ def main(
                 config.requires_arch = requires_arch
                 if verbose:
                     click.echo(f"Enabled: CPU architecture restriction ({requires_arch}, P2-16)")
+            if embed_data:
+                config.embed_data = embed_data
+                if verbose:
+                    click.echo(f"Enabled: Embedded encrypted data ({embed_data}, P2-14)")
 
             if fusion_requested and cross_file and Path(input_path).is_dir():
                 click.echo(

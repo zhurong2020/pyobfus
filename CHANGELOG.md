@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.10] - 2026-08-04
+
+**Feature release.** Adds `--embed-data <path>` (P2-14, Pro) — AES-256-GCM
+encrypts a resource file at build time (same cipher construction as the
+Runtime String Vault: 12-byte random nonce, 32-byte key, GCM tag) and
+embeds it base85-encoded as a module constant, plus a generated
+`get_embedded_data()` accessor that decrypts on call, not at import.
+Closes the Nuitka Commercial "Protect Data Files" / PyArmor `--bind-data`
+gap in pure Python. Not part of the patent-gated combination claims —
+reuses the Runtime String Vault's AES-256-GCM primitive for an arbitrary
+binary blob rather than a named string KV store. New module
+`pyobfus_pro/runtime/embedded_data.py`, 11 new tests (9 unit + 2
+build-fusion integration, one of which loads the obfuscated module and
+calls the generated accessor to confirm it returns the exact original
+file bytes). `pyobfus-mcp` released 0.3.4 the same day for an unrelated
+change (P2-12 PII-shape detection, see `pyobfus_mcp/CHANGELOG.md`) — no
+Glama Build-steps re-pin needed on the pyobfus side.
+
 ## [0.5.9] - 2026-08-04
 
 **Feature release.** Adds `--requires-os` / `--requires-python-min` /

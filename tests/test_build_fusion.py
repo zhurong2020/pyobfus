@@ -144,6 +144,21 @@ class TestFusionStructural:
         assert "arch_allowed=('x86_64', 'arm64')" in text
         assert _compiles(out)
 
+    def test_embed_data_injects_accessor(self, runner, marked_file, tmp_path):
+        resource = tmp_path / "resource.bin"
+        resource.write_bytes(b"binary resource payload \x00\xff")
+        out = tmp_path / "o.py"
+        res = _invoke(runner, marked_file, out, "--embed-data", str(resource))
+        assert res.exit_code == 0, res.output
+        text = out.read_text()
+        assert "_EMBED_DATA_KEY = " in text
+        assert "_EMBED_DATA_BLOB = " in text
+        assert "def get_embedded_data():" in text
+        # the original plaintext bytes must not appear verbatim in the
+        # obfuscated source -- only the encrypted, base85-encoded blob.
+        assert "binary resource payload" not in text
+        assert _compiles(out)
+
     def test_all_combined_compiles(self, runner, marked_file, tmp_path):
         out = tmp_path / "o.py"
         res = _invoke(
@@ -532,6 +547,27 @@ def test_period_runtime_enforces_limit(runner, tmp_path, monkeypatch):
         _load()  # run 3 -> counter 3 > max 2
     # counter file lives under the env-overridden dir, proving runtime resolution
     assert list(counter_dir.rglob("runs"))
+
+
+@requires_pro
+def test_embed_data_accessor_returns_original_bytes(runner, tmp_path):
+    """The generated get_embedded_data() actually decrypts back to the
+    original file bytes when the obfuscated module is loaded and called --
+    not just structurally present in the source."""
+    resource = tmp_path / "resource.bin"
+    original = b"round-trip me through the whole obfuscate+load pipeline \x00\x01\x02"
+    resource.write_bytes(original)
+
+    src = tmp_path / "simple.py"
+    src.write_text("VALUE = 42\n")
+    out = tmp_path / "o.py"
+    res = _invoke(runner, src, out, "--embed-data", str(resource))
+    assert res.exit_code == 0, res.output
+
+    spec = importlib.util.spec_from_file_location("embed_data_mod", str(out))
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    assert m.get_embedded_data() == original
 
 
 @requires_pro

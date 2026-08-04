@@ -20,7 +20,7 @@ A Python code obfuscator built with AST-based transformations. **Supports Python
 
 > **🔒 Pro Edition available** — 6 patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator, $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
 
-> **🔧 What's new in v0.5.9** — Pro builds now support `--requires-os` / `--requires-python-min` / `--requires-arch`, a pure-Python generalization of PyArmor BCC's platform-restriction mode: refuse to import unless the running OS / Python version / CPU architecture match build-time constraints. v0.5.8 added a [PyInstaller integration cookbook](docs/PYINSTALLER_COOKBOOK.md) for single-file executable delivery. Full details in the [CHANGELOG](CHANGELOG.md); see [Pro Edition](#-pro-edition) below.
+> **🔧 What's new in v0.5.10** — Pro builds now support `--embed-data <path>`, AES-256-GCM encrypting a resource file at build time and embedding it base85-encoded with a generated `get_embedded_data()` accessor — closes the Nuitka Commercial "Protect Data Files" / PyArmor `--bind-data` gap. The companion `pyobfus-mcp` package separately shipped 0.3.4 the same day, adding PII-shape detection (emails/IPv4/GUIDs/home-directory paths) to its risk scan. v0.5.9 added `--requires-os` / `--requires-python-min` / `--requires-arch` platform restrictions. Full details in the [CHANGELOG](CHANGELOG.md); see [Pro Edition](#-pro-edition) below.
 
 ## 🔌 Companion MCP server: [`pyobfus-mcp`](pyobfus_mcp/)
 
@@ -130,6 +130,11 @@ The following advanced features are available with a Pro license:
   - Minimum Python version: `--requires-python-min 3.10`
   - CPU architecture allowlist: `--requires-arch x86_64,arm64`
   - Any combination composes; each check is independent
+
+- **Embedded Encrypted Data** (v0.5.10)
+  - AES-256-GCM encrypt a resource file at build time and embed it base85-encoded in the output — closes the Nuitka Commercial "Protect Data Files" / PyArmor `--bind-data` gap
+  - CLI: `--embed-data path/to/resource.bin`
+  - Generates a `get_embedded_data()` accessor that decrypts on call, not at import
 
 - **Configuration Presets**
   - `--preset trial` - 30-day time-limited version

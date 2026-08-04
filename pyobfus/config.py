@@ -109,6 +109,7 @@ class ObfuscationConfig:
     requires_arch: Optional[str] = (
         None  # P2-16: comma-separated CPU arch allowlist (platform.machine())
     )
+    embed_data: Optional[str] = None  # P2-14: path to a resource file to AES-256-GCM embed
 
     # Performance options
     max_workers: Optional[int] = None  # None = auto (cpu_count), 1 = sequential
