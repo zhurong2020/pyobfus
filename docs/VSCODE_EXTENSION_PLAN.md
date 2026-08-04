@@ -1,11 +1,46 @@
 # VS Code extension design plan (ROADMAP P2-2)
 
-**Status**: M0 and M1 both code-complete 2026-08-04, held for release per
-the release-spacing gate (see `docs/ROADMAP.md`'s P2-2 entry / `CLAUDE.md`
-for exact dates). M1's full test suite (13 tests, including a real contract
-test against actually-installed pyobfus) passes in real CI
-(`.github/workflows/vscode-extension-ci.yml`) — not just typechecked.
+**Status**: M1 **published** 2026-08-04 as `pyobfus` v0.1.0 on the VS Code
+Marketplace (publisher `zhurong2020`) —
+https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus —
+via manual `.vsix` web upload, ~4 days ahead of the original 2026-08-08
+gate (see "Marketplace publishing note" below for why). M1's full test
+suite (13 tests, including a real contract test against actually-installed
+pyobfus) passed in real CI (`.github/workflows/vscode-extension-ci.yml`)
+before publish. M0 (pyobfus core `--json` prerequisites) is still
+code-complete-but-held, on its own separate PyPI release-spacing gate (see
+`docs/ROADMAP.md`'s P2-2 entry / `CLAUDE.md` for the exact date) — M1's
+early publish doesn't pull M0 forward, since M0 is a pyobfus-core PyPI
+release and the gate exists to space out *that* package's release traffic.
 **Recorded**: 2026-08-04
+
+## Marketplace publishing note (2026-08-04)
+
+CLI/PAT-based `vsce publish` needs a VS Code Marketplace publisher backed
+by an Azure DevOps organization. Azure DevOps org creation hit an
+unresolved "no subscription found" error against two valid subscriptions
+(both Owner role, Azure Plan) under an M365 Developer Program (E5 sandbox)
+tenant — a documented gap where Dev Program subscriptions aren't recognized
+as valid Azure DevOps billing anchors, distinct from the "stale
+cross-tenant token" failure mode (which has a known fix: force
+re-authentication via the Azure Portal directory switcher, not the org
+picker inside the DevOps flow itself — tried, did not resolve this case).
+
+Worked around by using the Marketplace web UI directly:
+`marketplace.visualstudio.com/manage/publishers/<publisher>` → "New
+extension" → "Visual Studio Code" → upload a locally-built `.vsix`
+(`npx vsce package --no-dependencies`, run outside the blocked Azure
+DevOps path — packaging itself never needed it). This path uses the
+Marketplace web session's own auth and never touches Azure DevOps/PAT
+machinery. Confirmed working: "[Succeeded] Extension publish on Visual
+Studio Marketplace" email + live listing within minutes.
+
+**Consequence for M4** (CI auto-publish on `vscode-v*.*.*` tags): a classic
+PAT is off the table for now (org creation is blocked), and the Entra
+ID/federated-credential approach still needs an Azure DevOps org too. M4
+may need to stay a manual-upload process, or the org-creation bug may
+resolve itself later (worth a periodic recheck) — not launch-blocking
+since M1 shipped without it.
 
 This is the design doc behind `docs/ROADMAP.md`'s P2-2 entry — same "satellite
 package, own design doc" shape as `docs/MCP_PRIMITIVES_DESIGN.md`.
