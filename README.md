@@ -20,7 +20,7 @@ A Python code obfuscator built with AST-based transformations. **Supports Python
 
 > **🔒 Pro Edition available** — 6 patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator, $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
 
-> **🔧 What's new in v0.5.7** — Pro builds now support `--import-obfuscation`, rewriting top-level imports to runtime `importlib` / `__import__` calls and encrypting the import strings. The comparison guide also now states the honest AST-vs-bytecode tradeoff for PyArmor alternatives. Full details in the [CHANGELOG](CHANGELOG.md); see [Pro Edition](#-pro-edition) below.
+> **🔧 What's new in v0.5.9** — Pro builds now support `--requires-os` / `--requires-python-min` / `--requires-arch`, a pure-Python generalization of PyArmor BCC's platform-restriction mode: refuse to import unless the running OS / Python version / CPU architecture match build-time constraints. v0.5.8 added a [PyInstaller integration cookbook](docs/PYINSTALLER_COOKBOOK.md) for single-file executable delivery. Full details in the [CHANGELOG](CHANGELOG.md); see [Pro Edition](#-pro-edition) below.
 
 ## 🔌 Companion MCP server: [`pyobfus-mcp`](pyobfus_mcp/)
 
@@ -123,6 +123,13 @@ The following advanced features are available with a Pro license:
   - Machine binding: `--bind-machine`
   - Run count limits: `--max-runs 100`
   - Offline verification - no external dependencies
+
+- **Runtime Policy** (v0.5.9)
+  - Refuse to import outside a build-time platform allowlist — a pure-Python generalization of PyArmor BCC's platform restrictions
+  - OS allowlist: `--requires-os Linux,Darwin`
+  - Minimum Python version: `--requires-python-min 3.10`
+  - CPU architecture allowlist: `--requires-arch x86_64,arm64`
+  - Any combination composes; each check is independent
 
 - **Configuration Presets**
   - `--preset trial` - 30-day time-limited version

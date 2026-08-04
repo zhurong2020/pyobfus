@@ -33,6 +33,12 @@ device-derived key at build and rewritten into a runtime re-derivation, so vault
 keys no longer ship as at-rest literals either. This runs in the vault PRE-pass
 (see :func:`_apply_vault_device_binding`) because Core preserves the
 ``_VAULT_KEY_<name>`` constant names and imported symbols through mangling.
+
+``--requires-os`` / ``--requires-python-min`` / ``--requires-arch`` (P2-16, not
+part of the patent-gated combination claims) inject a module-top
+``requires_runtime(...)`` guard, the same POST-pass shape as ``--expire-hard``/
+``--period``: refuse to import unless the running OS / Python version /
+CPU architecture satisfy build-time constraints.
 """
 
 from __future__ import annotations
@@ -62,6 +68,9 @@ def fusion_enabled(config) -> bool:
         or getattr(config, "period_max_runs", None)
         or getattr(config, "opacity_config", None)
         or getattr(config, "bind_device", False)
+        or getattr(config, "requires_os", None)
+        or getattr(config, "requires_python_min", None)
+        or getattr(config, "requires_arch", None)
     )
 
 
@@ -464,6 +473,17 @@ def apply_post_passes(
     if period:
         source = _inject_period_check(source, module_qualname, int(period))
 
+    requires_os = getattr(config, "requires_os", None)
+    requires_python_min = getattr(config, "requires_python_min", None)
+    requires_arch = getattr(config, "requires_arch", None)
+    if requires_os or requires_python_min or requires_arch:
+        source = _inject_runtime_policy_check(
+            source,
+            os_allowed=requires_os,
+            python_min=requires_python_min,
+            arch_allowed=requires_arch,
+        )
+
     return source
 
 
@@ -506,6 +526,43 @@ def _inject_period_check(source: str, module_qualname: str, max_runs: int) -> st
         "from pyobfus_pro import period_check as _pyobfus_period_check, "
         "default_counter_path as _pyobfus_counter_path\n"
         f"_pyobfus_period_check(_pyobfus_counter_path({artifact_id!r}), {int(max_runs)})\n"
+    )
+    return header + source
+
+
+def _inject_runtime_policy_check(
+    source: str,
+    *,
+    os_allowed: Optional[str],
+    python_min: Optional[str],
+    arch_allowed: Optional[str],
+) -> str:
+    """Inject a module-top ``requires_runtime(...)`` call (P2-16).
+
+    Refuses to import when the running environment doesn't match the
+    build-time OS / minimum-Python-version / CPU-architecture constraints;
+    raises ``RuntimePolicyError`` from ``pyobfus_pro.runtime_policy``.
+    ``os_allowed``/``arch_allowed`` are comma-separated strings (CLI form);
+    split into tuples before emitting. Idempotent on a marker comment.
+    """
+    marker = "# pyobfus:requires_runtime"
+    if marker in source:
+        return source
+
+    kwargs = []
+    if os_allowed:
+        os_tuple = tuple(s.strip() for s in os_allowed.split(",") if s.strip())
+        kwargs.append(f"os_allowed={os_tuple!r}")
+    if python_min:
+        kwargs.append(f"python_min={python_min!r}")
+    if arch_allowed:
+        arch_tuple = tuple(s.strip() for s in arch_allowed.split(",") if s.strip())
+        kwargs.append(f"arch_allowed={arch_tuple!r}")
+
+    header = (
+        f"{marker}\n"
+        "from pyobfus_pro import requires_runtime as _pyobfus_requires_runtime\n"
+        f"_pyobfus_requires_runtime({', '.join(kwargs)})\n"
     )
     return header + source
 

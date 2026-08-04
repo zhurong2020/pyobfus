@@ -123,6 +123,27 @@ class TestFusionStructural:
         assert "_pyobfus_counter_path(" in text
         assert _compiles(out)
 
+    def test_requires_runtime_injects_check(self, runner, marked_file, tmp_path):
+        out = tmp_path / "o.py"
+        res = _invoke(
+            runner,
+            marked_file,
+            out,
+            "--requires-os",
+            "Linux,Darwin",
+            "--requires-python-min",
+            "3.9",
+            "--requires-arch",
+            "x86_64,arm64",
+        )
+        assert res.exit_code == 0, res.output
+        text = out.read_text()
+        assert "_pyobfus_requires_runtime(" in text
+        assert "os_allowed=('Linux', 'Darwin')" in text
+        assert "python_min='3.9'" in text
+        assert "arch_allowed=('x86_64', 'arm64')" in text
+        assert _compiles(out)
+
     def test_all_combined_compiles(self, runner, marked_file, tmp_path):
         out = tmp_path / "o.py"
         res = _invoke(
@@ -511,6 +532,39 @@ def test_period_runtime_enforces_limit(runner, tmp_path, monkeypatch):
         _load()  # run 3 -> counter 3 > max 2
     # counter file lives under the env-overridden dir, proving runtime resolution
     assert list(counter_dir.rglob("runs"))
+
+
+@requires_pro
+def test_requires_runtime_enforces_python_min(runner, tmp_path):
+    """The injected requires_runtime() raises RuntimePolicyError on the
+    real running interpreter when python_min exceeds it, and imports
+    cleanly when python_min is satisfied -- exercised against the actual
+    interpreter running the test, not a mock."""
+    src = tmp_path / "simple.py"
+    src.write_text("VALUE = 42\n")
+
+    from pyobfus_pro import RuntimePolicyError
+
+    # Unsatisfiable minimum -> import must fail.
+    out_fail = tmp_path / "o_fail.py"
+    res = _invoke(runner, src, out_fail, "--requires-python-min", "99.0")
+    assert res.exit_code == 0, res.output
+
+    def _load(path, name):
+        spec = importlib.util.spec_from_file_location(name, str(path))
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        return m
+
+    with pytest.raises(RuntimePolicyError):
+        _load(out_fail, "requires_runtime_fail")
+
+    # Trivially satisfiable minimum -> import succeeds (name mangling renames
+    # VALUE, so just confirm the module loads without raising).
+    out_ok = tmp_path / "o_ok.py"
+    res = _invoke(runner, src, out_ok, "--requires-python-min", "3.0")
+    assert res.exit_code == 0, res.output
+    _load(out_ok, "requires_runtime_ok")
 
 
 class TestFusionGating:

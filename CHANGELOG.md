@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.9] - 2026-08-04
+
+**Feature release.** Adds `--requires-os` / `--requires-python-min` /
+`--requires-arch` (P2-16, Pro) — a pure-Python generalization of PyArmor
+BCC's platform-restriction mode. Each flag injects a module-top
+`requires_runtime(...)` guard call (same POST-pass shape as
+`--expire-hard`/`--period`) that raises `RuntimePolicyError` at import time
+if the running OS, Python version, or CPU architecture don't satisfy the
+build-time constraint. Not part of the patent-gated combination claims —
+a standalone environment check, no cryptographic binding involved. New
+module `pyobfus_pro/runtime_policy.py`, 15 new tests (13 unit + 2
+build-fusion integration, one of which runs the injected check against the
+real interpreter, not a mock). `pyobfus-mcp` is unchanged (no tool-surface
+change), so no MCP Registry publish or Glama Build-steps re-pin is needed
+for this release.
+
 ## [0.5.8] - 2026-08-04
 
 **Content release, no code changes.** Adds a PyInstaller integration

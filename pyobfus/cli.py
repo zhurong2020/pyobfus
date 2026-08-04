@@ -234,6 +234,24 @@ except ImportError:
     "machine (Pro, v0.5.3; implies --bind-device)",
 )
 @click.option(
+    "--requires-os",
+    type=str,
+    help="Comma-separated OS allowlist (e.g. 'Linux,Darwin'); module-top "
+    "check refuses import elsewhere (Pro, v0.5.9)",
+)
+@click.option(
+    "--requires-python-min",
+    type=str,
+    help="Minimum Python version 'X.Y' (e.g. '3.10') required at import " "time (Pro, v0.5.9)",
+)
+@click.option(
+    "--requires-arch",
+    type=str,
+    help="Comma-separated CPU architecture allowlist (e.g. 'x86_64,arm64', "
+    "platform.machine() values); module-top check refuses import elsewhere "
+    "(Pro, v0.5.9)",
+)
+@click.option(
     "--preset",
     type=click.Choice(
         [
@@ -386,6 +404,9 @@ def main(
     opacity_config: Optional[str],
     bind_device: bool,
     bind_device_id: Optional[str],
+    requires_os: Optional[str],
+    requires_python_min: Optional[str],
+    requires_arch: Optional[str],
     preset: Optional[str],
     list_presets: bool,
     stats: bool,
@@ -656,6 +677,9 @@ def main(
             or opacity_config
             or bind_device
             or bind_device_id
+            or requires_os
+            or requires_python_min
+            or requires_arch
         )
         pro_features_requested = (
             control_flow
@@ -768,6 +792,18 @@ def main(
                 if verbose:
                     _target = f"device {bind_device_id}" if bind_device_id else "build machine"
                     click.echo(f"Enabled: Device binding ({_target}, P2-8)")
+            if requires_os:
+                config.requires_os = requires_os
+                if verbose:
+                    click.echo(f"Enabled: OS restriction ({requires_os}, P2-16)")
+            if requires_python_min:
+                config.requires_python_min = requires_python_min
+                if verbose:
+                    click.echo(f"Enabled: Minimum Python version ({requires_python_min}, P2-16)")
+            if requires_arch:
+                config.requires_arch = requires_arch
+                if verbose:
+                    click.echo(f"Enabled: CPU architecture restriction ({requires_arch}, P2-16)")
 
             if fusion_requested and cross_file and Path(input_path).is_dir():
                 click.echo(

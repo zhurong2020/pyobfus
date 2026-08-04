@@ -104,6 +104,11 @@ class ObfuscationConfig:
     )
     bind_device: bool = False  # P2-8: runtime device-key substitution for L3 (v0.5.3)
     bind_device_id: Optional[str] = None  # P2-8: target machine-id (None = build machine)
+    requires_os: Optional[str] = None  # P2-16: comma-separated OS allowlist (platform.system())
+    requires_python_min: Optional[str] = None  # P2-16: minimum Python version "X.Y"
+    requires_arch: Optional[str] = (
+        None  # P2-16: comma-separated CPU arch allowlist (platform.machine())
+    )
 
     # Performance options
     max_workers: Optional[int] = None  # None = auto (cpu_count), 1 = sequential

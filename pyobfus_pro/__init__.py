@@ -73,6 +73,7 @@ from .runtime.scrub import (
 )
 from .runtime.seal import IntegrityError, _verify_seal
 from .runtime.vault import Vault, VaultError, vault_secrets
+from .runtime_policy import RuntimePolicyError, requires_runtime
 
 
 def seal_code(func):
@@ -137,6 +138,8 @@ __all__ = [
     "install_scrub_excepthook",
     "opacity",
     "period_check",
+    "requires_runtime",
+    "RuntimePolicyError",
     "seal_code",
     "unscrub_error_id",
     "vault_secrets",
