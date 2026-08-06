@@ -71,6 +71,10 @@ dev = [
     # brought up to the new defaults (or a select= list pins the rule set
     # explicitly so upgrades stop being silent).
     "ruff>=0.1.0,<0.16",
+    # Test-only: validates scripts/generate_vscode_schema.py's output is
+    # real, well-formed JSON Schema draft-07 (see tests/test_generate_vscode_schema.py).
+    # Not a runtime dependency of pyobfus itself.
+    "jsonschema>=4.0",
 ]
 
 [project.urls]
