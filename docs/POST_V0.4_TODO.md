@@ -127,9 +127,9 @@
 > gap in the same pass: the extension's own `CHANGELOG.md` had never
 > split M1's content into its own `[0.1.0]` header (both M1 and M2 sat
 > under one `[Unreleased]`) — now properly `[Unreleased]` (empty) →
-> `[0.2.0]` → `[0.1.0]`. P2-2's only remaining slice is **M3** (`pyobfus.yaml`
-> IntelliSense), not yet scoped. Next PyPI release-spacing gate: **2026-08-08**
-> (2 days after 0.5.12).
+> `[0.2.0]` → `[0.1.0]`. P2-2's remaining slice, M3 (`pyobfus.yaml`
+> IntelliSense), was scoped and built the same day — see the note below.
+> Next PyPI release-spacing gate: **2026-08-08** (2 days after 0.5.12).
 > **Glama Build-steps re-pinned to 0.3.5 — 2026-08-06.** Admin Configuration
 > page confirmed: Build steps array and the Dockerfile preview's `RUN` line
 > both read `pyobfus-mcp==0.3.5`; a new "Make Release" test
@@ -171,6 +171,47 @@
 > routine feature. Tag `vscode-v0.2.1` + GitHub Release, public listing
 > confirmed live. Full diagnosis: memory
 > `pyobfus_vscode_cwd_bug_fix_2026-08-06.md`.
+> **Competitive scan + two follow-ups + M3, all same day (2026-08-06).**
+> A fresh PyArmor/Nuitka/VS-Code-Marketplace/LLM-deobfuscation/MCP-Server-
+> Card scan (see `docs/ROADMAP.md`'s "Additions from 2026-08-06" section)
+> re-validated existing positioning (no new competitive threats) and
+> surfaced two candidates: **P2-23** (Nuitka Commercial's traceback
+> encryption is symmetric-only per its own docs, weaker than our existing
+> RSA+AES hybrid `--scrub-traceback`; added a comparison section to
+> `docs/COMPARISON.md`, content-only, held for the PyPI gate) and
+> **P2-24**, which turned into a correction of the scan's own first-pass
+> framing before any code was written: SEP-2127's Server Card discovery is
+> explicitly HTTP-transport-only, and stdio servers (pyobfus-mcp is one)
+> are routed to `server.json` + the MCP Registry instead — already in
+> place, no code change needed.
+> **M3 (`pyobfus.yaml` IntelliSense) was then scoped and fully built the
+> same day.** Scoping surfaced a real pyobfus core bug (`--validate-config`
+> false-warned on `preset` and every Pro field added since v0.5.0, because
+> `config_validator.py`'s hand-maintained `VALID_SCHEMA` had silently
+> drifted stale) — new `pyobfus/config_schema.py::describe_fields()`
+> introspects `ObfuscationConfig`'s actual dataclass fields and fixes it
+> (computed live, nothing cached to drift again), 23 tests. A release-time
+> script (`scripts/generate_vscode_schema.py`, not a runtime dependency)
+> walks the same data to emit a real JSON Schema draft-07, 9 tests
+> (verified against a real `jsonschema.Draft7Validator`, not just
+> structural checks). **The extension-side design changed mid-
+> implementation**: the original plan called for `redhat.vscode-yaml`'s
+> runtime `registerContributor` API plus an "install this extension"
+> prompt as a fallback; before writing that code, checking the extension's
+> own docs one more time found a purely declarative
+> `contributes.yamlValidation` entry in `package.json` instead — zero
+> runtime code, no `extensionDependencies` force-install, and none of the
+> runtime API's documented activation-order reliability gap
+> (`redhat-developer/vscode-yaml#261`). The install-prompt design was
+> dropped entirely, not deferred — it existed only to compensate for a
+> reliability gap the simpler mechanism doesn't have. A
+> `# yaml-language-server: $schema=...` modeline (pointing at a stable
+> public URL, not a local extension-install path) was kept as a
+> cross-editor fallback. 5 more tests. 37 new tests total across both
+> packages; real CI green on every surface (23-job OS/Python matrix,
+> headless xvfb Extension Host tests, CodeQL). M3 is code-complete, held
+> for its own Marketplace release-spacing gate as v0.3.0 — full account in
+> `docs/VSCODE_EXTENSION_PLAN.md`'s M3 section.
 
 ## Current prioritized TODO (2026-08-01)
 
@@ -930,7 +971,7 @@ gh api repos/zhurong2020/pyobfus --jq '.topics' | tr ',' '\n' | grep -i pyarmor 
 | **P2-3** | `--strip-ai-artifacts` mode | ✅ **DONE 2026-06-06** (PR #17, merged to main · `transformers/ai_artifact_stripper.py` · removes AI provenance markers from docstrings + attribution dunders · conservative attribution-only · 27 tests · unreleased, in CHANGELOG `[Unreleased]`) | Pairs naturally with new N3 (claude-skill preset); both serve "ship AI-generated code as IP" segment. Public-OK (Core feature, not patent-gated). |
 | **P2-4** | Import obfuscation (Pro) | ✅ **DONE 2026-08-02** (`--import-obfuscation` · `pyobfus_pro/import_obfuscation.py` · top-level `import ...` and absolute `from ... import ...` → runtime `importlib` / `__import__` calls · import strings encrypted via auto-enabled AES · relative / `__future__` / star imports deliberately preserved · full core/MCP/integration suites + black/ruff/mypy passed locally) | Keep · closes PyArmor Pro feature gap. Public-OK (existing public Pro module category). |
 | **P2-5** | Numeric / constant obfuscation | ✅ **DONE 2026-06-06** (PR #16, merged to main · `transformers/numeric_obfuscator.py` · `--numeric-obfuscation` · int→XOR/add/sub, float→`float.fromhex` · 37 tests · unreleased, in CHANGELOG `[Unreleased]`) | Keep · small effort, fills gap. Public-OK (Core feature). |
-| **P2-2** | VSCode extension | ✅ **M0/M1/M2 all DONE, plus a same-day 0.2.1 bugfix patch.** M1 2026-08-04 (`pyobfus` v0.1.0, diagnostics + reverse trace — https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus). M0 shipped 2026-08-06 as pyobfus **0.5.12** (`--json` on trial/license status). M2 shipped 2026-08-06 as vscode-extension **0.2.0** (status bar, generate-config, right-click obfuscate, Pro funnel — https://github.com/zhurong2020/pyobfus/releases/tag/vscode-v0.2.0), which also empirically confirmed the Marketplace's "update an existing listing" flow (⋯ menu → Update; see `docs/VSCODE_MARKETPLACE_PUBLISHER_SETUP.md`). **0.2.1 shipped same day** (https://github.com/zhurong2020/pyobfus/releases/tag/vscode-v0.2.1) as an expedited bugfix — hands-on testing of 0.2.0 immediately surfaced a `cwd`-shadowing crash in "Obfuscate with pyobfus" (`runJsonCommand` never set `cwd`, so `-m pyobfus` let an ambient `pyobfus`-named directory shadow the real install); fixed with a safe `os.tmpdir()` default plus a dedicated `cwdForTarget()` for the one call site that needs a real project-rooted cwd for `pyobfus.yaml` auto-discovery. Only **M3** (`pyobfus.yaml` IntelliSense) remains, unscoped. — re-scoped after real 2026 competitive/trend research (see `docs/VSCODE_EXTENSION_PLAN.md`), first-mover in the category, diagnostics-API hook cost zero core-code changes. | Public-OK. |
+| **P2-2** | VSCode extension | ✅ **All four milestones (M0/M1/M2/M3) code-complete.** M1 2026-08-04 (`pyobfus` v0.1.0, diagnostics + reverse trace — https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus). M0 shipped 2026-08-06 as pyobfus **0.5.12** (`--json` on trial/license status). M2 shipped 2026-08-06 as vscode-extension **0.2.0** (status bar, generate-config, right-click obfuscate, Pro funnel — https://github.com/zhurong2020/pyobfus/releases/tag/vscode-v0.2.0), which also empirically confirmed the Marketplace's "update an existing listing" flow (⋯ menu → Update; see `docs/VSCODE_MARKETPLACE_PUBLISHER_SETUP.md`). **0.2.1 shipped same day** (https://github.com/zhurong2020/pyobfus/releases/tag/vscode-v0.2.1) as an expedited bugfix — hands-on testing of 0.2.0 immediately surfaced a `cwd`-shadowing crash in "Obfuscate with pyobfus"; fixed with a safe `os.tmpdir()` default plus a dedicated `cwdForTarget()`. **M3 (`pyobfus.yaml` IntelliSense) scoped and built same day (2026-08-06)** — new `pyobfus/config_schema.py` fixes a real core bug found while scoping (`--validate-config` false-warned on `preset` and every Pro field added since v0.5.0) and feeds a JSON Schema wired into the extension via a declarative `contributes.yamlValidation` entry, simpler than the original runtime-API-registration design (swapped mid-implementation after finding `redhat.vscode-yaml`'s docs supported a purely declarative path with no activation-order risk). 37 new tests across the two packages, real CI green (23-job matrix + headless xvfb extension host). Held for its own Marketplace gate as v0.3.0; full account in `docs/VSCODE_EXTENSION_PLAN.md`'s M3 section. — re-scoped after real 2026 competitive/trend research, first-mover in the category, diagnostics-API hook cost zero core-code changes. | Public-OK. |
 | **drop-3.8** | Drop Python 3.8 support | TODO | Both new competitors require `>=3.10`; we're paying 3.8 cost for shrinking userbase. Public-OK. |
 | **P2-7** 🔒 | Forensic watermarking / `--fingerprint <buyer-id>` (Pro) | **W4 PRIMITIVE DONE-PRIVATE 2026-05-09** (`forensic/watermark.py` · `forensic_seed` SHA-256 versioned · `WatermarkRNG` HMAC-SHA256 counter-mode · `derive_layer_key` per-buyer 32-byte AES-256 · `verify_layer_key_match` forensic recovery · 32 tests · 3 patent findings · zero-change wiring through existing `opacity.transform_module(layer_key=...)` and `vault.transform_module(vault_keys=...)` · Core rename-map RNG integration deferred to post-申请号) | Patent target. Strongest novelty (only vmp-protector 1.0.0 ships per-buyer deterministic build; arXiv 2510.11251 CLASP backing). **Implementation in private repo per Path C; ship to public on 申请号 receipt.** |
 | **P2-8** 🔒 | License binding combo (Pro) | **W4-A PRIMITIVE DONE-PRIVATE 2026-05-09** (`license/binding.py` · `current_machine_id` OS-priority chain · `bind_device_key` PBKDF2-HMAC-SHA256 · `expire_check` ISO-date · `period_check` atomic-rename file counter · 32 tests · 3 patent findings · build-orchestrator integration tests prove license gate woven into AES-GCM decryption path) | Patent target. `--expire` + `--bind-device` + `--period` combo, pure Python. License gate is the AES-GCM tag check itself when `--bind-device` set — no separate check call to patch out. **Implementation in private repo per Path C; ship to public on 申请号 receipt.** |
