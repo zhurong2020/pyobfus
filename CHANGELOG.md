@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+**Content, no code changes (P2-23).** `docs/COMPARISON.md`'s Nuitka section
+gains a traceback-protection comparison: Nuitka Commercial's "Traceback
+Encryption" is symmetric-only per its own docs (asymmetric still "planned"),
+while `--scrub-traceback` (Pro) already uses a hybrid RSA-2048-OAEP +
+AES-256-GCM scheme reversible only via the separate `pyobfus-unscrub` CLI.
+Found via a 2026-08-06 competitive scan, see `docs/ROADMAP.md`'s "Additions
+from 2026-08-06" section.
+
 ## [0.5.12] - 2026-08-06
 
 **Feature release — VS Code extension M0 prerequisite.** `pyobfus-trial status`
