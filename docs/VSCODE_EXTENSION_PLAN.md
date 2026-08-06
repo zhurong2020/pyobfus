@@ -233,20 +233,136 @@ could echo the malicious listing's old name.
   real-contract integration tests (trial/license status, `--init --json`,
   real obfuscate `--json --dry-run`), all passing locally against the
   actual installed pyobfus.
-- **M3** (v0.3.0) — YAML IntelliSense: `scripts/generate-schema.py`
-  introspects `ObfuscationConfig` → `schemas/pyobfus.schema.json`, CI check
-  for schema drift. **Note**: `pyobfus/config_validator.py`'s
-  `VALID_SCHEMA` (used by `pyobfus --validate-config`) is separately,
-  already confirmed stale — missing `preset` and all v0.5.x Pro keys, so
-  `--validate-config` false-warns on configs `--init` itself generates. Real
-  bug, **out of scope for this extension** — flagged here so it isn't lost;
-  worth its own tiny fix release. This milestone's generated schema must
-  NOT be derived from that stale validator.
+- **M3** (v0.3.0) — YAML IntelliSense. **Researched and scoped 2026-08-06**,
+  see the dedicated section below — the original one-line stub undersold
+  both the scope (it grew to include a real core-package bugfix) and how
+  small the actual VS Code-side lift turned out to be.
 - **M4+** (later) — CI auto-publish on `vscode-v*.*.*` tags (prefer Entra ID
   auth over a classic PAT given the 2026-12-01 Azure DevOps PAT retirement),
   Open VSX (`ovsx`) publish alongside Marketplace, Verified Publisher badge
   (needs 6mo extension history + 6mo-old domain, not launch-blocking),
   schemastore.org submission.
+
+## M3: YAML IntelliSense — design (researched 2026-08-06)
+
+**Goal**: real autocomplete, hover documentation, and inline validation for
+`pyobfus.yaml` in VS Code — not just the diagnostics-on-save M1 already
+covers, but editing the config file itself.
+
+### The mechanism (researched, not assumed)
+
+VS Code has no built-in YAML language server; **`redhat.vscode-yaml`
+(the YAML Language Server extension) is still the de facto standard** for
+JSON-Schema-backed YAML IntelliSense as of this research pass — no newer
+built-in alternative has displaced it. Three ways to associate a schema
+with a file, in order of how automatic they are for our users:
+
+1. **Programmatic registration via `redhat.vscode-yaml`'s own extension
+   API** (`vscode.extensions.getExtension('redhat.vscode-yaml')` →
+   `registerContributor`) — zero user configuration, works the moment both
+   extensions are active.
+2. **An inline modeline comment**: `# yaml-language-server: $schema=<path>`
+   at the top of the file — relative paths resolve from the YAML file's own
+   location, not the workspace root. Works even if our extension's
+   activation-time registration (option 1) doesn't fire for some reason.
+3. **The user's own `yaml.schemas` setting** — manual, not something we
+   drive, but documented as a fallback in the README.
+
+We should NOT add `redhat.vscode-yaml` as a hard `extensionDependencies` —
+that force-installs a ~10MB extension on every pyobfus user, including the
+majority who never hand-edit `pyobfus.yaml`. Instead: register via its API
+(option 1) when it's already active, emit the modeline (option 2) into
+every file "Generate pyobfus.yaml" writes so it works either way, and if
+`redhat.vscode-yaml` isn't installed when a `pyobfus.yaml`-named file is
+opened, show a one-time dismissible info message with an "Install" action
+(`workbench.extensions.installExtension`) — same low-friction pattern VS
+Code's own first-party extensions use for related-tooling prompts.
+
+**Deliberately out of scope for M3**: submitting to schemastore.org (would
+give IntelliSense to `redhat.vscode-yaml` users who don't even have our
+extension installed, purely by filename match — genuinely valuable, but a
+separate external governance process with a review queue we don't control;
+stays on the M4+ list). Also out of scope: a hand-written custom completion
+provider — unnecessary, the JSON Schema + existing language server already
+covers autocomplete/hover/validation without us reimplementing that logic.
+
+### A real bug found while scoping this, not a hypothetical
+
+Before designing where the schema's *content* comes from, checked what
+already validates `pyobfus.yaml` today: `pyobfus/config_validator.py`'s
+`VALID_SCHEMA` is a hand-maintained dict, and it has drifted stale —
+**missing `preset` entirely (the key `pyobfus --init` itself writes into
+every config it generates) and every Pro field added since v0.5.0**
+(`selective_opacity`, `scrub_traceback`, `vault`, `seal_code`,
+`fingerprint`, `expire_hard`, `period_max_runs`, `opacity_config`,
+`bind_device`, `bind_device_id`, `requires_os`, `requires_python_min`,
+`requires_arch`, `embed_data`, `max_workers`, `license_*`,
+`control_flow_flattening`, `dead_code_injection`, `import_obfuscation`,
+`anti_debug`, `string_encryption`, `numeric_obfuscation`,
+`strip_ai_artifacts`). Reproduced empirically:
+```
+$ pyobfus --validate-config test_config.yaml   # preset + 2 legit Pro keys
+[WARNING] Unknown configuration key: 'obfuscation.preset'
+[WARNING] Unknown configuration key: 'obfuscation.selective_opacity'
+[WARNING] Unknown configuration key: 'obfuscation.scrub_traceback'
+```
+This is a **pyobfus core bug**, independent of the VS Code extension and
+its own timeline — `--validate-config` false-warns on the exact output of
+`--init`, for any user, with or without VS Code involved.
+
+### Design: one source of truth, two consumers
+
+Rather than hand-write a JSON Schema separately (which would just create a
+*third* place this can drift, on top of the two that already disagree):
+
+1. A new introspection helper (in `pyobfus/config.py` or a small sibling
+   module) derives structured field metadata from `ObfuscationConfig`'s
+   actual dataclass fields (`dataclasses.fields()` — type, default) plus
+   `ObfuscationConfig.list_presets()` for the `preset` enum. No new
+   runtime dependency (writing JSON Schema syntax by hand from introspected
+   data doesn't need the `jsonschema` package — only *validating against* a
+   schema would, and that validation happens client-side inside VS Code's
+   language server, not in our Python code).
+2. **Consumer A — fixes the core bug**: `config_validator.py`'s
+   `VALID_SCHEMA` is computed from this helper instead of hand-maintained,
+   so it cannot go stale again — there's no "regenerate and forget" step
+   for this consumer since it's derived live, every call.
+3. **Consumer B — the VS Code schema**: a dev-time script (same shape as
+   `pyobfus-mcp-verify --generate`'s frozen-at-release-time pattern) walks
+   the same introspection data and emits standard JSON Schema draft-07 at
+   `vscode-extension/schemas/pyobfus.schema.json`, checked into the repo,
+   regenerated + drift-checked in CI at each pyobfus release — the exact
+   "shipped a new field, forgot to update the generated artifact" failure
+   this whole investigation started from, closed by making the check
+   automatic rather than relying on someone remembering.
+   Per-field human-readable descriptions (valuable for hover tooltips, the
+   actual point of "IntelliSense") aren't recoverable from
+   `dataclasses.fields()` alone — Python doesn't expose inline `#` comments
+   at runtime — so these need a small, explicitly-maintained
+   `FIELD_DESCRIPTIONS` mapping alongside the introspection helper, not
+   silently omitted.
+
+### Release-track split
+
+This spans pyobfus core's PyPI track and vscode-extension's Marketplace
+track independently — same as M0 already did for this feature pair:
+
+- **pyobfus core**: the introspection helper + `config_validator.py` fix.
+  Small, self-contained, can ship on its own next PyPI gate regardless of
+  the VS Code side's timeline.
+- **vscode-extension**: `scripts/generate_vscode_schema.py` (lives in the
+  core repo, since it introspects the core dataclass) + the schema file +
+  registration/modeline/install-prompt logic, ships as v0.3.0 on its own
+  Marketplace gate. Depends on the core introspection helper existing, so
+  build order matters even though release order doesn't have to match.
+
+### Estimate
+
+Revised down from the original stub's "1-2 weeks" now that the actual
+mechanism is researched rather than assumed — closer to **3-4 days total**:
+introspection helper + `config_validator.py` fix + tests (~1 day),
+`generate_vscode_schema.py` + CI drift check (~1 day), extension-side
+registration + modeline + install-prompt + tests (~1-2 days).
 
 ## Tech stack
 
