@@ -6,6 +6,50 @@ Independent version/release cadence from the main `pyobfus` and `pyobfus-mcp` Py
 
 ## [Unreleased]
 
+**Bugfix, found via hands-on testing 2026-08-06.** "Obfuscate with pyobfus"
+(and, less commonly, the on-save/manual check commands) could crash with a
+confusing raw Python error --
+`No module named pyobfus.__main__; 'pyobfus' is a package and cannot be
+directly executed` -- because `runJsonCommand` never set an explicit `cwd`
+for its `python -m pyobfus ...` invocation. `-m` puts the process's cwd
+first on `sys.path`, so an unset/inherited ambient cwd is a hazard: if it
+(or a sibling directory) happens to be named `pyobfus` -- e.g. the
+maintainer's own `~/projects/pyobfus` symlink to this checkout -- Python
+resolves `import pyobfus` to that directory (a namespace package) instead
+of the real pip-installed one, even against a perfectly good interpreter.
+
+### Fixed
+
+- `runJsonCommand` now defaults `cwd` to `os.tmpdir()` instead of leaving
+  it unset, closing the hazard for every caller that doesn't have a more
+  meaningful directory to supply (`checkFile`/`checkWorkspace`'s `--check`
+  and `unmapTrace`'s `--unmap` code paths never touch pyobfus's own
+  `pyobfus.yaml` auto-discovery, confirmed against `pyobfus/cli.py`, so this
+  default is safe for them with no behavior change).
+- `obfuscateFile.ts`'s "Obfuscate with pyobfus" is the one call site that
+  *does* need a real project-rooted `cwd` -- pyobfus's main obfuscate
+  command auto-discovers a project's `pyobfus.yaml` from cwd when
+  `--config` isn't passed explicitly, and the safe `os.tmpdir()` default
+  would silently skip it. New `cwdForTarget()` resolves the enclosing
+  workspace folder when the target is part of one, else the target's own
+  directory, matching where a user manually running
+  `pyobfus <target> -o <out>` from a terminal would have `cd`-ed to.
+- `reportCliError` now recognizes this same Python error text as a
+  distinct case (`isStalePyobfusInstall`) and shows an actionable message
+  ("pyobfus at `<path>` is too old to run as a module... Upgrade it, or
+  select a different interpreter") instead of the raw traceback -- this
+  also covers the separate, unrelated way the same error text can appear:
+  a genuinely too-old `pyobfus` install (pre-dating `-m pyobfus`
+  module-invocation support, added around the v0.4.0 AI-native CLI work),
+  found live when the maintainer's own environment resolved a shared
+  research venv still carrying `pyobfus==0.2.3` from December 2025.
+
+8 new tests (2 in `cliRunner.test.ts` proving the safe cwd default, 2 real
+`--dry-run --verbose` integration tests in `integration.test.ts` proving
+`cwdForTarget` correctly preserves `pyobfus.yaml` auto-discovery in both
+the workspace-folder and no-workspace-folder cases, 4 pure-logic tests for
+`isStalePyobfusInstall`).
+
 ## [0.2.0] - 2026-08-06
 
 **M2.** Status bar tier indicator + guided Pro funnel + generate-config +

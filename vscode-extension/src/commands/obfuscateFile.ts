@@ -6,6 +6,7 @@
  * and reverse-trace since it's the weakest/most-cloneable differentiator).
  */
 import * as vscode from "vscode";
+import * as fs from "node:fs";
 import * as path from "node:path";
 import { resolveInterpreter } from "../cli/locate";
 import { runJsonCommand } from "../cli/runner";
@@ -48,7 +49,15 @@ async function obfuscateFile(uri: vscode.Uri | undefined, outputChannel: vscode.
         runJsonCommand<ObfuscateSuccessResult | ObfuscateErrorResult>(
           interpreter.pythonPath,
           ["-m", "pyobfus", target.fsPath, "-o", outputPath, "--json"],
-          { allowNonZeroExit: true },
+          // pyobfus auto-discovers a project's pyobfus.yaml from cwd when
+          // --config isn't passed explicitly (config_validator.find_config_file
+          // checks `<cwd>/pyobfus.yaml` etc., no upward directory walk) -- so,
+          // unlike checkFile/checkWorkspace/unmapTrace (whose --check/--unmap
+          // code paths never touch config auto-discovery, verified against
+          // pyobfus/cli.py), this call site needs a real project-rooted cwd,
+          // not runJsonCommand's safe os.tmpdir() default, or a project's own
+          // pyobfus.yaml would be silently ignored during obfuscation.
+          { cwd: cwdForTarget(target), allowNonZeroExit: true },
         ),
     );
 
@@ -90,4 +99,25 @@ function defaultOutputPath(inputPath: string): string {
   const ext = path.extname(inputPath);
   const base = ext ? path.basename(inputPath, ext) : path.basename(inputPath);
   return path.join(dir, `${base}_obf${ext}`);
+}
+
+/**
+ * The directory pyobfus.yaml auto-discovery should look in: the enclosing
+ * workspace folder when the target is part of one, else the target's own
+ * directory (or the target itself, if it's already a directory) -- the
+ * same place a user manually running `pyobfus <target> -o <out>` from a
+ * terminal would have `cd`-ed to.
+ */
+export function cwdForTarget(target: vscode.Uri): string {
+  const workspaceFolder = vscode.workspace.getWorkspaceFolder(target);
+  if (workspaceFolder) {
+    return workspaceFolder.uri.fsPath;
+  }
+  try {
+    return fs.statSync(target.fsPath).isDirectory() ? target.fsPath : path.dirname(target.fsPath);
+  } catch {
+    // Target vanished between the input box and here (rare race) -- fall
+    // back to its parent; pyobfus itself will report the real ENOENT.
+    return path.dirname(target.fsPath);
+  }
 }

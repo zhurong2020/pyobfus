@@ -22,6 +22,25 @@ export function reportCliError(
     if (err.stderr) {
       outputChannel.appendLine(err.stderr);
     }
+    if (isStalePyobfusInstall(err.stderr)) {
+      void vscode.window
+        .showWarningMessage(
+          `pyobfus at ${interpreterPath} is too old to run as a module (this extension needs ` +
+            `\`python -m pyobfus\` support). Upgrade it, or select a different interpreter.`,
+          "Upgrade pyobfus",
+          "Select Interpreter",
+        )
+        .then((choice) => {
+          if (choice === "Upgrade pyobfus") {
+            const terminal = vscode.window.createTerminal("pyobfus upgrade");
+            terminal.show();
+            terminal.sendText(`"${interpreterPath}" -m pip install --upgrade pyobfus`);
+          } else if (choice === "Select Interpreter") {
+            void vscode.commands.executeCommand("python.setInterpreter");
+          }
+        });
+      return;
+    }
     void vscode.window.showErrorMessage(
       `pyobfus: ${actionLabel} failed. ${err.stderr.trim() || err.message}`,
     );
@@ -58,4 +77,21 @@ export function reportCliError(
   void vscode.window.showErrorMessage(
     `pyobfus: unexpected error during ${actionLabel}. See the pyobfus output channel.`,
   );
+}
+
+/**
+ * Detects Python's stock "package cannot be directly executed" error for
+ * `-m pyobfus`, which fires whenever the resolved interpreter has a
+ * `pyobfus` importable but lacking `pyobfus/__main__.py` -- in practice
+ * this means a pyobfus version predating module-invocation support (added
+ * around the AI-native CLI work, v0.4.0), not a corrupt install. Found
+ * live 2026-08-06: the maintainer's own environment resolved a shared
+ * research venv with `pyobfus==0.2.3` (installed ~Dec 2025) still on it,
+ * and the raw Python error text ("No module named pyobfus.__main__;
+ * 'pyobfus' is a package and cannot be directly executed") gives zero
+ * indication of what's actually wrong or how to fix it. Exported for unit
+ * testing without needing a real subprocess.
+ */
+export function isStalePyobfusInstall(stderr: string): boolean {
+  return stderr.includes("pyobfus.__main__") && stderr.includes("cannot be directly executed");
 }

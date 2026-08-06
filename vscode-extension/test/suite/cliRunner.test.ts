@@ -1,4 +1,6 @@
 import * as assert from "node:assert";
+import * as fs from "node:fs";
+import * as os from "node:os";
 import * as path from "node:path";
 import { runJsonCommand, PyobfusCliError, PyobfusJsonParseError } from "../../src/cli/runner";
 
@@ -56,5 +58,34 @@ suite("cli/runner", () => {
       runJsonCommand("pyobfus-this-binary-does-not-exist-anywhere", ["--json"]),
       (err: unknown) => (err as NodeJS.ErrnoException).code === "ENOENT",
     );
+  });
+
+  // Regression test for a real bug found 2026-08-06: `-m pyobfus` puts cwd
+  // first on sys.path, so an unset/inherited ambient cwd is a hazard --
+  // if it (or a sibling) happens to be named `pyobfus`, Python resolves
+  // `import pyobfus` to that directory (a namespace package) instead of
+  // the real pip-installed one, failing with "No module named
+  // pyobfus.__main__; 'pyobfus' is a package and cannot be directly
+  // executed" even against a perfectly good interpreter. Reproduced live
+  // against the maintainer's own `~/projects/pyobfus` symlink. The fix is
+  // a safe default cwd in runJsonCommand itself, not a per-call-site fix,
+  // so every current and future caller that doesn't have a more
+  // meaningful cwd to supply is covered automatically.
+  test("defaults cwd to a safe temp directory, not the ambient process cwd", async () => {
+    const result = await runJsonCommand<{ cwd: string }>(process.execPath, [
+      path.join(FIXTURES_DIR, "print-cwd.js"),
+    ]);
+    assert.strictEqual(fs.realpathSync(result.cwd), fs.realpathSync(os.tmpdir()));
+    assert.notStrictEqual(fs.realpathSync(result.cwd), fs.realpathSync(process.cwd()));
+  });
+
+  test("honors an explicit cwd override (e.g. generateConfig's workspace folder)", async () => {
+    const explicitCwd = fs.realpathSync(os.homedir());
+    const result = await runJsonCommand<{ cwd: string }>(
+      process.execPath,
+      [path.join(FIXTURES_DIR, "print-cwd.js")],
+      { cwd: explicitCwd },
+    );
+    assert.strictEqual(fs.realpathSync(result.cwd), explicitCwd);
   });
 });

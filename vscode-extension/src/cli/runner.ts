@@ -5,6 +5,7 @@
  * against arbitrary user file paths.
  */
 import { execFile } from "node:child_process";
+import * as os from "node:os";
 
 export class PyobfusCliError extends Error {
   constructor(
@@ -29,7 +30,24 @@ export class PyobfusJsonParseError extends Error {
 }
 
 export interface RunOptions {
-  /** Working directory for the invocation. */
+  /**
+   * Working directory for the invocation. Defaults to `os.tmpdir()`, NOT
+   * the ambient extension-host process cwd -- `-m pyobfus` puts cwd first
+   * on sys.path, so an unset/inherited cwd is a real hazard: if it (or
+   * any sibling directory next to it) happens to be named `pyobfus` --
+   * e.g. a checkout of this very repo, or any other plain directory/
+   * namespace package by that name -- Python resolves `import pyobfus` to
+   * that directory instead of the real pip-installed package, then fails
+   * with "No module named pyobfus.__main__; 'pyobfus' is a package and
+   * cannot be directly executed" even when the target interpreter has
+   * pyobfus correctly installed. Reproduced live 2026-08-06: the
+   * maintainer's own dev machine keeps `~/projects/pyobfus` as a symlink
+   * to this checkout for cross-project convenience, and it shadowed a
+   * real install the instant the ambient cwd landed there. Callers that
+   * have a more meaningful cwd (e.g. `generateConfig.ts`'s workspace
+   * folder) should still pass it explicitly -- this default only protects
+   * callers that don't have one to give.
+   */
   cwd?: string;
   /** Milliseconds before the process is killed. Default 30s. */
   timeoutMs?: number;
@@ -54,7 +72,7 @@ export async function runJsonCommand<T>(
   args: string[],
   options: RunOptions = {},
 ): Promise<T> {
-  const { cwd, timeoutMs = 30_000, allowNonZeroExit = true } = options;
+  const { cwd = os.tmpdir(), timeoutMs = 30_000, allowNonZeroExit = true } = options;
 
   const { stdout, stderr, code } = await execFileAsync(executable, args, {
     cwd,
