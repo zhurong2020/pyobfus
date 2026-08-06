@@ -125,14 +125,37 @@ obvious success banner, so success was confirmed two ways:
    is available for use in Visual Studio Marketplace."
 3. The live listing itself resolves: `https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus`.
 
-## For next time (v0.2.0 / M2, and beyond)
+## Updating an already-listed extension (confirmed 2026-08-06, M2 / v0.2.0)
 
-This runbook only covers the **first-ever** publish, which used "New
-extension." The Marketplace UI presumably has a distinct **update** flow for
-an already-listed extension's next version (upload against the existing
-listing, not "New extension" again) — **not yet exercised**, since M2 is
-still held for its own release-spacing gate as of this writing. Figure this
-out live when M2 actually ships, and fold the answer back into this doc.
+The update flow is **not** the "New extension" button — that's for a
+brand-new listing. Instead:
+
+1. Go to `https://marketplace.visualstudio.com/manage/publishers/zhurong2020`.
+2. Click into the existing extension's listing (its name, e.g. "pyobfus —
+   Python Code Obfuscator"). This lands on the Acquisition-overview tab;
+   there are also "Rating & Reviews" and "Manage" tabs, but neither of
+   those is where the update control lives.
+3. Next to the extension's name/title, there's a **"⋯" (three-dot) overflow
+   menu** — easy to miss, it's icon-only with no visible label in the
+   surrounding layout. It has an **"Update"** option.
+4. Click "Update" → upload the new `.vsix` (built the same way as before:
+   `npx vsce package --no-dependencies`, no PAT/Azure DevOps needed, same
+   as the first-publish workaround above).
+5. On success, the page shows **"It's live! Your extension is now visible
+   on the Marketplace ... and can be discovered and installed from every
+   Azure DevOps organization."** with a "How to unpublish" link (in case of
+   mistakes).
+6. The new version doesn't appear on the public listing page instantly —
+   it goes through a **"verifying `<version>`"** state first (visible on
+   the Manage tab's version table) before the public
+   `marketplace.visualstudio.com/items?itemName=...` page's version string
+   flips over. Budget a few minutes; no manual action needed during this
+   window, just re-check the public page or wait for the
+   `vsmarketplace@microsoft.com` confirmation email.
+
+This is the same manifest-identity-based mechanism `vsce publish` (the CLI
+path) would use — the web UI's "Update" entry point is the GUI equivalent,
+still fully sidestepping Azure DevOps/PAT.
 
 ## Implication for M4 (CI auto-publish on `vscode-v*.*.*` tags)
 
