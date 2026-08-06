@@ -74,9 +74,7 @@ def test_genuinely_unknown_key_is_still_flagged(tmp_path: Path) -> None:
     something that was never a real field must still warn."""
     cfg = _write(tmp_path, "obfuscation:\n  this_key_has_never_existed: true\n")
     result = validate_config_file(cfg)
-    assert any(
-        "this_key_has_never_existed" in w and "Unknown" in w for w in result.warnings
-    )
+    assert any("this_key_has_never_existed" in w and "Unknown" in w for w in result.warnings)
 
 
 def test_invalid_preset_name_is_an_error(tmp_path: Path) -> None:

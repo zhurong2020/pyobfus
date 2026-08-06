@@ -105,7 +105,13 @@
           "description": "Run 'pyobfus --check' on every .py file save and show findings as diagnostics."
         }
       }
-    }
+    },
+    "yamlValidation": [
+      {
+        "fileMatch": ["pyobfus.yaml", "pyobfus.yml", ".pyobfus.yaml", ".pyobfus.yml"],
+        "url": "./schemas/pyobfus.schema.json"
+      }
+    ]
   },
   "scripts": {
     "compile": "node esbuild.js",

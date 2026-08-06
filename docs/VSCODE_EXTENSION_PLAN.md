@@ -1,8 +1,9 @@
 # VS Code extension design plan (ROADMAP P2-2)
 
 **Status**: M0, M1, and M2 are all **published**, plus an expedited 0.2.1
-bugfix patch the same day M2 shipped. Only M3 (`pyobfus.yaml`
-IntelliSense) remains, not yet scoped in detail.
+bugfix patch the same day M2 shipped. **M3** (`pyobfus.yaml` IntelliSense)
+is **code-complete, held for its own Marketplace release-spacing gate**
+as v0.3.0 — see the dedicated M3 section below.
 
 **0.2.1 bugfix (2026-08-06, same day as M2)**: hands-on testing of the
 freshly-published 0.2.0 immediately surfaced a real crash in "Obfuscate
@@ -249,34 +250,52 @@ could echo the malicious listing's old name.
 `pyobfus.yaml` in VS Code — not just the diagnostics-on-save M1 already
 covers, but editing the config file itself.
 
-### The mechanism (researched, not assumed)
+### The mechanism (researched, not assumed — and revised once more during implementation)
 
 VS Code has no built-in YAML language server; **`redhat.vscode-yaml`
 (the YAML Language Server extension) is still the de facto standard** for
 JSON-Schema-backed YAML IntelliSense as of this research pass — no newer
-built-in alternative has displaced it. Three ways to associate a schema
-with a file, in order of how automatic they are for our users:
+built-in alternative has displaced it. The initial research pass surfaced
+three ways to associate a schema with a file and picked the middle one
+(programmatic registration via `redhat.vscode-yaml`'s own extension API,
+`registerContributor`) as primary, with the modeline comment as a
+fallback and an "install redhat.vscode-yaml" prompt to handle the
+not-installed case.
 
-1. **Programmatic registration via `redhat.vscode-yaml`'s own extension
-   API** (`vscode.extensions.getExtension('redhat.vscode-yaml')` →
-   `registerContributor`) — zero user configuration, works the moment both
-   extensions are active.
-2. **An inline modeline comment**: `# yaml-language-server: $schema=<path>`
-   at the top of the file — relative paths resolve from the YAML file's own
-   location, not the workspace root. Works even if our extension's
-   activation-time registration (option 1) doesn't fire for some reason.
-3. **The user's own `yaml.schemas` setting** — manual, not something we
-   drive, but documented as a fallback in the README.
+**That plan changed before any of it got built.** A closer look at
+`redhat.vscode-yaml`'s own docs turned up a *fourth*, better option missed
+on the first pass: a **purely declarative `contributes.yamlValidation`
+contribution point** in `package.json` — the same shape VS Code's own
+built-in JSON support already uses for `contributes.jsonValidation`. This
+needs zero runtime code, has no activation-order dependency (a real,
+documented failure mode of the `registerContributor` API — see
+`redhat-developer/vscode-yaml` issue #261, "registerContributor is not
+called when yaml file is opened at vscode start"), and is picked up
+automatically by `redhat.vscode-yaml` if it's active, with no error and no
+effect at all if it isn't. The whole "programmatic registration +
+install-prompt" design was replaced by one static array entry:
 
-We should NOT add `redhat.vscode-yaml` as a hard `extensionDependencies` —
-that force-installs a ~10MB extension on every pyobfus user, including the
-majority who never hand-edit `pyobfus.yaml`. Instead: register via its API
-(option 1) when it's already active, emit the modeline (option 2) into
-every file "Generate pyobfus.yaml" writes so it works either way, and if
-`redhat.vscode-yaml` isn't installed when a `pyobfus.yaml`-named file is
-opened, show a one-time dismissible info message with an "Install" action
-(`workbench.extensions.installExtension`) — same low-friction pattern VS
-Code's own first-party extensions use for related-tooling prompts.
+```json
+"contributes": {
+  "yamlValidation": [
+    { "fileMatch": ["pyobfus.yaml", "pyobfus.yml", ".pyobfus.yaml", ".pyobfus.yml"],
+      "url": "./schemas/pyobfus.schema.json" }
+  ]
+}
+```
+
+The modeline comment stays, but demoted to what it always should have
+been — a cross-editor / no-extension-installed fallback, not the thing an
+install-prompt exists to make more reliable. `redhat.vscode-yaml` is
+**not** an `extensionDependencies` (would force-install a ~10MB extension
+on every pyobfus user, including the majority who never hand-edit
+`pyobfus.yaml`) — with the declarative path, nothing forces it to be one:
+absent, the association is simply inert.
+
+The "one-time dismissible install prompt for `redhat.vscode-yaml`" idea
+from the first design pass was dropped, not deferred — it existed to
+paper over the programmatic-registration API's reliability gap, and that
+gap doesn't apply to the declarative mechanism.
 
 **Deliberately out of scope for M3**: submitting to schemastore.org (would
 give IntelliSense to `redhat.vscode-yaml` users who don't even have our
@@ -342,27 +361,55 @@ Rather than hand-write a JSON Schema separately (which would just create a
    `FIELD_DESCRIPTIONS` mapping alongside the introspection helper, not
    silently omitted.
 
-### Release-track split
+### Implementation (code-complete 2026-08-06)
 
-This spans pyobfus core's PyPI track and vscode-extension's Marketplace
-track independently — same as M0 already did for this feature pair:
+- **pyobfus core**: `pyobfus/config_schema.py` (`describe_fields()` /
+  `preset_names()`) + `config_validator.py`'s `VALID_SCHEMA` now computed
+  from it. 23 new tests. Shipped as its own PyPI-track item (see the main
+  `CHANGELOG.md`'s `[Unreleased]` entry), independent of the extension's
+  own release.
+- **Schema generator**: `scripts/generate_vscode_schema.py` (repo root,
+  imports `pyobfus.config_schema`, not a package runtime dependency) emits
+  `vscode-extension/schemas/pyobfus.schema.json` (JSON Schema draft-07,
+  `additionalProperties: false` on the `obfuscation` object — deliberate,
+  a typo'd key should get a real-time red squiggle, matching
+  `config_validator.py`'s existing `COMMON_TYPOS` intent). `--check` mode
+  exits 1 on drift; no separate CI workflow step needed for this since
+  `tests/test_generate_vscode_schema.py::test_checked_in_schema_file_is_not_stale`
+  already runs the same check as a normal pytest test, across the full
+  OS/Python matrix the core test job already covers. 9 tests total for the
+  generator (schema validity, every dataclass field present, typo/enum/
+  type rejection all verified against a real `jsonschema.Draft7Validator`,
+  not just structural assertions).
+- **vscode-extension**: the `contributes.yamlValidation` entry in
+  `package.json` (see above) + `commands/generateConfig.ts`'s
+  `addSchemaModelineIfMissing()`, which prepends the modeline to every
+  freshly-written `pyobfus.yaml` before opening it (idempotent — checked
+  the first line before writing). `SCHEMA_URL` is a public
+  `raw.githubusercontent.com` URL, not a local extension-install path —
+  a modeline gets written into a file the user may commit to their own
+  repo, so it has to keep resolving after this extension updates or is
+  uninstalled, or when a teammate without it opens the same file. 5 new
+  tests (`test/suite/yamlSchema.test.ts`): the `yamlValidation` manifest
+  entry + referenced schema file are well-formed, the modeline gets
+  prepended and is idempotent, `SCHEMA_URL` is actually a public HTTPS URL.
+  Confirmed the schema file is bundled into the packaged `.vsix`
+  (`vsce package --no-dependencies` → `schemas/pyobfus.schema.json`,
+  9.49 KB, not excluded by `.vscodeignore`).
 
-- **pyobfus core**: the introspection helper + `config_validator.py` fix.
-  Small, self-contained, can ship on its own next PyPI gate regardless of
-  the VS Code side's timeline.
-- **vscode-extension**: `scripts/generate_vscode_schema.py` (lives in the
-  core repo, since it introspects the core dataclass) + the schema file +
-  registration/modeline/install-prompt logic, ships as v0.3.0 on its own
-  Marketplace gate. Depends on the core introspection helper existing, so
-  build order matters even though release order doesn't have to match.
+Held for its own Marketplace release-spacing gate as `vscode-extension`
+v0.3.0 — see `CHANGELOG.md`'s `[Unreleased]` entry. Release order doesn't
+have to match the core fix's own PyPI release, only build order did (the
+schema generator needs `pyobfus.config_schema` to exist first).
 
-### Estimate
+### Estimate vs. actual
 
-Revised down from the original stub's "1-2 weeks" now that the actual
-mechanism is researched rather than assumed — closer to **3-4 days total**:
-introspection helper + `config_validator.py` fix + tests (~1 day),
-`generate_vscode_schema.py` + CI drift check (~1 day), extension-side
-registration + modeline + install-prompt + tests (~1-2 days).
+Estimated **3-4 days** once the mechanism was researched (down from the
+original stub's "1-2 weeks"); actual build, once the simpler declarative
+mechanism replaced the original programmatic-registration design, came in
+under that — same pattern as M0-M2, where researching the real mechanism
+before writing code consistently found a smaller, more robust
+implementation than the first-pass estimate assumed.
 
 ## Tech stack
 
@@ -442,8 +489,10 @@ named presets from `ObfuscationConfig.list_presets()`).
   --json` contract, source for the diagnostics provider
 - `pyobfus/trial_cli.py`, `pyobfus_pro/cli.py` — M0's `--json` additions
   (done)
-- `pyobfus/config.py` (`ObfuscationConfig`, `list_presets()`) — M3 schema
-  source of truth
+- `pyobfus/config.py` (`ObfuscationConfig`, `list_presets()`) +
+  `pyobfus/config_schema.py` (`describe_fields()`) — M3 schema source of
+  truth (done); `scripts/generate_vscode_schema.py` is the consumer that
+  emits `vscode-extension/schemas/pyobfus.schema.json` from it
 - `pyobfus/constants.py`, `pyobfus_mcp/pyobfus_mcp/tools.py` (`_pro_unlock`,
   `explain_preset`, `start_pro_trial`) — M2 funnel copy to reuse verbatim
 - `.github/workflows/ci.yml`, `release.yml` — precedent for the new

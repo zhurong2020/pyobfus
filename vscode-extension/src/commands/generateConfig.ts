@@ -9,6 +9,21 @@ import { runJsonCommand } from "../cli/runner";
 import { reportCliError } from "../cli/errorReporting";
 import { InitResult } from "../cli/types";
 
+// A public, stable URL -- NOT a local extension-install path. This
+// modeline gets written into a file the user may commit to their own
+// repo, so it must keep resolving after this extension is updated,
+// uninstalled, or opened by a teammate who never installed it at all
+// (as long as they have redhat.vscode-yaml, this alone is enough for
+// IntelliSense). The declarative `contributes.yamlValidation` entry in
+// package.json (a relative `./schemas/...` path, resolved fresh against
+// whichever extension version is actually installed) is the primary,
+// more robust mechanism for users who do have this extension --  this
+// modeline is a cross-editor/no-extension-installed fallback, not the
+// main path.
+export const SCHEMA_URL =
+  "https://raw.githubusercontent.com/zhurong2020/pyobfus/main/vscode-extension/schemas/pyobfus.schema.json";
+const SCHEMA_MODELINE = `# yaml-language-server: $schema=${SCHEMA_URL}\n`;
+
 export function registerGenerateConfigCommand(
   context: vscode.ExtensionContext,
   outputChannel: vscode.OutputChannel,
@@ -37,6 +52,8 @@ async function generateConfig(outputChannel: vscode.OutputChannel): Promise<void
         ),
     );
 
+    await addSchemaModelineIfMissing(result.config_path);
+
     const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(result.config_path));
     await vscode.window.showTextDocument(doc, { preview: false });
 
@@ -54,4 +71,25 @@ async function generateConfig(outputChannel: vscode.OutputChannel): Promise<void
   } catch (err) {
     reportCliError(err, interpreter.pythonPath, outputChannel, "generating pyobfus.yaml");
   }
+}
+
+/**
+ * Prepend the yaml-language-server schema modeline to a freshly-generated
+ * pyobfus.yaml -- gives IntelliSense to anyone who opens the file with
+ * redhat.vscode-yaml, even without this extension installed at all
+ * (this extension's own declarative `contributes.yamlValidation` entry
+ * in package.json is the primary, more robust mechanism for users who
+ * do have it -- see SCHEMA_URL's comment above). `--init` always writes
+ * a fresh file with no prior modeline, so this only guards against a
+ * hypothetical future where that stops being true, not a real steady
+ * state today.
+ */
+export async function addSchemaModelineIfMissing(configPath: string): Promise<void> {
+  const uri = vscode.Uri.file(configPath);
+  const bytes = await vscode.workspace.fs.readFile(uri);
+  const text = Buffer.from(bytes).toString("utf-8");
+  if (text.startsWith("# yaml-language-server:")) {
+    return;
+  }
+  await vscode.workspace.fs.writeFile(uri, Buffer.from(SCHEMA_MODELINE + text, "utf-8"));
 }

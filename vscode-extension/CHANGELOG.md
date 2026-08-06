@@ -6,6 +6,28 @@ Independent version/release cadence from the main `pyobfus` and `pyobfus-mcp` Py
 
 ## [Unreleased]
 
+**M3 (v0.3.0), code-complete 2026-08-06, held for the release-spacing
+gate.** Real IntelliSense (autocomplete, hover docs, inline validation) for
+`pyobfus.yaml`: a declarative `contributes.yamlValidation` entry in
+`package.json` associates a generated JSON Schema
+(`schemas/pyobfus.schema.json`) with `pyobfus.yaml`/`.pyobfus.yaml`/
+`pyobfus.yml`/`.pyobfus.yml` for anyone with the
+[redhat.vscode-yaml](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml)
+extension active — zero runtime code, no `extensionDependencies`
+force-install. "Generate pyobfus.yaml" now also prepends a
+`# yaml-language-server: $schema=...` modeline pointing at a stable public
+URL (not a local extension-install path, which would go stale on every
+extension update) as a cross-editor / no-extension-installed fallback.
+
+The schema itself is generated from `pyobfus/config_schema.py`'s
+introspection of `ObfuscationConfig`'s actual dataclass fields (new in
+pyobfus core, see the main `CHANGELOG.md`), which also fixed a real core
+bug found while scoping this milestone: `--validate-config` used to
+false-warn on `preset` and every Pro field added since v0.5.0 because the
+old hand-maintained schema had silently drifted stale. 9 new tests for the
+schema generator (`tests/test_generate_vscode_schema.py`, pyobfus core) + 5
+new tests here (`test/suite/yamlSchema.test.ts`).
+
 ## [0.2.1] - 2026-08-06
 
 **Bugfix, found via hands-on testing 2026-08-06.** "Obfuscate with pyobfus"
