@@ -6,10 +6,10 @@ Independent version/release cadence from the main `pyobfus` and `pyobfus-mcp` Py
 
 ## [Unreleased]
 
-**M2 (v0.2.0), code-complete 2026-08-04.** Held for release per the
-release-spacing gate — eligible from **2026-08-06** (2 days after M1's
-actual publish date), so Marketplace releases stay spaced the same way
-PyPI releases do. Full design rationale in
+## [0.2.0] - 2026-08-06
+
+**M2.** Status bar tier indicator + guided Pro funnel + generate-config +
+right-click obfuscate. Full design rationale in
 [`docs/VSCODE_EXTENSION_PLAN.md`](../docs/VSCODE_EXTENSION_PLAN.md).
 
 ### Added
@@ -34,6 +34,8 @@ PyPI releases do. Full design rationale in
 - Refactored the on-save/manual check commands to report their
   `CheckReport` back to the status bar via an `onReport` callback, so the
   status bar's summary updates the same way the Problems panel does.
+
+## [0.1.0] - 2026-08-04
 
 **M1, first Marketplace release.** Published as `pyobfus` (publisher
 `zhurong2020`) on the VS Code Marketplace via manual `.vsix` upload
