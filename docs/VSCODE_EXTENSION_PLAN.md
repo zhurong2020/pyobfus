@@ -1,28 +1,42 @@
 # VS Code extension design plan (ROADMAP P2-2)
 
-**Status**: M1 **published** 2026-08-04 as `pyobfus` v0.1.0 on the VS Code
-Marketplace (publisher `zhurong2020`) —
+**Status**: M0, M1, and M2 are all **published**. Only M3 (`pyobfus.yaml`
+IntelliSense) remains, not yet scoped in detail.
+
+M1 published 2026-08-04 as `pyobfus` v0.1.0 on the VS Code Marketplace
+(publisher `zhurong2020`) —
 https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus —
 via manual `.vsix` web upload, ~4 days ahead of the original 2026-08-08
 gate (see "Marketplace publishing note" below for why). M1's full test
 suite (13 tests, including a real contract test against actually-installed
 pyobfus) passed in real CI (`.github/workflows/vscode-extension-ci.yml`)
-before publish. **M2 code-complete 2026-08-04** (status bar, generate-config
-command, right-click obfuscate, Pro trial/unlock funnel commands), held for
-release — eligible from **2026-08-06** (2 days after M1's actual publish
-date, spacing Marketplace releases from each other the same way PyPI
-releases are spaced). 24/24 tests pass locally against the real installed
-pyobfus (`PYOBFUS_PYTHON_PATH=venv/bin/python3 npm test`), including 4 new
-real-contract tests (trial/license status, `--init --json`, real obfuscate
-`--json --dry-run`) and 8 new pure-logic tests for `deriveTier`. M0
-(pyobfus core `--json` prerequisites) is still code-complete-but-held, on
-its own separate PyPI release-spacing gate (see `docs/ROADMAP.md`'s P2-2
-entry / `CLAUDE.md` for the exact date) — M1/M2's early Marketplace
-publishing doesn't pull M0 forward, since M0 is a pyobfus-core PyPI release
-and the gate exists to space out *that* package's release traffic.
-**Recorded**: 2026-08-04
+before publish.
 
-## Marketplace publishing note (2026-08-04)
+M0 (`--json` on `pyobfus-trial status` / `pyobfus-license status`) shipped
+2026-08-06 as pyobfus **0.5.12** on its own PyPI release-spacing gate (a
+pure version-bump/CHANGELOG-promotion release — the code itself had been
+merged 2026-08-04).
+
+M2 (status bar, generate-config command, right-click obfuscate, Pro
+trial/unlock funnel commands) shipped 2026-08-06 as `vscode-extension`
+**v0.2.0** — https://github.com/zhurong2020/pyobfus/releases/tag/vscode-v0.2.0
+— on its own Marketplace release-spacing gate (2 days after M1). 24/24
+tests passed locally against the real installed pyobfus
+(`PYOBFUS_PYTHON_PATH=venv/bin/python3 npm test`), including 4 real-contract
+tests (trial/license status, `--init --json`, real obfuscate
+`--json --dry-run`) and 8 pure-logic tests for `deriveTier`. Publishing M2
+also empirically confirmed the Marketplace's "update an already-listed
+extension" flow for the first time — see "Marketplace publishing note"
+below, and the fuller writeup in
+[`docs/VSCODE_MARKETPLACE_PUBLISHER_SETUP.md`](VSCODE_MARKETPLACE_PUBLISHER_SETUP.md).
+The public listing page's version field flipped to `0.2.0` (confirmed via
+a scripted poll of the page's JSON) and the Marketplace's own Manage tab
+shows a green checkmark next to the `0.2.0` version row, meaning the
+package passed automated validation, not just "uploaded."
+
+**Recorded**: 2026-08-04, updated 2026-08-06
+
+## Marketplace publishing note (2026-08-04, updated 2026-08-06)
 
 **Full step-by-step registration process + troubleshooting log**:
 [`docs/VSCODE_MARKETPLACE_PUBLISHER_SETUP.md`](VSCODE_MARKETPLACE_PUBLISHER_SETUP.md)
@@ -55,6 +69,20 @@ ID/federated-credential approach still needs an Azure DevOps org too. M4
 may need to stay a manual-upload process, or the org-creation bug may
 resolve itself later (worth a periodic recheck) — not launch-blocking
 since M1 shipped without it.
+
+**Updating an already-published extension (confirmed 2026-08-06, M2 v0.2.0)**:
+the "New extension" entry point above is first-publish only. The control
+for a *new version of an existing listing* is a "⋯" (three-dot) overflow
+menu next to the extension's name on its own listing page — not the
+Manage tab, and easy to miss since it's icon-only. "⋯" → "Update" → upload
+the new `.vsix` (built the same PAT-free way) → an "It's live!"
+confirmation page. The new version then sits in a transient "verifying
+`<version>`" state on the Manage tab for a few minutes (confirmed here via
+scripted polling of the public listing page's JSON) before both the public
+version string and a green checkmark next to the version row (automated
+validation passed) appear. Full step-by-step in
+[`docs/VSCODE_MARKETPLACE_PUBLISHER_SETUP.md`](VSCODE_MARKETPLACE_PUBLISHER_SETUP.md)'s
+"Updating an already-listed extension" section.
 
 This is the design doc behind `docs/ROADMAP.md`'s P2-2 entry — same "satellite
 package, own design doc" shape as `docs/MCP_PRIMITIVES_DESIGN.md`.
@@ -129,8 +157,10 @@ could echo the malicious listing's old name.
 
 ## Staged milestones (publish 1-2 days apart, each independently demoable)
 
-- **M0** (pyobfus core, tiny standalone release) — ✅ code-complete
-  2026-08-04, held for release. Added `--json` to `pyobfus-trial status` and
+- **M0** (pyobfus core, tiny standalone release) — ✅ **shipped 2026-08-06**
+  as pyobfus **0.5.12** (code merged 2026-08-04, release itself was a pure
+  version-bump/CHANGELOG-promotion once the release-spacing gate passed).
+  Added `--json` to `pyobfus-trial status` and
   `pyobfus-license status`, returning `get_trial_status()` /
   `get_license_status(masked=True)` verbatim — same pattern as the existing
   `--check --json`/`--unmap --json` code. Chosen over replicating the MCP
@@ -153,8 +183,9 @@ could echo the malicious listing's old name.
   a contract test against an actually-installed pyobfus, not a mock.
   Published via manual `.vsix` web upload, not `vsce publish` — see
   "Marketplace publishing note" above.
-- **M2** (v0.2.0) — ✅ **code-complete 2026-08-04**, held for release
-  (eligible 2026-08-06). Status bar (`statusBar/statusBarController.ts` +
+- **M2** (v0.2.0) — ✅ **published 2026-08-06** —
+  https://github.com/zhurong2020/pyobfus/releases/tag/vscode-v0.2.0.
+  Status bar (`statusBar/statusBarController.ts` +
   `status/tierStatus.ts`'s pure `deriveTier()`) showing tier + last-check
   summary, consuming M0's `pyobfus-trial status --json` /
   `pyobfus-license status --json`; a QuickPick menu (`commands/showMenu.ts`)
