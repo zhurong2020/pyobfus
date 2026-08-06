@@ -20,7 +20,7 @@ A Python code obfuscator built with AST-based transformations. **Supports Python
 
 > **🔒 Pro Edition available** — 6 patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator, $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
 
-> **🔧 What's new in v0.5.11** — `--anti-debug` now checks three more signals beyond the original `sys.gettrace()`: TracerPid (Linux native debuggers), WinAPI `IsDebuggerPresent()` (Windows), and a timing-skew check that catches single-stepping on any platform. v0.5.10 added `--embed-data <path>` (AES-256-GCM resource-file embedding) and, separately, `pyobfus-mcp` 0.3.4 added PII-shape detection to its risk scan. v0.5.9 added `--requires-os` / `--requires-python-min` / `--requires-arch` platform restrictions. Full details in the [CHANGELOG](CHANGELOG.md); see [Pro Edition](#-pro-edition) below.
+> **🔧 What's new in v0.5.12** — `pyobfus-trial status --json` / `pyobfus-license status --json` return structured JSON (the VS Code extension's status bar reads these). v0.5.11 added three more `--anti-debug` signals beyond the original `sys.gettrace()`: TracerPid (Linux native debuggers), WinAPI `IsDebuggerPresent()` (Windows), and a timing-skew check that catches single-stepping on any platform. v0.5.10 added `--embed-data <path>` (AES-256-GCM resource-file embedding) and, separately, `pyobfus-mcp` 0.3.4 added PII-shape detection to its risk scan. Full details in the [CHANGELOG](CHANGELOG.md); see [Pro Edition](#-pro-edition) below.
 
 ## 🔌 Companion MCP server: [`pyobfus-mcp`](pyobfus_mcp/)
 
@@ -59,7 +59,7 @@ See [`skills/`](skills/) for the skill and install details. (This is distinct fr
 
 ### 🧑‍💻 VS Code extension
 
-pyobfus is also on the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus) (publisher `zhurong2020`) — the **first** obfuscation-focused extension in this category, since no competitor (PyArmor, Nuitka, Sourcedefender) has one. Inline obfuscation-risk diagnostics (`pyobfus --check` findings rendered via VS Code's native `DiagnosticCollection` API — squiggles + Problems panel, no separate linter to configure) plus a "Reverse Stack Trace" command. Source and design rationale in [`vscode-extension/`](vscode-extension/) and [`docs/VSCODE_EXTENSION_PLAN.md`](docs/VSCODE_EXTENSION_PLAN.md).
+pyobfus is also on the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus) (publisher `zhurong2020`) — the **first** obfuscation-focused extension in this category, since no competitor (PyArmor, Nuitka, Sourcedefender) has one. Inline obfuscation-risk diagnostics (`pyobfus --check` findings rendered via VS Code's native `DiagnosticCollection` API — squiggles + Problems panel, no separate linter to configure), a "Reverse Stack Trace" command, a status bar item showing your current tier with a one-click menu (Check Workspace / Generate Config / Start Trial / Unlock Pro), a "Generate pyobfus.yaml" command, and right-click "Obfuscate with pyobfus" from the Explorer or editor. Source and design rationale in [`vscode-extension/`](vscode-extension/) and [`docs/VSCODE_EXTENSION_PLAN.md`](docs/VSCODE_EXTENSION_PLAN.md).
 
 ### 🤖 AI-native features
 
