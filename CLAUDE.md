@@ -87,6 +87,8 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 **✅ 2026-08-06：M0（pyobfus 0.5.12）+ M2（vscode-extension v0.2.0）均已发布，P2-2 只剩 M3（`pyobfus.yaml` IntelliSense，未 scope）未做。** VS Code Marketplace「更新已有 listing」的真实流程已现场探明并写入 `docs/VSCODE_MARKETPLACE_PUBLISHER_SETUP.md`：扩展名称旁「⋯」菜单 → Update（不是 Manage tab、也不是「New extension」按钮）。
 
+- 🐛 **同日 M2 发布后，user 亲手实测右键混淆命令，揪出并修复一个真崩溃 bug，已加急发 vscode-extension 0.2.1（不等 2 天 gate）**：`runJsonCommand` 从未传 `cwd`，`-m pyobfus` 把进程 cwd 放在 `sys.path` 最前——若 cwd（或其兄弟目录）恰好叫 `pyobfus`（例如 maintainer 自己 `~/projects/pyobfus` 指回本仓库的符号链接），Python 会把它当 namespace package 抢先命中，报 "'pyobfus' is a package and cannot be directly executed"，即使目标解释器本身完全正常。诊断途中一度被**同一段报错文字的另一个不相关根因**带偏：user 实测那个文件解析到的解释器（`vbca/wsl_venv`，cardiac 研究共用 venv）里装的是 2025-12 的古董版本 `pyobfus==0.2.3`，那时候压根没有 `__main__.py`——两种根因文字完全相同，靠 `pip show` 交叉核实才分清。修复：`runJsonCommand` 默认 `cwd=os.tmpdir()`（对 check/workspace-check/反解 trace 安全，已核实它们的 `--check`/`--unmap` 分支不碰 `pyobfus.yaml` 自动发现）；`obfuscateFile.ts` 单独用 `cwdForTarget()`（工作区根目录优先，否则退回目标自身目录）因为混淆主命令确实会从 cwd 自动发现 `pyobfus.yaml`；`reportCliError` 新增 `isStalePyobfusInstall` 识别，命中老版本时给"升级或换解释器"按钮而非原始 traceback。8 个新测试（含两个用真实 `--dry-run --verbose` 输出核实 auto-discovery 确实按 cwd 生效，不是只测路径字符串），32/32 全绿，真实 CI 也全过。tag `vscode-v0.2.1` + GitHub Release 已建，公开 listing 已核实显示 0.2.1。完整诊断经过见 memory `pyobfus_vscode_cwd_bug_fix_2026-08-06.md`。
+
 **Cold-start session 第一句话应问 user**：「pyobfus/mcp 下一个发布 gate 是 2026-08-08（0.5.12 之后 2 天）——今天是不是到了？到了的话有什么要发的吗，还是先看看 M3 怎么 scope？」附带常规检查：plugin marketplace 审核（`https://platform.claude.com/plugins/submissions`）查一下有没有新进展，那个"protected_project"笔误要不要顺手改掉；PyPI 下载量隔几天补个快照（上次 2026-08-03，pyobfus 232/421/1232，mcp 178/186/348，日/周/月）。
 
 **Cold-start 资料定位**（按读取优先级）：

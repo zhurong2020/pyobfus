@@ -1,7 +1,35 @@
 # VS Code extension design plan (ROADMAP P2-2)
 
-**Status**: M0, M1, and M2 are all **published**. Only M3 (`pyobfus.yaml`
+**Status**: M0, M1, and M2 are all **published**, plus an expedited 0.2.1
+bugfix patch the same day M2 shipped. Only M3 (`pyobfus.yaml`
 IntelliSense) remains, not yet scoped in detail.
+
+**0.2.1 bugfix (2026-08-06, same day as M2)**: hands-on testing of the
+freshly-published 0.2.0 immediately surfaced a real crash in "Obfuscate
+with pyobfus" — `runJsonCommand` never set an explicit `cwd` for
+`python -m pyobfus ...`, and `-m` puts cwd first on `sys.path`, so an
+ambient cwd (or sibling directory) named `pyobfus` shadows the real
+pip-installed package as a namespace package, even against a perfectly
+good interpreter (reproduced against the maintainer's own
+`~/projects/pyobfus` symlink to this checkout). The diagnosis briefly
+went sideways because the *exact same* Python error text
+(`No module named pyobfus.__main__; 'pyobfus' is a package and cannot be
+directly executed`) also fires for an unrelated reason — a genuinely
+too-old `pyobfus` install predating `-m` module-invocation support,
+which is what the maintainer's own real repro (a shared research venv
+still carrying `pyobfus==0.2.3` from December 2025) actually hit — `pip
+show` was needed to tell the two apart. Fixed both: `runJsonCommand` now
+defaults `cwd` to `os.tmpdir()` (safe for `checkFile`/`checkWorkspace`/
+`unmapTrace`, confirmed their `--check`/`--unmap` code paths never touch
+`pyobfus.yaml` auto-discovery); `obfuscateFile.ts` gets a dedicated
+`cwdForTarget()` since the main obfuscate command *does* auto-discover
+`pyobfus.yaml` from cwd; `reportCliError` gained `isStalePyobfusInstall`
+to show an actionable "upgrade or select a different interpreter"
+message instead of the raw traceback when the stale-install case is
+detected. 8 new tests, 32/32 total passing, real CI green. Released
+same-day rather than waiting for the usual spacing gate, since it fixes
+a genuine crash rather than shipping a routine feature —
+https://github.com/zhurong2020/pyobfus/releases/tag/vscode-v0.2.1.
 
 M1 published 2026-08-04 as `pyobfus` v0.1.0 on the VS Code Marketplace
 (publisher `zhurong2020`) —
