@@ -182,7 +182,8 @@ Run right after the VS Code extension M0-M2 + 0.2.1 bugfix ship, to re-check the
 **New findings — genuinely actionable:**
 
 - [x] **P2-23: Nuitka Commercial traceback-encryption comparison content.** — _Content-complete 2026-08-06, held for the next release-spacing gate (2026-08-08)._ Nuitka Commercial's "Traceback Encryption" (€250/year) is **symmetric-only today** ("plans to introduce asymmetric encryption in future updates" per their own docs) — our `--scrub-traceback` (RSA-2048-OAEP + AES-256-GCM hybrid, `pyobfus-unscrub` CLI to reverse) is already the more sophisticated scheme, and pyobfus's $45 one-time price undercuts Nuitka's €250/year recurring by a wide margin. `docs/COMPARISON.md` doesn't currently name this Nuitka feature at all. _Estimate: half a day, content-only, same shape as P2-22._
-- [ ] **P2-24: Adopt the real MCP Server Card standard path.** SEP-1649 (the spec P2-20's ARD manifest work targeted) has been **superseded by SEP-2127**, and — unlike when P2-20 was scoped — **Claude Desktop and Cursor are already shipping consumer support** for it (April 2026), fetching `/.well-known/mcp/server-card.json`. Our existing ARD 1.0 manifest lives at a *different*, custom path (`/en/latest/.well-known/ai-catalog.json` on Read the Docs) — real clients that speak the actual MCP-standard discovery flow won't find it. Publish (or redirect) a spec-compliant `server-card.json` at the standard path pyobfus-mcp actually serves from (not just the docs site), reusing the tool/transport/version data already collected for the ARD manifest. This elevates P2-20's "pending" tail above where it sat in the 07-07 scan, since the consuming clients are now real, not speculative. _Estimate: 1-2 days (spec is still draft, watch for schema churn before shipping)._
+- [x] **P2-24: MCP Server Card applicability — investigated 2026-08-06, correction to this scan's own first-pass framing.** The original entry (below, struck through in spirit) proposed publishing a spec-compliant `server-card.json` at `/.well-known/mcp/server-card.json`. Checking SEP-2127's actual text before building anything found that framing wrong: **`.well-known` Server Card discovery is explicitly scoped to HTTP-transport servers only** — SEP-2127 itself says local, stdio-based servers "should plan to distribute via `server.json` and the MCP Registry" instead, not a `.well-known` HTTP endpoint (which a stdio process has no way to serve from in the first place). pyobfus-mcp is stdio-only, so this mechanism doesn't apply to it today — same shape as the existing "OAuth 2.1 targets remote servers, N/A for local stdio" notes already on P2-6/P2-21. The applicable mechanism (`pyobfus_mcp/server.json` published to the official MCP Registry, confirmed `isLatest`) is already in place and looks complete against the current schema. This becomes actionable only if/when N14 (hosted MCP endpoint, unbuilt) ships a real HTTP transport — no code work today. The custom ARD `ai-catalog.json` manifest (P2-20) is a *different*, non-MCP-standard mechanism (general AI-crawler discovery, not MCP protocol discovery) and is unaffected by this finding; its own pending tail (RTD root `.well-known` redirect 404, unconfirmed PulseMCP listing) stays open separately.
+  - ~~Original (2026-08-06, superseded same day): "Adopt the real MCP Server Card standard path... Publish (or redirect) a spec-compliant `server-card.json` at the standard path pyobfus-mcp actually serves from."~~
 - **Context, not an action item**: a Veracode Spring-2026 threat report found obfuscated-package volume in the wild up 65.1% (500K+ packages), obfuscation increasingly used to defeat malware scanners. This raises the ambient suspicion any "code obfuscator" brand carries — reinforces (doesn't change) the existing call to lean on verifiable trust infra (OpenSSF Best Practices, PEP 740, provenance/tool-integrity manifests) explicitly in listing copy, already the design principle behind P2-2's VS Code listing and P2-17/P2-21's manifests.
 - LLM-deobfuscation research volume kept climbing since the 07-07 scan (BinDeObfBench, LLM-DAS, an Android/Smali obfuscation-detection study), but all of it targets **binary/ARM/Android-Smali** deobfuscation, not Python-source-level like P2-18's own benchmark — the specific lane P2-18 measured stays under-researched by outsiders, which is good: no new prior art invalidates the existing internal-evidence-complete result, and the broader trend still supports keeping `docs/LLM_RESISTANCE_PILOT_RESULTS_2026-08-01.md`'s publication track as a live (if unforced) option.
 
@@ -254,9 +255,16 @@ See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.
 Nuitka/VS Code Marketplace/new AST-obfuscator entrants/LLM-deobfuscation
 research/MCP Server Card standard) run after the VS Code extension M0-M2 +
 0.2.1 patch shipped, to inform what's next; see "Additions from 2026-08-06
-competitive + market scan" above for the two new actionable candidates
-(P2-23 Nuitka traceback-encryption comparison content, P2-24 real MCP
-Server Card standard path) and the re-validation notes. Also fixed a stale
+competitive + market scan" above. **P2-23** (Nuitka traceback-encryption
+comparison content) shipped same day, content-only, held for the
+2026-08-08 gate. **P2-24** was scoped as "adopt the real MCP Server Card
+standard path" but, before writing any code, checking SEP-2127's actual
+text found that framing wrong for pyobfus-mcp: `.well-known` Server Card
+discovery is HTTP-transport-only by the spec's own words, and stdio
+servers (which is all pyobfus-mcp is) are explicitly routed to
+`server.json` + the MCP Registry instead — already in place. Corrected
+same day rather than building something spec-incorrect; see P2-24's own
+entry above for the full finding. Also fixed a stale
 checkbox found while reading the file: **P2-13 (PyInstaller cookbook) was
 already shipped in 0.5.8, 2026-08-04** — missed in that release's own
 re-audit below.
