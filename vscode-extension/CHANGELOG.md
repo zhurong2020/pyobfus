@@ -6,6 +6,8 @@ Independent version/release cadence from the main `pyobfus` and `pyobfus-mcp` Py
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-08-06
+
 **Bugfix, found via hands-on testing 2026-08-06.** "Obfuscate with pyobfus"
 (and, less commonly, the on-save/manual check commands) could crash with a
 confusing raw Python error --
