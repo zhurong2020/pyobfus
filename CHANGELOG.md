@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+**Bugfix, found while scoping the VS Code extension's M3 (`pyobfus.yaml`
+IntelliSense).** `--validate-config` false-warned on `preset` -- the key
+`pyobfus --init` itself writes into every config it generates -- and every
+Pro field added since v0.5.0, because `config_validator.py`'s `VALID_SCHEMA`
+was a hand-maintained dict that had silently drifted stale. New
+`pyobfus/config_schema.py` derives the schema from `ObfuscationConfig`'s
+actual dataclass fields instead (computed live, not a cached artifact that
+can itself go stale) -- both `VALID_SCHEMA` and the Pro-feature-requires-
+`level: pro` check (which used to hand-check only 3 fields) now cover every
+field automatically. 23 new tests. `pyobfus-mcp` unchanged, no Glama
+Build-steps re-pin needed.
+
 **Content, no code changes (P2-23).** `docs/COMPARISON.md`'s Nuitka section
 gains a traceback-protection comparison: Nuitka Commercial's "Traceback
 Encryption" is symmetric-only per its own docs (asymmetric still "planned"),

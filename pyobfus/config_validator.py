@@ -9,82 +9,61 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 import yaml
 
-# Valid configuration schema
-VALID_SCHEMA = {
-    "obfuscation": {
-        "type": "dict",
-        "children": {
-            "level": {
-                "type": "str",
-                "valid_values": ["community", "pro"],
-                "default": "community",
-            },
-            "exclude_names": {
-                "type": "list",
-                "item_type": "str",
-            },
-            "exclude_patterns": {
-                "type": "list",
-                "item_type": "str",
-            },
-            "string_encoding": {
-                "type": "bool",
-                "default": False,
-            },
-            "numeric_obfuscation": {
-                "type": "bool",
-                "default": False,
-            },
-            "strip_ai_artifacts": {
-                "type": "bool",
-                "default": False,
-            },
-            "string_encryption": {
-                "type": "bool",
-                "default": False,
-                "requires_level": "pro",
-            },
-            "import_obfuscation": {
-                "type": "bool",
-                "default": False,
-                "requires_level": "pro",
-            },
-            "anti_debug": {
-                "type": "bool",
-                "default": False,
-                "requires_level": "pro",
-            },
-            "remove_docstrings": {
-                "type": "bool",
-                "default": True,
-            },
-            "remove_comments": {
-                "type": "bool",
-                "default": True,
-            },
-            "name_prefix": {
-                "type": "str",
-                "default": "I",
-            },
-            "preserve_param_names": {
-                "type": "bool",
-                "default": False,
-            },
-            "max_files": {
-                "type": "int",
-                "min_value": 1,
-            },
-            "max_total_loc": {
-                "type": "int",
-                "min_value": 1,
-            },
-        },
-    },
-    "verbose": {
-        "type": "bool",
-        "default": False,
-    },
+from pyobfus import config_schema
+
+_JSON_TYPE_TO_LEGACY_TYPE = {
+    "string": "str",
+    "boolean": "bool",
+    "integer": "int",
+    "array": "list",
 }
+
+
+def _build_valid_schema() -> Dict[str, Any]:
+    """
+    Build the schema _validate_dict walks below, derived from
+    config_schema.describe_fields()/preset_names() -- see
+    pyobfus/config_schema.py's module docstring for why: this dict used to
+    be hand-maintained here directly and had silently drifted stale,
+    missing `preset` (the key `pyobfus --init` itself writes into every
+    config it generates) and every Pro field added since v0.5.0, so
+    --validate-config false-warned on --init's own output. Computed once
+    at import time from ObfuscationConfig's live dataclass fields, so it
+    can't drift out of sync with them again.
+    """
+    children: Dict[str, Any] = {}
+    for entry in config_schema.describe_fields():
+        key_schema: Dict[str, Any] = {
+            "type": _JSON_TYPE_TO_LEGACY_TYPE.get(entry["json_type"], "str")
+        }
+        if entry["json_type"] == "array":
+            key_schema["item_type"] = _JSON_TYPE_TO_LEGACY_TYPE.get(
+                entry.get("item_type", "string"), "str"
+            )
+        if "valid_values" in entry:
+            key_schema["valid_values"] = entry["valid_values"]
+        if "min_value" in entry:
+            key_schema["min_value"] = entry["min_value"]
+        if entry.get("default") is not None:
+            key_schema["default"] = entry["default"]
+        if entry["pro_only"]:
+            key_schema["requires_level"] = "pro"
+        children[entry["name"]] = key_schema
+
+    # `preset` isn't an ObfuscationConfig dataclass field -- it's popped
+    # and dispatched to get_preset() before the rest of the keys are
+    # applied (see ObfuscationConfig.from_file), so it's special-cased
+    # here too, same as it always effectively was.
+    children["preset"] = {"type": "str", "valid_values": config_schema.preset_names()}
+
+    return {
+        "obfuscation": {"type": "dict", "children": children},
+        "verbose": {"type": "bool", "default": False},
+    }
+
+
+# Valid configuration schema
+VALID_SCHEMA = _build_valid_schema()
 
 # Common typos and their corrections
 COMMON_TYPOS = {
@@ -258,18 +237,25 @@ def _check_typos(config: Dict[str, Any], result: ValidationResult) -> None:
     check_keys(config)
 
 
+_PRO_ONLY_FIELD_NAMES = [
+    entry["name"] for entry in config_schema.describe_fields() if entry["pro_only"]
+]
+
+
 def _check_pro_requirements(config: Dict[str, Any], result: ValidationResult) -> None:
-    """Check if Pro features are used with correct level."""
+    """
+    Check if Pro features are used with correct level.
+
+    Iterates every field config_schema flags pro_only, not a hand-picked
+    subset -- the original hardcoded list here (string_encryption /
+    import_obfuscation / anti_debug only) predated most of the fields it
+    should have covered, same root cause as VALID_SCHEMA's staleness
+    above.
+    """
     obf = config.get("obfuscation", {})
     level = obf.get("level", "community")
 
-    pro_features = []
-    if obf.get("string_encryption"):
-        pro_features.append("string_encryption")
-    if obf.get("import_obfuscation"):
-        pro_features.append("import_obfuscation")
-    if obf.get("anti_debug"):
-        pro_features.append("anti_debug")
+    pro_features = [name for name in _PRO_ONLY_FIELD_NAMES if obf.get(name)]
 
     if pro_features and level != "pro":
         features = ", ".join(pro_features)

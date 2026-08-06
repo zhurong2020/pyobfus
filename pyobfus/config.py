@@ -693,7 +693,7 @@ class ObfuscationConfig:
         return presets[name_lower]()
 
     @classmethod
-    def list_presets(cls) -> list:
+    def list_presets(cls) -> List[str]:
         """
         List all available preset names.
 
