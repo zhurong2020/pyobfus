@@ -28,15 +28,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 **✅ 2026-08-04 找到确切查询入口 + 状态确认**：权威地址是 **`https://platform.claude.com/plugins/submissions`**（Claude Console → Plugin submissions，需登录 user 自己的 Console 账号 `Rong / Shanghai Nirong Technology Co., Ltd.`）。页面显示 pyobfus 状态仍是 **"Submitted and pending review"**（提交于 2 天前，与 08-02 提交时间吻合，尚无 approve/reject 结论）。顺带核实了那个"protected_project"笔误确实还留在已提交的描述文案里（"One-call protected_project workflow..."一句）——继续维持"机会性修复"处置，不主动改，除非 Anthropic 跟进要求补充信息。公开旁证渠道（`claude-plugins-community` 仓库 `.claude-plugin/marketplace.json`，2298 个插件里搜 `pyobfus`）2026-08-04 同步核实：尚未出现，与 Console 状态一致。
 
-**⏳ Glama 后台 Dockerfile 版本号更新——尝试过，被 Glama 自己的 UI bug 卡住，user 改天再试**：user 能进后台管理页（`.../admin`，能看到 Profile/Analytics/Repository/Dockerfile 四个 tab），但点 Dockerfile tab 不跳转、又弹回 Profile 页，F12 有报错但没抓到具体错误文本。不是 user 操作问题，像是 Glama 前端路由 bug 或临时故障。**下次重试时先截报错原文**——这是唯一缺的信息，抓到就能真正定位，不然就是重试运气。详见 `docs/DOC_SYNC_AUDIT_2026-08-02.md` 第 3 节。
-
-**✅ 已回填（2026-08-02 验证，原「下次 session 直接执行清单」①②两项其实早已完成）**：`docs/DOC_SYNC_AUDIT_2026-08-02.md`「Session 2 punch list」①② 两项实测 `README.md` 均已完成——① 锚点链接已是 `#-pro-edition`（README.md:21，非损坏的旧版 `#-pro-edition-available-now`）② Pro Edition 常驻提示行已在 README.md 第 21 行（`> **🔒 Pro Edition available** — 6 patent-targeted...`）。**仍待**：③ Glama 后台 Dockerfile 版本号手动更新（目标应是当前最新 **0.3.3**）。**2026-08-03 复查**：Dockerfile tab 不跳转的 UI bug 看起来自愈了（能正常打开、看到 Configuration 表单），但 user 反映"还是有问题"（具体报错未截取），且决定性的 **Build steps** 字段实际内容（是否还写死旧版本号）当场没能确认——**user 决定过几天再看**，下次重试先截 Build steps 字段的实际 JSON 内容 + 任何报错原文。**极小尾巴仍待**：plugin marketplace 提交描述里有个笔误"protected_project"应为"protect_project"，不影响功能，Anthropic 若跟进补充信息时顺手改。
-
-**✅ 2026-08-04 UI bug 确认自愈 + Build steps 字段内容已拿到**：user 贴出完整 admin Dockerfile 页面，Profile/Analytics/Repository/Dockerfile 四个 tab 均正常可点，Configuration 表单完整显示，之前的路由 bug 不再复现（不需要再截 F12 报错）。**Build steps 字段实测写死 `["uv pip install --system --break-system-packages pyobfus-mcp==0.3.1"]`**——落后当前 PyPI latest 两个版本（0.3.1，应为 0.3.3），与此前记录一致：之前每次改到 0.3.2 的尝试都被那个路由 UI bug 卡住、从未真正提交成功，所以字段停留在最早的 0.3.1 原值，不是"改过又被覆盖"。Pinned commit SHA 显示 `b216665`、旁注"Current head commit: b216665 (sync)"，即该字段只是跟随 repo HEAD 自动同步、与 mcp 包版本号无关，**不用动**。改法：把 Build steps 数组里的 `pyobfus-mcp==0.3.1` 手动改成 `pyobfus-mcp==0.3.3`，保存后右侧 Dockerfile 预览里的 `RUN (uv pip install ...)` 那行应同步刷新为 0.3.3；Recent Tests 面板通常会因配置变更自动跑一次新测试，可用来确认。
-
-**✅ 已确认保存生效（2026-08-04 同日）**：user 保存后贴出的页面截图核实——Build steps 字段与 Dockerfile 预览里的 `RUN` 行均已是 `pyobfus-mcp==0.3.3`；Recent Tests 新增一条 "Make Release"（`019fcb2e-4fbc-726b-b1f3-0064598f2e75`，2026-08-04 13:10），证明这次真的触发了重新构建，不是像 0.3.2 那次"改了没存住"。**Glama 版本同步任务本轮彻底收尾**，不用再问。
-
-完整时间线 + 修复细节见 `docs/POST_V0.4_TODO.md` 顶部 handoff note + § item 7-8。
+**✅ Glama Dockerfile Build-steps 版本号已同步至 0.3.5（2026-08-06）**：user 贴出的 admin Configuration 页面核实 Build steps 数组与 Dockerfile 预览的 `RUN` 行均为 `pyobfus-mcp==0.3.5`，Recent Tests 新增一条 "Make Release"（`019fd4f7-f687-7f25-ab75-73bbc774acf9`，2026-08-06 10:47）。此前 2026-08-02~08-04 那轮"点 Dockerfile tab 不跳转"的路由 UI bug 已确认自愈，不再复现。**公开 API 目前仍返回 0 tools**——这是已知的 re-index 滞后模式（历史上最长 ≤1 天自行追上，2026-06-08 那次即是先例），不是新问题，不用现在采取行动，隔天复查一次即可。「Recent Releases」面板显示的 0.5.9/0.5.8/0.5.7 是 Glama 自增计数器、与实际安装的 mcp 版本号无关，忽略。完整历史时间线见 `docs/POST_V0.4_TODO.md` 顶部 handoff note + § item 7-8。
 
 ### ✅ 2026-08-02 又一轮 — pyobfus 0.5.7 + pyobfus-mcp 0.3.3 已发布
 
@@ -118,7 +110,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.5，2026-08-04 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.1` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp` (active, isLatest=true · **0.3.1**)
 - **Smithery (Skill)**: https://smithery.ai/skills/zhurong2020/pyobfus-protect (2026-06-22 上线 · 本地工具走 Skill 渠道非 MCP 渠道) · **mcp.so**: 已收录
-- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus (Quality A) — Glama 容器 build 自 **admin Dockerfile→Configuration「Build steps」字段**(web-UI)，**不读 repo 的 `pyobfus_mcp/Dockerfile`**，且**不自动跟 PyPI 最新**：每次发 mcp 新版都要手动把该字段的 `pyobfus-mcp==<ver>` bump 一次，否则 listing 静默供旧工具面——**发布必做步骤**，已进 `docs/V0.5_RELEASE_PLAN.md` Phase 5.6。最近 2026-07-07 从 0.2.0→0.3.1(test `019f3b5a` 返回全 8 工具)；公开 API re-index 滞后 ≤1 天。「Recent Releases」的版本号(如 0.5.4)是 Glama 自增计数、与实装版本无关，忽略。教训 memory `glama_container_build_source` · 历史 `docs/POST_V0.4_TODO.md`
+- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus (Quality A) — Glama 容器 build 自 **admin Dockerfile→Configuration「Build steps」字段**(web-UI)，**不读 repo 的 `pyobfus_mcp/Dockerfile`**，且**不自动跟 PyPI 最新**：每次发 mcp 新版都要手动把该字段的 `pyobfus-mcp==<ver>` bump 一次，否则 listing 静默供旧工具面——**发布必做步骤**，已进 `docs/V0.5_RELEASE_PLAN.md` Phase 5.6。最近 2026-08-06 从 0.3.3→0.3.5(test `019fd4f7`)；公开 API re-index 滞后 ≤1 天。「Recent Releases」的版本号(如 0.5.4)是 Glama 自增计数、与实装版本无关，忽略。教训 memory `glama_container_build_source` · 历史 `docs/POST_V0.4_TODO.md`
 - **GitHub**: https://github.com/zhurong2020/pyobfus (public)
 - **文档**: https://pyobfus.readthedocs.io
 - **许可**: Apache 2.0 (Core) + Proprietary (Pro)

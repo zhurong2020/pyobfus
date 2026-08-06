@@ -130,6 +130,23 @@
 > `[0.2.0]` → `[0.1.0]`. P2-2's only remaining slice is **M3** (`pyobfus.yaml`
 > IntelliSense), not yet scoped. Next PyPI release-spacing gate: **2026-08-08**
 > (2 days after 0.5.12).
+> **Glama Build-steps re-pinned to 0.3.5 — 2026-08-06.** Admin Configuration
+> page confirmed: Build steps array and the Dockerfile preview's `RUN` line
+> both read `pyobfus-mcp==0.3.5`; a new "Make Release" test
+> (`019fd4f7-f687-7f25-ab75-73bbc774acf9`, 2026-08-06 10:47) appears in
+> Recent Tests. This closes the gap opened when mcp shipped 0.3.4 and 0.3.5
+> (2026-08-04's Tier-1 batch release) without a corresponding re-pin — the
+> field had been sitting at 0.3.3 since the last fix. Public API still
+> returns 0 tools at time of writing; this is the documented re-index-lag
+> pattern (self-resolves within ≤1 day historically, e.g. 2026-06-08), not
+> a new failure — recheck next session, no action needed unless it's still
+> stale after a day. Also confirmed via VS Code Marketplace UI: installing
+> `pyobfus` v0.2.0 fresh (searched, clicked Install both before and after
+> connecting to Remote-WSL — button read plain "Install" in both cases, no
+> separate "Install in WSL: <distro>" label appeared) triggers the standard
+> unverified-publisher trust prompt ("Do you trust the publisher 'Rong
+> Zhu'?") on first install from this publisher — expected VS Code behavior
+> for any non-Microsoft-verified publisher's first extension, not a bug.
 
 ## Current prioritized TODO (2026-08-01)
 
