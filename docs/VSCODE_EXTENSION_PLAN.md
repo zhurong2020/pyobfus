@@ -237,10 +237,11 @@ could echo the malicious listing's old name.
 - **M3** (v0.3.0) — YAML IntelliSense. Researched and scoped 2026-08-06 —
   see the dedicated section below — the original one-line stub undersold
   both the scope (it grew to include a real core-package bugfix) and how
-  small the actual VS Code-side lift turned out to be. ✅ **Tagged
-  2026-08-07** (`vscode-v0.3.0`, GitHub Release published, real CI green);
-  **Marketplace upload still pending** a human walking the manual
-  "⋯" → Update flow — see "Marketplace publishing note" above.
+  small the actual VS Code-side lift turned out to be. ✅ **Published
+  2026-08-07** (`vscode-v0.3.0`, GitHub Release published, real CI green,
+  Marketplace listing independently confirmed serving
+  `"version":"0.3.0"` after the manual "⋯" → Update upload). P2-2's full
+  M0-M3 chain is now shipped end to end.
 - **M4+** (later) — CI auto-publish on `vscode-v*.*.*` tags (prefer Entra ID
   auth over a classic PAT given the 2026-12-01 Azure DevOps PAT retirement),
   Open VSX (`ovsx`) publish alongside Marketplace, Verified Publisher badge
@@ -405,11 +406,11 @@ Rather than hand-write a JSON Schema separately (which would just create a
 gate, on explicit user request — see `CHANGELOG.md`'s `[0.3.0]` entry.
 Tagged `vscode-v0.3.0`, GitHub Release published, 37/37 tests green
 including real contract tests against 0.5.13, real CI (CodeQL +
-VSCode Extension CI) green. **Marketplace upload is the one remaining
-manual step** — no CLI/PAT path exists yet (see the Marketplace
-publishing note above), so the packaged `pyobfus-0.3.0.vsix` needs a
-human to walk the "⋯" → Update flow from
-`docs/VSCODE_MARKETPLACE_PUBLISHER_SETUP.md`.
+VSCode Extension CI) green. Marketplace upload (the manual "⋯" → Update
+flow from `docs/VSCODE_MARKETPLACE_PUBLISHER_SETUP.md` — still no
+CLI/PAT path) done the same day; the public listing was independently
+re-checked afterward and confirms `"version":"0.3.0"`. P2-2's M0-M3
+milestone chain is complete.
 
 ### Estimate vs. actual
 

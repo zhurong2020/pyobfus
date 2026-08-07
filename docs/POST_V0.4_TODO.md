@@ -248,12 +248,14 @@
 > GitHub Release published, real CI green (CodeQL + VSCode Extension CI +
 > the main OS/Python matrix). `pyobfus-mcp` untouched this cycle (its own
 > `[Unreleased]` section is empty) -- no Glama Build-steps re-pin needed.
-> **One step remains, and only a human can do it**: the Marketplace
-> "..." -> Update -> upload `.vsix` flow needs a browser session (no CLI/PAT
-> path exists -- see `docs/VSCODE_MARKETPLACE_PUBLISHER_SETUP.md`). The
-> packaged file is at `vscode-extension/pyobfus-0.3.0.vsix` (gitignored,
-> not committed) -- until it's uploaded, the live Marketplace listing
-> still serves 0.2.1.
+> **The Marketplace upload -- the one step only a human could do -- is
+> also done.** The maintainer walked the "..." -> Update -> upload
+> `.vsix` flow (`docs/VSCODE_MARKETPLACE_PUBLISHER_SETUP.md`, no CLI/PAT
+> path exists) and confirmed the page shows 0.3.0; independently
+> re-verified via `curl` against the public listing, which now serves
+> `"version":"0.3.0"`. **P2-2's full M0-M3 milestone chain is shipped end
+> to end.** Next PyPI release-spacing gate: 1-2 days after 0.5.13, i.e.
+> 2026-08-08 or 2026-08-09.
 
 ## Current prioritized TODO (2026-08-01)
 
