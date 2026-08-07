@@ -212,6 +212,30 @@
 > headless xvfb Extension Host tests, CodeQL). M3 is code-complete, held
 > for its own Marketplace release-spacing gate as v0.3.0 — full account in
 > `docs/VSCODE_EXTENSION_PLAN.md`'s M3 section.
+> **2026-08-07 — release dry-run for the 2026-08-08 gate, done a day early.**
+> Re-checked the Glama admin panel (pasted by the maintainer): Build steps
+> field is still correctly pinned at `pyobfus-mcp==0.3.5`, no action needed;
+> confirmed once more that the "Recent Releases" panel's 0.5.8/0.5.9/0.5.10
+> entries are Glama's own internal counter, unrelated to the real package
+> version. Looked for any genuinely local (repo-file) task that could close
+> out before the gate and found none — the two remaining queue items (RTD
+> root `.well-known` redirect, the plugin-marketplace "protected_project"
+> typo) both live in external admin dashboards/forms, not this repo, so
+> there's nothing to commit for either. Ran the full pre-publish gate
+> instead: all three pytest roots green (core 1154 passed/1 skipped, MCP 89
+> passed, integration 7 passed), black/ruff/mypy clean, `python -m build` +
+> `twine check` both pass on a throwaway `dist_dryrun/` (deleted after,
+> `git status` unaffected). **Purpose: pre-pay the verification cost today so
+> 2026-08-08's actual session can skip re-running tests and go straight to
+> the mechanical release steps** (version bump, CHANGELOG promotion, tag,
+> push, PyPI/Marketplace verification) — recorded in `CLAUDE.md`'s cold-start
+> section. Also refreshed the PyPI download snapshot (pypistats
+> intermittently 429'd, both packages eventually answered): pyobfus
+> day/week/month 181/1,017/1,746, pyobfus-mcp 48/442/593 — a large jump over
+> 2026-08-04's readings, most likely 2026-08-06's release batch's own
+> CI/dependency-resolution noise again (same pattern as the 2026-08-03 mcp
+> 0→178 spike that reverted by 2026-08-04), not treated as organic signal
+> yet; full snapshot table in memory `pypi_download_tracking.md`.
 
 ## Current prioritized TODO (2026-08-01)
 
