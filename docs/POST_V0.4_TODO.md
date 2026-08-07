@@ -236,6 +236,24 @@
 > CI/dependency-resolution noise again (same pattern as the 2026-08-03 mcp
 > 0→178 spike that reverted by 2026-08-04), not treated as organic signal
 > yet; full snapshot table in memory `pypi_download_tracking.md`.
+> **2026-08-07, same day -- the gate cleared early, on explicit user
+> request.** One day after 0.5.12 still satisfies the "1-2 days apart"
+> spacing rule, so both queued items shipped immediately after the dry-run
+> above rather than waiting for 2026-08-08: `pyobfus` **0.5.13**
+> (`config_schema.py`'s `--validate-config` fix + P2-23 content) tagged,
+> OIDC + PEP 740 release workflow green, PyPI JSON API confirms `0.5.13` is
+> latest. `vscode-extension` **0.3.0** (M3) built and tested for real
+> (lint/typecheck/pretest clean, 37/37 tests including real-contract tests
+> against 0.5.13), packaged as `pyobfus-0.3.0.vsix`, tagged `vscode-v0.3.0`,
+> GitHub Release published, real CI green (CodeQL + VSCode Extension CI +
+> the main OS/Python matrix). `pyobfus-mcp` untouched this cycle (its own
+> `[Unreleased]` section is empty) -- no Glama Build-steps re-pin needed.
+> **One step remains, and only a human can do it**: the Marketplace
+> "..." -> Update -> upload `.vsix` flow needs a browser session (no CLI/PAT
+> path exists -- see `docs/VSCODE_MARKETPLACE_PUBLISHER_SETUP.md`). The
+> packaged file is at `vscode-extension/pyobfus-0.3.0.vsix` (gitignored,
+> not committed) -- until it's uploaded, the live Marketplace listing
+> still serves 0.2.1.
 
 ## Current prioritized TODO (2026-08-01)
 

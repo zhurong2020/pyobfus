@@ -234,10 +234,13 @@ could echo the malicious listing's old name.
   real-contract integration tests (trial/license status, `--init --json`,
   real obfuscate `--json --dry-run`), all passing locally against the
   actual installed pyobfus.
-- **M3** (v0.3.0) — YAML IntelliSense. **Researched and scoped 2026-08-06**,
+- **M3** (v0.3.0) — YAML IntelliSense. Researched and scoped 2026-08-06 —
   see the dedicated section below — the original one-line stub undersold
   both the scope (it grew to include a real core-package bugfix) and how
-  small the actual VS Code-side lift turned out to be.
+  small the actual VS Code-side lift turned out to be. ✅ **Tagged
+  2026-08-07** (`vscode-v0.3.0`, GitHub Release published, real CI green);
+  **Marketplace upload still pending** a human walking the manual
+  "⋯" → Update flow — see "Marketplace publishing note" above.
 - **M4+** (later) — CI auto-publish on `vscode-v*.*.*` tags (prefer Entra ID
   auth over a classic PAT given the 2026-12-01 Azure DevOps PAT retirement),
   Open VSX (`ovsx`) publish alongside Marketplace, Verified Publisher badge
@@ -397,10 +400,16 @@ Rather than hand-write a JSON Schema separately (which would just create a
   (`vsce package --no-dependencies` → `schemas/pyobfus.schema.json`,
   9.49 KB, not excluded by `.vscodeignore`).
 
-Held for its own Marketplace release-spacing gate as `vscode-extension`
-v0.3.0 — see `CHANGELOG.md`'s `[Unreleased]` entry. Release order doesn't
-have to match the core fix's own PyPI release, only build order did (the
-schema generator needs `pyobfus.config_schema` to exist first).
+**Released 2026-08-07** as `vscode-extension` v0.3.0 alongside `pyobfus`
+0.5.13 (the core fix), a day ahead of the originally-projected 2026-08-08
+gate, on explicit user request — see `CHANGELOG.md`'s `[0.3.0]` entry.
+Tagged `vscode-v0.3.0`, GitHub Release published, 37/37 tests green
+including real contract tests against 0.5.13, real CI (CodeQL +
+VSCode Extension CI) green. **Marketplace upload is the one remaining
+manual step** — no CLI/PAT path exists yet (see the Marketplace
+publishing note above), so the packaged `pyobfus-0.3.0.vsix` needs a
+human to walk the "⋯" → Update flow from
+`docs/VSCODE_MARKETPLACE_PUBLISHER_SETUP.md`.
 
 ### Estimate vs. actual
 
