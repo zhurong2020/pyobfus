@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.13] - 2026-08-07
+
 **Bugfix, found while scoping the VS Code extension's M3 (`pyobfus.yaml`
 IntelliSense).** `--validate-config` false-warned on `preset` -- the key
 `pyobfus --init` itself writes into every config it generates -- and every
