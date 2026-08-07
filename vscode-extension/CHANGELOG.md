@@ -6,8 +6,9 @@ Independent version/release cadence from the main `pyobfus` and `pyobfus-mcp` Py
 
 ## [Unreleased]
 
-**M3 (v0.3.0), code-complete 2026-08-06, held for the release-spacing
-gate.** Real IntelliSense (autocomplete, hover docs, inline validation) for
+## [0.3.0] - 2026-08-07
+
+**M3.** Real IntelliSense (autocomplete, hover docs, inline validation) for
 `pyobfus.yaml`: a declarative `contributes.yamlValidation` entry in
 `package.json` associates a generated JSON Schema
 (`schemas/pyobfus.schema.json`) with `pyobfus.yaml`/`.pyobfus.yaml`/
