@@ -114,7 +114,8 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.9-3.14, AST, setuptools
-- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.12，2026-08-06 发布**；完整版本历史见 `CHANGELOG.md`)
+- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.13，2026-08-07 发布**；完整版本历史见 `CHANGELOG.md`)
+- **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.3.0，2026-08-07 发布**；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`)
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.5，2026-08-04 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.1` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp` (active, isLatest=true · **0.3.1**)
 - **Smithery (Skill)**: https://smithery.ai/skills/zhurong2020/pyobfus-protect (2026-06-22 上线 · 本地工具走 Skill 渠道非 MCP 渠道) · **mcp.so**: 已收录
