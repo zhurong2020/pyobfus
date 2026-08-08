@@ -306,6 +306,20 @@
 > yet. The plugin-marketplace Console page was re-checked: still
 > "Submitted and pending review", unchanged from 08-02. Full repro +
 > message drafts in memory `glama_zero_tools_repro_2026-08-07.md`.
+> **2026-08-08, same day — adopted a standing periodic post-release
+> review cadence.** After every ~3-5 accumulated releases (or a 1-2 week
+> span, not every session — too frequent conflates release-day noise
+> with trend), run all four together: (1) download trend (week/month,
+> not day — day counts are noise-prone, verified repeatedly on this
+> project by the 08-03/08-06/08-07 release-day spikes that all receded),
+> (2) an issue sweep (GitHub issues/PRs, CI, Glama/plugin-marketplace
+> external platform status), (3) a fresh competitive re-scan (re-search,
+> don't reuse a prior scan's conclusions — the market moves), and (4) a
+> retrospective on the *existing* shipped design, not just
+> candidate-hunting for the next feature — called out explicitly since
+> it's the one easiest to skip by default "what's the next feature"
+> thinking. Full rationale in memory
+> `feedback_periodic_release_review_cadence.md`.
 
 ## Current prioritized TODO (2026-08-01)
 
