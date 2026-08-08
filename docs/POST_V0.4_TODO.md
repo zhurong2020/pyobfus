@@ -256,6 +256,33 @@
 > `"version":"0.3.0"`. **P2-2's full M0-M3 milestone chain is shipped end
 > to end.** Next PyPI release-spacing gate: 1-2 days after 0.5.13, i.e.
 > 2026-08-08 or 2026-08-09.
+> **2026-08-08 — routine cold-start checks, Glama Discord report posted.**
+> All three CHANGELOGs (`pyobfus`, `pyobfus-mcp`, `vscode-extension`) have
+> empty `[Unreleased]` sections — nothing local to ship this session. Ran
+> the three standing recheck items: (1) Glama public API `tools` field
+> re-checked via `curl`, still `[]`, >48h past the last successful rebuild
+> (08-06 10:47) — past the historical "≤1 day self-resolves" window, so
+> the drafted repro-backed message (memory `glama_zero_tools_repro_2026-
+> 08-07.md`) was surfaced and **the maintainer posted it to the Glama
+> Discord General channel** (as `zzann`) addressed to `@punkpeye`; no
+> reply yet, check back next session. (2) Plugin-marketplace public
+> listing re-checked by downloading the full `claude-plugins-community/
+> marketplace.json` and `grep`-ing it directly (not a summarizing
+> WebFetch, which truncated the file and would have under-reported) — no
+> `pyobfus` entry, consistent with "pending review"; the private Console
+> submissions page still needs the maintainer's own login. (3) PyPI
+> download snapshot refreshed: pyobfus day/week/month 145/1,147/1,871,
+> pyobfus-mcp 13/453/606 — both packages' day counts receded sharply from
+> 08-07 (181→145, 48→13) while week/month keep creeping up, further
+> confirming the 08-06 release batch's day-1 spike was CI/dependency-
+> resolution noise, not organic growth; logged to memory `pypi_download_
+> tracking.md`. Main branch is clean, CI green, 0 open issues/PRs.
+> **No next active-work item was picked this session** — P2-2 is fully
+> shipped and the only open ROADMAP item (P2-20's tail: RTD root
+> `.well-known` redirect, unconfirmed PulseMCP listing) is external/
+> passive with no code work available; the maintainer will decide the
+> next direction (P2-20 tail vs. a fresh competitive scan vs. P3
+> long-term items) rather than defaulting into one.
 
 ## Current prioritized TODO (2026-08-01)
 
