@@ -101,6 +101,8 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 **🎯 同日再追加：user 点了「Build & Release」，问题范围被精确定位——不再是构建/内省失败，是 Release→公开 API 的同步环节坏了**。新构建（`019fe034-...`，08-08 15:09）**成功**（1m17s），Instance logs 显示 Glama 自己在构建时做的真实 `initialize`→`ListToolsRequest` handshake **完整拿到全部 8 个工具**（与本地复现逐字一致），页面显示"Release Created"（`0.5.11`，其自增计数器）。**但构建+Release 完成后立刻复查公开 API，`tools` 依然是 `[]`**。这是迄今最强证据：Glama 自己的 introspection 已经证明拿到了正确数据，只是没同步进公开目录。已把待发 Discord 消息更新为更精确的 v2 版本（引用这次成功构建的 log 作证据），旧的 v1（针对 08-07 失败构建）已存档但被取代。同时 user 查了 Console plugin-submissions 页面：pyobfus 状态仍是 "Submitted and pending review"（6 天前提交，跟 08-02 提交日期一致，无新进展）。**v2 消息已由 user 用 Reply（带 `@punkpeye` mention）挂在原始报告下发出**（Discord 时间戳 "zzann — 3:18 PM"），@punkpeye 尚未回复。下次 cold-start 查两条消息下面有没有回音，同时继续照旧 `curl` 复查公开 API。全文 memory `glama_zero_tools_repro_2026-08-07.md`。
 
+**📅 周期性发布后复盘节奏（user 2026-08-08 定下的标准做法）**：不要只在发布当天查一次下载量就算完——每积累约 3-5 个版本发布后（或跨度 1-2 周，取决于实际发布节奏；不是每次 session 都做，太频繁会把发布日噪音当趋势），做一轮**四件事一起做**：① 下载量趋势（pypistats/pepy，看 week/month 别只看 day）② 排查可能出现的新问题（GitHub issues/PR、CI、Glama/plugin marketplace 等外部平台状态）③ 重新对比同类产品（PyArmor/Nuitka/VS Code marketplace 等，重新搜索确认现状，别复用上次扫描结论）④ **复盘并完善"原来的设计"本身，不只是找下一个新功能**——回头看已实现机制是否有可改进点，这条最容易被"下一个功能是什么"的默认思维忽略掉。结果记入 `docs/ROADMAP.md` 带日期小节。完整 rationale 见 memory `feedback_periodic_release_review_cadence`。
+
 **Cold-start 资料定位**（按读取优先级）：
 
 | 优先级 | 文件 | 用途 |
