@@ -283,6 +283,29 @@
 > passive with no code work available; the maintainer will decide the
 > next direction (P2-20 tail vs. a fresh competitive scan vs. P3
 > long-term items) rather than defaulting into one.
+> **2026-08-08, same day — a forwarded Glama build-failure email, then a
+> manual rebuild, narrowed the 0-tools bug precisely.** A Glama Support
+> email (received Friday 08-07) revealed a rebuild *was* attempted at
+> 08-07 17:30 Shanghai time (build id
+> `019fdb8f-8498-70fb-ab64-a340239f9970`) and failed after 12m23s pulling
+> the `debian:trixie-slim` base image (`context deadline exceeded`) — an
+> infra-side Docker Hub session timeout, unrelated to pyobfus-mcp or the
+> Build steps config. This overturned the earlier "no rebuild since
+> 08-06" assumption. The maintainer then clicked "Build & Release" in the
+> admin panel: the new build (`019fe034-...`, 08-08 15:09) **succeeded**
+> in 1m17s, and its own instance logs show a real `initialize` →
+> `ListToolsRequest` handshake that correctly returned all 8 tools
+> (matching the local repro exactly), with "Release Created" (labeled
+> `0.5.11` in Glama's internal counter). **The public API was rechecked
+> immediately after and still returned `tools: []`** — narrowing the bug
+> precisely to the release→public-API sync step, not build, config, or
+> introspection. The drafted Discord message was updated to a v2 citing
+> this stronger evidence and posted by the maintainer as a reply (with
+> `@punkpeye` re-mentioned, since Discord's reply-notification only pings
+> the original message's author) under the first report; no response
+> yet. The plugin-marketplace Console page was re-checked: still
+> "Submitted and pending review", unchanged from 08-02. Full repro +
+> message drafts in memory `glama_zero_tools_repro_2026-08-07.md`.
 
 ## Current prioritized TODO (2026-08-01)
 
