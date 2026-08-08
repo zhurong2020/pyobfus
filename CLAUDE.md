@@ -97,6 +97,8 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 **✅ 2026-08-08 — Glama 复查条件满足，Discord 消息已由 user 发出**：cold-start 三项常规检查全跑了一遍——① `curl` 复查 Glama 公开 API，`tools` 仍是 `[]`（距 08-06 10:47 最后一次成功 rebuild 已超 48 小时，超过历史"≤1 天自愈"窗口），达到 08-07 定下的"明天仍是 0 才正式发"条件，把写好的消息原文（未改时间措辞）呈现给 user，**user 已贴进 Glama Discord General 频道**（显示用户名 `zzann`，同日下午发出）；@punkpeye 尚未回复，下次 cold-start 查一下有没有回音，同时继续照旧 `curl` 复查——如果哪天自愈了直接记录，不必等回复。② plugin marketplace：直接 `curl`+`grep` 公开 `claude-plugins-community/marketplace.json` 全文（不用 WebFetch 摘要，避免大文件被小模型截断误判"未找到"），仍未出现 `pyobfus` 条目，与"pending review"状态一致；Console 私有提交页仍需 user 自己登录查。③ PyPI 下载快照：pyobfus 日145/周1147/月1871，mcp 日13/周453/月606——较 08-07 两包 day 都明显回落（pyobfus 181→145、mcp 48→13），week/month 仍缓慢爬升，**进一步坐实 08-06 那批发布的 day-1 跳变是 CI/依赖解析噪音，不是有机信号**，已记入 memory `pypi_download_tracking.md`。**结论：三个测试根+CHANGELOG 均无 `[Unreleased]` 待发内容，main 分支干净、CI 全绿、0 open issue/PR，本轮没有本地可发布的机械任务**；下一步方向（P2-20 RTD 重定向尾巴 / P3 长线实验项 / 新一轮竞品扫描挑新功能）留给 user 拍板，不要在没有信号的情况下自行开一个新大方向。
 
+**🔑 同日追加：user 转发 Glama 08-07 官方 build-failure 邮件，找到实锤根因线索**——08-07 17:30 上海时间 Glama 确实自动触发过一次 rebuild（build id `019fdb8f-8498-70fb-ab64-a340239f9970`），但因**他们自家构建集群拉取 `debian:trixie-slim` 基础镜像超时**（`context deadline exceeded`，发生在 Dockerfile 第一层，跟 pyobfus-mcp 包/我们的配置完全无关）失败——这推翻了"08-06 后无新 rebuild、纯玄学等自愈"的旧猜测，也是比"indexing lag"更有说服力的证据。已写好待发的 Discord 追加消息（纯文本）+ 建议 user 检查 admin 面板 08-07 17:30 后有没有更多尝试、或手动重新保存 Build steps 触发重试，全文见 memory `glama_zero_tools_repro_2026-08-07.md`（尚未执行，等 user 决定）。
+
 **Cold-start 资料定位**（按读取优先级）：
 
 | 优先级 | 文件 | 用途 |
