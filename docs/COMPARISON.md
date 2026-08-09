@@ -163,7 +163,7 @@ Nuitka compiles Python to standalone executables.
 | **File size** | Original size | Large (includes Python) |
 | **Commercial price** | $45 | ~$270/year |
 | **License model** | One-time | Annual subscription |
-| **Traceback protection** | RSA-2048-OAEP + AES-256-GCM hybrid, reversible via `pyobfus-unscrub` | Symmetric encryption only ([per Nuitka's own docs](https://nuitka.net/doc/commercial/encrypted-tracebacks.html), asymmetric "planned" as of 2026-08) |
+| **Traceback protection** | RSA-2048-OAEP + AES-256-GCM hybrid, reversible via `pyobfus-unscrub` | Symmetric encryption only ([per Nuitka's own docs](https://nuitka.net/doc/commercial/traceback-encryption.html), asymmetric "planned" as of 2026-08) |
 
 #### Traceback Protection: Hybrid vs Symmetric-Only
 

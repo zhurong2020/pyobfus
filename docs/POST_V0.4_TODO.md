@@ -107,6 +107,32 @@
 > Anthropic follows up. Cross-checked against the public
 > `claude-plugins-community` marketplace.json (2298 listed plugins, no
 > `pyobfus` match) — consistent with pending-review status.
+> **Plugin marketplace review — status re-confirmed 2026-08-09.** The
+> maintainer manually rechecked `https://platform.claude.com/plugins/submissions`.
+> It still shows:
+> `Plugin submissions` → `pyobfus` → **`Submitted and pending review`**,
+> dated **Aug 2**. No approve/reject/follow-up message is visible. The
+> submitted description remains the same, including the visible typo
+> `One-call protected_project workflow` (should be `protect_project`);
+> disposition unchanged: do not resubmit just for this typo, fix it only if
+> Anthropic asks for changes or provides an edit/resubmission path.
+> Same follow-up sweep: public `claude-plugins-community` marketplace still
+> has no `pyobfus`/`protect_project` match; GitHub open issues/PRs remain
+> empty; latest `main` CI + CodeQL runs on commit `911ce27` are successful;
+> Glama public API still returns `tools: []`, so the Glama `#support`
+> report remains the active external blocker. pypistats snapshot:
+> pyobfus day/week/month **34 / 1,093 / 1,871**; pyobfus-mcp
+> **9 / 462 / 601** — daily counts continue to fall back from the 08-06
+> release batch spike, consistent with release/CI/dependency-resolution
+> noise rather than organic growth.
+> **Post-release review completed 2026-08-09.** Results are recorded in
+> `docs/ROADMAP.md` → "Post-release Review (2026-08-09)". Key decisions:
+> do not start a large new feature while Glama public API and Claude plugin
+> review are unresolved; treat Glama as a platform sync blocker, not a local
+> code/config blocker; keep the next work small and evidence-driven. Direct
+> doc hygiene from the review was fixed immediately: `docs/VSCODE_EXTENSION_PLAN.md`
+> top status now says M3/v0.3.0 is published, and the Nuitka traceback link in
+> `docs/COMPARISON.md` now points at the current official page.
 > **2026-08-06 — M0 + M2 gate reached, both shipped.** `pyobfus` 0.5.12
 > released (pure version-bump/CHANGELOG-promotion for M0, code already
 > merged 2026-08-04 in `672cd43`): all three test roots green, black/
@@ -209,9 +235,9 @@
 > public URL, not a local extension-install path) was kept as a
 > cross-editor fallback. 5 more tests. 37 new tests total across both
 > packages; real CI green on every surface (23-job OS/Python matrix,
-> headless xvfb Extension Host tests, CodeQL). M3 is code-complete, held
-> for its own Marketplace release-spacing gate as v0.3.0 — full account in
-> `docs/VSCODE_EXTENSION_PLAN.md`'s M3 section.
+> headless xvfb Extension Host tests, CodeQL). M3 was code-complete at this
+> point and subsequently shipped 2026-08-07 as vscode-extension v0.3.0 —
+> full account in `docs/VSCODE_EXTENSION_PLAN.md`'s M3 section.
 > **2026-08-07 — release dry-run for the 2026-08-08 gate, done a day early.**
 > Re-checked the Glama admin panel (pasted by the maintainer): Build steps
 > field is still correctly pinned at `pyobfus-mcp==0.3.5`, no action needed;
@@ -306,6 +332,20 @@
 > yet. The plugin-marketplace Console page was re-checked: still
 > "Submitted and pending review", unchanged from 08-02. Full repro +
 > message drafts in memory `glama_zero_tools_repro_2026-08-07.md`.
+> **2026-08-09 — Glama Discord destination corrected.** The two 2026-08-08
+> Glama bug reports above were initially posted in the **Model Context
+> Protocol** Discord server's `#general` channel, not the Glama Discord
+> server. The maintainer found the separate **Glama** Discord, where
+> `#support` is the right channel for admin/build/public-API sync issues
+> (there are contemporaneous reports about Docker base-image timeouts,
+> admin UI rendering, and public API/profile cache drift). A shortened
+> report was reposted there in `#support`: server `zhurong2020/pyobfus`,
+> public API `https://glama.ai/api/mcp/v1/servers/zhurong2020/pyobfus`,
+> build `019fe034-7da2-73ef-8b02-b279c9ae4b68` succeeded, Glama's own
+> `initialize -> ListToolsRequest` introspection returned all 8 tools, but
+> the public API still returns `tools: []`. Next check should look for a
+> reply in **Glama Discord `#support`**, not only the MCP server's
+> `#general`, and still re-run the public API curl.
 > **2026-08-08, same day — adopted a standing periodic post-release
 > review cadence.** After every ~3-5 accumulated releases (or a 1-2 week
 > span, not every session — too frequent conflates release-day noise
@@ -1079,7 +1119,7 @@ gh api repos/zhurong2020/pyobfus --jq '.topics' | tr ',' '\n' | grep -i pyarmor 
 | **P2-3** | `--strip-ai-artifacts` mode | ✅ **DONE 2026-06-06** (PR #17, merged to main · `transformers/ai_artifact_stripper.py` · removes AI provenance markers from docstrings + attribution dunders · conservative attribution-only · 27 tests · unreleased, in CHANGELOG `[Unreleased]`) | Pairs naturally with new N3 (claude-skill preset); both serve "ship AI-generated code as IP" segment. Public-OK (Core feature, not patent-gated). |
 | **P2-4** | Import obfuscation (Pro) | ✅ **DONE 2026-08-02** (`--import-obfuscation` · `pyobfus_pro/import_obfuscation.py` · top-level `import ...` and absolute `from ... import ...` → runtime `importlib` / `__import__` calls · import strings encrypted via auto-enabled AES · relative / `__future__` / star imports deliberately preserved · full core/MCP/integration suites + black/ruff/mypy passed locally) | Keep · closes PyArmor Pro feature gap. Public-OK (existing public Pro module category). |
 | **P2-5** | Numeric / constant obfuscation | ✅ **DONE 2026-06-06** (PR #16, merged to main · `transformers/numeric_obfuscator.py` · `--numeric-obfuscation` · int→XOR/add/sub, float→`float.fromhex` · 37 tests · unreleased, in CHANGELOG `[Unreleased]`) | Keep · small effort, fills gap. Public-OK (Core feature). |
-| **P2-2** | VSCode extension | ✅ **All four milestones (M0/M1/M2/M3) code-complete.** M1 2026-08-04 (`pyobfus` v0.1.0, diagnostics + reverse trace — https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus). M0 shipped 2026-08-06 as pyobfus **0.5.12** (`--json` on trial/license status). M2 shipped 2026-08-06 as vscode-extension **0.2.0** (status bar, generate-config, right-click obfuscate, Pro funnel — https://github.com/zhurong2020/pyobfus/releases/tag/vscode-v0.2.0), which also empirically confirmed the Marketplace's "update an existing listing" flow (⋯ menu → Update; see `docs/VSCODE_MARKETPLACE_PUBLISHER_SETUP.md`). **0.2.1 shipped same day** (https://github.com/zhurong2020/pyobfus/releases/tag/vscode-v0.2.1) as an expedited bugfix — hands-on testing of 0.2.0 immediately surfaced a `cwd`-shadowing crash in "Obfuscate with pyobfus"; fixed with a safe `os.tmpdir()` default plus a dedicated `cwdForTarget()`. **M3 (`pyobfus.yaml` IntelliSense) scoped and built same day (2026-08-06)** — new `pyobfus/config_schema.py` fixes a real core bug found while scoping (`--validate-config` false-warned on `preset` and every Pro field added since v0.5.0) and feeds a JSON Schema wired into the extension via a declarative `contributes.yamlValidation` entry, simpler than the original runtime-API-registration design (swapped mid-implementation after finding `redhat.vscode-yaml`'s docs supported a purely declarative path with no activation-order risk). 37 new tests across the two packages, real CI green (23-job matrix + headless xvfb extension host). Held for its own Marketplace gate as v0.3.0; full account in `docs/VSCODE_EXTENSION_PLAN.md`'s M3 section. — re-scoped after real 2026 competitive/trend research, first-mover in the category, diagnostics-API hook cost zero core-code changes. | Public-OK. |
+| **P2-2** | VSCode extension | ✅ **All four milestones (M0/M1/M2/M3) shipped end to end.** M1 2026-08-04 (`pyobfus` v0.1.0, diagnostics + reverse trace — https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus). M0 shipped 2026-08-06 as pyobfus **0.5.12** (`--json` on trial/license status). M2 shipped 2026-08-06 as vscode-extension **0.2.0** (status bar, generate-config, right-click obfuscate, Pro funnel — https://github.com/zhurong2020/pyobfus/releases/tag/vscode-v0.2.0), which also empirically confirmed the Marketplace's "update an existing listing" flow (⋯ menu → Update; see `docs/VSCODE_MARKETPLACE_PUBLISHER_SETUP.md`). **0.2.1 shipped same day** (https://github.com/zhurong2020/pyobfus/releases/tag/vscode-v0.2.1) as an expedited bugfix — hands-on testing of 0.2.0 immediately surfaced a `cwd`-shadowing crash in "Obfuscate with pyobfus"; fixed with a safe `os.tmpdir()` default plus a dedicated `cwdForTarget()`. **M3 (`pyobfus.yaml` IntelliSense) scoped and built 2026-08-06, then published 2026-08-07 as vscode-extension v0.3.0** — new `pyobfus/config_schema.py` fixes a real core bug found while scoping (`--validate-config` false-warned on `preset` and every Pro field added since v0.5.0) and feeds a JSON Schema wired into the extension via a declarative `contributes.yamlValidation` entry, simpler than the original runtime-API-registration design (swapped mid-implementation after finding `redhat.vscode-yaml`'s docs supported a purely declarative path with no activation-order risk). 37 new tests across the two packages, real CI green (23-job matrix + headless xvfb extension host). Full account in `docs/VSCODE_EXTENSION_PLAN.md`'s M3 section. — re-scoped after real 2026 competitive/trend research, first-mover in the category, diagnostics-API hook cost zero core-code changes. | Public-OK. |
 | **drop-3.8** | Drop Python 3.8 support | TODO | Both new competitors require `>=3.10`; we're paying 3.8 cost for shrinking userbase. Public-OK. |
 | **P2-7** 🔒 | Forensic watermarking / `--fingerprint <buyer-id>` (Pro) | **W4 PRIMITIVE DONE-PRIVATE 2026-05-09** (`forensic/watermark.py` · `forensic_seed` SHA-256 versioned · `WatermarkRNG` HMAC-SHA256 counter-mode · `derive_layer_key` per-buyer 32-byte AES-256 · `verify_layer_key_match` forensic recovery · 32 tests · 3 patent findings · zero-change wiring through existing `opacity.transform_module(layer_key=...)` and `vault.transform_module(vault_keys=...)` · Core rename-map RNG integration deferred to post-申请号) | Patent target. Strongest novelty (only vmp-protector 1.0.0 ships per-buyer deterministic build; arXiv 2510.11251 CLASP backing). **Implementation in private repo per Path C; ship to public on 申请号 receipt.** |
 | **P2-8** 🔒 | License binding combo (Pro) | **W4-A PRIMITIVE DONE-PRIVATE 2026-05-09** (`license/binding.py` · `current_machine_id` OS-priority chain · `bind_device_key` PBKDF2-HMAC-SHA256 · `expire_check` ISO-date · `period_check` atomic-rename file counter · 32 tests · 3 patent findings · build-orchestrator integration tests prove license gate woven into AES-GCM decryption path) | Patent target. `--expire` + `--bind-device` + `--period` combo, pure Python. License gate is the AES-GCM tag check itself when `--bind-device` set — no separate check call to patch out. **Implementation in private repo per Path C; ship to public on 申请号 receipt.** |

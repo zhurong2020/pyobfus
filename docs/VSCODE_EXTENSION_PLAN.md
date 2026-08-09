@@ -1,9 +1,9 @@
 # VS Code extension design plan (ROADMAP P2-2)
 
-**Status**: M0, M1, and M2 are all **published**, plus an expedited 0.2.1
-bugfix patch the same day M2 shipped. **M3** (`pyobfus.yaml` IntelliSense)
-is **code-complete, held for its own Marketplace release-spacing gate**
-as v0.3.0 — see the dedicated M3 section below.
+**Status**: M0, M1, M2, the expedited 0.2.1 bugfix patch, and M3
+(`pyobfus.yaml` IntelliSense) are all **published**. P2-2's full M0-M3
+chain shipped end to end on 2026-08-07 as `pyobfus` 0.5.13 plus
+`vscode-extension` 0.3.0 — see the dedicated M3 section below.
 
 **0.2.1 bugfix (2026-08-06, same day as M2)**: hands-on testing of the
 freshly-published 0.2.0 immediately surfaced a real crash in "Obfuscate
@@ -63,7 +63,8 @@ a scripted poll of the page's JSON) and the Marketplace's own Manage tab
 shows a green checkmark next to the `0.2.0` version row, meaning the
 package passed automated validation, not just "uploaded."
 
-**Recorded**: 2026-08-04, updated 2026-08-06
+**Recorded**: 2026-08-04, updated 2026-08-06, post-release status synced
+2026-08-09
 
 ## Marketplace publishing note (2026-08-04, updated 2026-08-06)
 
