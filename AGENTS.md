@@ -91,7 +91,7 @@ pyobfus_pro/        # Pro edition (commercial license) — kept separate from co
 skills/             # Claude Code skill (pyobfus-protect) + plugin marketplace
 templates/          # copy-in AI rule files + python-baseline bootstrap
 tests/ · pyobfus_mcp/tests/ · integration_tests/
-docs/               # ROADMAP.md, POST_V0.4_TODO.md (forward TODO SoT), threat model
+docs/               # CURRENT_PLAN_ZH.md (current plan), archived roadmap/TODO, threat model
 cloudflare-worker/  # Pro license verification Worker
 ```
 
@@ -120,11 +120,13 @@ These mechanisms now ship to the public repo via a **controlled Phase 5 merge**
 (deliberate, one-time public disclosure) — see `docs/V0.5_RELEASE_PLAN.md`. Until
 that merge lands, still don't leak unreleased mechanism detail in incidental
 commits. The permanent rules remain: `pyobfus-legal/` never enters git (PII), and
-Pro/Core source stays separated. See `docs/POST_V0.4_TODO.md` § P1 for status.
+Pro/Core source stays separated. See `docs/CURRENT_PLAN_ZH.md` for current
+planning state and the archived `docs/POST_V0.4_TODO.md` § P1 for historical
+patent/release context.
 
 ## Where to look next
 
-- **Forward TODO / current state**: [`docs/POST_V0.4_TODO.md`](docs/POST_V0.4_TODO.md) (single source of truth).
-- **Roadmap**: [`docs/ROADMAP.md`](docs/ROADMAP.md).
+- **Current plan / daily source of truth**: [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md).
+- **Historical detail**: [`docs/POST_V0.4_TODO.md`](docs/POST_V0.4_TODO.md) and [`docs/ROADMAP.md`](docs/ROADMAP.md) are archived context, not the primary cold-start entry.
 - **Contributing**: [`CONTRIBUTING.md`](CONTRIBUTING.md).
 - **Security policy**: [`SECURITY.md`](SECURITY.md).

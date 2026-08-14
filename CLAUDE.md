@@ -8,9 +8,25 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ## ⚡ Current pending work (cold-start 必读)
 
-**Single source of truth for forward TODO**: [`docs/POST_V0.4_TODO.md`](docs/POST_V0.4_TODO.md) — 重启 session 第一份必读
+**Single source of truth for current plan**: [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md) — 重启 session 第一份必读
 
-该文档顶部是活的「Current prioritized TODO」（随每次发布/里程碑刷新日期），下方是冻结的历史执行记录——**只读顶部，别被下面的历史小节带偏**。
+`docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已在 2026-08-14 归档，只作为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
+
+### ✅ 2026-08-14 — 本 session 收尾状态，中文计划文档已成为主入口
+
+**文档主入口已切换**：新增 `docs/CURRENT_PLAN_ZH.md`（文件名英文，内容中文），整合当前状态、Glama/Claude 外部阻塞、竞品/最佳实践判断、P0/P1/P2/P3 优先级和明确不做项。`README.md`、`pyproject.toml` project URLs、`mkdocs.yml` nav、`docs/index.md`、`docs/llms.txt`、`docs/PROJECT_STRUCTURE.md` 均已指向新文档；`docs/ROADMAP.md` / `docs/POST_V0.4_TODO.md` 顶部已加归档提示。
+
+**本 session 两个分类提交**：
+- `461f498` `Polish VS Code trace mapping picker`：VS Code Reverse Stack Trace 会从 selected trace、clipboard trace 或 active obfuscated file 的 `--trace-marker` / `--mapping` 信息推断 mapping 文件选择器默认路径。新增测试后 `npm run lint`、`npm run typecheck`、`npm run pretest`、`npm test` 均通过（43 passing）。
+- `10b1eb4` `Consolidate current plan documentation`：新增中文计划文档并同步公开入口。`venv/bin/mkdocs build` 通过；仍有历史文档的既有 link/nav warning，不是本次新增文档引入。
+
+**外部状态最新记录**：Glama `#support` 截至 user 提供的 2026-08-14 Discord 内容仍无 pyobfus 直接回复；同频道多名维护者报告 BuildKit `debian:trixie-slim ... no active session ... context deadline exceeded`、stale public API/JSON-LD/profile fields、OAuth probe unhealthy 等平台侧问题，进一步支持这是 Glama release-to-public-API/listing 同步问题。Glama public API 复查仍是 `tools: []`。Claude plugin Console 仍显示 `pyobfus` `Submitted and pending review`，日期 Aug 2。下载快照：`pyobfus-mcp` day/week/month `2 / 67 / 598`；`pyobfus` 新请求遇到 pypistats 429，沿用同日稍早成功快照 `30 / 324 / 1,847`。
+
+**下次 cold-start 顺序**：
+1. 先读 `docs/CURRENT_PLAN_ZH.md`。
+2. 再查 Glama `#support` 回复 + curl public API。
+3. 再查 Claude plugin submission 页面是否仍 pending。
+4. 若外部仍卡住，继续 P1：VS Code trace/config 小打磨或 `pyobfus_mcp/server.json` schema hardening，不要开 hosted MCP / `--output-pyc` / SBOM 大项，除非用户明确切换方向。
 
 ### ✅ 2026-08-02 — pyobfus 0.5.6 已发布，issue #25 已关闭，CodeQL 已清零
 
@@ -75,7 +91,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - ✅ **README/MCP/ROADMAP 陈旧内容审计 + 修复（2026-08-02）**：见上，5 commits 全绿。
 - ✅ **pyobfus 0.5.7 已发布（2026-08-02）**：`--import-obfuscation`（Pro，P2-4）+ P2-22 诚实对比内容。tag `v0.5.7` 经 OIDC + PEP 740 发 PyPI，GitHub Release 已建。
 - ✅ **pyobfus-mcp 0.3.3 已发布（2026-08-02）**：`recommend_tier`/`start_pro_trial` 补 `--import-obfuscation` 到硬编码 Pro 机制清单（同 0.3.2 那类内容漂移修复）。tag `mcp-v0.3.3` 发 PyPI + Registry（isLatest），GitHub Release 附 wheel+sdist。
-- ⏭️ **更后续**（完整清单见 `docs/POST_V0.4_TODO.md` 顶部「Current prioritized TODO」）:P2-13/P2-22 这类零代码内容型候选（PyInstaller cookbook / PyArmor 对比页）。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
+- ⏭️ **更后续**：旧的 P2-13/P2-22 等历史候选已经被 2026-08-14 规划刷新吸收；当前完整优先级看 `docs/CURRENT_PLAN_ZH.md`。Launch wave 已收工转被动监测(+7d/+30d checkpoint,不主动推)。IP 商业化迁移(个人→旎嵘科技)排在更后面。
 
 ### ✅ 2026-08-04 又一轮 — Tier 1 六项全部发布 + 采用「间隔发布」节奏
 
@@ -118,7 +134,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 | 1 | `~/projects/pyobfus-legal/patent/SESSION_LOG_20260617.md`（最新）+ `SESSION_LOG_20260611.md` | 最新时间线 + 初审合格 + next action（off-repo · 完整 narrative）|
 | 2 | `~/.claude/projects/-mnt-c-onedrive-msft-OneDrive---MSFT-rong-3-job-program-pyobfus/memory/patent_correction_notice_2026-06-01.md` | 初审合格结论 + 补正根因/历史 + 受理/费用状态 |
 | 3 | `~/projects/pyobfus-legal/patent/08_提交记录/` | 五份官方通知书正本（受理 / 收费减缴 / 电子回执 / 补正 / **初步审查合格**）|
-| 4 | `docs/V0.5_RELEASE_PLAN.md` + `https://github.com/zhurong2020/pyobfus/blob/main/docs/POST_V0.4_TODO.md` § P1 | v0.5 发布 checklist + 公开版状态块 |
+| 4 | `docs/CURRENT_PLAN_ZH.md` + archived `docs/V0.5_RELEASE_PLAN.md` / `docs/POST_V0.4_TODO.md` § P1 | 当前计划 + v0.5/patent 历史状态块 |
 
 **跨项目联动**：cac-plus-ip 与本 pyobfus 共享同一个人申请人 + 同一 2026 年度费减备案；`~/projects/cac-plus-ip/CLAUDE.md` 含完整跨项目索引。详见 memory `ip_workflow_cross_project.md`。
 
