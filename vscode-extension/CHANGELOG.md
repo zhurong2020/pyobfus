@@ -6,6 +6,15 @@ Independent version/release cadence from the main `pyobfus` and `pyobfus-mcp` Py
 
 ## [Unreleased]
 
+### Added
+
+- "pyobfus: Reverse Stack Trace" now uses `--trace-marker` metadata to place
+  the mapping-file picker: if the selected trace, clipboard trace, or active
+  obfuscated file contains `# pyobfus:obfuscated ... mapping=...` or the
+  generated `pyobfus --unmap ... --mapping ...` command, the picker opens at
+  that mapping path. Without marker metadata it now defaults to the workspace
+  folder instead of an arbitrary last-used location.
+
 ## [0.3.0] - 2026-08-07
 
 **M3.** Real IntelliSense (autocomplete, hover docs, inline validation) for

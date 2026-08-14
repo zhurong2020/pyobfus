@@ -31,8 +31,12 @@ async function unmapTrace(outputChannel: vscode.OutputChannel): Promise<void> {
     return;
   }
 
+  const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri;
+  const mappingHintText = mappingHintSourceText(traceText);
+  const defaultMappingUri = mappingDialogDefaultUri(mappingHintText, workspaceFolder);
   const mappingUris = await vscode.window.showOpenDialog({
     title: "Select the pyobfus mapping.json produced by --save-mapping",
+    defaultUri: defaultMappingUri,
     canSelectMany: false,
     filters: { "Mapping JSON": ["json"] },
   });
@@ -41,7 +45,6 @@ async function unmapTrace(outputChannel: vscode.OutputChannel): Promise<void> {
   }
   const mappingPath = mappingUris[0].fsPath;
 
-  const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri;
   const interpreter = await resolveInterpreter(workspaceFolder);
 
   const tmpTraceFile = path.join(os.tmpdir(), `pyobfus-trace-${randomUUID()}.txt`);
@@ -69,7 +72,52 @@ async function getTraceText(): Promise<string | undefined> {
     return editor.document.getText(editor.selection);
   }
   const clipboard = await vscode.env.clipboard.readText();
-  return clipboard.trim().length > 0 ? clipboard : undefined;
+  if (clipboard.trim().length > 0) {
+    return clipboard;
+  }
+  return undefined;
+}
+
+function mappingHintSourceText(traceText: string): string {
+  const editor = vscode.window.activeTextEditor;
+  if (!editor) {
+    return traceText;
+  }
+  return `${traceText}\n${editor.document.getText()}`;
+}
+
+export function mappingDialogDefaultUri(
+  traceText: string,
+  workspaceFolder?: vscode.Uri,
+): vscode.Uri | undefined {
+  const mappingRef = mappingReferenceFromText(traceText);
+  if (!mappingRef) {
+    return workspaceFolder;
+  }
+  if (path.isAbsolute(mappingRef)) {
+    return vscode.Uri.file(mappingRef);
+  }
+  if (!workspaceFolder) {
+    return undefined;
+  }
+  return vscode.Uri.joinPath(workspaceFolder, mappingRef);
+}
+
+export function mappingReferenceFromText(text: string): string | undefined {
+  const markerMatch = text.match(/^# pyobfus:obfuscated\b.*\bmapping=([^\s]+)/m);
+  if (markerMatch) {
+    return cleanMappingReference(markerMatch[1]);
+  }
+
+  const commandMatch = text.match(/\bpyobfus\s+--unmap\b[^\n\r]*\s--mapping\s+([^\s]+)/);
+  if (commandMatch) {
+    return cleanMappingReference(commandMatch[1]);
+  }
+  return undefined;
+}
+
+function cleanMappingReference(ref: string): string {
+  return ref.replace(/^["']|["'.,;:)]+$/g, "");
 }
 
 async function showUnmappedTrace(result: UnmapResult): Promise<void> {
