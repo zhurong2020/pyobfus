@@ -171,7 +171,7 @@ the bound device.
 
 > Requires Python ≥ 3.9 as of v0.5.0 (3.8 dropped, EOL 2024-10).
 
-See [ROADMAP.md](docs/ROADMAP.md) for the full feature timeline.
+See [CURRENT_PLAN_ZH.md](docs/CURRENT_PLAN_ZH.md) for the current project plan and priorities.
 
 ## Try Pro Features FREE
 
@@ -727,7 +727,7 @@ Because obfuscated code must decrypt strings at runtime, the encryption key is n
 ### For Developers
 - **[Project Structure](https://github.com/zhurong2020/pyobfus/blob/main/docs/PROJECT_STRUCTURE.md)** - Codebase architecture and development workflow
 - **[Contributing Guide](https://github.com/zhurong2020/pyobfus/blob/main/CONTRIBUTING.md)** - How to contribute code and documentation
-- **[Development Roadmap](https://github.com/zhurong2020/pyobfus/blob/main/docs/ROADMAP.md)** - Planned features and timeline
+- **[Current Plan](https://github.com/zhurong2020/pyobfus/blob/main/docs/CURRENT_PLAN_ZH.md)** - Current project status and priorities
 - **[Changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md)** - Version history and release notes
 
 ### Community & Support

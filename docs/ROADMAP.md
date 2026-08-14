@@ -1,5 +1,9 @@
 # Development Roadmap
 
+> **Archived as of 2026-08-14.** The current project status and priority list now
+> live in [`CURRENT_PLAN_ZH.md`](CURRENT_PLAN_ZH.md). Keep this file only as
+> historical roadmap context unless a future cleanup deliberately removes it.
+
 This document outlines **future plans** for pyobfus. For released version history, see [CHANGELOG.md](../CHANGELOG.md). For the detailed AI-era positioning strategy, see [AI_INTEGRATION_STRATEGY.md](AI_INTEGRATION_STRATEGY.md). For execution tracking, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTION_LOG.md).
 
 **Target Users**: Individual developers and small teams shipping Python code in the AI-assisted development era
@@ -260,12 +264,119 @@ Run right after the VS Code extension M0-M2 + 0.2.1 bugfix ship, to re-check the
 
 ---
 
+## Planning refresh from 2026-08-14 competitor + best-practice scan
+
+This refresh re-checks the roadmap against current official sources rather
+than extending the feature list by inertia. It confirms the earlier strategic
+line: do not chase PyArmor/Nuitka into native virtualization as the primary
+product identity; instead, double down on the "AI-native, debuggable, verifiable
+Python protection workflow" wedge where pyobfus is already differentiated.
+
+**Competitor baseline, updated:** PyArmor 9.2.x's own documentation emphasizes
+`rft`, `mini`, `vmc`, `ecc`, BCC/JIT/Themida, `mix-str`, `assert-import`, and
+`assert-call` as its high-security path. Nuitka Commercial emphasizes data
+hiding, protected data files, protected output/traceback encryption, and
+compiled delivery; its traceback encryption documentation still says symmetric
+encryption today with asymmetric encryption planned. SOURCEdefender remains a
+runtime import-hook encrypted-file product (`.pye`, AES-256, TTL, PyInstaller
+bundling), currently Python 3.7-3.14 and commercial/proprietary. These products
+validate demand for stronger runtime/data protection, but their core tradeoff
+remains the same: they optimize for opaque delivery, not source-preserving
+AI-debuggable workflows.
+
+**Best-practice baseline, updated:** PyPI's PEP 740 / Integrity API support
+has made release provenance a first-class public trust surface, but PyPI's own
+security model is explicit that attestations prove where a package came from,
+not whether the code is trustworthy. PEP 770 recommends SBOMs use widely
+accepted standards such as CycloneDX or SPDX, UTF-8 JSON where possible,
+creation metadata, primary components, and relationship paths. CycloneDX's
+official CLI now supports validation, signing, verification, conversion,
+diffing, merging, and adding file components. MCP's 2026-07-28 spec moves
+toward stateless protocol core, cacheable list results, header-based routing,
+and authorization hardening; the MCP authorization spec still says stdio
+servers should not use the HTTP OAuth flow and should read credentials from the
+environment. The MCP Registry `server.json` schema also now treats package
+hashes, repository IDs, exact versions, and command-argument injection warnings
+as important trust/discovery data.
+
+**Resulting priority order:**
+
+- [~] **P2-25: VS Code trace/config workflow polish** — already started
+  2026-08-14. Keep this as the immediate short-cycle work while Glama/Claude
+  distribution blockers are unresolved. Focus on low-risk UX improvements that
+  make the already-shipped reverse-trace and `pyobfus.yaml` workflow smoother:
+  trace-marker-aware mapping discovery, clearer mapping/config errors, and
+  config validation surfaced in editor context. Do not change pyobfus core
+  semantics unless a real bug is found. _Target: extension patch/minor, 1-2
+  days per slice._
+- [ ] **P2-26: Obfuscated-output SBOM + provenance manifest** — promote N13(b)
+  from "interesting long-term" to the next substantial feature after the
+  external queue stabilizes. Extend the existing `--provenance-manifest`
+  foundation into a CycloneDX-compatible output manifest for the obfuscated
+  artifact: pyobfus version, source commit if available, config hash, input and
+  output file hashes, mapping digest, and relationship metadata. This is the
+  strongest best-practice-aligned differentiator because competitors protect
+  code/data but do not give teams a clean supply-chain record for the protected
+  output. Start as Core/community unless Pro-specific fields require gated
+  enrichment. _Target: 1-2 weeks; release as a real feature._
+- [ ] **P2-27: Attestation-verification helper / trust report** — add a small
+  CLI/docs utility that verifies pyobfus/pyobfus-mcp release provenance through
+  PyPI's Integrity API or `pypi-attestations`, then explains the result in
+  honest terms: valid provenance means "built/published by this Trusted
+  Publisher identity", not "safe code". This complements P2-17/P2-21 and gives
+  VS Code / MCP users a concrete trust story after the malicious-VS-Code-
+  extension incident in the same category. _Target: 2-4 days; docs-first if
+  the CLI surface would be too narrow._
+- [ ] **P2-28: MCP Registry/server.json schema hardening** — re-validate
+  `pyobfus_mcp/server.json` against the current official schema and add any
+  now-useful trust metadata that applies to stdio/package distribution:
+  repository stable ID, exact package version pin discipline, package hash if
+  feasible for the published artifact model, explicit non-shell command
+  examples, and a doc note that HTTP OAuth / Server Card items remain N/A until
+  a hosted endpoint exists. This is small but high-leverage for agentic
+  discovery and avoids Glama-style directory drift becoming our own metadata
+  drift. _Target: 0.5-1 day._
+- [ ] **P2-29: Framework/runtime packaging compatibility checks** — add more
+  pre-flight guidance for combinations users actually ship: PyInstaller
+  already has a cookbook; next candidates are import-hook/encrypted-file
+  ecosystems, compiled packaging, and model-serving layouts. Prefer
+  `--check`/VS Code/MCP diagnostics and docs over new transforms unless a
+  repeatable breakage pattern appears. _Target: rolling small items._
+- [ ] **P3-1: `--output-pyc` feasibility spike** — keep as a spike, not a
+  committed product promise. Validate whether a bytecode-only output path can
+  coexist with pyobfus's AI-debuggability, mapping/unmap workflow, framework
+  reflection safety, and pure-Python portability. Exit criteria should be
+  empirical: decompilation resistance delta, traceback mapping behavior, import
+  compatibility, and packaging behavior. If it weakens the core workflow or
+  merely imitates PyArmor/SOURCEdefender poorly, close it as non-fit.
+- [ ] **P3-2: Hosted/remote MCP endpoint** — keep behind P2-20/Glama stability.
+  MCP 2026-07-28 makes stateless hosted endpoints more practical, but exposing
+  filesystem-sensitive tools remotely would create a new risk profile. If
+  built, expose read-only/side-effect-free tools first, with rate limits,
+  audit logging, and no token passthrough. Do not let this displace local stdio
+  quality while Glama's current public API sync is still broken.
+
+**Explicit de-prioritizations confirmed by this scan:**
+
+- Do not build PyArmor-style BCC/JIT/Themida/VMC equivalents as v0.6 headline
+  work. They are valid competitor strengths, but they pull the product into a
+  maintenance-heavy native/runtime lane where pyobfus loses the AI-debuggable
+  identity.
+- Do not market attestations or manifests as proof that code is trustworthy.
+  The correct promise is provenance, reproducibility evidence, and tamper/drift
+  detection.
+- Do not implement HTTP OAuth, Server Card, or hosted-connector machinery for
+  the local stdio MCP server. Those become relevant only if/when P3-2 ships a
+  real HTTP transport.
+
+---
+
 ## v0.6.0+ Long-term (3-6 months)
 
 ### P3 - Experimental
 
 - [ ] AI-native plugin API — natural-language transformer descriptions, LLM-generated AST plugins
-- [ ] `--output-pyc` optional bytecode-only backend
+- [ ] `--output-pyc` optional bytecode-only backend — spike only until P3-1 exit criteria are met
 - [ ] Enhanced key obfuscation (previously P1 in old plan, now low-priority: no user demand signal)
 
 ---

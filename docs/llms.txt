@@ -97,7 +97,7 @@ per-mechanism flags (0.5.1+), which stack on top of the base obfuscation. Use
 
 - Source: https://github.com/zhurong2020/pyobfus
 - Docs: https://pyobfus.readthedocs.io/
-- Roadmap: https://github.com/zhurong2020/pyobfus/blob/main/docs/ROADMAP.md
+- Current plan: https://github.com/zhurong2020/pyobfus/blob/main/docs/CURRENT_PLAN_ZH.md
 - AI integration guide: https://github.com/zhurong2020/pyobfus/blob/main/docs/AI_INTEGRATION_STRATEGY.md
 - MCP server: https://github.com/zhurong2020/pyobfus/tree/main/pyobfus_mcp
 - Changelog: https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md

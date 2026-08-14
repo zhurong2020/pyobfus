@@ -90,7 +90,8 @@ pyobfus/
 ├── .editorconfig         # Editor configuration
 └── docs/                 # Documentation
     ├── index.md          # GitHub Pages homepage
-    ├── ROADMAP.md        # Development roadmap
+    ├── CURRENT_PLAN_ZH.md # Current project plan and priorities (Chinese content)
+    ├── ROADMAP.md        # Archived development roadmap
     ├── COMPARISON.md     # Tool comparison (vs PyArmor, etc.)
     ├── PROJECT_STRUCTURE.md    # This file
     ├── LICENSE_ACTIVATION_GUIDE.md  # Pro license activation

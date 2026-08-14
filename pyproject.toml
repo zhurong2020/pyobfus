@@ -88,7 +88,7 @@ Repository = "https://github.com/zhurong2020/pyobfus"
 "Funding" = "https://www.buymeacoffee.com/zhurong052Q"
 "Citation" = "https://doi.org/10.5281/zenodo.20846053"
 "AI Integration Guide" = "https://github.com/zhurong2020/pyobfus/blob/main/docs/AI_INTEGRATION_STRATEGY.md"
-"Roadmap" = "https://github.com/zhurong2020/pyobfus/blob/main/docs/ROADMAP.md"
+"Current Plan" = "https://github.com/zhurong2020/pyobfus/blob/main/docs/CURRENT_PLAN_ZH.md"
 
 [project.scripts]
 pyobfus = "pyobfus.cli:main"

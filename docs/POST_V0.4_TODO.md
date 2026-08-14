@@ -1,5 +1,9 @@
 # pyobfus Post-v0.4 Action Plan
 
+> **Archived as of 2026-08-14.** The current single planning entry is
+> [`CURRENT_PLAN_ZH.md`](CURRENT_PLAN_ZH.md). This file remains as historical
+> execution context and raw handoff detail, not the daily source of truth.
+
 **Snapshot**: 2026-05-09 (after pyobfus-mcp 0.2.0 ship + mcpservers.org listing live + 2026-05-09 strategy review added P0.5/P0.6/P0.7 + N7/N8/N9 + single-tier pricing guardrail).
 
 **Use as cold-start cheat sheet** when resuming work after a session break. This doc supersedes ad-hoc TODO scattered in chat; future Claude sessions should read this first.
@@ -346,6 +350,78 @@
 > the public API still returns `tools: []`. Next check should look for a
 > reply in **Glama Discord `#support`**, not only the MCP server's
 > `#general`, and still re-run the public API curl.
+> **2026-08-14 — Glama/Claude follow-up supplied by maintainer; small-polish
+> direction picked.** Glama `#support` still has **no direct reply** to the
+> pyobfus report. The broader channel state now strongly supports treating
+> this as a Glama platform/indexing problem rather than a pyobfus problem:
+> multiple maintainers reported the same auto-generated Docker builder failure
+> before their own repo steps ran (`debian:trixie-slim` metadata resolution →
+> `no active session ... context deadline exceeded`, including
+> `herbertkokholm/cite-caddy`, `Considus/proton-bridge-mcp`,
+> `Considus/pagespeed-insights-mcp`, `andreilungeanu/codex-delegate-mcp`,
+> and `postio-uk/postio-integrations`); other reports in the same window cite
+> stale stored public API/JSON-LD/profile fields that survive manual syncs and
+> successful Build & Release runs; OAuth-gated connectors are also being marked
+> unhealthy because probes cannot complete interactive auth. One separate env-var
+> placeholder regression was fixed by Glama on 2026-08-11, proving staff are
+> making platform-side fixes, but there is still no pyobfus-specific response.
+> Rechecked the pyobfus public API on 2026-08-14: it still returns
+> `tools: []`. Claude plugin Console status is still **`Submitted and pending
+> review`**, dated Aug 2, with the submitted description still visible and no
+> approve/reject/follow-up path. Download refresh: `pyobfus-mcp` answered with
+> day/week/month **2 / 67 / 598**; `pyobfus` hit pypistats 429 on the fresh
+> retry, so keep the earlier same-day 2026-08-14 snapshot **30 / 324 / 1,847**
+> as the latest successful value rather than inventing a new one. Decision:
+> continue passive/external follow-up on Glama + Claude, but start only a small
+> local polish plan next, not a large feature.
+>
+> **Small polish plan selected (2026-08-14): VS Code trace/config workflow.**
+> Scope stays deliberately narrow and releasable as a patch/minor extension
+> update: (1) inspect current extension UX around Reverse Stack Trace,
+> `pyobfus.yaml` schema/modeline, and generated-config flow; (2) add one or two
+> high-confidence improvements that reduce friction without changing pyobfus
+> core semantics, likely around mapping-file discovery, clearer stale CLI/error
+> reporting, or schema/config validation surfacing; (3) cover with focused
+> extension tests plus real-contract smoke tests where practical; (4) update
+> `vscode-extension/CHANGELOG.md` and docs only after the implementation is
+> actually validated. Avoid `--output-pyc`, hosted MCP, SBOM, pricing, or
+> research-paper work until the external distribution queue is less noisy.
+>
+> **2026-08-14 — roadmap refresh after current competitor/best-practice scan.**
+> Added `docs/ROADMAP.md` section "Planning refresh from 2026-08-14 competitor
+> + best-practice scan". Updated sources checked: PyArmor 9.2.x docs (RFT/
+> BCC/JIT/Themida/VMC/ECC/security recipes), Nuitka Commercial docs (data
+> hiding, protected data files, symmetric traceback encryption today with
+> asymmetric planned), SOURCEdefender PyPI docs (AES-256 `.pye`, TTL,
+> PyInstaller bundling), PyPI PEP 740 / Integrity API / attestation security
+> model, PEP 770 SBOM guidance, CycloneDX CLI capabilities, MCP 2026-07-28
+> stateless/auth/caching direction, MCP Authorization's stdio-vs-HTTP split,
+> and the current MCP Registry `server.json` schema. Decision: competitor
+> pressure validates runtime/data protection demand, but the project should not
+> chase PyArmor/Nuitka native virtualization as its headline. Priority should
+> stay on AI-debuggable workflow + verifiable supply-chain output + MCP/IDE
+> trust surfaces.
+>
+> **Execution priority queue after the refresh:**
+> 1. **P2-25 VS Code trace/config workflow polish** — current active small work.
+>    Finish trace-marker-aware mapping discovery first; then consider one more
+>    tightly-scoped config validation/error-surfacing improvement if it remains
+>    low risk.
+> 2. **P2-28 MCP Registry/server.json schema hardening** — small, high leverage.
+>    Re-validate against the current official schema and add applicable trust
+>    metadata only if it fits stdio/package distribution.
+> 3. **P2-26 obfuscated-output SBOM + provenance manifest** — next substantial
+>    feature once Glama/Claude are stable or clearly aging out. Build on
+>    `--provenance-manifest`, target CycloneDX-compatible output metadata, and
+>    keep the claim to provenance/reproducibility rather than "trust".
+> 4. **P2-27 attestation-verification helper / trust report** — docs-first or
+>    tiny CLI that verifies PyPI provenance honestly.
+> 5. **P2-29 compatibility checks** — incremental diagnostics/docs for real
+>    packaging/model-serving pain, not new transforms by default.
+> 6. **P3-1 `--output-pyc`** — feasibility spike only; close as non-fit if it
+>    weakens AI-debuggability or only imitates bytecode tools poorly.
+> 7. **P3-2 hosted MCP endpoint** — still behind P2-20/Glama stability; read-only
+>    tools only if built.
 > **2026-08-08, same day — adopted a standing periodic post-release
 > review cadence.** After every ~3-5 accumulated releases (or a 1-2 week
 > span, not every session — too frequent conflates release-day noise
