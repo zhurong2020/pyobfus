@@ -6,6 +6,8 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+## [0.3.6] - 2026-08-17
+
 ### Changed
 
 - `server.json` now includes the GitHub repository stable ID
@@ -16,9 +18,10 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ### Fixed
 
-- Runtime package metadata now reports `pyobfus_mcp.__version__ == "0.3.5"`,
-  matching `pyproject.toml` and `server.json`. A regression test now checks
-  these version fields stay in sync.
+- Runtime package metadata (`pyobfus_mcp.__version__`), `pyproject.toml`,
+  and `server.json` had drifted out of sync at points in prior releases.
+  A new regression test (`test_version_metadata.py`) now asserts all three
+  — plus `server.json`'s `repository.id` — stay aligned on every release.
 
 ## [0.3.5] - 2026-08-04
 
