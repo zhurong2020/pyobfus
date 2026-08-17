@@ -484,7 +484,7 @@ def main(
 
     # Handle --validate-config: Validate configuration file
     if validate_config_path:
-        _handle_validate_config(validate_config_path)
+        _handle_validate_config(validate_config_path, json_output=json_output)
         return
 
     # For obfuscation, input_path and output_path are required
@@ -2037,16 +2037,42 @@ def _handle_check(input_path: Path, json_output: bool = False) -> None:
     sys.exit(report.exit_code())
 
 
-def _handle_validate_config(config_path: str) -> None:
+def _handle_validate_config(config_path: str, json_output: bool = False) -> None:
     """
     Validate a configuration file and report errors/warnings.
 
     Args:
         config_path: Path to configuration file
     """
-    click.echo(f"Validating: {config_path}\n")
-
     result = validate_config_file(Path(config_path))
+
+    if json_output:
+        status = "error" if not result.is_valid else "warnings" if result.warnings else "success"
+        exit_code = 0 if result.is_valid else 1
+        payload = {
+            "version": 1,
+            "status": status,
+            "valid": result.is_valid,
+            "config_path": config_path,
+            "errors": result.errors,
+            "warnings": result.warnings,
+            "suggestions": result.suggestions,
+            "summary": result.get_summary(),
+            "ai_hint": (
+                "Fix errors before running obfuscation."
+                if not result.is_valid
+                else "Configuration is usable; review warnings before shipping."
+                if result.warnings
+                else "Configuration is valid and ready for obfuscation."
+            ),
+            "exit_code": exit_code,
+        }
+        click.echo(json.dumps(payload, indent=2, ensure_ascii=False))
+        if exit_code:
+            sys.exit(exit_code)
+        return
+
+    click.echo(f"Validating: {config_path}\n")
 
     # Print errors
     for error in result.errors:

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `pyobfus --validate-config FILE --json` now emits a stable machine-readable
+  validation contract (`status`, `valid`, `errors`, `warnings`, `suggestions`,
+  `summary`, `ai_hint`, `exit_code`) while preserving the existing text output
+  when `--json` is not passed. This gives IDE/MCP callers a real config
+  validation surface without scraping human text.
+
 ## [0.5.13] - 2026-08-07
 
 **Bugfix, found while scoping the VS Code extension's M3 (`pyobfus.yaml`

@@ -15,6 +15,7 @@ Tests cover the main CLI entry point including:
 - --version
 """
 
+import json
 import pytest
 from pathlib import Path
 from click.testing import CliRunner
@@ -189,6 +190,39 @@ class TestValidateConfig:
         result = runner.invoke(main, ["--validate-config", str(cfg)])
         # Validator may exit 0 or 1 depending on severity, just check it doesn't crash
         assert result.exit_code in (0, 1)
+
+    def test_validate_config_json_success(self, runner, tmp_path):
+        cfg = tmp_path / "test.yaml"
+        cfg.write_text("obfuscation:\n  level: community\n  remove_docstrings: true\n")
+        result = runner.invoke(main, ["--validate-config", str(cfg), "--json"])
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert data["version"] == 1
+        assert data["status"] == "success"
+        assert data["valid"] is True
+        assert data["errors"] == []
+        assert data["warnings"] == []
+        assert data["exit_code"] == 0
+
+    def test_validate_config_json_warnings(self, runner, tmp_path):
+        cfg = tmp_path / "test.yaml"
+        cfg.write_text("obfuscation:\n  level: community\n  unknown_key: value\n")
+        result = runner.invoke(main, ["--validate-config", str(cfg), "--json"])
+        assert result.exit_code == 0
+        data = json.loads(result.output)
+        assert data["status"] == "warnings"
+        assert data["valid"] is True
+        assert any("unknown_key" in warning for warning in data["warnings"])
+
+    def test_validate_config_json_error(self, runner, tmp_path):
+        cfg = tmp_path / "bad.yaml"
+        cfg.write_text("")
+        result = runner.invoke(main, ["--validate-config", str(cfg), "--json"])
+        assert result.exit_code == 1
+        data = json.loads(result.output)
+        assert data["status"] == "error"
+        assert data["valid"] is False
+        assert any("empty" in error for error in data["errors"])
 
 
 class TestConfigAutoDiscovery:
