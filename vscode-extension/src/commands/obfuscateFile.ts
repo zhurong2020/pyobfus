@@ -42,6 +42,7 @@ async function obfuscateFile(uri: vscode.Uri | undefined, outputChannel: vscode.
   }
 
   const interpreter = await resolveInterpreter(target);
+  const workingDir = cwdForTarget(target);
   try {
     const result = await vscode.window.withProgress(
       { location: vscode.ProgressLocation.Notification, title: `pyobfus: obfuscating ${path.basename(target.fsPath)}...` },
@@ -57,12 +58,12 @@ async function obfuscateFile(uri: vscode.Uri | undefined, outputChannel: vscode.
           // pyobfus/cli.py), this call site needs a real project-rooted cwd,
           // not runJsonCommand's safe os.tmpdir() default, or a project's own
           // pyobfus.yaml would be silently ignored during obfuscation.
-          { cwd: cwdForTarget(target), allowNonZeroExit: true },
+          { cwd: workingDir, allowNonZeroExit: true },
         ),
     );
 
     if (result.status === "error") {
-      await handleObfuscateError(result);
+      await handleObfuscateError(result, workingDir);
       return;
     }
 
@@ -79,7 +80,7 @@ async function obfuscateFile(uri: vscode.Uri | undefined, outputChannel: vscode.
   }
 }
 
-async function handleObfuscateError(result: ObfuscateErrorResult): Promise<void> {
+async function handleObfuscateError(result: ObfuscateErrorResult, workingDir: string): Promise<void> {
   if (result.error_type === "LimitExceededError") {
     const choice = await vscode.window.showWarningMessage(
       `pyobfus: ${result.message}`,
@@ -90,7 +91,33 @@ async function handleObfuscateError(result: ObfuscateErrorResult): Promise<void>
     }
     return;
   }
+  if (isConfigValidationError(result)) {
+    const configPath = findPyobfusConfigInCwd(workingDir);
+    const choice = await vscode.window.showErrorMessage(
+      `pyobfus: config error. ${result.message}`,
+      ...(configPath ? ["Open pyobfus.yaml"] : []),
+    );
+    if (choice === "Open pyobfus.yaml" && configPath) {
+      const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(configPath));
+      await vscode.window.showTextDocument(doc, { preview: false });
+    }
+    return;
+  }
   void vscode.window.showErrorMessage(`pyobfus: ${result.message} (${result.suggestion})`);
+}
+
+export function isConfigValidationError(result: ObfuscateErrorResult): boolean {
+  return result.error_type === "ValueError" && /^Unknown configuration key: /.test(result.message);
+}
+
+export function findPyobfusConfigInCwd(cwd: string): string | undefined {
+  for (const name of ["pyobfus.yaml", "pyobfus.yml", ".pyobfus.yaml", ".pyobfus.yml"]) {
+    const candidate = path.join(cwd, name);
+    if (fs.existsSync(candidate)) {
+      return candidate;
+    }
+  }
+  return undefined;
 }
 
 /** `foo.py` -> `foo_obf.py`; `src/` (directory) -> sibling `src_obf/`. */

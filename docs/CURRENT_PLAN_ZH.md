@@ -123,7 +123,10 @@ bytecode 加密。
      - Reverse Stack Trace 复用共享 CLI 错误提示；旧版 pyobfus / 解释器错误现在
        给出和 obfuscate / generate-config 一致的 Upgrade / Select Interpreter
        动作入口。
-   - 下一项候选：更清晰的 config validation / stale CLI / mapping 错误提示。
+     - Obfuscate with pyobfus 识别配置 unknown-key 错误，并提供打开自动发现的
+       `pyobfus.yaml` 动作入口。
+   - 下一项候选：若继续 VS Code 小修，优先补 `--validate-config` JSON contract，
+     再接入真正的 config validation 命令；避免在扩展里解析文本输出。
    - 原则：只做小而确定的 UX 改善，不改变 core 语义。
 
 2. `P2-28` MCP Registry / `server.json` schema hardening
@@ -189,5 +192,5 @@ bytecode 加密。
 
 ## 下次工作建议
 
-1. 若还要继续 VS Code 小打磨，优先 config validation 错误提示。
+1. 若还要继续 VS Code 小打磨，先给 core `--validate-config` 增加 JSON contract。
 2. 若外部分发仍无进展，但状态已稳定，就开始 `P2-26` SBOM/provenance 设计。

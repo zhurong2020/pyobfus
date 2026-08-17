@@ -21,6 +21,9 @@ Independent version/release cadence from the main `pyobfus` and `pyobfus-mcp` Py
   stale pyobfus installs get the same actionable "Upgrade pyobfus" / "Select
   Interpreter" choices as obfuscation and config-generation commands instead
   of a raw `--unmap` failure message.
+- "Obfuscate with pyobfus" now recognizes config unknown-key errors and offers
+  to open the auto-discovered `pyobfus.yaml` instead of showing only the generic
+  JSON error envelope.
 
 ## [0.3.0] - 2026-08-07
 
