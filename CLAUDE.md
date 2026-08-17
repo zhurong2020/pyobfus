@@ -10,23 +10,21 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 **Single source of truth for current plan**: [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md) — 重启 session 第一份必读
 
-`docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已在 2026-08-14 归档，只作为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
+`docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### ✅ 2026-08-14 — 本 session 收尾状态，中文计划文档已成为主入口
+### ✅ 2026-08-17 — session 收尾状态，冷启动面已同步
 
-**文档主入口已切换**：新增 `docs/CURRENT_PLAN_ZH.md`（文件名英文，内容中文），整合当前状态、Glama/Claude 外部阻塞、竞品/最佳实践判断、P0/P1/P2/P3 优先级和明确不做项。`README.md`、`pyproject.toml` project URLs、`mkdocs.yml` nav、`docs/index.md`、`docs/llms.txt`、`docs/PROJECT_STRUCTURE.md` 均已指向新文档；`docs/ROADMAP.md` / `docs/POST_V0.4_TODO.md` 顶部已加归档提示。
+**本轮本地推进已完成并分类提交**：VS Code trace/config polish、MCP Registry `server.json` schema hardening、`--validate-config --json`、VS Code `Validate pyobfus.yaml` 命令、provenance manifest 元数据增强、`--verify-provenance-manifest`、release provenance verification runbook、外部分发状态与 roadmap/todo 文档同步均已落地。`main` 本地领先 `origin/main` 多个提交；下次若要备份/发布协作成果，先确认是否 push。
 
-**本 session 两个分类提交**：
-- `461f498` `Polish VS Code trace mapping picker`：VS Code Reverse Stack Trace 会从 selected trace、clipboard trace 或 active obfuscated file 的 `--trace-marker` / `--mapping` 信息推断 mapping 文件选择器默认路径。新增测试后 `npm run lint`、`npm run typecheck`、`npm run pretest`、`npm test` 均通过（43 passing）。
-- `10b1eb4` `Consolidate current plan documentation`：新增中文计划文档并同步公开入口。`venv/bin/mkdocs build` 通过；仍有历史文档的既有 link/nav warning，不是本次新增文档引入。
+**外部状态最新记录**：Glama 旧 public API 路径 `/api/mcp/v1/servers/io.github.zhurong2020/pyobfus-mcp` 已返回 `not_found`，公开页面 `/mcp/servers/zhurong2020/pyobfus` 可访问且能看到 8 个 tool 名称；user 于 2026-08-17 手工查 Discord 对应频道，暂时没有 Glama 回复。按外部 listing/API 漂移处理，先记录并跳过，不阻塞本地 P2。Claude Console `/plugins/submissions` 于 2026-08-17 手工确认仍显示 `pyobfus` / `Submitted and pending review` / 日期 `Aug 2`；提交文案里 `One-call protected_project workflow` typo 仍在，继续作为机会性修复，不为此单独重提。
 
-**外部状态最新记录**：Glama `#support` 截至 user 提供的 2026-08-14 Discord 内容仍无 pyobfus 直接回复；同频道多名维护者报告 BuildKit `debian:trixie-slim ... no active session ... context deadline exceeded`、stale public API/JSON-LD/profile fields、OAuth probe unhealthy 等平台侧问题，进一步支持这是 Glama release-to-public-API/listing 同步问题。Glama public API 复查仍是 `tools: []`。Claude plugin Console 仍显示 `pyobfus` `Submitted and pending review`，日期 Aug 2。下载快照：`pyobfus-mcp` day/week/month `2 / 67 / 598`；`pyobfus` 新请求遇到 pypistats 429，沿用同日稍早成功快照 `30 / 324 / 1,847`。
+**已同步文档面**：`docs/CURRENT_PLAN_ZH.md`、`docs/ROADMAP.md`、`docs/POST_V0.4_TODO.md`、`docs/DISTRIBUTION_CHANNELS.md`、`docs/VSCODE_EXTENSION_PLAN.md`、`docs/PROVENANCE_MANIFEST.md`、`docs/RELEASE_PROVENANCE_VERIFICATION.md`、`README.md`、`docs/llms.txt`、`docs/index.md` 等当前入口/索引已对齐。历史审计/执行日志类文档保留当时状态，不回写成当前状态。
 
 **下次 cold-start 顺序**：
 1. 先读 `docs/CURRENT_PLAN_ZH.md`。
-2. 再查 Glama `#support` 回复 + curl public API。
-3. 再查 Claude plugin submission 页面是否仍 pending。
-4. 若外部仍卡住，继续 P1：VS Code trace/config 小打磨或 `pyobfus_mcp/server.json` schema hardening，不要开 hosted MCP / `--output-pyc` / SBOM 大项，除非用户明确切换方向。
+2. 查 `git status --short --branch` 和最近提交，确认是否需要 push 本轮 8 月 17 日本地提交。
+3. Glama/Claude 只做周期性外部状态复查；没有回复或新审核结论时不要阻塞本地工作。
+4. 继续 P2-29：Python 3.14 / 依赖 / VS Code host 兼容性检查。
 
 ### ✅ 2026-08-02 — pyobfus 0.5.6 已发布，issue #25 已关闭，CodeQL 已清零
 
@@ -149,7 +147,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.5，2026-08-04 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.1` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp` (active, isLatest=true · **0.3.5**)
 - **Smithery (Skill)**: https://smithery.ai/skills/zhurong2020/pyobfus-protect (2026-06-22 上线 · 本地工具走 Skill 渠道非 MCP 渠道) · **mcp.so**: 已收录
-- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus (Quality A) — Glama 容器 build 自 **admin Dockerfile→Configuration「Build steps」字段**(web-UI)，**不读 repo 的 `pyobfus_mcp/Dockerfile`**，且**不自动跟 PyPI 最新**：每次发 mcp 新版都要手动把该字段的 `pyobfus-mcp==<ver>` bump 一次，否则 listing 静默供旧工具面——**发布必做步骤**，已进 `docs/V0.5_RELEASE_PLAN.md` Phase 5.6。最近 2026-08-06 从 0.3.3→0.3.5(test `019fd4f7`)。「Recent Releases」的版本号(如 0.5.4)是 Glama 自增计数、与实装版本无关，忽略。**⚠️ 公开 API 工具数 2026-08-07/08-08 复查仍是 0**（超过此前"≤1 天自愈"的历史窗口）——**本地已完整复现 Glama 的构建管道并排除我方问题**：`pip install pyobfus-mcp==0.3.5` 干净装 + 直接 stdio 握手 → 8/8 工具返回正常；再套一层 Glama 自家的 `mcp-proxy@6.4.3`（与 Dockerfile 里 `CMD ["mcp-proxy","--","pyobfus-mcp"]` 完全一致）暴露成 streamable-HTTP，同样走 `initialize`→`tools/list` 全流程 → 8/8 工具+完整 schema 正常返回。08-08 手动 Build & Release `019fe034-7da2-73ef-8b02-b279c9ae4b68` 成功，Glama 自己的 instance logs 也显示 `initialize -> ListToolsRequest` 返回全部 8 tools，但 public API 仍 `tools: []`。**结论：pyobfus-mcp 包本身、mcp-proxy 桥接、Glama 构建和 Glama 内省都健康，0 tools 是 Glama 自家 release→public directory API 同步层的问题，不是我方代码或配置问题**。08-09 已确认 08-08 的报告先发错到 Model Context Protocol Discord `#general`，后续已补发到 **Glama Discord `#support`**；下次查 Glama `#support` 回复 + 继续 public API curl。教训 memory `glama_introspection_dockerfile_pin_2026-06-05` + `glama_zero_tools_repro_2026-08-07` · 历史 `docs/POST_V0.4_TODO.md`
+- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus (Quality A) — Glama 容器 build 自 **admin Dockerfile→Configuration「Build steps」字段**(web-UI)，**不读 repo 的 `pyobfus_mcp/Dockerfile`**，且**不自动跟 PyPI 最新**：每次发 mcp 新版都要手动把该字段的 `pyobfus-mcp==<ver>` bump 一次，否则 listing 静默供旧工具面——**发布必做步骤**，已进 `docs/V0.5_RELEASE_PLAN.md` Phase 5.6。最近 2026-08-06 从 0.3.3→0.3.5(test `019fd4f7`)。「Recent Releases」的版本号(如 0.5.4)是 Glama 自增计数、与实装版本无关，忽略。**2026-08-17 状态**：公开页面可访问且页面内容显示 8 个 tool 名称；旧 public API 路径 `/api/mcp/v1/servers/io.github.zhurong2020/pyobfus-mcp` 已返回 `not_found`，不再沿用早前 `tools: []` 判断；user 手工查 Glama Discord 对应频道，暂时没有回复。当前按外部 listing/API drift 记录并跳过，除非 Glama 给出新复现或修改要求。历史排障结论仍成立：pyobfus-mcp 包、mcp-proxy 桥接、Glama 构建和 Glama 内省此前均已证明能返回 8/8 tools。教训 memory `glama_introspection_dockerfile_pin_2026-06-05` + `glama_zero_tools_repro_2026-08-07` · 历史 `docs/POST_V0.4_TODO.md`
 - **GitHub**: https://github.com/zhurong2020/pyobfus (public)
 - **文档**: https://pyobfus.readthedocs.io
 - **许可**: Apache 2.0 (Core) + Proprietary (Pro)
