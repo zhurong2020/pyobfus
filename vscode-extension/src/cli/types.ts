@@ -57,6 +57,20 @@ export interface InitResult {
   ai_hint: string;
 }
 
+/** `pyobfus --validate-config <path> --json` */
+export interface ValidateConfigResult {
+  version: number;
+  status: "success" | "warnings" | "error";
+  valid: boolean;
+  config_path: string;
+  errors: string[];
+  warnings: string[];
+  suggestions: string[];
+  summary: string;
+  ai_hint: string;
+  exit_code: number;
+}
+
 export interface MappingStats {
   modules: number;
   original_names: number;

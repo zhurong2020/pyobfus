@@ -125,8 +125,11 @@ bytecode 加密。
        动作入口。
      - Obfuscate with pyobfus 识别配置 unknown-key 错误，并提供打开自动发现的
        `pyobfus.yaml` 动作入口。
-   - 下一项候选：若继续 VS Code 小修，优先补 `--validate-config` JSON contract，
-     再接入真正的 config validation 命令；避免在扩展里解析文本输出。
+     - Core `pyobfus --validate-config --json` 已有稳定 JSON contract。
+     - VS Code 已新增 `pyobfus: Validate pyobfus.yaml`，基于 JSON contract 显示
+       validation 摘要，并把错误/警告写入 pyobfus output channel。
+   - 该轮 trace/config polish 已可收束；除非实际使用发现新痛点，不继续扩大
+     VS Code scope。
    - 原则：只做小而确定的 UX 改善，不改变 core 语义。
 
 2. `P2-28` MCP Registry / `server.json` schema hardening
@@ -192,5 +195,4 @@ bytecode 加密。
 
 ## 下次工作建议
 
-1. 若还要继续 VS Code 小打磨，先给 core `--validate-config` 增加 JSON contract。
-2. 若外部分发仍无进展，但状态已稳定，就开始 `P2-26` SBOM/provenance 设计。
+1. 若外部分发仍无进展，但状态已稳定，就开始 `P2-26` SBOM/provenance 设计。

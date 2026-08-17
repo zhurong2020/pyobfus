@@ -3,6 +3,7 @@ import { DiagnosticsProvider } from "./diagnostics/diagnosticsProvider";
 import { registerCheckCommands } from "./commands/checkWorkspace";
 import { registerUnmapTraceCommand } from "./commands/unmapTrace";
 import { registerGenerateConfigCommand } from "./commands/generateConfig";
+import { registerValidateConfigCommand } from "./commands/validateConfig";
 import { registerObfuscateFileCommand } from "./commands/obfuscateFile";
 import { registerProFunnelCommands } from "./commands/proFunnel";
 import { registerShowMenuCommand } from "./commands/showMenu";
@@ -26,6 +27,7 @@ export function activate(context: vscode.ExtensionContext): void {
   registerCheckCommands(context, diagnostics, onReport);
   registerUnmapTraceCommand(context, outputChannel);
   registerGenerateConfigCommand(context, outputChannel);
+  registerValidateConfigCommand(context, outputChannel);
   registerObfuscateFileCommand(context, outputChannel);
   registerProFunnelCommands(context);
   registerShowMenuCommand(context, statusBar);

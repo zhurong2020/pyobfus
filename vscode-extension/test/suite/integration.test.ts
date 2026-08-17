@@ -13,6 +13,7 @@ import {
   ObfuscateErrorResult,
   ObfuscateSuccessResult,
   TrialStatusResult,
+  ValidateConfigResult,
 } from "../../src/cli/types";
 import { DiagnosticsProvider } from "../../src/diagnostics/diagnosticsProvider";
 import { deriveTier } from "../../src/status/tierStatus";
@@ -159,6 +160,40 @@ suite("integration: M2 real pyobfus contracts", () => {
     assert.strictEqual(result.version, 1);
     assert.strictEqual(result.written, true);
     assert.ok(result.config_path.endsWith("pyobfus.yaml"));
+  });
+
+  test("pyobfus --validate-config --json produces the documented shape", async function () {
+    this.timeout(20_000);
+
+    const tmpDir = path.join(os.tmpdir(), `pyobfus-validate-test-${randomUUID()}`);
+    const configPath = path.join(tmpDir, "pyobfus.yaml");
+    await vscode.workspace.fs.createDirectory(vscode.Uri.file(tmpDir));
+    await vscode.workspace.fs.writeFile(
+      vscode.Uri.file(configPath),
+      Buffer.from("obfuscation:\n  level: community\n", "utf-8"),
+    );
+
+    const interpreter = await resolveInterpreter(vscode.Uri.file(configPath));
+    let result: ValidateConfigResult;
+    try {
+      result = await runJsonCommand<ValidateConfigResult>(
+        interpreter.pythonPath,
+        ["-m", "pyobfus", "--validate-config", configPath, "--json"],
+        { cwd: tmpDir, allowNonZeroExit: true },
+      );
+    } catch (err) {
+      if (skipOnEnoent(this, err, interpreter.pythonPath)) {
+        return;
+      }
+      throw err;
+    }
+
+    assert.strictEqual(result.version, 1);
+    assert.strictEqual(result.status, "success");
+    assert.strictEqual(result.valid, true);
+    assert.strictEqual(result.config_path, configPath);
+    assert.deepStrictEqual(result.errors, []);
+    assert.deepStrictEqual(result.warnings, []);
   });
 
   test("pyobfus --json (real obfuscate, --dry-run) produces the documented success shape", async function () {

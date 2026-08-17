@@ -14,6 +14,9 @@ Independent version/release cadence from the main `pyobfus` and `pyobfus-mcp` Py
   generated `pyobfus --unmap ... --mapping ...` command, the picker opens at
   that mapping path. Without marker metadata it now defaults to the workspace
   folder instead of an arbitrary last-used location.
+- Added "pyobfus: Validate pyobfus.yaml", backed by the new core
+  `--validate-config --json` contract, with summary notifications and detailed
+  errors/warnings in the pyobfus output channel.
 
 ### Fixed
 

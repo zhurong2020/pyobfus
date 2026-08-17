@@ -55,6 +55,11 @@
         "category": "pyobfus"
       },
       {
+        "command": "pyobfus.validateConfig",
+        "title": "pyobfus: Validate pyobfus.yaml",
+        "category": "pyobfus"
+      },
+      {
         "command": "pyobfus.obfuscateFile",
         "title": "Obfuscate with pyobfus",
         "category": "pyobfus"

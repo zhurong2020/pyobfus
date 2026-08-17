@@ -20,6 +20,7 @@ export function registerShowMenuCommand(
       const items: MenuItem[] = [
         { label: "$(search) Check Workspace for Obfuscation Risks", command: "pyobfus.checkWorkspace" },
         { label: "$(gear) Generate pyobfus.yaml", command: "pyobfus.generateConfig" },
+        { label: "$(checklist) Validate pyobfus.yaml", command: "pyobfus.validateConfig" },
       ];
       if (tier === "community") {
         items.push({
