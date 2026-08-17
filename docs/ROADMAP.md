@@ -13,7 +13,21 @@ This document outlines **future plans** for pyobfus. For released version histor
 
 ## Current Status
 
-**Latest (2026-08-07)**: **`pyobfus` 0.5.13 + `vscode-extension` 0.3.0 (M3) released together, P2-2's full M0-M3 milestone chain now shipped end to end.** Shipped a day ahead of the originally-projected 2026-08-08 gate on explicit user request (one day after 0.5.12 still fits the "1-2 days apart" spacing rule). `pyobfus` 0.5.13 — `pyobfus/config_schema.py` derives `--validate-config`'s schema live from `ObfuscationConfig`'s actual dataclass fields, fixing a false-warn on `preset` and every Pro field added since v0.5.0 (23 tests), plus P2-23 content (Nuitka traceback-encryption comparison) — tagged via OIDC + PEP 740, PyPI confirmed latest. `vscode-extension` 0.3.0 (M3) — real `pyobfus.yaml` IntelliSense via a declarative `contributes.yamlValidation` entry pointing at a generated JSON Schema (`scripts/generate_vscode_schema.py`), zero runtime code — 37/37 tests green including real-contract tests against 0.5.13, real CI green (CodeQL + VSCode Extension CI + main matrix), tagged `vscode-v0.3.0`, GitHub Release published, Marketplace listing independently re-checked and confirms `"version":"0.3.0"` after the manual "⋯" → Update upload. `pyobfus-mcp` untouched this cycle. Full account: `docs/POST_V0.4_TODO.md`'s 2026-08-07 handoff notes, `docs/VSCODE_EXTENSION_PLAN.md`'s M3 section.
+**Latest (2026-08-17)**: local post-release work completed and documented:
+P2-25 VS Code trace/config polish, P2-26 obfuscated-output SBOM/provenance
+manifest enrichment, P2-27 release-provenance verification runbook, and P2-28
+MCP Registry `server.json` schema hardening. Highlights: VS Code now wraps the
+new `pyobfus --validate-config --json` contract through a `pyobfus: Validate
+pyobfus.yaml` command; `--provenance-manifest` now records input hashes, git
+commit when available, and a CycloneDX-compatible component/dependency section;
+`pyobfus --verify-provenance-manifest --json` validates manifest shape,
+relationships, and local integrity digest; `docs/RELEASE_PROVENANCE_VERIFICATION.md`
+records the PyPI Integrity API / `pypi-attestations` posture and confirms the
+latest `pyobfus 0.5.13` / `pyobfus-mcp 0.3.5` wheel+sdist provenance endpoints
+return `HTTP 200`. These are local commits for the next release; the latest
+published pyobfus remains 0.5.13.
+
+**Prior (2026-08-07)**: **`pyobfus` 0.5.13 + `vscode-extension` 0.3.0 (M3) released together, P2-2's full M0-M3 milestone chain now shipped end to end.** Shipped a day ahead of the originally-projected 2026-08-08 gate on explicit user request (one day after 0.5.12 still fits the "1-2 days apart" spacing rule). `pyobfus` 0.5.13 — `pyobfus/config_schema.py` derives `--validate-config`'s schema live from `ObfuscationConfig`'s actual dataclass fields, fixing a false-warn on `preset` and every Pro field added since v0.5.0 (23 tests), plus P2-23 content (Nuitka traceback-encryption comparison) — tagged via OIDC + PEP 740, PyPI confirmed latest. `vscode-extension` 0.3.0 (M3) — real `pyobfus.yaml` IntelliSense via a declarative `contributes.yamlValidation` entry pointing at a generated JSON Schema (`scripts/generate_vscode_schema.py`), zero runtime code — 37/37 tests green including real-contract tests against 0.5.13, real CI green (CodeQL + VSCode Extension CI + main matrix), tagged `vscode-v0.3.0`, GitHub Release published, Marketplace listing independently re-checked and confirms `"version":"0.3.0"` after the manual "⋯" → Update upload. `pyobfus-mcp` untouched this cycle. Full account: `docs/POST_V0.4_TODO.md`'s 2026-08-07 handoff notes, `docs/VSCODE_EXTENSION_PLAN.md`'s M3 section.
 
 ### Post-release Review (2026-08-09)
 
@@ -301,25 +315,24 @@ as important trust/discovery data.
 
 **Resulting priority order:**
 
-- [~] **P2-25: VS Code trace/config workflow polish** — already started
-  2026-08-14. Keep this as the immediate short-cycle work while Glama/Claude
-  distribution blockers are unresolved. Focus on low-risk UX improvements that
-  make the already-shipped reverse-trace and `pyobfus.yaml` workflow smoother:
-  trace-marker-aware mapping discovery, clearer mapping/config errors, and
-  config validation surfaced in editor context. Do not change pyobfus core
-  semantics unless a real bug is found. _Target: extension patch/minor, 1-2
-  days per slice._
-- [~] **P2-26: Obfuscated-output SBOM + provenance manifest** — first stage
-  landed locally 2026-08-17 on top of the existing `--provenance-manifest`
-  foundation: the manifest keeps its original fields and integrity digest, and
-  now adds per-input SHA-256 hashes, the containing Git commit when available,
-  and a CycloneDX-compatible `cyclonedx` section with file components plus
-  input/output/mapping relationships. Remaining work: formalize the schema /
-  validator posture, add user-facing examples, and decide whether a separate
-  `--sbom` output path is worth adding or whether the embedded CycloneDX
-  section is the right stable surface. This remains a provenance,
-  reproducibility, and tamper-evidence feature, not a claim that the protected
-  output is automatically trustworthy.
+- [x] **P2-25: VS Code trace/config workflow polish** — local post-0.3.0 polish
+  completed 2026-08-17. Reverse Stack Trace uses `--trace-marker` hints to
+  locate mapping files, shares the same stale-CLI/interpreter error reporting
+  as the other commands, Obfuscate with pyobfus surfaces unknown config-key
+  errors with an action to open the discovered `pyobfus.yaml`, and VS Code now
+  exposes `pyobfus: Validate pyobfus.yaml` backed by the core
+  `--validate-config --json` contract. Stop expanding this slice unless real
+  user testing finds a fresh workflow break.
+- [x] **P2-26: Obfuscated-output SBOM + provenance manifest** — local
+  implementation/docs complete 2026-08-17 on top of the existing
+  `--provenance-manifest` foundation. The manifest keeps its original fields
+  and integrity digest, and now adds per-input SHA-256 hashes, the containing
+  Git commit when available, and a CycloneDX-compatible `cyclonedx` section
+  with file components plus input/output/mapping relationships. User docs live
+  in `docs/PROVENANCE_MANIFEST.md`; `pyobfus --verify-provenance-manifest
+  --json` validates manifest shape, CycloneDX-compatible relationships, and
+  local integrity digest. A separate `--sbom` flag is deferred unless embedded
+  CycloneDX proves insufficient.
 - [x] **P2-27: Attestation-verification helper / trust report** — docs-first
   runbook landed 2026-08-17 in `docs/RELEASE_PROVENANCE_VERIFICATION.md`.
   Verified the current PyPI JSON latest versions (`pyobfus 0.5.13`,

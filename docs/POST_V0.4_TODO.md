@@ -412,18 +412,36 @@
 >    schema and now includes GitHub repository stable ID `1093960892`.
 >    `fileSha256` stays omitted because PyPI's wheel/sdist multi-artifact model
 >    makes a single optional hash ambiguous.
-> 3. **P2-26 obfuscated-output SBOM + provenance manifest** — next substantial
->    feature once Glama/Claude are stable or clearly aging out. Build on
->    `--provenance-manifest`, target CycloneDX-compatible output metadata, and
->    keep the claim to provenance/reproducibility rather than "trust".
-> 4. **P2-27 attestation-verification helper / trust report** — docs-first or
->    tiny CLI that verifies PyPI provenance honestly.
-> 5. **P2-29 compatibility checks** — incremental diagnostics/docs for real
+> 3. **P2-26 obfuscated-output SBOM + provenance manifest** — ✅ completed
+>    locally 2026-08-17 on the embedded `--provenance-manifest` path; standalone
+>    `--sbom` remains deferred unless external tooling requires it.
+> 4. **P2-27 attestation-verification helper / trust report** — ✅ docs-first
+>    runbook completed 2026-08-17.
+> 5. **P2-29 compatibility checks** — next active queue: incremental diagnostics/docs for real
 >    packaging/model-serving pain, not new transforms by default.
 > 6. **P3-1 `--output-pyc`** — feasibility spike only; close as non-fit if it
 >    weakens AI-debuggability or only imitates bytecode tools poorly.
 > 7. **P3-2 hosted MCP endpoint** — still behind P2-20/Glama stability; read-only
 >    tools only if built.
+>
+> **2026-08-17 — local follow-through on the 2026-08-14 queue.**
+> P2-25 trace/config workflow polish is complete locally: Reverse Stack Trace
+> consumes `--trace-marker` mapping hints, CLI error reporting is shared across
+> reverse-trace/obfuscate/config commands, config unknown-key errors point back
+> to the discovered `pyobfus.yaml`, and VS Code exposes `pyobfus: Validate
+> pyobfus.yaml` through the core `--validate-config --json` contract. P2-28 is
+> complete locally (`server.json` validates against the official `2025-12-11`
+> schema and includes GitHub repository stable ID `1093960892`). P2-26 is
+> complete locally for the embedded-manifest path: `--provenance-manifest`
+> now includes input hashes, git commit when available, CycloneDX-compatible
+> components/dependencies, docs in `docs/PROVENANCE_MANIFEST.md`, and a new
+> `pyobfus --verify-provenance-manifest --json` validator. P2-27 is docs-first
+> complete in `docs/RELEASE_PROVENANCE_VERIFICATION.md`; PyPI Integrity API
+> endpoints for the latest `pyobfus 0.5.13` and `pyobfus-mcp 0.3.5`
+> wheel/sdist artifacts all returned `HTTP 200` on 2026-08-17. Next active
+> queue is P2-29 compatibility checks. Glama Discord still had no reply when
+> the maintainer checked on 2026-08-17; Claude plugin submission remains
+> `Submitted and pending review` from Aug 2.
 > **2026-08-08, same day — adopted a standing periodic post-release
 > review cadence.** After every ~3-5 accumulated releases (or a 1-2 week
 > span, not every session — too frequent conflates release-day noise
@@ -1428,11 +1446,11 @@ So target submission window = **2026-Q3 / Q4** (after v0.5 ships on PyPI per Pat
 **Why**: MCP 2026 roadmap proposes **Server Cards** (SEP-1649 server-card at `/.well-known/mcp/server-card.json` + SEP-1960 manifest at `/.well-known/mcp`) — a standard for advertising server capabilities, tool surface, transports, auth, protocol version **without connecting**. Aggregators (Glama, PulseMCP, Smithery, future Anthropic clients) and crawlers read it to discover/rank servers. **Expected to land in the June-2026 spec cycle**; SDK support follows. Same narrow first-mover dynamic as N1 (PEP 750 t-strings): "the obfuscator MCP that ships a Server Card before the field" is a real-but-short SEO/discovery edge. Sources: SEP-1649 <https://github.com/modelcontextprotocol/modelcontextprotocol/issues/1649> · MCP roadmap <https://modelcontextprotocol.io/development/roadmap>.
 
 **Action**:
-1. Author a static `server-card.json` per SEP-1649 schema: name `io.github.zhurong2020/pyobfus-mcp`, 7 tools w/ descriptions, transport `stdio` (+ remote URL once N14 lands), Apache-2.0, protocol version, link to Glama A listing + MCP Registry entry.
+1. Author a static `server-card.json` per SEP-1649 schema: name `io.github.zhurong2020/pyobfus-mcp`, 8 tools w/ descriptions, transport `stdio` (+ remote URL once N14 lands), Apache-2.0, protocol version, link to Glama listing + MCP Registry entry.
 2. Serve it at `/.well-known/mcp/server-card.json` on `pyobfus.dev` (depends on N7 domain being live) AND commit a copy in-repo (`pyobfus_mcp/server-card.json`) so the Registry/`glama.yaml` can reference it.
 3. Validate against the emerging schema (ref impl `github.com/cognimata/mcp-server-card-demo`); re-check when SEP merges into core spec (wording may shift server-card.json ↔ mcp manifest).
 
-**Done when**: `curl https://pyobfus.dev/.well-known/mcp/server-card.json` returns a schema-valid card listing all 7 tools; in-repo copy committed; re-validation note filed when SEP-1649/1960 merges. **Path C safe** (pure metadata). **Depends on**: N7 (domain).
+**Done when**: `curl https://pyobfus.dev/.well-known/mcp/server-card.json` returns a schema-valid card listing all 8 tools; in-repo copy committed; re-validation note filed if/when a Server Card mechanism becomes applicable to a hosted HTTP transport. **Path C safe** (pure metadata). **Depends on**: N7 (domain) and no longer applies to the local stdio-only server by itself.
 
 #### N13 — SBOM + provenance for the obfuscated *output* (1-2 weeks · enterprise differentiator · added 2026-06-05)
 
@@ -1440,10 +1458,10 @@ So target submission window = **2026-Q3 / Q4** (after v0.5 ships on PyPI per Pat
 
 **Action**:
 1. (a) Add CycloneDX SBOM generation for pyobfus itself to the release workflow (ride next bump; complements PEP 740). Low effort.
-2. (b) New CLI flag `pyobfus --sbom <out.json>` (or auto-emit alongside `dist/`): CycloneDX-format manifest of the obfuscated output — input file set, source provenance (git commit if available), pyobfus version + obfuscation-config hash, per-output-file SHA-256, declared third-party deps untouched. Optional `--attest` to sign it (reuse sigstore path).
+2. (b) 2026-08-17 local first implementation uses the existing `--provenance-manifest` surface rather than adding a new flag: the manifest now embeds CycloneDX-compatible output metadata — input file set, source provenance (git commit if available), pyobfus version + obfuscation-config hash, per-input/output-file SHA-256, mapping digest, and component relationships. A separate `pyobfus --sbom <out.json>` remains deferred unless the embedded `cyclonedx` section proves insufficient.
 3. Document the output-SBOM as an enterprise/Pro-adjacent feature on the comparison page + a short blog post ("ship obfuscated Python with a supply-chain manifest").
 
-**Done when**: release emits pyobfus's own CycloneDX SBOM; `pyobfus --sbom` produces a schema-valid CycloneDX manifest for the obfuscated output with per-file hashes; documented on `pyobfus.dev`/comparison. **Path C safe** (output metadata, not v0.5 mechanism). Decide Core-vs-Pro split for (b) before shipping.
+**Done when**: release emits pyobfus's own CycloneDX SBOM; `--provenance-manifest` includes validated CycloneDX-compatible output metadata with per-file hashes; documented in `docs/PROVENANCE_MANIFEST.md` and later on `pyobfus.dev`/comparison. **Path C safe** (output metadata, not v0.5 mechanism). Current local implementation is Core/community; revisit a separate `--sbom` flag only if users need a standalone CycloneDX file.
 
 #### N14 — Hosted/remote `pyobfus-mcp` endpoint (1 week · new install funnel · added 2026-06-05)
 
@@ -1467,7 +1485,7 @@ So target submission window = **2026-Q3 / Q4** (after v0.5 ships on PyPI per Pat
 | punkpeye merges PR #5777 | ✅ **MERGED 2026-06-06 22:52 UTC** by punkpeye (Frank Fiegel) — pyobfus-mcp now listed in `punkpeye/awesome-mcp-servers` (86K★) under Developer Tools. Opened 2026-05-03 → ~34 days at human cadence. (2026-05-29: PR had gone `CONFLICTING`/`DIRTY` from a README.md collision; resolved by merging `upstream/main` + re-appending the 7-tool entry → back to `MERGEABLE`.) | ✅ done |
 | Glama license badge F → A | **2026-05-29: root-caused** — GitHub `licensee` returned `NOASSERTION` because the dual-license preamble prefixed the Apache text; Glama mirrors that field. Fix: `LICENSE` → pure Apache-2.0, notice moved to `LICENSE-NOTICE.md`. **PR #15 MERGED 2026-05-29 (commit `5556f8b`); GitHub now reports `spdx_id=Apache-2.0` ✅ (verified via `gh api repos/zhurong2020/pyobfus/license`).** Only remaining step is passive: Glama cron re-crawl flips the badge F → A. | 1-3 days (Glama crawl) |
 | Glama "No glama.json" checklist clears | Glama cron re-scan after `glama.json` schema fix (commit `8d92487`) | 1-3 days |
-| Glama tool-count re-index 0/5 → 7 | ✅ **2026-06-08: RESOLVED at source** — true root cause was NOT the repo Dockerfile (06-05 `bbeefb8` hypothesis) but the Glama admin **Dockerfile → Configuration "Build steps"** field, independently pinned to `pyobfus-mcp==0.1.2` (web-UI-only setting Glama generates its container from; the repo's own Dockerfile is ignored). Edited that field `0.1.2`→`0.2.0` + saved → test `019ea6c5` **succeeded 2026-06-08 18:27 CST**, introspection `ListToolsRequest` returned **all 7 tools**. **Remaining = passive re-index lag**: public API + page "Tools" panel still showed 0/5 immediately after; verify `curl -s https://glama.ai/api/mcp/v1/servers/zhurong2020/pyobfus \| python3 -c "import sys,json;print(len(json.load(sys.stdin)['tools']))"` → expect 7 within ~1 day. Full root-cause + lesson in 30-Second-Resume 2026-06-08 block above. | passive — API/listing catches up ≤1 day from the 06-08 successful test |
+| Glama tool-count re-index / stale API | ✅ **2026-06-08: original 0/5→7 issue resolved at source** — true root cause was NOT the repo Dockerfile (06-05 `bbeefb8` hypothesis) but the Glama admin **Dockerfile → Configuration "Build steps"** field, independently pinned to `pyobfus-mcp==0.1.2` (web-UI-only setting Glama generates its container from; the repo's own Dockerfile is ignored). Edited that field `0.1.2`→`0.2.0` + saved → test `019ea6c5` **succeeded 2026-06-08 18:27 CST**, introspection `ListToolsRequest` returned **all 7 tools**. **2026-08-17 update**: current public page is reachable and shows 8 tool names, but the old API path now returns `not_found`; maintainer checked Glama Discord and saw no reply yet. Treat as external listing/API drift, not a local pyobfus-mcp issue unless Glama gives a reproducer. | wait for Glama reply / next periodic external check |
 | First external GitHub issue | Real user encounters something | depends on launch |
 | First Pro license sale | Launch traffic + Stripe checkout funnel | depends on launch |
 | GitHub stars 0 → 100+ | Launch + Glama/Registry organic discovery | depends on launch |
@@ -1595,5 +1613,5 @@ By 2026-06-15: v0.5.0 release candidate (Core) + N7 demo live + 5-6 SEO pages in
 
 ---
 
-**Last updated**: 2026-06-08 (PR #5777 MERGED 2026-06-06 → punkpeye/awesome-mcp-servers LIVE [N5 fully done, 2 lists live]; synced across ROADMAP/DISTRIBUTION_CHANNELS/AI_INTEGRATION_STRATEGY. Glama tool-count RESOLVED at source — true root cause = admin Configuration "Build steps" field pinned `0.1.2`, NOT the repo Dockerfile; edited to `0.2.0`, test `019ea6c5` succeeded with all 7 tools; API/listing re-index is the only passive remainder. See 30-Second-Resume 2026-06-08 block + P2 row. Also: README tool-count already reads "seven" — N10 doc-lag item resolved.). Earlier: 2026-06-05 (patent FILED+ACCEPTED 申请号 202610712171X · fees fully paid · now in 补正 formality correction ~2026-08-01 deadline · Path C gate tightened to "after 补正 resolved" · see §P1 2026-06-05 block + Glama tool-count P2 item · also: Glama introspection Dockerfile-pin fix commit bbeefb8 · **NEW N12 MCP Server Card + N13 obfuscated-output SBOM + N14 hosted MCP endpoint added from 2026-06-05 competitive/trend scan; CodeEnigma logged in verified-facts table**). Earlier: 2026-05-10 (Patent draft v1 + CNIPA web upload progress block added under §🟡 P1 v0.5 work · 5 web tabs filled + saved · 备案 submitted 待审核 · final 提交 pending 备案 approval ~1-2 weeks · 申请号 receipt expected late May / early June; v0.5 public release ~mid-June). Earlier: 2026-05-09 (added P0.5/P0.6/P0.7 + N7/N8/N9 + pricing-tier do-not-do guardrail · post-strategy-review with user) · P0 status: P0.1 ✅ · P0.2 ✅ · P0.3 ✅ shipped with 0.2.0 (Registry stripped publisher namespace; investigation queued for next bump) · P0.4 ✅ live at https://dev.to/zhurong2020/let-claude-code-debug-your-obfuscated-python-a-guide-to-the-pyobfus-mcp-integration-3epm · **P0.5/P0.6/P0.7 NEW**: GitHub topic curation + Socket score push + Discussions poll (all queued for week-2 cont. 5-13+) · **N2 ✅ SHIPPED**: pyobfus-mcp 0.2.0 live on PyPI (with PEP 740 attestations) + MCP Registry (active + isLatest) · **N5 ✅ FINAL**: wong2/mcpservers.org LIVE + punkpeye #5777 still OPEN + appcypher dead-end · **N6 ✅ STAGED**: PyPI summary + keywords edits in source (both packages); ride next legitimate version bump · **N7/N8/N9 NEW**: pyobfus.dev demo + 5-6 SEO landing pages + Stripe quantity field (gated on launch signal · weeks 4-6) · launch wave next: HN Mon 5-11 / Reddit Tue 5-12 / CN trio Fri-Sat 5-8/9
+**Last updated**: 2026-08-17 (P2-25 VS Code trace/config polish completed locally; P2-26 embedded obfuscated-output provenance/CycloneDX metadata + `--verify-provenance-manifest` completed locally; P2-27 release-provenance runbook completed; P2-28 MCP Registry `server.json` schema hardening completed; next active queue is P2-29 compatibility checks. Glama public page still lists 8 tools but the old API path returns `not_found`; maintainer checked Discord and saw no reply. Claude plugin submission still `Submitted and pending review` from Aug 2.). Earlier: 2026-06-08 (PR #5777 MERGED 2026-06-06 → punkpeye/awesome-mcp-servers LIVE [N5 fully done, 2 lists live]; Glama original tool-count issue RESOLVED at source — admin Configuration "Build steps" field pinned `0.1.2`, not the repo Dockerfile; edited to `0.2.0`, test `019ea6c5` succeeded with all 7 tools). Earlier: 2026-06-05 (patent FILED+ACCEPTED 申请号 202610712171X · fees fully paid · now in 补正 formality correction ~2026-08-01 deadline · Path C gate tightened to "after 补正 resolved" · see §P1 2026-06-05 block + Glama tool-count P2 item · also: Glama introspection Dockerfile-pin fix commit bbeefb8 · **NEW N12 MCP Server Card + N13 obfuscated-output SBOM + N14 hosted MCP endpoint added from 2026-06-05 competitive/trend scan; CodeEnigma logged in verified-facts table**). Earlier: 2026-05-10 (Patent draft v1 + CNIPA web upload progress block added under §🟡 P1 v0.5 work · 5 web tabs filled + saved · 备案 submitted 待审核 · final 提交 pending 备案 approval ~1-2 weeks · 申请号 receipt expected late May / early June; v0.5 public release ~mid-June). Earlier: 2026-05-09 (added P0.5/P0.6/P0.7 + N7/N8/N9 + pricing-tier do-not-do guardrail · post-strategy-review with user) · P0 status: P0.1 ✅ · P0.2 ✅ · P0.3 ✅ shipped with 0.2.0 (Registry stripped publisher namespace; investigation queued for next bump) · P0.4 ✅ live at https://dev.to/zhurong2020/let-claude-code-debug-your-obfuscated-python-a-guide-to-the-pyobfus-mcp-integration-3epm · **P0.5/P0.6/P0.7 NEW**: GitHub topic curation + Socket score push + Discussions poll (all queued for week-2 cont. 5-13+) · **N2 ✅ SHIPPED**: pyobfus-mcp 0.2.0 live on PyPI (with PEP 740 attestations) + MCP Registry (active + isLatest) · **N5 ✅ FINAL**: wong2/mcpservers.org LIVE + punkpeye #5777 still OPEN + appcypher dead-end · **N6 ✅ STAGED**: PyPI summary + keywords edits in source (both packages); ride next legitimate version bump · **N7/N8/N9 NEW**: pyobfus.dev demo + 5-6 SEO landing pages + Stripe quantity field (gated on launch signal · weeks 4-6) · launch wave next: HN Mon 5-11 / Reddit Tue 5-12 / CN trio Fri-Sat 5-8/9
 **Next review**: post-备案 approval (1-15 working days from 2026-05-10 · estimated 5-12 → 5-25) for final 提交 + 申请号 timeline; 24h post-dev.to for first-day reaction metrics; post-launch-wave (5-13) for full multi-platform signal feeding P0.7 poll → N7/N8/N9 prioritization decision in week 4

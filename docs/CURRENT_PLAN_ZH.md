@@ -157,7 +157,8 @@ bytecode 加密。
    - 用户文档已补 `docs/PROVENANCE_MANIFEST.md`，README / `llms.txt` 已同步。
    - CLI 已新增 `--verify-provenance-manifest`，可校验 pyobfus manifest shape、
      CycloneDX-compatible relationships 和本地 integrity digest，并支持 JSON 输出。
-   - 后续只剩决定是否需要独立 `--sbom` 入口；当前先不扩接口。
+   - 当前先不扩独立 `--sbom` 入口；只有当用户或外部工具明确需要 standalone
+     CycloneDX 文件时，再单独开后续项。
    - 价值：竞品能保护代码/数据，但通常不给“被保护产物”的供应链记录。
    - 口径：这是 provenance / reproducibility / tamper-evidence，不是“证明代码可信”。
 
