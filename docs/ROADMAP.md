@@ -309,16 +309,17 @@ as important trust/discovery data.
   config validation surfaced in editor context. Do not change pyobfus core
   semantics unless a real bug is found. _Target: extension patch/minor, 1-2
   days per slice._
-- [ ] **P2-26: Obfuscated-output SBOM + provenance manifest** — promote N13(b)
-  from "interesting long-term" to the next substantial feature after the
-  external queue stabilizes. Extend the existing `--provenance-manifest`
-  foundation into a CycloneDX-compatible output manifest for the obfuscated
-  artifact: pyobfus version, source commit if available, config hash, input and
-  output file hashes, mapping digest, and relationship metadata. This is the
-  strongest best-practice-aligned differentiator because competitors protect
-  code/data but do not give teams a clean supply-chain record for the protected
-  output. Start as Core/community unless Pro-specific fields require gated
-  enrichment. _Target: 1-2 weeks; release as a real feature._
+- [~] **P2-26: Obfuscated-output SBOM + provenance manifest** — first stage
+  landed locally 2026-08-17 on top of the existing `--provenance-manifest`
+  foundation: the manifest keeps its original fields and integrity digest, and
+  now adds per-input SHA-256 hashes, the containing Git commit when available,
+  and a CycloneDX-compatible `cyclonedx` section with file components plus
+  input/output/mapping relationships. Remaining work: formalize the schema /
+  validator posture, add user-facing examples, and decide whether a separate
+  `--sbom` output path is worth adding or whether the embedded CycloneDX
+  section is the right stable surface. This remains a provenance,
+  reproducibility, and tamper-evidence feature, not a claim that the protected
+  output is automatically trustworthy.
 - [ ] **P2-27: Attestation-verification helper / trust report** — add a small
   CLI/docs utility that verifies pyobfus/pyobfus-mcp release provenance through
   PyPI's Integrity API or `pypi-attestations`, then explains the result in

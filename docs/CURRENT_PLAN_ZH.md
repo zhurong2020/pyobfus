@@ -144,6 +144,9 @@ bytecode 加密。
 
 1. `P2-26` obfuscated-output SBOM + provenance manifest
    - 在现有 `--provenance-manifest` 基础上扩展。
+   - 第一阶段已在本地完成：manifest 保留原字段和 integrity digest，同时新增
+     input SHA-256、可用时的 git commit，以及 CycloneDX-compatible
+     `cyclonedx` 子结构。
    - 输出 CycloneDX-compatible manifest，包含：
      - pyobfus 版本
      - git commit（如可用）
@@ -151,6 +154,7 @@ bytecode 加密。
      - input/output file hash
      - mapping digest
      - artifact relationship metadata
+   - 后续仍需补正式 schema / validator 口径、发布文档和示例。
    - 价值：竞品能保护代码/数据，但通常不给“被保护产物”的供应链记录。
    - 口径：这是 provenance / reproducibility / tamper-evidence，不是“证明代码可信”。
 
@@ -195,4 +199,5 @@ bytecode 加密。
 
 ## 下次工作建议
 
-1. 若外部分发仍无进展，但状态已稳定，就开始 `P2-26` SBOM/provenance 设计。
+1. 收束 `P2-26`：补 schema/validator 口径、README/文档示例，并决定是否需要
+   独立 `--sbom` 输出入口。

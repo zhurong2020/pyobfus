@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `--provenance-manifest PATH` now includes richer obfuscated-output supply-chain
+  metadata: per-input SHA-256 hashes, the containing Git commit when available,
+  and a CycloneDX-compatible `cyclonedx` section with file components and
+  input/output/mapping relationships. The existing manifest fields and local
+  integrity digest remain unchanged.
 - `pyobfus --validate-config FILE --json` now emits a stable machine-readable
   validation contract (`status`, `valid`, `errors`, `warnings`, `suggestions`,
   `summary`, `ai_hint`, `exit_code`) while preserving the existing text output

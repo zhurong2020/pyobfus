@@ -52,7 +52,17 @@ def test_cli_writes_provenance_manifest_with_mapping_digest(tmp_path: Path) -> N
     assert data["mapping"]["sha256"]
     assert data["files"][0]["input"] == str(src)
     assert data["files"][0]["output"] == str(out)
+    assert data["files"][0]["input_sha256"]
     assert data["files"][0]["output_sha256"]
+    assert "source_control" in data
+    assert "git_commit" in data["source_control"]
+    assert data["cyclonedx"]["bomFormat"] == "CycloneDX"
+    assert data["cyclonedx"]["specVersion"] == "1.6"
+    component_refs = {component["bom-ref"] for component in data["cyclonedx"]["components"]}
+    assert component_refs == {"input:app.py", "output:app.py", "mapping:mapping.json"}
+    assert data["cyclonedx"]["dependencies"] == [
+        {"ref": "output:app.py", "dependsOn": ["input:app.py", "mapping:mapping.json"]}
+    ]
     assert verify_manifest_integrity(data)
 
     payload = json.loads(result.output)
@@ -85,7 +95,14 @@ def test_cli_writes_provenance_manifest_for_directory_input(tmp_path: Path) -> N
     assert relative_paths == {"a.py", "b.py"}
     for f in data["files"]:
         assert Path(f["output"]).exists()
+        assert f["input_sha256"]
         assert f["output_sha256"]
+    component_refs = {component["bom-ref"] for component in data["cyclonedx"]["components"]}
+    assert component_refs == {"input:a.py", "output:a.py", "input:b.py", "output:b.py"}
+    assert {dep["ref"] for dep in data["cyclonedx"]["dependencies"]} == {
+        "output:a.py",
+        "output:b.py",
+    }
     assert verify_manifest_integrity(data)
 
 

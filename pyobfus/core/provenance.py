@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
 from dataclasses import asdict, is_dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -59,6 +60,8 @@ def build_provenance_manifest(
 ) -> Dict[str, Any]:
     """Build a v1 provenance manifest payload with a local integrity digest."""
     file_records: List[Dict[str, str]] = []
+    components: List[Dict[str, Any]] = []
+    dependencies: List[Dict[str, Any]] = []
     for input_file in sorted(files):
         try:
             rel = input_file.relative_to(input_root if input_root.is_dir() else input_root.parent)
@@ -72,30 +75,142 @@ def build_provenance_manifest(
             "output": str(output_file),
             "relative_path": rel.as_posix(),
         }
+        input_digest = sha256_file(input_file)
+        if input_digest:
+            record["input_sha256"] = input_digest
         output_digest = sha256_file(output_file)
         if output_digest:
             record["output_sha256"] = output_digest
+        input_ref = f"input:{rel.as_posix()}"
+        output_ref = f"output:{rel.as_posix()}"
+        if input_digest:
+            components.append(
+                _cyclonedx_file_component(
+                    bom_ref=input_ref,
+                    name=rel.as_posix(),
+                    path=input_file,
+                    sha256=input_digest,
+                    role="source-input",
+                )
+            )
+        if output_digest:
+            components.append(
+                _cyclonedx_file_component(
+                    bom_ref=output_ref,
+                    name=rel.as_posix(),
+                    path=output_file,
+                    sha256=output_digest,
+                    role="obfuscated-output",
+                )
+            )
+            dependencies.append({"ref": output_ref, "dependsOn": [input_ref]})
         file_records.append(record)
 
     mapping_digest = sha256_file(mapping_path) if mapping_path else None
+    if mapping_path and mapping_digest:
+        mapping_ref = "mapping:mapping.json"
+        components.append(
+            _cyclonedx_file_component(
+                bom_ref=mapping_ref,
+                name=Path(mapping_path).name,
+                path=Path(mapping_path),
+                sha256=mapping_digest,
+                role="debug-mapping",
+            )
+        )
+        for dep in dependencies:
+            dep["dependsOn"].append(mapping_ref)
+
+    created_at = datetime.now(timezone.utc).isoformat()
+    config_digest = config_hash(config)
     payload: Dict[str, Any] = {
         "version": PROVENANCE_FORMAT_VERSION,
         "pyobfus_version": PYOBFUS_VERSION,
-        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": created_at,
         "tool": {"name": "pyobfus", "version": PYOBFUS_VERSION},
         "input_root": str(input_root),
         "output_root": str(output_root),
         "mode": mode,
         "preset": preset,
-        "config_hash": config_hash(config),
+        "config_hash": config_digest,
+        "source_control": {
+            "git_commit": git_commit_for_path(input_root),
+        },
         "mapping": {
             "path": str(mapping_path) if mapping_path else None,
             "sha256": mapping_digest,
         },
         "files": file_records,
+        "cyclonedx": {
+            "bomFormat": "CycloneDX",
+            "specVersion": "1.6",
+            "version": 1,
+            "metadata": {
+                "timestamp": created_at,
+                "tools": {
+                    "components": [
+                        {
+                            "type": "application",
+                            "name": "pyobfus",
+                            "version": PYOBFUS_VERSION,
+                        }
+                    ]
+                },
+                "component": {
+                    "type": "application",
+                    "name": "pyobfus-obfuscated-output",
+                    "version": "1",
+                    "properties": [
+                        {"name": "pyobfus:config-sha256", "value": config_digest},
+                        {"name": "pyobfus:mode", "value": mode},
+                    ],
+                },
+            },
+            "components": components,
+            "dependencies": dependencies,
+        },
     }
     payload["integrity"] = _integrity_digest_for(payload)
     return payload
+
+
+def git_commit_for_path(path: Union[str, Path]) -> Optional[str]:
+    """Return the containing Git commit for a path, or None outside Git."""
+    resolved = Path(path).resolve()
+    git_cwd = resolved if resolved.is_dir() else resolved.parent
+    try:
+        proc = subprocess.run(
+            ["git", "-C", str(git_cwd), "rev-parse", "HEAD"],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
+            text=True,
+            timeout=5,
+        )
+    except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        return None
+    commit = proc.stdout.strip()
+    return commit or None
+
+
+def _cyclonedx_file_component(
+    *,
+    bom_ref: str,
+    name: str,
+    path: Path,
+    sha256: str,
+    role: str,
+) -> Dict[str, Any]:
+    return {
+        "type": "file",
+        "bom-ref": bom_ref,
+        "name": name,
+        "hashes": [{"alg": "SHA-256", "content": sha256}],
+        "properties": [
+            {"name": "pyobfus:path", "value": str(path)},
+            {"name": "pyobfus:role", "value": role},
+        ],
+    }
 
 
 def save_provenance_manifest(manifest: Dict[str, Any], path: Union[str, Path]) -> None:
