@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.14] - 2026-08-17
+
 ### Added
 
 - `--provenance-manifest PATH` now includes richer obfuscated-output supply-chain
@@ -26,6 +28,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `summary`, `ai_hint`, `exit_code`) while preserving the existing text output
   when `--json` is not passed. This gives IDE/MCP callers a real config
   validation surface without scraping human text.
+
+### Fixed
+
+- `_handle_verify_provenance_manifest`'s `result` variable typed as
+  `Dict[str, object]` under mypy (inferred from its first assignment, an
+  except-branch dict literal), making `result["errors"]`/`result["warnings"]`
+  untyped for the text-output `for` loops. Caught by CI on this feature's
+  first real push; fixed with an explicit `Dict[str, Any]` annotation.
 
 ## [0.5.13] - 2026-08-07
 
