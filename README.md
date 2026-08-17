@@ -4,7 +4,7 @@
   <img src="https://raw.githubusercontent.com/zhurong2020/pyobfus/main/docs/assets/logo.jpeg" alt="pyobfus Logo" width="200">
 </p>
 
-**pyobfus** (pronounced as "Python obfuscator") is a modern, AST-based **python-obfuscator / code-obfuscator** with framework-aware presets, reverse stack-trace mapping for AI-assisted debugging, and a machine-readable JSON CLI designed for [Claude Code](https://claude.com/claude-code), [Cursor](https://cursor.com/), [Codex](https://openai.com/codex/), and MCP agents. A transparent, open-source alternative to PyArmor.
+**pyobfus** (pronounced as "Python obfuscator") is a modern, AST-based **python-obfuscator / code-obfuscator** with framework-aware presets, reverse stack-trace mapping for AI-assisted debugging, and a machine-readable JSON CLI designed for [Claude Code](https://claude.com/claude-code), [Cursor](https://cursor.com/), [GitHub Copilot](https://github.com/features/copilot), [Codex](https://openai.com/codex/), [CodeBuddy](https://www.codebuddy.ai/), and any MCP-compatible AI agent. A transparent, open-source alternative to PyArmor.
 
 [![PyPI version](https://img.shields.io/pypi/v/pyobfus.svg)](https://pypi.org/project/pyobfus/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/pyobfus.svg)](https://pypi.org/project/pyobfus/)

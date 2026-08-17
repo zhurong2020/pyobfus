@@ -25,7 +25,7 @@
       "licensing_model": "apache-2.0-core-plus-proprietary-pro",
       "quality_grade": "A",
       "tool_intent": "code-protection",
-      "target_clients": ["claude-desktop", "claude-code", "cursor", "windsurf", "zed", "codex"]
+      "target_clients": ["claude-desktop", "claude-code", "cursor", "github-copilot", "windsurf", "zed", "codex", "codebuddy"]
     }
   }
 }

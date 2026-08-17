@@ -1,6 +1,6 @@
 # pyobfus — the Python obfuscator
 
-> pyobfus is a modern, AST-based Python obfuscator (python-obfuscator / code-obfuscator) with framework-aware presets, reverse stack-trace mapping for AI-assisted debugging, and a machine-readable JSON CLI designed to be called by AI coding agents (Claude Code, Cursor, Windsurf) and MCP servers. Apache-2.0; a transparent open-source alternative to PyArmor.
+> pyobfus is a modern, AST-based Python obfuscator (python-obfuscator / code-obfuscator) with framework-aware presets, reverse stack-trace mapping for AI-assisted debugging, and a machine-readable JSON CLI designed to be called by AI coding agents (Claude Code, Cursor, GitHub Copilot, Windsurf, CodeBuddy) and MCP servers. Apache-2.0; a transparent open-source alternative to PyArmor.
 
 ## When to use pyobfus
 

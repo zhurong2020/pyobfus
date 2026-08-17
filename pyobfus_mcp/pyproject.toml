@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "pyobfus-mcp"
 version = "0.3.6"
-description = "Model Context Protocol server for pyobfus — the Python obfuscator. Lets Claude Desktop, Claude Code, Cursor, Windsurf, Zed, and Codex call pyobfus tools (preflight risk check, zero-config init, reverse stack-trace mapping) directly from an agent conversation. PyArmor alternative with first-class AI-debug story."
+description = "Model Context Protocol server for pyobfus — the Python obfuscator. Lets Claude Desktop, Claude Code, Cursor, GitHub Copilot, Windsurf, Zed, Codex, and CodeBuddy call pyobfus tools (preflight risk check, zero-config init, reverse stack-trace mapping) directly from an agent conversation. PyArmor alternative with first-class AI-debug story."
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.10"
 license = {text = "Apache-2.0"}
