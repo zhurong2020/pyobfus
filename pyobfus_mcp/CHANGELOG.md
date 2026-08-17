@@ -6,6 +6,20 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+### Changed
+
+- `server.json` now includes the GitHub repository stable ID
+  (`repository.id`) and has been re-validated against the official MCP
+  Registry `2025-12-11` schema. `fileSha256` is still intentionally omitted:
+  PyPI publishes multiple artifacts, and an incorrect single-artifact hash
+  would be worse than no optional hash.
+
+### Fixed
+
+- Runtime package metadata now reports `pyobfus_mcp.__version__ == "0.3.5"`,
+  matching `pyproject.toml` and `server.json`. A regression test now checks
+  these version fields stay in sync.
+
 ## [0.3.5] - 2026-08-04
 
 **Feature release (P2-21): tool-description integrity, rug-pull

@@ -5,6 +5,7 @@
   "description": "Obfuscate Python & reverse-map stack traces from your agent. AST-based, no phone-home. PyArmor alt.",
   "repository": {
     "url": "https://github.com/zhurong2020/pyobfus",
+    "id": "1093960892",
     "source": "github",
     "subfolder": "pyobfus_mcp"
   },
