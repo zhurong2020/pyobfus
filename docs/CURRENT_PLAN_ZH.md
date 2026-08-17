@@ -1,6 +1,6 @@
 # pyobfus 当前计划
 
-更新时间：2026-08-17
+更新时间：2026-08-17（三包发布后同日刷新）
 
 这份文档是当前项目状态和后续计划的中文单一入口，面向维护者日常查看。旧的
 `ROADMAP.md` 和 `POST_V0.4_TODO.md` 保留为历史归档和详细来源，但后续日常
@@ -17,13 +17,18 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
 
 ## 当前状态
 
-- 主包：`pyobfus 0.5.13` 已发布。
-- MCP 包：`pyobfus-mcp 0.3.5` 已发布。
-- VS Code 扩展：`0.3.0` 已发布到 Marketplace。
-- GitHub：主分支健康，当前公开 issues/PRs 为 0。
-- 近期下载：`pyobfus-mcp` 最新成功刷新为 day/week/month `2 / 67 / 598`；
-  `pyobfus` 最近一次刷新触发 pypistats 429，沿用同日稍早成功快照
-  `30 / 324 / 1,847`。
+- 主包：`pyobfus 0.5.14` 已发布（2026-08-17）。
+- MCP 包：`pyobfus-mcp 0.3.6` 已发布（2026-08-17），MCP Registry 同步发布，
+  `isLatest=true` 已核实。
+- VS Code 扩展：`0.4.0` 已 tag + GitHub Release 发布（2026-08-17）；
+  **Marketplace 手工上传（「⋯」→ Update → 上传 .vsix）待用户完成**，完成前
+  公开 listing 仍显示 `0.3.0`。
+- Glama admin「Build steps」字段仍停在 `pyobfus-mcp==0.3.5`，需要用户手工
+  改成 `0.3.6`（Claude 无法操作该 admin 面板）。
+- GitHub：主分支健康，当前公开 issues/PRs 为 0，CI/CodeQL 全绿。
+- 近期下载：距上次记录（08-09）满 8 天的安静基线读数——`pyobfus` day/week/
+  month `9 / 206 / 1,870`；`pyobfus-mcp` `0 / 46 / 581`。此前几次发布后
+  1-3 天的 day/week 跳升已证实是 CI/依赖解析噪音，非有机增长信号。
 - 外部分发状态：
   - Glama 旧公开 API 路径
     `/api/mcp/v1/servers/io.github.zhurong2020/pyobfus-mcp` 当前返回
@@ -114,65 +119,61 @@ bytecode 加密。
    - 如 Anthropic 给出修改入口，再顺手修 `protected_project` typo 为
      `protect_project`。
 
-### P1：短周期打磨
+### ✅ 已发布（原 P1/P2 打磨项，2026-08-17 三包发版后收口）
 
-1. `P2-25` VS Code trace/config workflow polish
-   - 当前 active。
-   - 已完成：
+1. `P2-25` VS Code trace/config workflow polish — **已发布于 `vscode-extension`
+   0.4.0**（tag + GitHub Release；Marketplace 手工上传待完成）。
      - Reverse Stack Trace 利用 `--trace-marker` 自动定位 mapping 文件。
      - Reverse Stack Trace 复用共享 CLI 错误提示；旧版 pyobfus / 解释器错误现在
        给出和 obfuscate / generate-config 一致的 Upgrade / Select Interpreter
        动作入口。
      - Obfuscate with pyobfus 识别配置 unknown-key 错误，并提供打开自动发现的
        `pyobfus.yaml` 动作入口。
-     - Core `pyobfus --validate-config --json` 已有稳定 JSON contract。
+     - Core `pyobfus --validate-config --json`（`pyobfus` 0.5.14 已发布）已有
+       稳定 JSON contract。
      - VS Code 已新增 `pyobfus: Validate pyobfus.yaml`，基于 JSON contract 显示
        validation 摘要，并把错误/警告写入 pyobfus output channel。
    - 该轮 trace/config polish 已可收束；除非实际使用发现新痛点，不继续扩大
      VS Code scope。
    - 原则：只做小而确定的 UX 改善，不改变 core 语义。
 
-2. `P2-28` MCP Registry / `server.json` schema hardening
-   - 本轮已完成本地处理：用官方 `2025-12-11` schema 重新验证
-     `pyobfus_mcp/server.json`，并补充 GitHub repository stable ID
-     `1093960892`。
+2. `P2-28` MCP Registry / `server.json` schema hardening — **已发布于
+   `pyobfus-mcp` 0.3.6**（PyPI + MCP Registry，`isLatest=true` 已核实）。
+   - 用官方 `2025-12-11` schema 重新验证 `pyobfus_mcp/server.json`，并补充
+     GitHub repository stable ID `1093960892`。
    - `fileSha256` 暂不补：PyPI 有 wheel/sdist 多 artifact，填错单一 hash 比不填
      可选 hash 风险更高。
-   - 已继续明确 HTTP OAuth / Server Card 对当前 stdio server 不适用。
+   - 已明确 HTTP OAuth / Server Card 对当前 stdio server 不适用。
+   - 新增 `test_version_metadata.py` 回归测试，防止版本号三处（`__init__.py`/
+     `pyproject.toml`/`server.json`）再次漂移。
+   - ⚠️ Glama admin「Build steps」字段仍停在 `0.3.5`，需要用户手工改成 `0.3.6`。
 
-### P2：下一项实质功能
-
-1. `P2-26` obfuscated-output SBOM + provenance manifest
-   - 在现有 `--provenance-manifest` 基础上扩展。
-   - 第一阶段已在本地完成：manifest 保留原字段和 integrity digest，同时新增
-     input SHA-256、可用时的 git commit，以及 CycloneDX-compatible
-     `cyclonedx` 子结构。
-   - 输出 CycloneDX-compatible manifest，包含：
-     - pyobfus 版本
-     - git commit（如可用）
-     - config hash
-     - input/output file hash
-     - mapping digest
-     - artifact relationship metadata
+3. `P2-26` obfuscated-output SBOM + provenance manifest — **已发布于
+   `pyobfus` 0.5.14**。
+   - 在现有 `--provenance-manifest` 基础上扩展：manifest 保留原字段和
+     integrity digest，同时新增 input SHA-256、可用时的 git commit，以及
+     CycloneDX-compatible `cyclonedx` 子结构（file components + input/output/
+     mapping relationships）。
    - 用户文档已补 `docs/PROVENANCE_MANIFEST.md`，README / `llms.txt` 已同步。
    - CLI 已新增 `--verify-provenance-manifest`，可校验 pyobfus manifest shape、
      CycloneDX-compatible relationships 和本地 integrity digest，并支持 JSON 输出。
    - 当前先不扩独立 `--sbom` 入口；只有当用户或外部工具明确需要 standalone
      CycloneDX 文件时，再单独开后续项。
-   - 价值：竞品能保护代码/数据，但通常不给“被保护产物”的供应链记录。
-   - 口径：这是 provenance / reproducibility / tamper-evidence，不是“证明代码可信”。
+   - 价值：竞品能保护代码/数据，但通常不给"被保护产物"的供应链记录。
+   - 口径：这是 provenance / reproducibility / tamper-evidence，不是"证明代码可信"。
 
-2. `P2-27` attestation verification helper / trust report
-   - docs-first 已完成：新增 `docs/RELEASE_PROVENANCE_VERIFICATION.md`。
-   - 2026-08-17 已确认 PyPI JSON API 最新版本为 `pyobfus 0.5.13`、
-     `pyobfus-mcp 0.3.5`。
-   - 2026-08-17 已确认四个最新 wheel/sdist 的 PyPI Integrity API provenance
-     endpoint 均返回 `HTTP 200`。
+4. `P2-27` attestation verification helper / trust report — **docs-first 已发布**
+   （新增 `docs/RELEASE_PROVENANCE_VERIFICATION.md`）。
+   - 2026-08-17 三包发版后已重新核实：PyPI JSON API 最新版本
+     `pyobfus 0.5.14`、`pyobfus-mcp 0.3.6`；四个最新 wheel/sdist 的 PyPI
+     Integrity API provenance endpoint 均返回真实 `HTTP 200`（非文本平移）。
    - 文档给出 `pypi-attestations verify pypi` 的完整验证口径；当前不手写
      sigstore / DSSE 校验逻辑。
    - 输出要诚实：证明发布身份和产物 digest，不证明代码没有漏洞或恶意。
 
-3. `P2-29` compatibility checks
+### P1：下一项工作
+
+1. `P2-29` compatibility checks
    - 针对真实交付组合补诊断和文档。
    - 已有 PyInstaller cookbook。
    - 后续关注 import-hook/encrypted-file ecosystem、compiled packaging、
@@ -207,5 +208,8 @@ bytecode 加密。
 
 ## 下次工作建议
 
-1. 进入 `P2-29` compatibility checks：优先从真实交付组合的诊断和 cookbook 做小步
+1. 先处理 2026-08-17 三包发布留下的两项收尾：确认 Marketplace 是否已上传
+   `vscode-extension` 0.4.0（`curl` 公开 listing 核实版本号），以及 Glama
+   admin「Build steps」是否已改成 `pyobfus-mcp==0.3.6`。
+2. 进入 `P2-29` compatibility checks：优先从真实交付组合的诊断和 cookbook 做小步
    增量，不默认新增 transform。

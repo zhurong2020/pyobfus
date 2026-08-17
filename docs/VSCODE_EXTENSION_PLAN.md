@@ -5,15 +5,20 @@
 chain shipped end to end on 2026-08-07 as `pyobfus` 0.5.13 plus
 `vscode-extension` 0.3.0 — see the dedicated M3 section below.
 
-**Post-0.3.0 polish (2026-08-17, local next-release work)**:
-P2-25 trace/config workflow polish is complete locally. Reverse Stack Trace now
+**0.4.0 (2026-08-17)**: P2-25 trace/config workflow polish, released as
+`vscode-extension` 0.4.0 (tagged `vscode-v0.4.0`, GitHub Release published
+with the `.vsix` attached; Marketplace upload via the manual "⋯" → Update
+flow is the one step still pending, since there's no CI publish path yet —
+see `docs/VSCODE_MARKETPLACE_PUBLISHER_SETUP.md`). Reverse Stack Trace now
 uses `--trace-marker` metadata to preselect mapping files, shares the same
 stale-pyobfus/interpreter error reporting as Obfuscate / Generate Config, and
 Obfuscate with pyobfus recognizes unknown config-key errors with an action to
 open the discovered `pyobfus.yaml`. The extension also adds
 `pyobfus: Validate pyobfus.yaml`, backed by the core
-`pyobfus --validate-config --json` contract; validation summaries appear in
-notifications and full errors/warnings go to the pyobfus output channel.
+`pyobfus --validate-config --json` contract (shipped the same day as
+`pyobfus` 0.5.14); validation summaries appear in notifications and full
+errors/warnings go to the pyobfus output channel. 51/51 tests green,
+including live contract tests against the just-released 0.5.14 CLI.
 
 **0.2.1 bugfix (2026-08-06, same day as M2)**: hands-on testing of the
 freshly-published 0.2.0 immediately surfaced a real crash in "Obfuscate

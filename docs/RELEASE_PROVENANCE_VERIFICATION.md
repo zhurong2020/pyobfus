@@ -20,7 +20,7 @@ Use this to confirm that PyPI has provenance JSON for a published artifact:
 ```bash
 curl -fsS \
   -H 'Accept: application/vnd.pypi.integrity.v1+json' \
-  https://pypi.org/integrity/pyobfus/0.5.13/pyobfus-0.5.13-py3-none-any.whl/provenance \
+  https://pypi.org/integrity/pyobfus/0.5.14/pyobfus-0.5.14-py3-none-any.whl/provenance \
   >/tmp/pyobfus-provenance.json
 ```
 
@@ -38,7 +38,7 @@ python -m pip install pypi-attestations
 
 pypi-attestations verify pypi \
   --repository https://github.com/zhurong2020/pyobfus \
-  https://files.pythonhosted.org/packages/.../pyobfus-0.5.13-py3-none-any.whl
+  https://files.pythonhosted.org/packages/.../pyobfus-0.5.14-py3-none-any.whl
 ```
 
 Repeat for each wheel/sdist you intend to trust or mirror. Do not verify only
@@ -46,26 +46,27 @@ one file and assume the whole release is covered.
 
 ## Latest Verified Snapshot
 
-Checked on 2026-08-17:
+Checked on 2026-08-17 (re-verified same-day, after the v0.5.14 / mcp-v0.3.6
+release):
 
 | Project | Version | Artifact | Integrity API |
 |---|---:|---|---|
-| `pyobfus` | `0.5.13` | `pyobfus-0.5.13-py3-none-any.whl` | `200` |
-| `pyobfus` | `0.5.13` | `pyobfus-0.5.13.tar.gz` | `200` |
-| `pyobfus-mcp` | `0.3.5` | `pyobfus_mcp-0.3.5-py3-none-any.whl` | `200` |
-| `pyobfus-mcp` | `0.3.5` | `pyobfus_mcp-0.3.5.tar.gz` | `200` |
+| `pyobfus` | `0.5.14` | `pyobfus-0.5.14-py3-none-any.whl` | `200` |
+| `pyobfus` | `0.5.14` | `pyobfus-0.5.14.tar.gz` | `200` |
+| `pyobfus-mcp` | `0.3.6` | `pyobfus_mcp-0.3.6-py3-none-any.whl` | `200` |
+| `pyobfus-mcp` | `0.3.6` | `pyobfus_mcp-0.3.6.tar.gz` | `200` |
 
 Commands used:
 
 ```bash
 curl -fsSI -H 'Accept: application/vnd.pypi.integrity.v1+json' \
-  https://pypi.org/integrity/pyobfus/0.5.13/pyobfus-0.5.13-py3-none-any.whl/provenance
+  https://pypi.org/integrity/pyobfus/0.5.14/pyobfus-0.5.14-py3-none-any.whl/provenance
 curl -fsSI -H 'Accept: application/vnd.pypi.integrity.v1+json' \
-  https://pypi.org/integrity/pyobfus/0.5.13/pyobfus-0.5.13.tar.gz/provenance
+  https://pypi.org/integrity/pyobfus/0.5.14/pyobfus-0.5.14.tar.gz/provenance
 curl -fsSI -H 'Accept: application/vnd.pypi.integrity.v1+json' \
-  https://pypi.org/integrity/pyobfus-mcp/0.3.5/pyobfus_mcp-0.3.5-py3-none-any.whl/provenance
+  https://pypi.org/integrity/pyobfus-mcp/0.3.6/pyobfus_mcp-0.3.6-py3-none-any.whl/provenance
 curl -fsSI -H 'Accept: application/vnd.pypi.integrity.v1+json' \
-  https://pypi.org/integrity/pyobfus-mcp/0.3.5/pyobfus_mcp-0.3.5.tar.gz/provenance
+  https://pypi.org/integrity/pyobfus-mcp/0.3.6/pyobfus_mcp-0.3.6.tar.gz/provenance
 ```
 
 ## Sources

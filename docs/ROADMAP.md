@@ -24,8 +24,14 @@ commit when available, and a CycloneDX-compatible component/dependency section;
 relationships, and local integrity digest; `docs/RELEASE_PROVENANCE_VERIFICATION.md`
 records the PyPI Integrity API / `pypi-attestations` posture and confirms the
 latest `pyobfus 0.5.13` / `pyobfus-mcp 0.3.5` wheel+sdist provenance endpoints
-return `HTTP 200`. These are local commits for the next release; the latest
-published pyobfus remains 0.5.13.
+return `HTTP 200`.
+
+**Update, same day**: these local commits were pushed and released the same
+day as `pyobfus` **0.5.14**, `pyobfus-mcp` **0.3.6** (PyPI + MCP Registry,
+`isLatest` confirmed), and `vscode-extension` **0.4.0** (tagged + GitHub
+Release; Marketplace manual upload pending). See `CURRENT_PLAN_ZH.md` for the
+current state — this section is retained as-written for historical
+continuity.
 
 **Prior (2026-08-07)**: **`pyobfus` 0.5.13 + `vscode-extension` 0.3.0 (M3) released together, P2-2's full M0-M3 milestone chain now shipped end to end.** Shipped a day ahead of the originally-projected 2026-08-08 gate on explicit user request (one day after 0.5.12 still fits the "1-2 days apart" spacing rule). `pyobfus` 0.5.13 — `pyobfus/config_schema.py` derives `--validate-config`'s schema live from `ObfuscationConfig`'s actual dataclass fields, fixing a false-warn on `preset` and every Pro field added since v0.5.0 (23 tests), plus P2-23 content (Nuitka traceback-encryption comparison) — tagged via OIDC + PEP 740, PyPI confirmed latest. `vscode-extension` 0.3.0 (M3) — real `pyobfus.yaml` IntelliSense via a declarative `contributes.yamlValidation` entry pointing at a generated JSON Schema (`scripts/generate_vscode_schema.py`), zero runtime code — 37/37 tests green including real-contract tests against 0.5.13, real CI green (CodeQL + VSCode Extension CI + main matrix), tagged `vscode-v0.3.0`, GitHub Release published, Marketplace listing independently re-checked and confirms `"version":"0.3.0"` after the manual "⋯" → Update upload. `pyobfus-mcp` untouched this cycle. Full account: `docs/POST_V0.4_TODO.md`'s 2026-08-07 handoff notes, `docs/VSCODE_EXTENSION_PLAN.md`'s M3 section.
 

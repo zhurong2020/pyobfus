@@ -20,7 +20,7 @@ A Python code obfuscator built with AST-based transformations. **Supports Python
 
 > **🔒 Pro Edition available** — 6 patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator, $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
 
-> **🔧 What's new in v0.5.13** — `--validate-config` no longer false-warns on `preset` (which `--init` itself writes into every config) or any Pro field added since v0.5.0; the validator's schema is now derived live from `ObfuscationConfig`'s actual dataclass fields instead of a hand-maintained list that had silently drifted stale. v0.5.12 added `pyobfus-trial status --json` / `pyobfus-license status --json` structured JSON (the VS Code extension's status bar reads these). Full details in the [CHANGELOG](CHANGELOG.md); see [Pro Edition](#-pro-edition) below.
+> **🔧 What's new in v0.5.14** — `--provenance-manifest` now records per-input SHA-256 hashes, the containing git commit, and a CycloneDX-compatible component/relationship section; `--verify-provenance-manifest FILE --json` validates that manifest's shape, relationships, and local integrity digest; `--validate-config FILE --json` gives IDE/MCP callers a stable machine-readable config-validation contract. v0.5.13 fixed `--validate-config` false-warning on `preset` and every Pro field added since v0.5.0. Full details in the [CHANGELOG](CHANGELOG.md); see [Pro Edition](#-pro-edition) below.
 
 ## 🔌 Companion MCP server: [`pyobfus-mcp`](pyobfus_mcp/)
 
