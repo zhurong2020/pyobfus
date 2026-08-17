@@ -218,6 +218,16 @@ pytest integration_tests/ -v
 4. `python -m build && twine upload dist/*`（或走 `git tag vX.Y.Z && git push --tags`
    触发 `.github/workflows/release.yml` 的 OIDC 自动发布，是当前实际使用的路径）
 
+**⚠️ 区分两类内容，别把动态徽标误判成需要手动更新的静态文案**（2026-08-17
+教训）：README 顶部 `[![PyPI version](https://img.shields.io/pypi/v/pyobfus.svg)]`
+这一行徽标是**动态生成**的，shields.io 每次都会实时查 PyPI 最新版本号，
+**从来不需要手动改这行 markdown**——它显示旧版本号只可能是缓存滞后（shields.io
+自身 + GitHub camo 代理两层 `max-age=10800`（3 小时）缓存，或用户浏览器自己
+缓存了图片），耐心等或强制刷新页面（Ctrl+Shift+R）即可，**不是**上面第 3
+步说的那种"打包时固化、发布后不可变"的问题，不要为此改代码或重新发版。
+真正需要在打 tag 前更新的只有 README 里**文字内容**（"What's new in
+vX.Y.Z"横幅），跟徽标是两回事。
+
 ## 注意事项
 
 - **公开仓库**: 不要提交 Pro 许可密钥或 Stripe Webhook Secret
