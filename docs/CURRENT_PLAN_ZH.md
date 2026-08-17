@@ -112,6 +112,14 @@ bytecode 加密。
    - 每次冷启动同时检查旧 API 路径和公开页面能否列出 8 个工具。
    - 找到 Glama 当前推荐 API 后，替换旧的 `tools: []` 检查口径。
    - 不为 Glama 单独改 pyobfus-mcp 代码，除非 Glama 给出可复现的本地问题。
+   - **2026-08-17 新证据**：mcp 0.3.6 发布后照惯例重新 pin Build steps，
+     触发的新构建（`01a00e39-...`）15 分钟后失败，`ECONNRESET`/"aborted"，
+     卡在拉取 `debian:trixie-slim` 基础镜像元数据这一步——与 08-07 那次失败
+     （`context deadline exceeded`，同一卡点）是**第二个独立复现实例**，
+     错误签名不同但卡点相同，指向 Glama 构建集群拉取该 base image 的网络层
+     问题，与 pyobfus-mcp 包/配置无关（Build steps 已确认正确显示
+     `pyobfus-mcp==0.3.6`）。**用户决定继续观察，暂不追加 Discord 消息、
+     暂不手动重试**。详见 memory `glama_zero_tools_repro_2026-08-07.md`。
 
 2. Claude plugin marketplace
    - 2026-08-17 已复核：仍为 `Submitted and pending review`，日期 Aug 2。
