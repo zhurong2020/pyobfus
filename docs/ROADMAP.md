@@ -320,14 +320,16 @@ as important trust/discovery data.
   section is the right stable surface. This remains a provenance,
   reproducibility, and tamper-evidence feature, not a claim that the protected
   output is automatically trustworthy.
-- [ ] **P2-27: Attestation-verification helper / trust report** — add a small
-  CLI/docs utility that verifies pyobfus/pyobfus-mcp release provenance through
-  PyPI's Integrity API or `pypi-attestations`, then explains the result in
-  honest terms: valid provenance means "built/published by this Trusted
-  Publisher identity", not "safe code". This complements P2-17/P2-21 and gives
-  VS Code / MCP users a concrete trust story after the malicious-VS-Code-
-  extension incident in the same category. _Target: 2-4 days; docs-first if
-  the CLI surface would be too narrow._
+- [x] **P2-27: Attestation-verification helper / trust report** — docs-first
+  runbook landed 2026-08-17 in `docs/RELEASE_PROVENANCE_VERIFICATION.md`.
+  Verified the current PyPI JSON latest versions (`pyobfus 0.5.13`,
+  `pyobfus-mcp 0.3.5`) and checked that both latest wheel/sdist artifacts for
+  both packages return `HTTP 200` from PyPI's Integrity API provenance endpoint.
+  The documented posture is intentionally honest: Integrity API presence is a
+  provenance-object check, full cryptographic verification should use
+  `pypi-attestations verify pypi`, and a valid attestation proves release
+  identity plus artifact digest, not that the code is vulnerability-free or
+  trustworthy.
 - [x] **P2-28: MCP Registry/server.json schema hardening** — re-validate
   `pyobfus_mcp/server.json` against the current official schema and add any
   now-useful trust metadata that applies to stdio/package distribution:

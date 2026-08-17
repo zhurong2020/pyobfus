@@ -38,6 +38,7 @@ uvx pyobfus-mcp
 - `pyobfus src/ -o dist/ --save-mapping mapping.json` — obfuscate AND emit mapping
 - `pyobfus src/ -o dist/ --provenance-manifest provenance.json` (0.5.5+) — emit a local JSON build-provenance manifest (input/output hashes, config hash, pyobfus version, git commit when available, mapping digest, CycloneDX-compatible relationships)
 - `pyobfus --verify-provenance-manifest provenance.json --json` — validate provenance-manifest shape, CycloneDX-compatible relationships, and local integrity digest
+- `docs/RELEASE_PROVENANCE_VERIFICATION.md` — PyPI Integrity API / PEP 740 runbook for checking pyobfus and pyobfus-mcp release provenance
 - `pyobfus --list-presets` — see every preset with a description
 
 ## Framework-aware presets (community, free)

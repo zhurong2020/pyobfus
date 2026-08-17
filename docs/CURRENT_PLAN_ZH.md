@@ -162,9 +162,13 @@ bytecode 加密。
    - 口径：这是 provenance / reproducibility / tamper-evidence，不是“证明代码可信”。
 
 2. `P2-27` attestation verification helper / trust report
-   - docs-first 或小 CLI。
-   - 通过 PyPI Integrity API 或 `pypi-attestations` 验证 pyobfus / pyobfus-mcp 的
-     release provenance。
+   - docs-first 已完成：新增 `docs/RELEASE_PROVENANCE_VERIFICATION.md`。
+   - 2026-08-17 已确认 PyPI JSON API 最新版本为 `pyobfus 0.5.13`、
+     `pyobfus-mcp 0.3.5`。
+   - 2026-08-17 已确认四个最新 wheel/sdist 的 PyPI Integrity API provenance
+     endpoint 均返回 `HTTP 200`。
+   - 文档给出 `pypi-attestations verify pypi` 的完整验证口径；当前不手写
+     sigstore / DSSE 校验逻辑。
    - 输出要诚实：证明发布身份和产物 digest，不证明代码没有漏洞或恶意。
 
 3. `P2-29` compatibility checks
@@ -202,5 +206,5 @@ bytecode 加密。
 
 ## 下次工作建议
 
-1. 收束 `P2-26`：决定是否需要独立 `--sbom` 输出入口；当前优先不扩接口，观察
-   embedded CycloneDX section 是否足够。
+1. 进入 `P2-29` compatibility checks：优先从真实交付组合的诊断和 cookbook 做小步
+   增量，不默认新增 transform。

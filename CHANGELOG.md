@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   provenance-manifest shape, embedded CycloneDX-compatible component
   relationships, and local integrity digest with a machine-readable
   `valid`/`errors`/`warnings` contract.
+- Added a release-provenance verification runbook covering PyPI's Integrity API,
+  `pypi-attestations verify pypi`, and the latest pyobfus / pyobfus-mcp
+  artifact provenance snapshot.
 - `pyobfus --validate-config FILE --json` now emits a stable machine-readable
   validation contract (`status`, `valid`, `errors`, `warnings`, `suggestions`,
   `summary`, `ai_hint`, `exit_code`) while preserving the existing text output
