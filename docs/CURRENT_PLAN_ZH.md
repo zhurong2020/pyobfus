@@ -1,6 +1,6 @@
 # pyobfus 当前计划
 
-更新时间：2026-08-14
+更新时间：2026-08-17
 
 这份文档是当前项目状态和后续计划的中文单一入口，面向维护者日常查看。旧的
 `ROADMAP.md` 和 `POST_V0.4_TODO.md` 保留为历史归档和详细来源，但后续日常
@@ -24,11 +24,19 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
 - 近期下载：`pyobfus-mcp` 最新成功刷新为 day/week/month `2 / 67 / 598`；
   `pyobfus` 最近一次刷新触发 pypistats 429，沿用同日稍早成功快照
   `30 / 324 / 1,847`。
-- 外部分发阻塞：
-  - Glama 公开 API 仍返回 `tools: []`，但 Glama 自己的 build instance logs
-    已确认 `initialize -> ListToolsRequest` 能看到 8 个 tools。判断为 Glama
-    release-to-public-API/listing 同步问题，不是 pyobfus-mcp 代码或配置问题。
-  - Claude plugin submission 仍为 `Submitted and pending review`，日期 Aug 2。
+- 外部分发状态：
+  - Glama 旧公开 API 路径
+    `/api/mcp/v1/servers/io.github.zhurong2020/pyobfus-mcp` 当前返回
+    `not_found`；公开页面 `/mcp/servers/zhurong2020/pyobfus` 仍可打开，页面内
+    可解析到 8 个工具名。下一步不是改 pyobfus-mcp 代码，而是确认 Glama 当前
+    推荐的 public API / listing 查询路径，并在 Discord `#support` 跟进旧路径
+    失效或同步状态。维护者 2026-08-17 手工复核对应 Discord 频道：暂未看到
+    Glama 回复，本轮跳过，等待外部反馈或下一次周期复查。
+  - Claude plugin submission 已由维护者在 Console
+    `/plugins/submissions` 于 2026-08-17 手工复核：`pyobfus` 仍为
+    `Submitted and pending review`，日期 Aug 2；提交描述里的
+    `One-call protected_project workflow` typo 仍存在，继续机会性修复，不为
+    typo 单独重提。
 
 ## 已完成的关键能力
 
@@ -91,16 +99,18 @@ bytecode 加密。
 
 ## 后续优先级
 
-### P0：外部阻塞继续跟进
+### P0：外部状态继续跟进
 
-1. Glama `tools: []`
-   - 继续在 Glama Discord `#support` 等待 / 跟进。
-   - 每次冷启动重新 curl public API。
+1. Glama public API / listing 状态
+   - 2026-08-17 手工复核 Discord 对应频道：暂未看到 Glama 回复。
+   - 继续在 Glama Discord `#support` 等待 / 跟进，但本轮不阻塞本地工作。
+   - 每次冷启动同时检查旧 API 路径和公开页面能否列出 8 个工具。
+   - 找到 Glama 当前推荐 API 后，替换旧的 `tools: []` 检查口径。
    - 不为 Glama 单独改 pyobfus-mcp 代码，除非 Glama 给出可复现的本地问题。
 
 2. Claude plugin marketplace
-   - 维护者登录 Console 查看 submission。
-   - 如仍 pending，只记录状态。
+   - 2026-08-17 已复核：仍为 `Submitted and pending review`，日期 Aug 2。
+   - 后续每轮外部状态检查只需确认是否出现 approve / reject / 补充信息。
    - 如 Anthropic 给出修改入口，再顺手修 `protected_project` typo 为
      `protect_project`。
 
@@ -108,15 +118,21 @@ bytecode 加密。
 
 1. `P2-25` VS Code trace/config workflow polish
    - 当前 active。
-   - 第一项：Reverse Stack Trace 利用 `--trace-marker` 自动定位 mapping 文件。
+   - 已完成：
+     - Reverse Stack Trace 利用 `--trace-marker` 自动定位 mapping 文件。
+     - Reverse Stack Trace 复用共享 CLI 错误提示；旧版 pyobfus / 解释器错误现在
+       给出和 obfuscate / generate-config 一致的 Upgrade / Select Interpreter
+       动作入口。
    - 下一项候选：更清晰的 config validation / stale CLI / mapping 错误提示。
    - 原则：只做小而确定的 UX 改善，不改变 core 语义。
 
 2. `P2-28` MCP Registry / `server.json` schema hardening
-   - 用当前官方 schema 重新验证 `pyobfus_mcp/server.json`。
-   - 能补就补：repository stable ID、exact package version 纪律、适用的 package
-     hash、非 shell 执行示例、stdio-only 说明。
-   - 明确 HTTP OAuth / Server Card 对当前 stdio server 不适用。
+   - 本轮已完成本地处理：用官方 `2025-12-11` schema 重新验证
+     `pyobfus_mcp/server.json`，并补充 GitHub repository stable ID
+     `1093960892`。
+   - `fileSha256` 暂不补：PyPI 有 wheel/sdist 多 artifact，填错单一 hash 比不填
+     可选 hash 风险更高。
+   - 已继续明确 HTTP OAuth / Server Card 对当前 stdio server 不适用。
 
 ### P2：下一项实质功能
 
@@ -173,7 +189,5 @@ bytecode 加密。
 
 ## 下次工作建议
 
-1. 完成并发布 VS Code trace/config 小打磨。
-2. 做 `server.json` schema hardening。
-3. 若外部分发仍无进展，但状态已稳定，就开始 `P2-26` SBOM/provenance 设计。
-
+1. 若还要继续 VS Code 小打磨，优先 config validation 错误提示。
+2. 若外部分发仍无进展，但状态已稳定，就开始 `P2-26` SBOM/provenance 设计。

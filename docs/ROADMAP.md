@@ -327,7 +327,7 @@ as important trust/discovery data.
   VS Code / MCP users a concrete trust story after the malicious-VS-Code-
   extension incident in the same category. _Target: 2-4 days; docs-first if
   the CLI surface would be too narrow._
-- [ ] **P2-28: MCP Registry/server.json schema hardening** — re-validate
+- [x] **P2-28: MCP Registry/server.json schema hardening** — re-validate
   `pyobfus_mcp/server.json` against the current official schema and add any
   now-useful trust metadata that applies to stdio/package distribution:
   repository stable ID, exact package version pin discipline, package hash if
@@ -335,7 +335,10 @@ as important trust/discovery data.
   examples, and a doc note that HTTP OAuth / Server Card items remain N/A until
   a hosted endpoint exists. This is small but high-leverage for agentic
   discovery and avoids Glama-style directory drift becoming our own metadata
-  drift. _Target: 0.5-1 day._
+  drift. _Completed locally 2026-08-17: `server.json` validates against the
+  official `2025-12-11` schema, now carries GitHub repository stable ID
+  `1093960892`, and keeps `fileSha256` omitted deliberately because PyPI's
+  wheel/sdist multi-artifact model makes a single optional hash ambiguous._
 - [ ] **P2-29: Framework/runtime packaging compatibility checks** — add more
   pre-flight guidance for combinations users actually ship: PyInstaller
   already has a cookbook; next candidates are import-hook/encrypted-file

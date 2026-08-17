@@ -407,9 +407,11 @@
 >    Finish trace-marker-aware mapping discovery first; then consider one more
 >    tightly-scoped config validation/error-surfacing improvement if it remains
 >    low risk.
-> 2. **P2-28 MCP Registry/server.json schema hardening** — small, high leverage.
->    Re-validate against the current official schema and add applicable trust
->    metadata only if it fits stdio/package distribution.
+> 2. **P2-28 MCP Registry/server.json schema hardening** — ✅ completed locally
+>    2026-08-17. `server.json` validates against the official `2025-12-11`
+>    schema and now includes GitHub repository stable ID `1093960892`.
+>    `fileSha256` stays omitted because PyPI's wheel/sdist multi-artifact model
+>    makes a single optional hash ambiguous.
 > 3. **P2-26 obfuscated-output SBOM + provenance manifest** — next substantial
 >    feature once Glama/Claude are stable or clearly aging out. Build on
 >    `--provenance-manifest`, target CycloneDX-compatible output metadata, and
