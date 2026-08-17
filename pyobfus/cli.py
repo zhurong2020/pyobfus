@@ -2061,9 +2061,11 @@ def _handle_validate_config(config_path: str, json_output: bool = False) -> None
             "ai_hint": (
                 "Fix errors before running obfuscation."
                 if not result.is_valid
-                else "Configuration is usable; review warnings before shipping."
-                if result.warnings
-                else "Configuration is valid and ready for obfuscation."
+                else (
+                    "Configuration is usable; review warnings before shipping."
+                    if result.warnings
+                    else "Configuration is valid and ready for obfuscation."
+                )
             ),
             "exit_code": exit_code,
         }
