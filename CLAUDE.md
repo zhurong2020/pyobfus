@@ -209,7 +209,14 @@ pytest integration_tests/ -v
 
 1. 更新 `pyproject.toml` 版本号
 2. 更新 `CHANGELOG.md`
-3. `python -m build && twine upload dist/*`
+3. **同一提交里顺手更新 `README.md` 的"What's new in vX.Y.Z"横幅**（打 tag
+   之前）——PyPI 包一旦发布不可变，README 快照就是发布那一刻的 `main`；
+   若这句更新拖到打 tag 之后的单独 docs-sync 提交里，就会正好被已发布的
+   包错过，PyPI 页面 description 从此永久落后一个版本，只能等下次自然
+   发版才带上（2026-08-17 v0.5.14 实际踩过这个坑，处置见
+   `docs/CURRENT_PLAN_ZH.md` 当前状态块）。
+4. `python -m build && twine upload dist/*`（或走 `git tag vX.Y.Z && git push --tags`
+   触发 `.github/workflows/release.yml` 的 OIDC 自动发布，是当前实际使用的路径）
 
 ## 注意事项
 

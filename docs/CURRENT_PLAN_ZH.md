@@ -26,6 +26,15 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
 - Glama admin「Build steps」字段仍停在 `pyobfus-mcp==0.3.5`，需要用户手工
   改成 `0.3.6`（Claude 无法操作该 admin 面板）。
 - GitHub：主分支健康，当前公开 issues/PRs 为 0，CI/CodeQL 全绿。
+- ⚠️ **已知：PyPI `pyobfus` 页面 description 摘要落后一个版本**——`v0.5.14`
+  tag 精确指向的是纯版本号提交（`41fd810`，只改 `pyproject.toml`/
+  `CHANGELOG.md`），README.md 里"What's new"横幅的同步更新落在了 tag 之后
+  的单独 docs-sync 提交（`ad1b28e`）里，而 PyPI 包一旦发布不可变，导致当前
+  PyPI 页面仍显示"What's new in v0.5.13"文案。GitHub 上的 README.md 本身
+  已经是对的（v0.5.14）。用户决定不为此单独发版，等下次自然发布时随新
+  README 快照一起带上。**流程教训**：以后做版本发布时，README"What's
+  new"横幅更新要并入发布提交本身（打 tag 之前），不要留到后续单独的
+  docs-sync 提交——那样会正好错过这次发布的包快照。
 - 近期下载：距上次记录（08-09）满 8 天的安静基线读数——`pyobfus` day/week/
   month `9 / 206 / 1,870`；`pyobfus-mcp` `0 / 46 / 581`。此前几次发布后
   1-3 天的 day/week 跳升已证实是 CI/依赖解析噪音，非有机增长信号。
