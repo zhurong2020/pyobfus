@@ -15,6 +15,13 @@ Independent version/release cadence from the main `pyobfus` and `pyobfus-mcp` Py
   that mapping path. Without marker metadata it now defaults to the workspace
   folder instead of an arbitrary last-used location.
 
+### Fixed
+
+- "pyobfus: Reverse Stack Trace" now uses the shared CLI error reporter, so
+  stale pyobfus installs get the same actionable "Upgrade pyobfus" / "Select
+  Interpreter" choices as obfuscation and config-generation commands instead
+  of a raw `--unmap` failure message.
+
 ## [0.3.0] - 2026-08-07
 
 **M3.** Real IntelliSense (autocomplete, hover docs, inline validation) for

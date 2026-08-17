@@ -10,7 +10,8 @@ import * as path from "node:path";
 import { randomUUID } from "node:crypto";
 import { promises as fs } from "node:fs";
 import { resolveInterpreter } from "../cli/locate";
-import { runJsonCommand, PyobfusCliError, PyobfusJsonParseError } from "../cli/runner";
+import { reportCliError } from "../cli/errorReporting";
+import { runJsonCommand } from "../cli/runner";
 import { UnmapResult } from "../cli/types";
 
 export function registerUnmapTraceCommand(
@@ -58,7 +59,7 @@ async function unmapTrace(outputChannel: vscode.OutputChannel): Promise<void> {
     );
     await showUnmappedTrace(result);
   } catch (err) {
-    reportError(err, outputChannel);
+    reportCliError(err, interpreter.pythonPath, outputChannel, "reversing stack trace");
   } finally {
     await fs.unlink(tmpTraceFile).catch(() => {
       /* best-effort cleanup; a stray temp file is harmless */
@@ -134,31 +135,4 @@ async function showUnmappedTrace(result: UnmapResult): Promise<void> {
     `pyobfus: reversed ${stats.unique_obfuscated} identifier(s)`,
     5000,
   );
-}
-
-function reportError(err: unknown, outputChannel: vscode.OutputChannel): void {
-  if (err instanceof PyobfusCliError) {
-    outputChannel.appendLine(`[pyobfus] unmap failed: ${err.message}`);
-    if (err.stderr) {
-      outputChannel.appendLine(err.stderr);
-    }
-    void vscode.window.showErrorMessage(
-      `pyobfus: could not reverse the trace. ${err.stderr.trim() || err.message}`,
-    );
-    return;
-  }
-  if (err instanceof PyobfusJsonParseError) {
-    outputChannel.appendLine(`[pyobfus] unmap output was not valid JSON: ${err.message}`);
-    void vscode.window.showErrorMessage("pyobfus: unexpected output from --unmap. See the pyobfus output channel.");
-    return;
-  }
-  const nodeErr = err as NodeJS.ErrnoException;
-  if (nodeErr?.code === "ENOENT") {
-    void vscode.window.showErrorMessage(
-      "pyobfus: interpreter not found or pyobfus not installed. Set pyobfus.pythonPath or install pyobfus for the active interpreter.",
-    );
-    return;
-  }
-  outputChannel.appendLine(`[pyobfus] unexpected error during unmap: ${String(err)}`);
-  void vscode.window.showErrorMessage("pyobfus: unexpected error reversing the trace. See the pyobfus output channel.");
 }
