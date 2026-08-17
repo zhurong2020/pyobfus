@@ -31,6 +31,7 @@ title: pyobfus - Modern Python Code Obfuscator
     <li><strong>Multi-file Support</strong>: Obfuscate entire projects</li>
     <li><strong>YAML Configuration</strong>: Flexible configuration system</li>
     <li><strong>Parameter Preservation</strong>: Keep function parameter names for keyword arguments</li>
+    <li><strong>Build Provenance</strong>: Local provenance manifest with hashes and CycloneDX-compatible relationships</li>
   </ul>
 </div>
 
@@ -94,6 +95,12 @@ With configuration:
 pyobfus src/ -o obfuscated/ --config pyobfus.yaml
 ```
 
+With an offline provenance manifest:
+
+```bash
+pyobfus src/ -o obfuscated/ --save-mapping mapping.json --provenance-manifest provenance.json
+```
+
 ## Example
 
 **Before obfuscation:**
@@ -122,6 +129,7 @@ def I0(I1, I2):
 ## Documentation
 
 - [README](https://github.com/zhurong2020/pyobfus#readme) - Full documentation
+- [Provenance Manifest](PROVENANCE_MANIFEST.html) - Obfuscated-output manifest fields and integrity notes
 - [Current Plan](https://github.com/zhurong2020/pyobfus/blob/main/docs/CURRENT_PLAN_ZH.md) - Current project status and priorities
 - [Changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md) - Version history
 - [Security Policy](https://github.com/zhurong2020/pyobfus/blob/main/SECURITY.md) - Report vulnerabilities

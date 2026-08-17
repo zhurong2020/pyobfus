@@ -154,7 +154,8 @@ bytecode 加密。
      - input/output file hash
      - mapping digest
      - artifact relationship metadata
-   - 后续仍需补正式 schema / validator 口径、发布文档和示例。
+   - 用户文档已补 `docs/PROVENANCE_MANIFEST.md`，README / `llms.txt` 已同步。
+   - 后续仍需补正式 schema / validator 口径，并决定是否需要独立 `--sbom` 入口。
    - 价值：竞品能保护代码/数据，但通常不给“被保护产物”的供应链记录。
    - 口径：这是 provenance / reproducibility / tamper-evidence，不是“证明代码可信”。
 
@@ -199,5 +200,4 @@ bytecode 加密。
 
 ## 下次工作建议
 
-1. 收束 `P2-26`：补 schema/validator 口径、README/文档示例，并决定是否需要
-   独立 `--sbom` 输出入口。
+1. 收束 `P2-26`：补 schema/validator 口径，并决定是否需要独立 `--sbom` 输出入口。
