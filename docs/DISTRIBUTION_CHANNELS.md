@@ -5,7 +5,7 @@ Living reference of where `pyobfus` has a foothold, what each account looks like
 For the **why** behind the channel mix, see [AI_INTEGRATION_STRATEGY.md](AI_INTEGRATION_STRATEGY.md).
 For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTION_LOG.md).
 
-**Last updated**: 2026-06-08 (PR #5777 MERGED 2026-06-06 → punkpeye/awesome-mcp-servers now LIVE; Glama tool-count resolved 7/7). Earlier: 2026-05-09 (Session 23 · OpenSSF passing badge + PR #5777 description silent-refreshed + version bumps reflected)
+**Last updated**: 2026-08-17 (`pyobfus` 0.5.13, `pyobfus-mcp` 0.3.5, VS Code extension 0.3.0; Glama public API path stale but public page still lists 8 tools; Claude plugin submission still pending review). Earlier: 2026-06-08 (PR #5777 MERGED 2026-06-06 → punkpeye/awesome-mcp-servers now LIVE; Glama tool-count resolved 7/7).
 
 > **Note (2026-05-09)**: most of the per-channel facts below are now current as of Session 23. Outside of the launch wave (HN 5-11 / Reddit 5-12 / CN trio 5-8/9), the live state is reflected here. Consult `docs/POST_V0.4_TODO.md` for forward TODO and `docs/V0.4_EXECUTION_LOG.md` for session-by-session deltas.
 
@@ -15,14 +15,15 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 
 ### PyPI — `pyobfus`
 - URL: https://pypi.org/project/pyobfus/
-- Current version: **0.5.3** (released 2026-07-07)
+- Current version: **0.5.13** (released 2026-08-07) · ships with PEP 740 attestations via OIDC trusted publishing
+- Current headline: live config schema/validator fix, `--validate-config --json`, VS Code 0.3.0 IntelliSense contract, and recent provenance-manifest validation work staged locally for the next release.
 - Pre-v0.4 baseline: ~324 downloads / month, ~30% real users (rest is mirror noise)
 - Tracker: `gh api repos/zhurong2020/pyobfus` + PePy
 
 ### PyPI — `pyobfus-mcp`
 - URL: https://pypi.org/project/pyobfus-mcp/
-- Current version: **0.3.1** (released 2026-06-22) · ships with PEP 740 sigstore attestations via OIDC trusted publishing
-- 0.3.1 contents: FastMCP baseline + Pro funnel surfaces (`recommend_tier`, `start_pro_trial`, funnel copy naming the v0.5 Pro mechanisms) + 10-category MCP server security baseline (path scoping / rate limiting / audit logging) — total 8 tools registered (was 5 in 0.1.x)
+- Current version: **0.3.5** (released 2026-08-04) · ships with PEP 740 attestations via OIDC trusted publishing
+- 0.3.5 contents: FastMCP baseline + 8 registered tools, Pro funnel surfaces (`recommend_tier`, `start_pro_trial`), 10-category MCP server security baseline, PII-shape detection in `check_obfuscation_risks`, and `pyobfus-mcp-verify` tool-description integrity verification.
 
 ### GitHub — `zhurong2020/pyobfus`
 - URL: https://github.com/zhurong2020/pyobfus
@@ -74,9 +75,19 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 
 ### MCP Registry — `io.github.zhurong2020/pyobfus-mcp` 🟢 LIVE
 - URL: https://registry.modelcontextprotocol.io/v0/servers?search=pyobfus
-- Latest published: 2026-05-08 with 0.2.0 · status: `active` · isLatest: `true`
-- Caveat: publisher-claimed `_meta.io.github.zhurong2020.pyobfus_mcp` namespace was silently stripped server-side on 0.2.0 publish. Investigation queued for next bump (try `io.github.zhurong2020` no-suffix form). See `~/.claude/projects/-mnt-c-onedrive-msft-OneDrive---MSFT-rong-3-job-program-pyobfus/memory/mcp_registry_meta_namespace.md`.
+- Latest published: **0.3.5** (2026-08-04) · status: `active` · `isLatest` confirmed in the latest release cycle.
+- 2026-08-17 local hardening: `pyobfus_mcp/server.json` validates against the official `2025-12-11` schema and includes GitHub repository stable ID `1093960892`; `fileSha256` remains omitted because the PyPI wheel/sdist multi-artifact model makes a single optional hash ambiguous.
 - Implications: Claude Desktop / Claude Code / Cursor / Windsurf / Zed users querying the registry for "pyobfus" or "python obfuscator" will discover this server without manual config file edits.
+
+### Glama — `zhurong2020/pyobfus` 🟡 LISTED / API STALE
+- Public page: https://glama.ai/mcp/servers/zhurong2020/pyobfus
+- 2026-08-17 state: the public page is reachable and still exposes 8 tool names, but the older API path `/api/mcp/v1/servers/io.github.zhurong2020/pyobfus-mcp` returns `not_found`.
+- Maintainer manually checked the relevant Glama Discord channel on 2026-08-17; no reply yet. Treat this as an external listing/API sync issue, not a pyobfus-mcp code issue unless Glama provides a reproducible local failure.
+
+### Claude Plugin Marketplace 🟡 PENDING
+- Console entry: `pyobfus`
+- 2026-08-17 state: `Submitted and pending review`, submission date Aug 2.
+- Known copy issue: submitted description says `protected_project`; correct tool name is `protect_project`. Do not resubmit only for this typo; fix opportunistically if Anthropic exposes an edit/request-changes path.
 
 ### OpenSSF Best Practices passing badge 🟢 LIVE
 - URL: https://www.bestpractices.dev/projects/12788
