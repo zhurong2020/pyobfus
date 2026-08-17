@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and a CycloneDX-compatible `cyclonedx` section with file components and
   input/output/mapping relationships. The existing manifest fields and local
   integrity digest remain unchanged.
+- `pyobfus --verify-provenance-manifest FILE --json` validates the pyobfus
+  provenance-manifest shape, embedded CycloneDX-compatible component
+  relationships, and local integrity digest with a machine-readable
+  `valid`/`errors`/`warnings` contract.
 - `pyobfus --validate-config FILE --json` now emits a stable machine-readable
   validation contract (`status`, `valid`, `errors`, `warnings`, `suggestions`,
   `summary`, `ai_hint`, `exit_code`) while preserving the existing text output

@@ -99,6 +99,7 @@ With an offline provenance manifest:
 
 ```bash
 pyobfus src/ -o obfuscated/ --save-mapping mapping.json --provenance-manifest provenance.json
+pyobfus --verify-provenance-manifest provenance.json --json
 ```
 
 ## Example

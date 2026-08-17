@@ -9,7 +9,11 @@ from click.testing import CliRunner
 
 from pyobfus.cli import main
 from pyobfus.config import ObfuscationConfig
-from pyobfus.core.provenance import config_hash, verify_manifest_integrity
+from pyobfus.core.provenance import (
+    config_hash,
+    validate_provenance_manifest,
+    verify_manifest_integrity,
+)
 
 
 def test_config_hash_is_stable_for_equivalent_sets() -> None:
@@ -126,6 +130,75 @@ def test_verify_manifest_integrity_detects_tampering(tmp_path: Path) -> None:
     tampered = dict(data)
     tampered["files"] = []
     assert not verify_manifest_integrity(tampered)
+
+
+def test_validate_provenance_manifest_reports_shape_and_integrity_errors(
+    tmp_path: Path,
+) -> None:
+    src = tmp_path / "app.py"
+    src.write_text("def predict(x):\n    return x + 1\n", encoding="utf-8")
+    out = tmp_path / "out.py"
+    manifest_path = tmp_path / "provenance.json"
+
+    CliRunner().invoke(
+        main,
+        [str(src), "-o", str(out), "--provenance-manifest", str(manifest_path), "--json"],
+    )
+    data = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert validate_provenance_manifest(data)["valid"]
+
+    tampered = dict(data)
+    tampered.pop("cyclonedx")
+    tampered["files"] = []
+    result = validate_provenance_manifest(tampered)
+
+    assert not result["valid"]
+    assert "Missing required field: cyclonedx" in result["errors"]
+    assert "integrity digest does not match manifest payload." in result["errors"]
+    assert result["warnings"] == ["files is empty; no obfuscated file records are present."]
+
+
+def test_cli_verify_provenance_manifest_json_success(tmp_path: Path) -> None:
+    src = tmp_path / "app.py"
+    src.write_text("def predict(x):\n    return x + 1\n", encoding="utf-8")
+    out = tmp_path / "out.py"
+    manifest_path = tmp_path / "provenance.json"
+
+    build = CliRunner().invoke(
+        main,
+        [str(src), "-o", str(out), "--provenance-manifest", str(manifest_path), "--json"],
+    )
+    assert build.exit_code == 0, build.output
+
+    result = CliRunner().invoke(
+        main,
+        ["--verify-provenance-manifest", str(manifest_path), "--json"],
+    )
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.output)
+    assert payload["status"] == "success"
+    assert payload["valid"] is True
+    assert payload["manifest_path"] == str(manifest_path)
+    assert payload["errors"] == []
+    assert payload["summary"] == "Valid provenance manifest."
+
+
+def test_cli_verify_provenance_manifest_json_error(tmp_path: Path) -> None:
+    manifest_path = tmp_path / "bad.json"
+    manifest_path.write_text("{not json", encoding="utf-8")
+
+    result = CliRunner().invoke(
+        main,
+        ["--verify-provenance-manifest", str(manifest_path), "--json"],
+    )
+
+    assert result.exit_code == 1
+    payload = json.loads(result.output)
+    assert payload["status"] == "error"
+    assert payload["valid"] is False
+    assert payload["errors"][0].startswith("Invalid JSON:")
+    assert payload["exit_code"] == 1
 
 
 def test_dry_run_does_not_write_provenance_manifest(tmp_path: Path) -> None:

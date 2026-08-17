@@ -59,6 +59,19 @@ Anyone who can edit the manifest can recompute this digest after changing the
 payload. For authenticity, pair the manifest with your normal release signing or
 attestation workflow.
 
+## Validation
+
+Use `--verify-provenance-manifest` to validate the pyobfus manifest shape, the
+embedded CycloneDX-compatible relationships, and the local integrity digest:
+
+```bash
+pyobfus --verify-provenance-manifest provenance.json
+pyobfus --verify-provenance-manifest provenance.json --json
+```
+
+The JSON mode returns `valid`, `errors`, `warnings`, `summary`, `ai_hint`, and
+`exit_code`, matching the project's other machine-readable CLI contracts.
+
 ## Minimal Shape
 
 ```json

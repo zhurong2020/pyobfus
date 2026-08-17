@@ -77,6 +77,12 @@ except ImportError:
     help="Validate a configuration file",
 )
 @click.option(
+    "--verify-provenance-manifest",
+    "verify_provenance_manifest_path",
+    type=click.Path(exists=True),
+    help="Validate a pyobfus provenance manifest and its local integrity digest",
+)
+@click.option(
     "--level",
     type=click.Choice(["community", "pro"], case_sensitive=False),
     default="community",
@@ -381,6 +387,7 @@ def main(
     config_path: Optional[str],
     init_config_template: Optional[str],
     validate_config_path: Optional[str],
+    verify_provenance_manifest_path: Optional[str],
     level: str,
     remove_docstrings: Optional[bool],
     remove_comments: Optional[bool],
@@ -443,6 +450,7 @@ def main(
       pyobfus --check src/ --json           # machine-readable report
       pyobfus --init-config django
       pyobfus --validate-config pyobfus.yaml
+      pyobfus --verify-provenance-manifest provenance.json
     """
     # Handle --check: pre-flight risk scan (no output files)
     if check_mode:
@@ -487,6 +495,11 @@ def main(
         _handle_validate_config(validate_config_path, json_output=json_output)
         return
 
+    # Handle --verify-provenance-manifest: Validate provenance manifest structure
+    if verify_provenance_manifest_path:
+        _handle_verify_provenance_manifest(verify_provenance_manifest_path, json_output=json_output)
+        return
+
     # For obfuscation, input_path and output_path are required
     if not input_path:
         click.echo("Error: Missing argument 'INPUT_PATH'.", err=True)
@@ -494,6 +507,10 @@ def main(
         click.echo("\nOr use utility commands:", err=True)
         click.echo("  pyobfus --init-config django     Generate Django config template", err=True)
         click.echo("  pyobfus --validate-config FILE   Validate config file", err=True)
+        click.echo(
+            "  pyobfus --verify-provenance-manifest FILE   Validate provenance manifest",
+            err=True,
+        )
         sys.exit(1)
 
     if not output_path:
@@ -2093,6 +2110,68 @@ def _handle_validate_config(config_path: str, json_output: bool = False) -> None
 
     if not result.is_valid:
         sys.exit(1)
+
+
+def _handle_verify_provenance_manifest(manifest_path: str, json_output: bool = False) -> None:
+    """Validate a pyobfus provenance manifest and report errors/warnings."""
+    from pyobfus.core.provenance import validate_provenance_manifest
+
+    path = Path(manifest_path)
+    try:
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        result = {
+            "valid": False,
+            "errors": [f"Invalid JSON: {exc}"],
+            "warnings": [],
+            "summary": "Invalid provenance manifest: invalid JSON.",
+        }
+    except OSError as exc:
+        result = {
+            "valid": False,
+            "errors": [f"Could not read manifest: {exc}"],
+            "warnings": [],
+            "summary": "Invalid provenance manifest: file could not be read.",
+        }
+    else:
+        result = validate_provenance_manifest(manifest)
+
+    exit_code = 0 if result["valid"] else 1
+
+    if json_output:
+        status = "error" if not result["valid"] else "warnings" if result["warnings"] else "success"
+        payload = {
+            "version": 1,
+            "status": status,
+            "valid": result["valid"],
+            "manifest_path": manifest_path,
+            "errors": result["errors"],
+            "warnings": result["warnings"],
+            "summary": result["summary"],
+            "ai_hint": (
+                "Fix manifest errors before using it as build provenance."
+                if not result["valid"]
+                else (
+                    "Manifest structure is usable; review warnings before shipping."
+                    if result["warnings"]
+                    else "Manifest is valid and its local integrity digest matches."
+                )
+            ),
+            "exit_code": exit_code,
+        }
+        click.echo(json.dumps(payload, indent=2, ensure_ascii=False))
+        if exit_code:
+            sys.exit(exit_code)
+        return
+
+    click.echo(f"Validating provenance manifest: {manifest_path}\n")
+    for error in result["errors"]:
+        click.echo(error, err=True)
+    for warning in result["warnings"]:
+        click.echo(warning)
+    click.echo(result["summary"])
+    if exit_code:
+        sys.exit(exit_code)
 
 
 def _try_auto_discover_config(verbose: bool) -> Optional[Path]:

@@ -68,6 +68,7 @@ pyobfus is also on the [VS Code Marketplace](https://marketplace.visualstudio.co
 - **`pyobfus --unmap --trace error.log --mapping mapping.json`** — reverse obfuscated identifiers in a production stack trace so you can debug (or hand the trace to an AI assistant) without reversing the obfuscation itself.
 - **`pyobfus … --save-mapping mapping.json --trace-marker`** — stamp each obfuscated file with a `# pyobfus:obfuscated` header (id + mapping filename + the exact `--unmap` command) so an AI agent that lands in an obfuscated file from a traceback immediately knows it's pyobfus output and how to reverse the names.
 - **`pyobfus … --provenance-manifest provenance.json`** — write a local JSON manifest (input/output hashes, config hash, pyobfus version, git commit when available, mapping digest, CycloneDX-compatible component relationships, and a self-consistency integrity digest — not a cryptographic signature) for offline build provenance. See [`docs/PROVENANCE_MANIFEST.md`](docs/PROVENANCE_MANIFEST.md).
+- **`pyobfus --verify-provenance-manifest provenance.json --json`** — validate the manifest structure, CycloneDX-compatible relationships, and local integrity digest before archiving or shipping it.
 - **Framework-aware presets** — `--preset fastapi | django | flask | pydantic | click | sqlalchemy | ml` with built-in exclusions for dispatch methods, decorators, ORM fields, migrations, model-serving wrappers, and dependency-injection parameters.
 - **Global `--json`** — every CLI mode (`obfuscate`, `--check`, `--unmap`, `--init`) emits the same structured schema with an `ai_hint` field, ready for Claude Code, Cursor, Windsurf, and MCP servers to consume.
 
@@ -96,6 +97,7 @@ The following features are **fully implemented and available** in the current ve
 - **Pre-flight Risk Scanning** (`--check`): detects `eval`/`exec`, dynamic attribute access, and framework reflection points before you obfuscate
 - **Reverse Stack-Trace Mapping** (`--unmap`): reverse obfuscated identifiers in a production stack trace, so you (or an AI coding assistant) can debug without un-obfuscating the shipped code
 - **Build Provenance** (`--provenance-manifest`, v0.5.5+): local JSON manifest of an obfuscation run — input/output file hashes, config hash, pyobfus version, git commit when available, mapping digest, and CycloneDX-compatible component relationships — for offline build provenance, no network calls
+- **Provenance Validation** (`--verify-provenance-manifest`): validates manifest shape, CycloneDX-compatible relationships, and the local integrity digest; JSON output is available for CI/agent use
 
 ### 🔒 Pro Edition
 

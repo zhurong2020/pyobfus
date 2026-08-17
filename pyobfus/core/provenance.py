@@ -238,6 +238,176 @@ def verify_manifest_integrity(manifest: Dict[str, Any]) -> bool:
     return integrity == expected
 
 
+def validate_provenance_manifest(manifest: Dict[str, Any]) -> Dict[str, Any]:
+    """Validate pyobfus provenance manifest structure and local integrity."""
+    errors: List[str] = []
+    warnings: List[str] = []
+
+    if not isinstance(manifest, dict):
+        return {
+            "valid": False,
+            "errors": ["Manifest root must be a JSON object."],
+            "warnings": [],
+            "summary": "Invalid provenance manifest: 1 error.",
+        }
+
+    for key in (
+        "version",
+        "pyobfus_version",
+        "tool",
+        "created_at",
+        "input_root",
+        "output_root",
+        "config_hash",
+        "mapping",
+        "files",
+        "cyclonedx",
+        "integrity",
+    ):
+        if key not in manifest:
+            errors.append(f"Missing required field: {key}")
+
+    if manifest.get("version") != PROVENANCE_FORMAT_VERSION:
+        errors.append(
+            f"Unsupported provenance format version: {manifest.get('version')!r} "
+            f"(expected {PROVENANCE_FORMAT_VERSION})"
+        )
+
+    tool = manifest.get("tool")
+    if not isinstance(tool, dict) or tool.get("name") != "pyobfus":
+        errors.append("tool.name must be 'pyobfus'.")
+
+    files = manifest.get("files")
+    if not isinstance(files, list):
+        errors.append("files must be a list.")
+        files = []
+    elif not files:
+        warnings.append("files is empty; no obfuscated file records are present.")
+
+    for index, record in enumerate(files):
+        if not isinstance(record, dict):
+            errors.append(f"files[{index}] must be an object.")
+            continue
+        for key in ("input", "output", "relative_path"):
+            if not isinstance(record.get(key), str) or not record.get(key):
+                errors.append(f"files[{index}].{key} must be a non-empty string.")
+        if not _looks_like_sha256(record.get("input_sha256")):
+            errors.append(f"files[{index}].input_sha256 must be a SHA-256 hex digest.")
+        if not _looks_like_sha256(record.get("output_sha256")):
+            errors.append(f"files[{index}].output_sha256 must be a SHA-256 hex digest.")
+
+    mapping = manifest.get("mapping")
+    if not isinstance(mapping, dict):
+        errors.append("mapping must be an object.")
+    elif mapping.get("sha256") is not None and not _looks_like_sha256(mapping.get("sha256")):
+        errors.append("mapping.sha256 must be null or a SHA-256 hex digest.")
+
+    source_control = manifest.get("source_control")
+    if source_control is None:
+        warnings.append("source_control is missing; git commit provenance is unavailable.")
+    elif not isinstance(source_control, dict):
+        errors.append("source_control must be an object when present.")
+    elif source_control.get("git_commit") is not None and not isinstance(
+        source_control.get("git_commit"), str
+    ):
+        errors.append("source_control.git_commit must be a string or null.")
+
+    _validate_cyclonedx_section(manifest.get("cyclonedx"), errors, warnings)
+
+    if "integrity" in manifest and not verify_manifest_integrity(manifest):
+        errors.append("integrity digest does not match manifest payload.")
+
+    error_count = len(errors)
+    warning_count = len(warnings)
+    if error_count:
+        summary = (
+            f"Invalid provenance manifest: {error_count} error" f"{'' if error_count == 1 else 's'}"
+        )
+        if warning_count:
+            summary += f", {warning_count} warning{'' if warning_count == 1 else 's'}"
+        summary += "."
+    elif warning_count:
+        summary = (
+            f"Valid provenance manifest with {warning_count} "
+            f"warning{'' if warning_count == 1 else 's'}."
+        )
+    else:
+        summary = "Valid provenance manifest."
+
+    return {
+        "valid": error_count == 0,
+        "errors": errors,
+        "warnings": warnings,
+        "summary": summary,
+    }
+
+
+def _validate_cyclonedx_section(cyclonedx: Any, errors: List[str], warnings: List[str]) -> None:
+    if not isinstance(cyclonedx, dict):
+        errors.append("cyclonedx must be an object.")
+        return
+    if cyclonedx.get("bomFormat") != "CycloneDX":
+        errors.append("cyclonedx.bomFormat must be 'CycloneDX'.")
+    if cyclonedx.get("specVersion") != "1.6":
+        errors.append("cyclonedx.specVersion must be '1.6'.")
+
+    components = cyclonedx.get("components")
+    if not isinstance(components, list):
+        errors.append("cyclonedx.components must be a list.")
+        components = []
+    elif not components:
+        warnings.append("cyclonedx.components is empty.")
+
+    component_refs = set()
+    for index, component in enumerate(components):
+        if not isinstance(component, dict):
+            errors.append(f"cyclonedx.components[{index}] must be an object.")
+            continue
+        bom_ref = component.get("bom-ref")
+        if not isinstance(bom_ref, str) or not bom_ref:
+            errors.append(f"cyclonedx.components[{index}].bom-ref must be a non-empty string.")
+            continue
+        component_refs.add(bom_ref)
+        hashes = component.get("hashes")
+        if not isinstance(hashes, list) or not any(
+            isinstance(item, dict)
+            and item.get("alg") == "SHA-256"
+            and _looks_like_sha256(item.get("content"))
+            for item in hashes
+        ):
+            errors.append(f"cyclonedx.components[{index}] must include a SHA-256 hash entry.")
+
+    dependencies = cyclonedx.get("dependencies")
+    if not isinstance(dependencies, list):
+        errors.append("cyclonedx.dependencies must be a list.")
+        return
+    for index, dependency in enumerate(dependencies):
+        if not isinstance(dependency, dict):
+            errors.append(f"cyclonedx.dependencies[{index}] must be an object.")
+            continue
+        ref = dependency.get("ref")
+        if ref not in component_refs:
+            errors.append(f"cyclonedx.dependencies[{index}].ref has no matching component.")
+        depends_on = dependency.get("dependsOn")
+        if not isinstance(depends_on, list):
+            errors.append(f"cyclonedx.dependencies[{index}].dependsOn must be a list.")
+            continue
+        for dep_ref in depends_on:
+            if dep_ref not in component_refs:
+                errors.append(
+                    f"cyclonedx.dependencies[{index}].dependsOn contains "
+                    f"unknown component ref: {dep_ref!r}"
+                )
+
+
+def _looks_like_sha256(value: Any) -> bool:
+    return (
+        isinstance(value, str)
+        and len(value) == 64
+        and all(c in "0123456789abcdefABCDEF" for c in value)
+    )
+
+
 def _integrity_digest_for(payload: Dict[str, Any]) -> Dict[str, str]:
     canonical = dict(payload)
     canonical.pop("integrity", None)
