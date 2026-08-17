@@ -6,6 +6,8 @@ Independent version/release cadence from the main `pyobfus` and `pyobfus-mcp` Py
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-17
+
 ### Added
 
 - "pyobfus: Reverse Stack Trace" now uses `--trace-marker` metadata to place

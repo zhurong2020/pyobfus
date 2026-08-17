@@ -2,7 +2,7 @@
   "name": "pyobfus",
   "displayName": "pyobfus — Python Code Obfuscator",
   "description": "Inline risk diagnostics + reverse-mapped stack traces for pyobfus, the open-source AST-based Python obfuscator. Open source, OpenSSF Best Practices verified, PEP 740 attested releases.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "publisher": "zhurong2020",
   "license": "Apache-2.0",
   "icon": "icon.png",
