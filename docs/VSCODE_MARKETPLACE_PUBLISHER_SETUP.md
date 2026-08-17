@@ -127,6 +127,11 @@ obvious success banner, so success was confirmed two ways:
 
 ## Updating an already-listed extension (confirmed 2026-08-06, M2 / v0.2.0)
 
+> **Sign in with `wuxiami@hotmail.com`** — the maintainer has multiple
+> Microsoft accounts; this is the one the `zhurong2020` publisher account was
+> created under (Step 1 above) and the only one that can see/update this
+> listing. Confirmed again 2026-08-17 (v0.4.0 update).
+
 The update flow is **not** the "New extension" button — that's for a
 brand-new listing. Instead:
 
