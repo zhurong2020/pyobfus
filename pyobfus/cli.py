@@ -2117,6 +2117,7 @@ def _handle_verify_provenance_manifest(manifest_path: str, json_output: bool = F
     from pyobfus.core.provenance import validate_provenance_manifest
 
     path = Path(manifest_path)
+    result: Dict[str, Any]
     try:
         manifest = json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
