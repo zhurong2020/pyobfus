@@ -20,12 +20,15 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
 - 主包：`pyobfus 0.5.14` 已发布（2026-08-17）。
 - MCP 包：`pyobfus-mcp 0.3.6` 已发布（2026-08-17），MCP Registry 同步发布，
   `isLatest=true` 已核实。
-- VS Code 扩展：`0.4.0` 已 tag + GitHub Release 发布（2026-08-17）；
-  **Marketplace 手工上传（「⋯」→ Update → 上传 .vsix）待用户完成**，完成前
-  公开 listing 仍显示 `0.3.0`。
-- Glama admin「Build steps」字段仍停在 `pyobfus-mcp==0.3.5`，需要用户手工
-  改成 `0.3.6`（Claude 无法操作该 admin 面板）。
+- VS Code 扩展：`0.4.0` 已 tag + GitHub Release 发布，**Marketplace 手工上传
+  也已由用户完成**（`curl` 核实公开 listing 已返回 `"version":"0.4.0"`）。
+- Glama admin「Build steps」已由用户手工改到 `pyobfus-mcp==0.3.6`，但触发的
+  新构建 15 分钟后失败（`ECONNRESET`，卡在拉取 base image 这一步，是第二个
+  独立复现实例，非我方问题）——详见下方 P0 小节。
 - GitHub：主分支健康，当前公开 issues/PRs 为 0，CI/CodeQL 全绿。
+- README/`llms.txt`/两个 `pyproject.toml`/`server.json` 的 AI 客户端定位
+  文案已补 GitHub Copilot + CodeBuddy（实时搜索核实后添加，非训练记忆），
+  README tagline 结尾改成"any MCP-compatible AI agent"泛称。
 - ⚠️ **已知：PyPI `pyobfus` 页面 description 摘要落后一个版本**——`v0.5.14`
   tag 精确指向的是纯版本号提交（`41fd810`，只改 `pyproject.toml`/
   `CHANGELOG.md`），README.md 里"What's new"横幅的同步更新落在了 tag 之后
@@ -139,7 +142,8 @@ bytecode 加密。
 ### ✅ 已发布（原 P1/P2 打磨项，2026-08-17 三包发版后收口）
 
 1. `P2-25` VS Code trace/config workflow polish — **已发布于 `vscode-extension`
-   0.4.0**（tag + GitHub Release；Marketplace 手工上传待完成）。
+   0.4.0**（tag + GitHub Release + Marketplace 手工上传均已完成，`curl` 核实
+   公开 listing 已返回 `"version":"0.4.0"`）。
      - Reverse Stack Trace 利用 `--trace-marker` 自动定位 mapping 文件。
      - Reverse Stack Trace 复用共享 CLI 错误提示；旧版 pyobfus / 解释器错误现在
        给出和 obfuscate / generate-config 一致的 Upgrade / Select Interpreter
@@ -163,7 +167,9 @@ bytecode 加密。
    - 已明确 HTTP OAuth / Server Card 对当前 stdio server 不适用。
    - 新增 `test_version_metadata.py` 回归测试，防止版本号三处（`__init__.py`/
      `pyproject.toml`/`server.json`）再次漂移。
-   - ⚠️ Glama admin「Build steps」字段仍停在 `0.3.5`，需要用户手工改成 `0.3.6`。
+   - ✅ Glama admin「Build steps」字段已由用户手工改成 `0.3.6`（确认无误），
+     但触发的新构建随后失败（`ECONNRESET`，Glama 自家基础设施问题，非我方
+     配置问题）——详见 P0 小节。
 
 3. `P2-26` obfuscated-output SBOM + provenance manifest — **已发布于
    `pyobfus` 0.5.14**。
@@ -225,8 +231,8 @@ bytecode 加密。
 
 ## 下次工作建议
 
-1. 先处理 2026-08-17 三包发布留下的两项收尾：确认 Marketplace 是否已上传
-   `vscode-extension` 0.4.0（`curl` 公开 listing 核实版本号），以及 Glama
-   admin「Build steps」是否已改成 `pyobfus-mcp==0.3.6`。
+1. 三包发布留下的两项手工收尾（Marketplace 上传、Glama Build steps 重新
+   pin）均已在同一 session 内完成，无需重复确认；只需按 P0 小节检查 Glama
+   `01a00e39-...` 那次构建失败之后有没有新尝试、Discord 有没有回复。
 2. 进入 `P2-29` compatibility checks：优先从真实交付组合的诊断和 cookbook 做小步
    增量，不默认新增 transform。

@@ -12,25 +12,28 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### ✅ 2026-08-17 — 三包发布完成：pyobfus 0.5.14 / pyobfus-mcp 0.3.6 / vscode-extension 0.4.0
+### ✅ 2026-08-17 — 三包发布完成 + session 收尾（pyobfus 0.5.14 / pyobfus-mcp 0.3.6 / vscode-extension 0.4.0）
 
-**本轮完整发布流程**：早前 session 积累的 17 个本地提交先推送到 `origin/main`（P-1），推送后 CI 首次真正跑这批改动，抓到一个真 mypy 回归（`_handle_verify_provenance_manifest` 的 `result` 被推断成 `Dict[str, object]`）并当场修复（commit `e883c0a`）。随后判断距上次发布（08-07）已 10 天、早过"1-2 天"间隔窗口，三包依次发版：
+**发布流程**：早前 session 积累的 17 个本地提交先推送到 `origin/main`（P-1），推送后 CI 首次真正跑这批改动，抓到一个真 mypy 回归（`_handle_verify_provenance_manifest` 的 `result` 被推断成 `Dict[str, object]`）并当场修复（commit `e883c0a`）。随后判断距上次发布（08-07）已 10 天、早过"1-2 天"间隔窗口，三包依次发版：
 1. `pyobfus` **0.5.14**（provenance manifest CycloneDX 增强 + `--verify-provenance-manifest` + `--validate-config --json`）—— tag `v0.5.14`，OIDC+PEP740 workflow 绿，PyPI 核实 latest。
-2. `pyobfus-mcp` **0.3.6**（`server.json` repository ID + 官方 `2025-12-11` schema 校验 + 新增版本同步回归测试）—— tag `mcp-v0.3.6`，PyPI 核实 latest；**MCP Registry 也重新发布**（`mcp-publisher login github` 缓存 token 已过期，走了一次新的 device-code 授权，用户在浏览器完成，`isLatest=true` 已核实）。
-3. `vscode-extension` **0.4.0**（trace-marker mapping picker + `Validate pyobfus.yaml` 命令）—— 本地 51/51 测试绿（含对刚发布的 0.5.14 的真实合约测试），打出 `pyobfus-0.4.0.vsix`，tag `vscode-v0.4.0`，GitHub Release 已建并附 vsix。**Marketplace 手工上传（「⋯」→ Update → 上传 .vsix）这一步还没做**，等用户完成。
+2. `pyobfus-mcp` **0.3.6**（`server.json` repository ID + 官方 `2025-12-11` schema 校验 + 新增版本同步回归测试）—— tag `mcp-v0.3.6`，PyPI 核实 latest；MCP Registry 也重新发布（`mcp-publisher login github` 缓存 token 已过期，走了一次新的 device-code 授权，用户在浏览器完成，`isLatest=true` 已核实）。
+3. `vscode-extension` **0.4.0**（trace-marker mapping picker + `Validate pyobfus.yaml` 命令）—— 本地 51/51 测试绿（含对刚发布的 0.5.14 的真实合约测试），打出 `pyobfus-0.4.0.vsix`，tag `vscode-v0.4.0`，GitHub Release 已建并附 vsix。**Marketplace 手工上传已由用户完成**，`curl` 独立核实公开 listing 已返回 `"version":"0.4.0"`。
 
-**⚠️ 遗留待办（下次 cold-start 先查）**：
-1. Marketplace 是否已手工上传 0.4.0——`curl` 公开 listing 的 `"version"` 字段核实。
-2. **Glama admin Build steps 字段仍停在 `pyobfus-mcp==0.3.5`**，需要用户手工登录改成 `0.3.6`，否则 Glama 容器继续跑旧版工具面。
-3. `docs/RELEASE_PROVENANCE_VERIFICATION.md` 已用新版本号重新核验 Integrity API（真实 curl，非平移文本）。
+**✅ Glama Build steps 已由用户手工改到 `pyobfus-mcp==0.3.6`**——但触发的新构建（`01a00e39-...`）15 分钟后**失败**（`ECONNRESET`/"aborted"，卡在拉取 `debian:trixie-slim` 基础镜像元数据这一步），与 08-07 那次失败是第二个独立复现实例，同一卡点、不同错误签名，非我方包/配置问题（Build steps 本身已核实正确）。**用户决定继续观察，暂不追加 Discord 消息、暂不手动重试**。详见 memory `glama_zero_tools_repro_2026-08-07.md` 的 08-17 追加小节。
 
-**外部状态（发布前最后一次复查，08-17 早些时候）**：Glama 旧 public API 路径 `not_found`，Discord 频道暂无回复；Claude plugin marketplace 仍 `Submitted and pending review`（Aug 2）。这两条不受本轮发布影响，继续被动等待。
+**两处发布流程教训，已固化进下方「发布流程」清单，避免重犯**：
+1. **README"What's new"横幅必须在打 tag 前的同一提交里更新**——0.5.14 的 tag 只包含 `pyproject.toml`/`CHANGELOG.md`，横幅更新拖到 tag 之后的 docs-sync 提交里才做，导致 PyPI 包（不可变）永久错过这次快照，页面 description 卡在"v0.5.13"字样。用户决定不为此单独发版，等下次自然发布带上。
+2. **PyPI 版本徽标（shields.io badge）是动态生成的，不需要、也不该被当作发布清单项**——用户同时问徽标是否也滞后，`curl` 直接探 shields.io 源头 + GitHub camo 代理确认两层当时已经是最新版本，纯粹是缓存/浏览器问题，跟①不是同一类 bug。
+
+**AI 客户端清单扩充**：用户问 README"designed for X/Y/Z"是否该加国内主流工具，实时搜索核实（非训练记忆）后确认 GitHub Copilot（42% 市占率，仓库本就有 `copilot-instructions.md` 模板却漏提）和 CodeBuddy（腾讯云，中国首个支持 MCP 的编程助手）均属实有据，已加进 README/llms.txt/mcp README/两个 pyproject.toml description/server.json target_clients 共 6 个文件，README tagline 结尾改成"any MCP-compatible AI agent"泛称防止以后再漂移。
+
+**外部状态（session 内多次复查，均未变化）**：Glama 旧 public API 路径 `not_found`，Discord `#support` 暂无回复；Claude plugin marketplace 仍 `Submitted and pending review`（Aug 2）。两条继续被动等待，不阻塞本地工作。
 
 **下次 cold-start 顺序**：
 1. 先读 `docs/CURRENT_PLAN_ZH.md`。
-2. 处理上面「遗留待办」的 1-2 两项（Marketplace 上传确认 + Glama 重新 pin）。
-3. Glama/Claude 只做周期性外部状态复查；没有回复或新审核结论时不要阻塞本地工作。
-4. 继续 P2-29：Python 3.14 / 依赖 / VS Code host 兼容性检查。
+2. Glama：检查 `01a00e39-...` 之后 admin 面板 Recent Tests 有没有新构建尝试；Discord `#support` 有没有回复；`curl` 复查公开 API 的 `tools` 字段。
+3. Claude plugin：只需确认 Console 状态是否变化。
+4. 没有新信号则继续 P2-29：Python 3.14 / 依赖 / VS Code host 兼容性检查（下一项真正待开工的新功能）。
 
 ### ✅ 2026-08-02 — pyobfus 0.5.6 已发布，issue #25 已关闭，CodeQL 已清零
 
@@ -149,11 +152,11 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.9-3.14, AST, setuptools
 - **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.14，2026-08-17 发布**；完整版本历史见 `CHANGELOG.md`)
-- **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.0，2026-08-17 tag+GitHub Release 已发；Marketplace 手工上传步骤待用户完成**；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`)
+- **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.0，2026-08-17 发布**（tag+GitHub Release+Marketplace 手工上传均已完成，`curl` 核实公开 listing 已返回 `"version":"0.4.0"`）；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`)
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.6，2026-08-17 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.1` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp` (active, isLatest=true · **0.3.6**，2026-08-17 经 `mcp-publisher publish`(GitHub device-code 重新登录)确认)
 - **Smithery (Skill)**: https://smithery.ai/skills/zhurong2020/pyobfus-protect (2026-06-22 上线 · 本地工具走 Skill 渠道非 MCP 渠道) · **mcp.so**: 已收录
-- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus (Quality A) — Glama 容器 build 自 **admin Dockerfile→Configuration「Build steps」字段**(web-UI)，**不读 repo 的 `pyobfus_mcp/Dockerfile`**，且**不自动跟 PyPI 最新**：每次发 mcp 新版都要手动把该字段的 `pyobfus-mcp==<ver>` bump 一次，否则 listing 静默供旧工具面——**发布必做步骤**，已进 `docs/V0.5_RELEASE_PLAN.md` Phase 5.6。⚠️ **待办（2026-08-17 mcp 0.3.6 发布后）**：Build steps 字段仍停在 `pyobfus-mcp==0.3.5`，需要用户手工登录 Glama admin 面板改成 `0.3.6`，Claude 做不到。最近一次已完成的 re-pin 是 2026-08-06 从 0.3.3→0.3.5(test `019fd4f7`)。「Recent Releases」的版本号(如 0.5.4)是 Glama 自增计数、与实装版本无关，忽略。**2026-08-17 状态**：公开页面可访问且页面内容显示 8 个 tool 名称；旧 public API 路径 `/api/mcp/v1/servers/io.github.zhurong2020/pyobfus-mcp` 已返回 `not_found`，不再沿用早前 `tools: []` 判断；user 手工查 Glama Discord 对应频道，暂时没有回复。当前按外部 listing/API drift 记录并跳过，除非 Glama 给出新复现或修改要求。历史排障结论仍成立：pyobfus-mcp 包、mcp-proxy 桥接、Glama 构建和 Glama 内省此前均已证明能返回 8/8 tools。教训 memory `glama_introspection_dockerfile_pin_2026-06-05` + `glama_zero_tools_repro_2026-08-07` · 历史 `docs/POST_V0.4_TODO.md`
+- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus (Quality A) — Glama 容器 build 自 **admin Dockerfile→Configuration「Build steps」字段**(web-UI)，**不读 repo 的 `pyobfus_mcp/Dockerfile`**，且**不自动跟 PyPI 最新**：每次发 mcp 新版都要手动把该字段的 `pyobfus-mcp==<ver>` bump 一次，否则 listing 静默供旧工具面——**发布必做步骤**，已进 `docs/V0.5_RELEASE_PLAN.md` Phase 5.6。**2026-08-17 mcp 0.3.6 发布后**：Build steps 字段已由用户手工改成 `pyobfus-mcp==0.3.6`（确认无误），但触发的新构建（`01a00e39-...`）15 分钟后失败（`ECONNRESET`/"aborted"，卡在拉取 `debian:trixie-slim` 基础镜像元数据这一步）——与 08-07 那次失败是第二个独立复现实例，同一卡点、不同错误签名，非我方包/配置问题，用户决定继续观察，暂不追加 Discord 消息/手动重试。详见 memory `glama_zero_tools_repro_2026-08-07.md`。「Recent Releases」的版本号(如 0.5.4)是 Glama 自增计数、与实装版本无关，忽略。**2026-08-17 状态**：公开页面可访问且页面内容显示 8 个 tool 名称；旧 public API 路径 `/api/mcp/v1/servers/io.github.zhurong2020/pyobfus-mcp` 已返回 `not_found`，不再沿用早前 `tools: []` 判断；user 手工查 Glama Discord 对应频道，暂时没有回复。当前按外部 listing/API drift 记录并跳过，除非 Glama 给出新复现或修改要求。历史排障结论仍成立：pyobfus-mcp 包、mcp-proxy 桥接、Glama 构建和 Glama 内省此前均已证明能返回 8/8 tools。教训 memory `glama_introspection_dockerfile_pin_2026-06-05` + `glama_zero_tools_repro_2026-08-07` · 历史 `docs/POST_V0.4_TODO.md`
 - **GitHub**: https://github.com/zhurong2020/pyobfus (public)
 - **文档**: https://pyobfus.readthedocs.io
 - **许可**: Apache 2.0 (Core) + Proprietary (Pro)
