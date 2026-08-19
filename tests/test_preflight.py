@@ -9,6 +9,7 @@ from pathlib import Path
 
 from pyobfus.core.preflight import (
     CAT_ALL_EXPORT,
+    CAT_COMPAT_ADVISORY,
     CAT_DYNAMIC_ATTR,
     CAT_DYNAMIC_EXEC,
     CAT_DYNAMIC_IMPORT,
@@ -20,6 +21,8 @@ from pyobfus.core.preflight import (
     CAT_UNSAFE_DESERIALIZATION,
     PreflightChecker,
     SEVERITY_HIGH,
+    SEVERITY_INFO,
+    SEVERITY_LOW,
     SEVERITY_MEDIUM,
     format_report_text,
 )
@@ -352,3 +355,100 @@ def test_text_formatter_smoke(tmp_path: Path) -> None:
     assert "pyobfus pre-flight check" in text
     assert "Next:" in text
     assert "HIGH" in text
+
+
+# ---------------------------------------------------------------------------
+# Compatibility advisories (P2-29): delivery-combo detection
+# ---------------------------------------------------------------------------
+
+
+def test_detects_sourcedefender_import(tmp_path: Path) -> None:
+    f = _write(tmp_path, "a.py", "import sourcedefender\n")
+    report = PreflightChecker().check_path(f)
+    risks = [r for r in report.risks if r.category == CAT_COMPAT_ADVISORY]
+    assert any(r.severity == SEVERITY_LOW and "sourcedefender" in r.message for r in risks)
+
+
+def test_detects_nuitka_import(tmp_path: Path) -> None:
+    f = _write(tmp_path, "a.py", "import nuitka\n")
+    report = PreflightChecker().check_path(f)
+    risks = [r for r in report.risks if r.category == CAT_COMPAT_ADVISORY]
+    assert any("nuitka" in r.message for r in risks)
+
+
+def test_detects_cython_import(tmp_path: Path) -> None:
+    f = _write(tmp_path, "a.py", "from Cython.Build import cythonize\n")
+    report = PreflightChecker().check_path(f)
+    risks = [r for r in report.risks if r.category == CAT_COMPAT_ADVISORY]
+    assert any("Compiled packaging" in r.message for r in risks)
+
+
+def test_detects_pye_literal(tmp_path: Path) -> None:
+    f = _write(tmp_path, "a.py", 'ENC = "secret.pye"\n')
+    report = PreflightChecker().check_path(f)
+    risks = [r for r in report.risks if r.category == CAT_COMPAT_ADVISORY]
+    assert any(".pye" in r.message for r in risks)
+
+
+def test_detects_pyx_literal(tmp_path: Path) -> None:
+    f = _write(tmp_path, "a.py", 'SRC = "mymodule.pyx"\n')
+    report = PreflightChecker().check_path(f)
+    risks = [r for r in report.risks if r.category == CAT_COMPAT_ADVISORY]
+    assert any(".pyx" in r.message for r in risks)
+
+
+def test_detects_sys_meta_path_assignment(tmp_path: Path) -> None:
+    f = _write(
+        tmp_path,
+        "a.py",
+        """
+        import sys
+        sys.meta_path = [MyFinder()]
+        """,
+    )
+    report = PreflightChecker().check_path(f)
+    risks = [r for r in report.risks if r.category == CAT_COMPAT_ADVISORY]
+    assert any("sys.meta_path" in r.message for r in risks)
+
+
+def test_detects_importlib_abc_subclass(tmp_path: Path) -> None:
+    f = _write(
+        tmp_path,
+        "a.py",
+        """
+        import importlib.abc
+        class MyFinder(importlib.abc.MetaPathFinder):
+            pass
+        """,
+    )
+    report = PreflightChecker().check_path(f)
+    risks = [r for r in report.risks if r.category == CAT_COMPAT_ADVISORY]
+    assert any("import hook" in r.message for r in risks)
+
+
+def test_ml_framework_emits_info_compat_advisory(tmp_path: Path) -> None:
+    f = _write(
+        tmp_path,
+        "serve.py",
+        """
+        import torch
+        def predict(x):
+            return x
+        """,
+    )
+    report = PreflightChecker().check_path(f)
+    risks = [r for r in report.risks if r.category == CAT_COMPAT_ADVISORY]
+    assert any(r.severity == SEVERITY_INFO for r in risks)
+    assert report.suggested_preset == "ml"
+
+
+def test_compat_advisory_low_does_not_block_exit(tmp_path: Path) -> None:
+    f = _write(
+        tmp_path,
+        "a.py",
+        'import nuitka\nENC = "secret.pye"\n',
+    )
+    report = PreflightChecker().check_path(f)
+    assert report.exit_code() == 0
+    assert any(r.category == CAT_COMPAT_ADVISORY for r in report.risks)
+

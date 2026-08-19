@@ -3,7 +3,9 @@ Pre-flight risk checker for pyobfus.
 
 Scans Python source for constructs that may break after obfuscation
 (eval/exec, dynamic attribute access, framework reflection, __all__ exports,
-name-string references). Produces a structured report with severity levels,
+name-string references) and emits compatibility advisories for common delivery
+combinations (import-hook / encrypted-file tooling, compiled packaging,
+ML/model-serving). Produces a structured report with severity levels,
 per-file findings, and AI-consumable hints for the next command.
 
 Used by the `pyobfus --check` CLI flag and by the MCP server tool
@@ -42,6 +44,7 @@ CAT_FRAMEWORK = "framework_reflection"
 CAT_ENTRY_POINT = "entry_point"
 CAT_UNSAFE_DESERIALIZATION = "unsafe_deserialization"
 CAT_MODEL_ARTIFACT_LITERAL = "model_artifact_literal"
+CAT_COMPAT_ADVISORY = "compatibility_advisory"
 
 
 @dataclass
@@ -175,6 +178,16 @@ _MODEL_ARTIFACT_SUFFIXES = (
     ".bin",
 )
 
+# Delivery-combo detection for compatibility advisories. These flag tooling that
+# pyobfus composes with (rather than competes against) so --check can point the
+# user at the right cookbook. Severity is always low/info — these never block
+# obfuscation or change the CLI exit code.
+_COMPAT_IMPORT_HOOK = {"sourcedefender"}
+_COMPAT_COMPILED = {"nuitka", "cython"}
+_COMPAT_ENCRYPTED_SUFFIXES = (".pye",)
+_COMPAT_COMPILED_SUFFIXES = (".pyx",)
+_COMPAT_HOOK_BASES = {"metapathfinder", "loader", "fileloader", "sourcefileloader"}
+
 
 class _RiskVisitor(ast.NodeVisitor):
     """Walk one AST module collecting risks for a single file."""
@@ -190,19 +203,51 @@ class _RiskVisitor(ast.NodeVisitor):
 
     def visit_Import(self, node: ast.Import) -> None:
         for alias in node.names:
-            self.imports.add(alias.name.split(".")[0])
+            top = alias.name.split(".")[0]
+            self.imports.add(top)
+            self._check_compat_import(top, node)
         self.generic_visit(node)
 
     def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
         if node.module:
-            self.imports.add(node.module.split(".")[0])
+            top = node.module.split(".")[0]
+            self.imports.add(top)
+            self._check_compat_import(top, node)
+        self.generic_visit(node)
+
+    def visit_ClassDef(self, node: ast.ClassDef) -> None:
+        for base in node.bases:
+            base_name = ""
+            if isinstance(base, ast.Name):
+                base_name = base.id
+            elif isinstance(base, ast.Attribute):
+                base_name = base.attr
+            if base_name.lower() in _COMPAT_HOOK_BASES:
+                self._add(
+                    CAT_COMPAT_ADVISORY,
+                    SEVERITY_LOW,
+                    node,
+                    "Custom import hook (importlib.abc subclass) detected.",
+                    "Obfuscate the source BEFORE it is loaded through a custom "
+                    "import hook. See docs/IMPORT_HOOK_COOKBOOK.md.",
+                )
+                break
         self.generic_visit(node)
 
     # ---- __all__ --------------------------------------------------------
 
     def visit_Assign(self, node: ast.Assign) -> None:
         for target in node.targets:
-            if isinstance(target, ast.Name) and target.id == "__all__":
+            if self._is_sys_meta_path(target):
+                self._add(
+                    CAT_COMPAT_ADVISORY,
+                    SEVERITY_LOW,
+                    node,
+                    "sys.meta_path assignment detected (custom import hook).",
+                    "Obfuscate the source BEFORE registering a custom import hook. "
+                    "See docs/IMPORT_HOOK_COOKBOOK.md.",
+                )
+            elif isinstance(target, ast.Name) and target.id == "__all__":
                 self.has_all_export = True
                 self._add(
                     CAT_ALL_EXPORT,
@@ -232,6 +277,18 @@ class _RiskVisitor(ast.NodeVisitor):
 
     def visit_Call(self, node: ast.Call) -> None:
         func = node.func
+
+        # sys.meta_path.append/insert/register(...) — custom import hook.
+        if isinstance(func, ast.Attribute) and func.attr in {"append", "insert", "register"}:
+            if self._is_sys_meta_path(func.value):
+                self._add(
+                    CAT_COMPAT_ADVISORY,
+                    SEVERITY_LOW,
+                    node,
+                    "sys.meta_path mutation detected (custom import hook).",
+                    "Obfuscate the source BEFORE registering a custom import hook. "
+                    "See docs/IMPORT_HOOK_COOKBOOK.md.",
+                )
 
         # Bare-name builtins: eval(...), getattr(...), __import__(...)
         if isinstance(func, ast.Name):
@@ -330,15 +387,34 @@ class _RiskVisitor(ast.NodeVisitor):
                 self._add_unsafe_deserialization(node, f"{owner}.load_model()")
 
     def visit_Constant(self, node: ast.Constant) -> None:
-        if isinstance(node.value, str) and _looks_like_model_artifact(node.value):
-            self._add(
-                CAT_MODEL_ARTIFACT_LITERAL,
-                SEVERITY_LOW,
-                node,
-                "Model artifact path literal detected.",
-                "For Pro builds, wrap model/weight paths with vault_secrets({...}) "
-                "and enable --vault so paths route through the Runtime String Vault.",
-            )
+        if isinstance(node.value, str):
+            if _looks_like_model_artifact(node.value):
+                self._add(
+                    CAT_MODEL_ARTIFACT_LITERAL,
+                    SEVERITY_LOW,
+                    node,
+                    "Model artifact path literal detected.",
+                    "For Pro builds, wrap model/weight paths with vault_secrets({...}) "
+                    "and enable --vault so paths route through the Runtime String Vault.",
+                )
+            elif _looks_like_encrypted_file(node.value):
+                self._add(
+                    CAT_COMPAT_ADVISORY,
+                    SEVERITY_LOW,
+                    node,
+                    "Encrypted-file / import-hook artifact path detected (.pye).",
+                    "Obfuscate the source BEFORE encrypting / packaging it as an "
+                    "import-hook artifact. See docs/IMPORT_HOOK_COOKBOOK.md.",
+                )
+            elif _looks_like_compiled_source(node.value):
+                self._add(
+                    CAT_COMPAT_ADVISORY,
+                    SEVERITY_LOW,
+                    node,
+                    "Compiled-packaging source reference detected (.pyx).",
+                    "Obfuscate the pure-Python module first, then compile. "
+                    "See docs/COMPILED_PACKAGING_COOKBOOK.md.",
+                )
         self.generic_visit(node)
 
     # ---- name-string references ----------------------------------------
@@ -373,6 +449,36 @@ class _RiskVisitor(ast.NodeVisitor):
                 suggestion=suggestion,
             )
         )
+
+    def _is_sys_meta_path(self, node: ast.AST) -> bool:
+        return (
+            isinstance(node, ast.Attribute)
+            and node.attr == "meta_path"
+            and isinstance(node.value, ast.Name)
+            and node.value.id == "sys"
+        )
+
+    def _check_compat_import(self, module: str, node: ast.AST) -> None:
+        low = module.lower()
+        if low in _COMPAT_IMPORT_HOOK:
+            self._add(
+                CAT_COMPAT_ADVISORY,
+                SEVERITY_LOW,
+                node,
+                f"Import-hook / encrypted-file tooling detected ({module}).",
+                "Obfuscate your pure-Python source with pyobfus BEFORE it passes "
+                "through the import hook / encryption layer. "
+                "See docs/IMPORT_HOOK_COOKBOOK.md.",
+            )
+        elif low in _COMPAT_COMPILED:
+            self._add(
+                CAT_COMPAT_ADVISORY,
+                SEVERITY_LOW,
+                node,
+                f"Compiled packaging detected ({module}).",
+                f"Obfuscate pure-Python sources first, then compile with {module}. "
+                "See docs/COMPILED_PACKAGING_COOKBOOK.md.",
+            )
 
     def _add_unsafe_deserialization(self, node: ast.Call, call_name: str) -> None:
         self._add(
@@ -428,6 +534,14 @@ def _looks_like_model_artifact(value: str) -> bool:
     return lowered.endswith(_MODEL_ARTIFACT_SUFFIXES) or any(
         part in lowered for part in ("/models/", "/checkpoints/", "\\models\\", "\\checkpoints\\")
     )
+
+
+def _looks_like_encrypted_file(value: str) -> bool:
+    return value.lower().endswith(_COMPAT_ENCRYPTED_SUFFIXES)
+
+
+def _looks_like_compiled_source(value: str) -> bool:
+    return value.lower().endswith(_COMPAT_COMPILED_SUFFIXES)
 
 
 # ---------------------------------------------------------------------------
@@ -540,6 +654,23 @@ class PreflightChecker:
                 if exclude_glob not in seen_excludes:
                     report.suggested_excludes.append(exclude_glob)
                     seen_excludes.add(exclude_glob)
+
+        # ML/model-serving compatibility advisory: keep the obfuscation mapping
+        # so runtime tracebacks captured from a serving process still reverse.
+        if "ml" in framework_keys:
+            report.risks.append(
+                Risk(
+                    category=CAT_COMPAT_ADVISORY,
+                    severity=SEVERITY_INFO,
+                    file=report.root,
+                    line=0,
+                    col=0,
+                    message="ML/model-serving detected — keep the obfuscation mapping "
+                    "for reverse stack traces.",
+                    suggestion="Use --trace-marker and --save-mapping; recover traces "
+                    "with `pyobfus --unmap`. See docs/MODEL_SERVING_COOKBOOK.md.",
+                )
+            )
 
         # AI hint: the single next command the user (or an AI agent) should run.
         counts = report.severity_counts()
