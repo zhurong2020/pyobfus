@@ -194,14 +194,29 @@ bytecode 加密。
      sigstore / DSSE 校验逻辑。
    - 输出要诚实：证明发布身份和产物 digest，不证明代码没有漏洞或恶意。
 
-### P1：下一项工作
+### ✅ P1：`P2-29` compatibility checks — 本轮收口（2026-08-19）
 
-1. `P2-29` compatibility checks
-   - 针对真实交付组合补诊断和文档。
-   - 已有 PyInstaller cookbook。
-   - 后续关注 import-hook/encrypted-file ecosystem、compiled packaging、
-     model-serving layout。
-   - 优先 `--check` / VS Code / MCP 诊断和 cookbook，不默认新增 transform。
+针对真实交付组合补诊断与文档，**未新增任何 transform**（遵守"明确不做"）。
+
+- **`--check` 新增 `compatibility_advisory` 类别**（`pyobfus/core/preflight.py`，
+  severity `low`/`info`，不改动 `exit_code` 语义，不阻塞 CI）。自动流入 VS Code
+  红线（`diagnosticsProvider.ts` 消费 `Risk` contract，`low→Information`/
+  `info→Hint`）与 MCP `check_obfuscation_risks` 工具（包裹 `PreflightChecker`）——
+  **VS Code / MCP 无需改代码**。
+  - import-hook / 加密文件生态：`import sourcedefender`、`.pye` 字面量、
+    `sys.meta_path` 赋值/变更、`importlib.abc` 子类。
+  - 编译打包：`import nuitka` / `import Cython` / `.pyx` 字面量。
+  - model-serving：检测到 `ml` preset 时追加一条 `info` 级建议，指向保留
+    mapping 做反向栈追踪。
+- **三篇 cookbook**（`docs/`）：`IMPORT_HOOK_COOKBOOK.md`、
+  `COMPILED_PACKAGING_COOKBOOK.md`、`MODEL_SERVING_COOKBOOK.md`，沿用
+  `PYINSTALLER_COOKBOOK.md` 的 compose-not-compete 格式。
+- **两个端到端复现示例**（`examples/`，参考性、不进 pytest）：
+  `examples/import_hook/`（标准库自定义 import hook，无需付费依赖即可跑通）、
+  `examples/compiled_packaging/`（Cython，免费）。
+- 回归测试：`tests/test_preflight.py` 新增 9 条 `compatibility_advisory` 用例。
+- 后续机会（未并入本轮）：`--check` 接入已配置 `--config` / `exclude_patterns`
+  以减少真实组合的误报，属独立行为改动，留作单独小项。
 
 ### P3：探索项
 
@@ -234,5 +249,7 @@ bytecode 加密。
 1. 三包发布留下的两项手工收尾（Marketplace 上传、Glama Build steps 重新
    pin）均已在同一 session 内完成，无需重复确认；只需按 P0 小节检查 Glama
    `01a00e39-...` 那次构建失败之后有没有新尝试、Discord 有没有回复。
-2. 进入 `P2-29` compatibility checks：优先从真实交付组合的诊断和 cookbook 做小步
-   增量，不默认新增 transform。
+2. `P2-29` compatibility checks 已于本轮收口（`--check` 的 `compatibility_advisory`
+   类别 + 三篇 cookbook + 两个 `examples/` 复现 + 回归测试）。后续若有真实用户
+   反馈新的交付组合（如 PyInstaller 之外的 bundler、其他 import-hook 产品），再
+   机会性扩检测信号或补 cookbook，仍遵守"优先诊断 + 文档、不新增 transform"。

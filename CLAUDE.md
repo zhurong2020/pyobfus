@@ -33,7 +33,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 1. 先读 `docs/CURRENT_PLAN_ZH.md`。
 2. Glama：检查 `01a00e39-...` 之后 admin 面板 Recent Tests 有没有新构建尝试；Discord `#support` 有没有回复；`curl` 复查公开 API 的 `tools` 字段。
 3. Claude plugin：只需确认 Console 状态是否变化。
-4. 没有新信号则继续 P2-29：Python 3.14 / 依赖 / VS Code host 兼容性检查（下一项真正待开工的新功能）。
+4. P2-29 compatibility checks 已于本轮收口（见 `docs/CURRENT_PLAN_ZH.md` P1 小节）：`--check` 新增 `compatibility_advisory` 类别（import-hook/加密文件生态、编译打包、model-serving 三类真实交付组合），并补三篇 cookbook + 两个 `examples/` 端到端复现 + 回归测试；VS Code 红线与 MCP `check_obfuscation_risks` 经既有 `Risk` contract 自动继承这些建议，无需改那两处代码。后续若有新交付组合反馈，机会性扩检测信号或补 cookbook。
 
 ### ✅ 2026-08-02 — pyobfus 0.5.6 已发布，issue #25 已关闭，CodeQL 已清零
 
