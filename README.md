@@ -71,6 +71,7 @@ pyobfus is also on the [VS Code Marketplace](https://marketplace.visualstudio.co
 - **`pyobfus --verify-provenance-manifest provenance.json --json`** — validate the manifest structure, CycloneDX-compatible relationships, and local integrity digest before archiving or shipping it.
 - **Release provenance** — pyobfus and pyobfus-mcp are published through PyPI Trusted Publishing with PEP 740 attestations; see [`docs/RELEASE_PROVENANCE_VERIFICATION.md`](docs/RELEASE_PROVENANCE_VERIFICATION.md) for verification commands and the current snapshot.
 - **Framework-aware presets** — `--preset fastapi | django | flask | pydantic | click | sqlalchemy | ml` with built-in exclusions for dispatch methods, decorators, ORM fields, migrations, model-serving wrappers, and dependency-injection parameters.
+- **Compatibility cookbooks** — pair pyobfus with real delivery pipelines: import-hook / encrypted-file (SOURCEdefender `.pye`), compiled packaging (Nuitka / Cython), and ML model-serving. `pyobfus --check` also emits `compatibility_advisory` findings for these. See [`docs/IMPORT_HOOK_COOKBOOK.md`](docs/IMPORT_HOOK_COOKBOOK.md), [`docs/COMPILED_PACKAGING_COOKBOOK.md`](docs/COMPILED_PACKAGING_COOKBOOK.md), and [`docs/MODEL_SERVING_COOKBOOK.md`](docs/MODEL_SERVING_COOKBOOK.md).
 - **Global `--json`** — every CLI mode (`obfuscate`, `--check`, `--unmap`, `--init`) emits the same structured schema with an `ai_hint` field, ready for Claude Code, Cursor, Windsurf, and MCP servers to consume.
 
 ## Features
