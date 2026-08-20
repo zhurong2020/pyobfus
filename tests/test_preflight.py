@@ -451,4 +451,3 @@ def test_compat_advisory_low_does_not_block_exit(tmp_path: Path) -> None:
     report = PreflightChecker().check_path(f)
     assert report.exit_code() == 0
     assert any(r.category == CAT_COMPAT_ADVISORY for r in report.risks)
-
