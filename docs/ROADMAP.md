@@ -396,6 +396,168 @@ as important trust/discovery data.
 
 ---
 
+## Planning refresh from 2026-08-20 competitor + ecosystem scan
+
+Run at the user's request right after the 0.5.15 release, specifically to
+surface new competitor entrants and ecosystem trend shifts for the next
+iteration — not to extend the feature list by inertia. Every claim below was
+checked with live search, not recalled from training data.
+
+**Competitor baseline, re-checked:**
+
+- **PyArmor** is at 9.2.6 (July 23, 2026 on PyPI). Delta since the 08-14 scan:
+  three new subcommands (`pyarmor init`, `pyarmor env`, `pyarmor build`) and a
+  "readonly obfuscated module" feature (plain scripts can call into an
+  obfuscated module's attributes/functions but not mutate them). Both are
+  workflow/ergonomics additions on top of the existing `rft`/`mini`/`vmc`/`ecc`
+  lane already ruled out — no new strategic threat.
+- **Nuitka Commercial** — €250/year (Full Package with priority support
+  €400/year), confirmed unchanged. Traceback Encryption is still
+  symmetric-only; asymmetric remains a stated future item, not shipped. No
+  update needed to the P2-23 comparison content already in `COMPARISON.md`.
+- **SOURCEdefender** — active (338 total releases, latest July 3, 2026),
+  AES-256 `.pye` import-hook model unchanged. No new action.
+- **🆕 PyLocket — a genuinely new, credible entrant, not previously scanned.**
+  Positions itself against SOURCEdefender as "a full platform" rather than an
+  encryption utility: per-function bytecode encryption (not whole-file),
+  device-bound keys issued at activation and never embedded in the shipped
+  app, plus anti-debug/anti-VM/dynamic-API-resolution/memory protection, and
+  built-in licensing + device binding + revocation + delivery pages + trials +
+  checkout. Pricing: flat subscription + $4/activated license (a different
+  shape than pyobfus's $45 one-time). Requires **Python 3.12-3.14 only** — no
+  3.9-3.11 support, narrower than pyobfus's 3.9-3.14 range. A $0.97 identity
+  verification is required for every account, explicitly to keep the platform
+  from protecting malware and to allow code-signing/scanning of every build —
+  an anti-abuse design worth noting as an industry signal (the same pressure
+  that already shaped this project's "defender-lane" framing in
+  `COMPARISON.md`'s PyArmor section). **No mention anywhere in PyLocket's own
+  docs/marketing of debugging support, traceback handling, or AI-assisted
+  workflows** — on the specific wedge pyobfus already claims (AI-debuggable
+  protection), PyLocket does not compete; it competes on tamper-resistance
+  strength and go-to-market completeness instead. Not a reason to chase
+  per-function bytecode encryption as a headline feature (`## What We Won't
+  Do`'s native/VM-lane exclusion still applies to this shape of protection
+  too), but a real comparison-table gap.
+- **Small/hobby AST-obfuscator entrants** (`bobskater`, `davidteather/
+  python-obfuscator`, `uwuscator`, `Manglify`) — all single-maintainer, no
+  framework-awareness, no reverse-trace mapping, no AI/MCP integration, no
+  trust infra, several inactive or 3.13-only. Same conclusion as every prior
+  scan: none compete on pyobfus's actual differentiators.
+
+**Ecosystem trend findings — genuinely actionable:**
+
+- **PEP 740 attestation adoption is still low industry-wide**: as of this
+  scan, only ~5% of the 360 most-downloaded PyPI packages have attestations
+  uploaded, out of 20,000+ attestations published overall. pyobfus has shipped
+  PEP 740 (via Trusted Publishing) since well before this scan and already has
+  a documented verification runbook (`docs/RELEASE_PROVENANCE_VERIFICATION.md`,
+  P2-27) — this remains a genuine, still-rare differentiator worth keeping
+  visible in positioning copy, not a solved/commoditized checkbox.
+- **The MCP security-scanner ecosystem has matured into credible, branded
+  tooling since the last scan**: Cisco's open-source `mcp-scanner`
+  (`cisco-ai-defense/mcp-scanner` — static/behavioral scanning, explicitly
+  designed for CI/CD use against pre-generated tool-list JSON), Invariant
+  Labs' `MCP-Scan`, and smaller entrants (`Proximity`, `mcp-audit`,
+  `agent-audit`). Independently, the general MCP-security research this scan
+  surfaced repeats the same gap: "as of mid-2026, there is no widely adopted
+  certification or vetting system for publicly distributed MCP servers," and
+  public directories (Glama's own listing included, per this project's own
+  ongoing Glama drift saga) carry "widely varying security quality." Running
+  a reputable scanner like Cisco's against `pyobfus-mcp` and publishing a
+  clean result would be a new, low-effort trust signal filling exactly that
+  gap — same shape as the OpenSSF Best Practices badge, but for the MCP
+  surface specifically. Not yet attempted.
+- **VS Code Marketplace's malicious-extension wave has intensified, not
+  cooled, since the last scan** (GlassWorm/WhiteCobra worm campaigns, Open VSX
+  removing 77 "evil-twin" extensions in August 2026, a trojanized Nx Console
+  update in May 2026 hitting 2.2M installs and a verified GitHub employee
+  machine). Critically: **"Verified Publisher" is now documented as an
+  unreliable trust signal industry-wide** — Nx Console carried that exact
+  badge when it shipped a credential stealer, and security researchers now
+  explicitly warn that install counts and verified badges "end up actually
+  working against you." This validates (does not change) the existing
+  decision to lean on structurally-verifiable claims — OpenSSF Best Practices,
+  PEP 740, SHA-pinned CI, CodeQL-clean, Apache-2.0-auditable core — rather
+  than marketplace badges; worth making those signals more visible directly
+  in the extension's own Marketplace listing description text, not only in
+  the README a click away.
+- **Python 3.14 free-threading (PEP 779) is now officially supported, not
+  experimental** — a bigger CPython internals shift than routine point
+  releases (GIL becomes fully optional; a copy-and-patch JIT also expanded
+  coverage in 3.14). pyobfus already claims 3.9-3.14 support, but there is no
+  documented verification that the Pro runtime components with the most
+  GIL-adjacent assumptions — Runtime String Vault, device/expiry/period
+  license binding, anti-debug checks — have actually been exercised against a
+  free-threaded build (`python3.14t`). This is a real, previously-unflagged
+  compatibility gap, not a hypothetical one, given how new PEP 779's
+  stable status is.
+- **Decompiler landscape for modern Python remains immature** (uncompyle6 caps
+  out around 3.7-3.8; `pycdc` and newer entrants like `PycDecompiler` claim up
+  to 3.13 but explicitly still "error out" often on post-3.7 bytecode; no tool
+  found claims solid 3.14 support). This is unchanged-but-reconfirmed context
+  for P3-1: bytecode-only output still would not clearly buy more
+  decompilation resistance than the status quo today, while risking the same
+  mapping/traceback tradeoffs already identified — no reason to raise P3-1's
+  priority.
+
+**Resulting priority order:**
+
+- [ ] **P2-30: Add PyLocket to `docs/COMPARISON.md`.** Doc-only, no product
+  risk. Lead with the three concrete gaps found: Python version breadth
+  (3.9-3.14 vs. PyLocket's 3.12-3.14 only), one-time $45 vs. subscription +
+  per-license fee, and — the sharpest one — PyLocket's own docs never mention
+  debugging, traceback handling, or AI-assisted workflows, while that is
+  pyobfus's headline differentiator. Also note PyLocket's real strength
+  honestly (per-function bytecode encryption + device-bound keys is a
+  materially stronger tamper-resistance claim than pyobfus's AST + Pro vault)
+  — the comparison should stay in the same honest register as the existing
+  PyArmor/Nuitka entries, not oversell. _Estimate: half a day, content-only._
+- [ ] **P2-31: Run a reputable open-source MCP security scanner against
+  `pyobfus-mcp` and publish the result.** Start with Cisco's
+  `cisco-ai-defense/mcp-scanner` (most credible brand, explicit CI/CD-friendly
+  static/offline mode against a pre-generated tool-list JSON — fits
+  `pyobfus_mcp/server.json` well). If the result is clean, document it
+  alongside the existing OpenSSF Best Practices / PEP 740 trust signals (in
+  `pyobfus_mcp/README.md` and the Glama/MCP Registry listing copy where
+  space allows); if it finds something real, fix it before publishing the
+  badge. Directly answers the "no MCP vetting standard exists" gap this scan
+  surfaced. _Estimate: half a day to a day, mostly investigation._
+- [ ] **P2-32: Verify Pro runtime components under Python 3.14
+  free-threading (`python3.14t`).** Install/build a free-threaded 3.14
+  interpreter, run the full Pro test suite (Runtime String Vault, license
+  binding, anti-debug) against it, and either add it to the CI matrix as a
+  new job or document a manual verification result if a full CI job is too
+  costly for now. PEP 779 just went from experimental to officially supported
+  in 3.14, so "3.9-3.14 support" as currently claimed has not actually been
+  exercised against this specific build mode. _Estimate: half a day, spike
+  first to see if anything breaks before deciding on CI-matrix cost._
+- [ ] **P2-33: VS Code Marketplace listing copy — make structural trust
+  signals more visible.** Given "Verified Publisher" is now a documented weak
+  signal industry-wide (Nx Console incident), surface OpenSSF Best
+  Practices/PEP 740/CodeQL-clean/Apache-2.0-auditable-core claims directly in
+  the Marketplace listing description itself, not only in the README a click
+  away. Copy-only change, no code risk. _Estimate: small, bundle with the next
+  vscode-extension release rather than a solo release._
+
+**Explicit de-prioritizations confirmed by this scan:**
+
+- Do not chase PyLocket's per-function bytecode encryption / device-bound key
+  architecture as a competing headline feature — it is a stronger
+  tamper-resistance claim, but it is the same native/opaque-runtime lane this
+  project has repeatedly ruled out as the primary identity (`## What We Won't
+  Do`), and PyLocket's own positioning confirms the AI-debuggable wedge is
+  still uncontested rather than something to abandon in favor of matching
+  their approach.
+- Do not build licensing/commerce infrastructure (checkout, delivery pages,
+  trials-as-a-service) to match PyLocket's "full platform" positioning — that
+  is a different product category (a business platform vs. a code-protection
+  tool add-on) and stays out of scope; the existing Cloudflare Worker /
+  recipe-level Pro-license reference is sufficient for this project's shape.
+- Do not raise P3-1 (`--output-pyc` spike) priority based on this scan — the
+  decompiler-immaturity finding is reconfirming context, not new urgency.
+
+---
+
 ## v0.6.0+ Long-term (3-6 months)
 
 ### P3 - Experimental

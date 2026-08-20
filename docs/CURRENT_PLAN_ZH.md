@@ -103,6 +103,40 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
 AI-debuggable workflow。pyobfus 不应把 v0.6 的主目标变成模仿 native VM 或
 bytecode 加密。
 
+### 🆕 2026-08-20 竞品 + 生态扫描（实时搜索核实，非训练记忆）
+
+完整版见 `docs/ROADMAP.md`「Planning refresh from 2026-08-20」小节，中文摘要：
+
+- **PyLocket——一个此前未扫描过的新对手**，定位比 SOURCEdefender 更"完整平台"：
+  逐函数字节码加密（非整文件）+ 设备绑定密钥（激活时下发、从不内嵌进产物）
+  + anti-debug/anti-VM/内存保护 + 内置 licensing/delivery/checkout 全套商业化
+  基础设施。仅支持 **Python 3.12-3.14**（比 pyobfus 的 3.9-3.14 窄），定价
+  是订阅 + $4/激活许可（与 pyobfus $45 一次性完全不同形态）。**关键发现**：
+  它的官方文档/营销材料完全没有提到调试支持、traceback 处理或 AI 辅助工作流
+  ——在 pyobfus 主打的"可调试保护"这条赛道上，PyLocket 并不构成竞争，它拼的
+  是防篡改强度和商业化完整度。**不追它的逐函数加密架构**（仍属于此前反复
+  排除的 native/opaque-runtime 主线），但值得诚实加进 `COMPARISON.md`。
+- **MCP 安全扫描生态已经成熟**：Cisco `mcp-scanner`、Invariant `MCP-Scan`
+  等可信品牌工具出现，且研究反复确认"目前没有被广泛采纳的公开 MCP server
+  认证/审查标准"——这是给 `pyobfus-mcp` 加一个新信任信号的低成本机会（跑
+  Cisco 的扫描器、结果干净就公开引用，同 OpenSSF badge 的逻辑）。
+- **PEP 740 attestation 采用率仍然很低**（360 个最热门 PyPI 包里只有约 5%
+  已上传 attestation）——pyobfus 已经做了，且比生态平均水平领先很多，值得
+  在定位文案里继续强调，不是"已经普及、不再是差异化"的东西。
+- **VS Code Marketplace 恶意插件浪潮在加剧**（GlassWorm/WhiteCobra 蠕虫式
+  campaign、Open VSX 08 月下架 77 个"evil-twin"插件、Nx Console 带
+  Verified-Publisher 徽章却在 05 月被植入凭证窃取器影响 220 万安装量）——
+  **"Verified Publisher" 徽章现在被行业公认为不可靠信号**，反向验证了
+  pyobfus 一直坚持的策略（不靠徽章，靠 OpenSSF/PEP740/CodeQL-clean/
+  Apache-2.0 可审计这类结构性可验证信号），值得把这些信号在 Marketplace
+  listing 文案本身里做得更显眼，不能只放在 README 里点进去才看到。
+- **Python 3.14 free-threading（PEP 779）已从实验特性转正**——pyobfus 声称
+  支持 3.9-3.14，但 Pro 运行时组件（Runtime String Vault、license binding、
+  anti-debug）目前没有针对 free-threaded build（`python3.14t`）做过验证，
+  是一个此前没被标记过的真实兼容性缺口（不是假设性的）。
+- decompiler 生态对现代 Python（3.8+）依然不成熟——重新确认（不是新发现）
+  P3-1 `--output-pyc` spike 不需要因此提高优先级。
+
 ### 国际最佳实践
 
 - PyPI PEP 740 / Integrity API 让 release provenance 成为公开信任面。
@@ -231,6 +265,23 @@ bytecode 加密。
 - 后续机会（未并入本轮）：`--check` 接入已配置 `--config` / `exclude_patterns`
   以减少真实组合的误报，属独立行为改动，留作单独小项。
 
+### P1/P2：2026-08-20 扫描新增（按优先级，均为下一轮迭代候选，尚未开始）
+
+1. `P2-30` `docs/COMPARISON.md` 加 PyLocket 条目——纯文档，半天量级。诚实列出
+   它的真实优势（逐函数字节码加密+设备绑定密钥，防篡改强度确实比 pyobfus
+   AST+Pro vault 强），同时点出三个真实差距（Python 版本覆盖更窄、订阅+
+   按许可计费 vs 一次性 $45、完全没提调试/AI 工作流支持）。
+2. `P2-31` 跑 Cisco `mcp-scanner`（或同类可信开源扫描器）扫 `pyobfus-mcp`，
+   结果干净就作为新信任信号公开（同 OpenSSF badge 逻辑）；扫出真问题就先
+   修再发。半天到一天，以调研为主。
+3. `P2-32` 验证 Pro 运行时组件（Vault/license binding/anti-debug）在
+   Python 3.14 free-threaded build（`python3.14t`）下的行为——先 spike 看
+   会不会炸，再决定要不要正式进 CI 矩阵。半天量级。
+4. `P2-33` VS Code Marketplace listing 文案把结构性信任信号（OpenSSF/
+   PEP740/CodeQL-clean/Apache-2.0 可审计）放得更显眼，不要只塞在 README
+   里点进去才看到——"Verified Publisher"徽章已被证实不可靠，这条更有说服力
+   了。纯文案改动，跟下一次 vscode-extension 发布一起带，不用单独发。
+
 ### P3：探索项
 
 1. `P3-1` `--output-pyc` feasibility spike
@@ -256,6 +307,9 @@ bytecode 加密。
 - 不做 anti-VM / sandbox-evasion 类能力，避免工具定位被污染。
 - 不做云端 obfuscation-as-a-service，避免破坏隐私定位。
 - 不做复杂企业 license server；可保留 Cloudflare Worker / recipe 级参考。
+- 不追 PyLocket 的逐函数字节码加密+设备绑定密钥架构（仍属 native/opaque
+  runtime 主线，非 AI-debuggable 定位）；不建它那种 licensing/checkout/
+  delivery 商业化平台（是完全不同的产品类别）。
 
 ## 下次工作建议
 
@@ -274,3 +328,9 @@ bytecode 加密。
 5. 下载量：0.5.15 发布后建议按"周期性发布后复盘节奏"再等几天采一次快照，
    对比 08-20 发布前的读数（`pyobfus` 26/295/1,912；`pyobfus-mcp`
    8/124/687）是否回落，判断是否为真实趋势而非发布噪音。
+6. **下一轮功能迭代候选已就绪，待用户拍板优先级**：`P2-30`（COMPARISON.md
+   加 PyLocket）、`P2-31`（跑 MCP 安全扫描器建信任信号）、`P2-32`（验证
+   Python 3.14 free-threading 兼容性）、`P2-33`（VS Code listing 文案强化
+   信任信号），详见上方"P1/P2：2026-08-20 扫描新增"小节 + `docs/ROADMAP.md`
+   同日「Planning refresh」完整版。四项均为独立小项，互不阻塞，可任意顺序
+   或并行安排。
