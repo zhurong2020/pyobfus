@@ -6,6 +6,16 @@ Independent version/release cadence from the main `pyobfus` and `pyobfus-mcp` Py
 
 ## [Unreleased]
 
+### Changed
+
+- "Why trust this extension" section strengthened with the May 2026 Nx
+  Console incident (a Verified-Publisher-badged, 2.2M-install extension
+  still shipped a credential stealer) — makes the case that this extension's
+  claims are independently checkable rather than badge-based. Added two
+  previously-omitted concrete signals: zero open CodeQL alerts (linked to
+  the live Security tab) and SHA-pinned CI/CD across the build/test/release
+  workflows.
+
 ## [0.4.0] - 2026-08-17
 
 ### Added

@@ -6,15 +6,24 @@ AST-based Python code obfuscator.
 
 ## Why trust this extension
 
-This category has a documented trust problem: in April 2025, a malicious
-extension named "Python Obfuscator for VSCode" was part of a 10-extension
-malware campaign that reached 300,000+ installs before removal (it deployed
-the XMRig cryptominer via a PowerShell loader). This extension is not that,
-and doesn't have to ask you to take that on faith:
+This category has a documented trust problem, and it's getting worse, not
+better. In April 2025, a malicious extension named "Python Obfuscator for
+VSCode" was part of a 10-extension malware campaign that reached 300,000+
+installs before removal (it deployed the XMRig cryptominer via a PowerShell
+loader). More recently, in May 2026, a trojanized update of Nx Console — a
+VS Code extension with ~2.2M installs and Marketplace's own "Verified
+Publisher" badge — shipped a credential stealer that ran on a GitHub
+employee's machine. **The badge didn't stop it**: "Verified Publisher" only
+confirms domain ownership, not code safety, and security researchers now
+explicitly warn that install counts and verified badges "end up actually
+working against you." This extension is not asking you to trust a badge —
+every claim below is independently checkable, not just asserted:
 
 - **Fully open source**: [github.com/zhurong2020/pyobfus](https://github.com/zhurong2020/pyobfus), Apache-2.0.
 - **[OpenSSF Best Practices](https://www.bestpractices.dev/) verified** — the underlying pyobfus project holds the passing badge.
 - **PEP 740 attested PyPI releases** — every `pyobfus` release is published via OIDC Trusted Publishing with cryptographic build attestations, independently verifiable via PyPI's integrity API.
+- **Zero open CodeQL alerts** — static analysis runs on every push; check the current state yourself in the [Security tab](https://github.com/zhurong2020/pyobfus/security/code-scanning).
+- **SHA-pinned CI/CD** — every third-party GitHub Action in the build, test, and release workflows is pinned to a specific commit SHA, not a mutable tag, closing the exact supply-chain vector the Nx Console incident exploited elsewhere.
 - **A build-provenance manifest** (`--provenance-manifest`) and a **tool-description integrity manifest** (`pyobfus-mcp-verify`, for the companion MCP server) — both self-consistency-checkable, not just claimed.
 - **No telemetry, no network calls** beyond the explicit, user-initiated "Unlock Pro" link. This extension only ever shells out to your own locally-installed `pyobfus`.
 
