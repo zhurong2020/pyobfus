@@ -4,7 +4,7 @@
  */
 
 // DRAFT: 嵘说 content membership webhook (not yet enabled in production)
-import { handleContentWebhook } from './content_webhook.js';
+import { handleContentWebhook, verifyStripeSignature } from './content_webhook.js';
 
 export default {
   async fetch(request, env, ctx) {
@@ -175,14 +175,17 @@ async function handleStripeWebhook(request, env, corsHeaders) {
   const signature = request.headers.get('stripe-signature');
   const body = await request.text();
 
-  // TODO: Verify Stripe signature (需要 Stripe webhook secret)
-  // For now, we'll implement basic processing
-
-  let event;
-  try {
-    event = JSON.parse(body);
-  } catch (err) {
-    return new Response(JSON.stringify({ error: 'Invalid JSON' }), {
+  // Verify the webhook actually came from Stripe (HMAC-SHA256 over the raw
+  // body using STRIPE_WEBHOOK_SECRET, configured via `wrangler secret put`
+  // since 2025-11-12 -- this had never actually been checked before,
+  // meaning anyone who knew this URL could POST a fake
+  // checkout.session.completed payload and mint a free license. Reuses the
+  // same verifyStripeSignature() already proven in content_webhook.js
+  // (constant-time compare, 5-minute replay window, no Stripe SDK needed).
+  const event = await verifyStripeSignature(body, signature, env.STRIPE_WEBHOOK_SECRET);
+  if (!event) {
+    console.error('Rejected webhook: invalid or missing Stripe signature');
+    return new Response(JSON.stringify({ error: 'Invalid signature' }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });

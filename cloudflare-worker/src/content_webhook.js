@@ -27,7 +27,7 @@
  * Verify Stripe webhook signature (Web Crypto, no Stripe SDK needed)
  * @returns {Promise<object|null>} parsed event if valid, null otherwise
  */
-async function verifyStripeSignature(rawBody, signatureHeader, webhookSecret) {
+export async function verifyStripeSignature(rawBody, signatureHeader, webhookSecret) {
   if (!signatureHeader || !webhookSecret) return null;
 
   // Stripe-Signature: t=1234567890,v1=abc123...,v0=...
