@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `--check` now reports a `compatibility_advisory` category (severity `low`/
+  `info`, does not change `exit_code` semantics) for three real-world delivery
+  combinations: the import-hook / encrypted-file ecosystem (`import
+  sourcedefender`, `.pye` literals, `sys.meta_path` assignment, `importlib.abc`
+  subclasses), compiled packaging (`import nuitka` / `import Cython`, `.pyx`
+  literals), and model-serving (an `info`-level reminder to keep the mapping
+  file when the `ml` preset is detected). VS Code diagnostics and the MCP
+  `check_obfuscation_risks` tool inherit these advisories automatically
+  through the existing `Risk` contract — no changes needed on either side.
+- Three new cookbooks following the `PYINSTALLER_COOKBOOK.md` compose-not-
+  compete pattern: `docs/IMPORT_HOOK_COOKBOOK.md`,
+  `docs/COMPILED_PACKAGING_COOKBOOK.md`, `docs/MODEL_SERVING_COOKBOOK.md`.
+- Two runnable end-to-end examples: `examples/import_hook/` (stdlib custom
+  import hook, no paid dependency) and `examples/compiled_packaging/`
+  (Cython).
+
 ## [0.5.14] - 2026-08-17
 
 ### Added
