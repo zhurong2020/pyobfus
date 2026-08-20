@@ -49,6 +49,43 @@ Glama 平台侧问题，不需要我方改代码。Frank/Glama team 对频道内
 Claude plugin marketplace：user 08-20 再核实仍 `Submitted and pending
 review`（Aug 2），无变化。
 
+**同日续（P2-30~33 落地 + 一个真实安全漏洞的发现/修复/部署）**：竞品扫描后
+提出的四项候选（`docs/ROADMAP.md`「Planning refresh from 2026-08-20」）全部
+动手实现——`docs/COMPARISON.md` 加 PyLocket 诚实对比；**真实**装 Cisco
+`mcp-scanner` 扫真实发布的 `pyobfus-mcp` 0.3.6（8/8 SAFE、0 findings）；
+**真实**下载 free-threaded Python 3.14.7 验证 Pro 运行时组件（核心测试
+1169/1169 + 混淆/执行/崩溃/加密/解密全链路冒烟测试全过）；VS Code 信任信号
+文案补 Nx Console 2026 事件+CodeQL-clean+SHA-pinned CI。四项均 held 在
+`[Unreleased]`，未发布（下次按"1-2 天间隔"节奏判断）。
+
+🔴 **过程中意外发现并已修复部署一个真实、可被利用的安全漏洞**：排查一位付费
+客户活跃度时，在 `cloudflare-worker/src/index.js` 发现 Stripe webhook
+从未校验签名（"TODO: Verify Stripe signature"从未实现）——任何人知道公开
+URL 就能伪造请求白拿永久 Pro license，完全绕过付款。已复用仓库里 
+`content_webhook.js` 已验证的 HMAC-SHA256 校验函数修复（commit `b49fdb2`，
+5 场景功能测试全过：合法签名/篡改 body/错误 secret/**缺签名请求头**[即
+原漏洞利用方式]/10 分钟前重放，全部按预期通过），**并已用 `npx wrangler
+deploy` 部署到生产、现场重放原攻击确认 `HTTP 400 Invalid signature`**。
+KV 里仅 4 条 license 记录全部对得上号（3 真实客户+1 自测数据），无证据
+显示漏洞被实际利用过。`STRIPE_WEBHOOK_SECRET` 早在 2025-11-12 就已配置为
+Cloudflare secret，纯代码修复，未新增任何密钥。
+
+README 顺带两处修正：加了"Watch this repo → Releases"的 CTA（此前 0
+watcher）；Pro Support 段落"any issues→email"改窄为"license/账号问题
+留邮件，其他导去 GitHub"。
+
+**跨项目动作**：① Gmail MCP（`claude.ai Gmail` 连接器）本 session 首次接入，
+是账号级能力非 pyobfus 专属，已记入全局 `~/.claude/CLAUDE.md`；② 用 Gmail
+搜索顺手查到 cardiac-manuscripts AIC-01(CAC Plus) 论文的拒稿信，动手更新
+追踪文档前先去核对，发现该项目自己的 `STATUS.md` 已经领先于其"权威"
+`PAPERS_MASTER_INVENTORY.md`——已同步该文件五处并单独 commit+push 到
+cardiac-manuscripts 仓库（不影响 pyobfus 仓库本身）。
+
+完整过程见 memory `pyobfus_p2_30_33_scan_followups_2026-08-20.md` +
+`reference_pyobfus_pro_customer_outreach.md`（含安全漏洞完整时间线）+
+`credentials_workflow.md`（Vaultwarden 凭证记录同步）+ 跨项目
+`~/projects/WORK_LOG_INDEX.md` 顶行。
+
 ### ✅ 2026-08-17 — 三包发布完成 + session 收尾（pyobfus 0.5.14 / pyobfus-mcp 0.3.6 / vscode-extension 0.4.0）
 
 **发布流程**：早前 session 积累的 17 个本地提交先推送到 `origin/main`（P-1），推送后 CI 首次真正跑这批改动，抓到一个真 mypy 回归（`_handle_verify_provenance_manifest` 的 `result` 被推断成 `Dict[str, object]`）并当场修复（commit `e883c0a`）。随后判断距上次发布（08-07）已 10 天、早过"1-2 天"间隔窗口，三包依次发版：
