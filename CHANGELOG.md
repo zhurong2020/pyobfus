@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `docs/COMPARISON.md` now covers PyLocket (per-function bytecode encryption
+  + device-bound licensing + built-in commerce platform), including an honest
+  account of where its tamper-resistance is genuinely stronger and where it
+  doesn't compete with pyobfus's AI-debuggable workflow at all.
+
 ## [0.5.15] - 2026-08-20
 
 ### Added
