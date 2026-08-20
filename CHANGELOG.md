@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   + device-bound licensing + built-in commerce platform), including an honest
   account of where its tamper-resistance is genuinely stronger and where it
   doesn't compete with pyobfus's AI-debuggable workflow at all.
+- Verified and documented Python 3.14 free-threading (`python3.14t`, PEP 779)
+  compatibility: full core test suite (1169 passed, 1 skipped) plus a real
+  obfuscate → execute → crash → decrypt round trip with `--seal-code
+  --scrub-traceback` against a free-threaded interpreter, with GIL-disabled
+  status confirmed at each step. See `docs/PYTHON314_FREETHREADING.md` for
+  the honest scope (single-process usage verified; concurrent multi-threaded
+  access to Pro runtime state was not specifically stress-tested).
 
 ## [0.5.15] - 2026-08-20
 

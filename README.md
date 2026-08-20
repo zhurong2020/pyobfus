@@ -588,7 +588,7 @@ Add an additional layer of protection for commercial Python software.
 
 ## Technical Details
 
-- **Python Support**: 3.9, 3.10, 3.11, 3.12, 3.13, 3.14
+- **Python Support**: 3.9, 3.10, 3.11, 3.12, 3.13, 3.14 — including free-threaded 3.14 builds (`python3.14t`, [verified](docs/PYTHON314_FREETHREADING.md): full test suite + a real seal/scrub-traceback obfuscate→execute→decrypt round trip)
 - **Naming Scheme**: Index-based (I0, I1, I2...) - simple and effective
 - **Architecture**: Modular transformer pipeline with two-phase cross-file obfuscation
 - **Testing**: 1,000+ tests, 90% coverage, multi-OS CI/CD (Python 3.9-3.14 × Ubuntu / macOS / Windows)
