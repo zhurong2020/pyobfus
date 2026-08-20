@@ -6,6 +6,16 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+### Added
+
+- Independent security scan documented: Cisco's open-source `mcp-scanner` run
+  against the published PyPI package via a live stdio `initialize` →
+  `tools/list` handshake, YARA + dependency-vulnerability analyzers — 8/8
+  tools SAFE, 0 findings (2026-08-20, `pyobfus-mcp` 0.3.6). Full reproducible
+  steps and an honest scope statement in
+  [`docs/MCP_SECURITY_SCAN.md`](../docs/MCP_SECURITY_SCAN.md), summarized in
+  the package README's new "Independent security scan" section.
+
 ## [0.3.6] - 2026-08-17
 
 ### Changed
