@@ -502,42 +502,53 @@ checked with live search, not recalled from training data.
 
 **Resulting priority order:**
 
-- [ ] **P2-30: Add PyLocket to `docs/COMPARISON.md`.** Doc-only, no product
-  risk. Lead with the three concrete gaps found: Python version breadth
-  (3.9-3.14 vs. PyLocket's 3.12-3.14 only), one-time $45 vs. subscription +
-  per-license fee, and — the sharpest one — PyLocket's own docs never mention
-  debugging, traceback handling, or AI-assisted workflows, while that is
-  pyobfus's headline differentiator. Also note PyLocket's real strength
-  honestly (per-function bytecode encryption + device-bound keys is a
-  materially stronger tamper-resistance claim than pyobfus's AST + Pro vault)
-  — the comparison should stay in the same honest register as the existing
-  PyArmor/Nuitka entries, not oversell. _Estimate: half a day, content-only._
-- [ ] **P2-31: Run a reputable open-source MCP security scanner against
-  `pyobfus-mcp` and publish the result.** Start with Cisco's
-  `cisco-ai-defense/mcp-scanner` (most credible brand, explicit CI/CD-friendly
-  static/offline mode against a pre-generated tool-list JSON — fits
-  `pyobfus_mcp/server.json` well). If the result is clean, document it
-  alongside the existing OpenSSF Best Practices / PEP 740 trust signals (in
-  `pyobfus_mcp/README.md` and the Glama/MCP Registry listing copy where
-  space allows); if it finds something real, fix it before publishing the
-  badge. Directly answers the "no MCP vetting standard exists" gap this scan
-  surfaced. _Estimate: half a day to a day, mostly investigation._
-- [ ] **P2-32: Verify Pro runtime components under Python 3.14
-  free-threading (`python3.14t`).** Install/build a free-threaded 3.14
-  interpreter, run the full Pro test suite (Runtime String Vault, license
-  binding, anti-debug) against it, and either add it to the CI matrix as a
-  new job or document a manual verification result if a full CI job is too
-  costly for now. PEP 779 just went from experimental to officially supported
-  in 3.14, so "3.9-3.14 support" as currently claimed has not actually been
-  exercised against this specific build mode. _Estimate: half a day, spike
-  first to see if anything breaks before deciding on CI-matrix cost._
-- [ ] **P2-33: VS Code Marketplace listing copy — make structural trust
-  signals more visible.** Given "Verified Publisher" is now a documented weak
-  signal industry-wide (Nx Console incident), surface OpenSSF Best
-  Practices/PEP 740/CodeQL-clean/Apache-2.0-auditable-core claims directly in
-  the Marketplace listing description itself, not only in the README a click
-  away. Copy-only change, no code risk. _Estimate: small, bundle with the next
-  vscode-extension release rather than a solo release._
+- [x] **P2-30: Add PyLocket to `docs/COMPARISON.md`.** _Done 2026-08-20._ New
+  `### pyobfus vs PyLocket` section: honest about PyLocket's real strength
+  (per-function bytecode encryption + device-bound keys is a materially
+  stronger tamper-resistance claim than pyobfus's AST + Pro vault) alongside
+  the three concrete gaps (Python 3.12-3.14 only vs. 3.9-3.14, subscription +
+  per-license fee vs. one-time $45, and no mention anywhere in PyLocket's own
+  docs of debugging/traceback/AI-assisted workflows). Held under
+  `CHANGELOG.md`'s `[Unreleased]`, no version bump yet.
+- [x] **P2-31: Run a reputable open-source MCP security scanner against
+  `pyobfus-mcp` and publish the result.** _Done 2026-08-20._ Ran Cisco's
+  `cisco-ai-mcp-scanner` (PyPI) against the real published `pyobfus-mcp`
+  0.3.6 package via a live stdio `initialize`→`tools/list` handshake:
+  **8/8 tools SAFE, 0 findings** on the fully-offline YARA + dependency-audit
+  analyzers (no API key needed). Cross-checked the dependency result with a
+  direct `pip-audit --strict` run after hitting a real CLI bug in the
+  scanner's own `vulnerable-package` subcommand. Full reproducible steps +
+  an honest scope statement (offline analyzers only; `api`/`llm`/
+  `behavioral`/`virustotal` need paid keys and weren't run) in new
+  `docs/MCP_SECURITY_SCAN.md`, summarized in `pyobfus_mcp/README.md`. Held
+  under `pyobfus_mcp/CHANGELOG.md`'s `[Unreleased]`.
+- [x] **P2-32: Verify Pro runtime components under Python 3.14
+  free-threading (`python3.14t`).** _Done 2026-08-20._ Downloaded a
+  python-build-standalone free-threaded 3.14.7 build (no root/apt needed),
+  confirmed `sys._is_gil_enabled()` is `False`, then ran the full core test
+  suite (1169 passed, 1 skipped, including every Pro-runtime-focused file)
+  plus a real end-to-end smoke test beyond unit tests: obfuscated a sample
+  module with `--seal-code --scrub-traceback`, executed the protected
+  artifact under `python3.14t` (correct output, GIL confirmed still
+  disabled), triggered a real exception to confirm the RSA+AES scrub hook
+  fires correctly, and round-tripped it back with `pyobfus-unscrub`. New
+  `docs/PYTHON314_FREETHREADING.md` states the honest scope: single-process
+  usage verified; concurrent multi-threaded access to Pro runtime state was
+  not specifically stress-tested (doesn't arise in pyobfus's normal usage
+  pattern). Held under `CHANGELOG.md`'s `[Unreleased]`.
+- [x] **P2-33: VS Code Marketplace listing copy — make structural trust
+  signals more visible.** _Done 2026-08-20, smaller than originally scoped._
+  Investigation found this was already largely addressed in an earlier
+  session — `package.json`'s `description` and the README's "Why trust this
+  extension" section already surfaced OpenSSF/PEP 740 prominently, not
+  buried behind a click as this scan assumed before checking current file
+  contents. Added what was genuinely still missing: the May 2026 Nx Console
+  incident (~2.2M installs, carried the Marketplace's own "Verified
+  Publisher" badge, still shipped a credential stealer) as stronger, more
+  current corroboration, plus two previously-omitted verified signals —
+  zero open CodeQL alerts (linked to the live Security tab) and SHA-pinned
+  CI/CD across build/test/release workflows. Held under
+  `vscode-extension/CHANGELOG.md`'s `[Unreleased]`.
 
 **Explicit de-prioritizations confirmed by this scan:**
 

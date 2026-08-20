@@ -265,22 +265,44 @@ bytecode 加密。
 - 后续机会（未并入本轮）：`--check` 接入已配置 `--config` / `exclude_patterns`
   以减少真实组合的误报，属独立行为改动，留作单独小项。
 
-### P1/P2：2026-08-20 扫描新增（按优先级，均为下一轮迭代候选，尚未开始）
+### ✅ P1/P2：2026-08-20 扫描新增——四项均已完成，held 等发布
 
-1. `P2-30` `docs/COMPARISON.md` 加 PyLocket 条目——纯文档，半天量级。诚实列出
-   它的真实优势（逐函数字节码加密+设备绑定密钥，防篡改强度确实比 pyobfus
-   AST+Pro vault 强），同时点出三个真实差距（Python 版本覆盖更窄、订阅+
-   按许可计费 vs 一次性 $45、完全没提调试/AI 工作流支持）。
-2. `P2-31` 跑 Cisco `mcp-scanner`（或同类可信开源扫描器）扫 `pyobfus-mcp`，
-   结果干净就作为新信任信号公开（同 OpenSSF badge 逻辑）；扫出真问题就先
-   修再发。半天到一天，以调研为主。
-3. `P2-32` 验证 Pro 运行时组件（Vault/license binding/anti-debug）在
-   Python 3.14 free-threaded build（`python3.14t`）下的行为——先 spike 看
-   会不会炸，再决定要不要正式进 CI 矩阵。半天量级。
-4. `P2-33` VS Code Marketplace listing 文案把结构性信任信号（OpenSSF/
-   PEP740/CodeQL-clean/Apache-2.0 可审计）放得更显眼，不要只塞在 README
-   里点进去才看到——"Verified Publisher"徽章已被证实不可靠，这条更有说服力
-   了。纯文案改动，跟下一次 vscode-extension 发布一起带，不用单独发。
+用户要求"依次完成上述所有功能，但等几天再发布"——四项均已实现+验证+提交到
+main，CHANGELOG 改动留在各自的 `[Unreleased]` 段，version/tag/发布留到间隔
+够了再做（沿用本项目一贯的"功能先合并、发布单独 gate"节奏）。
+
+1. ✅ `P2-30` `docs/COMPARISON.md` 加了 `### pyobfus vs PyLocket` 完整小节——
+   诚实列出它的真实优势（逐函数字节码加密+设备绑定密钥，防篡改强度确实比
+   pyobfus AST+Pro vault 强），同时点出三个真实差距（Python 版本覆盖更窄、
+   订阅+按许可计费 vs 一次性 $45、完全没提调试/AI 工作流支持）。
+2. ✅ `P2-31` 实际跑了 Cisco `cisco-ai-mcp-scanner`（PyPI 真实工具，非模拟）
+   扫真实发布的 `pyobfus-mcp` 0.3.6（干净 venv 装的 PyPI 包，非本地开发版）
+   ——**8/8 工具 SAFE，0 findings**（YARA + 依赖漏洞审计两个离线 analyzer，
+   不需要 API key）。过程中撞到扫描器自己的一个 CLI bug（`vulnerable-package`
+   子命令参数解析冲突），改用直接 `pip-audit --strict` 交叉验证同样干净。
+   新建 `docs/MCP_SECURITY_SCAN.md`（完整可复现步骤 + 诚实的适用范围声明：
+   只测了离线 analyzer，`api`/`llm`/`behavioral`/`virustotal` 需要付费 key
+   没测），`pyobfus_mcp/README.md` 加了摘要小节引用。
+3. ✅ `P2-32` 下载了 python-build-standalone 的 free-threaded Python 3.14.7
+   独立构建（不需要 sudo/apt），核实 `sys._is_gil_enabled()` 确实是 `False`，
+   然后：① 完整核心测试套件 1169 passed/1 skipped 全过（含所有 Pro 运行时
+   测试文件：Vault/license binding/scrub/seal）；② 真实端到端冒烟测试（不只
+   是单测）——用 `--seal-code --scrub-traceback` 混淆一个样例文件，在
+   `python3.14t` 下执行保护产物，正常路径输出正确且 GIL 确认仍是禁用状态；
+   异常路径触发真实 KeyError，确认 RSA+AES 加密 hook 正确触发，再用
+   `pyobfus-unscrub` 完整解密回原始 traceback——free-threading 下全链路
+   走通。新建 `docs/PYTHON314_FREETHREADING.md`，诚实声明适用范围（验证的
+   是单进程使用场景，没有专门做并发多线程访问 Pro 运行时状态的压力测试，
+   因为这不是 pyobfus 的正常使用模式）。
+4. ✅ `P2-33` 调研发现原计划部分过时——`package.json` description 和 README
+   "Why trust this extension" 小节其实早在之前的 session 里就已经把
+   OpenSSF/PEP740 放得很显眼了，不是"只塞在 README 里点进去才看到"。真正补
+   的是这次扫描里发现的新证据：**Nx Console 事件**（220 万安装量、带
+   Marketplace 自己的"Verified Publisher"徽章，2026 年 5 月还是被植入了
+   凭证窃取器）——比原有的 2025 年 4 月"Python Obfuscator for VSCode"案例
+   更有说服力，直接证明徽章不可靠。另外补了两条此前没写但真实可核实的信号：
+   零个 open CodeQL alert（链接到 Security tab）+ CI/CD 全部第三方 Action
+   SHA-pinned（`gh api` + `grep` 实测核实后才写）。
 
 ### P3：探索项
 
@@ -328,9 +350,10 @@ bytecode 加密。
 5. 下载量：0.5.15 发布后建议按"周期性发布后复盘节奏"再等几天采一次快照，
    对比 08-20 发布前的读数（`pyobfus` 26/295/1,912；`pyobfus-mcp`
    8/124/687）是否回落，判断是否为真实趋势而非发布噪音。
-6. **下一轮功能迭代候选已就绪，待用户拍板优先级**：`P2-30`（COMPARISON.md
-   加 PyLocket）、`P2-31`（跑 MCP 安全扫描器建信任信号）、`P2-32`（验证
-   Python 3.14 free-threading 兼容性）、`P2-33`（VS Code listing 文案强化
-   信任信号），详见上方"P1/P2：2026-08-20 扫描新增"小节 + `docs/ROADMAP.md`
-   同日「Planning refresh」完整版。四项均为独立小项，互不阻塞，可任意顺序
-   或并行安排。
+6. **`P2-30`~`P2-33` 四项已全部实现+提交（2026-08-20 同日），held 等发布**：
+   详见上方"✅ P1/P2：2026-08-20 扫描新增"小节。三个 CHANGELOG（根
+   `CHANGELOG.md`、`pyobfus_mcp/CHANGELOG.md`、`vscode-extension/
+   CHANGELOG.md`）的 `[Unreleased]` 段都已有对应条目，等下次冷启动判断
+   间隔够了（沿用"1-2 天"节奏）再做版本号提升+tag+发布，三包可能不必同天
+   一起发——`pyobfus` 有 P2-30/32 两项内容，`pyobfus-mcp` 有 P2-31，
+   `vscode-extension` 有 P2-33，各自按自己的发布间隔独立判断即可。
