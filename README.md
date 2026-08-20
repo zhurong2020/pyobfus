@@ -285,7 +285,7 @@ After your trial, purchase a license to continue using Pro features.
    pyobfus input.py -o output.py --string-encryption --import-obfuscation --anti-debug --control-flow --dead-code
    ```
 
-**Support**: If you encounter any issues, contact zhurong0525@gmail.com with your license key.
+**Support**: For license activation, billing, or account questions, email zhurong0525@gmail.com with your license key. For bug reports or usage questions, please [open a GitHub issue](https://github.com/zhurong2020/pyobfus/issues) or [start a discussion](https://github.com/zhurong2020/pyobfus/discussions) — that way the answer is there for the next person who hits the same thing.
 
 ### Legal & Policies
 
