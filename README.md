@@ -20,7 +20,13 @@ A Python code obfuscator built with AST-based transformations. **Supports Python
 
 > **🔒 Pro Edition available** — 6 patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator, $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
 
-> **🔧 What's new in v0.5.14** — `--provenance-manifest` now records per-input SHA-256 hashes, the containing git commit, and a CycloneDX-compatible component/relationship section; `--verify-provenance-manifest FILE --json` validates that manifest's shape, relationships, and local integrity digest; `--validate-config FILE --json` gives IDE/MCP callers a stable machine-readable config-validation contract. v0.5.13 fixed `--validate-config` false-warning on `preset` and every Pro field added since v0.5.0. Full details in the [CHANGELOG](CHANGELOG.md); see [Pro Edition](#-pro-edition) below.
+> **🔧 What's new in v0.5.15** — `--check` now flags real-world delivery-combo
+> risks as a new `compatibility_advisory` category (import-hook/encrypted-file
+> loaders like SOURCEdefender, compiled packaging via Nuitka/Cython,
+> model-serving), surfaced automatically in VS Code diagnostics and the MCP
+> `check_obfuscation_risks` tool. New cookbooks and runnable examples cover
+> each combo end-to-end. Full details in the [CHANGELOG](CHANGELOG.md); see
+> [Pro Edition](#-pro-edition) below.
 
 ## 🔌 Companion MCP server: [`pyobfus-mcp`](pyobfus_mcp/)
 
