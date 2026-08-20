@@ -1,6 +1,6 @@
 # pyobfus 当前计划
 
-更新时间：2026-08-17（三包发布后同日刷新）
+更新时间：2026-08-20（0.5.15 发布 + Glama 第三方独立复现证据后刷新）
 
 这份文档是当前项目状态和后续计划的中文单一入口，面向维护者日常查看。旧的
 `ROADMAP.md` 和 `POST_V0.4_TODO.md` 保留为历史归档和详细来源，但后续日常
@@ -17,7 +17,13 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
 
 ## 当前状态
 
-- 主包：`pyobfus 0.5.14` 已发布（2026-08-17）。
+- 主包：`pyobfus 0.5.15` 已发布（2026-08-20）——`--check` 新增
+  `compatibility_advisory` 类别（P2-29，import-hook/加密文件生态、编译打包、
+  model-serving 三类交付组合）+ 三篇 cookbook + 两个 `examples/` 端到端复现。
+  距上次发布（0.5.14，08-17）3 天，符合"1-2 天间隔、不批量"的节奏。发布前
+  修复了一个已经让 main CI 红了约 19 小时的 black 格式化回归（P2-29 提交里
+  `tests/test_preflight.py` 多了一个尾随空行），README"What's new"横幅这次
+  与版本号/CHANGELOG 在同一提交里更新（吸取 0.5.14 那次教训）。
 - MCP 包：`pyobfus-mcp 0.3.6` 已发布（2026-08-17），MCP Registry 同步发布，
   `isLatest=true` 已核实。
 - VS Code 扩展：`0.4.0` 已 tag + GitHub Release 发布，**Marketplace 手工上传
@@ -29,18 +35,15 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
 - README/`llms.txt`/两个 `pyproject.toml`/`server.json` 的 AI 客户端定位
   文案已补 GitHub Copilot + CodeBuddy（实时搜索核实后添加，非训练记忆），
   README tagline 结尾改成"any MCP-compatible AI agent"泛称。
-- ⚠️ **已知：PyPI `pyobfus` 页面 description 摘要落后一个版本**——`v0.5.14`
-  tag 精确指向的是纯版本号提交（`41fd810`，只改 `pyproject.toml`/
-  `CHANGELOG.md`），README.md 里"What's new"横幅的同步更新落在了 tag 之后
-  的单独 docs-sync 提交（`ad1b28e`）里，而 PyPI 包一旦发布不可变，导致当前
-  PyPI 页面仍显示"What's new in v0.5.13"文案。GitHub 上的 README.md 本身
-  已经是对的（v0.5.14）。用户决定不为此单独发版，等下次自然发布时随新
-  README 快照一起带上。**流程教训**：以后做版本发布时，README"What's
-  new"横幅更新要并入发布提交本身（打 tag 之前），不要留到后续单独的
-  docs-sync 提交——那样会正好错过这次发布的包快照。
-- 近期下载：距上次记录（08-09）满 8 天的安静基线读数——`pyobfus` day/week/
-  month `9 / 206 / 1,870`；`pyobfus-mcp` `0 / 46 / 581`。此前几次发布后
-  1-3 天的 day/week 跳升已证实是 CI/依赖解析噪音，非有机增长信号。
+- ✅ **v0.5.14 那次 PyPI description 落后一个版本的问题已随 0.5.15 自然翻新**
+  （新包快照带上了正确的 README 横幅），流程教训已固化进 `CLAUDE.md` 发布
+  流程清单（README 横幅须在打 tag 前的同一提交里更新），0.5.15 发布时已
+  实际验证生效，不再是待办。
+- 近期下载（2026-08-20 发布前快照，pypistats.org）：`pyobfus` day/week/
+  month `26 / 295 / 1,912`；`pyobfus-mcp` `8 / 124 / 687`。较 08-17 安静基线
+  （`9/206/1,870` / `0/46/581`）周环比明显上升（pyobfus +43%，mcp +170%），
+  但按历史经验（发布后 1-3 天的跳变多为 CI/依赖解析噪音），暂不当作真实
+  有机增长信号——下次复查时对比是否回落。
 - 外部分发状态：
   - Glama 旧公开 API 路径
     `/api/mcp/v1/servers/io.github.zhurong2020/pyobfus-mcp` 当前返回
@@ -124,17 +127,27 @@ bytecode 加密。
    - 每次冷启动同时检查旧 API 路径和公开页面能否列出 8 个工具。
    - 找到 Glama 当前推荐 API 后，替换旧的 `tools: []` 检查口径。
    - 不为 Glama 单独改 pyobfus-mcp 代码，除非 Glama 给出可复现的本地问题。
-   - **2026-08-17 新证据**：mcp 0.3.6 发布后照惯例重新 pin Build steps，
+   - **2026-08-17 证据**：mcp 0.3.6 发布后照惯例重新 pin Build steps，
      触发的新构建（`01a00e39-...`）15 分钟后失败，`ECONNRESET`/"aborted"，
      卡在拉取 `debian:trixie-slim` 基础镜像元数据这一步——与 08-07 那次失败
      （`context deadline exceeded`，同一卡点）是**第二个独立复现实例**，
      错误签名不同但卡点相同，指向 Glama 构建集群拉取该 base image 的网络层
      问题，与 pyobfus-mcp 包/配置无关（Build steps 已确认正确显示
-     `pyobfus-mcp==0.3.6`）。**用户决定继续观察，暂不追加 Discord 消息、
-     暂不手动重试**。详见 memory `glama_zero_tools_repro_2026-08-07.md`。
+     `pyobfus-mcp==0.3.6`）。
+   - **2026-08-20 第三方独立复现（不是我们自己的数据点）**：user 转发
+     Glama `#support` 频道全文，至少 3 位其他 maintainer（Considus/Andrei
+     Lungeanu/ojkingston）报了完全相同的 `debian:trixie-slim` 构建卡点和
+     错误签名，累计 5+ 个互不相关的 server 撞到同一故障；另有 maintainer
+     （mellowmelomel/nolpak14/Cabal_hunter）独立报了与我们完全一致的
+     "页面工具正常、公开 API 却 `tools: []`/字段陈旧"症状。两点均坐实此前
+     判断——纯 Glama 平台侧构建基础设施 + 目录同步层问题，与 pyobfus-mcp
+     包/配置无关，继续不需要我方改代码。Frank/Glama team 对频道内所有报告
+     （含我们的两条）都尚未回复，看起来在处理积压，**用户决定不主动追发
+     消息**。详见 memory `glama_zero_tools_repro_2026-08-07.md`。
 
 2. Claude plugin marketplace
-   - 2026-08-17 已复核：仍为 `Submitted and pending review`，日期 Aug 2。
+   - 2026-08-20 user 再次核实 Console 页面：仍为 `Submitted and pending
+     review`，日期 Aug 2，提交描述里的 `protected_project` typo 也仍在。
    - 后续每轮外部状态检查只需确认是否出现 approve / reject / 补充信息。
    - 如 Anthropic 给出修改入口，再顺手修 `protected_project` typo 为
      `protect_project`。
@@ -194,7 +207,7 @@ bytecode 加密。
      sigstore / DSSE 校验逻辑。
    - 输出要诚实：证明发布身份和产物 digest，不证明代码没有漏洞或恶意。
 
-### ✅ P1：`P2-29` compatibility checks — 本轮收口（2026-08-19）
+### ✅ P1：`P2-29` compatibility checks — 已发布于 `pyobfus` 0.5.15（2026-08-20）
 
 针对真实交付组合补诊断与文档，**未新增任何 transform**（遵守"明确不做"）。
 
@@ -246,10 +259,18 @@ bytecode 加密。
 
 ## 下次工作建议
 
-1. 三包发布留下的两项手工收尾（Marketplace 上传、Glama Build steps 重新
-   pin）均已在同一 session 内完成，无需重复确认；只需按 P0 小节检查 Glama
-   `01a00e39-...` 那次构建失败之后有没有新尝试、Discord 有没有回复。
-2. `P2-29` compatibility checks 已于本轮收口（`--check` 的 `compatibility_advisory`
-   类别 + 三篇 cookbook + 两个 `examples/` 复现 + 回归测试）。后续若有真实用户
-   反馈新的交付组合（如 PyInstaller 之外的 bundler、其他 import-hook 产品），再
-   机会性扩检测信号或补 cookbook，仍遵守"优先诊断 + 文档、不新增 transform"。
+1. `pyobfus 0.5.15` 已发布并核实 PyPI latest；main CI 已从 P2-29 提交带来
+   的 black 格式化回归中修复转绿。本轮无遗留的本地机械任务。
+2. `P2-29` compatibility checks 已发布收口。后续若有真实用户反馈新的交付
+   组合（如 PyInstaller 之外的 bundler、其他 import-hook 产品），再机会性
+   扩检测信号或补 cookbook，仍遵守"优先诊断 + 文档、不新增 transform"。
+3. Glama：2026-08-20 已有多位第三方 maintainer 独立复现我们报告过的两个
+   症状（构建卡 `debian:trixie-slim`、页面正常但公开 API `tools: []`），
+   进一步确认是 Glama 平台侧问题。继续被动等 `#support` 回复，不主动追发
+   消息、不改代码。下次冷启动检查：① 两条帖子有没有回复；② `curl` 复查
+   `tools` 字段；③ Recent Tests 有没有新构建尝试。
+4. Claude plugin marketplace：仍 `Submitted and pending review`（Aug 2），
+   只需确认是否出现 approve/reject/补充信息。
+5. 下载量：0.5.15 发布后建议按"周期性发布后复盘节奏"再等几天采一次快照，
+   对比 08-20 发布前的读数（`pyobfus` 26/295/1,912；`pyobfus-mcp`
+   8/124/687）是否回落，判断是否为真实趋势而非发布噪音。

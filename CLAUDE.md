@@ -12,6 +12,43 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
+### ✅ 2026-08-20 — pyobfus 0.5.15 发布 + main CI 修复 + Glama 第三方独立复现证据
+
+**发现并修复了一次未察觉的 main CI 红灯**：P2-29 的 `0ec2179` 提交（08-19
+20:04 推送）在 `tests/test_preflight.py` 结尾多带了一个空行，触发
+`black --check` 失败，`Lint and Type Check` job 已经红了约 19 小时无人
+注意（此前几次发布只查了 Release/CodeQL，没查完整 CI 矩阵，跟 08-06 那次
+P2-15 反调试测试连红 3 次是同一类"发布检查清单漏了完整 CI 矩阵"的疏漏）。
+已本地复现、`black` 修好、验证仓库全部 161 个文件重新通过 `black --check`
+且该文件 35 测试仍全过，commit `895a56b` 推送后 CI 转绿。
+
+**顺势发布 `pyobfus` 0.5.15**：CHANGELOG `[Unreleased]` 段此前一直是空的
+（P2-29 三个提交漏写），先补录（commit `6b0b613`），距上次发布（0.5.14，
+08-17）3 天符合"1-2 天间隔"节奏，随后正式发版——版本号提升 + CHANGELOG
+`[0.5.15]`成节 + README"What's new"横幅**这次在打 tag 前的同一提交里更新**
+（吸取 0.5.14 那次教训，此次已验证 PyPI 新包快照带上了正确文案）。三个
+测试根（1169+90+7 全过）+ black/ruff/mypy 全绿后打 tag `v0.5.15`，OIDC
+发布 workflow `success`，PyPI JSON API 核实 `latest=0.5.15`。内容：`--check`
+新增 `compatibility_advisory` 类别（P2-29）+ 三篇 cookbook + 两个
+`examples/` 复现。
+
+**Glama：第三方独立复现坐实此前两个猜测**（user 转发 `#support` 频道
+08-08~08-18 全文，非我方自己的数据点）——至少 3 位其他 maintainer
+（Considus/Andrei Lungeanu/ojkingston）报了与我们完全相同的
+`debian:trixie-slim` 构建卡点错误签名，累计 5+ 个互不相关 server 撞到同一
+故障；另有 maintainer（mellowmelomel 等）独立报了与 pyobfus-mcp 完全一致
+的"页面工具正常、公开 API 却 `tools: []`/字段陈旧"症状。两点均确认是纯
+Glama 平台侧问题，不需要我方改代码。Frank/Glama team 对频道内所有报告都
+尚未回复，**用户决定不主动追发消息**。详见 memory
+`glama_zero_tools_repro_2026-08-07.md`。
+
+**下载量**（0.5.15 发布前快照，pypistats）：`pyobfus` day/week/month
+26/295/1,912；`pyobfus-mcp` 8/124/687——较 08-17 安静基线周环比明显上升
+（pyobfus +43%，mcp +170%），按历史经验暂不当真实信号，下次复查看是否回落。
+
+Claude plugin marketplace：user 08-20 再核实仍 `Submitted and pending
+review`（Aug 2），无变化。
+
 ### ✅ 2026-08-17 — 三包发布完成 + session 收尾（pyobfus 0.5.14 / pyobfus-mcp 0.3.6 / vscode-extension 0.4.0）
 
 **发布流程**：早前 session 积累的 17 个本地提交先推送到 `origin/main`（P-1），推送后 CI 首次真正跑这批改动，抓到一个真 mypy 回归（`_handle_verify_provenance_manifest` 的 `result` 被推断成 `Dict[str, object]`）并当场修复（commit `e883c0a`）。随后判断距上次发布（08-07）已 10 天、早过"1-2 天"间隔窗口，三包依次发版：
@@ -151,7 +188,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.9-3.14, AST, setuptools
-- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.14，2026-08-17 发布**；完整版本历史见 `CHANGELOG.md`)
+- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.15，2026-08-20 发布**；完整版本历史见 `CHANGELOG.md`)
 - **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.0，2026-08-17 发布**（tag+GitHub Release+Marketplace 手工上传均已完成，`curl` 核实公开 listing 已返回 `"version":"0.4.0"`）；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`)
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.6，2026-08-17 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.1` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp` (active, isLatest=true · **0.3.6**，2026-08-17 经 `mcp-publisher publish`(GitHub device-code 重新登录)确认)
