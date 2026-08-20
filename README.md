@@ -28,6 +28,11 @@ A Python code obfuscator built with AST-based transformations. **Supports Python
 > each combo end-to-end. Full details in the [CHANGELOG](CHANGELOG.md); see
 > [Pro Edition](#-pro-edition) below.
 
+> 🔔 **Starring this repo doesn't notify you about new releases** — GitHub only
+> sends release notifications to people who explicitly **Watch** it. Click
+> **Watch → Custom → Releases** (top of this page) to get a heads-up the
+> moment a new version ships, without the noise of every commit/issue.
+
 ## 🔌 Companion MCP server: [`pyobfus-mcp`](pyobfus_mcp/)
 
 This repository ships **two installable packages**:
