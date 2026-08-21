@@ -12,6 +12,26 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
+### ✅ 2026-08-21 — 周期性复查（下载量 + Glama + Claude plugin），全部无变化
+
+按"周期性发布后复盘节奏"做的轻量复查（非完整竞品扫描；2026-08-20 刚做过
+完整版）：
+- **下载量**：pypistats 快照与 08-20 基线**完全一致**（`pyobfus`
+  26/295/1,912；`pyobfus-mcp` 8/124/687）——发布后的跳变未再放大，维持
+  "发布噪音而非有机增长"判断，无新动作。
+- **Glama**：旧 API 路径 `/api/mcp/v1/servers/io.github.zhurong2020/
+  pyobfus-mcp` 仍 `not_found`；公开页面正常、仍列出 8 个工具，但版本元数据
+  陈旧（停在 v0.5.13，当前 0.5.15）——维持"Glama 侧目录同步陈旧"判断。
+  Discord `#support` 回复与 Recent Tests 需 user 登录查，本轮未变。
+- **Claude plugin marketplace**：Console 登录墙无法程序化核实；user 08-20
+  已查仍 `Submitted and pending review`（Aug 2），维持"机会性修 typo、被动
+  等待"策略。
+- 文档同步：`docs/DISTRIBUTION_CHANNELS.md`（版本号 0.5.14→0.5.15、
+  Marketplace 上传状态、Glama/plugin 复查结果、GitHub Releases 行）与
+  `docs/CURRENT_PLAN_ZH.md`（更新时间、下载复查、P0 小节、下次工作建议 3/5）
+  均已同步。**下一步唯一动作仍是 P2-30~33 三包按"1-2 天间隔"各自独立发版**
+  （0.5.15 是 08-20，08-21 间隔已够，cold-start 后即可执行）。
+
 ### ✅ 2026-08-20 — pyobfus 0.5.15 发布 + main CI 修复 + Glama 第三方独立复现证据
 
 **发现并修复了一次未察觉的 main CI 红灯**：P2-29 的 `0ec2179` 提交（08-19

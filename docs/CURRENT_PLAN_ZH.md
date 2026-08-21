@@ -1,6 +1,6 @@
 # pyobfus 当前计划
 
-更新时间：2026-08-20（0.5.15 发布 + Glama 第三方独立复现证据后刷新）
+更新时间：2026-08-21（0.5.15 发布 + 08-21 周期性复查后刷新）
 
 这份文档是当前项目状态和后续计划的中文单一入口，面向维护者日常查看。旧的
 `ROADMAP.md` 和 `POST_V0.4_TODO.md` 保留为历史归档和详细来源，但后续日常
@@ -44,6 +44,10 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
   （`9/206/1,870` / `0/46/581`）周环比明显上升（pyobfus +43%，mcp +170%），
   但按历史经验（发布后 1-3 天的跳变多为 CI/依赖解析噪音），暂不当作真实
   有机增长信号——下次复查时对比是否回落。
+- **2026-08-21 周期性复查**：下载量快照与 08-20 基线**完全一致**（pyobfus
+  `26/295/1,912`、mcp `8/124/687`），发布后的跳变未再放大，维持"发布噪音
+  而非有机增长"判断，无需调整任何动作；Glama 与 Claude plugin 状态复查亦无
+  变化（详见 P0 小节与 `docs/DISTRIBUTION_CHANNELS.md`）。
 - 外部分发状态：
   - Glama 旧公开 API 路径
     `/api/mcp/v1/servers/io.github.zhurong2020/pyobfus-mcp` 当前返回
@@ -178,10 +182,15 @@ bytecode 加密。
      包/配置无关，继续不需要我方改代码。Frank/Glama team 对频道内所有报告
      （含我们的两条）都尚未回复，看起来在处理积压，**用户决定不主动追发
      消息**。详见 memory `glama_zero_tools_repro_2026-08-07.md`。
+   - **2026-08-21 复查**：旧 API 路径仍 `not_found`；公开页面正常且列出
+     全部 8 个工具，但页面版本元数据仍停在 v0.5.13（当前 0.5.15）——维持
+     "Glama 侧目录同步陈旧"判断。Discord `#support` 与 Recent Tests 两项
+     需 user 登录后手工查，本轮未变化。
 
 2. Claude plugin marketplace
    - 2026-08-20 user 再次核实 Console 页面：仍为 `Submitted and pending
      review`，日期 Aug 2，提交描述里的 `protected_project` typo 也仍在。
+   - 2026-08-21：Console 登录墙，程序化无法核实，维持 user 手工复查。
    - 后续每轮外部状态检查只需确认是否出现 approve / reject / 补充信息。
    - 如 Anthropic 给出修改入口，再顺手修 `protected_project` typo 为
      `protect_project`。
@@ -343,13 +352,15 @@ main，CHANGELOG 改动留在各自的 `[Unreleased]` 段，version/tag/发布�
 3. Glama：2026-08-20 已有多位第三方 maintainer 独立复现我们报告过的两个
    症状（构建卡 `debian:trixie-slim`、页面正常但公开 API `tools: []`），
    进一步确认是 Glama 平台侧问题。继续被动等 `#support` 回复，不主动追发
-   消息、不改代码。下次冷启动检查：① 两条帖子有没有回复；② `curl` 复查
-   `tools` 字段；③ Recent Tests 有没有新构建尝试。
+   消息、不改代码。✅ **2026-08-21 已复查**：旧 API 路径仍 `not_found`、
+   公开页面 8 工具可列出但版本元数据陈旧（v0.5.13）。下次冷启动检查：
+   ① 两条帖子有没有回复；② 公开页面/API `tools` 字段；③ Recent Tests
+   有没有新构建尝试（①② 可程序化，③ 需 user 登录 admin 面板）。
 4. Claude plugin marketplace：仍 `Submitted and pending review`（Aug 2），
    只需确认是否出现 approve/reject/补充信息。
-5. 下载量：0.5.15 发布后建议按"周期性发布后复盘节奏"再等几天采一次快照，
-   对比 08-20 发布前的读数（`pyobfus` 26/295/1,912；`pyobfus-mcp`
-   8/124/687）是否回落，判断是否为真实趋势而非发布噪音。
+5. 下载量：✅ **2026-08-21 已复查**——与 08-20 基线完全一致（`pyobfus`
+   26/295/1,912；`pyobfus-mcp` 8/124/687），维持"发布噪音非有机增长"判断。
+   下一次按周期节奏（每积累 3-5 个版本或 1-2 周）再看，无需单日盯盘。
 6. **`P2-30`~`P2-33` 四项已全部实现+提交（2026-08-20 同日），held 等发布**：
    详见上方"✅ P1/P2：2026-08-20 扫描新增"小节。三个 CHANGELOG（根
    `CHANGELOG.md`、`pyobfus_mcp/CHANGELOG.md`、`vscode-extension/
