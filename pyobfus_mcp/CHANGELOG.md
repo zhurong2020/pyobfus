@@ -6,6 +6,15 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+### Added
+
+- `docs/MCP_SECURITY_SCAN.md` now documents a manual SSRF / arbitrary-URL
+  fetch-surface check: a grep across the package source confirms no
+  outbound HTTP/URL-fetch code path exists anywhere in `pyobfus-mcp`, so
+  the SSRF class affecting ~36.7% of audited public MCP servers (per the
+  OWASP MCP Security Cheat Sheet) doesn't apply to this tool surface as of
+  0.3.7.
+
 ## [0.3.7] - 2026-08-22
 
 ### Added

@@ -85,6 +85,35 @@ as a cross-check: `No known vulnerabilities found`.
   2026-08-20. Re-run it after any release that changes tool descriptions,
   schemas, or dependencies.
 
+## Manual check: SSRF / arbitrary-URL fetch surface
+
+Neither `mcp-scanner`'s offline analyzers nor the scan above specifically test
+for server-side request forgery (SSRF) — a class the MCP ecosystem has been
+paying closer attention to: a 2025 audit of 7,000+ public MCP servers found
+36.7% vulnerable, structurally, wherever a tool accepts a user- or
+LLM-supplied URL without validation and fetches it
+([OWASP MCP Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/MCP_Security_Cheat_Sheet.html)).
+
+`pyobfus-mcp`'s 8 tools (`protect_project`, `check_obfuscation_risks`,
+`generate_pyobfus_config`, `unmap_stack_trace`, `list_presets`,
+`explain_preset`, `recommend_tier`, `start_pro_trial`) all operate on local
+file paths and config, not remote resources, so this class shouldn't apply —
+but "shouldn't" isn't a security claim, so it was checked directly rather
+than assumed:
+
+```bash
+grep -rln -i "requests\.\|urlopen\|httpx\|urllib\.request\|aiohttp\|\.get(http" \
+  pyobfus_mcp/pyobfus_mcp/*.py
+```
+
+Zero matches (2026-08-22, `pyobfus-mcp` 0.3.7 source tree) — there is no
+outbound HTTP/URL-fetch code path anywhere in the package, so no tool can be
+handed a URL and made to issue a request on the server's behalf. SSRF is not
+a currently-applicable risk for this tool surface. This is a point-in-time
+grep against the current source, not a standing guarantee — re-check if a
+future tool ever accepts a URL-shaped parameter or adds an HTTP client
+dependency.
+
 ## Reproducing this yourself
 
 The commands above are the complete reproduction — no pyobfus-specific
