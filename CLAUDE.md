@@ -245,10 +245,10 @@ cardiac-manuscripts 仓库（不影响 pyobfus 仓库本身）。
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.9-3.14, AST, setuptools
-- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.15，2026-08-20 发布**；完整版本历史见 `CHANGELOG.md`)
-- **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.0，2026-08-17 发布**（tag+GitHub Release+Marketplace 手工上传均已完成，`curl` 核实公开 listing 已返回 `"version":"0.4.0"`）；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`)
-- **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.6，2026-08-17 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.1` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
-- **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp` (active, isLatest=true · **0.3.6**，2026-08-17 经 `mcp-publisher publish`(GitHub device-code 重新登录)确认)
+- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.16，2026-08-22 发布**；完整版本历史见 `CHANGELOG.md`)
+- **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.1，2026-08-22 发布**（tag+GitHub Release+Marketplace 手工上传均已完成，`curl` 核实公开 listing 已返回 `"version":"0.4.1"`）；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`)
+- **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.7，2026-08-22 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.1` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
+- **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp` (active, isLatest=true · **0.3.7**，2026-08-22 发布，`registry.modelcontextprotocol.io` 直查核实)
 - **Smithery (Skill)**: https://smithery.ai/skills/zhurong2020/pyobfus-protect (2026-06-22 上线 · 本地工具走 Skill 渠道非 MCP 渠道) · **mcp.so**: 已收录
 - **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus (Quality A) — Glama 容器 build 自 **admin Dockerfile→Configuration「Build steps」字段**(web-UI)，**不读 repo 的 `pyobfus_mcp/Dockerfile`**，且**不自动跟 PyPI 最新**：每次发 mcp 新版都要手动把该字段的 `pyobfus-mcp==<ver>` bump 一次，否则 listing 静默供旧工具面——**发布必做步骤**，已进 `docs/V0.5_RELEASE_PLAN.md` Phase 5.6。**2026-08-17 mcp 0.3.6 发布后**：Build steps 字段已由用户手工改成 `pyobfus-mcp==0.3.6`（确认无误），但触发的新构建（`01a00e39-...`）15 分钟后失败（`ECONNRESET`/"aborted"，卡在拉取 `debian:trixie-slim` 基础镜像元数据这一步）——与 08-07 那次失败是第二个独立复现实例，同一卡点、不同错误签名，非我方包/配置问题，用户决定继续观察，暂不追加 Discord 消息/手动重试。详见 memory `glama_zero_tools_repro_2026-08-07.md`。「Recent Releases」的版本号(如 0.5.4)是 Glama 自增计数、与实装版本无关，忽略。**2026-08-17 状态**：公开页面可访问且页面内容显示 8 个 tool 名称；旧 public API 路径 `/api/mcp/v1/servers/io.github.zhurong2020/pyobfus-mcp` 已返回 `not_found`，不再沿用早前 `tools: []` 判断；user 手工查 Glama Discord 对应频道，暂时没有回复。当前按外部 listing/API drift 记录并跳过，除非 Glama 给出新复现或修改要求。历史排障结论仍成立：pyobfus-mcp 包、mcp-proxy 桥接、Glama 构建和 Glama 内省此前均已证明能返回 8/8 tools。教训 memory `glama_introspection_dockerfile_pin_2026-06-05` + `glama_zero_tools_repro_2026-08-07` · 历史 `docs/POST_V0.4_TODO.md`
 - **GitHub**: https://github.com/zhurong2020/pyobfus (public)
