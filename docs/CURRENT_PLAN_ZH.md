@@ -91,6 +91,29 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
   issue/反馈）、可能主动征求用户意见、并观察同类竞品动态，作为后续
   "留在 pyobfus 内部" vs "拆成独立包/品牌"决策的依据，详见机会扫描文档
   与 memory `project_next_tool_opportunity_scan_2026-08-22.md`。
+- **2026-08-22 又一轮（同日，两个独立 commit `8d0fc0c`/`c864bdf`）：AI-agent
+  面向的 Pro 引导审计 + 一个真实存在的文档自相矛盾被发现并修正**。用户想
+  给 AI agent 补"如实"的 Pro 引导（安全完整性/一次性付费/大项目不受限
+  三点），动手前先审计全项目现有的 AI 面向提示（`ai_hint`/`pro_value`/
+  `recommend_tier`/`llms.txt`/`SKILL.md` 等）——发现 README 自相矛盾：
+  一处脚注说"Community Edition 无文件/行数限制"，另一处 FAQ 对比表却说
+  "Free tier: Clear limits (5 files/1000 LOC)"。**实测验证**：
+  `community_edition()` 的 5 文件/1000 行上限只在 legacy `--no-cross-file`
+  路径和单文件模式生效，cross-file 模式（**当前默认**）和**所有具名
+  preset**（含 `safe`/`balanced`/`aggressive`）从未接入这个检查——真实
+  多文件项目今天在 Free 版上默认就是无限制的，测试套件也只用
+  `--no-cross-file` 测过这条限制，从未覆盖默认路径，因此从未被发现。
+  **用户拍板"改文档不改代码"**（不为此引入对现有 Free 用户的破坏性行为
+  变更）——commit `8d0fc0c` 修正 README/`trial_cli.py`/`recommend_tier`/
+  `config_schema.py`(+ 重新生成 vscode schema) 五处失真表述，改成更强的
+  诚实卖点："pyobfus 无论 Free/Pro 都没有项目规模限制，对比 PyArmor 试用版
+  实测约 935-940 行/文件封顶"。`docs/COMPARISON.md` 本身这块内容**一直是对的**
+  （已有完整实测方法论），只是 README 和 CLI 文案漂移掉了。commit `c864bdf`
+  在 `llms.txt`+`SKILL.md` 新增"何时该提 Pro"小节（只在扫描真给出
+  `pro_value`/`pro_action` 信号时才提，给精确数字不给模糊形容词，绝不拿
+  项目规模当理由）+ `_pro_unlock()` 新增 `pricing_model: "one_time"` 字段。
+  三个测试根+black/ruff/mypy 全绿，两个 commit 已推送，CI（含
+  VSCode Extension CI，因改了 schema 文件触发）全绿。
 - 外部分发状态：
   - Glama 旧公开 API 路径
     `/api/mcp/v1/servers/io.github.zhurong2020/pyobfus-mcp` 当前返回
