@@ -35,6 +35,7 @@ PyArmor is the most established Python obfuscator. Here's how pyobfus compares:
 | **Anti-debugging** | Yes (Pro) | Yes (Pro) |
 | **Control flow flattening** | Yes (Pro v0.3.0+) | Yes (Pro) |
 | **Import obfuscation** | Yes (Pro, runtime importlib + encrypted import strings) | Yes (Pro) |
+| **Function-body virtualization** | No (AST-level only) | Yes — VMC/ECC modes (PyArmor 9.2.x, 2026) |
 | **License binding** | Per-device (3 devices) | Per-device |
 | **Future Python support** | Community-driven | "Can't guarantee" (per docs) |
 
@@ -58,6 +59,20 @@ disassembly and experimental source without executing the protected program:
 [Pyarmor-Static-Unpack-1shot](https://github.com/Lil-House/Pyarmor-Static-Unpack-1shot).
 The tool's own README is careful about limits: disassembly can be accurate while
 decompiled source may be incomplete or incorrect.
+
+**A stronger PyArmor tier exists above plain RFT/bytecode encryption.** As of
+PyArmor 9.2.x (2026), `pyarmor build --vmc`/`--ecc` replace an entire function
+body — not just names — with either PyArmor's own VM bytecode (VMC mode: no C
+compiler needed at build time; PyArmor's own docs describe the result as
+reversible) or compiled C machine code (ECC mode: requires a C compiler at
+build time; irreversible). We haven't verified whether the unpacking tooling
+above also handles VMC/ECC output specifically — its documented scope is
+standard `pytransform`-encrypted bytecode. Either way, this function-level
+virtualization is a real capability pyobfus doesn't have: pyobfus stays at
+the AST source-transformation layer and doesn't compile function bodies to a
+private VM instruction set or native code. If VMC/ECC-grade function
+virtualization is the requirement, PyArmor's Pro/Group tiers are the right
+tool for that job, not pyobfus.
 
 That matters for how to choose a tool. If your threat model is "stop a curious
 customer from reading ordinary source," PyArmor's bytecode layer is useful. If

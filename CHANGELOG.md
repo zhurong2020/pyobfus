@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `docs/COMPARISON.md` now covers PyArmor's VMC/ECC function-body
+  virtualization modes (9.2.x, 2026) — an honest capability gap: pyobfus
+  stays at the AST source-transformation layer and does not compile
+  function bodies to a private VM instruction set (VMC) or native code
+  (ECC).
+
 ## [0.5.16] - 2026-08-22
 
 ### Added
