@@ -5,7 +5,7 @@ Living reference of where `pyobfus` has a foothold, what each account looks like
 For the **why** behind the channel mix, see [AI_INTEGRATION_STRATEGY.md](AI_INTEGRATION_STRATEGY.md).
 For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTION_LOG.md).
 
-**Last updated**: 2026-08-22 (`pyobfus` 0.5.16 released 2026-08-22 — docs-only release: PyLocket comparison in `docs/COMPARISON.md` + verified/documented Python 3.14 free-threading compatibility. Previous: 0.5.15 released 2026-08-20 with the `compatibility_advisory` `--check` category + cookbooks; `pyobfus-mcp` 0.3.6 and VS Code extension 0.4.0 both shipped 2026-08-17, Marketplace upload **done** and listing re-verified at `"version":"0.4.0"`; 08-21 periodic recheck: downloads flat vs 08-20 baseline, Glama public page still lists 8 tools but version metadata stale at v0.5.13, Claude plugin submission still pending review). Earlier: 2026-06-08 (PR #5777 MERGED 2026-06-06 → punkpeye/awesome-mcp-servers now LIVE; Glama tool-count resolved 7/7).
+**Last updated**: 2026-08-22 (all three independently-versioned packages released same day, catching up sibling CHANGELOGs that had sat unreleased — see `scripts/check_unreleased_changelogs.py`: `pyobfus` 0.5.16 — docs-only, PyLocket comparison in `docs/COMPARISON.md` + verified/documented Python 3.14 free-threading compatibility; `pyobfus-mcp` 0.3.7 — docs-only, documents the independent Cisco mcp-scanner security scan (8/8 SAFE), republished to both PyPI and the MCP Registry (`isLatest: true` confirmed via public search endpoint); `vscode-extension` 0.4.1 — docs-only, "Why trust this extension" Nx Console comparison + CodeQL/CI trust signals, manually uploaded to the Marketplace and independently re-verified live at `"version":"0.4.1"`. Previous: 0.5.15 released 2026-08-20 with the `compatibility_advisory` `--check` category + cookbooks; `pyobfus-mcp` 0.3.6 and VS Code extension 0.4.0 both shipped 2026-08-17; 08-21 periodic recheck: downloads flat vs 08-20 baseline, Glama public page still lists 8 tools but version metadata stale (see Glama section below for the 08-22 cross-package-confusion detail), Claude plugin submission still pending review). Earlier: 2026-06-08 (PR #5777 MERGED 2026-06-06 → punkpeye/awesome-mcp-servers now LIVE; Glama tool-count resolved 7/7).
 
 > **Note (2026-05-09)**: most of the per-channel facts below are now current as of Session 23. Outside of the launch wave (HN 5-11 / Reddit 5-12 / CN trio 5-8/9), the live state is reflected here. Consult `docs/POST_V0.4_TODO.md` for forward TODO and `docs/V0.4_EXECUTION_LOG.md` for session-by-session deltas.
 
@@ -22,8 +22,8 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 
 ### PyPI — `pyobfus-mcp`
 - URL: https://pypi.org/project/pyobfus-mcp/
-- Current version: **0.3.6** (released 2026-08-17) · ships with PEP 740 attestations via OIDC trusted publishing
-- 0.3.6 contents: `server.json` now carries the GitHub repository stable ID and is re-validated against the official MCP Registry `2025-12-11` schema; a new regression test keeps `pyobfus_mcp.__version__`/`pyproject.toml`/`server.json` from drifting again. Tool surface unchanged (8 tools: 6 community + 2 pro_funnel).
+- Current version: **0.3.7** (released 2026-08-22) · ships with PEP 740 attestations via OIDC trusted publishing
+- 0.3.7 contents: docs-only — documents the independent Cisco `mcp-scanner` security scan (8/8 tools SAFE, 0 findings) in `docs/MCP_SECURITY_SCAN.md` + package README. Previous 0.3.6: `server.json` now carries the GitHub repository stable ID and is re-validated against the official MCP Registry `2025-12-11` schema; a new regression test keeps `pyobfus_mcp.__version__`/`pyproject.toml`/`server.json` from drifting again. Tool surface unchanged (8 tools: 6 community + 2 pro_funnel).
 
 ### GitHub — `zhurong2020/pyobfus`
 - URL: https://github.com/zhurong2020/pyobfus
@@ -75,8 +75,8 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 
 ### MCP Registry — `io.github.zhurong2020/pyobfus-mcp` 🟢 LIVE
 - URL: https://registry.modelcontextprotocol.io/v0/servers?search=pyobfus
-- Latest published: **0.3.6** (2026-08-17) · status: `active` · `isLatest` confirmed via `mcp-publisher publish` (GitHub device-code re-auth) and the public search endpoint.
-- 0.3.6 hardening: `pyobfus_mcp/server.json` validates against the official `2025-12-11` schema and includes GitHub repository stable ID `1093960892`; `fileSha256` remains omitted because the PyPI wheel/sdist multi-artifact model makes a single optional hash ambiguous.
+- Latest published: **0.3.7** (2026-08-22) · status: `active` · `isLatest` confirmed via `mcp-publisher publish` (GitHub device-code re-auth) and the public search endpoint.
+- 0.3.7 contents: docs-only, see PyPI section above. Previous 0.3.6 hardening: `pyobfus_mcp/server.json` validates against the official `2025-12-11` schema and includes GitHub repository stable ID `1093960892`; `fileSha256` remains omitted because the PyPI wheel/sdist multi-artifact model makes a single optional hash ambiguous.
 - Implications: Claude Desktop / Claude Code / Cursor / Windsurf / Zed users querying the registry for "pyobfus" or "python obfuscator" will discover this server without manual config file edits.
 
 ### Glama — `zhurong2020/pyobfus` 🟡 LISTED / API STALE
