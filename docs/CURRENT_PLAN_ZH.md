@@ -56,6 +56,17 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
   `26/295/1,912`、mcp `8/124/687`），发布后的跳变未再放大，维持"发布噪音
   而非有机增长"判断，无需调整任何动作；Glama 与 Claude plugin 状态复查亦无
   变化（详见 P0 小节与 `docs/DISTRIBUTION_CHANNELS.md`）。
+- **2026-08-22 追加（非发布，held 在 `[Unreleased]`）**：一次竞品/MCP 安全
+  调研顺带产出两处已核实的诚实文档更新——`docs/COMPARISON.md` 补 PyArmor
+  VMC（可逆 VM 字节码）/ECC（不可逆 C 编译）函数体虚拟化模式的技术细节，
+  先查证官方 features 文档才落笔（最初 WebSearch 摘要在两份官方 GitHub
+  changelog 里都对不上号，坐实"不能直接采信搜索摘要"）；`docs/MCP_SECURITY_SCAN.md`
+  新增 SSRF 自查小节，grep 全部 `pyobfus_mcp` 源码确认零出站 HTTP/URL-fetch
+  代码路径，SSRF 类风险（OWASP 数据：7000+ 公开 MCP server 中 36.7% 中招）
+  对当前工具面不适用。顺带用 PyPI JSON API 核实 PyArmor 最新版仍是 9.2.6
+  （2026-07-27，非搜索摘要含糊提到的"9.2.7"）；`docs/ROADMAP.md` 里旧的
+  "9.2.6（June 2026）"月份有误，但那是已归档的历史扫描快照，按惯例不回溯
+  改写。两个 commit（`1616e5a`/`462213f`）已推送，等下次自然发布节奏带上。
 - 外部分发状态：
   - Glama 旧公开 API 路径
     `/api/mcp/v1/servers/io.github.zhurong2020/pyobfus-mcp` 当前返回
