@@ -6,6 +6,8 @@ Independent version/release cadence from the main `pyobfus` and `pyobfus-mcp` Py
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-08-22
+
 ### Changed
 
 - "Why trust this extension" section strengthened with the May 2026 Nx
