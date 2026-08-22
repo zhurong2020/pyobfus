@@ -20,6 +20,16 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
   pattern the OWASP MCP Security Cheat Sheet describes — see that doc for
   the full reasoning).
 
+### Fixed
+
+- `recommend_tier`'s `pro_tier_capabilities` no longer lists "Unlimited
+  files and lines of code" as a Pro-exclusive benefit — verified this
+  isn't actually gated by tier in the default obfuscation path (see the
+  main `pyobfus` package's `[Unreleased]` Fixed entry for the full
+  investigation). `free_tier_capabilities` now states the accurate,
+  positive fact instead: no file/line limit at any tier, contrasted with
+  PyArmor's measured ~935-940 line/file trial cap.
+
 ## [0.3.7] - 2026-08-22
 
 ### Added

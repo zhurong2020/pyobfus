@@ -28,7 +28,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   private-index false-positive caveat. New module:
   `pyobfus/core/dependency_advisory.py`.
 
-## [0.5.16] - 2026-08-22
+### Fixed
+
+- Removed a stale, self-contradicting claim that Community Edition caps
+  projects at 5 files / 1,000 total LOC. README (trial feature list +
+  the PyArmor comparison FAQ table), `pyobfus-trial features`, and
+  `config_schema.py`'s `max_files`/`max_total_loc` descriptions all
+  repeated this, while a separate README footnote already correctly said
+  the opposite ("Community Edition has no file or line limits"). Verified
+  directly: the `max_files=5`/`max_total_loc=1000` cap set by
+  `ObfuscationConfig.community_edition()` is only checked by the legacy
+  `--no-cross-file` directory path and single-file mode — the default
+  cross-file directory path (and every named preset, including
+  `safe`/`balanced`/`aggressive`) never enforced it. Rather than
+  reintroducing the cap on the default path (a breaking behavior change
+  for existing Free users, not attempted here), the docs now say what's
+  actually true: **pyobfus has no file or line limit at any tier**, in
+  contrast to PyArmor's free trial, independently measured at ~935-940
+  lines/file (2026-05-09). `config_schema.py`'s field descriptions for
+  `max_files`/`max_total_loc` now describe them accurately as an optional,
+  self-imposed cap rather than an automatic Community-tier gate.
 
 ### Added
 

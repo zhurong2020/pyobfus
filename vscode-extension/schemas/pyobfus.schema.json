@@ -247,7 +247,7 @@
             "null"
           ],
           "minimum": 1,
-          "description": "Maximum files per build (Community tier limit; omit for unlimited)."
+          "description": "Optional self-imposed cap on files per build; omit for unlimited (the default -- pyobfus does not limit project size at any tier). Only enforced for a single-file build or a directory build run with --no-cross-file; the default cross-file directory build does not check it."
         },
         "max_total_loc": {
           "type": [
@@ -255,7 +255,7 @@
             "null"
           ],
           "minimum": 1,
-          "description": "Maximum total lines of code per build (Community tier limit; omit for unlimited)."
+          "description": "Optional self-imposed cap on total lines of code per build; omit for unlimited (the default). Enforced for a single-file build or --no-cross-file directory build; not checked in the default cross-file directory build."
         },
         "preset": {
           "type": "string",

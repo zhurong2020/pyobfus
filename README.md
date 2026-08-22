@@ -211,7 +211,6 @@ pyobfus input.py -o output.py --level pro
 - Dead code injection (`--dead-code`)
 - License embedding (`--expire`, `--bind-machine`, `--max-runs`)
 - Configuration presets (`--preset trial/commercial/library/maximum`)
-- Unlimited files and lines of code
 
 After your trial, purchase a license to continue using Pro features.
 
@@ -664,8 +663,8 @@ portability can depend on syntax, dependencies, and enabled transformations.
 
 | Feature | pyobfus | PyArmor |
 |---------|---------|---------|
-| **Price** | $45 (Pro) | $89 (Pro) |
-| **Free tier** | Clear limits (5 files/1000 LOC) | Vague "trial" limitations |
+| **Price** | $45 (Pro, one-time) | $89 (Pro, one-time) |
+| **Free tier project size** | No file or line limits | Trial caps out around 935-940 lines/file (measured 2026-05-09) |
 | **Open source** | Yes (Core: Apache 2.0, Pro: Proprietary) | No |
 | **Native dependencies** | None (pure Python output) | Requires runtime library |
 | **Python 3.9-3.14 support** | Yes | Yes |

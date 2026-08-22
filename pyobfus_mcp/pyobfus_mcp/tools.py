@@ -741,6 +741,9 @@ def recommend_tier(path: str) -> Dict[str, Any]:
             "Framework presets (FastAPI, Django, Flask, Pydantic, Click, SQLAlchemy)",
             "JSON CLI for AI agents (--json + ai_hint fields)",
             "Reverse stack-trace mapping (--save-mapping + --unmap)",
+            "No file-count or line-count limit on the project itself (unlike PyArmor's "
+            "free trial, capped around 935-940 lines/file, measured 2026-05-09) -- "
+            "project size alone is never a reason this tool needs Pro",
         ],
         "pro_tier_capabilities": [
             "AES-256 string encryption, control-flow flattening, dead-code injection, anti-debugging",
@@ -750,7 +753,6 @@ def recommend_tier(path: str) -> Dict[str, Any]:
             "@seal_code bytecode integrity + --scrub-traceback production traceback encryption (v0.5)",
             "--import-obfuscation (v0.5.7) — rewrites top-level imports into runtime importlib/__import__ calls with automatic AES string encryption of module/symbol names",
             "Available as `pyobfus build` flags (v0.5.1) and the `pyobfus_pro` API",
-            "Unlimited files and lines of code",
         ],
         "free_action": free_action,
         "pro_action": pro_action,

@@ -86,9 +86,15 @@ _FIELD_DESCRIPTIONS: Dict[str, str] = {
     "embed as a module constant (Pro).",
     "max_workers": "Parallel worker count for multi-file builds; omit "
     "for the automatic cpu_count-based default.",
-    "max_files": "Maximum files per build (Community tier limit; omit " "for unlimited).",
-    "max_total_loc": "Maximum total lines of code per build (Community "
-    "tier limit; omit for unlimited).",
+    "max_files": "Optional self-imposed cap on files per build; omit for "
+    "unlimited (the default -- pyobfus does not limit project size at "
+    "any tier). Only enforced for a single-file build or a directory "
+    "build run with --no-cross-file; the default cross-file directory "
+    "build does not check it.",
+    "max_total_loc": "Optional self-imposed cap on total lines of code per "
+    "build; omit for unlimited (the default). Enforced for a single-file "
+    "build or --no-cross-file directory build; not checked in the default "
+    "cross-file directory build.",
 }
 
 # Fields that require `level: pro` (or a preset that sets it). Kept
