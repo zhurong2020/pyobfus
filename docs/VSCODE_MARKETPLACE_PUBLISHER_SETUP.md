@@ -130,7 +130,13 @@ obvious success banner, so success was confirmed two ways:
 > **Sign in with `wuxiami@hotmail.com`** — the maintainer has multiple
 > Microsoft accounts; this is the one the `zhurong2020` publisher account was
 > created under (Step 1 above) and the only one that can see/update this
-> listing. Confirmed again 2026-08-17 (v0.4.0 update).
+> listing. Confirmed again 2026-08-17 (v0.4.0 update); confirmed again
+> 2026-08-22 (v0.4.1 update) — publisher page showed the green verified
+> checkmark next to 0.4.1, the "[Succeeded] Extension publish on Visual
+> Studio Marketplace" email arrived at `wuxiami@hotmail.com`, and the public
+> listing independently re-checked (`curl` on
+> `marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus`) returned
+> `"version":"0.4.1"`.
 
 The update flow is **not** the "New extension" button — that's for a
 brand-new listing. Instead:
