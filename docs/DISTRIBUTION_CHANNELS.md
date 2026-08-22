@@ -5,7 +5,7 @@ Living reference of where `pyobfus` has a foothold, what each account looks like
 For the **why** behind the channel mix, see [AI_INTEGRATION_STRATEGY.md](AI_INTEGRATION_STRATEGY.md).
 For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTION_LOG.md).
 
-**Last updated**: 2026-08-21 (`pyobfus` 0.5.15 released 2026-08-20 with the `compatibility_advisory` `--check` category + cookbooks; `pyobfus-mcp` 0.3.6 and VS Code extension 0.4.0 both shipped 2026-08-17, Marketplace upload **done** and listing re-verified at `"version":"0.4.0"`; 08-21 periodic recheck: downloads flat vs 08-20 baseline, Glama public page still lists 8 tools but version metadata stale at v0.5.13, Claude plugin submission still pending review). Earlier: 2026-06-08 (PR #5777 MERGED 2026-06-06 → punkpeye/awesome-mcp-servers now LIVE; Glama tool-count resolved 7/7).
+**Last updated**: 2026-08-22 (`pyobfus` 0.5.16 released 2026-08-22 — docs-only release: PyLocket comparison in `docs/COMPARISON.md` + verified/documented Python 3.14 free-threading compatibility. Previous: 0.5.15 released 2026-08-20 with the `compatibility_advisory` `--check` category + cookbooks; `pyobfus-mcp` 0.3.6 and VS Code extension 0.4.0 both shipped 2026-08-17, Marketplace upload **done** and listing re-verified at `"version":"0.4.0"`; 08-21 periodic recheck: downloads flat vs 08-20 baseline, Glama public page still lists 8 tools but version metadata stale at v0.5.13, Claude plugin submission still pending review). Earlier: 2026-06-08 (PR #5777 MERGED 2026-06-06 → punkpeye/awesome-mcp-servers now LIVE; Glama tool-count resolved 7/7).
 
 > **Note (2026-05-09)**: most of the per-channel facts below are now current as of Session 23. Outside of the launch wave (HN 5-11 / Reddit 5-12 / CN trio 5-8/9), the live state is reflected here. Consult `docs/POST_V0.4_TODO.md` for forward TODO and `docs/V0.4_EXECUTION_LOG.md` for session-by-session deltas.
 
@@ -15,8 +15,8 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 
 ### PyPI — `pyobfus`
 - URL: https://pypi.org/project/pyobfus/
-- Current version: **0.5.15** (released 2026-08-20) · ships with PEP 740 attestations via OIDC trusted publishing
-- Current headline: `--check` gains a `compatibility_advisory` category flagging real-world delivery-combo risks (import-hook/encrypted-file ecosystem, compiled packaging, model-serving), plus three new cookbooks and two runnable `examples/`. Previous 0.5.14: `--provenance-manifest` per-input SHA-256 hashes + git commit + CycloneDX-compatible section; `--verify-provenance-manifest --json`; `--validate-config --json`.
+- Current version: **0.5.16** (released 2026-08-22) · ships with PEP 740 attestations via OIDC trusted publishing
+- Current headline: docs-only release — `docs/COMPARISON.md` gains a PyLocket entry, and Python 3.14 free-threading (`python3.14t`, PEP 779) compatibility is verified and documented in `docs/PYTHON314_FREETHREADING.md`. Previous 0.5.15: `--check` gains a `compatibility_advisory` category flagging real-world delivery-combo risks (import-hook/encrypted-file ecosystem, compiled packaging, model-serving), plus three new cookbooks and two runnable `examples/`.
 - Pre-v0.4 baseline: ~324 downloads / month, ~30% real users (rest is mirror noise)
 - Tracker: `gh api repos/zhurong2020/pyobfus` + PePy
 
@@ -31,7 +31,7 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 - Stars: 0 (target v0.4: 100+)
 - Topics (12): `python-obfuscator`, `code-obfuscator`, `ast-obfuscation`, `mcp-server`, `claude-code`, `cursor`, `llm-tools`, `ai-native`, `pyarmor-alternative`, `python-security`, `code-protection`, `source-protection`
 - Wiki: disabled · Discussions: enabled · Issues: open
-- Releases: latest `v0.5.15` (2026-08-20); earlier releases `v0.3.3` … `v0.5.14`, plus `mcp-v0.3.x` and `vscode-v0.x` tags (mcp releases attach wheel+sdist).
+- Releases: latest `v0.5.16` (2026-08-22); earlier releases `v0.3.3` … `v0.5.15`, plus `mcp-v0.3.x` and `vscode-v0.x` tags (mcp releases attach wheel+sdist).
 
 ### 有心工坊 (personal blog)
 - URL: https://www.arong.eu.org
@@ -81,7 +81,7 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 
 ### Glama — `zhurong2020/pyobfus` 🟡 LISTED / API STALE
 - Public page: https://glama.ai/mcp/servers/zhurong2020/pyobfus
-- 2026-08-21 recheck: the public page is reachable and still exposes 8 tool names, but its version metadata is stale (shows v0.5.13; current is 0.5.15); the older API path `/api/mcp/v1/servers/io.github.zhurong2020/pyobfus-mcp` still returns `not_found`.
+- 2026-08-21 recheck: the public page is reachable and still exposes 8 tool names, but its version metadata is stale (shows v0.5.13; current is 0.5.16); the older API path `/api/mcp/v1/servers/io.github.zhurong2020/pyobfus-mcp` still returns `not_found`.
 - 2026-08-20: third-party maintainers independently reproduced both symptoms (build stuck on `debian:trixie-slim`, page OK but public API stale) — confirms this is Glama-side infra/sync, not a pyobfus-mcp code issue. Discord `#support` still unanswered as of 08-21; policy is passive-wait, no code change, no re-pin until Glama responds.
 
 ### Claude Plugin Marketplace 🟡 PENDING
