@@ -508,8 +508,8 @@ checked with live search, not recalled from training data.
   stronger tamper-resistance claim than pyobfus's AST + Pro vault) alongside
   the three concrete gaps (Python 3.12-3.14 only vs. 3.9-3.14, subscription +
   per-license fee vs. one-time $45, and no mention anywhere in PyLocket's own
-  docs of debugging/traceback/AI-assisted workflows). Held under
-  `CHANGELOG.md`'s `[Unreleased]`, no version bump yet.
+  docs of debugging/traceback/AI-assisted workflows). Released in `pyobfus`
+  0.5.16 (2026-08-22).
 - [x] **P2-31: Run a reputable open-source MCP security scanner against
   `pyobfus-mcp` and publish the result.** _Done 2026-08-20._ Ran Cisco's
   `cisco-ai-mcp-scanner` (PyPI) against the real published `pyobfus-mcp`
@@ -520,8 +520,9 @@ checked with live search, not recalled from training data.
   scanner's own `vulnerable-package` subcommand. Full reproducible steps +
   an honest scope statement (offline analyzers only; `api`/`llm`/
   `behavioral`/`virustotal` need paid keys and weren't run) in new
-  `docs/MCP_SECURITY_SCAN.md`, summarized in `pyobfus_mcp/README.md`. Held
-  under `pyobfus_mcp/CHANGELOG.md`'s `[Unreleased]`.
+  `docs/MCP_SECURITY_SCAN.md`, summarized in `pyobfus_mcp/README.md`.
+  Released in `pyobfus-mcp` 0.3.7 (2026-08-22), and republished to the MCP
+  Registry (`isLatest: true` confirmed).
 - [x] **P2-32: Verify Pro runtime components under Python 3.14
   free-threading (`python3.14t`).** _Done 2026-08-20._ Downloaded a
   python-build-standalone free-threaded 3.14.7 build (no root/apt needed),
@@ -535,7 +536,7 @@ checked with live search, not recalled from training data.
   `docs/PYTHON314_FREETHREADING.md` states the honest scope: single-process
   usage verified; concurrent multi-threaded access to Pro runtime state was
   not specifically stress-tested (doesn't arise in pyobfus's normal usage
-  pattern). Held under `CHANGELOG.md`'s `[Unreleased]`.
+  pattern). Released in `pyobfus` 0.5.16 (2026-08-22).
 - [x] **P2-33: VS Code Marketplace listing copy — make structural trust
   signals more visible.** _Done 2026-08-20, smaller than originally scoped._
   Investigation found this was already largely addressed in an earlier
@@ -547,8 +548,9 @@ checked with live search, not recalled from training data.
   Publisher" badge, still shipped a credential stealer) as stronger, more
   current corroboration, plus two previously-omitted verified signals —
   zero open CodeQL alerts (linked to the live Security tab) and SHA-pinned
-  CI/CD across build/test/release workflows. Held under
-  `vscode-extension/CHANGELOG.md`'s `[Unreleased]`.
+  CI/CD across build/test/release workflows. Released in `vscode-extension`
+  0.4.1 (2026-08-22), manually uploaded to the Marketplace and independently
+  re-verified live (`"version":"0.4.1"` + Microsoft confirmation email).
 
 **Explicit de-prioritizations confirmed by this scan:**
 

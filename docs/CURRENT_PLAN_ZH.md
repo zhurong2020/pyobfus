@@ -1,6 +1,7 @@
 # pyobfus 当前计划
 
-更新时间：2026-08-21（0.5.15 发布 + 08-21 周期性复查后刷新）
+更新时间：2026-08-22（`pyobfus` 0.5.16 / `pyobfus-mcp` 0.3.7 / `vscode-extension`
+0.4.1 三包同日发布后刷新）
 
 这份文档是当前项目状态和后续计划的中文单一入口，面向维护者日常查看。旧的
 `ROADMAP.md` 和 `POST_V0.4_TODO.md` 保留为历史归档和详细来源，但后续日常
@@ -17,20 +18,27 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
 
 ## 当前状态
 
-- 主包：`pyobfus 0.5.15` 已发布（2026-08-20）——`--check` 新增
-  `compatibility_advisory` 类别（P2-29，import-hook/加密文件生态、编译打包、
-  model-serving 三类交付组合）+ 三篇 cookbook + 两个 `examples/` 端到端复现。
-  距上次发布（0.5.14，08-17）3 天，符合"1-2 天间隔、不批量"的节奏。发布前
-  修复了一个已经让 main CI 红了约 19 小时的 black 格式化回归（P2-29 提交里
-  `tests/test_preflight.py` 多了一个尾随空行），README"What's new"横幅这次
-  与版本号/CHANGELOG 在同一提交里更新（吸取 0.5.14 那次教训）。
-- MCP 包：`pyobfus-mcp 0.3.6` 已发布（2026-08-17），MCP Registry 同步发布，
-  `isLatest=true` 已核实。
-- VS Code 扩展：`0.4.0` 已 tag + GitHub Release 发布，**Marketplace 手工上传
-  也已由用户完成**（`curl` 核实公开 listing 已返回 `"version":"0.4.0"`）。
-- Glama admin「Build steps」已由用户手工改到 `pyobfus-mcp==0.3.6`，但触发的
-  新构建 15 分钟后失败（`ECONNRESET`，卡在拉取 base image 这一步，是第二个
-  独立复现实例，非我方问题）——详见下方 P0 小节。
+- 主包：`pyobfus 0.5.16` 已发布（2026-08-22，docs-only）——`docs/COMPARISON.md`
+  加 PyLocket 对比小节（P2-30）+ Python 3.14 free-threading 兼容性验证并文档化
+  （P2-32，`docs/PYTHON314_FREETHREADING.md`）。内容本身在 08-20 扫描当天就已
+  实现+提交，按"功能先合并、发布单独 gate"的节奏 held 了两天，本轮统一发布。
+  距上次发布（0.5.15，08-20）2 天，符合"1-2 天间隔、不批量"的节奏。
+- MCP 包：`pyobfus-mcp 0.3.7` 已发布（2026-08-22，docs-only）——记录 Cisco
+  `mcp-scanner` 独立安全扫描结果（P2-31，8/8 工具 SAFE、0 findings）。PyPI +
+  MCP Registry 同步发布，`isLatest=true` 已核实。
+- VS Code 扩展：`0.4.1` 已 tag + GitHub Release 发布（P2-33，"Why trust this
+  extension" 小节强化 Nx Console 事件对比 + CodeQL/CI 签名信号），**Marketplace
+  手工上传也已由用户完成**——微软 "[Succeeded]" 确认邮件已收到，公开 listing
+  `curl` 核实已返回 `"version":"0.4.1"`。
+- 🆕 **新增 `scripts/check_unreleased_changelogs.py`**：本轮发布前发现
+  `pyobfus-mcp`/`vscode-extension` 两份 CHANGELOG 的 `[Unreleased]` 内容已经
+  held 了几天没人想起来一起发——写了个脚本扫描仓库内三份 CHANGELOG 的
+  `[Unreleased]` 段落，已接入本地专用的 `docs/internal/PYPI_RELEASE_GUIDE.md`
+  发布前检查清单，避免同类遗漏再犯。
+- Glama admin「Build steps」此前已由用户手工改到 `pyobfus-mcp==0.3.6`，触发的
+  构建失败（`ECONNRESET`，卡在拉取 base image 这一步）是平台侧问题，非我方
+  配置——详见下方 P0 小节；`pyobfus-mcp` 0.3.7 发布后尚未重新触发 Glama 构建
+  （无强制要求，等下次冷启动或用户主动重 pin 时再做）。
 - GitHub：主分支健康，当前公开 issues/PRs 为 0，CI/CodeQL 全绿。
 - README/`llms.txt`/两个 `pyproject.toml`/`server.json` 的 AI 客户端定位
   文案已补 GitHub Copilot + CodeBuddy（实时搜索核实后添加，非训练记忆），
@@ -274,44 +282,52 @@ bytecode 加密。
 - 后续机会（未并入本轮）：`--check` 接入已配置 `--config` / `exclude_patterns`
   以减少真实组合的误报，属独立行为改动，留作单独小项。
 
-### ✅ P1/P2：2026-08-20 扫描新增——四项均已完成，held 等发布
+### ✅ 2026-08-20 扫描新增，2026-08-22 三包发布收口
 
-用户要求"依次完成上述所有功能，但等几天再发布"——四项均已实现+验证+提交到
-main，CHANGELOG 改动留在各自的 `[Unreleased]` 段，version/tag/发布留到间隔
-够了再做（沿用本项目一贯的"功能先合并、发布单独 gate"节奏）。
+用户要求"依次完成上述所有功能，但等几天再发布"——四项实现+验证+提交到 main
+后 held 了两天（沿用本项目一贯的"功能先合并、发布单独 gate"节奏），
+2026-08-22 统一切版本号发布（`pyobfus` 0.5.16 / `pyobfus-mcp` 0.3.7 /
+`vscode-extension` 0.4.1，各自独立 tag + PyPI/MCP Registry/Marketplace 全渠道
+核实）。发布前用新写的 `scripts/check_unreleased_changelogs.py` 核对，
+确认三份 CHANGELOG 均已清空 `[Unreleased]`。
 
-1. ✅ `P2-30` `docs/COMPARISON.md` 加了 `### pyobfus vs PyLocket` 完整小节——
-   诚实列出它的真实优势（逐函数字节码加密+设备绑定密钥，防篡改强度确实比
-   pyobfus AST+Pro vault 强），同时点出三个真实差距（Python 版本覆盖更窄、
-   订阅+按许可计费 vs 一次性 $45、完全没提调试/AI 工作流支持）。
-2. ✅ `P2-31` 实际跑了 Cisco `cisco-ai-mcp-scanner`（PyPI 真实工具，非模拟）
-   扫真实发布的 `pyobfus-mcp` 0.3.6（干净 venv 装的 PyPI 包，非本地开发版）
-   ——**8/8 工具 SAFE，0 findings**（YARA + 依赖漏洞审计两个离线 analyzer，
-   不需要 API key）。过程中撞到扫描器自己的一个 CLI bug（`vulnerable-package`
-   子命令参数解析冲突），改用直接 `pip-audit --strict` 交叉验证同样干净。
-   新建 `docs/MCP_SECURITY_SCAN.md`（完整可复现步骤 + 诚实的适用范围声明：
-   只测了离线 analyzer，`api`/`llm`/`behavioral`/`virustotal` 需要付费 key
-   没测），`pyobfus_mcp/README.md` 加了摘要小节引用。
-3. ✅ `P2-32` 下载了 python-build-standalone 的 free-threaded Python 3.14.7
-   独立构建（不需要 sudo/apt），核实 `sys._is_gil_enabled()` 确实是 `False`，
-   然后：① 完整核心测试套件 1169 passed/1 skipped 全过（含所有 Pro 运行时
-   测试文件：Vault/license binding/scrub/seal）；② 真实端到端冒烟测试（不只
-   是单测）——用 `--seal-code --scrub-traceback` 混淆一个样例文件，在
-   `python3.14t` 下执行保护产物，正常路径输出正确且 GIL 确认仍是禁用状态；
-   异常路径触发真实 KeyError，确认 RSA+AES 加密 hook 正确触发，再用
-   `pyobfus-unscrub` 完整解密回原始 traceback——free-threading 下全链路
-   走通。新建 `docs/PYTHON314_FREETHREADING.md`，诚实声明适用范围（验证的
-   是单进程使用场景，没有专门做并发多线程访问 Pro 运行时状态的压力测试，
-   因为这不是 pyobfus 的正常使用模式）。
-4. ✅ `P2-33` 调研发现原计划部分过时——`package.json` description 和 README
-   "Why trust this extension" 小节其实早在之前的 session 里就已经把
-   OpenSSF/PEP740 放得很显眼了，不是"只塞在 README 里点进去才看到"。真正补
-   的是这次扫描里发现的新证据：**Nx Console 事件**（220 万安装量、带
-   Marketplace 自己的"Verified Publisher"徽章，2026 年 5 月还是被植入了
-   凭证窃取器）——比原有的 2025 年 4 月"Python Obfuscator for VSCode"案例
-   更有说服力，直接证明徽章不可靠。另外补了两条此前没写但真实可核实的信号：
-   零个 open CodeQL alert（链接到 Security tab）+ CI/CD 全部第三方 Action
-   SHA-pinned（`gh api` + `grep` 实测核实后才写）。
+1. ✅ `P2-30` **已发布于 `pyobfus` 0.5.16**。`docs/COMPARISON.md` 加了
+   `### pyobfus vs PyLocket` 完整小节——诚实列出它的真实优势（逐函数字节码
+   加密+设备绑定密钥，防篡改强度确实比 pyobfus AST+Pro vault 强），同时点出
+   三个真实差距（Python 版本覆盖更窄、订阅+按许可计费 vs 一次性 $45、完全
+   没提调试/AI 工作流支持）。
+2. ✅ `P2-31` **已发布于 `pyobfus-mcp` 0.3.7**（PyPI + MCP Registry，
+   `isLatest=true` 已核实）。实际跑了 Cisco `cisco-ai-mcp-scanner`（PyPI 真实
+   工具，非模拟）扫真实发布的 `pyobfus-mcp` 0.3.6（干净 venv 装的 PyPI 包，
+   非本地开发版）——**8/8 工具 SAFE，0 findings**（YARA + 依赖漏洞审计两个
+   离线 analyzer，不需要 API key）。过程中撞到扫描器自己的一个 CLI bug
+   （`vulnerable-package` 子命令参数解析冲突），改用直接 `pip-audit --strict`
+   交叉验证同样干净。新建 `docs/MCP_SECURITY_SCAN.md`（完整可复现步骤 + 诚实
+   的适用范围声明：只测了离线 analyzer，`api`/`llm`/`behavioral`/`virustotal`
+   需要付费 key 没测），`pyobfus_mcp/README.md` 加了摘要小节引用。
+3. ✅ `P2-32` **已发布于 `pyobfus` 0.5.16**。下载了 python-build-standalone
+   的 free-threaded Python 3.14.7 独立构建（不需要 sudo/apt），核实
+   `sys._is_gil_enabled()` 确实是 `False`，然后：① 完整核心测试套件 1169
+   passed/1 skipped 全过（含所有 Pro 运行时测试文件：Vault/license
+   binding/scrub/seal）；② 真实端到端冒烟测试（不只是单测）——用
+   `--seal-code --scrub-traceback` 混淆一个样例文件，在 `python3.14t` 下执行
+   保护产物，正常路径输出正确且 GIL 确认仍是禁用状态；异常路径触发真实
+   KeyError，确认 RSA+AES 加密 hook 正确触发，再用 `pyobfus-unscrub` 完整
+   解密回原始 traceback——free-threading 下全链路走通。新建
+   `docs/PYTHON314_FREETHREADING.md`，诚实声明适用范围（验证的是单进程使用
+   场景，没有专门做并发多线程访问 Pro 运行时状态的压力测试，因为这不是
+   pyobfus 的正常使用模式）。
+4. ✅ `P2-33` **已发布于 `vscode-extension` 0.4.1**（Marketplace 手工上传已
+   完成，微软确认邮件已收到，公开 listing 核实为 `"version":"0.4.1"`）。
+   调研发现原计划部分过时——`package.json` description 和 README "Why trust
+   this extension" 小节其实早在之前的 session 里就已经把 OpenSSF/PEP740
+   放得很显眼了，不是"只塞在 README 里点进去才看到"。真正补的是这次扫描里
+   发现的新证据：**Nx Console 事件**（220 万安装量、带 Marketplace 自己的
+   "Verified Publisher"徽章，2026 年 5 月还是被植入了凭证窃取器）——比原有
+   的 2025 年 4 月"Python Obfuscator for VSCode"案例更有说服力，直接证明
+   徽章不可靠。另外补了两条此前没写但真实可核实的信号：零个 open CodeQL
+   alert（链接到 Security tab）+ CI/CD 全部第三方 Action SHA-pinned
+   （`gh api` + `grep` 实测核实后才写）。
 
 ### P3：探索项
 
@@ -344,27 +360,33 @@ main，CHANGELOG 改动留在各自的 `[Unreleased]` 段，version/tag/发布�
 
 ## 下次工作建议
 
-1. `pyobfus 0.5.15` 已发布并核实 PyPI latest；main CI 已从 P2-29 提交带来
-   的 black 格式化回归中修复转绿。本轮无遗留的本地机械任务。
-2. `P2-29` compatibility checks 已发布收口。后续若有真实用户反馈新的交付
-   组合（如 PyInstaller 之外的 bundler、其他 import-hook 产品），再机会性
-   扩检测信号或补 cookbook，仍遵守"优先诊断 + 文档、不新增 transform"。
+1. `pyobfus 0.5.16` / `pyobfus-mcp 0.3.7` / `vscode-extension 0.4.1` 三包
+   已于 2026-08-22 同日发布并全渠道核实（PyPI/MCP Registry/GitHub
+   Release/VS Code Marketplace）。`scripts/check_unreleased_changelogs.py`
+   确认三份 CHANGELOG 均已清空。本轮无遗留的本地机械任务。
+2. `P2-29` compatibility checks（0.5.15）与本轮 `P2-30`~`P2-33`（本轮发布）
+   均已收口。后续若有真实用户反馈新的交付组合（如 PyInstaller 之外的
+   bundler、其他 import-hook 产品），再机会性扩检测信号或补 cookbook，
+   仍遵守"优先诊断 + 文档、不新增 transform"。
 3. Glama：2026-08-20 已有多位第三方 maintainer 独立复现我们报告过的两个
    症状（构建卡 `debian:trixie-slim`、页面正常但公开 API `tools: []`），
    进一步确认是 Glama 平台侧问题。继续被动等 `#support` 回复，不主动追发
    消息、不改代码。✅ **2026-08-21 已复查**：旧 API 路径仍 `not_found`、
-   公开页面 8 工具可列出但版本元数据陈旧（v0.5.13）。下次冷启动检查：
-   ① 两条帖子有没有回复；② 公开页面/API `tools` 字段；③ Recent Tests
-   有没有新构建尝试（①② 可程序化，③ 需 user 登录 admin 面板）。
+   公开页面 8 工具可列出但版本元数据陈旧（v0.5.13，且 08-22 发现它把核心包
+   `pyobfus` 的 Release 标签和 `pyobfus-mcp` 自己的版本号搞混，见
+   `docs/DISTRIBUTION_CHANNELS.md` Glama 小节）。`pyobfus-mcp` 0.3.7
+   发布后尚未重新 pin Build steps 触发新构建（非必需，等下次冷启动或用户
+   主动重 pin）。下次冷启动检查：① 两条帖子有没有回复；② 公开页面/API
+   `tools` 字段；③ Recent Tests 有没有新构建尝试（①② 可程序化，③ 需 user
+   登录 admin 面板）。
 4. Claude plugin marketplace：仍 `Submitted and pending review`（Aug 2），
    只需确认是否出现 approve/reject/补充信息。
-5. 下载量：✅ **2026-08-21 已复查**——与 08-20 基线完全一致（`pyobfus`
+5. 下载量：上次复查 2026-08-21，与 08-20 基线完全一致（`pyobfus`
    26/295/1,912；`pyobfus-mcp` 8/124/687），维持"发布噪音非有机增长"判断。
-   下一次按周期节奏（每积累 3-5 个版本或 1-2 周）再看，无需单日盯盘。
-6. **`P2-30`~`P2-33` 四项已全部实现+提交（2026-08-20 同日），held 等发布**：
-   详见上方"✅ P1/P2：2026-08-20 扫描新增"小节。三个 CHANGELOG（根
-   `CHANGELOG.md`、`pyobfus_mcp/CHANGELOG.md`、`vscode-extension/
-   CHANGELOG.md`）的 `[Unreleased]` 段都已有对应条目，等下次冷启动判断
-   间隔够了（沿用"1-2 天"节奏）再做版本号提升+tag+发布，三包可能不必同天
-   一起发——`pyobfus` 有 P2-30/32 两项内容，`pyobfus-mcp` 有 P2-31，
-   `vscode-extension` 有 P2-33，各自按自己的发布间隔独立判断即可。
+   下一次按周期节奏（每积累 3-5 个版本或 1-2 周）再看，无需单日盯盘——本轮
+   三包发布后的下载量变化留到下次周期复查一并看。
+6. 竞品/生态扫描节奏：本项目历史扫描是"版本发布前后触发一次"，不是固定
+   周期盯梢（05-09→06-22→07-07→08-06→08-14→08-20，间隔 1-6 周不等）。
+   2026-08-22 又做了一轮（见下方"2026-08-22 扫描"小节），产出的行动项已
+   held 到 main，等下次自然发布节点再切版本号——不要因为"该扫了"本身去扫，
+   要有具体触发点（新对手/生态政策变化）或临近下次发布。
