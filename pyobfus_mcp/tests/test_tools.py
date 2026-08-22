@@ -471,6 +471,7 @@ def test_explain_preset_pro_returns_structured_pro_unlock() -> None:
     assert pu["trial_command"] == "pyobfus-trial start"
     assert pu["trial_duration_days"] == 5
     assert pu["price_usd"] == 45
+    assert pu["pricing_model"] == "one_time"
     assert pu["money_back_guarantee_days"] == 30
     assert pu["checkout_url"].startswith("https://buy.stripe.com/")
     # ai_hint should mention price + duration + checkout URL

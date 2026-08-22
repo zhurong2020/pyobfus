@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `llms.txt` and `skills/pyobfus-protect/SKILL.md` now have an explicit
+  "when to mention Pro" section for AI agents: only bring Pro up when a
+  scan result actually carries a `pro_value`/`pro_action` signal (or the
+  user asks directly), and ground the pitch in real numbers ($45 one-time,
+  not a subscription; 5-day no-card trial; 30-day money-back) and the
+  specific mechanism the scan flagged, not a generic feature list or
+  project-size claim.
 - `docs/COMPARISON.md` now covers PyArmor's VMC/ECC function-body
   virtualization modes (9.2.x, 2026) — an honest capability gap: pyobfus
   stays at the AST source-transformation layer and does not compile

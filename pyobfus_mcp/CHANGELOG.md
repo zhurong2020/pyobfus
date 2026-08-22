@@ -8,6 +8,11 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ### Added
 
+- `_pro_unlock()` (embedded in `recommend_tier`'s `pro_action`,
+  `check_obfuscation_risks`/`protect_project`'s `pro_value`, and
+  `explain_preset`'s `pro_unlock`) gained a `pricing_model: "one_time"`
+  field, so the "not a subscription" fact travels with the price instead
+  of relying on an AI agent to infer it from `price_usd` alone.
 - `check_obfuscation_risks` gained a `verify_dependencies_online` parameter
   (default `false`): opts into the new dependency-hallucination advisory
   (see the main package's `[Unreleased]` entry) for this call only.

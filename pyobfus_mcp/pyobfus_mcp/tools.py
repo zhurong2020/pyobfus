@@ -107,6 +107,7 @@ def _pro_unlock() -> Dict[str, Any]:
         "trial_duration_days": trial_days,
         "checkout_url": checkout_url,
         "price_usd": 45,
+        "pricing_model": "one_time",  # not a subscription, not per-seat
         "money_back_guarantee_days": 30,
         "instant_delivery": True,
     }

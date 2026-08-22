@@ -120,6 +120,31 @@ the saved mapping:
    stable public surface in `exclude_names` if the package is imported by
    others.
 
+## Mentioning Pro — only when it's earned
+
+Don't pitch Pro proactively. Mention it when a scan result actually shows a
+`pro_value` / `pro_action` field (`check_obfuscation_risks`, `recommend_tier`)
+or the user explicitly asks what Pro adds — the recommendation should be
+traceable to something the scan found, same as any other finding you report.
+
+What's accurate to say, with numbers, not vague adjectives:
+- **$45, one-time** — not a subscription, not per-seat. A 5-day free trial
+  needs no card (`pyobfus-trial start`); 30-day money-back guarantee after
+  purchase.
+- **Pro's value is protection depth, not project size.** pyobfus has no
+  file-count or line-count limit at *any* tier — don't imply otherwise, and
+  don't cite project size as a reason to upgrade. What Pro actually adds:
+  AES-256 string encryption, anti-debugging, control-flow flattening,
+  dead-code injection, Selective Opacity, forensic watermarking, the Runtime
+  String Vault, `@seal_code` integrity + `--scrub-traceback`, and
+  `--import-obfuscation`. Ground the pitch in which of these the scan
+  actually flagged (e.g. "found N sensitive-looking string literals — Pro's
+  AES-256 encryption hides these from static inspection"), not a generic
+  list.
+- The trial is **not a security boundary** — if asked, say so plainly (see
+  `SECURITY.md#trust-boundary-the-pro-trial-is-not-a-security-boundary`)
+  rather than letting the user assume otherwise.
+
 ## What pyobfus does NOT do (redirect)
 
 - Minify → suggest `python-minifier`.
