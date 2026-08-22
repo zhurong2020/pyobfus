@@ -323,6 +323,14 @@ except ImportError:
     help="Emit machine-readable JSON output (for --check and future AI-agent integrations).",
 )
 @click.option(
+    "--offline",
+    "offline",
+    is_flag=True,
+    help="With --check: skip the dependency-hallucination advisory's PyPI "
+    "lookups (it runs by default and needs network access). No effect "
+    "outside --check.",
+)
+@click.option(
     "--save-mapping",
     "save_mapping_path",
     type=click.Path(),
@@ -427,6 +435,7 @@ def main(
     jobs: int,
     check_mode: bool,
     json_output: bool,
+    offline: bool,
     save_mapping_path: Optional[str],
     provenance_manifest_path: Optional[str],
     trace_marker: bool,
@@ -448,6 +457,7 @@ def main(
       pyobfus src/ -o dist/ --config pyobfus.yaml
       pyobfus --check src/                  # pre-flight risk scan
       pyobfus --check src/ --json           # machine-readable report
+      pyobfus --check src/ --offline        # skip PyPI dependency lookups
       pyobfus --init-config django
       pyobfus --validate-config pyobfus.yaml
       pyobfus --verify-provenance-manifest provenance.json
@@ -457,7 +467,7 @@ def main(
         if not input_path:
             click.echo("Error: --check requires INPUT_PATH.", err=True)
             sys.exit(1)
-        _handle_check(Path(input_path), json_output=json_output)
+        _handle_check(Path(input_path), json_output=json_output, offline=offline)
         return
 
     # Handle --unmap: reverse obfuscated names in a stack trace
@@ -2035,15 +2045,18 @@ def _handle_unmap(
         click.echo(rewritten, nl=False)
 
 
-def _handle_check(input_path: Path, json_output: bool = False) -> None:
+def _handle_check(input_path: Path, json_output: bool = False, offline: bool = False) -> None:
     """
     Run pre-flight risk scan and print report.
 
-    Exits with code 0 (safe), 1 (high-severity findings), or 2 (parse errors).
+    Includes the dependency-hallucination advisory (PyPI lookups for
+    requirements*.txt / pyproject.toml dependencies) unless --offline is
+    passed. Exits with code 0 (safe), 1 (high-severity findings), or
+    2 (parse errors).
     """
     from pyobfus.core.preflight import PreflightChecker, format_report_text
 
-    checker = PreflightChecker()
+    checker = PreflightChecker(check_dependencies=True, offline=offline)
     report = checker.check_path(input_path)
 
     if json_output:

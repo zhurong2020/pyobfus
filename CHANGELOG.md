@@ -14,6 +14,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   stays at the AST source-transformation layer and does not compile
   function bodies to a private VM instruction set (VMC) or native code
   (ECC).
+- `--check` now runs a **dependency-hallucination advisory**
+  (`dependency_advisory` category, severity `medium`/`info`, does not
+  change `exit_code` semantics): flags declared dependencies in
+  `requirements*.txt` / `pyproject.toml` that don't resolve on public
+  PyPI — the signature of "slopsquatting" (an LLM hallucinates a
+  plausible package name; if an attacker registers it, a routine
+  `pip install` silently pulls in malicious code). Runs by default and
+  needs network access (`https://pypi.org/pypi/<name>/json`); pass
+  `--offline` to skip it. See
+  `docs/DEPENDENCY_ADVISORY_COOKBOOK.md` for the honest scope (it can only
+  prove a nonexistent name, not detect an already-squatted one) and the
+  private-index false-positive caveat. New module:
+  `pyobfus/core/dependency_advisory.py`.
 
 ## [0.5.16] - 2026-08-22
 

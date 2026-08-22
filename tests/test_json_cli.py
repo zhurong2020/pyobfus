@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from unittest import mock
 
 from click.testing import CliRunner
 
@@ -120,6 +121,35 @@ def test_check_json_output_shape(tmp_path: Path) -> None:
     assert "severity_counts" in data
     assert "ai_hint" in data
     assert "exit_code" in data
+
+
+def test_check_offline_flag_skips_dependency_advisory_network_calls(tmp_path: Path) -> None:
+    (tmp_path / "requirements.txt").write_text(
+        "totally-made-up-hallucinated-pkg==1.0\n", encoding="utf-8"
+    )
+    src = tmp_path / "a.py"
+    src.write_text("x = 1\n", encoding="utf-8")
+
+    with mock.patch("pyobfus.core.dependency_advisory._pypi_exists") as mocked:
+        result = CliRunner().invoke(main, ["--check", str(src), "--json", "--offline"])
+        mocked.assert_not_called()
+
+    data = json.loads(result.output)
+    assert data["category_counts"].get("dependency_advisory") is None
+
+
+def test_check_without_offline_runs_dependency_advisory(tmp_path: Path) -> None:
+    (tmp_path / "requirements.txt").write_text(
+        "totally-made-up-hallucinated-pkg==1.0\n", encoding="utf-8"
+    )
+    src = tmp_path / "a.py"
+    src.write_text("x = 1\n", encoding="utf-8")
+
+    with mock.patch("pyobfus.core.dependency_advisory._pypi_exists", return_value=False):
+        result = CliRunner().invoke(main, ["--check", str(src), "--json"])
+
+    data = json.loads(result.output)
+    assert data["category_counts"].get("dependency_advisory") == 1
 
 
 # ---------------------------------------------------------------------------

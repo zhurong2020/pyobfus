@@ -8,6 +8,12 @@ combinations (import-hook / encrypted-file tooling, compiled packaging,
 ML/model-serving). Produces a structured report with severity levels,
 per-file findings, and AI-consumable hints for the next command.
 
+Optionally (``check_dependencies=True``) also runs the dependency-
+hallucination advisory (`pyobfus/core/dependency_advisory.py`), which flags
+declared dependencies that don't resolve on public PyPI — a signal of
+AI-hallucinated ("slopsquatting") or typo'd package names. Off by default;
+see that module's docstring for the network-access tradeoffs.
+
 Used by the `pyobfus --check` CLI flag and by the MCP server tool
 `check_obfuscation_risks`.
 """
@@ -45,6 +51,7 @@ CAT_ENTRY_POINT = "entry_point"
 CAT_UNSAFE_DESERIALIZATION = "unsafe_deserialization"
 CAT_MODEL_ARTIFACT_LITERAL = "model_artifact_literal"
 CAT_COMPAT_ADVISORY = "compatibility_advisory"
+CAT_DEPENDENCY_ADVISORY = "dependency_advisory"
 
 
 @dataclass
@@ -552,8 +559,22 @@ def _looks_like_compiled_source(value: str) -> bool:
 class PreflightChecker:
     """Scan a file or project and produce a PreflightReport."""
 
-    def __init__(self, exclude_patterns: Optional[Sequence[str]] = None) -> None:
+    def __init__(
+        self,
+        exclude_patterns: Optional[Sequence[str]] = None,
+        *,
+        check_dependencies: bool = False,
+        offline: bool = False,
+    ) -> None:
         self.exclude_patterns: List[str] = list(exclude_patterns or [])
+        # Opt-in dependency-hallucination advisory (see
+        # pyobfus/core/dependency_advisory.py). Off by default so existing
+        # callers/tests that construct PreflightChecker() see no behavior
+        # change; the CLI and MCP tool turn it on explicitly.
+        self.check_dependencies = check_dependencies
+        # When check_dependencies is True: skip the PyPI network lookups
+        # (an explicit opt-out, produces no findings/caveats either way).
+        self.offline = offline
 
     def check_path(self, path: Path) -> PreflightReport:
         if path.is_file():
@@ -671,6 +692,15 @@ class PreflightChecker:
                     "with `pyobfus --unmap`. See docs/MODEL_SERVING_COOKBOOK.md.",
                 )
             )
+
+        # Dependency-hallucination advisory (opt-in, see dependency_advisory.py).
+        # Lazy import: dependency_advisory.py imports Risk/severity constants
+        # from this module, so importing it at module load time would cycle.
+        if self.check_dependencies:
+            from pyobfus.core.dependency_advisory import check_dependency_hallucination
+
+            result = check_dependency_hallucination(Path(report.root), offline=self.offline)
+            report.risks.extend(result.risks)
 
         # AI hint: the single next command the user (or an AI agent) should run.
         counts = report.severity_counts()

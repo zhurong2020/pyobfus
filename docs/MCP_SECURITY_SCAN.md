@@ -103,16 +103,29 @@ than assumed:
 
 ```bash
 grep -rln -i "requests\.\|urlopen\|httpx\|urllib\.request\|aiohttp\|\.get(http" \
-  pyobfus_mcp/pyobfus_mcp/*.py
+  pyobfus_mcp/pyobfus_mcp/*.py pyobfus/core/*.py
 ```
 
-Zero matches (2026-08-22, `pyobfus-mcp` 0.3.7 source tree) — there is no
-outbound HTTP/URL-fetch code path anywhere in the package, so no tool can be
-handed a URL and made to issue a request on the server's behalf. SSRF is not
-a currently-applicable risk for this tool surface. This is a point-in-time
-grep against the current source, not a standing guarantee — re-check if a
-future tool ever accepts a URL-shaped parameter or adds an HTTP client
-dependency.
+**Update (post-0.3.7, `[Unreleased]`)**: this now returns one match —
+`pyobfus/core/dependency_advisory.py` (`urllib.request.urlopen`), added for
+the dependency-hallucination advisory. `check_obfuscation_risks` reaches it
+transitively (via `PreflightChecker`), which is why the grep scope above now
+also covers `pyobfus/core/`, not just the `pyobfus_mcp` package itself —
+scoping the check to only the MCP package's own files would have kept
+reporting a stale "zero matches" once a core module it calls into gained
+network code. This still isn't the SSRF pattern the OWASP cheat sheet
+describes, for a specific reason: the request target is
+`https://pypi.org/pypi/{name}/json` with a hardcoded host — the only
+caller-influenced input is a PEP-503-normalized package name substituted
+into the *path*, not the host, and it's percent-encoded
+(`urllib.parse.quote`) before use. No parameter on any tool accepts a URL or
+a host, so no caller can redirect the request anywhere but `pypi.org`. It's
+also off by default: `check_obfuscation_risks` only makes this call when a
+caller explicitly passes `verify_dependencies_online=True` — the MCP
+surface's default egress remains zero. This is a point-in-time grep against
+the current source, not a standing guarantee — re-check it (and re-confirm
+the "hardcoded host, no URL/host parameter" property still holds) after any
+release that touches this code path.
 
 ## Reproducing this yourself
 

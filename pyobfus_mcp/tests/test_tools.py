@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import textwrap
 from pathlib import Path
+from unittest import mock
 
 import yaml
 
@@ -96,6 +97,34 @@ def test_check_obfuscation_risks_path_not_found(tmp_path: Path) -> None:
     result = check_obfuscation_risks(str(nonexistent))
     assert result["status"] == "error"
     assert result["error_type"] == "PathNotFound"
+
+
+def test_check_obfuscation_risks_dependency_check_off_by_default(tmp_path: Path) -> None:
+    """The MCP tool must make no outbound network call unless explicitly asked.
+
+    pyobfus-mcp otherwise has zero egress (docs/MCP_SECURITY_SCAN.md) --
+    verify_dependencies_online defaults to False so that stays true.
+    """
+    _write(tmp_path, "a.py", "x = 1\n")
+    _write(tmp_path, "requirements.txt", "totally-made-up-hallucinated-pkg==1.0\n")
+
+    with mock.patch("pyobfus.core.dependency_advisory._pypi_exists") as mocked:
+        result = check_obfuscation_risks(str(tmp_path))
+        mocked.assert_not_called()
+
+    assert result["category_counts"].get("dependency_advisory") is None
+
+
+def test_check_obfuscation_risks_dependency_check_opt_in(tmp_path: Path) -> None:
+    _write(tmp_path, "a.py", "x = 1\n")
+    _write(tmp_path, "requirements.txt", "totally-made-up-hallucinated-pkg==1.0\n")
+
+    with mock.patch("pyobfus.core.dependency_advisory._pypi_exists", return_value=False):
+        result = check_obfuscation_risks(str(tmp_path), verify_dependencies_online=True)
+
+    assert result["category_counts"].get("dependency_advisory") == 1
+    risk = next(r for r in result["risks"] if r["category"] == "dependency_advisory")
+    assert "totally-made-up-hallucinated-pkg" in risk["message"]
 
 
 # ---------------------------------------------------------------------------

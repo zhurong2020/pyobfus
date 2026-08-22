@@ -1,13 +1,18 @@
 {
-  "digest": "5cf4c902d460706ede83b68ca636b77bdb11d03fb027036dfa025bd5e3d4f7ba",
+  "digest": "bf93cff323ea016e87b1c2a34d0c092d0f237751928494b4f73e5a0edada152c",
   "tools": [
     {
-      "description": "Scan a Python project for patterns that may break obfuscation (eval/exec, dynamic attribute access, framework reflection, unsafe model loading). Returns severity counts, detected frameworks (FastAPI/Django/Flask/Pydantic/Click/SQLAlchemy/ML), and a suggested preset.",
+      "description": "Scan a Python project for patterns that may break obfuscation (eval/exec, dynamic attribute access, framework reflection, unsafe model loading). Returns severity counts, detected frameworks (FastAPI/Django/Flask/Pydantic/Click/SQLAlchemy/ML), and a suggested preset. Also locates requirements*.txt / pyproject.toml and, only if verify_dependencies_online=true, checks each declared dependency against public PyPI to flag AI-hallucinated ('slopsquatting') package names -- off by default, this tool makes no outbound network calls unless you opt in.",
       "input_schema": {
         "properties": {
           "path": {
             "title": "Path",
             "type": "string"
+          },
+          "verify_dependencies_online": {
+            "default": false,
+            "title": "Verify Dependencies Online",
+            "type": "boolean"
           }
         },
         "required": [

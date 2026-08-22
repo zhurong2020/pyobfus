@@ -117,12 +117,17 @@ def _build_server() -> Any:
             "Scan a Python project for patterns that may break obfuscation "
             "(eval/exec, dynamic attribute access, framework reflection, unsafe model loading). "
             "Returns severity counts, detected frameworks (FastAPI/Django/"
-            "Flask/Pydantic/Click/SQLAlchemy/ML), and a suggested preset."
+            "Flask/Pydantic/Click/SQLAlchemy/ML), and a suggested preset. Also "
+            "locates requirements*.txt / pyproject.toml and, only if "
+            "verify_dependencies_online=true, checks each declared dependency "
+            "against public PyPI to flag AI-hallucinated ('slopsquatting') "
+            "package names -- off by default, this tool makes no outbound "
+            "network calls unless you opt in."
         ),
         meta=dict(_META_COMMUNITY),
     )
-    def _check(path: str) -> Dict[str, Any]:
-        return check_obfuscation_risks(path)
+    def _check(path: str, verify_dependencies_online: bool = False) -> Dict[str, Any]:
+        return check_obfuscation_risks(path, verify_dependencies_online=verify_dependencies_online)
 
     @app.tool(
         name="generate_pyobfus_config",

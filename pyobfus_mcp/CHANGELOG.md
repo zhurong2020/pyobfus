@@ -8,12 +8,17 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ### Added
 
-- `docs/MCP_SECURITY_SCAN.md` now documents a manual SSRF / arbitrary-URL
-  fetch-surface check: a grep across the package source confirms no
-  outbound HTTP/URL-fetch code path exists anywhere in `pyobfus-mcp`, so
-  the SSRF class affecting ~36.7% of audited public MCP servers (per the
-  OWASP MCP Security Cheat Sheet) doesn't apply to this tool surface as of
-  0.3.7.
+- `check_obfuscation_risks` gained a `verify_dependencies_online` parameter
+  (default `false`): opts into the new dependency-hallucination advisory
+  (see the main package's `[Unreleased]` entry) for this call only.
+  `pyobfus-mcp` otherwise makes zero outbound network calls, and that stays
+  true by default here too — the check runs, unauthenticated against public
+  PyPI, only when a caller explicitly asks. `docs/MCP_SECURITY_SCAN.md`'s
+  SSRF section is updated accordingly (this is the package's first outbound
+  HTTP code path, reached transitively via `pyobfus.core`; it's a
+  fixed-host call, not a caller-supplied-URL fetch, so it isn't the SSRF
+  pattern the OWASP MCP Security Cheat Sheet describes — see that doc for
+  the full reasoning).
 
 ## [0.3.7] - 2026-08-22
 

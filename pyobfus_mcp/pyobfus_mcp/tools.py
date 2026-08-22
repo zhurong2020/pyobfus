@@ -359,15 +359,28 @@ def _pro_value_for_scan(
 
 
 @secure_tool()
-def check_obfuscation_risks(path: str) -> Dict[str, Any]:
+def check_obfuscation_risks(path: str, verify_dependencies_online: bool = False) -> Dict[str, Any]:
     """Scan a Python project for patterns that may break obfuscation.
 
     Wraps `pyobfus --check`. Returns a structured report with severity
     counts, detected frameworks, a suggested preset, and an `ai_hint`
     telling the calling agent the exact command to run next.
 
+    Also runs the dependency-hallucination advisory (flags declared
+    dependencies in requirements*.txt / pyproject.toml that don't resolve
+    on public PyPI -- a signal of AI-hallucinated "slopsquatting" package
+    names). Unlike `pyobfus --check` on the CLI, this tool does NOT make
+    outbound network calls by default -- pyobfus-mcp otherwise has zero
+    egress (see docs/MCP_SECURITY_SCAN.md), and that stays true unless a
+    caller explicitly opts in here.
+
     Args:
         path: Path to a Python file or directory to scan.
+        verify_dependencies_online: Set True to let this call reach out to
+            pypi.org and verify declared dependencies actually exist there.
+            Off by default (no network access). When off, dependency files
+            are still located but not checked, and no risk is reported for
+            them.
 
     Returns:
         Dict with keys: status, files_scanned, severity_counts,
@@ -390,7 +403,9 @@ def check_obfuscation_risks(path: str) -> Dict[str, Any]:
     except FileNotFoundError as e:
         return _error("PathNotFound", str(e), "Double-check the path and try again.")
 
-    report = PreflightChecker().check_path(target)
+    report = PreflightChecker(
+        check_dependencies=True, offline=not verify_dependencies_online
+    ).check_path(target)
     payload = report.to_dict()
     payload["status"] = "success" if payload.get("exit_code", 0) == 0 else "warnings"
 

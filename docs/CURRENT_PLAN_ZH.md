@@ -67,6 +67,30 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
   （2026-07-27，非搜索摘要含糊提到的"9.2.7"）；`docs/ROADMAP.md` 里旧的
   "9.2.6（June 2026）"月份有误，但那是已归档的历史扫描快照，按惯例不回溯
   改写。两个 commit（`1616e5a`/`462213f`）已推送，等下次自然发布节奏带上。
+- **2026-08-22 又追加（同日新增，非发布，held 在 `[Unreleased]`）：
+  `--check` 新增 `dependency_advisory` 类别**——源自
+  `~/projects/NEXT_TOOL_OPPORTUNITY_SCAN.md` 机会扫描的 A1 候选（Python
+  vibe-coding 安全检查/hallucinated-dependency 检测），user 拍板"先做成
+  pyobfus 内部 advisory 做低成本验证"。检测 `requirements*.txt`/
+  `pyproject.toml` 声明的依赖是否在公开 PyPI 上真实存在，命中"不存在"时
+  给出 MEDIUM 级 risk（含 slopsquatting 说明 + 自定义 index 场景下调低置信度
+  的 caveat）。**CLI 默认联网**（`pyobfus --check` 会真的发 PyPI 请求，
+  `--offline` 关掉）；**MCP 侧 `check_obfuscation_risks` 默认离线**
+  （新增 `verify_dependencies_online` 参数需显式传 `true` 才联网）——两者
+  刻意不同默认值，是为了不让 pyobfus-mcp 已经建立的"零出站网络"安全姿态
+  被静默打破。这也是仓库第一次出现出站网络调用，**上面那条"SSRF 自查……
+  零出站 HTTP 代码路径"的结论已随之更新**（`docs/MCP_SECURITY_SCAN.md` 已
+  同步修订，不是删除旧结论而是记录"新增一条、为什么它不构成 SSRF 模式"）。
+  新模块 `pyobfus/core/dependency_advisory.py` + 新 cookbook
+  `docs/DEPENDENCY_ADVISORY_COOKBOOK.md`（含诚实的能力边界：只能证伪"名字
+  不存在"，抓不到"已被抢注"的更危险场景）。21+6 个新测试，三个测试根
+  +black/ruff/mypy（含 CI 实际用的 `mypy pyobfus/ pyobfus_pro/
+  pyobfus_mcp/pyobfus_mcp/` 联合调用）全绿。**用户已明确要求这次先只提交
+  到 main、不升版本号，等用户后续通知再发布**——不要在没有新指示的情况下
+  自行打 tag/发布。发布前用户还要求：持续关注真实使用情况（GitHub
+  issue/反馈）、可能主动征求用户意见、并观察同类竞品动态，作为后续
+  "留在 pyobfus 内部" vs "拆成独立包/品牌"决策的依据，详见机会扫描文档
+  与 memory `project_next_tool_opportunity_scan_2026-08-22.md`。
 - 外部分发状态：
   - Glama 旧公开 API 路径
     `/api/mcp/v1/servers/io.github.zhurong2020/pyobfus-mcp` 当前返回
@@ -373,8 +397,10 @@ bytecode 加密。
 
 1. `pyobfus 0.5.16` / `pyobfus-mcp 0.3.7` / `vscode-extension 0.4.1` 三包
    已于 2026-08-22 同日发布并全渠道核实（PyPI/MCP Registry/GitHub
-   Release/VS Code Marketplace）。`scripts/check_unreleased_changelogs.py`
-   确认三份 CHANGELOG 均已清空。本轮无遗留的本地机械任务。
+   Release/VS Code Marketplace）。⚠️ **同日晚些时候新增了待发布内容**：
+   `dependency_advisory`（见上方"当前状态"最新一条）已实现+测试+提交到
+   main，`[Unreleased]` 段非空——**下次不要凭"该发布了"的直觉直接切版本号**，
+   用户已明确要求这次要等他主动通知才发布，冷启动先确认是否已收到通知。
 2. `P2-29` compatibility checks（0.5.15）与本轮 `P2-30`~`P2-33`（本轮发布）
    均已收口。后续若有真实用户反馈新的交付组合（如 PyInstaller 之外的
    bundler、其他 import-hook 产品），再机会性扩检测信号或补 cookbook，
@@ -401,3 +427,38 @@ bytecode 加密。
    2026-08-22 又做了一轮（见下方"2026-08-22 扫描"小节），产出的行动项已
    held 到 main，等下次自然发布节点再切版本号——不要因为"该扫了"本身去扫，
    要有具体触发点（新对手/生态政策变化）或临近下次发布。
+7. **新增（2026-08-22，源自 `~/projects/NEXT_TOOL_OPPORTUNITY_SCAN.md`
+   机会扫描）：pyobfus-mcp 去申请 MCP 信任目录徽章**——扫描时发现 MCP
+   信任评分赛道已有至少 4 个独立竞品（MCP Skills 的 Verified badge、
+   Canopii Trust Index、MCP Trust Checker、企业级 MintMCP+SOC2），结论
+   是"不做新产品，去申请徽章"这个低成本分发动作。下次 cold-start 做：
+   ① 去 MCP Skills（mcpskills.io）用 pyobfus-mcp 的 repo/PyPI 包地址跑一次
+   trust score，若 composite score ≥7.0 门槛达标就申领 Verified badge；
+   ② 去 Canopii Trust Index（index.canopii.dev）和 MCP Trust Checker
+   （mcptrustchecker.com）确认 pyobfus-mcp 是否已被收录/评分，未收录则
+   提交登记。三个都是只读扫描 + 表单登记，不涉及代码改动，不占用现有
+   "1-2 天间隔"发布节奏。做完后把结果（score/badge 状态）记回
+   `docs/DISTRIBUTION_CHANNELS.md` 的 Glama 小节旁边。
+8. **新增（2026-08-22）：`dependency_advisory` 发布后的"毕业标准"跟踪
+   计划**——user 明确要求"先内部做、但一定要关注后续使用情况，可能还需要
+   主动征求用户意见，并且观察网上同类竞品的情况"，同时表态自己倾向认为
+   最终独立包更好。发布（等用户通知）之后按下面三条持续跟踪，作为"留在
+   pyobfus 内部" vs "拆成独立包/品牌"的判断依据：
+   - **使用信号**（pyobfus 无遥测，只能看间接信号）：GitHub issue/
+     Discussion 里是否有人主动提到这个检查、是否有人问"能不能脱离混淆
+     单独用"、`--check`/`check_obfuscation_risks` 相关的 Star/下载增量
+     是否在发布窗口后出现异常。每次例行下载量复查（见上面第 5 条）时顺手
+     瞄一眼 GitHub 通知，不用单独起一个监测任务。
+   - **主动征求意见**：下次发布这个功能时，release notes / README 里
+     明确写"这是一个实验性功能，欢迎反馈"并给出 GitHub issue 模板入口，
+     而不是悄悄上线指望自然被发现——用户已经说了"可能还需要主动征求"，
+     不要假设沉默=没需求。
+   - **竞品动态**：`slopcheck` 及其他 hallucinated-dependency /
+     slopsquatting 检测工具的成熟度目前仅初步核实过（见机会扫描文档），
+     下次触发竞品扫描（第 6 条节奏）时顺带查一次这个细分类目是否有新
+     进入者或明显做得更好的对手，而不是假设格局不变。
+   - 判断"何时拆独立包"没有固定时间表，出现下面任一信号就该主动向 user
+     提出讨论，而不是等 user 先问：① 有人明确提出"不要混淆功能，只要这个
+     检查"；② 竞品格局出现值得抢位的空窗（例如 slopcheck 明显不活跃/
+     体验差）；③ 使用信号显著高于 pyobfus 其它 advisory 类别（说明买家
+     画像可能不同，见本次讨论第 2 条判断依据）。
