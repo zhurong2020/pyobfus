@@ -6,6 +6,8 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+## [0.3.7] - 2026-08-22
+
 ### Added
 
 - Independent security scan documented: Cisco's open-source `mcp-scanner` run
