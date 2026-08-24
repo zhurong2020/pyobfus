@@ -1,7 +1,7 @@
 # pyobfus 当前计划
 
-更新时间：2026-08-24（`pyobfus` 0.5.17 / `pyobfus-mcp` 0.3.8 已进入发版准备，
-尚未打 tag 或发布；`vscode-extension` 最新仍为 0.4.1）
+更新时间：2026-08-24（`pyobfus` 0.5.17 / `pyobfus-mcp` 0.3.8 已发布；
+`vscode-extension` 最新仍为 0.4.1）
 
 这份文档是当前项目状态和后续计划的中文单一入口，面向维护者日常查看。旧的
 `ROADMAP.md` 和 `POST_V0.4_TODO.md` 保留为历史归档和详细来源，但后续日常
@@ -18,20 +18,19 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
 
 ## 当前状态
 
-- **2026-08-24 发版准备中**：用户已解除 `dependency_advisory` 的等待 gate，
-  准备发布 `pyobfus 0.5.17` 与 `pyobfus-mcp 0.3.8`；版本元数据、CHANGELOG、
-  README/AI 文档已开始同步。当前边界是“准备到可发布”，尚未打 tag、推送发布
-  commit、上传 PyPI 或发布 MCP Registry。VS Code 扩展 `[Unreleased]` 为空，
-  本轮保持 0.4.1 不动。
+- **2026-08-24 发布完成**：`pyobfus 0.5.17` 与 `pyobfus-mcp 0.3.8` 已通过
+  tag 触发的 OIDC workflow 发布到 PyPI，两个 wheel 的 Integrity provenance
+  endpoint 均返回 HTTP 200；GitHub Releases 已创建。MCP Registry 0.3.8 已
+  发布并公开核实为 `active` / `isLatest=true`。VS Code 扩展 `[Unreleased]`
+  为空，本轮保持 0.4.1 不动。
 
-- 主包：`pyobfus 0.5.16` 已发布（2026-08-22，docs-only）——`docs/COMPARISON.md`
-  加 PyLocket 对比小节（P2-30）+ Python 3.14 free-threading 兼容性验证并文档化
-  （P2-32，`docs/PYTHON314_FREETHREADING.md`）。内容本身在 08-20 扫描当天就已
-  实现+提交，按"功能先合并、发布单独 gate"的节奏 held 了两天，本轮统一发布。
-  距上次发布（0.5.15，08-20）2 天，符合"1-2 天间隔、不批量"的节奏。
-- MCP 包：`pyobfus-mcp 0.3.7` 已发布（2026-08-22，docs-only）——记录 Cisco
-  `mcp-scanner` 独立安全扫描结果（P2-31，8/8 工具 SAFE、0 findings）。PyPI +
-  MCP Registry 同步发布，`isLatest=true` 已核实。
+- 主包：`pyobfus 0.5.17` 已发布（2026-08-24）——`--check` 新增
+  `dependency_advisory`，默认联网核实声明的依赖名是否存在于公开 PyPI，
+  `--offline` 可关闭；同时发布诚实 Pro 引导、PyArmor VMC/ECC 对比和 Community
+  项目规模口径修正。
+- MCP 包：`pyobfus-mcp 0.3.8` 已发布（2026-08-24）——新增默认关闭的
+  `verify_dependencies_online` 参数，维持默认零出站网络；补
+  `pricing_model: one_time`，并将依赖下限提升到 `pyobfus>=0.5.17`。
 - VS Code 扩展：`0.4.1` 已 tag + GitHub Release 发布（P2-33，"Why trust this
   extension" 小节强化 Nx Console 事件对比 + CodeQL/CI 签名信号），**Marketplace
   手工上传也已由用户完成**——微软 "[Succeeded]" 确认邮件已收到，公开 listing
@@ -424,11 +423,10 @@ bytecode 加密。
 
 ## 下次工作建议
 
-1. `dependency_advisory` 的等待 gate 已由用户于 2026-08-24 解除；候选版本
-   `pyobfus 0.5.17` / `pyobfus-mcp 0.3.8` 已完成版本号、CHANGELOG、README/
-   AI 文档同步和本地发布前验证。下一步须由用户明确确认后，才提交发布准备
-   commit、打 `v0.5.17` / `mcp-v0.3.8` tag，并触发 PyPI OIDC / MCP Registry
-   发布；`vscode-extension` 本轮无待发布内容，保持 0.4.1。
+1. `dependency_advisory` 已随 `pyobfus 0.5.17` / `pyobfus-mcp 0.3.8` 发布并
+   完成 PyPI、PEP 740 provenance、GitHub Release、MCP Registry 全渠道核实。
+   下一步按下方毕业标准收集真实使用反馈；`vscode-extension` 本轮无待发布
+   内容，保持 0.4.1。
 2. `P2-29` compatibility checks（0.5.15）与本轮 `P2-30`~`P2-33`（本轮发布）
    均已收口。后续若有真实用户反馈新的交付组合（如 PyInstaller 之外的
    bundler、其他 import-hook 产品），再机会性扩检测信号或补 cookbook，
