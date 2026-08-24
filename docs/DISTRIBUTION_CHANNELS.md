@@ -115,10 +115,31 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   is now `e44e687` while repository HEAD is `8f00fba`; this does not change the
   runtime package because the Dockerfile explicitly installs the PyPI 0.3.8
   artifact, but it does explain stale checkout/page metadata. No local code fix.
+- 2026-08-24 final test evidence (user-supplied admin logs): test
+  `01a033e4-3336-7e7b-9792-0d7e056d2dba` completed **success** in 12.1s.
+  Install logs confirm `pyobfus-mcp==0.3.8` plus `pyobfus==0.5.17`; the live
+  `ListToolsRequest` returned all 8 tools and the new
+  `verify_dependencies_online` input field. This closes the build/runtime side
+  completely. The public API's `tools: []` is now proven to be directory sync
+  drift, not a server introspection failure. Build Spec reports
+  `pinnedCommit: null` even though generated clone logs still checkout
+  `e44e687`, another Glama metadata inconsistency with no runtime impact.
+
+### MCP Skills trust score — 🟡 ESTABLISHED / NOT VERIFIED
+- 2026-08-24 official free score API scan for `zhurong2020/pyobfus`: composite
+  **6.06**, tier `established`, 14 signals, `verified=false`.
+- Positive evidence: `no safety findings`; the scanner detected the AI skill.
+- Blocking flags: `SINGLE_AUTHOR_LOW_ADOPTION` and `low_legit`. Because Verified
+  requires composite >=7.0 plus dimension floors and no disqualifiers, the repo
+  cannot claim the gold badge yet.
+- Decision: do not buy the $2 full report or optimize code/docs merely to game
+  the score. Re-scan after genuine adoption/contributor growth; external
+  contributors, stars and real usage should improve the weak dimension
+  honestly.
 
 ### Claude Plugin Marketplace 🟡 PENDING
 - Console entry: `pyobfus`
-- 2026-08-21 recheck: still `Submitted and pending review`, submission date Aug 2 (Console is login-gated; verified by maintainer's manual check on 08-20, no change).
+- 2026-08-24 maintainer recheck: still `Submitted and pending review`, submission date Aug 2.
 - Known copy issue: submitted description says `protected_project`; correct tool name is `protect_project`. Do not resubmit only for this typo; fix opportunistically if Anthropic exposes an edit/request-changes path.
 
 ### OpenSSF Best Practices passing badge 🟢 LIVE
