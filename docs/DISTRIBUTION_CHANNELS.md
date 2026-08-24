@@ -53,7 +53,7 @@ For the frozen post-release evidence and recheck checklist from 2026-08-24, see
   prior is not evidence of an actual review. Continue tracking installs and
   real reviews, not raw update/download count alone.
 - Wiki: disabled · Discussions: enabled · Issues: open
-- Releases: latest `v0.5.16` (2026-08-22); earlier releases `v0.3.3` … `v0.5.15`, plus `mcp-v0.3.x` and `vscode-v0.x` tags (mcp releases attach wheel+sdist).
+- Releases: latest `v0.5.17` (2026-08-24); earlier releases `v0.3.3` … `v0.5.16`, plus `mcp-v0.3.x` and `vscode-v0.x` tags (mcp releases attach wheel+sdist).
 
 ### 有心工坊 (personal blog)
 - URL: https://www.arong.eu.org
@@ -98,7 +98,7 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 ### MCP Registry — `io.github.zhurong2020/pyobfus-mcp` 🟢 LIVE
 - URL: https://registry.modelcontextprotocol.io/v0/servers?search=pyobfus
 - Latest published: **0.3.8** (2026-08-24) · status: `active` · `isLatest=true` confirmed via `mcp-publisher publish` (GitHub device-code re-auth) and the public search endpoint.
-- 0.3.7 contents: docs-only, see PyPI section above. Previous 0.3.6 hardening: `pyobfus_mcp/server.json` validates against the official `2025-12-11` schema and includes GitHub repository stable ID `1093960892`; `fileSha256` remains omitted because the PyPI wheel/sdist multi-artifact model makes a single optional hash ambiguous.
+- 0.3.8 contents: opt-in dependency-name verification, structured one-time-pricing guidance, and runtime floor `pyobfus>=0.5.17`; see the PyPI section above. Previous 0.3.6 hardening: `pyobfus_mcp/server.json` validates against the official `2025-12-11` schema and includes GitHub repository stable ID `1093960892`; `fileSha256` remains omitted because the PyPI wheel/sdist multi-artifact model makes a single optional hash ambiguous.
 - Implications: Claude Desktop / Claude Code / Cursor / Windsurf / Zed users querying the registry for "pyobfus" or "python obfuscator" will discover this server without manual config file edits.
 
 ### Glama — `zhurong2020/pyobfus` 🟡 LISTED / API STALE

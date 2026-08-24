@@ -12,6 +12,24 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
+### ✅ 2026-08-24 — 0.5.17 / MCP 0.3.8 发布与外部渠道收尾
+
+- `pyobfus 0.5.17`、`pyobfus-mcp 0.3.8` 已通过 OIDC 发布；PyPI PEP 740
+  provenance、GitHub Releases、MCP Registry `active` / `isLatest=true` 均已
+  核实。VS Code 扩展保持 0.4.1。
+- 本轮发布 `dependency_advisory`：CLI 默认联网、`--offline` 可关闭；MCP 的
+  `verify_dependencies_online` 默认 false，只有显式 opt-in 才访问 PyPI。
+- Glama 21:09 测试成功（12.1s），实际安装 Core 0.5.17 + MCP 0.3.8，实时
+  `ListToolsRequest` 返回完整 8 工具。公开 API 的 `tools: []` 已坐实为 Glama
+  目录同步问题；不再改本地代码或重复排查容器运行时。
+- Claude plugin 仍为 Aug 2 `Submitted and pending review`。MCP Skills 扫描为
+  6.06 / established / no safety findings，因低采用和单作者未达 Verified。
+  Canopii 的 39/F 来自扫描 sibling Pro runtime 的 `marshal.loads` 语法命中，
+  MCP 输入无可达路径；先 claim + 请求按 0.3.8 重扫，仍命中再报上游误报。
+- 冷启动的完整数字、证据边界与 2-3 天后复查清单见
+  [`docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md`](docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md)。
+  当前开发/产品优先级仍只看 `docs/CURRENT_PLAN_ZH.md`。
+
 ### ✅ 2026-08-21 — 周期性复查（下载量 + Glama + Claude plugin），全部无变化
 
 按"周期性发布后复盘节奏"做的轻量复查（非完整竞品扫描；2026-08-20 刚做过
@@ -245,12 +263,12 @@ cardiac-manuscripts 仓库（不影响 pyobfus 仓库本身）。
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.9-3.14, AST, setuptools
-- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.16，2026-08-22 发布**；完整版本历史见 `CHANGELOG.md`)
+- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.17，2026-08-24 发布**；完整版本历史见 `CHANGELOG.md`)
 - **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.1，2026-08-22 发布**（tag+GitHub Release+Marketplace 手工上传均已完成，`curl` 核实公开 listing 已返回 `"version":"0.4.1"`）；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`)
-- **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.7，2026-08-22 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.1` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
-- **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp` (active, isLatest=true · **0.3.7**，2026-08-22 发布，`registry.modelcontextprotocol.io` 直查核实)
+- **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.8，2026-08-24 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.17` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
+- **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp` (active, isLatest=true · **0.3.8**，2026-08-24 发布，`registry.modelcontextprotocol.io` 直查核实)
 - **Smithery (Skill)**: https://smithery.ai/skills/zhurong2020/pyobfus-protect (2026-06-22 上线 · 本地工具走 Skill 渠道非 MCP 渠道) · **mcp.so**: 已收录
-- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus (Quality A) — Glama 容器 build 自 **admin Dockerfile→Configuration「Build steps」字段**(web-UI)，**不读 repo 的 `pyobfus_mcp/Dockerfile`**，且**不自动跟 PyPI 最新**：每次发 mcp 新版都要手动把该字段的 `pyobfus-mcp==<ver>` bump 一次，否则 listing 静默供旧工具面——**发布必做步骤**，已进 `docs/V0.5_RELEASE_PLAN.md` Phase 5.6。**2026-08-17 mcp 0.3.6 发布后**：Build steps 字段已由用户手工改成 `pyobfus-mcp==0.3.6`（确认无误），但触发的新构建（`01a00e39-...`）15 分钟后失败（`ECONNRESET`/"aborted"，卡在拉取 `debian:trixie-slim` 基础镜像元数据这一步）——与 08-07 那次失败是第二个独立复现实例，同一卡点、不同错误签名，非我方包/配置问题，用户决定继续观察，暂不追加 Discord 消息/手动重试。详见 memory `glama_zero_tools_repro_2026-08-07.md`。「Recent Releases」的版本号(如 0.5.4)是 Glama 自增计数、与实装版本无关，忽略。**2026-08-17 状态**：公开页面可访问且页面内容显示 8 个 tool 名称；旧 public API 路径 `/api/mcp/v1/servers/io.github.zhurong2020/pyobfus-mcp` 已返回 `not_found`，不再沿用早前 `tools: []` 判断；user 手工查 Glama Discord 对应频道，暂时没有回复。当前按外部 listing/API drift 记录并跳过，除非 Glama 给出新复现或修改要求。历史排障结论仍成立：pyobfus-mcp 包、mcp-proxy 桥接、Glama 构建和 Glama 内省此前均已证明能返回 8/8 tools。教训 memory `glama_introspection_dockerfile_pin_2026-06-05` + `glama_zero_tools_repro_2026-08-07` · 历史 `docs/POST_V0.4_TODO.md`
+- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus (Quality A) — admin Build steps 已自动更新到 `pyobfus-mcp==0.3.8`；2026-08-24 测试 `01a033e4-3336-7e7b-9792-0d7e056d2dba` success（12.1s），实时枚举完整 8 工具。公开 API 仍 `tools: []`，属于 Glama 目录同步漂移，非包、Docker 或 MCP introspection 故障。后续只查公开 API/Discord 回复；历史排障见 memory `glama_introspection_dockerfile_pin_2026-06-05`、`glama_zero_tools_repro_2026-08-07`，最新证据见 `docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md`。
 - **GitHub**: https://github.com/zhurong2020/pyobfus (public)
 - **文档**: https://pyobfus.readthedocs.io
 - **许可**: Apache 2.0 (Core) + Proprietary (Pro)
@@ -265,7 +283,7 @@ pyobfus/
 │   ├── transformers/   # AST 变换器
 │   └── cross_file/    # 跨文件混淆
 ├── pyobfus_pro/       # Pro Edition (商业许可)
-├── tests/             # 1033 测试用例 (90% coverage · 0.5.3 发布版)
+├── tests/             # 1192 passed + 1 skipped (90% coverage · 0.5.17 发布前验证)
 ├── examples/          # 示例代码
 ├── docs/              # 项目文档
 └── cloudflare-worker/ # 许可验证 Worker
