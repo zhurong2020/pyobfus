@@ -40,10 +40,10 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
   held 了几天没人想起来一起发——写了个脚本扫描仓库内三份 CHANGELOG 的
   `[Unreleased]` 段落，已接入本地专用的 `docs/internal/PYPI_RELEASE_GUIDE.md`
   发布前检查清单，避免同类遗漏再犯。
-- Glama admin「Build steps」此前已由用户手工改到 `pyobfus-mcp==0.3.6`，触发的
-  构建失败（`ECONNRESET`，卡在拉取 base image 这一步）是平台侧问题，非我方
-  配置——详见下方 P0 小节；`pyobfus-mcp` 0.3.7 发布后尚未重新触发 Glama 构建
-  （无强制要求，等下次冷启动或用户主动重 pin 时再做）。
+- Glama admin「Build steps」已于 2026-08-24 自动更新到
+  `pyobfus-mcp==0.3.8`，并触发 21:09 的新测试记录；页面摘录未显示测试终态，
+  暂不写成成功。新公开 API 路径可访问但仍返回 `tools: []`，继续判断为 Glama
+  目录/内省同步问题，非我方包或配置问题。
 - GitHub：主分支健康，当前公开 issues/PRs 为 0，CI/CodeQL 全绿。
 - README/`llms.txt`/两个 `pyproject.toml`/`server.json` 的 AI 客户端定位
   文案已补 GitHub Copilot + CodeBuddy（实时搜索核实后添加，非训练记忆），
@@ -437,11 +437,9 @@ bytecode 加密。
    消息、不改代码。✅ **2026-08-21 已复查**：旧 API 路径仍 `not_found`、
    公开页面 8 工具可列出但版本元数据陈旧（v0.5.13，且 08-22 发现它把核心包
    `pyobfus` 的 Release 标签和 `pyobfus-mcp` 自己的版本号搞混，见
-   `docs/DISTRIBUTION_CHANNELS.md` Glama 小节）。`pyobfus-mcp` 0.3.7
-   发布后尚未重新 pin Build steps 触发新构建（非必需，等下次冷启动或用户
-   主动重 pin）。下次冷启动检查：① 两条帖子有没有回复；② 公开页面/API
-   `tools` 字段；③ Recent Tests 有没有新构建尝试（①② 可程序化，③ 需 user
-   登录 admin 面板）。
+   `docs/DISTRIBUTION_CHANNELS.md` Glama 小节）。`pyobfus-mcp==0.3.8` Build
+   steps 已更新并触发新测试，无需再手工 re-pin。下次只需检查：① 21:09 测试
+   的最终日志/状态；② 公开 API 的 `tools: []` 是否恢复；③ Discord 是否回复。
 4. Claude plugin marketplace：仍 `Submitted and pending review`（Aug 2），
    只需确认是否出现 approve/reject/补充信息。
 5. 下载量：上次复查 2026-08-21，与 08-20 基线完全一致（`pyobfus`

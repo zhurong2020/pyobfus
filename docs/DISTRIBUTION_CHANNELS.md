@@ -84,6 +84,17 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 - 2026-08-21 recheck: the public page is reachable and still exposes 8 tool names, but its version metadata is stale (shows v0.5.13; current is 0.5.16); the older API path `/api/mcp/v1/servers/io.github.zhurong2020/pyobfus-mcp` still returns `not_found`.
 - 2026-08-20: third-party maintainers independently reproduced both symptoms (build stuck on `debian:trixie-slim`, page OK but public API stale) — confirms this is Glama-side infra/sync, not a pyobfus-mcp code issue. Discord `#support` still unanswered as of 08-21; policy is passive-wait, no code change, no re-pin until Glama responds.
 - 2026-08-22 recheck (post 0.5.16 release, user-supplied page dump): "Recent Releases" panel now lists **`0.5.12` dated 2026-08-22** — that version number belongs to the core `pyobfus` package's last GitHub Release (tagged 2026-08-06, before this session added `v0.5.16`), not to `pyobfus-mcp`'s own 0.3.x scheme, so Glama appears to be pulling GitHub Release tags from the shared `zhurong2020/pyobfus` repo without filtering by which sub-package they belong to, and mislabeling the date on top of that. Configured "Pinned commit SHA" also still reads `cd823d1` (pre-dates the 0.5.16 release commit `f694f3a`). Same underlying Glama-side crawler defect as above — no action taken, policy unchanged.
+- 2026-08-24 post-0.3.8 recheck (user-supplied admin page): Build steps has already
+  updated correctly to `pyobfus-mcp==0.3.8` and triggered Recent Test
+  `01a033e4-3336-7e7b-9792-0d7e056d2dba` at 21:09. The page excerpt does not
+  expose that test's pass/fail result, so record it only as "triggered", not
+  "successful". Glama's newly advertised API path
+  `/api/mcp/v1/servers/zhurong2020/pyobfus` is reachable but still returns
+  `tools: []`. "Recent Releases" now calls the same event `0.5.14`, again proving
+  that panel's numbering is not the MCP package's real 0.3.x version. Pinned SHA
+  is now `e44e687` while repository HEAD is `8f00fba`; this does not change the
+  runtime package because the Dockerfile explicitly installs the PyPI 0.3.8
+  artifact, but it does explain stale checkout/page metadata. No local code fix.
 
 ### Claude Plugin Marketplace 🟡 PENDING
 - Console entry: `pyobfus`
