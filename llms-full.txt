@@ -75,6 +75,7 @@ Error JSON schema (applies to LimitExceededError / PyObfusError / ParseError / g
 ```bash
 pyobfus --check src/                # human-readable
 pyobfus --check src/ --json         # for AI agents + CI
+pyobfus --check src/ --offline      # skip public-PyPI dependency verification
 ```
 
 Detects:

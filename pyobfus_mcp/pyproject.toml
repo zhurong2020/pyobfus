@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyobfus-mcp"
-version = "0.3.7"
+version = "0.3.8"
 description = "Model Context Protocol server for pyobfus — the Python obfuscator. Lets Claude Desktop, Claude Code, Cursor, GitHub Copilot, Windsurf, Zed, Codex, and CodeBuddy call pyobfus tools (preflight risk check, zero-config init, reverse stack-trace mapping) directly from an agent conversation. PyArmor alternative with first-class AI-debug story."
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.10"
@@ -37,7 +37,7 @@ dependencies = [
     # composable flags (Selective Opacity / watermarking / Vault /
     # --scrub-traceback / @seal_code), which land in pyobfus 0.5.1. Publish
     # pyobfus 0.5.1 before this MCP release.
-    "pyobfus>=0.5.1",
+    "pyobfus>=0.5.17",
     # Pin to mcp >=1.27 because that's the SDK we develop and test against
     # (the same version that surfaced the 0.1.1 FastMCP API drift). The 1.27
     # API has the `meta=` kwarg on @app.tool() that we use for tool versioning

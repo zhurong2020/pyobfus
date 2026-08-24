@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.17] - 2026-08-24
+
 ### Added
 
 - `llms.txt` and `skills/pyobfus-protect/SKILL.md` now have an explicit
@@ -55,6 +57,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   lines/file (2026-05-09). `config_schema.py`'s field descriptions for
   `max_files`/`max_total_loc` now describe them accurately as an optional,
   self-imposed cap rather than an automatic Community-tier gate.
+
+## [0.5.16] - 2026-08-22
 
 ### Added
 

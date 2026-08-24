@@ -20,13 +20,15 @@ A Python code obfuscator built with AST-based transformations. **Supports Python
 
 > **🔒 Pro Edition available** — 6 patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator, $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
 
-> **🔧 What's new in v0.5.15** — `--check` now flags real-world delivery-combo
-> risks as a new `compatibility_advisory` category (import-hook/encrypted-file
-> loaders like SOURCEdefender, compiled packaging via Nuitka/Cython,
-> model-serving), surfaced automatically in VS Code diagnostics and the MCP
-> `check_obfuscation_risks` tool. New cookbooks and runnable examples cover
-> each combo end-to-end. Full details in the [CHANGELOG](CHANGELOG.md); see
-> [Pro Edition](#-pro-edition) below.
+> **🔧 What's new in v0.5.17** — `pyobfus --check` now verifies declared
+> dependencies against public PyPI and reports nonexistent names as a
+> `dependency_advisory`, helping catch hallucinated-package / slopsquatting
+> risk before installation. Use `--offline` for private-index or offline
+> workflows. The MCP server keeps its zero-outbound default and only enables
+> this lookup when `verify_dependencies_online=true`. This is an experimental
+> advisory with deliberately narrow scope; feedback is welcome via
+> [GitHub Issues](https://github.com/zhurong2020/pyobfus/issues). Full details
+> and limitations are in the [cookbook](docs/DEPENDENCY_ADVISORY_COOKBOOK.md).
 
 > 🔔 **Starring this repo doesn't notify you about new releases** — GitHub only
 > sends release notifications to people who explicitly **Watch** it. Click
@@ -47,7 +49,7 @@ The MCP server lives in [`pyobfus_mcp/`](pyobfus_mcp/) and is built on the offic
 | MCP tool | Implementation | Purpose |
 |---|---|---|
 | `protect_project` | [`pyobfus_mcp/tools.py`](pyobfus_mcp/pyobfus_mcp/tools.py) | **One-call, self-verifying pipeline**: scan → preset → obfuscate → byte-compile + import-smoke-test the output → return `verified: true/false`. The agent reports a green check instead of hoping the transform didn't break anything |
-| `check_obfuscation_risks` | [`pyobfus_mcp/tools.py`](pyobfus_mcp/pyobfus_mcp/tools.py) | Pre-flight risk scan (eval/exec, dynamic attribute, framework reflection) |
+| `check_obfuscation_risks` | [`pyobfus_mcp/tools.py`](pyobfus_mcp/pyobfus_mcp/tools.py) | Pre-flight risk scan; pass `verify_dependencies_online=true` to check declared package names against public PyPI. |
 | `generate_pyobfus_config` | [`pyobfus_mcp/tools.py`](pyobfus_mcp/pyobfus_mcp/tools.py) | Auto-detect framework → write a working `pyobfus.yaml` |
 | `unmap_stack_trace` | [`pyobfus_mcp/tools.py`](pyobfus_mcp/pyobfus_mcp/tools.py) | Reverse obfuscated identifiers in a production stack trace |
 | `list_presets` | [`pyobfus_mcp/tools.py`](pyobfus_mcp/pyobfus_mcp/tools.py) | Enumerate community / framework / Pro presets |
@@ -74,7 +76,7 @@ pyobfus is also on the [VS Code Marketplace](https://marketplace.visualstudio.co
 
 ### 🤖 AI-native features
 
-- **`pyobfus --check src/`** — pre-flight risk scan: detects `eval`/`exec`, dynamic attribute access, and framework reflection points before you obfuscate. JSON output with an `ai_hint` telling your AI assistant what to run next.
+- **`pyobfus --check src/`** — pre-flight risk scan: detects `eval`/`exec`, dynamic attribute access, framework reflection points, and declared dependencies that do not exist on public PyPI before you obfuscate. The dependency lookup is enabled by default; use `--offline` to skip it. JSON output includes an `ai_hint` telling your AI assistant what to run next.
 - **`pyobfus --init src/`** — zero-config onboarding: scans the project, detects FastAPI/Django/Pydantic/Click/SQLAlchemy, and writes a ready-to-use `pyobfus.yaml`.
 - **`pyobfus --unmap --trace error.log --mapping mapping.json`** — reverse obfuscated identifiers in a production stack trace so you can debug (or hand the trace to an AI assistant) without reversing the obfuscation itself.
 - **`pyobfus … --save-mapping mapping.json --trace-marker`** — stamp each obfuscated file with a `# pyobfus:obfuscated` header (id + mapping filename + the exact `--unmap` command) so an AI agent that lands in an obfuscated file from a traceback immediately knows it's pyobfus output and how to reverse the names.

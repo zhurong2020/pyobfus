@@ -6,6 +6,8 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+## [0.3.8] - 2026-08-24
+
 ### Added
 
 - `_pro_unlock()` (embedded in `recommend_tier`'s `pro_action`,
@@ -13,9 +15,12 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
   `explain_preset`'s `pro_unlock`) gained a `pricing_model: "one_time"`
   field, so the "not a subscription" fact travels with the price instead
   of relying on an AI agent to infer it from `price_usd` alone.
+- The runtime dependency floor is now `pyobfus>=0.5.17`, ensuring the MCP
+  package always has the dependency-advisory implementation its new online
+  verification parameter invokes.
 - `check_obfuscation_risks` gained a `verify_dependencies_online` parameter
   (default `false`): opts into the new dependency-hallucination advisory
-  (see the main package's `[Unreleased]` entry) for this call only.
+  (see the main package's `0.5.17` entry) for this call only.
   `pyobfus-mcp` otherwise makes zero outbound network calls, and that stays
   true by default here too — the check runs, unauthenticated against public
   PyPI, only when a caller explicitly asks. `docs/MCP_SECURITY_SCAN.md`'s
@@ -30,7 +35,7 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 - `recommend_tier`'s `pro_tier_capabilities` no longer lists "Unlimited
   files and lines of code" as a Pro-exclusive benefit — verified this
   isn't actually gated by tier in the default obfuscation path (see the
-  main `pyobfus` package's `[Unreleased]` Fixed entry for the full
+  main `pyobfus` package's `0.5.17` Fixed entry for the full
   investigation). `free_tier_capabilities` now states the accurate,
   positive fact instead: no file/line limit at any tier, contrasted with
   PyArmor's measured ~935-940 line/file trial cap.
