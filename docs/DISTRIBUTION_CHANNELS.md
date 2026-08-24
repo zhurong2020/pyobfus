@@ -18,12 +18,20 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 - Current version: **0.5.17** (released 2026-08-24) · ships with PEP 740 attestations via OIDC trusted publishing
 - Current headline: experimental `dependency_advisory` in `--check` verifies declared package names against public PyPI (`--offline` disables it), with explicit feedback requested before deciding whether to split it into a standalone package.
 - Pre-v0.4 baseline: ~324 downloads / month, ~30% real users (rest is mirror noise)
+- 2026-08-24 pypistats snapshot (data through 08-23, known mirrors excluded):
+  day/week/month `27 / 502 / 2,059`. Weekly growth is dominated by release-day
+  spikes (08-17 `124`, 08-20 `119`, 08-22 `151`); 08-23 returned to `27`, so
+  this is not yet evidence of a higher organic baseline.
 - Tracker: `gh api repos/zhurong2020/pyobfus` + PePy
 
 ### PyPI — `pyobfus-mcp`
 - URL: https://pypi.org/project/pyobfus-mcp/
 - Current version: **0.3.8** (released 2026-08-24) · ships with PEP 740 attestations via OIDC trusted publishing
 - 0.3.8 contents: `check_obfuscation_risks` adds opt-in `verify_dependencies_online` (default false), structured Pro guidance adds `pricing_model: one_time`, and the runtime dependency floor moves to `pyobfus>=0.5.17`.
+- 2026-08-24 pypistats snapshot (data through 08-23, known mirrors excluded):
+  day/week/month `11 / 242 / 772`. Release-day spikes (08-17 `95`, 08-22 `110`)
+  dominate the weekly increase; 08-23 returned to `11`. CI/CD traffic remains
+  included, so do not treat the increase as organic adoption yet.
 
 ### GitHub — `zhurong2020/pyobfus`
 - URL: https://github.com/zhurong2020/pyobfus
