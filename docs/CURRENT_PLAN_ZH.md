@@ -69,6 +69,22 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
   “周/月累计上升”，不升级为自然用户增长信号；pypistats 会排除已知镜像，
   但仍包含 CI/CD 下载。下一次最早在数据覆盖 08-24 发布后 2-3 天时复查，
   且仍以非发布日基线是否抬升为判断标准。
+- **2026-08-24 发布后反馈全量审计**：GitHub 当前 0 open issue、0 open PR；
+  Discussions 共 6 条，最新项目公告仍为 08-01 且 0 评论，尚无人提到
+  `dependency_advisory` 或要求脱离混淆单独使用。仓库已有 6 stars / 2 forks；
+  过去 14 天 GitHub Traffic 为 155 views / 65 unique visitors、1,480 clones /
+  158 unique cloners。克隆量同样由 08-17/20/22 发布日尖峰主导，但 08-23
+  仍有 10 个 unique clones，是比“仅下载量”稍强、但仍不足以证明留存的弱
+  兴趣信号。来源包括 GitHub、Google、Bing、PyPI、ChatGPT；Stripe/Jira 各
+  只有 1 个来源访问，不能解释为购买或企业采用。VS Code Marketplace API：
+  0.4.1、3 installs、124 downloads，无可识别的真实评分/评论信号。最新 main
+  CI、CodeQL、Pages 及两个 release workflow 全绿。
+- 同类工具扫描确认不能把 `dependency_advisory` 当成空白赛道：Python/PyPI
+  已有名为 `slopcheck` 的独立工具，另有 `slopscan`；npm 侧同名 slopcheck
+  已扩展到 markdown/agent rule 文件、unpublished/security-hold 检测。近期研究
+  也在做已注册包的年龄、发布次数、作者/仓库等概率式风险判断。当前 pyobfus
+  的“只证伪不存在的声明依赖”定位仍诚实，但若将来独立，差异化不能只停留
+  在 PyPI 404 检查，应优先考虑 AI-agent JSON/SARIF 工作流和注册后可疑度证据。
 - **2026-08-22 追加（非发布，held 在 `[Unreleased]`）**：一次竞品/MCP 安全
   调研顺带产出两处已核实的诚实文档更新——`docs/COMPARISON.md` 补 PyArmor
   VMC（可逆 VM 字节码）/ECC（不可逆 C 编译）函数体虚拟化模式的技术细节，
@@ -494,4 +510,20 @@ bytecode 加密。
      提出讨论，而不是等 user 先问：① 有人明确提出"不要混淆功能，只要这个
      检查"；② 竞品格局出现值得抢位的空窗（例如 slopcheck 明显不活跃/
      体验差）；③ 使用信号显著高于 pyobfus 其它 advisory 类别（说明买家
-     画像可能不同，见本次讨论第 2 条判断依据）。
+   画像可能不同，见本次讨论第 2 条判断依据）。
+9. **2026-08-24 审计后的执行顺序**：
+   - 先等 2-3 个完整数据日，复查 08-24 发布后的非发布日 PyPI/GitHub unique
+     clone 基线；同时看 issue、Discussion、README/CHANGELOG 路径访问，不因
+     发布当天沉默提前下结论。
+   - 由维护者手工核实 Claude plugin Console 状态和 Glama 21:09 测试终态；
+     两者有登录墙，程序化检查不能替代。
+   - 低成本分发优先于写新功能：实际跑 MCP Skills / Canopii / MCP Trust
+     Checker 的评分与收录流程。三个站点已确认在线，但公开搜索尚未找到
+     pyobfus-mcp 的现成条目。
+   - 若 1-2 周仍无主动反馈，开一条简短 GitHub Discussion 投票，明确问：
+     “留在 pyobfus --check / 独立 Python 包 / 暂无需求”，不能把无 Issue
+     等同于无需求。
+   - 在出现毕业信号前，不立刻拆包。若进入独立包 spike，第一批候选不是更多
+     registry，而是：注册后可疑度（包年龄/发布历史/源码链接）、SARIF/CI
+     可阻断模式、缓存/并发/私有 index allowlist；保持现有 advisory 默认
+     非阻断和诚实能力边界。

@@ -38,6 +38,18 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 - Visibility: public
 - Stars: 0 (target v0.4: 100+)
 - Topics (12): `python-obfuscator`, `code-obfuscator`, `ast-obfuscation`, `mcp-server`, `claude-code`, `cursor`, `llm-tools`, `ai-native`, `pyarmor-alternative`, `python-security`, `code-protection`, `source-protection`
+- 2026-08-24 feedback snapshot: 6 stars, 2 forks, 0 open issues/PRs; six
+  Discussions with no new external comment on the 0.5.x announcement or
+  dependency advisory. 14-day Traffic: 155 views / 65 unique visitors and
+  1,480 clones / 158 unique cloners. Release-day automation dominates clones;
+  08-23 nevertheless recorded 10 unique cloners. Treat as interest, not proven
+  retention or production adoption.
+
+### VS Code Marketplace — `zhurong2020.pyobfus`
+- 2026-08-24 public Gallery API: version 0.4.1, 3 installs, 124 downloads.
+- No identifiable user rating/review signal yet; the API's weighted-rating
+  prior is not evidence of an actual review. Continue tracking installs and
+  real reviews, not raw update/download count alone.
 - Wiki: disabled · Discussions: enabled · Issues: open
 - Releases: latest `v0.5.16` (2026-08-22); earlier releases `v0.3.3` … `v0.5.15`, plus `mcp-v0.3.x` and `vscode-v0.x` tags (mcp releases attach wheel+sdist).
 
