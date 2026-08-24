@@ -4,6 +4,8 @@ Living reference of where `pyobfus` has a foothold, what each account looks like
 
 For the **why** behind the channel mix, see [AI_INTEGRATION_STRATEGY.md](AI_INTEGRATION_STRATEGY.md).
 For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTION_LOG.md).
+For the frozen post-release evidence and recheck checklist from 2026-08-24, see
+[EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
 **Last updated**: 2026-08-24 (`pyobfus` 0.5.17 and `pyobfus-mcp` 0.3.8 released; PyPI OIDC/PEP 740 provenance and GitHub Releases verified; MCP Registry 0.3.8 verified `active` / `isLatest=true`. VS Code extension remains 0.4.1.)
 
@@ -36,7 +38,7 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 ### GitHub — `zhurong2020/pyobfus`
 - URL: https://github.com/zhurong2020/pyobfus
 - Visibility: public
-- Stars: 0 (target v0.4: 100+)
+- Stars: 6 (2026-08-24 snapshot; historical v0.4 target was 100+)
 - Topics (12): `python-obfuscator`, `code-obfuscator`, `ast-obfuscation`, `mcp-server`, `claude-code`, `cursor`, `llm-tools`, `ai-native`, `pyarmor-alternative`, `python-security`, `code-protection`, `source-protection`
 - 2026-08-24 feedback snapshot: 6 stars, 2 forks, 0 open issues/PRs; six
   Discussions with no new external comment on the 0.5.x announcement or
@@ -136,6 +138,22 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   the score. Re-scan after genuine adoption/contributor growth; external
   contributors, stars and real usage should improve the weak dimension
   honestly.
+
+### Canopii Trust Index — 🟡 FALSE POSITIVE / CLAIM + RESCAN PENDING
+- 2026-08-24 page state: latest scanned version is stale at MCP v0.3.7, score
+  39/100 (F), confidence 81%. Its sole high failure is a broad
+  `marshal.loads(...)` match at `pyobfus_pro/runtime/opacity.py:147`.
+- The evidence is in the sibling Pro runtime, not `pyobfus_mcp/`, and follows a
+  successful authenticated AES-GCM decrypt. No MCP tool input reaches that
+  bytes/key/plaintext path. The public Canopii rule is syntax-only and scans the
+  whole monorepo, so this is not evidence of an exploitable MCP deserialization
+  path.
+- Next action: maintainer claims the listing with GitHub and requests a v0.3.8
+  rescan. If unchanged, file an upstream false-positive/scope issue with the
+  authenticated-data-flow and Registry subfolder evidence. Do not embed the F
+  badge or change product behavior merely to silence the scanner.
+- Full evidence and the exact recheck sequence:
+  [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md#canopii-trust-index39100f-的处理结论).
 
 ### Claude Plugin Marketplace 🟡 PENDING
 - Console entry: `pyobfus`

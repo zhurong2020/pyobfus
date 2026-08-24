@@ -513,6 +513,9 @@ bytecode 加密。
      体验差）；③ 使用信号显著高于 pyobfus 其它 advisory 类别（说明买家
    画像可能不同，见本次讨论第 2 条判断依据）。
 9. **2026-08-24 审计后的执行顺序**：
+   - 本轮外部渠道、下载/反馈基线、MCP Skills 与 Canopii 证据已冻结到
+     `docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md`；几天后复查应以该文档
+     为对照，不凭印象比较 rolling 数字。
    - 先等 2-3 个完整数据日，复查 08-24 发布后的非发布日 PyPI/GitHub unique
      clone 基线；同时看 issue、Discussion、README/CHANGELOG 路径访问，不因
      发布当天沉默提前下结论。
@@ -521,6 +524,11 @@ bytecode 加密。
      但因 `SINGLE_AUTHOR_LOW_ADOPTION` + `low_legit` disqualifier 未达 Verified。
      不花钱买 full report、不为评分刷指标，等真实采用/外部贡献后复评。下一步
      转向 Canopii / MCP Trust Checker 的评分与收录流程。
+   - Canopii 当前只扫描到 MCP v0.3.7，显示 39/F；唯一 high evidence 是
+     sibling Pro runtime 的 `marshal.loads`，且位于认证 AES-GCM 解密之后，
+     MCP tool 输入无可达路径。按误报处理：先 claim + 请求 v0.3.8 rescan；
+     若仍命中，再向 Canopii CLI 提交带数据流和 monorepo subfolder 证据的
+     upstream issue。当前不嵌 F badge、不为扫描器改产品逻辑。
    - 若 1-2 周仍无主动反馈，开一条简短 GitHub Discussion 投票，明确问：
      “留在 pyobfus --check / 独立 Python 包 / 暂无需求”，不能把无 Issue
      等同于无需求。
