@@ -12,6 +12,29 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
+### ✅ 2026-08-26 — 发布后数据复查、客户开票跟进与功能候选调研
+
+- 08-24 发布后的首轮完整数据已复查：发布日下载为 Core 137 / MCP 99，
+  08-25 随即回落为 27 / 8；GitHub issue、PR、Discussion 均无新增，维持
+  “发布/自动化噪音，尚无有机增长”判断。证据已追加到
+  [`docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md`](docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md)。
+- 一位真实 Pro 客户确认使用进展良好，并要求为既有 Payment Link 购买开票。
+  已邮件请求确认收票主体、法定名称、地址、税号及 PO/reference，当前等待回复；
+  不把单次开票需求提前解释为团队许可或企业功能需求。具体客户/支付信息只留在
+  Git 忽略的 `docs/internal/` 运营记录，绝不进入公开提交。
+- 下一轮功能方向已完成代码审计与官方资料调研，见
+  [`docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md`](docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md)。
+  首选实现候选为配置感知的 `--check`；随后考虑扩充现有
+  `--dry-run --json` 的 plan 对象和 syntax-only 验证。暂不做任意
+  `--verify-command`、zip/tar delivery bundle、mapping 内建加密或团队 license
+  后端。
+- 本 session 两个公开文档提交为 `09d8f4f`（发布后信号复查）和 `4e5655e`
+  （功能候选调研）；均只在本地 `main`，尚未 push。冷启动后先读
+  `docs/CURRENT_PLAN_ZH.md`，等待客户开票资料；除非用户明确 gate，不启动新功能
+  实现。外部手工项仍是 Canopii claim/rescan、Claude plugin pending 观察，并在
+  1–2 周后复查下载；若 9 月 1–7 日仍无 advisory 反馈，再考虑 GitHub Discussion
+  投票。
+
 ### ✅ 2026-08-24 — 0.5.17 / MCP 0.3.8 发布与外部渠道收尾
 
 - `pyobfus 0.5.17`、`pyobfus-mcp 0.3.8` 已通过 OIDC 发布；PyPI PEP 740
