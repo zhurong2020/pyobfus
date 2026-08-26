@@ -1,6 +1,6 @@
 # pyobfus 当前计划
 
-更新时间：2026-08-24（`pyobfus` 0.5.17 / `pyobfus-mcp` 0.3.8 已发布；
+更新时间：2026-08-26（`pyobfus` 0.5.17 / `pyobfus-mcp` 0.3.8 已发布；
 `vscode-extension` 最新仍为 0.4.1）
 
 这份文档是当前项目状态和后续计划的中文单一入口，面向维护者日常查看。旧的
@@ -70,6 +70,20 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
   “周/月累计上升”，不升级为自然用户增长信号；pypistats 会排除已知镜像，
   但仍包含 CI/CD 下载。下一次最早在数据覆盖 08-24 发布后 2-3 天时复查，
   且仍以非发布日基线是否抬升为判断标准。
+- **2026-08-26 首次 post-release 复查（数据截止 08-25）**：08-24 发布日
+  `pyobfus` / `pyobfus-mcp` 分别为 `137 / 99`，08-25 随即回落为 `27 / 8`；
+  最新 day/week/month 为 `27/512/2,178` 与 `8/245/874`。GitHub 仍为
+  6 stars、2 forks、0 open issue/PR，Discussions 无新评论；08-24 clone
+  `268/31 unique`，08-25 回落为 `10/6 unique`。维持“发布/自动化噪音，尚无
+  有机增长或 dependency_advisory 独立需求信号”判断。完整证据见
+  `docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md` 的 08-26 复查小节。
+- **2026-08-26 首个真实 Pro 客户售后信号（匿名记录）**：客户主动确认当前
+  使用“going well”，随后提出已完成购买的企业开票需求。已回复并请求确认
+  个人/公司收票主体、法定实体名称、账单地址、税号及 PO/reference；当前先
+  等客户资料，不提前把一次开票需求解释为团队许可或企业功能需求。PII、支付
+  编号与具体开票资料只保存在 Git 忽略的本地运营记录，不进入公开仓库。发票
+  完成后隔几天可做一次轻量需求回访，重点问实际使用功能、CI/CD/大项目/团队
+  工作流痛点，而不是推销预设功能。
 - **2026-08-24 发布后反馈全量审计**：GitHub 当前 0 open issue、0 open PR；
   Discussions 共 6 条，最新项目公告仍为 08-01 且 0 评论，尚无人提到
   `dependency_advisory` 或要求脱离混淆单独使用。仓库已有 6 stars / 2 forks；
@@ -417,6 +431,64 @@ bytecode 加密。
    alert（链接到 Security tab）+ CI/CD 全部第三方 Action SHA-pinned
    （`gh api` + `grep` 实测核实后才写）。
 
+### 下一轮功能候选（调研已完成，等待用户 gate）
+
+2026-08-26 已完成本轮本地代码审计与官方资料调研，完整证据和取舍见
+`docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md`。调研解决了技术/竞品依据，
+但不等于用户验证；本轮仍先等待上述 Pro 客户完成开票资料回复，不因单个售后
+事件立即扩大产品范围。
+
+1. **配置感知的 `--check`（当前首选代码候选）**
+   - 已有依据：P2-29 收口时已经明确记录 `--check` 接入 `--config` /
+     `exclude_patterns` 可降低真实组合误报；CLI/MCP/VS Code 共用现有 Risk
+     contract，增量路径清楚。
+   - 调研结论：复用真实 build 的 config discovery/override；excluded file 的
+     finding 从主风险数移出但单列 `excluded_findings`，不静默丢失；只有配置
+     确实缓解风险时才注释/降级，dependency declaration 保持项目级扫描。
+
+2. **结构化保护计划 `--plan --json`**
+   - 调研结论：有 Terraform plan/JSON、Nuitka compilation report 等成熟工作流
+     证据，但无需新增命令；优先给现有 `--dry-run --json` 增加 versioned `plan`
+     对象，列 effective config 摘要、选中/排除文件与原因、planned artifacts。
+   - 安全边界：不输出 literal/vault/key/device fingerprint/绝对 home path；首版
+     plan 不可保存后直接 apply，避免引入第二套状态管理。
+
+3. **受控的构建后验证**
+   - 调研结论：拒绝任意 `--verify-command` 和默认 import（会执行用户代码）；
+     只做 syntax-only spike，优先内存 `compile(..., "exec")`，不在输出目录留下
+     `__pycache__`。JSON 只能声明 `syntax_valid`，不能宣传 runtime verified。
+   - MCP 不接受任意命令；隔离 import verifier 仅在将来有明确需求时再研究。
+
+4. **标准 delivery bundle**
+   - 调研结论：当前不做 zip/tar bundle；自动把 mapping 与交付代码打包是安全
+     foot-gun。改为在 plan/provenance 中将 artifact 标为 `ship`、
+     `retain-internal`、`optional`，保持 mapping 默认在 output 外。
+   - 只有反复出现“需要单一交付包”企业反馈时才重新评估 archive。
+
+5. **mapping 安全增强**
+   - 调研结论：先做 mapping-inside-output warning + 安全存储文档；需要真实性
+     的团队可用 Sigstore/cosign 对覆盖 mapping digest 的 provenance 签名。
+   - 内置加密暂缓：它会引入密码/密钥输入、CI secret、恢复/轮换和 encrypted
+     unmap UX；没有具体存储威胁模型前不实现。
+
+6. **轻量团队/许可证管理 UX**
+   - 调研结论：近期只补 vendor/billing FAQ、三设备/CI/缓存删除与服务端撤销的
+     边界说明；现有 `status --json` 已覆盖本机信息。
+   - 自助 list/deactivate 需要 Worker machine-resource model、客户鉴权和隐私/
+     并发处理，等重复 activation 支持请求再 spike；不做 portal/SSO/复杂 server。
+
+7. **`dependency_advisory` 第二阶段**
+   - 已有专项机会/竞品扫描与毕业标准；候选仍是注册后可疑度、SARIF/CI、缓存/
+     并发、私有 index allowlist。继续以真实反馈触发，不立即拆包。
+
+8. **兼容性矩阵自动化**
+   - 已有 P2-29 advisory、三篇 cookbook、PyInstaller/compiled/import-hook
+     示例与 Python 3.14t 实测基础；“统一 compatibility report 命令”尚未做
+     独立用户价值调研。
+   - 调研结论：不新增 `compatibility-report` 命令；把 detected signals、配置缓解
+     和 cookbook 链接合入 config-aware `--check`/dry-run plan。静态扫描永远不
+     输出“已兼容”结论；只有复现过的支持案例或实测组合才扩规则。
+
 ### P3：探索项
 
 1. `P3-1` `--output-pyc` feasibility spike
@@ -467,11 +539,10 @@ bytecode 加密。
    只需检查：① 公开 API 的 `tools: []` 是否恢复；② Discord 是否回复。
 4. Claude plugin marketplace：用户于 2026-08-24 再次手工确认仍为
    `Submitted and pending review`（Aug 2），只需等待 approve/reject/补充信息。
-5. 下载量：2026-08-24 快照（数据截止 08-23）为 `pyobfus`
-   `27/502/2,059`、`pyobfus-mcp` `11/242/772`。周/月上升主要由 08-17、08-20、
-   08-22 发布日尖峰解释，非发布日基线尚未明显抬升；维持“发布/CI 噪音，未
-   证明有机增长”判断。由于当天 0.5.17/0.3.8 尚未进入数据，最早 2-3 天后
-   做一次 post-release 复查，此后恢复每 3-5 个版本或 1-2 周的周期。
+5. 下载量：✅ 2026-08-26 已完成第一次 post-release 复查。08-24 发布日为
+   `137/99`，08-25 回落为 `27/8`；最新 rolling day/week/month 为
+   `27/512/2,178`、`8/245/874`。非发布日基线没有明显抬升，维持“发布/CI
+   噪音，未证明有机增长”判断。此后恢复每 3-5 个版本或 1-2 周的周期。
 6. 竞品/生态扫描节奏：本项目历史扫描是"版本发布前后触发一次"，不是固定
    周期盯梢（05-09→06-22→07-07→08-06→08-14→08-20，间隔 1-6 周不等）。
    2026-08-22 又做了一轮（见下方"2026-08-22 扫描"小节），产出的行动项已
@@ -516,9 +587,9 @@ bytecode 加密。
    - 本轮外部渠道、下载/反馈基线、MCP Skills 与 Canopii 证据已冻结到
      `docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md`；几天后复查应以该文档
      为对照，不凭印象比较 rolling 数字。
-   - 先等 2-3 个完整数据日，复查 08-24 发布后的非发布日 PyPI/GitHub unique
-     clone 基线；同时看 issue、Discussion、README/CHANGELOG 路径访问，不因
-     发布当天沉默提前下结论。
+   - ✅ 08-26 已完成首次复查：08-25 PyPI 下载回落为 `27/8`，GitHub clone
+     回落为 `10/6 unique`；issue/PR/Discussion 无新增，README/CHANGELOG 各仅
+     3 unique views。尚无有机增长或 advisory 独立需求信号。
    - Claude plugin 仍 pending；Glama 21:09 测试已成功，二者本轮核实完成。
    - MCP Skills 已实跑：6.06 / established / 14 signals / no safety findings，
      但因 `SINGLE_AUTHOR_LOW_ADOPTION` + `low_legit` disqualifier 未达 Verified。
@@ -536,3 +607,8 @@ bytecode 加密。
      registry，而是：注册后可疑度（包年龄/发布历史/源码链接）、SARIF/CI
      可阻断模式、缓存/并发/私有 index allowlist；保持现有 advisory 默认
      非阻断和诚实能力边界。
+10. **2026-08-26 客户跟进与下一轮功能 gate**：当前先等待客户回复开票主体/
+    地址/税号/PO 信息并完成 paid invoice，不同时推销新功能。开票完成后隔几天
+    做一次不超过两个问题的轻量回访，确认实际使用功能以及大项目、CI/CD 或团队
+    工作流中最希望改善的一点。把回复作为上方 P2 候选排序证据；在回复前不启动
+    `--plan`、delivery bundle、mapping 加密或团队 license UX 实现。
