@@ -109,3 +109,37 @@ marshal.loads(plaintext)
    若仍命中同一行，再决定是否正式提交上游 issue。
 7. 一至两周仍无 `dependency_advisory` 主动反馈时，再开简短 GitHub Discussion
    投票；不要把“没有 issue”直接解释为“没有需求”。
+
+## 2026-08-26 首次发布后复查
+
+pypistats 已覆盖 08-24 发布日和 08-25 第一个完整非发布日：
+
+| 包 | 08-24 | 08-25 | 最新 day/week/month |
+|---|---:|---:|---:|
+| `pyobfus` | 137 | 27 | 27 / 512 / 2,178 |
+| `pyobfus-mcp` | 99 | 8 | 8 / 245 / 874 |
+
+08-24 的尖峰与发布时点一致；08-25 立即回落到与发布前安静日相近的水平。
+rolling week/month 虽继续上升，但仍主要由 08-17、08-20、08-22、08-24 的
+发布/自动化流量解释，暂不能认定自然用户基线抬升。
+
+GitHub 同期复查结果：
+
+- 仍为 6 stars、2 forks、0 open issues、0 open PRs；Discussions 仍为 6 条，
+  最新项目公告没有新评论，也没有人提到 `dependency_advisory` 或要求独立使用。
+- 14-day Traffic 更新为 176 views / 72 unique visitors、1,751 clones /
+  182 unique cloners。08-24 发布日为 268 clones / 31 unique，08-25 回落到
+  10 / 6；与 PyPI 一致，发布自动化仍是主要解释。
+- 热门路径以仓库首页为主；README、CHANGELOG 各只有 3 unique views，尚无
+  足够证据把访问归因到新 advisory。referrer 仍以 GitHub、Google、PyPI、
+  Bing 为主，ChatGPT 只有 2 unique。
+- 最新 main CI、CodeQL、Pages 仍全部成功。
+
+外部渠道：Glama 公开页面仍可解析到完整 8 个工具；其旧公开 API 本轮返回
+HTTP 401，进一步说明该 API 已不适合作为无需认证的健康检查。Canopii claim/
+v0.3.8 rescan、Claude Plugin Console 和 Glama Discord 仍需维护者登录，未在
+本轮程序化代操作。
+
+**结论**：完成第一次复查，但不升级为有机增长或拆包信号。下一次下载量复查
+恢复到 1--2 周周期；若到 09-01 至 09-07 仍无主动反馈，按原计划发起一条简短
+GitHub Discussion 投票。Canopii claim/rescan 仍是当前最高优先级人工事项。

@@ -7,7 +7,9 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-**Last updated**: 2026-08-24 (`pyobfus` 0.5.17 and `pyobfus-mcp` 0.3.8 released; PyPI OIDC/PEP 740 provenance and GitHub Releases verified; MCP Registry 0.3.8 verified `active` / `isLatest=true`. VS Code extension remains 0.4.1.)
+**Last updated**: 2026-08-26 (first post-0.5.17/0.3.8 signal recheck completed;
+08-25 non-release-day downloads and clones returned to baseline, with no new
+issue/PR/Discussion feedback. VS Code extension remains 0.4.1.)
 
 > **Note (2026-05-09)**: most of the per-channel facts below are now current as of Session 23. Outside of the launch wave (HN 5-11 / Reddit 5-12 / CN trio 5-8/9), the live state is reflected here. Consult `docs/POST_V0.4_TODO.md` for forward TODO and `docs/V0.4_EXECUTION_LOG.md` for session-by-session deltas.
 
@@ -24,6 +26,9 @@ For the frozen post-release evidence and recheck checklist from 2026-08-24, see
   day/week/month `27 / 502 / 2,059`. Weekly growth is dominated by release-day
   spikes (08-17 `124`, 08-20 `119`, 08-22 `151`); 08-23 returned to `27`, so
   this is not yet evidence of a higher organic baseline.
+- 2026-08-26 recheck (data through 08-25): 08-24 release-day downloads were
+  `137`, then returned to `27` on 08-25; latest day/week/month is
+  `27 / 512 / 2,178`. No organic-baseline uplift established.
 - Tracker: `gh api repos/zhurong2020/pyobfus` + PePy
 
 ### PyPI — `pyobfus-mcp`
@@ -34,6 +39,9 @@ For the frozen post-release evidence and recheck checklist from 2026-08-24, see
   day/week/month `11 / 242 / 772`. Release-day spikes (08-17 `95`, 08-22 `110`)
   dominate the weekly increase; 08-23 returned to `11`. CI/CD traffic remains
   included, so do not treat the increase as organic adoption yet.
+- 2026-08-26 recheck (data through 08-25): 08-24 release-day downloads were
+  `99`, then returned to `8` on 08-25; latest day/week/month is
+  `8 / 245 / 874`. No organic-baseline uplift established.
 
 ### GitHub — `zhurong2020/pyobfus`
 - URL: https://github.com/zhurong2020/pyobfus
@@ -46,6 +54,11 @@ For the frozen post-release evidence and recheck checklist from 2026-08-24, see
   1,480 clones / 158 unique cloners. Release-day automation dominates clones;
   08-23 nevertheless recorded 10 unique cloners. Treat as interest, not proven
   retention or production adoption.
+- 2026-08-26 feedback recheck: still 6 stars, 2 forks and no open issue/PR or
+  new Discussion comment. 14-day Traffic is now 176 views / 72 unique and
+  1,751 clones / 182 unique. Release day 08-24 produced 268 clones / 31 unique;
+  08-25 returned to 10 / 6. README and CHANGELOG each had only 3 unique views,
+  so there is still no attributable `dependency_advisory` usage signal.
 
 ### VS Code Marketplace — `zhurong2020.pyobfus`
 - 2026-08-24 public Gallery API: version 0.4.1, 3 installs, 124 downloads.
@@ -126,6 +139,10 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   drift, not a server introspection failure. Build Spec reports
   `pinnedCommit: null` even though generated clone logs still checkout
   `e44e687`, another Glama metadata inconsistency with no runtime impact.
+- 2026-08-26 programmatic recheck: the public listing still exposes all 8 tool
+  names. The formerly public API path now returns HTTP 401, so it is no longer a
+  usable unauthenticated health check; continue treating the listing plus the
+  successful live `ListToolsRequest` as the available evidence.
 
 ### MCP Skills trust score — 🟡 ESTABLISHED / NOT VERIFIED
 - 2026-08-24 official free score API scan for `zhurong2020/pyobfus`: composite
