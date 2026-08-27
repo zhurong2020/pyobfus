@@ -1,7 +1,9 @@
 # pyobfus 当前计划
 
-更新时间：2026-08-26（`pyobfus` 0.5.17 / `pyobfus-mcp` 0.3.8 已发布；
-`vscode-extension` 最新仍为 0.4.1）
+更新时间：2026-08-27（`pyobfus` 0.5.17 / `pyobfus-mcp` 0.3.8 已发布；
+`vscode-extension` 最新仍为 0.4.1；Pro 客户已回复开票主体，发票为当前唯一
+前台任务，完成后即可按 `docs/CONFIG_AWARE_CHECK_DESIGN.md` 推进配置感知
+`--check` 实现）
 
 这份文档是当前项目状态和后续计划的中文单一入口，面向维护者日常查看。旧的
 `ROADMAP.md` 和 `POST_V0.4_TODO.md` 保留为历史归档和详细来源，但后续日常
@@ -79,11 +81,18 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
   `docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md` 的 08-26 复查小节。
 - **2026-08-26 首个真实 Pro 客户售后信号（匿名记录）**：客户主动确认当前
   使用“going well”，随后提出已完成购买的企业开票需求。已回复并请求确认
-  个人/公司收票主体、法定实体名称、账单地址、税号及 PO/reference；当前先
-  等客户资料，不提前把一次开票需求解释为团队许可或企业功能需求。PII、支付
-  编号与具体开票资料只保存在 Git 忽略的本地运营记录，不进入公开仓库。发票
-  完成后隔几天可做一次轻量需求回访，重点问实际使用功能、CI/CD/大项目/团队
-  工作流痛点，而不是推销预设功能。
+  个人/公司收票主体、法定实体名称、账单地址、税号及 PO/reference；不提前
+  把一次开票需求解释为团队许可或企业功能需求。PII、支付编号与具体开票
+  资料只保存在 Git 忽略的本地运营记录，不进入公开仓库。
+- **2026-08-27 客户已回复开票资料**：收票主体为一家公司法律实体（某地区
+  子公司，与邮件签名里的美国母公司不同），需按客户书面确认的实体名/地址
+  开具，可选放一个联系人姓名；未提供单独税号，也未要求 PO 号。字面开票
+  信息只在邮件线程 + Git 忽略的 `docs/internal/CUSTOMER_SUPPORT_LOG.md`
+  + `docs/internal/STRIPE_POST_PURCHASE_INVOICE_RUNBOOK.md`，不进公开仓库。
+  **当前唯一前台任务 = 按 runbook 开具并交付 paid invoice**（目标约
+  2026-08-29 前），交付后按下方“恢复工作清单”推进功能实现。发票完成后
+  隔几天再做一次不超过两问的轻量需求回访（实际使用功能 + 大项目/CI/CD/
+  团队工作流最想改善的一点），不推销预设功能。
 - **2026-08-24 发布后反馈全量审计**：GitHub 当前 0 open issue、0 open PR；
   Discussions 共 6 条，最新项目公告仍为 08-01 且 0 评论，尚无人提到
   `dependency_advisory` 或要求脱离混淆单独使用。仓库已有 6 stars / 2 forks；
@@ -431,20 +440,38 @@ bytecode 加密。
    alert（链接到 Security tab）+ CI/CD 全部第三方 Action SHA-pinned
    （`gh api` + `grep` 实测核实后才写）。
 
-### 下一轮功能候选（调研已完成，等待用户 gate）
+### 下一轮功能候选（调研 + 设计已完成，等待用户 gate + 3 个决策）
 
 2026-08-26 已完成本轮本地代码审计与官方资料调研，完整证据和取舍见
-`docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md`。调研解决了技术/竞品依据，
-但不等于用户验证；本轮仍先等待上述 Pro 客户完成开票资料回复，不因单个售后
-事件立即扩大产品范围。
+`docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md`。2026-08-27 已把首选候选
+（配置感知 `--check`）落成**可直接实现的设计** `docs/CONFIG_AWARE_CHECK_DESIGN.md`
+（含共享 `core/config_resolve.py` helper、`PreflightReport` 增量字段、JSON
+契约全文、测试清单、rollout）。调研+设计解决了技术依据，但不等于用户验证；
+实现仍在 gate 后：先交付 Pro 客户发票，再由用户拍板下方 3 个设计决策。
 
-1. **配置感知的 `--check`（当前首选代码候选）**
+**实现前需用户拍板的 3 个决策**（详见设计文档 §Open questions）：
+1. `--check PATH` 的配置发现根：跟 build 一样用工作目录（推荐）vs 相对 `PATH`。
+2. `mitigated_by` 是否允许改写 `--check --json` 里的 `severity` 字符串
+   （永不动 `high`、永不影响 `exit_code`），还是只加注解、保留原 severity。
+3. 首版降级范围是否够（只 `exclude_names ↔ dynamic_attr` 字面量 +
+   `safe` preset 的 `__all__`），其余降级留后续。
+
+1. **配置感知的 `--check`（当前首选代码候选；设计已完成）**
    - 已有依据：P2-29 收口时已经明确记录 `--check` 接入 `--config` /
      `exclude_patterns` 可降低真实组合误报；CLI/MCP/VS Code 共用现有 Risk
      contract，增量路径清楚。
    - 调研结论：复用真实 build 的 config discovery/override；excluded file 的
      finding 从主风险数移出但单列 `excluded_findings`，不静默丢失；只有配置
      确实缓解风险时才注释/降级，dependency declaration 保持项目级扫描。
+   - 设计要点（`docs/CONFIG_AWARE_CHECK_DESIGN.md`）：新增 `--no-config`
+     回退开关；`--check` 开始认已有的 `--config`/`--preset`；抽 `main()`
+     内联的 config 解析成 `core/config_resolve.py::resolve_effective_config`
+     （`--check`/build/dry-run plan 三处共用，build 重构须行为不变）；
+     `PreflightReport` 增 `files_excluded` + `excluded_risks`，`to_dict()`
+     增 `effective_config`/`files_excluded`/`excluded_findings`，`Risk` 增
+     可选 `mitigated_by`——`severity_counts`/`exit_code`/`risks[]` 形状对
+     现有消费方不变；预计单个 `pyobfus` minor（0.5.18），MCP 侧
+     `use_project_config` 可同波或后续 `pyobfus-mcp` 版本。
 
 2. **结构化保护计划 `--plan --json`**
    - 调研结论：有 Terraform plan/JSON、Nuitka compilation report 等成熟工作流
@@ -607,8 +634,51 @@ bytecode 加密。
      registry，而是：注册后可疑度（包年龄/发布历史/源码链接）、SARIF/CI
      可阻断模式、缓存/并发/私有 index allowlist；保持现有 advisory 默认
      非阻断和诚实能力边界。
-10. **2026-08-26 客户跟进与下一轮功能 gate**：当前先等待客户回复开票主体/
-    地址/税号/PO 信息并完成 paid invoice，不同时推销新功能。开票完成后隔几天
-    做一次不超过两个问题的轻量回访，确认实际使用功能以及大项目、CI/CD 或团队
-    工作流中最希望改善的一点。把回复作为上方 P2 候选排序证据；在回复前不启动
-    `--plan`、delivery bundle、mapping 加密或团队 license UX 实现。
+10. **2026-08-27 客户跟进与下一轮功能 gate**：客户已回复开票主体（公司
+    实体，见 `docs/internal/CUSTOMER_SUPPORT_LOG.md` 2026-08-27 条）。
+    **当前唯一前台任务 = 按 `docs/internal/STRIPE_POST_PURCHASE_INVOICE_RUNBOOK.md`
+    开具并交付 paid invoice**（目标约 2026-08-29 前，不二次收款）。
+    发票交付后隔几天做一次不超过两个问题的轻量回访（实际使用功能 +
+    大项目/CI/CD/团队工作流最想改善的一点），把回复作为上方 P2 候选
+    排序证据。在发票交付前不启动任何功能实现；`--plan`、delivery bundle、
+    mapping 加密、团队 license UX 仍需真实重复需求才做。
+
+## 恢复工作清单（发票交付后按序执行）
+
+> Cold-start 判断：若 `docs/internal/CUSTOMER_SUPPORT_LOG.md` 最新条目
+> 显示发票已 `Paid` 并已发送 PDF，则本清单生效；否则先做发票。
+
+1. **前置检查**：`git status` 干净、`origin/main` 已同步；三个测试根
+   （`tests/`、`pyobfus_mcp/tests/`、`integration_tests/`）+ `black`/`ruff`/
+   CI 用的联合 `mypy pyobfus/ pyobfus_pro/ pyobfus_mcp/pyobfus_mcp/` 全绿。
+2. **确认 3 个设计决策**（见上方“下一轮功能候选”小节，或直接问用户）——
+   发现根、`mitigated_by` 是否改 severity、首版降级范围。定了才动手。
+3. **实现配置感知 `--check`**，严格按 `docs/CONFIG_AWARE_CHECK_DESIGN.md`：
+   - 新建 `pyobfus/core/config_resolve.py`（`resolve_effective_config` +
+     `ConfigProvenance`），并把 `main()` 内联 config 解析重构为调用它
+     （行为必须不变：同 config 对象、同 Pro-preset license gate 留在
+     `main()`）。
+   - `pyobfus/cli.py`：`_handle_check` 加 `config_path`/`preset`/`no_config`/
+     `level` 参数；dispatch 处转发已解析值；新增 `--no-config` flag；
+     `format_report_text` 加 “Effective config” + “Excluded files” 两行。
+   - `pyobfus/core/preflight.py`：`PreflightChecker` 加 `preserve_names`/
+     `report_excluded`；`_check_directory` 分桶 included/excluded；
+     `PreflightReport` 加 `files_excluded`/`excluded_risks`，`to_dict()`
+     加 `effective_config`/`files_excluded`/`excluded_findings`；`Risk` 加
+     可选 `mitigated_by`；`_finalize` 实现两条降级规则 + 依赖 advisory
+     保持项目级（加注释说明）。
+   - 测试：按设计文档 §Tests 清单补 `tests/test_preflight.py`、
+     `tests/test_json_cli.py`、`pyobfus_mcp/tests/`、config_resolve 单测；
+     守住 “`PreflightChecker()` 无参 → `to_dict()` 与改动前逐字节一致”。
+   - 文档：`docs/DEPENDENCY_ADVISORY_COOKBOOK.md` 补注释；README `--check`
+     示例块 + `docs/llms.txt` 加 “`--check` 与你的配置” 小节。
+4. **MCP 侧**（可同波或后续 `pyobfus-mcp` 版本）：`check_obfuscation_risks`
+   加 `use_project_config: bool = True`，payload 增 `effective_config`/
+   `excluded_findings`；更新 `pyobfus_mcp/CHANGELOG.md` + tool-manifest
+   描述；VS Code 无需改。
+5. **发布**：CHANGELOG 写进 `[Unreleased]`，**不打 tag / 不发布**，等用户
+   按“1-2 天间隔”节奏 gate（下个 `pyobfus` 版本预计 0.5.18）。发布前跑
+   `scripts/check_unreleased_changelogs.py`。
+6. **候选 2/3**（`--dry-run --json` plan 对象、syntax-only 验证 spike）：
+   复用 `config_resolve.py`，可与候选 1 同一版本或紧随其后，设计骨架已在
+   `docs/CONFIG_AWARE_CHECK_DESIGN.md` 末尾。
