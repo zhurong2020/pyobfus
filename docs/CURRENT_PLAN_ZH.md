@@ -1,9 +1,10 @@
 # pyobfus 当前计划
 
 更新时间：2026-08-27（`pyobfus` 0.5.17 / `pyobfus-mcp` 0.3.8 已发布；
-`vscode-extension` 最新仍为 0.4.1；Pro 客户已回复开票主体，发票为当前唯一
-前台任务，完成后即可按 `docs/CONFIG_AWARE_CHECK_DESIGN.md` 推进配置感知
-`--check` 实现）
+`vscode-extension` 最新仍为 0.4.1；Pro 客户开票为当前唯一前台任务，但发票
+卡在 Stripe 侧 guest-customer / 付款应用不匹配问题，已于 2026-08-27 通过
+认证 Dashboard 联系 Stripe Support，等待回复；发票交付后再按
+`docs/CONFIG_AWARE_CHECK_DESIGN.md` 推进配置感知 `--check` 实现）
 
 这份文档是当前项目状态和后续计划的中文单一入口，面向维护者日常查看。旧的
 `ROADMAP.md` 和 `POST_V0.4_TODO.md` 保留为历史归档和详细来源，但后续日常
@@ -93,6 +94,17 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
   2026-08-29 前），交付后按下方“恢复工作清单”推进功能实现。发票完成后
   隔几天再做一次不超过两问的轻量需求回访（实际使用功能 + 大项目/CI/CD/
   团队工作流最想改善的一点），不推销预设功能。
+- **2026-08-27 发票遇 Stripe 侧 blocker，已联系 Support**：原始 Payment
+  Link 付款挂在 Stripe guest customer 下，发票建在 regular Customer 下，
+  Stripe「应用付款」报 400 customer 不匹配；作废重建两次无效。按 runbook
+  的 guest-customer 分支，已于 2026-08-27 通过认证 Dashboard 联系 Stripe
+  Support（诉求：把既有付款关联到发票、产出正确的已付发票 PDF、不二次
+  收款、抬头保持公司实体）。中途在 Dashboard AI 助手指引下用了「mark as
+  paid」，结果不一致：列表显示已付但 PDF 仍显示应付金额 + 未来到期日。
+  **等待 Support 回复期间**：不把发票/PDF 发给客户、不再作废重建、不再
+  「mark as paid」、不退款重扣。若拖过约 2026-08-29，按 runbook 模板给
+  客户发简短进度更新。字面开票信息与 Stripe 标识符只在邮件线程 +
+  `docs/internal/CUSTOMER_SUPPORT_LOG.md`（Git 忽略），不进公开仓库。
 - **2026-08-24 发布后反馈全量审计**：GitHub 当前 0 open issue、0 open PR；
   Discussions 共 6 条，最新项目公告仍为 08-01 且 0 评论，尚无人提到
   `dependency_advisory` 或要求脱离混淆单独使用。仓库已有 6 stars / 2 forks；
@@ -638,6 +650,10 @@ bytecode 加密。
     实体，见 `docs/internal/CUSTOMER_SUPPORT_LOG.md` 2026-08-27 条）。
     **当前唯一前台任务 = 按 `docs/internal/STRIPE_POST_PURCHASE_INVOICE_RUNBOOK.md`
     开具并交付 paid invoice**（目标约 2026-08-29 前，不二次收款）。
+    ⏳ **2026-08-27 状态：发票卡在 Stripe guest-customer / 付款应用不匹配，
+    已通过认证 Dashboard 联系 Stripe Support，等待回复**；细节与 hold 清单
+    见 `CUSTOMER_SUPPORT_LOG.md` 2026-08-27 续条。Cold-start 若 Support 已
+    回复，按其指引拿到「发票关联真实付款、US$0.00 due」的正确 PDF 再交付。
     发票交付后隔几天做一次不超过两个问题的轻量回访（实际使用功能 +
     大项目/CI/CD/团队工作流最想改善的一点），把回复作为上方 P2 候选
     排序证据。在发票交付前不启动任何功能实现；`--plan`、delivery bundle、
@@ -647,6 +663,8 @@ bytecode 加密。
 
 > Cold-start 判断：若 `docs/internal/CUSTOMER_SUPPORT_LOG.md` 最新条目
 > 显示发票已 `Paid` 并已发送 PDF，则本清单生效；否则先做发票。
+> （2026-08-27 现状：发票卡在 Stripe guest-customer / 付款应用问题，已联系
+> Stripe Support 等待回复——先处理 Support 往返，不要动功能实现。）
 
 1. **前置检查**：`git status` 干净、`origin/main` 已同步；三个测试根
    （`tests/`、`pyobfus_mcp/tests/`、`integration_tests/`）+ `black`/`ruff`/

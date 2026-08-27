@@ -19,9 +19,13 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   “发布/自动化噪音，尚无有机增长”判断。证据已追加到
   [`docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md`](docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md)。
 - 一位真实 Pro 客户确认使用进展良好，并要求为既有 Payment Link 购买开票。
-  已邮件请求确认收票主体、法定名称、地址、税号及 PO/reference，当前等待回复；
-  不把单次开票需求提前解释为团队许可或企业功能需求。具体客户/支付信息只留在
-  Git 忽略的 `docs/internal/` 运营记录，绝不进入公开提交。
+  客户已回复收票主体（公司实体）；开具发票时撞上 Stripe 的 guest-customer /
+  付款应用不匹配问题（Payment Link 一次性购买记在 guest customer 名下，
+  无法把既有付款应用到 regular Customer 的发票），已于 2026-08-27 联系
+  Stripe Support 等待回复。不把单次开票需求提前解释为团队许可或企业功能
+  需求。当前状态、hold 清单与后续步骤以 `docs/CURRENT_PLAN_ZH.md` 为准；
+  具体客户/支付信息只留在 Git 忽略的 `docs/internal/` 运营记录，绝不进入
+  公开提交。
 - 下一轮功能方向已完成代码审计与官方资料调研，见
   [`docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md`](docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md)。
   首选实现候选为配置感知的 `--check`；随后考虑扩充现有
