@@ -1,13 +1,14 @@
 # pyobfus 当前计划
 
 更新时间：2026-08-28（`pyobfus` 0.5.17 / `pyobfus-mcp` 0.3.8 已发布；
-`vscode-extension` 最新仍为 0.4.1；Pro 客户开票为当前唯一前台任务。既有付款
+0.5.18 / 0.3.9 今日小版本候选正在本地准备，尚未 tag / push / 发布；
+`vscode-extension` 最新仍为 0.4.1。既有付款
 现已成功关联，Dashboard 显示 Paid / US$0.00 remaining，且 Stripe 生成的收据
 正确；但新下载的 invoice PDF 仍错误显示全额应付。已把正确收据与错误发票
 作为附件回复 Stripe Support，请 Billing/Invoicing 技术团队刷新 PDF；不得开
 贷项通知单、退款、解除付款或重新扣款。客户此前已收到澄清邮件，冷启动无需
-再发例行进度更新。拿到正确 paid invoice PDF 并交付后，再按
-`docs/CONFIG_AWARE_CHECK_DESIGN.md` 推进配置感知 `--check` 实现）
+再发例行进度更新。用户已允许本地发布准备，但正式 tag / 发布仍需再次明确
+同意）
 
 这份文档是当前项目状态和后续计划的中文单一入口，面向维护者日常查看。旧的
 `ROADMAP.md` 和 `POST_V0.4_TODO.md` 保留为历史归档和详细来源，但后续日常
@@ -469,7 +470,7 @@ bytecode 加密。
    alert（链接到 Security tab）+ CI/CD 全部第三方 Action SHA-pinned
    （`gh api` + `grep` 实测核实后才写）。
 
-### 下一轮功能候选（首选项已实现，held in `[Unreleased]`）
+### 下一轮功能候选（首选项已形成 0.5.18 / 0.3.9 本地发布候选）
 
 2026-08-26 已完成本轮本地代码审计与官方资料调研，完整证据和取舍见
 `docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md`。2026-08-27 已把首选候选
@@ -477,7 +478,8 @@ bytecode 加密。
 （含 `--check`/MCP 共用的 `core/config_resolve.py` helper、`PreflightReport` 增量字段、JSON
 契约全文、测试清单、rollout）。调研+设计解决了技术依据，但不等于用户验证；
 用户已于 2026-08-28 打开实现 gate，并接受下方三个推荐决策；首选项已进入
-代码与测试，完整回归已通过，等待下一版本发布 gate。发票 PDF 仍由 Stripe Support
+代码与测试，完整回归已通过，版本元数据已进入今日小版本准备，等待最终发布
+gate。发票 PDF 仍由 Stripe Support
 并行处理，不再阻塞本地开发。
 
 **发布 gate（用户 2026-08-28 再确认）**：实现完成不等于允许发布。正式改
@@ -491,6 +493,13 @@ run counter 测试不再读写开发者真实 `~/.pyobfus` / HOME，而是逐测
 pytest `tmp_path`。在 Codex 的只读 HOME 沙箱中直接运行标准
 `venv/bin/pytest tests/` 已通过（1201 passed, 1 skipped），不再需要临时覆盖
 `HOME=/tmp/...`；生产默认状态路径未改变。
+
+**今日发布候选验证（2026-08-28）**：Core 0.5.18 / MCP 0.3.9 的版本元数据、
+CHANGELOG、README highlight、MCP `server.json` 与依赖下限（`pyobfus>=0.5.18`）
+已同步。Core 1201 passed / 1 skipped、MCP 93 passed、端到端 7 passed，Black、
+Ruff、联合 mypy、tool manifest 均通过；两包 wheel/sdist 在 `/tmp` 隔离构建，
+四个制品 `twine check` 全通过，并在全新 venv 中按 Core→MCP 顺序安装后核实
+`pyobfus --version == 0.5.18` 与 MCP manifest digest。仍未 tag、push 或发布。
 
 **已确认的 3 个设计决策**（详见设计文档 §Open questions）：
 1. `--check PATH` 的配置发现根：跟 build 一样用工作目录（推荐）vs 相对 `PATH`。
@@ -729,9 +738,9 @@ pytest `tmp_path`。在 Codex 的只读 HOME 沙箱中直接运行标准
    加 `use_project_config: bool = True`，payload 增 `effective_config`/
    `excluded_findings`；更新 `pyobfus_mcp/CHANGELOG.md` + tool-manifest
    描述；VS Code 无需改。
-5. **发布**：CHANGELOG 写进 `[Unreleased]`，**不打 tag / 不发布**，等用户
-   按“1-2 天间隔”节奏 gate（下个 `pyobfus` 版本预计 0.5.18）。发布前跑
-   `scripts/check_unreleased_changelogs.py`。
+5. **发布**：0.5.18 / MCP 0.3.9 的 CHANGELOG 与版本元数据已进入本地发布
+   候选；**不打 tag / 不发布**，等待用户最终 gate。发布前跑
+   `scripts/check_unreleased_changelogs.py`，并固定先 Core、后 MCP 的顺序。
 6. **候选 2/3**（`--dry-run --json` plan 对象、syntax-only 验证 spike）：
    复用 `config_resolve.py`，不得与候选 1 捆成同一版本；按下载回落和用户
    逐次 gate 决定后续节奏，设计骨架已在
