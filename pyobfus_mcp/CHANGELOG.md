@@ -6,6 +6,15 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+### Added
+
+- `check_obfuscation_risks` now accepts `use_project_config` (default `true`).
+  It discovers config relative to the validated project path, returns
+  `effective_config`, `files_excluded`, and `excluded_findings`, and keeps
+  excluded-file risks out of editor/agent blocking counts. Set it to `false`
+  for the legacy unconfigured scan. This is read-only and adds no network
+  access.
+
 ## [0.3.8] - 2026-08-24
 
 ### Added

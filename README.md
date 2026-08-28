@@ -76,7 +76,7 @@ pyobfus is also on the [VS Code Marketplace](https://marketplace.visualstudio.co
 
 ### 🤖 AI-native features
 
-- **`pyobfus --check src/`** — pre-flight risk scan: detects `eval`/`exec`, dynamic attribute access, framework reflection points, and declared dependencies that do not exist on public PyPI before you obfuscate. The dependency lookup is enabled by default; use `--offline` to skip it. JSON output includes an `ai_hint` telling your AI assistant what to run next.
+- **`pyobfus --check src/`** — config-aware pre-flight risk scan: detects `eval`/`exec`, dynamic attribute access, framework reflection points, and declared dependencies that do not exist on public PyPI before you obfuscate. It honors the same explicit/discovered config and presets as a build; findings from excluded files are reported separately without affecting the primary result. Use `--no-config` for the legacy unfiltered scan and `--offline` to skip PyPI lookups. JSON includes `effective_config`, `excluded_findings`, and an `ai_hint` telling your AI assistant what to run next.
 - **`pyobfus --init src/`** — zero-config onboarding: scans the project, detects FastAPI/Django/Pydantic/Click/SQLAlchemy, and writes a ready-to-use `pyobfus.yaml`.
 - **`pyobfus --unmap --trace error.log --mapping mapping.json`** — reverse obfuscated identifiers in a production stack trace so you can debug (or hand the trace to an AI assistant) without reversing the obfuscation itself.
 - **`pyobfus … --save-mapping mapping.json --trace-marker`** — stamp each obfuscated file with a `# pyobfus:obfuscated` header (id + mapping filename + the exact `--unmap` command) so an AI agent that lands in an obfuscated file from a traceback immediately knows it's pyobfus output and how to reverse the names.

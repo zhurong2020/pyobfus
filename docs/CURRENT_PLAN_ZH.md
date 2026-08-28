@@ -469,16 +469,24 @@ bytecode 加密。
    alert（链接到 Security tab）+ CI/CD 全部第三方 Action SHA-pinned
    （`gh api` + `grep` 实测核实后才写）。
 
-### 下一轮功能候选（调研 + 设计已完成，等待用户 gate + 3 个决策）
+### 下一轮功能候选（首选项已实现，held in `[Unreleased]`）
 
 2026-08-26 已完成本轮本地代码审计与官方资料调研，完整证据和取舍见
 `docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md`。2026-08-27 已把首选候选
 （配置感知 `--check`）落成**可直接实现的设计** `docs/CONFIG_AWARE_CHECK_DESIGN.md`
-（含共享 `core/config_resolve.py` helper、`PreflightReport` 增量字段、JSON
+（含 `--check`/MCP 共用的 `core/config_resolve.py` helper、`PreflightReport` 增量字段、JSON
 契约全文、测试清单、rollout）。调研+设计解决了技术依据，但不等于用户验证；
-实现仍在 gate 后：先交付 Pro 客户发票，再由用户拍板下方 3 个设计决策。
+用户已于 2026-08-28 打开实现 gate，并接受下方三个推荐决策；首选项已进入
+代码与测试，完整回归已通过，等待下一版本发布 gate。发票 PDF 仍由 Stripe Support
+并行处理，不再阻塞本地开发。
 
-**实现前需用户拍板的 3 个决策**（详见设计文档 §Open questions）：
+**发布 gate（用户 2026-08-28 再确认）**：实现完成不等于允许发布。正式改
+版本号、打 tag 或触发 PyPI/MCP/Marketplace 发布前必须再次取得用户明确同意。
+多个功能不捆成一次大版本：本轮只准备配置感知 `--check`；dry-run plan 与
+syntax-only verification 留作后续独立节奏项，结合下载回落情况，通常至少间隔
+1–2 天逐项评估和发布。
+
+**已确认的 3 个设计决策**（详见设计文档 §Open questions）：
 1. `--check PATH` 的配置发现根：跟 build 一样用工作目录（推荐）vs 相对 `PATH`。
 2. `mitigated_by` 是否允许改写 `--check --json` 里的 `severity` 字符串
    （永不动 `high`、永不影响 `exit_code`），还是只加注解、保留原 severity。
@@ -493,9 +501,10 @@ bytecode 加密。
      finding 从主风险数移出但单列 `excluded_findings`，不静默丢失；只有配置
      确实缓解风险时才注释/降级，dependency declaration 保持项目级扫描。
    - 设计要点（`docs/CONFIG_AWARE_CHECK_DESIGN.md`）：新增 `--no-config`
-     回退开关；`--check` 开始认已有的 `--config`/`--preset`；抽 `main()`
-     内联的 config 解析成 `core/config_resolve.py::resolve_effective_config`
-     （`--check`/build/dry-run plan 三处共用，build 重构须行为不变）；
+     回退开关；`--check` 开始认已有的 `--config`/`--preset`；新增
+     `core/config_resolve.py::resolve_effective_config`，先供 `--check`/MCP
+     共用并镜像 build 优先级；build 重构留到 dry-run plan 独立增量，避免本轮
+     顺带改变成熟的 build/Pro license 路径；
      `PreflightReport` 增 `files_excluded` + `excluded_risks`，`to_dict()`
      增 `effective_config`/`files_excluded`/`excluded_findings`，`Risk` 增
      可选 `mitigated_by`——`severity_counts`/`exit_code`/`risks[]` 形状对
@@ -683,9 +692,9 @@ bytecode 加密。
 > Cold-start 判断：若 `docs/internal/CUSTOMER_SUPPORT_LOG.md` 最新条目
 > 显示发票已 `Paid` 并已发送 PDF，则本清单生效；否则先做发票。
 > （2026-08-28 现状：付款已关联且 receipt 正确，但 invoice PDF 仍错误显示
-> 应付；两份矛盾 PDF 已提交 Stripe Support。先完成 PDF 修复与客户交付，不要
-> 动功能实现，也不要贷记/退款/解除付款/重扣。客户已收到 2026-08-27 进度说明，
-> 除非 Support 往返拖很久，不要再主动给客户发邮件。）
+> 应付；两份矛盾 PDF 已提交 Stripe Support。用户已明确打开本地实现 gate，
+> 因此发票问题不再阻塞开发；仍不要贷记/退款/解除付款/重扣。正式发版继续等待
+> 用户单独确认。）
 
 1. **前置检查**：`git status` 干净、`origin/main` 已同步；三个测试根
    （`tests/`、`pyobfus_mcp/tests/`、`integration_tests/`）+ `black`/`ruff`/
@@ -694,9 +703,8 @@ bytecode 加密。
    发现根、`mitigated_by` 是否改 severity、首版降级范围。定了才动手。
 3. **实现配置感知 `--check`**，严格按 `docs/CONFIG_AWARE_CHECK_DESIGN.md`：
    - 新建 `pyobfus/core/config_resolve.py`（`resolve_effective_config` +
-     `ConfigProvenance`），并把 `main()` 内联 config 解析重构为调用它
-     （行为必须不变：同 config 对象、同 Pro-preset license gate 留在
-     `main()`）。
+     `ConfigProvenance`），本轮供 `--check`/MCP 共用；build 路径重构延后到
+     dry-run plan 独立增量，届时必须保持同 config 对象和 Pro license gate。
    - `pyobfus/cli.py`：`_handle_check` 加 `config_path`/`preset`/`no_config`/
      `level` 参数；dispatch 处转发已解析值；新增 `--no-config` flag；
      `format_report_text` 加 “Effective config” + “Excluded files” 两行。
@@ -719,5 +727,6 @@ bytecode 加密。
    按“1-2 天间隔”节奏 gate（下个 `pyobfus` 版本预计 0.5.18）。发布前跑
    `scripts/check_unreleased_changelogs.py`。
 6. **候选 2/3**（`--dry-run --json` plan 对象、syntax-only 验证 spike）：
-   复用 `config_resolve.py`，可与候选 1 同一版本或紧随其后，设计骨架已在
+   复用 `config_resolve.py`，不得与候选 1 捆成同一版本；按下载回落和用户
+   逐次 gate 决定后续节奏，设计骨架已在
    `docs/CONFIG_AWARE_CHECK_DESIGN.md` 末尾。

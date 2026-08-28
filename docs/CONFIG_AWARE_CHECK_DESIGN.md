@@ -1,14 +1,18 @@
 # Config-aware `--check` — implementation plan
 
-Status: design complete, not implemented. Follows
+Status: implementation complete on `main`, held in `[Unreleased]` pending the
+next version gate. Follows
 `docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md` (candidate 1, GO/P1) and turns
-its research decisions into a concrete, code-grounded plan. No code is committed
-by this document. Implementation still waits on the user's gate (see
-`docs/CURRENT_PLAN_ZH.md` — Pro-customer invoice follow-up is the current
-foreground item; feature implementation is explicitly held until the user says
-to start).
+its research decisions into a concrete, code-grounded plan. The implementation
+gate was opened by the user on 2026-08-28; this document remains the contract
+and review checklist for the held release.
 
-The same config-resolution plumbing this plan extracts is the prerequisite for
+Release boundary confirmed 2026-08-28: this version contains config-aware
+`--check` only. The dry-run plan and syntax-only verification previews below
+remain separate future increments. Do not bump versions, tag, or publish until
+the user explicitly approves the release after reviewing tests and timing.
+
+The config-resolution plumbing introduced by this plan is the prerequisite for
 candidate 2 (`--dry-run --json` plan object), so that is sketched at the end.
 
 ## Problem being solved
@@ -16,7 +20,7 @@ candidate 2 (`--dry-run --json` plan object), so that is sketched at the end.
 `pyobfus --check PATH` today runs `PreflightChecker(check_dependencies=True,
 offline=...)` and never looks at any obfuscation config
 (`pyobfus/cli.py::_handle_check`, ~line 2048). An actual build, by contrast,
-auto-discovers `pyobfus.yaml` / `.pyobfus.yaml` / `pyproject.toml[tool.pyobfus]`
+auto-discovers `pyobfus.yaml` / `.pyobfus.yaml`
 and applies its `exclude_patterns` (`main()` ~line 546-583,
 `config_validator.find_config_file`).
 
@@ -79,8 +83,10 @@ if check:
 
 Config resolution is currently inline in `main()` (lines ~546-660: discover,
 `ObfuscationConfig.from_file` / `.get_preset` / `.pro_edition` / level default).
-Extract a pure function so `--check`, the build path, and the future dry-run
-plan all resolve identically:
+The first increment adds a pure resolver for `--check` and MCP that mirrors the
+build path's precedence. Refactoring the mature build path onto the same helper
+is deliberately deferred to the future dry-run increment, avoiding an unrelated
+build/licensing behavior change in this small release:
 
 ```python
 # pyobfus/core/config_resolve.py  (new module)
@@ -92,8 +98,7 @@ class ConfigProvenance:
     config_path: str | None   # repo-relative when possible, else basename
     preset: str | None
     level: str
-    config_hash: str | None   # "sha256:<hex>" over the raw config bytes,
-                              #  or over a canonical preset descriptor
+    config_hash: str | None   # "sha256:<hex>" over canonical effective config
 
 def resolve_effective_config(
     *, config_path: str | None, preset: str | None, level: str,
@@ -111,9 +116,9 @@ Notes:
   the kind of divergence the research doc warns against. Documented explicitly.
 - `config_hash` reuses whatever `--provenance-manifest` already hashes for its
   `config_hash` field (`pyobfus/core/provenance.py`) so the two never disagree.
-- `main()` is refactored to call this helper. That refactor must be behavior-
-  preserving: same config object, same Pro-preset license gate (the gate stays
-  in `main()`, not in the helper — the helper is write-free and license-free).
+- The existing build path remains unchanged in this increment. Moving it onto
+  the helper is paired with the future dry-run work and must preserve the same
+  config object and Pro-preset license gate.
 
 ## PreflightChecker changes
 
@@ -295,7 +300,8 @@ New / extended:
 - `tests/test_json_cli.py`
   - `--check --json` has `effective_config` with the right `source` for each of:
     explicit `--config`, discovered file, `--preset`, nothing, `--no-config`.
-  - `--check --json --no-config` output equals the pre-change golden.
+  - `--check --json --no-config` preserves pre-change scan/count/exit behavior
+    while identifying the effective config source as `none`.
 - `pyobfus_mcp/tests/`
   - `check_obfuscation_risks(..., use_project_config=False)` reproduces the old
     payload; default `True` adds `effective_config`.
@@ -320,7 +326,7 @@ Run the three roots separately (`tests/`, `pyobfus_mcp/tests/`,
   `docs/AI_INTEGRATION_STRATEGY.md` if it enumerates the contract.
 - `scripts/check_unreleased_changelogs.py` already guards the release-prep step.
 
-## Open questions for the user
+## Decisions resolved by the user
 
 1. **Discovery root for `--check PATH`**: match a build (working directory,
    proposed) vs. discover relative to `PATH`. Proposed = working directory, to

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `pyobfus --check` is now config-aware: it honors explicit or discovered
+  `pyobfus.yaml` plus `--preset`, reports the effective config, and moves
+  findings from excluded files into a separate `excluded_findings` bucket
+  that does not affect the primary risk counts or exit code. `--no-config`
+  preserves the previous unfiltered scan. Literal `getattr()` findings covered
+  by `exclude_names`, and `__all__` under the `safe` preset, are annotated with
+  `mitigated_by` and reduced from `medium` to `info`; mitigation never downgrades
+  a `high` finding, and excluded-file risks cannot block the primary result.
+
 ## [0.5.17] - 2026-08-24
 
 ### Added

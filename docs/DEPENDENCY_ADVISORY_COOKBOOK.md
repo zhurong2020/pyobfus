@@ -14,6 +14,11 @@ This is an advisory, same family as `compatibility_advisory` — it doesn't
 change `--check`'s exit code, and it's a scan of your dependency files, not
 your obfuscation output.
 
+Project config does not hide this project-level check. Source files matched by
+`exclude_patterns` are reported in the separate `excluded_findings` bucket,
+but dependency declarations beside the scan root remain eligible for the
+advisory. Use `--offline` when the public-PyPI lookup is not appropriate.
+
 ## Running it
 
 ```bash
