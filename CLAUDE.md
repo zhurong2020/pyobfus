@@ -12,7 +12,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### ✅ 2026-08-26 — 发布后数据复查、客户开票跟进与功能候选调研
+### ⏳ 2026-08-28 — 客户 paid-invoice PDF 等待 Stripe 技术修复
 
 - 08-24 发布后的首轮完整数据已复查：发布日下载为 Core 137 / MCP 99，
   08-25 随即回落为 27 / 8；GitHub issue、PR、Discussion 均无新增，维持
@@ -36,9 +36,10 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   `--dry-run --json` 的 plan 对象和 syntax-only 验证。暂不做任意
   `--verify-command`、zip/tar delivery bundle、mapping 内建加密或团队 license
   后端。
-- 该轮公开文档提交 `09d8f4f`（发布后信号复查）、`4e5655e`（功能候选调研）
-  及后续 `4ec9c84`/`5973a20`/`d5b1432` **均已 push**（`origin/main` HEAD =
-  `d5b1432`）。冷启动后先读 `docs/CURRENT_PLAN_ZH.md`，等待客户开票资料；
+- 前序公开文档提交 `09d8f4f`、`4e5655e`、`4ec9c84`、`5973a20`、`d5b1432`
+  **均已 push**（`origin/main` HEAD = `d5b1432`）；本次 paid-invoice PDF
+  escalation / session closeout 文档提交仍仅在本地 `main`，尚未 push。
+  冷启动后先读 `docs/CURRENT_PLAN_ZH.md`，等待 Stripe 技术团队刷新 PDF；
   除非用户明确 gate，不启动新功能实现。外部手工项仍是 Canopii claim/rescan、Claude plugin pending 观察，并在
   1–2 周后复查下载；若 9 月 1–7 日仍无 advisory 反馈，再考虑 GitHub Discussion
   投票。
