@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import json
 import textwrap
+from unittest import mock
 from pathlib import Path
 
 
 from pyobfus.core.preflight import (
     CAT_ALL_EXPORT,
     CAT_COMPAT_ADVISORY,
+    CAT_DEPENDENCY_ADVISORY,
     CAT_DYNAMIC_ATTR,
     CAT_DYNAMIC_EXEC,
     CAT_DYNAMIC_IMPORT,
@@ -73,6 +75,53 @@ def test_getattr_with_string_literal_is_medium(tmp_path: Path) -> None:
     risks = [r for r in report.risks if r.category == CAT_DYNAMIC_ATTR]
     assert len(risks) == 1
     assert risks[0].severity == SEVERITY_MEDIUM
+
+
+def test_getattr_preserved_by_config_is_info(tmp_path: Path) -> None:
+    f = _write(tmp_path, "a.py", "v = getattr(obj, 'known_attr')\n")
+    report = PreflightChecker(preserve_names={"known_attr"}).check_path(f)
+    risk = next(r for r in report.risks if r.category == CAT_DYNAMIC_ATTR)
+    assert risk.severity == SEVERITY_INFO
+    assert risk.mitigated_by == "exclude_names"
+    assert risk.to_dict()["mitigated_by"] == "exclude_names"
+
+
+def test_safe_preset_mitigates_all_export(tmp_path: Path) -> None:
+    f = _write(tmp_path, "a.py", "__all__ = ['foo']\ndef foo(): pass\n")
+    report = PreflightChecker(safe_preset=True).check_path(f)
+    risk = next(r for r in report.risks if r.category == CAT_ALL_EXPORT)
+    assert risk.severity == SEVERITY_INFO
+    assert risk.mitigated_by == "preset:safe"
+
+
+def test_excluded_findings_are_bucketed_without_affecting_exit_code(tmp_path: Path) -> None:
+    _write(tmp_path, "main.py", "value = 1\n")
+    _write(tmp_path, "excluded.py", "value = eval('1')\n")
+    report = PreflightChecker(
+        exclude_patterns=["excluded.py"],
+        report_excluded=True,
+        effective_config={"source": "explicit-config"},
+    ).check_path(tmp_path)
+    assert report.exit_code() == 0
+    assert report.files_scanned == 1
+    assert report.files_excluded == 1
+    assert not any(r.category == CAT_DYNAMIC_EXEC for r in report.risks)
+    assert any(r.category == CAT_DYNAMIC_EXEC for r in report.excluded_risks)
+    payload = report.to_dict()
+    assert payload["excluded_findings"]["severity_counts"]["high"] == 1
+
+
+def test_source_excludes_do_not_suppress_dependency_advisory(tmp_path: Path) -> None:
+    (tmp_path / "excluded").mkdir()
+    _write(tmp_path, "excluded/main.py", "value = 1\n")
+    (tmp_path / "requirements.txt").write_text("invented-package-name==1\n", encoding="utf-8")
+    with mock.patch("pyobfus.core.dependency_advisory._pypi_exists", return_value=False):
+        report = PreflightChecker(
+            exclude_patterns=["excluded/**"],
+            check_dependencies=True,
+        ).check_path(tmp_path)
+
+    assert any(r.category == CAT_DEPENDENCY_ADVISORY for r in report.risks)
 
 
 def test_detects_dunder_import(tmp_path: Path) -> None:

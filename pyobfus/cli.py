@@ -331,6 +331,11 @@ except ImportError:
     "outside --check.",
 )
 @click.option(
+    "--no-config",
+    is_flag=True,
+    help="With --check: skip config discovery and scan exactly as legacy --check did.",
+)
+@click.option(
     "--save-mapping",
     "save_mapping_path",
     type=click.Path(),
@@ -436,6 +441,7 @@ def main(
     check_mode: bool,
     json_output: bool,
     offline: bool,
+    no_config: bool,
     save_mapping_path: Optional[str],
     provenance_manifest_path: Optional[str],
     trace_marker: bool,
@@ -467,7 +473,15 @@ def main(
         if not input_path:
             click.echo("Error: --check requires INPUT_PATH.", err=True)
             sys.exit(1)
-        _handle_check(Path(input_path), json_output=json_output, offline=offline)
+        _handle_check(
+            Path(input_path),
+            json_output=json_output,
+            offline=offline,
+            config_path=config_path,
+            preset=preset,
+            level=level,
+            no_config=no_config,
+        )
         return
 
     # Handle --unmap: reverse obfuscated names in a stack trace
@@ -2045,7 +2059,15 @@ def _handle_unmap(
         click.echo(rewritten, nl=False)
 
 
-def _handle_check(input_path: Path, json_output: bool = False, offline: bool = False) -> None:
+def _handle_check(
+    input_path: Path,
+    json_output: bool = False,
+    offline: bool = False,
+    config_path: Optional[str] = None,
+    preset: Optional[str] = None,
+    level: str = "community",
+    no_config: bool = False,
+) -> None:
     """
     Run pre-flight risk scan and print report.
 
@@ -2054,9 +2076,25 @@ def _handle_check(input_path: Path, json_output: bool = False, offline: bool = F
     passed. Exits with code 0 (safe), 1 (high-severity findings), or
     2 (parse errors).
     """
+    from pyobfus.core.config_resolve import resolve_effective_config
     from pyobfus.core.preflight import PreflightChecker, format_report_text
 
-    checker = PreflightChecker(check_dependencies=True, offline=offline)
+    config, provenance = resolve_effective_config(
+        config_path=config_path,
+        preset=preset,
+        level=level,
+        cwd=Path.cwd(),
+        no_config=no_config,
+    )
+    checker = PreflightChecker(
+        exclude_patterns=config.exclude_patterns,
+        preserve_names=config.exclude_names,
+        safe_preset=(provenance.preset == "safe"),
+        report_excluded=not no_config,
+        effective_config=provenance.to_dict(),
+        check_dependencies=True,
+        offline=offline,
+    )
     report = checker.check_path(input_path)
 
     if json_output:

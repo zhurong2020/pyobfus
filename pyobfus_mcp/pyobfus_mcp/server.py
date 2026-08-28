@@ -122,12 +122,22 @@ def _build_server() -> Any:
             "verify_dependencies_online=true, checks each declared dependency "
             "against public PyPI to flag AI-hallucinated ('slopsquatting') "
             "package names -- off by default, this tool makes no outbound "
-            "network calls unless you opt in."
+            "network calls unless you opt in. By default the scan honors the "
+            "project's pyobfus config; set use_project_config=false for the "
+            "legacy config-free scan."
         ),
         meta=dict(_META_COMMUNITY),
     )
-    def _check(path: str, verify_dependencies_online: bool = False) -> Dict[str, Any]:
-        return check_obfuscation_risks(path, verify_dependencies_online=verify_dependencies_online)
+    def _check(
+        path: str,
+        verify_dependencies_online: bool = False,
+        use_project_config: bool = True,
+    ) -> Dict[str, Any]:
+        return check_obfuscation_risks(
+            path,
+            verify_dependencies_online=verify_dependencies_online,
+            use_project_config=use_project_config,
+        )
 
     @app.tool(
         name="generate_pyobfus_config",

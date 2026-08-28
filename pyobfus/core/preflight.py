@@ -24,7 +24,7 @@ import ast
 import json
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence, Set, Tuple
+from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 from pyobfus.core.parser import ASTParser
 from pyobfus.exceptions import ParseError
@@ -66,9 +66,15 @@ class Risk:
     message: str
     suggestion: str
     snippet: str = ""
+    mitigated_by: Optional[str] = None
+    _target_name: Optional[str] = field(default=None, repr=False)
 
     def to_dict(self) -> dict:
-        return asdict(self)
+        data = asdict(self)
+        data.pop("_target_name", None)
+        if data["mitigated_by"] is None:
+            data.pop("mitigated_by")
+        return data
 
 
 @dataclass
@@ -92,6 +98,9 @@ class PreflightReport:
     suggested_preset: Optional[str] = None
     suggested_excludes: List[str] = field(default_factory=list)
     ai_hint: str = ""
+    files_excluded: int = 0
+    excluded_risks: List[Risk] = field(default_factory=list)
+    effective_config: Optional[Dict[str, object]] = None
     # Internal bookkeeping only -- not part of the public to_dict() contract.
     # Several _FRAMEWORK_SIGNATURES entries can share one display name (e.g.
     # torch/tensorflow/keras/transformers/sklearn/joblib all map to "ml"), so
@@ -125,7 +134,7 @@ class PreflightReport:
     # ---- serialization -----------------------------------------------
 
     def to_dict(self) -> dict:
-        return {
+        payload = {
             "version": 1,
             "root": self.root,
             "files_scanned": self.files_scanned,
@@ -139,6 +148,26 @@ class PreflightReport:
             "ai_hint": self.ai_hint,
             "exit_code": self.exit_code(),
         }
+        if self.effective_config is not None:
+            payload["effective_config"] = self.effective_config
+            payload["files_excluded"] = self.files_excluded
+            excluded_severity = {
+                SEVERITY_HIGH: 0,
+                SEVERITY_MEDIUM: 0,
+                SEVERITY_LOW: 0,
+                SEVERITY_INFO: 0,
+            }
+            excluded_categories: Dict[str, int] = {}
+            for risk in self.excluded_risks:
+                excluded_severity[risk.severity] += 1
+                excluded_categories[risk.category] = excluded_categories.get(risk.category, 0) + 1
+            payload["excluded_findings"] = {
+                "count": len(self.excluded_risks),
+                "severity_counts": excluded_severity,
+                "category_counts": excluded_categories,
+                "sample": [risk.to_dict() for risk in self.excluded_risks[:10]],
+            }
+        return payload
 
     def to_json(self, indent: int = 2) -> str:
         return json.dumps(self.to_dict(), indent=indent, ensure_ascii=False)
@@ -328,13 +357,14 @@ class _RiskVisitor(ast.NodeVisitor):
                     "or rewrite to static attribute access.",
                 )
             else:
-                self._add(
+                risk = self._add(
                     CAT_DYNAMIC_ATTR,
                     SEVERITY_MEDIUM,
                     node,
                     f"{name}() with string literal — ensure the target name is preserved.",
                     "Add the literal name to 'exclude_names' in pyobfus.yaml.",
                 )
+                risk._target_name = _constant_attr_name(node)
         elif name == "__import__":
             self._add(
                 CAT_DYNAMIC_IMPORT,
@@ -444,18 +474,18 @@ class _RiskVisitor(ast.NodeVisitor):
 
     def _add(
         self, category: str, severity: str, node: ast.AST, message: str, suggestion: str
-    ) -> None:
-        self.risks.append(
-            Risk(
-                category=category,
-                severity=severity,
-                file=self.filename,
-                line=getattr(node, "lineno", 0),
-                col=getattr(node, "col_offset", 0),
-                message=message,
-                suggestion=suggestion,
-            )
+    ) -> Risk:
+        risk = Risk(
+            category=category,
+            severity=severity,
+            file=self.filename,
+            line=getattr(node, "lineno", 0),
+            col=getattr(node, "col_offset", 0),
+            message=message,
+            suggestion=suggestion,
         )
+        self.risks.append(risk)
+        return risk
 
     def _is_sys_meta_path(self, node: ast.AST) -> bool:
         return (
@@ -529,6 +559,14 @@ def _first_arg_is_constant_string(node: ast.Call) -> bool:
     return isinstance(arg, ast.Constant) and isinstance(arg.value, str)
 
 
+def _constant_attr_name(node: ast.Call) -> Optional[str]:
+    if not _first_arg_is_constant_string(node):
+        return None
+    value = node.args[1]
+    assert isinstance(value, ast.Constant)
+    return value.value if isinstance(value.value, str) else None
+
+
 def _has_true_keyword(node: ast.Call, keyword_name: str) -> bool:
     for kw in node.keywords:
         if kw.arg == keyword_name and isinstance(kw.value, ast.Constant) and kw.value.value is True:
@@ -565,6 +603,10 @@ class PreflightChecker:
         *,
         check_dependencies: bool = False,
         offline: bool = False,
+        preserve_names: Optional[Iterable[str]] = None,
+        safe_preset: bool = False,
+        report_excluded: bool = False,
+        effective_config: Optional[Dict[str, object]] = None,
     ) -> None:
         self.exclude_patterns: List[str] = list(exclude_patterns or [])
         # Opt-in dependency-hallucination advisory (see
@@ -575,6 +617,10 @@ class PreflightChecker:
         # When check_dependencies is True: skip the PyPI network lookups
         # (an explicit opt-out, produces no findings/caveats either way).
         self.offline = offline
+        self.preserve_names = set(preserve_names or [])
+        self.safe_preset = safe_preset
+        self.report_excluded = report_excluded
+        self.effective_config = effective_config
 
     def check_path(self, path: Path) -> PreflightReport:
         if path.is_file():
@@ -585,6 +631,7 @@ class PreflightChecker:
 
     def _check_file(self, file_path: Path, root: Path) -> PreflightReport:
         report = PreflightReport(root=str(root))
+        report.effective_config = self.effective_config
         self._scan_one(file_path, report)
         self._finalize(report)
         return report
@@ -593,11 +640,27 @@ class PreflightChecker:
 
     def _check_directory(self, directory: Path) -> PreflightReport:
         report = PreflightReport(root=str(directory))
+        report.effective_config = self.effective_config
         files = filter_python_files(directory, self.exclude_patterns)
         for f in files:
             self._scan_one(f, report)
+        if self.report_excluded and self.exclude_patterns:
+            included = set(files)
+            for f in filter_python_files(directory, []):
+                if f not in included:
+                    self._scan_excluded(f, report)
         self._finalize(report)
         return report
+
+    def _scan_excluded(self, file_path: Path, report: PreflightReport) -> None:
+        try:
+            tree = ASTParser.parse_file(file_path)
+        except (ParseError, FileNotFoundError, ValueError):
+            return
+        visitor = _RiskVisitor(str(file_path))
+        visitor.visit(tree)
+        report.excluded_risks.extend(visitor.risks)
+        report.files_excluded += 1
 
     # ---- core scan ----------------------------------------------------
 
@@ -633,6 +696,20 @@ class PreflightChecker:
     # ---- finalize: suggested preset + ai_hint -------------------------
 
     def _finalize(self, report: PreflightReport) -> None:
+        for risk in report.risks:
+            if (
+                risk.category == CAT_DYNAMIC_ATTR
+                and risk.severity == SEVERITY_MEDIUM
+                and risk._target_name in self.preserve_names
+            ):
+                risk.severity = SEVERITY_INFO
+                risk.mitigated_by = "exclude_names"
+                risk.message = (
+                    f"{risk._target_name!r} is preserved by the effective exclude_names config."
+                )
+            elif risk.category == CAT_ALL_EXPORT and self.safe_preset:
+                risk.severity = SEVERITY_INFO
+                risk.mitigated_by = "preset:safe"
         # Framework-driven preset suggestion (first detected wins, highest priority first)
         priority = ["fastapi", "django", "flask", "pydantic", "click", "sqlalchemy", "ml"]
         # Map framework display name -> preset key via _FRAMEWORK_SIGNATURES
@@ -726,6 +803,12 @@ class PreflightChecker:
         else:
             report.ai_hint = f"Low risk. Run: pyobfus {report.root} -o dist/ --preset balanced"
 
+        if report.excluded_risks:
+            report.ai_hint += (
+                f" {len(report.excluded_risks)} finding(s) in excluded files are reported "
+                "separately and do not affect this result."
+            )
+
 
 # ---------------------------------------------------------------------------
 # Text formatter (human-readable output)
@@ -741,6 +824,14 @@ def format_report_text(report: PreflightReport, show_risks_limit: int = 20) -> s
     lines.append("=" * 60)
     lines.append(f"  Root: {report.root}")
     lines.append(f"  Files scanned: {report.files_scanned}")
+    if report.effective_config is not None:
+        config = report.effective_config
+        label = config.get("config_path") or config.get("preset") or config.get("source")
+        lines.append(f"  Effective config: {label} ({config.get('source')})")
+        lines.append(
+            f"  Excluded files: {report.files_excluded}; "
+            f"findings reported separately: {len(report.excluded_risks)}"
+        )
 
     counts = report.severity_counts()
     lines.append(

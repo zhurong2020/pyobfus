@@ -123,6 +123,42 @@ def test_check_json_output_shape(tmp_path: Path) -> None:
     assert "exit_code" in data
 
 
+def test_check_json_uses_discovered_config_and_buckets_excluded(
+    tmp_path: Path, monkeypatch: object
+) -> None:
+    (tmp_path / "pyobfus.yaml").write_text(
+        "obfuscation:\n  exclude_patterns: ['excluded.py']\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "main.py").write_text("value = 1\n", encoding="utf-8")
+    (tmp_path / "excluded.py").write_text("value = eval('1')\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)  # type: ignore[attr-defined]
+    result = CliRunner().invoke(main, ["--check", str(tmp_path), "--json", "--offline"])
+    assert result.exit_code == 0, result.output
+    data = json.loads(result.output)
+    assert data["effective_config"]["source"] == "auto-discovered"
+    assert data["files_excluded"] == 1
+    assert data["excluded_findings"]["severity_counts"]["high"] == 1
+
+
+def test_check_json_no_config_preserves_unfiltered_scan(
+    tmp_path: Path, monkeypatch: object
+) -> None:
+    (tmp_path / "pyobfus.yaml").write_text(
+        "obfuscation:\n  exclude_patterns: ['excluded.py']\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "excluded.py").write_text("value = eval('1')\n", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)  # type: ignore[attr-defined]
+    result = CliRunner().invoke(
+        main, ["--check", str(tmp_path), "--json", "--offline", "--no-config"]
+    )
+    assert result.exit_code == 1
+    data = json.loads(result.output)
+    assert data["effective_config"]["source"] == "none"
+    assert data["files_excluded"] == 0
+
+
 def test_check_offline_flag_skips_dependency_advisory_network_calls(tmp_path: Path) -> None:
     (tmp_path / "requirements.txt").write_text(
         "totally-made-up-hallucinated-pkg==1.0\n", encoding="utf-8"

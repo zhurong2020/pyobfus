@@ -1,13 +1,18 @@
 {
-  "digest": "bf93cff323ea016e87b1c2a34d0c092d0f237751928494b4f73e5a0edada152c",
+  "digest": "ed4541b572e2211c715bf0e3bc357a937ad4c3aff1eaea2c5d02cab522aed70d",
   "tools": [
     {
-      "description": "Scan a Python project for patterns that may break obfuscation (eval/exec, dynamic attribute access, framework reflection, unsafe model loading). Returns severity counts, detected frameworks (FastAPI/Django/Flask/Pydantic/Click/SQLAlchemy/ML), and a suggested preset. Also locates requirements*.txt / pyproject.toml and, only if verify_dependencies_online=true, checks each declared dependency against public PyPI to flag AI-hallucinated ('slopsquatting') package names -- off by default, this tool makes no outbound network calls unless you opt in.",
+      "description": "Scan a Python project for patterns that may break obfuscation (eval/exec, dynamic attribute access, framework reflection, unsafe model loading). Returns severity counts, detected frameworks (FastAPI/Django/Flask/Pydantic/Click/SQLAlchemy/ML), and a suggested preset. Also locates requirements*.txt / pyproject.toml and, only if verify_dependencies_online=true, checks each declared dependency against public PyPI to flag AI-hallucinated ('slopsquatting') package names -- off by default, this tool makes no outbound network calls unless you opt in. By default the scan honors the project's pyobfus config; set use_project_config=false for the legacy config-free scan.",
       "input_schema": {
         "properties": {
           "path": {
             "title": "Path",
             "type": "string"
+          },
+          "use_project_config": {
+            "default": true,
+            "title": "Use Project Config",
+            "type": "boolean"
           },
           "verify_dependencies_online": {
             "default": false,

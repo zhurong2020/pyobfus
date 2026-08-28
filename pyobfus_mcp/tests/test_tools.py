@@ -360,6 +360,23 @@ def test_check_obfuscation_risks_no_pro_value_on_clean_project(tmp_path: Path) -
     ), f"clean project should not get pro_value; got {result.get('pro_value')!r}"
 
 
+def test_check_obfuscation_risks_uses_project_config_by_default(tmp_path: Path) -> None:
+    _write(tmp_path, "main.py", "value = 1\n")
+    _write(tmp_path, "excluded.py", "value = eval('1')\n")
+    (tmp_path / "pyobfus.yaml").write_text(
+        "obfuscation:\n  exclude_patterns: ['excluded.py']\n", encoding="utf-8"
+    )
+    configured = check_obfuscation_risks(str(tmp_path))
+    assert configured["effective_config"]["source"] == "auto-discovered"
+    assert configured["files_excluded"] == 1
+    assert configured["severity_counts"]["high"] == 0
+    assert configured["excluded_findings"]["severity_counts"]["high"] == 1
+
+    legacy = check_obfuscation_risks(str(tmp_path), use_project_config=False)
+    assert "effective_config" not in legacy
+    assert legacy["severity_counts"]["high"] == 1
+
+
 def test_check_obfuscation_risks_pro_value_on_sensitive_literals(
     tmp_path: Path,
 ) -> None:

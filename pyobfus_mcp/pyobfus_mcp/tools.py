@@ -360,7 +360,11 @@ def _pro_value_for_scan(
 
 
 @secure_tool()
-def check_obfuscation_risks(path: str, verify_dependencies_online: bool = False) -> Dict[str, Any]:
+def check_obfuscation_risks(
+    path: str,
+    verify_dependencies_online: bool = False,
+    use_project_config: bool = True,
+) -> Dict[str, Any]:
     """Scan a Python project for patterns that may break obfuscation.
 
     Wraps `pyobfus --check`. Returns a structured report with severity
@@ -382,6 +386,9 @@ def check_obfuscation_risks(path: str, verify_dependencies_online: bool = False)
             Off by default (no network access). When off, dependency files
             are still located but not checked, and no risk is reported for
             them.
+        use_project_config: Resolve pyobfus config from the scanned project's
+            directory and report excluded-file findings separately. Set False
+            for the legacy unconfigured scan.
 
     Returns:
         Dict with keys: status, files_scanned, severity_counts,
@@ -404,9 +411,28 @@ def check_obfuscation_risks(path: str, verify_dependencies_online: bool = False)
     except FileNotFoundError as e:
         return _error("PathNotFound", str(e), "Double-check the path and try again.")
 
-    report = PreflightChecker(
-        check_dependencies=True, offline=not verify_dependencies_online
-    ).check_path(target)
+    checker_kwargs: Dict[str, Any] = {
+        "check_dependencies": True,
+        "offline": not verify_dependencies_online,
+    }
+    if use_project_config:
+        from pyobfus.core.config_resolve import resolve_effective_config
+
+        discovery_root = target if target.is_dir() else target.parent
+        config, provenance = resolve_effective_config(
+            config_path=None,
+            preset=None,
+            level="community",
+            cwd=discovery_root,
+        )
+        checker_kwargs.update(
+            exclude_patterns=config.exclude_patterns,
+            preserve_names=config.exclude_names,
+            safe_preset=(provenance.preset == "safe"),
+            report_excluded=True,
+            effective_config=provenance.to_dict(),
+        )
+    report = PreflightChecker(**checker_kwargs).check_path(target)
     payload = report.to_dict()
     payload["status"] = "success" if payload.get("exit_code", 0) == 0 else "warnings"
 
