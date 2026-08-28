@@ -3,8 +3,12 @@ Tests for the trial management system.
 """
 
 import json
+import sys
 import pytest
 from datetime import datetime, timedelta
+from pathlib import Path
+
+import pyobfus.trial as trial_module
 
 from pyobfus.trial import (
     start_trial,
@@ -15,6 +19,17 @@ from pyobfus.trial import (
     TRIAL_FILE,
     TRIAL_DURATION,
 )
+
+
+@pytest.fixture(autouse=True)
+def isolated_trial_state(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep trial tests away from the developer's real ~/.pyobfus state."""
+    trial_dir = tmp_path / ".pyobfus"
+    trial_file = trial_dir / "trial.json"
+    monkeypatch.setattr(trial_module, "TRIAL_DIR", trial_dir)
+    monkeypatch.setattr(trial_module, "TRIAL_FILE", trial_file)
+    monkeypatch.setattr(sys.modules[__name__], "TRIAL_FILE", trial_file)
+    assert trial_module.TRIAL_FILE.is_relative_to(tmp_path)
 
 
 class TestTrialDeviceId:
@@ -44,15 +59,6 @@ class TestTrialDeviceId:
 
 class TestTrialManagement:
     """Tests for trial start and status."""
-
-    @pytest.fixture(autouse=True)
-    def cleanup_trial(self):
-        """Clean up trial file before and after each test."""
-        if TRIAL_FILE.exists():
-            TRIAL_FILE.unlink()
-        yield
-        if TRIAL_FILE.exists():
-            TRIAL_FILE.unlink()
 
     def test_no_trial_initially(self):
         """Should return None when no trial exists."""
@@ -111,15 +117,6 @@ class TestTrialManagement:
 
 class TestTrialExpiration:
     """Tests for trial expiration behavior."""
-
-    @pytest.fixture(autouse=True)
-    def cleanup_trial(self):
-        """Clean up trial file before and after each test."""
-        if TRIAL_FILE.exists():
-            TRIAL_FILE.unlink()
-        yield
-        if TRIAL_FILE.exists():
-            TRIAL_FILE.unlink()
 
     def test_expired_trial_not_active(self):
         """Expired trial should not be active."""
@@ -188,14 +185,6 @@ class TestTrialTrustBoundary:
     re-read SECURITY.md and update the documented boundary deliberately rather
     than shipping a change that only looks like enforcement.
     """
-
-    @pytest.fixture(autouse=True)
-    def cleanup_trial(self):
-        if TRIAL_FILE.exists():
-            TRIAL_FILE.unlink()
-        yield
-        if TRIAL_FILE.exists():
-            TRIAL_FILE.unlink()
 
     def test_trial_state_is_unsigned_plaintext(self):
         """State carries no signature or MAC that could detect edits."""

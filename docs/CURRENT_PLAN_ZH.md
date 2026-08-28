@@ -486,6 +486,12 @@ bytecode 加密。
 syntax-only verification 留作后续独立节奏项，结合下载回落情况，通常至少间隔
 1–2 天逐项评估和发布。
 
+**测试隔离已修复（2026-08-28）**：trial、Pro license cache、license-embed
+run counter 测试不再读写开发者真实 `~/.pyobfus` / HOME，而是逐测试绑定
+pytest `tmp_path`。在 Codex 的只读 HOME 沙箱中直接运行标准
+`venv/bin/pytest tests/` 已通过（1201 passed, 1 skipped），不再需要临时覆盖
+`HOME=/tmp/...`；生产默认状态路径未改变。
+
 **已确认的 3 个设计决策**（详见设计文档 §Open questions）：
 1. `--check PATH` 的配置发现根：跟 build 一样用工作目录（推荐）vs 相对 `PATH`。
 2. `mitigated_by` 是否允许改写 `--check --json` 里的 `severity` 字符串

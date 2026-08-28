@@ -7,8 +7,10 @@ These tests verify the license verification, caching, and management functionali
 import hashlib
 import io
 import json
+import sys
 import tempfile
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Any
 from unittest.mock import MagicMock, patch
 
@@ -83,6 +85,21 @@ except ImportError:
     def get_device_fingerprint(*args: Any, **kwargs: Any) -> str:  # type: ignore[no-redef]
         """Stub for get_device_fingerprint."""
         return "stub-fingerprint"
+
+
+@pytest.fixture(autouse=True)
+def isolated_license_cache(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep license tests away from the developer's real ~/.pyobfus cache."""
+    if not PRO_AVAILABLE:
+        return
+    import pyobfus_pro.license as license_module
+
+    cache_dir = tmp_path / ".pyobfus"
+    cache_file = cache_dir / "license.json"
+    monkeypatch.setattr(license_module, "CACHE_DIR", cache_dir)
+    monkeypatch.setattr(license_module, "CACHE_FILE", cache_file)
+    monkeypatch.setattr(sys.modules[__name__], "CACHE_FILE", cache_file)
+    assert license_module.CACHE_FILE.is_relative_to(tmp_path)
 
 
 class TestLicenseKeyGeneration:

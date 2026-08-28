@@ -217,8 +217,10 @@ def hello():
         ast.fix_missing_locations(result)
         compile(result, "<test>", "exec")
 
-    def test_run_count_works(self):
+    def test_run_count_works(self, tmp_path, monkeypatch):
         """Test that run count tracking works."""
+        monkeypatch.setenv("HOME", str(tmp_path))
+        monkeypatch.setenv("USERPROFILE", str(tmp_path))
         code = """
 result = "success"
 """
@@ -241,6 +243,8 @@ result = "success"
                 exec(compiled, namespace)
                 assert namespace["result"] == "success"
 
+            assert (tmp_path / counter_file).exists()
+
             # 6th run should fail
             with pytest.raises(RuntimeError, match="run limit"):
                 exec(compiled, {})
@@ -260,8 +264,10 @@ result = "success"
         assert len(fp) == 16  # 16 hex characters
         assert all(c in "0123456789abcdef" for c in fp)
 
-    def test_combined_restrictions(self):
+    def test_combined_restrictions(self, tmp_path, monkeypatch):
         """Test combining multiple restrictions."""
+        monkeypatch.setenv("HOME", str(tmp_path))
+        monkeypatch.setenv("USERPROFILE", str(tmp_path))
         code = """
 result = "success"
 """
@@ -284,6 +290,7 @@ result = "success"
         namespace = {}
         exec(compiled, namespace)
         assert namespace["result"] == "success"
+        assert (tmp_path / ".pyobfus_rc").exists()
 
 
 class TestConvenienceFunction:
