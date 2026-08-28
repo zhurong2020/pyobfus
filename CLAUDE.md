@@ -23,19 +23,23 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   付款应用不匹配问题（Payment Link 一次性购买记在 guest customer 名下，
   无法把既有付款应用到 regular Customer 的发票），已于 2026-08-27 联系
   Stripe Support 等待回复。不把单次开票需求提前解释为团队许可或企业功能
-  需求。当前状态、hold 清单与后续步骤以 `docs/CURRENT_PLAN_ZH.md` 为准；
-  具体客户/支付信息只留在 Git 忽略的 `docs/internal/` 运营记录，绝不进入
-  公开提交。
+  需求。（2026-08-28 追加：既有付款现已成功关联，Dashboard 与 receipt 均为
+  已付/US$0.00 remaining，但新下载的 invoice PDF 仍错误显示全额应付；正确
+  收据与错误发票已附在 Support 原线程，请技术团队刷新。不得开贷项通知单、
+  退款、解除付款或重扣。客户已收到 08-27 的非新扣款澄清，冷启动无需再发
+  例行进度更新，除非 Support 往返拖很久。）当前状态、hold 清单与后续
+  步骤以 `docs/CURRENT_PLAN_ZH.md` 为准；具体客户/支付信息只留在 Git 忽略
+  的 `docs/internal/` 运营记录，绝不进入公开提交。
 - 下一轮功能方向已完成代码审计与官方资料调研，见
   [`docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md`](docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md)。
   首选实现候选为配置感知的 `--check`；随后考虑扩充现有
   `--dry-run --json` 的 plan 对象和 syntax-only 验证。暂不做任意
   `--verify-command`、zip/tar delivery bundle、mapping 内建加密或团队 license
   后端。
-- 本 session 两个公开文档提交为 `09d8f4f`（发布后信号复查）和 `4e5655e`
-  （功能候选调研）；均只在本地 `main`，尚未 push。冷启动后先读
-  `docs/CURRENT_PLAN_ZH.md`，等待客户开票资料；除非用户明确 gate，不启动新功能
-  实现。外部手工项仍是 Canopii claim/rescan、Claude plugin pending 观察，并在
+- 该轮公开文档提交 `09d8f4f`（发布后信号复查）、`4e5655e`（功能候选调研）
+  及后续 `4ec9c84`/`5973a20`/`d5b1432` **均已 push**（`origin/main` HEAD =
+  `d5b1432`）。冷启动后先读 `docs/CURRENT_PLAN_ZH.md`，等待客户开票资料；
+  除非用户明确 gate，不启动新功能实现。外部手工项仍是 Canopii claim/rescan、Claude plugin pending 观察，并在
   1–2 周后复查下载；若 9 月 1–7 日仍无 advisory 反馈，再考虑 GitHub Discussion
   投票。
 
