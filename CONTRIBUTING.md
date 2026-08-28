@@ -87,6 +87,12 @@ pip install -e ".[dev]"
 pytest tests/ -v
 ```
 
+Tests that exercise trial state, license caching, or generated run counters
+must isolate those files with pytest's `tmp_path`. Never let a test touch the
+developer's real `~/.pyobfus` directory or HOME, and do not make contributors
+override `HOME` merely to run the suite. See `AGENTS.md` for the canonical test
+isolation rule.
+
 ### Development Workflow
 
 ```bash

@@ -50,6 +50,13 @@ Note: the core and MCP test roots are collected as **separate** pytest
 invocations (CI runs them as separate jobs) — don't point one `pytest` at both
 roots at once.
 
+Tests must never read, write, or delete a developer's real pyobfus state under
+`~/.pyobfus` (notably `trial.json` and `license.json`) or place generated run
+counters in the real home directory. Bind module-level state paths and any
+generated-code `HOME` / `USERPROFILE` lookup to pytest's per-test `tmp_path`.
+The standard commands above must pass with the caller's normal HOME; requiring
+`HOME=/tmp/...` is a test-isolation regression, not an accepted prerequisite.
+
 **4th test root — `vscode-extension/`** (Node/npm, not pytest; independent
 package, see `docs/VSCODE_EXTENSION_PLAN.md`):
 
