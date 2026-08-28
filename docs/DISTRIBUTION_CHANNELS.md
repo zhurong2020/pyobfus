@@ -7,9 +7,9 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-**Last updated**: 2026-08-26 (first post-0.5.17/0.3.8 signal recheck completed;
-08-25 non-release-day downloads and clones returned to baseline, with no new
-issue/PR/Discussion feedback. VS Code extension remains 0.4.1.)
+**Last updated**: 2026-08-28 (pyobfus 0.5.18 and pyobfus-mcp 0.3.9 published
+through OIDC; GitHub Releases, provenance, MCP Registry and a clean public-PyPI
+install verified. VS Code extension remains 0.4.1.)
 
 > **Note (2026-05-09)**: most of the per-channel facts below are now current as of Session 23. Outside of the launch wave (HN 5-11 / Reddit 5-12 / CN trio 5-8/9), the live state is reflected here. Consult `docs/POST_V0.4_TODO.md` for forward TODO and `docs/V0.4_EXECUTION_LOG.md` for session-by-session deltas.
 
@@ -19,8 +19,8 @@ issue/PR/Discussion feedback. VS Code extension remains 0.4.1.)
 
 ### PyPI — `pyobfus`
 - URL: https://pypi.org/project/pyobfus/
-- Current version: **0.5.17** (released 2026-08-24) · ships with PEP 740 attestations via OIDC trusted publishing
-- Current headline: experimental `dependency_advisory` in `--check` verifies declared package names against public PyPI (`--offline` disables it), with explicit feedback requested before deciding whether to split it into a standalone package.
+- Current version: **0.5.18** (released 2026-08-28) · ships with PEP 740 attestations via OIDC trusted publishing
+- Current headline: config-aware `--check` reports the effective project configuration and findings already mitigated by it, while preserving high-risk findings and exit-code semantics.
 - Pre-v0.4 baseline: ~324 downloads / month, ~30% real users (rest is mirror noise)
 - 2026-08-24 pypistats snapshot (data through 08-23, known mirrors excluded):
   day/week/month `27 / 502 / 2,059`. Weekly growth is dominated by release-day
@@ -33,8 +33,8 @@ issue/PR/Discussion feedback. VS Code extension remains 0.4.1.)
 
 ### PyPI — `pyobfus-mcp`
 - URL: https://pypi.org/project/pyobfus-mcp/
-- Current version: **0.3.8** (released 2026-08-24) · ships with PEP 740 attestations via OIDC trusted publishing
-- 0.3.8 contents: `check_obfuscation_risks` adds opt-in `verify_dependencies_online` (default false), structured Pro guidance adds `pricing_model: one_time`, and the runtime dependency floor moves to `pyobfus>=0.5.17`.
+- Current version: **0.3.9** (released 2026-08-28) · ships with PEP 740 attestations via OIDC trusted publishing
+- 0.3.9 contents: `check_obfuscation_risks` adds default-on `use_project_config`, returns effective-config and excluded-finding context from Core, and moves the runtime dependency floor to `pyobfus>=0.5.18`.
 - 2026-08-24 pypistats snapshot (data through 08-23, known mirrors excluded):
   day/week/month `11 / 242 / 772`. Release-day spikes (08-17 `95`, 08-22 `110`)
   dominate the weekly increase; 08-23 returned to `11`. CI/CD traffic remains
@@ -66,7 +66,7 @@ issue/PR/Discussion feedback. VS Code extension remains 0.4.1.)
   prior is not evidence of an actual review. Continue tracking installs and
   real reviews, not raw update/download count alone.
 - Wiki: disabled · Discussions: enabled · Issues: open
-- Releases: latest `v0.5.17` (2026-08-24); earlier releases `v0.3.3` … `v0.5.16`, plus `mcp-v0.3.x` and `vscode-v0.x` tags (mcp releases attach wheel+sdist).
+- Releases: latest `v0.5.18` (2026-08-28); earlier releases `v0.3.3` … `v0.5.17`, plus `mcp-v0.3.x` and `vscode-v0.x` tags (mcp releases attach wheel+sdist).
 
 ### 有心工坊 (personal blog)
 - URL: https://www.arong.eu.org
@@ -110,8 +110,8 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 
 ### MCP Registry — `io.github.zhurong2020/pyobfus-mcp` 🟢 LIVE
 - URL: https://registry.modelcontextprotocol.io/v0/servers?search=pyobfus
-- Latest published: **0.3.8** (2026-08-24) · status: `active` · `isLatest=true` confirmed via `mcp-publisher publish` (GitHub device-code re-auth) and the public search endpoint.
-- 0.3.8 contents: opt-in dependency-name verification, structured one-time-pricing guidance, and runtime floor `pyobfus>=0.5.17`; see the PyPI section above. Previous 0.3.6 hardening: `pyobfus_mcp/server.json` validates against the official `2025-12-11` schema and includes GitHub repository stable ID `1093960892`; `fileSha256` remains omitted because the PyPI wheel/sdist multi-artifact model makes a single optional hash ambiguous.
+- Latest published: **0.3.9** (2026-08-28) · status: `active` · `isLatest=true` confirmed via the direct public version endpoint after `mcp-publisher publish`.
+- 0.3.9 contents: default-on project-config awareness and runtime floor `pyobfus>=0.5.18`; see the PyPI section above. Previous 0.3.6 hardening: `pyobfus_mcp/server.json` validates against the official `2025-12-11` schema and includes GitHub repository stable ID `1093960892`; `fileSha256` remains omitted because the PyPI wheel/sdist multi-artifact model makes a single optional hash ambiguous.
 - Implications: Claude Desktop / Claude Code / Cursor / Windsurf / Zed users querying the registry for "pyobfus" or "python obfuscator" will discover this server without manual config file edits.
 
 ### Glama — `zhurong2020/pyobfus` 🟡 LISTED / API STALE

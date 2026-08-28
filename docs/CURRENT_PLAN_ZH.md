@@ -1,14 +1,13 @@
 # pyobfus 当前计划
 
-更新时间：2026-08-28（`pyobfus` 0.5.17 / `pyobfus-mcp` 0.3.8 已发布；
-0.5.18 / 0.3.9 今日小版本候选正在本地准备，尚未 tag / push / 发布；
+更新时间：2026-08-28（`pyobfus` 0.5.18 / `pyobfus-mcp` 0.3.9 已发布；
 `vscode-extension` 最新仍为 0.4.1。既有付款
 现已成功关联，Dashboard 显示 Paid / US$0.00 remaining，且 Stripe 生成的收据
 正确；但新下载的 invoice PDF 仍错误显示全额应付。已把正确收据与错误发票
 作为附件回复 Stripe Support，请 Billing/Invoicing 技术团队刷新 PDF；不得开
 贷项通知单、退款、解除付款或重新扣款。客户此前已收到澄清邮件，冷启动无需
-再发例行进度更新。用户已允许本地发布准备，但正式 tag / 发布仍需再次明确
-同意）
+再发例行进度更新。本次正式发布已获用户明确批准并完成；后续每次正式发布仍
+须单独取得用户同意）
 
 这份文档是当前项目状态和后续计划的中文单一入口，面向维护者日常查看。旧的
 `ROADMAP.md` 和 `POST_V0.4_TODO.md` 保留为历史归档和详细来源，但后续日常
@@ -25,19 +24,24 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
 
 ## 当前状态
 
+- **2026-08-28 发布完成**：`pyobfus 0.5.18` 与 `pyobfus-mcp 0.3.9` 已通过
+  tag 触发的 OIDC workflow 发布到 PyPI，并分别创建 GitHub Release；四个
+  wheel/sdist Integrity provenance endpoint 均返回 HTTP 200。MCP Registry
+  0.3.9 已公开核实为 `active` / `isLatest=true`，全新虚拟环境从公开 PyPI
+  安装 `pyobfus-mcp==0.3.9` 会解析到 Core 0.5.18，manifest 校验通过。
+
 - **2026-08-24 发布完成**：`pyobfus 0.5.17` 与 `pyobfus-mcp 0.3.8` 已通过
   tag 触发的 OIDC workflow 发布到 PyPI，两个 wheel 的 Integrity provenance
   endpoint 均返回 HTTP 200；GitHub Releases 已创建。MCP Registry 0.3.8 已
   发布并公开核实为 `active` / `isLatest=true`。VS Code 扩展 `[Unreleased]`
   为空，本轮保持 0.4.1 不动。
 
-- 主包：`pyobfus 0.5.17` 已发布（2026-08-24）——`--check` 新增
-  `dependency_advisory`，默认联网核实声明的依赖名是否存在于公开 PyPI，
-  `--offline` 可关闭；同时发布诚实 Pro 引导、PyArmor VMC/ECC 对比和 Community
-  项目规模口径修正。
-- MCP 包：`pyobfus-mcp 0.3.8` 已发布（2026-08-24）——新增默认关闭的
-  `verify_dependencies_online` 参数，维持默认零出站网络；补
-  `pricing_model: one_time`，并将依赖下限提升到 `pyobfus>=0.5.17`。
+- 主包：`pyobfus 0.5.18` 已发布（2026-08-28）——`--check` 可解析有效项目
+  配置并报告 `effective_config` / `excluded_findings`，在不改变 high finding 与
+  exit code 的前提下解释配置已缓解的风险。
+- MCP 包：`pyobfus-mcp 0.3.9` 已发布（2026-08-28）——
+  `check_obfuscation_risks` 新增默认开启的 `use_project_config`，并将依赖下限
+  提升到 `pyobfus>=0.5.18`；VS Code 扩展本轮无改动。
 - VS Code 扩展：`0.4.1` 已 tag + GitHub Release 发布（P2-33，"Why trust this
   extension" 小节强化 Nx Console 事件对比 + CodeQL/CI 签名信号），**Marketplace
   手工上传也已由用户完成**——微软 "[Succeeded]" 确认邮件已收到，公开 listing
@@ -470,7 +474,7 @@ bytecode 加密。
    alert（链接到 Security tab）+ CI/CD 全部第三方 Action SHA-pinned
    （`gh api` + `grep` 实测核实后才写）。
 
-### 下一轮功能候选（首选项已形成 0.5.18 / 0.3.9 本地发布候选）
+### 下一轮功能候选（首选项已随 0.5.18 / 0.3.9 发布）
 
 2026-08-26 已完成本轮本地代码审计与官方资料调研，完整证据和取舍见
 `docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md`。2026-08-27 已把首选候选
@@ -478,8 +482,7 @@ bytecode 加密。
 （含 `--check`/MCP 共用的 `core/config_resolve.py` helper、`PreflightReport` 增量字段、JSON
 契约全文、测试清单、rollout）。调研+设计解决了技术依据，但不等于用户验证；
 用户已于 2026-08-28 打开实现 gate，并接受下方三个推荐决策；首选项已进入
-代码与测试，完整回归已通过，版本元数据已进入今日小版本准备，等待最终发布
-gate。发票 PDF 仍由 Stripe Support
+代码与测试，并在用户明确批准后完成 0.5.18 / 0.3.9 全渠道发布。发票 PDF 仍由 Stripe Support
 并行处理，不再阻塞本地开发。
 
 **发布 gate（用户 2026-08-28 再确认）**：实现完成不等于允许发布。正式改
@@ -494,12 +497,17 @@ pytest `tmp_path`。在 Codex 的只读 HOME 沙箱中直接运行标准
 `venv/bin/pytest tests/` 已通过（1201 passed, 1 skipped），不再需要临时覆盖
 `HOME=/tmp/...`；生产默认状态路径未改变。
 
-**今日发布候选验证（2026-08-28）**：Core 0.5.18 / MCP 0.3.9 的版本元数据、
+**今日发布验证（2026-08-28）**：Core 0.5.18 / MCP 0.3.9 的版本元数据、
 CHANGELOG、README highlight、MCP `server.json` 与依赖下限（`pyobfus>=0.5.18`）
 已同步。Core 1201 passed / 1 skipped、MCP 93 passed、端到端 7 passed，Black、
 Ruff、联合 mypy、tool manifest 均通过；两包 wheel/sdist 在 `/tmp` 隔离构建，
 四个制品 `twine check` 全通过，并在全新 venv 中按 Core→MCP 顺序安装后核实
-`pyobfus --version == 0.5.18` 与 MCP manifest digest。仍未 tag、push 或发布。
+`pyobfus --version == 0.5.18` 与 MCP manifest digest。首次主分支 CI 因尚未发布的
+Core 依赖下限导致 MCP latest-SDK smoke 从 PyPI 解析失败；提交 `99a6b84` 改为
+同时安装本地 Core 候选后，全矩阵复跑通过。随后按 Core→MCP 顺序发布，四个
+provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
+以及公开 PyPI 全新安装均已核实。CI 另提示旧版 `setup-python` 将由 GitHub
+强制切到 Node 24；后续应在独立维护提交中核实并更新固定 SHA，不阻塞本次发布。
 
 **已确认的 3 个设计决策**（详见设计文档 §Open questions）：
 1. `--check PATH` 的配置发现根：跟 build 一样用工作目录（推荐）vs 相对 `PATH`。
@@ -738,9 +746,10 @@ Ruff、联合 mypy、tool manifest 均通过；两包 wheel/sdist 在 `/tmp` 隔
    加 `use_project_config: bool = True`，payload 增 `effective_config`/
    `excluded_findings`；更新 `pyobfus_mcp/CHANGELOG.md` + tool-manifest
    描述；VS Code 无需改。
-5. **发布**：0.5.18 / MCP 0.3.9 的 CHANGELOG 与版本元数据已进入本地发布
-   候选；**不打 tag / 不发布**，等待用户最终 gate。发布前跑
-   `scripts/check_unreleased_changelogs.py`，并固定先 Core、后 MCP 的顺序。
+5. **发布**：0.5.18 / MCP 0.3.9 已在用户最终批准后完成 tag、PyPI、GitHub
+   Release、PEP 740 provenance、MCP Registry 与公开安装验证。后续版本继续在
+   发布前运行 `scripts/check_unreleased_changelogs.py`，固定先 Core、后 MCP，
+   并逐次取得用户明确批准。
 6. **候选 2/3**（`--dry-run --json` plan 对象、syntax-only 验证 spike）：
    复用 `config_resolve.py`，不得与候选 1 捆成同一版本；按下载回落和用户
    逐次 gate 决定后续节奏，设计骨架已在

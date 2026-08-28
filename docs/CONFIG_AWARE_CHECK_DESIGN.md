@@ -1,16 +1,16 @@
 # Config-aware `--check` — implementation plan
 
-Status: implementation complete on `main`; versioned as the local 0.5.18 / MCP
-0.3.9 release candidate pending the final publish gate. Follows
+Status: implemented and released in pyobfus 0.5.18 / pyobfus-mcp 0.3.9 on
+2026-08-28 after the final user publish gate. Follows
 `docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md` (candidate 1, GO/P1) and turns
 its research decisions into a concrete, code-grounded plan. The implementation
 gate was opened by the user on 2026-08-28; this document remains the contract
-and review checklist for the held release.
+and review record for the released increment.
 
 Release boundary confirmed 2026-08-28: this version contains config-aware
 `--check` only. The dry-run plan and syntax-only verification previews below
-remain separate future increments. Do not bump versions, tag, or publish until
-the user explicitly approves the release after reviewing tests and timing.
+remain separate future increments. Each future version bump, tag, or publish
+still requires explicit user approval after reviewing tests and timing.
 
 The config-resolution plumbing introduced by this plan is the prerequisite for
 candidate 2 (`--dry-run --json` plan object), so that is sketched at the end.
