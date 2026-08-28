@@ -20,15 +20,12 @@ A Python code obfuscator built with AST-based transformations. **Supports Python
 
 > **🔒 Pro Edition available** — 6 patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator, $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
 
-> **🔧 What's new in v0.5.17** — `pyobfus --check` now verifies declared
-> dependencies against public PyPI and reports nonexistent names as a
-> `dependency_advisory`, helping catch hallucinated-package / slopsquatting
-> risk before installation. Use `--offline` for private-index or offline
-> workflows. The MCP server keeps its zero-outbound default and only enables
-> this lookup when `verify_dependencies_online=true`. This is an experimental
-> advisory with deliberately narrow scope; feedback is welcome via
-> [GitHub Issues](https://github.com/zhurong2020/pyobfus/issues). Full details
-> and limitations are in the [cookbook](docs/DEPENDENCY_ADVISORY_COOKBOOK.md).
+> **🔧 What's new in v0.5.18** — `pyobfus --check` now honors your explicit or
+> discovered `pyobfus.yaml` and presets. Risks in files excluded from the build
+> are reported separately without blocking the primary result, while configured
+> name preservation is reflected as mitigation. Use `--no-config` for the
+> previous unfiltered scan. MCP callers get the same behavior by default and can
+> opt out with `use_project_config=false`.
 
 > 🔔 **Starring this repo doesn't notify you about new releases** — GitHub only
 > sends release notifications to people who explicitly **Watch** it. Click

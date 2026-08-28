@@ -1,7 +1,7 @@
 # Config-aware `--check` — implementation plan
 
-Status: implementation complete on `main`, held in `[Unreleased]` pending the
-next version gate. Follows
+Status: implementation complete on `main`; versioned as the local 0.5.18 / MCP
+0.3.9 release candidate pending the final publish gate. Follows
 `docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md` (candidate 1, GO/P1) and turns
 its research decisions into a concrete, code-grounded plan. The implementation
 gate was opened by the user on 2026-08-28; this document remains the contract

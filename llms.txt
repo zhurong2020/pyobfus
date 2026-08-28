@@ -32,7 +32,7 @@ uvx pyobfus-mcp
 ## Core commands
 
 - `pyobfus src/ -o dist/` — obfuscate a project
-- `pyobfus --check src/` (next release) — config-aware pre-flight risk scan,
+- `pyobfus --check src/` (0.5.18) — config-aware pre-flight risk scan,
   including a separate non-blocking bucket for excluded-file findings and declared
   dependency names that do not resolve on public PyPI; pass `--offline` to
   skip network verification (for private indexes or offline workflows); JSON

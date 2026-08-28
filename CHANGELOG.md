@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.18] - 2026-08-28
+
 ### Added
 
 - `pyobfus --check` is now config-aware: it honors explicit or discovered
