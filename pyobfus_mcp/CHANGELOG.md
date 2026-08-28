@@ -6,6 +6,8 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+## [0.3.9] - 2026-08-28
+
 ### Added
 
 - `check_obfuscation_risks` now accepts `use_project_config` (default `true`).
@@ -14,6 +16,12 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
   excluded-file risks out of editor/agent blocking counts. Set it to `false`
   for the legacy unconfigured scan. This is read-only and adds no network
   access.
+
+### Changed
+
+- Raised the runtime dependency floor to `pyobfus>=0.5.18`, which provides the
+  shared config resolver and config-aware preflight report fields used by
+  `use_project_config=true`.
 
 ## [0.3.8] - 2026-08-24
 
