@@ -769,6 +769,31 @@ provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
     大项目/CI/CD/团队工作流最想改善的一点），把回复作为上方 P2 候选
     排序证据。在发票交付前不启动任何功能实现；`--plan`、delivery bundle、
     mapping 加密、团队 license UX 仍需真实重复需求才做。
+11. **🆕 长尾词 / AI 搜索优化 rollout（2026-08-31 用户请求，已列入 TODO）**：
+    完整规划 = [`docs/SEO_AND_COMPETITOR_SCAN_2026-08-31.md`](SEO_AND_COMPETITOR_SCAN_2026-08-31.md)
+    §2（15 个 surface + 目标意图短语 + Wave A/B/C + 红线）。用户意向：**过几天
+    就这些内容发一个小版本（或与其它功能合并发布）**。执行拆分：
+    - **Wave A**（维护者操作，非代码，无需发版，可立即做）：改 GitHub 仓库
+      description（去掉 "Enterprise-grade / 50% lower cost" 定位漂移）、补
+      `homepageUrl` = RTD、加约 7 个 topics。**Claude 做不了，需用户在
+      GitHub 设置里操作**——Claude 负责给出改写文案。
+    - **Wave B**（纯 docs，无发版 gate，可随时并入一轮 `docs:` commit）：
+      `ai-catalog.json` `representativeQueries` 4→~10；`llms.txt` 三孪生加
+      精简 `## FAQ` + `## Compared to`（改后 `cmp` 必须 byte-identical +
+      `mkdocs build` 复核 + 保持精简）；`mkdocs.yml` `site_description` 扩写；
+      `docs/index.md` 引言段重写；`COMPARISON.md` 补 CodeEnigma /
+      `python-obfuscator` / SOURCEdefender / 在线工具行；`CITATION.cff`
+      keywords（**不碰 version/date-released**）。
+    - **Wave C**（并入下次发版的同一 commit，PyPI 需版本号才刷新）：
+      `server.json` description 改意图短语（走 `pyobfus-mcp` 版本）；两个
+      `pyproject.toml` 的 keywords 补 `reverse-mapping`/`unmap`/`deobfuscation`/
+      `provenance`/`slopsquatting`/`obfuscate-before-shipping` 簇；README FAQ
+      加 3 条 + 引言段确保含 "obfuscate before shipping" / "debug obfuscated
+      stack traces"（**必须在打 tag 前的同一 commit**）。
+    - 红线：同一短语不跨 >2 surface、不堆砌；发版前复核 "50% lower cost"
+      对 PyArmor 现价是否仍成立（`COMPARISON.md` 仍写 $89）。
+    - 附带的 `dependency_advisory` #8 判断：slopsquatting 检测赛道已拥挤
+      （见 scan §1.2），倾向**保留在 `--check` 内部不拆包**，待用户确认。
 
 ## 恢复工作清单（发票交付后按序执行）
 
@@ -817,3 +842,8 @@ provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
    全矩阵 CI/CodeQL 均绿，全新 venv 安装核实带两个新 flag）。发布前质量门为
    Core 1208 passed/1 skipped、MCP 93 passed、端到端 7 passed，Black/Ruff/
    联合 mypy 全绿。MCP 与 VS Code 扩展本轮 `[Unreleased]` 均为空，未动。
+7. **长尾词 / AI 搜索优化 rollout**（见上方"下次工作建议" #11 + scan doc §2）：
+   ⏳ 已列入 TODO，用户意向"过几天发一个小版本（或与其它功能合并）"。到点时
+   按 Wave B（docs-only，可先做）→ Wave C（keywords/README/`server.json`，进
+   发版 commit）执行；Wave A 交用户在 GitHub 设置里操作，Claude 只出文案。
+   发版仍走 `check_unreleased_changelogs.py` → 先 Core 后 MCP → 用户逐次批准。

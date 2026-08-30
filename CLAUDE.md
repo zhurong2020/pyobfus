@@ -67,7 +67,14 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   配置感知 `--check`（0.5.18）、`--dry-run --json` versioned plan 与
   `--verify-syntax`（均 0.5.19，见本节首条）都已发布。暂不做任意
   `--verify-command`、zip/tar delivery bundle、mapping 内建加密或团队 license
-  后端。下一功能方向须由用户 gate 再开。
+  后端。
+- **🆕 已排入 TODO（2026-08-31，用户意向"过几天发一个小版本或与其它功能合并"）：
+  长尾词 / AI 搜索优化 rollout** —— 竞品扫描 + 15 个 surface 的关键词计划见
+  [`docs/SEO_AND_COMPETITOR_SCAN_2026-08-31.md`](docs/SEO_AND_COMPETITOR_SCAN_2026-08-31.md)，
+  执行拆分与 gate 见 `docs/CURRENT_PLAN_ZH.md` "下次工作建议" #11 + "恢复
+  工作清单" #7。Wave B（纯 docs）可先做；Wave C（keywords/README/`server.json`）
+  进发版 commit；Wave A（GitHub 仓库 description/topics/homepageUrl）交用户
+  在 GitHub 设置里操作，Claude 只出文案。除此之外下一功能方向仍须用户 gate。
 - 本 session 全部产出已 push（0.5.19 发布 `beae06d`→`e99339b`→`452ba29`→`f91e78d`，
   docs cleanup `4482eb7`→`f1c3e4a`→`ac6a572`→`e3ed135`），tag `v0.5.19` 在 origin，
   工作区干净。逐轮明细以 `docs/CURRENT_PLAN_ZH.md` +
