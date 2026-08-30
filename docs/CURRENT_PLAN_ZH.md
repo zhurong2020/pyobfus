@@ -10,7 +10,9 @@ invoice PDF，在付款关联成功 84+ 小时后仍错误显示全额应付，�
 贷项通知单、退款、解除付款或重新扣款。客户此前已收到澄清邮件，冷启动无需
 再发例行进度更新；客户已确认未收到 Stripe 的错误自动邮件，并已获告知无需
 付款或操作，正确 paid invoice 就绪后再发送。本次正式发布已获用户明确批准
-并完成；后续每次正式发布仍须单独取得用户同意）
+并完成。结构化 dry-run plan 与 syntax-only 构建后验证已作为两个独立 commit
+实现并通过完整质量门，当前 held 在 `[Unreleased]`；版本号、tag 与正式发布均
+未动，后续正式发布仍须单独取得用户同意）
 
 这份文档是当前项目状态和后续计划的中文单一入口，面向维护者日常查看。旧的
 `ROADMAP.md` 和 `POST_V0.4_TODO.md` 保留为历史归档和详细来源，但后续日常
@@ -546,7 +548,14 @@ provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
      现有消费方不变；预计单个 `pyobfus` minor（0.5.18），MCP 侧
      `use_project_config` 可同波或后续 `pyobfus-mcp` 版本。
 
-2. **结构化保护计划 `--plan --json`**
+2. **结构化保护计划 `--dry-run --json` plan 对象**
+   - ✅ **2026-08-30 已实现，held 在 `[Unreleased]`，未发版**：沿用现有
+     `--dry-run --json`，新增 versioned `plan` 对象；commit `3758482`。
+     JSON 列 effective config 摘要/哈希、选中与排除文件及原因、planned
+     artifacts，并用 `ship` / `retain-internal` / `optional` 标明交付角色。
+     所有路径只给 cwd-relative label 或 basename，不输出源码 literal、密钥、
+     device fingerprint 或绝对 home path；`apply_supported=false`，不能把 plan
+     保存后直接 apply。非 dry-run JSON contract 不新增 `plan`。
    - 调研结论：有 Terraform plan/JSON、Nuitka compilation report 等成熟工作流
      证据，但无需新增命令；优先给现有 `--dry-run --json` 增加 versioned `plan`
      对象，列 effective config 摘要、选中/排除文件与原因、planned artifacts。
@@ -554,6 +563,12 @@ provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
      plan 不可保存后直接 apply，避免引入第二套状态管理。
 
 3. **受控的构建后验证**
+   - ✅ **2026-08-30 已实现，held 在 `[Unreleased]`，未发版**：新增显式
+     `--verify-syntax`；commit `1a1b18c`。构建写出后逐个读取生成的 `.py` 并在
+     内存调用 `compile(..., "exec", dont_inherit=True)`，不 import、不执行、
+     不生成 `__pycache__`。JSON 只报告 `mode=syntax-only`、`syntax_valid`、
+     `files_checked` 与相对错误位置；失败返回结构化 error 并明确禁止交付。
+     `--dry-run` 与 `--verify-syntax` 互斥，避免声称验证尚未生成的产物。
    - 调研结论：拒绝任意 `--verify-command` 和默认 import（会执行用户代码）；
      只做 syntax-only spike，优先内存 `compile(..., "exec")`，不在输出目录留下
      `__pycache__`。JSON 只能声明 `syntax_valid`，不能宣传 runtime verified。
@@ -766,6 +781,7 @@ provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
    发布前运行 `scripts/check_unreleased_changelogs.py`，固定先 Core、后 MCP，
    并逐次取得用户明确批准。
 6. **候选 2/3**（`--dry-run --json` plan 对象、syntax-only 验证 spike）：
-   复用 `config_resolve.py`，不得与候选 1 捆成同一版本；按下载回落和用户
-   逐次 gate 决定后续节奏，设计骨架已在
-   `docs/CONFIG_AWARE_CHECK_DESIGN.md` 末尾。
+   ✅ 已于 2026-08-30 按两个独立 commit 实现并 held 在 `[Unreleased]`；完整
+   质量门为 Core 1208 passed/1 skipped、MCP 93 passed、端到端 7 passed，
+   Black/Ruff/联合 mypy 全绿。当前仍是 `pyobfus 0.5.18`，没有版本 bump、tag、
+   build 或 publish；是否组成下一 Core 小版本须再次经过用户发布 gate。

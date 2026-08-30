@@ -42,8 +42,11 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   的 `docs/internal/` 运营记录，绝不进入公开提交。
 - 下一轮功能方向已完成代码审计与官方资料调研，见
   [`docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md`](docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md)。
-  首选实现候选为配置感知的 `--check`；随后考虑扩充现有
-  `--dry-run --json` 的 plan 对象和 syntax-only 验证。暂不做任意
+  配置感知 `--check` 已发布；后续两个独立候选也已于 2026-08-30 实现并 held
+  在 `[Unreleased]`：`3758482` 为 `--dry-run --json` versioned plan，
+  `1a1b18c` 为显式 `--verify-syntax`。完整质量门为 Core 1208 passed/1 skipped、
+  MCP 93 passed、端到端 7 passed，Black/Ruff/联合 mypy 全绿。版本仍为 0.5.18，
+  未打 tag、未发布；正式发布继续等待用户单独批准。暂不做任意
   `--verify-command`、zip/tar delivery bundle、mapping 内建加密或团队 license
   后端。
 - 本 session 的 Stripe 交接、配置感知实现、HOME 隔离测试、发布准备、CI 修复、

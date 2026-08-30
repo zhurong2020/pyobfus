@@ -7,10 +7,12 @@ its research decisions into a concrete, code-grounded plan. The implementation
 gate was opened by the user on 2026-08-28; this document remains the contract
 and review record for the released increment.
 
-Release boundary confirmed 2026-08-28: this version contains config-aware
+Release boundary confirmed 2026-08-28: that version contained config-aware
 `--check` only. The dry-run plan and syntax-only verification previews below
-remain separate future increments. Each future version bump, tag, or publish
-still requires explicit user approval after reviewing tests and timing.
+were subsequently implemented as two separate commits on 2026-08-30 and are
+held in `[Unreleased]`; no version bump, tag, or publish has occurred. Any
+future release still requires explicit user approval after reviewing tests and
+timing.
 
 The config-resolution plumbing introduced by this plan is the prerequisite for
 candidate 2 (`--dry-run --json` plan object), so that is sketched at the end.
