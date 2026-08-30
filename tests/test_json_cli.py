@@ -61,8 +61,71 @@ def test_obfuscate_dry_run_json(tmp_path: Path) -> None:
     assert result.exit_code == 0, result.output
     data = json.loads(result.output)
     assert data["dry_run"] is True
+    assert data["plan"]["version"] == 1
+    assert data["plan"]["mode"] == "single_file"
+    assert data["plan"]["files"]["selected"] == [
+        {"path": "a.py", "output": "out.py", "reason": "included"}
+    ]
+    assert data["plan"]["artifacts"][0]["role"] == "ship"
+    assert data["plan"]["apply_supported"] is False
     # In dry-run mode the output file should NOT exist
     assert not out.exists()
+
+
+def test_dry_run_plan_reports_config_excludes_and_artifact_roles(tmp_path: Path) -> None:
+    src = tmp_path / "src"
+    src.mkdir()
+    (src / "app.py").write_text("def run(): return 1\n", encoding="utf-8")
+    (src / "test_app.py").write_text("def test_run(): pass\n", encoding="utf-8")
+    out = tmp_path / "dist"
+    mapping = tmp_path / "mapping.json"
+    manifest = tmp_path / "provenance.json"
+
+    result = CliRunner().invoke(
+        main,
+        [
+            str(src),
+            "-o",
+            str(out),
+            "--dry-run",
+            "--json",
+            "--save-mapping",
+            str(mapping),
+            "--provenance-manifest",
+            str(manifest),
+            "--trace-marker",
+        ],
+    )
+    assert result.exit_code == 0, result.output
+    plan = json.loads(result.output)["plan"]
+    assert plan["mode"] == "cross_file"
+    assert plan["files"]["selected_count"] == 1
+    assert plan["files"]["excluded_count"] == 1
+    assert plan["files"]["excluded"][0] == {
+        "path": "test_app.py",
+        "reason": "exclude_pattern",
+        "pattern": "test_*.py",
+    }
+    assert plan["effective_config"]["source"] == "level-default"
+    assert plan["effective_config"]["config_hash"].startswith("sha256:")
+    roles = {artifact["kind"]: artifact["role"] for artifact in plan["artifacts"]}
+    assert roles == {
+        "obfuscated-output": "ship",
+        "debug-mapping": "retain-internal",
+        "provenance-manifest": "optional",
+        "trace-marker": "ship",
+    }
+    serialized = json.dumps(plan)
+    assert str(tmp_path) not in serialized
+
+
+def test_non_dry_run_json_does_not_add_plan(tmp_path: Path) -> None:
+    src = tmp_path / "a.py"
+    src.write_text("value = 1\n", encoding="utf-8")
+    out = tmp_path / "out.py"
+    result = CliRunner().invoke(main, [str(src), "-o", str(out), "--json"])
+    assert result.exit_code == 0, result.output
+    assert "plan" not in json.loads(result.output)
 
 
 def test_obfuscate_preset_flows_into_json(tmp_path: Path) -> None:

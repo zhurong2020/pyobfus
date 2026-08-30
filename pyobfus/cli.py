@@ -870,6 +870,33 @@ def main(
         input_path_obj = Path(input_path)
         output_path_obj = Path(output_path)
 
+        build_plan: Optional[Dict[str, Any]] = None
+        if dry_run and json_output:
+            from pyobfus.core.build_plan import build_obfuscation_plan
+
+            if effective_config_path:
+                plan_config_source = "explicit-config" if config_path else "auto-discovered"
+                plan_config_path = Path(effective_config_path)
+            elif preset:
+                plan_config_source = "preset"
+                plan_config_path = None
+            else:
+                plan_config_source = "level-default"
+                plan_config_path = None
+            build_plan = build_obfuscation_plan(
+                input_path=input_path_obj,
+                output_path=output_path_obj,
+                config=config,
+                config_source=plan_config_source,
+                config_path=plan_config_path,
+                preset=preset,
+                cross_file=cross_file,
+                mapping_path=save_mapping_path,
+                provenance_manifest_path=provenance_manifest_path,
+                trace_marker=trace_marker,
+                cwd=Path.cwd(),
+            )
+
         if dry_run:
             click.echo("\n[DRY RUN MODE] - No files will be written")
 
@@ -1040,6 +1067,7 @@ def main(
                 mapping_path=save_mapping_path,
                 provenance_manifest_path=written_manifest_path,
                 trace_marker_id=trace_marker_id,
+                plan=build_plan,
             )
             return
 
@@ -1882,6 +1910,7 @@ def _emit_obfuscate_success_json(
     mapping_path: Optional[str],
     provenance_manifest_path: Optional[str] = None,
     trace_marker_id: Optional[str] = None,
+    plan: Optional[Dict[str, Any]] = None,
 ) -> None:
     """Emit the obfuscation success summary as JSON."""
     # AI hint: suggest the most useful next command based on context
@@ -1916,6 +1945,8 @@ def _emit_obfuscate_success_json(
         "trace_marker_id": trace_marker_id,
         "ai_hint": ai_hint,
     }
+    if dry_run and plan is not None:
+        payload["plan"] = plan
     _emit_success_json_payload(payload)
 
 

@@ -322,6 +322,9 @@ pyobfus src/ -o dist/
 # Preview obfuscation without writing files (v0.2.0+)
 pyobfus src/ -o dist/ --dry-run
 
+# Machine-readable plan: effective config, included/excluded files, artifacts
+pyobfus src/ -o dist/ --dry-run --json
+
 # Legacy single-file mode (v0.2.0+)
 pyobfus src/ -o dist/ --no-cross-file
 
@@ -620,6 +623,9 @@ pyobfus src/ -o dist/
 
 # Preview without writing files
 pyobfus src/ -o dist/ --dry-run
+
+# Preview a structured, non-applicable protection plan for an AI/CI consumer
+pyobfus src/ -o dist/ --dry-run --json
 ```
 
 ### Will my code still work after obfuscation?

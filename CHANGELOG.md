@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `--dry-run --json` now includes a versioned `plan` object describing the
+  effective configuration, selected and excluded files with reasons, and
+  planned artifacts classified as `ship`, `retain-internal`, or `optional`.
+  Plans contain relative labels rather than source contents, secrets, device
+  fingerprints, or absolute home paths, and are previews rather than saved
+  apply files.
+
 ## [0.5.18] - 2026-08-28
 
 ### Added
