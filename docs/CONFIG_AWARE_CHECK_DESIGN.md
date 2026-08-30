@@ -317,9 +317,9 @@ Run the three roots separately (`tests/`, `pyobfus_mcp/tests/`,
 
 ## Rollout
 
-- One `pyobfus` minor bump (next is 0.5.18): `config_resolve.py`, `preflight.py`,
-  `cli.py`, docs, tests. CHANGELOG `[Unreleased]` only — **do not tag/publish**
-  until the user gates a release (current standing rule).
+- One `pyobfus` minor bump (shipped as 0.5.18): `config_resolve.py`, `preflight.py`,
+  `cli.py`, docs, tests. Landed in CHANGELOG `[Unreleased]` first and was tagged
+  only after the user gated the release (the standing rule for every release).
 - MCP change can ride the same wave as `pyobfus-mcp` 0.3.9 or a later bump;
   it depends only on the new `pyobfus` version for the helper.
 - Docs: extend `docs/DEPENDENCY_ADVISORY_COOKBOOK.md` note; add a short

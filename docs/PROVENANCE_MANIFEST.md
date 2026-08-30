@@ -77,7 +77,7 @@ The JSON mode returns `valid`, `errors`, `warnings`, `summary`, `ai_hint`, and
 ```json
 {
   "version": 1,
-  "pyobfus_version": "0.5.13",
+  "pyobfus_version": "0.5.19",
   "config_hash": "sha256...",
   "source_control": {
     "git_commit": "abc123..."
