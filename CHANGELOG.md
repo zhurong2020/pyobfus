@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Plans contain relative labels rather than source contents, secrets, device
   fingerprints, or absolute home paths, and are previews rather than saved
   apply files.
+- Added opt-in `--verify-syntax` post-build verification. It compiles generated
+  Python source in memory without importing or executing it and without writing
+  `__pycache__`; JSON reports `syntax_valid`, checked-file count, and relative
+  error locations, and deliberately makes no runtime-correctness claim.
 
 ## [0.5.18] - 2026-08-28
 

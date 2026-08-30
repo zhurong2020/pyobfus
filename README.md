@@ -325,6 +325,9 @@ pyobfus src/ -o dist/ --dry-run
 # Machine-readable plan: effective config, included/excluded files, artifacts
 pyobfus src/ -o dist/ --dry-run --json
 
+# Write output, then compile every generated .py in memory (no import/execution)
+pyobfus src/ -o dist/ --verify-syntax --json
+
 # Legacy single-file mode (v0.2.0+)
 pyobfus src/ -o dist/ --no-cross-file
 
@@ -627,6 +630,11 @@ pyobfus src/ -o dist/ --dry-run
 # Preview a structured, non-applicable protection plan for an AI/CI consumer
 pyobfus src/ -o dist/ --dry-run --json
 ```
+
+`--verify-syntax` is an opt-in post-build check: it compiles generated Python
+source in memory, creates no `__pycache__`, and reports `syntax_valid` in JSON.
+It does not import or execute the project and is not a runtime compatibility
+guarantee.
 
 ### Will my code still work after obfuscation?
 

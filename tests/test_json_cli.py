@@ -128,6 +128,60 @@ def test_non_dry_run_json_does_not_add_plan(tmp_path: Path) -> None:
     assert "plan" not in json.loads(result.output)
 
 
+def test_verify_syntax_json_reports_honest_scope(tmp_path: Path) -> None:
+    src = tmp_path / "a.py"
+    src.write_text("def answer(): return 42\n", encoding="utf-8")
+    out = tmp_path / "out.py"
+    result = CliRunner().invoke(main, [str(src), "-o", str(out), "--verify-syntax", "--json"])
+    assert result.exit_code == 0, result.output
+    verification = json.loads(result.output)["verification"]
+    assert verification == {
+        "mode": "syntax-only",
+        "syntax_valid": True,
+        "files_checked": 1,
+        "errors": [],
+        "execution_performed": False,
+        "pycache_written": False,
+    }
+    assert not (tmp_path / "__pycache__").exists()
+
+
+def test_verify_syntax_rejects_dry_run(tmp_path: Path) -> None:
+    src = tmp_path / "a.py"
+    src.write_text("value = 1\n", encoding="utf-8")
+    out = tmp_path / "out.py"
+    result = CliRunner().invoke(
+        main,
+        [str(src), "-o", str(out), "--dry-run", "--verify-syntax", "--json"],
+    )
+    assert result.exit_code == 1
+    payload = json.loads(result.output)
+    assert payload["error_type"] == "UsageError"
+    assert not out.exists()
+
+
+def test_verify_syntax_failure_is_structured_and_blocking(tmp_path: Path) -> None:
+    src = tmp_path / "a.py"
+    src.write_text("value = 1\n", encoding="utf-8")
+    out = tmp_path / "out.py"
+    failed = {
+        "mode": "syntax-only",
+        "syntax_valid": False,
+        "files_checked": 0,
+        "errors": [{"path": "out.py", "line": 1, "offset": 4, "message": "invalid"}],
+        "execution_performed": False,
+        "pycache_written": False,
+    }
+    with mock.patch("pyobfus.cli._verify_output_syntax", return_value=failed):
+        result = CliRunner().invoke(main, [str(src), "-o", str(out), "--verify-syntax", "--json"])
+    assert result.exit_code == 1
+    payload = json.loads(result.output)
+    assert payload["status"] == "error"
+    assert payload["error_type"] == "SyntaxVerificationError"
+    assert payload["verification"] == failed
+    assert "Do not ship" in payload["ai_hint"]
+
+
 def test_obfuscate_preset_flows_into_json(tmp_path: Path) -> None:
     src = tmp_path / "a.py"
     src.write_text(

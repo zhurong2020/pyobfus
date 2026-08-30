@@ -132,6 +132,11 @@ except ImportError:
     help="Preview obfuscation without writing output",
 )
 @click.option(
+    "--verify-syntax",
+    is_flag=True,
+    help="Compile generated Python in memory after writing; does not import or execute it",
+)
+@click.option(
     "--cross-file/--no-cross-file",
     default=True,
     help="Enable cross-file import mapping (default: enabled)",
@@ -410,6 +415,7 @@ def main(
     strip_ai_artifacts: bool,
     verbose: bool,
     dry_run: bool,
+    verify_syntax: bool,
     cross_file: bool,
     upgrade: bool,
     control_flow: bool,
@@ -548,6 +554,23 @@ def main(
             )
         else:
             click.echo("Error: Missing required option '-o' / '--output'.", err=True)
+        sys.exit(1)
+
+    if dry_run and verify_syntax:
+        if json_output:
+            _emit_error_json(
+                "UsageError",
+                "--verify-syntax requires generated output and cannot be combined with --dry-run.",
+                "Run without --dry-run to write and syntax-check the generated files.",
+                "pyobfus INPUT -o OUTPUT --verify-syntax --json",
+                exit_code=1,
+            )
+        else:
+            click.echo(
+                "Error: --verify-syntax cannot be combined with --dry-run; "
+                "syntax verification checks generated output.",
+                err=True,
+            )
         sys.exit(1)
 
     # In JSON mode, buffer all chatty intermediate output so the final JSON
@@ -912,6 +935,7 @@ def main(
             "dead_code_injected": 0,
             "anti_debug_checks": 0,
         }
+        verification: Optional[Dict[str, Any]] = None
 
         # Incremental short-circuit: directory mode only (single-file
         # rebuilds are cheap enough to skip this machinery)
@@ -930,6 +954,16 @@ def main(
                 obfuscation_stats["files_processed"] = 0
                 obfuscation_stats["files_skipped"] = len(cached_outputs or [])
                 # Short-circuit to summary
+                if verify_syntax:
+                    verification = _verify_output_syntax(input_path_obj, output_path_obj)
+                if verification is not None and not verification["syntax_valid"]:
+                    sys.stdout = _saved_stdout
+                    _report_syntax_verification_failure(
+                        input_path=input_path,
+                        output_path=output_path,
+                        verification=verification,
+                        json_output=json_output,
+                    )
                 if json_output:
                     sys.stdout = _saved_stdout
                     _emit_obfuscate_success_json(
@@ -941,8 +975,11 @@ def main(
                         stats=obfuscation_stats,
                         mapping_path=save_mapping_path,
                         provenance_manifest_path=None,
+                        verification=verification,
                     )
                     return
+                if verification is not None:
+                    _display_syntax_verification_success(verification)
                 # Fall through to normal text success path below by
                 # flagging that we have nothing more to do
                 click.echo("\nObfuscation completed successfully! (cache hit)")
@@ -1022,6 +1059,19 @@ def main(
                     err=True,
                 )
 
+        if verify_syntax:
+            verification = _verify_output_syntax(input_path_obj, output_path_obj)
+            if not verification["syntax_valid"]:
+                sys.stdout = _saved_stdout
+                _report_syntax_verification_failure(
+                    input_path=input_path,
+                    output_path=output_path,
+                    verification=verification,
+                    json_output=json_output,
+                )
+            if not json_output:
+                _display_syntax_verification_success(verification)
+
         written_manifest_path: Optional[str] = None
         if provenance_manifest_path and not dry_run:
             from pyobfus.core.provenance import (
@@ -1068,6 +1118,7 @@ def main(
                 provenance_manifest_path=written_manifest_path,
                 trace_marker_id=trace_marker_id,
                 plan=build_plan,
+                verification=verification,
             )
             return
 
@@ -1911,6 +1962,7 @@ def _emit_obfuscate_success_json(
     provenance_manifest_path: Optional[str] = None,
     trace_marker_id: Optional[str] = None,
     plan: Optional[Dict[str, Any]] = None,
+    verification: Optional[Dict[str, Any]] = None,
 ) -> None:
     """Emit the obfuscation success summary as JSON."""
     # AI hint: suggest the most useful next command based on context
@@ -1947,7 +1999,55 @@ def _emit_obfuscate_success_json(
     }
     if dry_run and plan is not None:
         payload["plan"] = plan
+    if verification is not None:
+        payload["verification"] = verification
     _emit_success_json_payload(payload)
+
+
+def _verify_output_syntax(input_path: Path, output_path: Path) -> Dict[str, Any]:
+    """Run the opt-in syntax-only verifier against generated output."""
+    from pyobfus.core.syntax_verify import verify_generated_syntax
+
+    return verify_generated_syntax(input_path, output_path)
+
+
+def _display_syntax_verification_success(verification: Dict[str, Any]) -> None:
+    click.echo(
+        f"Syntax verification passed: {verification['files_checked']} generated "
+        "Python file(s) compiled in memory; nothing was executed."
+    )
+
+
+def _report_syntax_verification_failure(
+    *,
+    input_path: str,
+    output_path: str,
+    verification: Dict[str, Any],
+    json_output: bool,
+) -> None:
+    if json_output:
+        _emit_success_json_payload(
+            {
+                "version": 1,
+                "status": "error",
+                "error_type": "SyntaxVerificationError",
+                "input": input_path,
+                "output": output_path,
+                "verification": verification,
+                "ai_hint": (
+                    "Generated files were written but failed syntax-only verification. "
+                    "Do not ship them; inspect the reported file and line."
+                ),
+            }
+        )
+    else:
+        click.echo("Error: generated output failed syntax verification.", err=True)
+        for error in verification["errors"]:
+            location = error["path"]
+            if error["line"] is not None:
+                location += f":{error['line']}"
+            click.echo(f"  {location}: {error['message']}", err=True)
+    raise SystemExit(1)
 
 
 def _emit_error_json(
