@@ -23,10 +23,14 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   发到 PyPI，wheel/sdist 两个 Integrity provenance endpoint 均 HTTP 200，全新
   venv `pip install pyobfus==0.5.19` 已核实带上两个新 flag，GitHub Release 已建，
   Release / CI 全矩阵 / CodeQL 均绿。发布收尾提交为
-  `docs: record pyobfus 0.5.19 release`。发布前发现并顺手修的一处旧漂移：根
-  `llms.txt` 漏了这两个 feature 行（feature commit 只写进了 `docs/llms.txt`），
-  已补齐；两份 `llms.txt` 双向 drift 的完整对账留作独立 `docs:` cleanup（未做）。
-  MCP 与 VS Code 扩展本轮 `[Unreleased]` 均为空，未动。
+  `docs: record pyobfus 0.5.19 release`。MCP 与 VS Code 扩展本轮
+  `[Unreleased]` 均为空，未动。
+- **docs cleanup 已做（2026-08-31，commit `4482eb7`）**：`llms.txt` ↔
+  `docs/llms.txt` 双向 drift 完整对账，`cmp` 已 byte-identical、指针全 resolve、
+  `mkdocs build` 核实 `docs/llms.txt` 发布到站点根；顺带刷新 `llms-full.txt`
+  （MCP 工具表 5→8 个、按 shipped `tool_manifest.json` 校对签名，Versioning
+  段补到 0.5.19，示例 header `v0.5.6`→`v0.5.19`，Links `Roadmap`→`Current plan`）。
+  `llms-full.txt` 无 `docs/` 孪生（llmstxt.org 规范只要求 `/docs/llms.txt`）。
 - **当日小版本发布已完成**：用户明确批准后，`pyobfus 0.5.18` 与
   `pyobfus-mcp 0.3.9` 已按 Core→MCP 顺序通过 OIDC 发布；两个 GitHub
   Releases、四个 PyPI provenance endpoint、MCP Registry
@@ -61,14 +65,16 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   后端。下一功能方向须由用户 gate 再开。
 - 0.5.19 这一轮共 3 个 commit 全部 push（`beae06d` release prep → `e99339b`
   record release → `452ba29` channel state + README 特性表同步），`origin/main`
-  tip = `452ba29`，tag `v0.5.19` 已在 origin。此前 session 的 Stripe 交接、
-  配置感知实现、HOME 隔离测试、发票工程升级状态也均已 push。跨项目索引
-  `~/projects/WORK_LOG_INDEX.md` 顶行已加本轮条目。
+  0.5.19 一轮 4 commit（`beae06d`→`e99339b`→`452ba29`→`f91e78d`）+ docs
+  cleanup `4482eb7` 全部 push，`origin/main` tip = `4482eb7`，tag `v0.5.19`
+  已在 origin。此前 session 的 Stripe 交接、配置感知实现、HOME 隔离测试、
+  发票工程升级状态也均已 push。跨项目索引 `~/projects/WORK_LOG_INDEX.md`
+  顶行已加本轮条目。
   冷启动后先读 `docs/CURRENT_PLAN_ZH.md`，等待 Stripe Billing/Invoicing 工程
   团队提供正确 paid invoice PDF；
   除非用户明确 gate，不启动下一项功能实现或发布。外部手工项仍是 Canopii claim/rescan、Claude plugin pending 观察，并在
   1–2 周后复查下载；若 9 月 1–7 日仍无 advisory 反馈，再考虑 GitHub Discussion
-  投票。可选 cleanup：两份 `llms.txt` 双向 drift 对账（见本节首条）。
+  投票。（`llms.txt` twin drift 对账已于 `4482eb7` 完成，见上方 docs cleanup 条。）
 
 ### ✅ 2026-08-24 — 0.5.17 / MCP 0.3.8 发布与外部渠道收尾
 
