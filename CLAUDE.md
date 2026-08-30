@@ -75,12 +75,12 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   工作清单" #7。Wave B（纯 docs）可先做；Wave C（keywords/README/`server.json`）
   进发版 commit；Wave A（GitHub 仓库 description/topics/homepageUrl）交用户
   在 GitHub 设置里操作，Claude 只出文案。除此之外下一功能方向仍须用户 gate。
-- 本 session 全部产出已 push（0.5.19 发布 `beae06d`→`e99339b`→`452ba29`→`f91e78d`，
-  docs cleanup `4482eb7`→`f1c3e4a`→`ac6a572`→`e3ed135`），tag `v0.5.19` 在 origin，
-  工作区干净。逐轮明细以 `docs/CURRENT_PLAN_ZH.md` +
-  `~/projects/WORK_LOG_INDEX.md` 顶行为准（每轮追加，是活的 tip 来源）。此前
-  session 的 Stripe 交接、配置感知实现、HOME 隔离测试、发票工程升级状态也均已
-  push。冷启动后先读 `docs/CURRENT_PLAN_ZH.md`，等待 Stripe Billing/Invoicing
+- 本 session 全部产出已 push（自 `b39e0b0` 起一串 `docs:`/`release:` commit：
+  0.5.19 发布 → 两轮 docs cleanup（llms 孪生对账 + Home 页刷新）→ 竞品扫描 +
+  SEO/长尾词规划 → 把 SEO rollout 排入 TODO），tag `v0.5.19` 在 origin，工作区
+  干净。**逐轮明细与活的 `origin/main` tip 一律以 `docs/CURRENT_PLAN_ZH.md` +
+  `~/projects/WORK_LOG_INDEX.md` 顶行为准**（每轮追加）。此前 session 的 Stripe
+  交接、配置感知实现、HOME 隔离测试、发票工程升级状态也均已 push。冷启动后先读 `docs/CURRENT_PLAN_ZH.md`，等待 Stripe Billing/Invoicing
   工程团队提供正确 paid invoice PDF；除非用户明确 gate，不启动下一项功能实现
   或发布。外部手工项仍是 Canopii claim/rescan、Claude plugin pending 观察，并在
   1–2 周后复查下载；若 9 月 1–7 日仍无 advisory 反馈，再考虑 GitHub Discussion
