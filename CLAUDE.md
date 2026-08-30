@@ -12,7 +12,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### ⏳ 2026-08-28 — 客户 paid-invoice PDF 等待 Stripe 技术修复
+### ⏳ 2026-08-30 — 客户 paid-invoice PDF 已升级 Stripe 工程处理
 
 - **当日小版本发布已完成**：用户明确批准后，`pyobfus 0.5.18` 与
   `pyobfus-mcp 0.3.9` 已按 Core→MCP 顺序通过 OIDC 发布；两个 GitHub
@@ -31,11 +31,13 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   付款应用不匹配问题（Payment Link 一次性购买记在 guest customer 名下，
   无法把既有付款应用到 regular Customer 的发票），已于 2026-08-27 联系
   Stripe Support 等待回复。不把单次开票需求提前解释为团队许可或企业功能
-  需求。（2026-08-28 追加：既有付款现已成功关联，Dashboard 与 receipt 均为
-  已付/US$0.00 remaining，但新下载的 invoice PDF 仍错误显示全额应付；正确
-  收据与错误发票已附在 Support 原线程，请技术团队刷新。不得开贷项通知单、
-  退款、解除付款或重扣。客户已收到 08-27 的非新扣款澄清，冷启动无需再发
-  例行进度更新，除非 Support 往返拖很久。）当前状态、hold 清单与后续
+  需求。（2026-08-30 追加：既有付款现已成功关联，Dashboard 与 receipt 均为
+  已付/US$0.00 remaining；但按 Support 指示从实时 Dashboard 新下载的 invoice
+  PDF，在付款关联 84+ 小时后仍错误显示全额应付，已排除误开旧文件和其所称的
+  24 小时 CDN 延迟。新 PDF 与实时状态截图已附回原线程，请 Billing/Invoicing
+  工程团队重生成。不得开贷项通知单、退款、解除付款或重扣。客户确认未收到
+  Stripe 的错误自动邮件，且已获告知无需付款或操作；冷启动无需再发例行进度
+  更新。）当前状态、hold 清单与后续
   步骤以 `docs/CURRENT_PLAN_ZH.md` 为准；具体客户/支付信息只留在 Git 忽略
   的 `docs/internal/` 运营记录，绝不进入公开提交。
 - 下一轮功能方向已完成代码审计与官方资料调研，见
@@ -44,9 +46,10 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   `--dry-run --json` 的 plan 对象和 syntax-only 验证。暂不做任意
   `--verify-command`、zip/tar delivery bundle、mapping 内建加密或团队 license
   后端。
-- 本 session 的 Stripe 交接、配置感知实现、HOME 隔离测试、发布准备、CI 修复
-  与发布收尾提交均已 push；`origin/main` 已包含 `0cf24be`。
-  冷启动后先读 `docs/CURRENT_PLAN_ZH.md`，等待 Stripe 技术团队刷新 PDF；
+- 本 session 的 Stripe 交接、配置感知实现、HOME 隔离测试、发布准备、CI 修复、
+  发布收尾与发票工程升级状态均已 push；`origin/main` 已包含 `1d69e1d`。
+  冷启动后先读 `docs/CURRENT_PLAN_ZH.md`，等待 Stripe Billing/Invoicing 工程
+  团队提供正确 paid invoice PDF；
   除非用户明确 gate，不启动下一项功能实现或发布。外部手工项仍是 Canopii claim/rescan、Claude plugin pending 观察，并在
   1–2 周后复查下载；若 9 月 1–7 日仍无 advisory 反馈，再考虑 GitHub Discussion
   投票。
