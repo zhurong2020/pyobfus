@@ -59,9 +59,11 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   `--verify-syntax`（均 0.5.19，见本节首条）都已发布。暂不做任意
   `--verify-command`、zip/tar delivery bundle、mapping 内建加密或团队 license
   后端。下一功能方向须由用户 gate 再开。
-- 本 session 的 Stripe 交接、配置感知实现、HOME 隔离测试、0.5.19 发布准备与
-  收尾、CI 修复、发票工程升级状态均已 push；`origin/main` 已含
-  `docs: record pyobfus 0.5.19 release`。
+- 0.5.19 这一轮共 3 个 commit 全部 push（`beae06d` release prep → `e99339b`
+  record release → `452ba29` channel state + README 特性表同步），`origin/main`
+  tip = `452ba29`，tag `v0.5.19` 已在 origin。此前 session 的 Stripe 交接、
+  配置感知实现、HOME 隔离测试、发票工程升级状态也均已 push。跨项目索引
+  `~/projects/WORK_LOG_INDEX.md` 顶行已加本轮条目。
   冷启动后先读 `docs/CURRENT_PLAN_ZH.md`，等待 Stripe Billing/Invoicing 工程
   团队提供正确 paid invoice PDF；
   除非用户明确 gate，不启动下一项功能实现或发布。外部手工项仍是 Canopii claim/rescan、Claude plugin pending 观察，并在
