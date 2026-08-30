@@ -1,13 +1,16 @@
 # pyobfus 当前计划
 
-更新时间：2026-08-28（`pyobfus` 0.5.18 / `pyobfus-mcp` 0.3.9 已发布；
+更新时间：2026-08-30（`pyobfus` 0.5.18 / `pyobfus-mcp` 0.3.9 已发布；
 `vscode-extension` 最新仍为 0.4.1。既有付款
 现已成功关联，Dashboard 显示 Paid / US$0.00 remaining，且 Stripe 生成的收据
-正确；但新下载的 invoice PDF 仍错误显示全额应付。已把正确收据与错误发票
-作为附件回复 Stripe Support，请 Billing/Invoicing 技术团队刷新 PDF；不得开
+正确；但 2026-08-30 按 Stripe Support 指示从实时 Dashboard 再次下载的新
+invoice PDF，在付款关联成功 84+ 小时后仍错误显示全额应付，已排除误开旧文件
+和其所称的 24 小时 CDN 延迟。已把实时 Dashboard 状态截图与新错误 PDF 作为
+附件回复原 Support 线程，请 Billing/Invoicing 工程团队重生成 PDF；不得开
 贷项通知单、退款、解除付款或重新扣款。客户此前已收到澄清邮件，冷启动无需
-再发例行进度更新。本次正式发布已获用户明确批准并完成；后续每次正式发布仍
-须单独取得用户同意）
+再发例行进度更新；客户已确认未收到 Stripe 的错误自动邮件，并已获告知无需
+付款或操作，正确 paid invoice 就绪后再发送。本次正式发布已获用户明确批准
+并完成；后续每次正式发布仍须单独取得用户同意）
 
 这份文档是当前项目状态和后续计划的中文单一入口，面向维护者日常查看。旧的
 `ROADMAP.md` 和 `POST_V0.4_TODO.md` 保留为历史归档和详细来源，但后续日常
@@ -127,6 +130,15 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
   Git 忽略的内部归档。当前 hold：不向客户发送错误 invoice，不退款、不贷记、
   不解除付款、不重新扣款；正确 receipt 只在交付紧急时作为临时证明，不能
   默默替代客户要求的 paid invoice。
+- **2026-08-30 Dashboard 新下载仍错误，已要求工程升级处理**：Stripe Support
+  将矛盾归因于最长 24 小时的 CDN 缓存，并要求从实时 Dashboard 下载；实际
+  严格照做后，新生成文件在付款成功关联 84+ 小时后仍显示全额应付和未来到期
+  日。文件时间与 digest 均证明不是误开旧本地文件；同时保存的 Dashboard
+  截图明确显示 Paid、全额付款已应用、余额 US$0.00。已在原 Support 线程附上
+  新 PDF 与截图，请 Billing/Invoicing 工程团队重生成/失效错误 PDF asset，
+  hold 清单不变。客户确认未收到 Stripe 的错误自动邮件；已回复其购买全额付清、
+  无需付款或操作，待正确公司抬头 paid invoice 就绪后再发送，未向其发送错误
+  PDF 或 Stripe 内部细节。字面标识符与附件仍只在 Git 忽略的内部归档和邮件中。
 - **2026-08-24 发布后反馈全量审计**：GitHub 当前 0 open issue、0 open PR；
   Discussions 共 6 条，最新项目公告仍为 08-01 且 0 评论，尚无人提到
   `dependency_advisory` 或要求脱离混淆单独使用。仓库已有 6 stars / 2 forks；
@@ -699,12 +711,14 @@ provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
     实体，见 `docs/internal/CUSTOMER_SUPPORT_LOG.md` 2026-08-27 条）。
     **当前唯一前台任务 = 按 `docs/internal/STRIPE_POST_PURCHASE_INVOICE_RUNBOOK.md`
     开具并交付 paid invoice**（目标约 2026-08-29 前，不二次收款）。
-    ⏳ **2026-08-28 状态：既有付款已成功关联，Dashboard 与 receipt 均显示
-    已付/US$0.00 remaining，但 invoice PDF 仍错误显示全额应付；已附两份 PDF
-    回复 Stripe Support 请求技术团队刷新**。细节与 hold 清单见
-    `CUSTOMER_SUPPORT_LOG.md` 2026-08-28 续条。客户已收到此前的非新扣款澄清，
-    冷启动无需再发例行进度更新。Cold-start 若 Support 已回复，只接受不退款、
-    不贷记、不解除付款、不重扣前提下的正确 paid invoice PDF，再交付客户。
+    ⏳ **2026-08-30 状态：既有付款已成功关联，Dashboard 与 receipt 均显示
+    已付/US$0.00 remaining；但按 Support 指示从 Dashboard 新下载的 PDF 在
+    84+ 小时后仍错误显示全额应付，已附新 PDF + 实时状态截图要求
+    Billing/Invoicing 工程升级处理**。细节与 hold 清单见
+    `CUSTOMER_SUPPORT_LOG.md` 2026-08-30 续条。客户确认未收到错误自动邮件，
+    且已获告知无需付款或操作；冷启动无需再发例行进度更新。Cold-start 若
+    Support 已回复，只接受不退款、不贷记、不解除付款、不重扣前提下的正确
+    paid invoice PDF，再交付客户。
     发票交付后隔几天做一次不超过两个问题的轻量回访（实际使用功能 +
     大项目/CI/CD/团队工作流最想改善的一点），把回复作为上方 P2 候选
     排序证据。在发票交付前不启动任何功能实现；`--plan`、delivery bundle、
@@ -714,8 +728,9 @@ provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
 
 > Cold-start 判断：若 `docs/internal/CUSTOMER_SUPPORT_LOG.md` 最新条目
 > 显示发票已 `Paid` 并已发送 PDF，则本清单生效；否则先做发票。
-> （2026-08-28 现状：付款已关联且 receipt 正确，但 invoice PDF 仍错误显示
-> 应付；两份矛盾 PDF 已提交 Stripe Support。用户已明确打开本地实现 gate，
+> （2026-08-30 现状：付款已关联且 receipt 正确，但 Dashboard 新下载的
+> invoice PDF 在 84+ 小时后仍错误显示应付；新 PDF + 实时状态截图已提交
+> Stripe Billing/Invoicing 工程升级处理。用户已明确打开本地实现 gate，
 > 因此发票问题不再阻塞开发；仍不要贷记/退款/解除付款/重扣。正式发版继续等待
 > 用户单独确认。）
 
