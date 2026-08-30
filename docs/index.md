@@ -29,9 +29,12 @@ title: pyobfus - Modern Python Code Obfuscator
     <li><strong>Comment Removal</strong>: Strip comments and docstrings</li>
     <li><strong>String Encoding</strong>: Base64 encoding for string literals</li>
     <li><strong>Multi-file Support</strong>: Obfuscate entire projects</li>
+    <li><strong>Reverse Stack-Trace Mapping</strong> (<code>--unmap</code>): translate an obfuscated production traceback back to original names, so you (or an AI assistant) can debug shipped code without un-obfuscating it</li>
+    <li><strong>Pre-flight Risk Check</strong> (<code>--check</code>): flags <code>eval</code>/<code>exec</code>, dynamic attribute access, framework reflection, and declared dependencies that do not resolve on public PyPI &mdash; config-aware, JSON output</li>
     <li><strong>YAML Configuration</strong>: Flexible configuration system</li>
     <li><strong>Parameter Preservation</strong>: Keep function parameter names for keyword arguments</li>
-    <li><strong>Build Provenance</strong>: Local provenance manifest with hashes and CycloneDX-compatible relationships</li>
+    <li><strong>Build Provenance</strong>: Local provenance manifest with hashes and CycloneDX-compatible relationships; <code>--verify-provenance-manifest</code> validates it</li>
+    <li><strong>Structured Dry-Run Plan &amp; Syntax Verification</strong> (v0.5.19): <code>--dry-run --json</code> previews a versioned plan; <code>--verify-syntax</code> compiles generated output in memory after a build (no import, no execution)</li>
   </ul>
 </div>
 
@@ -44,7 +47,7 @@ title: pyobfus - Modern Python Code Obfuscator
     <li style="margin: 0.5em 0;">🔐 <strong>AES-256 String Encryption</strong>: Military-grade encryption for strings</li>
     <li style="margin: 0.5em 0;">🛡️ <strong>Anti-Debugging Checks</strong>: Detect and prevent debugging attempts</li>
     <li style="margin: 0.5em 0;">📅 <strong>License Embedding</strong>: Expiration dates, machine binding, run limits</li>
-    <li style="margin: 0.5em 0;">🧱 <strong>v0.5 build-fusion mechanisms</strong> (compose via <code>pyobfus SRC -o OUT --level pro --&lt;flag&gt;</code>): Selective Opacity, Seal-Code, String Vault, Scrub-Traceback, Fingerprint, Expire-Hard</li>
+    <li style="margin: 0.5em 0;">🧱 <strong>v0.5 build-fusion mechanisms</strong> (compose via <code>pyobfus SRC -o OUT --level pro --&lt;flag&gt;</code>): Selective Opacity, Seal-Code, String Vault, Scrub-Traceback, Fingerprint, Expire-Hard &mdash; plus run-counter cap, targeted opacity config, device-locked keys, and runtime import obfuscation</li>
     <li style="margin: 0.5em 0;">⚡ <strong>Configuration Presets</strong>: One-command setup (trial, commercial, library)</li>
     <li style="margin: 0.5em 0;">🔄 <strong>Lifetime Updates</strong>: All future Pro features included</li>
     <li style="margin: 0.5em 0;">💻 <strong>Up to 3 Devices</strong>: Use on multiple machines</li>
@@ -182,7 +185,7 @@ pyobfus src/ -o dist/ --preset commercial
 pyobfus input.py -o output.py --control-flow --string-encryption --anti-debug --dead-code
 
 # With license restrictions
-pyobfus src/ -o dist/ --expire 2025-12-31 --bind-machine
+pyobfus src/ -o dist/ --expire 2027-12-31 --bind-machine
 
 # Check trial status
 pyobfus-trial status
