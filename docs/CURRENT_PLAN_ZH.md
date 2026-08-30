@@ -686,6 +686,14 @@ provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
    2026-08-22 又做了一轮（见下方"2026-08-22 扫描"小节），产出的行动项已
    held 到 main，等下次自然发布节点再切版本号——不要因为"该扫了"本身去扫，
    要有具体触发点（新对手/生态政策变化）或临近下次发布。
+   **2026-08-31 又做了一轮 + 长尾词/AI 搜索优化规划**（用户请求触发）：完整
+   结论、竞品表、15 个 surface 的关键词计划与 Wave A/B/C 优先级见
+   [`docs/SEO_AND_COMPETITOR_SCAN_2026-08-31.md`](SEO_AND_COMPETITOR_SCAN_2026-08-31.md)。
+   要点：PyArmor 9.2.7 / Nuitka Commercial 无实质变化；两个新 AST 系
+   entrant（`davidteather/python-obfuscator` MIT v0.1.0 很薄但撞通用名、
+   CodeEnigma ~58★ 定位最像但走加密字节码 loader、无反向映射/AI/MCP）；
+   在线混淆站是 comparison 关键词的真实 SERP 对手；slopsquatting 检测赛道
+   已拥挤（喂给 #8 的 graduation 判断）。执行等用户 gate。
 7. **新增（2026-08-22，源自 `~/projects/NEXT_TOOL_OPPORTUNITY_SCAN.md`
    机会扫描）：pyobfus-mcp 去申请 MCP 信任目录徽章**——扫描时发现 MCP
    信任评分赛道已有至少 4 个独立竞品（MCP Skills 的 Verified badge、
