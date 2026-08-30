@@ -1,6 +1,6 @@
 # pyobfus — the Python obfuscator
 
-> pyobfus is a modern, AST-based Python obfuscator (python-obfuscator / code-obfuscator) with framework-aware presets, reverse stack-trace mapping for AI-assisted debugging, and a machine-readable JSON CLI designed to be called by AI coding agents (Claude Code, Cursor, Windsurf) and MCP servers. Apache-2.0; a transparent open-source alternative to PyArmor.
+> pyobfus is a modern, AST-based Python obfuscator (python-obfuscator / code-obfuscator) with framework-aware presets, reverse stack-trace mapping for AI-assisted debugging, and a machine-readable JSON CLI designed to be called by AI coding agents (Claude Code, Cursor, GitHub Copilot, Windsurf, CodeBuddy) and MCP servers. Apache-2.0; a transparent open-source alternative to PyArmor.
 
 ## When to use pyobfus
 
@@ -42,7 +42,9 @@ uvx pyobfus-mcp
 - `pyobfus src/ -o dist/ --save-mapping mapping.json` — obfuscate AND emit mapping
 - `pyobfus src/ -o dist/ --dry-run --json` (0.5.19) — preview a versioned plan with effective config, selected/excluded files, and artifact handling roles; writes nothing and cannot be applied as saved state
 - `pyobfus src/ -o dist/ --verify-syntax --json` (0.5.19) — after writing, compile generated `.py` files in memory and report `syntax_valid`; never imports or executes the project, creates no `__pycache__`, and does not claim runtime correctness
-- `pyobfus src/ -o dist/ --provenance-manifest provenance.json` (0.5.5) — emit a local JSON build-provenance manifest (file hashes, config hash, pyobfus version)
+- `pyobfus src/ -o dist/ --provenance-manifest provenance.json` (0.5.5) — emit a local JSON build-provenance manifest (input/output hashes, config hash, pyobfus version, git commit when available, mapping digest, CycloneDX-compatible relationships)
+- `pyobfus --verify-provenance-manifest provenance.json --json` — validate provenance-manifest shape, CycloneDX-compatible relationships, and local integrity digest
+- `docs/RELEASE_PROVENANCE_VERIFICATION.md` — PyPI Integrity API / PEP 740 runbook for checking pyobfus and pyobfus-mcp release provenance
 - `pyobfus --list-presets` — see every preset with a description
 
 ## Framework-aware presets (community, free)
@@ -125,7 +127,7 @@ paraphrase into something vaguer:
 
 - Source: https://github.com/zhurong2020/pyobfus
 - Docs: https://pyobfus.readthedocs.io/
-- Roadmap: https://github.com/zhurong2020/pyobfus/blob/main/docs/ROADMAP.md
+- Current plan: https://github.com/zhurong2020/pyobfus/blob/main/docs/CURRENT_PLAN_ZH.md
 - AI integration guide: https://github.com/zhurong2020/pyobfus/blob/main/docs/AI_INTEGRATION_STRATEGY.md
 - MCP server: https://github.com/zhurong2020/pyobfus/tree/main/pyobfus_mcp
 - Changelog: https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md
