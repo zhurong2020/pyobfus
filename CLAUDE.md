@@ -25,12 +25,17 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   Release / CI 全矩阵 / CodeQL 均绿。发布收尾提交为
   `docs: record pyobfus 0.5.19 release`。MCP 与 VS Code 扩展本轮
   `[Unreleased]` 均为空，未动。
-- **docs cleanup 已做（2026-08-31，commit `4482eb7`）**：`llms.txt` ↔
-  `docs/llms.txt` 双向 drift 完整对账，`cmp` 已 byte-identical、指针全 resolve、
-  `mkdocs build` 核实 `docs/llms.txt` 发布到站点根；顺带刷新 `llms-full.txt`
-  （MCP 工具表 5→8 个、按 shipped `tool_manifest.json` 校对签名，Versioning
-  段补到 0.5.19，示例 header `v0.5.6`→`v0.5.19`，Links `Roadmap`→`Current plan`）。
-  `llms-full.txt` 无 `docs/` 孪生（llmstxt.org 规范只要求 `/docs/llms.txt`）。
+- **docs cleanup 已做（2026-08-31，commits `4482eb7`/`f1c3e4a`/`ac6a572`/`e3ed135`）**：
+  ① `llms.txt` ↔ `docs/llms.txt` 双向 drift 完整对账，`cmp` 已 byte-identical、
+  指针全 resolve、`mkdocs build` 核实 `docs/llms.txt` 发布到站点根；顺带刷新
+  `llms-full.txt`（MCP 工具表 5→8 个、按 shipped `tool_manifest.json` 校对签名，
+  Versioning 段补到 0.5.19，示例 header `v0.5.6`→`v0.5.19`，Links
+  `Roadmap`→`Current plan`）。`llms-full.txt` 无 `docs/` 孪生（llmstxt.org 规范
+  只要求 `/docs/llms.txt`）。② mkdocs Home 页 `docs/index.md` 补 headline 反向
+  映射/`--check`/0.5.19 flags + 补全 Pro build-fusion 行 + 过期 `--expire`
+  示例日期；`CONFIG_AWARE_CHECK_DESIGN.md` 时态修正 + `PROVENANCE_MANIFEST.md`
+  样例 JSON 版本 0.5.13→0.5.19。其余（`AGENTS.md`/`pyobfus_mcp/README.md` 8
+  工具表/`SKILL.md`/`templates/`/`_drafts/` 0.4.0 营销稿/归档 docs）核实无需改。
 - **当日小版本发布已完成**：用户明确批准后，`pyobfus 0.5.18` 与
   `pyobfus-mcp 0.3.9` 已按 Core→MCP 顺序通过 OIDC 发布；两个 GitHub
   Releases、四个 PyPI provenance endpoint、MCP Registry
@@ -63,18 +68,16 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   `--verify-syntax`（均 0.5.19，见本节首条）都已发布。暂不做任意
   `--verify-command`、zip/tar delivery bundle、mapping 内建加密或团队 license
   后端。下一功能方向须由用户 gate 再开。
-- 0.5.19 这一轮共 3 个 commit 全部 push（`beae06d` release prep → `e99339b`
-  record release → `452ba29` channel state + README 特性表同步），`origin/main`
-  0.5.19 一轮 4 commit（`beae06d`→`e99339b`→`452ba29`→`f91e78d`）+ docs
-  cleanup `4482eb7` 全部 push，`origin/main` tip = `4482eb7`，tag `v0.5.19`
-  已在 origin。此前 session 的 Stripe 交接、配置感知实现、HOME 隔离测试、
-  发票工程升级状态也均已 push。跨项目索引 `~/projects/WORK_LOG_INDEX.md`
-  顶行已加本轮条目。
-  冷启动后先读 `docs/CURRENT_PLAN_ZH.md`，等待 Stripe Billing/Invoicing 工程
-  团队提供正确 paid invoice PDF；
-  除非用户明确 gate，不启动下一项功能实现或发布。外部手工项仍是 Canopii claim/rescan、Claude plugin pending 观察，并在
+- 本 session 全部产出已 push（0.5.19 发布 `beae06d`→`e99339b`→`452ba29`→`f91e78d`，
+  docs cleanup `4482eb7`→`f1c3e4a`→`ac6a572`→`e3ed135`），tag `v0.5.19` 在 origin，
+  工作区干净。逐轮明细以 `docs/CURRENT_PLAN_ZH.md` +
+  `~/projects/WORK_LOG_INDEX.md` 顶行为准（每轮追加，是活的 tip 来源）。此前
+  session 的 Stripe 交接、配置感知实现、HOME 隔离测试、发票工程升级状态也均已
+  push。冷启动后先读 `docs/CURRENT_PLAN_ZH.md`，等待 Stripe Billing/Invoicing
+  工程团队提供正确 paid invoice PDF；除非用户明确 gate，不启动下一项功能实现
+  或发布。外部手工项仍是 Canopii claim/rescan、Claude plugin pending 观察，并在
   1–2 周后复查下载；若 9 月 1–7 日仍无 advisory 反馈，再考虑 GitHub Discussion
-  投票。（`llms.txt` twin drift 对账已于 `4482eb7` 完成，见上方 docs cleanup 条。）
+  投票。
 
 ### ✅ 2026-08-24 — 0.5.17 / MCP 0.3.8 发布与外部渠道收尾
 

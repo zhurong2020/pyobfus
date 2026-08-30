@@ -51,13 +51,19 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
   构建后内存 `compile()` 验证（不 import、不执行、不写 `__pycache__`，JSON 只
   声明 `syntax_valid`）。两个 wheel/sdist Integrity provenance endpoint 均
   HTTP 200；MCP 与 VS Code 扩展本轮无改动（`[Unreleased]` 均为空）。
-- **2026-08-31 docs cleanup**（commit `4482eb7`）：`llms.txt` ↔ `docs/llms.txt`
-  两份孪生文件此前双向漂移（~5 commit），已完整对账为 byte-identical
-  （`cmp` 干净、指针全 resolve、`mkdocs build` 核实 `docs/llms.txt` 发布到站点
-  根）；顺带刷新 `llms-full.txt`（MCP 工具表 5→8 个按 shipped `tool_manifest.json`
-  校对、Versioning 段补到 0.5.19、示例 header→`v0.5.19`、Links `Roadmap`→
-  `Current plan`）。`llms-full.txt` 无 `docs/` 孪生（llmstxt.org 规范只要求
-  `/docs/llms.txt`），非缺失。
+- **2026-08-31 docs cleanup**（commits `4482eb7`/`f1c3e4a`/`ac6a572`/`e3ed135`）：
+  ① `llms.txt` ↔ `docs/llms.txt` 两份孪生文件此前双向漂移（~5 commit），已完整
+  对账为 byte-identical（`cmp` 干净、指针全 resolve、`mkdocs build` 核实
+  `docs/llms.txt` 发布到站点根）；顺带刷新 `llms-full.txt`（MCP 工具表 5→8 个按
+  shipped `tool_manifest.json` 校对、Versioning 段补到 0.5.19、示例 header→
+  `v0.5.19`、Links `Roadmap`→`Current plan`）。`llms-full.txt` 无 `docs/` 孪生
+  （llmstxt.org 规范只要求 `/docs/llms.txt`），非缺失。② mkdocs Home 页
+  `docs/index.md` 补 headline 反向映射 / `--check` / 0.5.19 flags + 补全 Pro
+  build-fusion 行 + 修过期 `--expire` 示例日期；`CONFIG_AWARE_CHECK_DESIGN.md`
+  Rollout 段时态修正；`PROVENANCE_MANIFEST.md` 样例 JSON `pyobfus_version`
+  0.5.13→0.5.19。其余候选（`AGENTS.md` / `pyobfus_mcp/README.md` 8 工具表 /
+  `skills/pyobfus-protect/SKILL.md` / `templates/ai-integration/` / `_drafts/`
+  0.4.0 营销稿 / 归档 docs）逐个核实无需改。
 - 主包：`pyobfus 0.5.18` 已发布（2026-08-28）——`--check` 可解析有效项目
   配置并报告 `effective_config` / `excluded_findings`，在不改变 high finding 与
   exit code 的前提下解释配置已缓解的风险。
