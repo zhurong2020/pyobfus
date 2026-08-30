@@ -14,6 +14,19 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ### ⏳ 2026-08-30 — 客户 paid-invoice PDF 已升级 Stripe 工程处理
 
+- **`pyobfus 0.5.19` 已发布（2026-08-30，用户明确批准）**：把此前 held 的两个
+  独立 commit 组成 Core 小版本——`3758482` 的 `--dry-run --json` versioned
+  `plan` 对象（effective config / 选中与排除文件及原因 / artifacts 交付角色，
+  只给 cwd-relative label，`apply_supported=false`）与 `1a1b18c` 的 opt-in
+  `--verify-syntax`（构建后内存 `compile()`，不 import / 不执行 / 不写
+  `__pycache__`，JSON 只声明 `syntax_valid`）。tag `v0.5.19` 经 OIDC + PEP 740
+  发到 PyPI，wheel/sdist 两个 Integrity provenance endpoint 均 HTTP 200，全新
+  venv `pip install pyobfus==0.5.19` 已核实带上两个新 flag，GitHub Release 已建，
+  Release / CI 全矩阵 / CodeQL 均绿。发布收尾提交为
+  `docs: record pyobfus 0.5.19 release`。发布前发现并顺手修的一处旧漂移：根
+  `llms.txt` 漏了这两个 feature 行（feature commit 只写进了 `docs/llms.txt`），
+  已补齐；两份 `llms.txt` 双向 drift 的完整对账留作独立 `docs:` cleanup（未做）。
+  MCP 与 VS Code 扩展本轮 `[Unreleased]` 均为空，未动。
 - **当日小版本发布已完成**：用户明确批准后，`pyobfus 0.5.18` 与
   `pyobfus-mcp 0.3.9` 已按 Core→MCP 顺序通过 OIDC 发布；两个 GitHub
   Releases、四个 PyPI provenance endpoint、MCP Registry
@@ -42,20 +55,18 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   的 `docs/internal/` 运营记录，绝不进入公开提交。
 - 下一轮功能方向已完成代码审计与官方资料调研，见
   [`docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md`](docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md)。
-  配置感知 `--check` 已发布；后续两个独立候选也已于 2026-08-30 实现并 held
-  在 `[Unreleased]`：`3758482` 为 `--dry-run --json` versioned plan，
-  `1a1b18c` 为显式 `--verify-syntax`。完整质量门为 Core 1208 passed/1 skipped、
-  MCP 93 passed、端到端 7 passed，Black/Ruff/联合 mypy 全绿。版本仍为 0.5.18，
-  未打 tag、未发布；正式发布继续等待用户单独批准。暂不做任意
+  配置感知 `--check`（0.5.18）、`--dry-run --json` versioned plan 与
+  `--verify-syntax`（均 0.5.19，见本节首条）都已发布。暂不做任意
   `--verify-command`、zip/tar delivery bundle、mapping 内建加密或团队 license
-  后端。
-- 本 session 的 Stripe 交接、配置感知实现、HOME 隔离测试、发布准备、CI 修复、
-  发布收尾与发票工程升级状态均已 push；`origin/main` 已包含 `1d69e1d`。
+  后端。下一功能方向须由用户 gate 再开。
+- 本 session 的 Stripe 交接、配置感知实现、HOME 隔离测试、0.5.19 发布准备与
+  收尾、CI 修复、发票工程升级状态均已 push；`origin/main` 已含
+  `docs: record pyobfus 0.5.19 release`。
   冷启动后先读 `docs/CURRENT_PLAN_ZH.md`，等待 Stripe Billing/Invoicing 工程
   团队提供正确 paid invoice PDF；
   除非用户明确 gate，不启动下一项功能实现或发布。外部手工项仍是 Canopii claim/rescan、Claude plugin pending 观察，并在
   1–2 周后复查下载；若 9 月 1–7 日仍无 advisory 反馈，再考虑 GitHub Discussion
-  投票。
+  投票。可选 cleanup：两份 `llms.txt` 双向 drift 对账（见本节首条）。
 
 ### ✅ 2026-08-24 — 0.5.17 / MCP 0.3.8 发布与外部渠道收尾
 
@@ -308,7 +319,7 @@ cardiac-manuscripts 仓库（不影响 pyobfus 仓库本身）。
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.9-3.14, AST, setuptools
-- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.18，2026-08-28 发布**；完整版本历史见 `CHANGELOG.md`)
+- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.19，2026-08-30 发布**；完整版本历史见 `CHANGELOG.md`)
 - **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.1，2026-08-22 发布**（tag+GitHub Release+Marketplace 手工上传均已完成，`curl` 核实公开 listing 已返回 `"version":"0.4.1"`）；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`)
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.9，2026-08-28 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.18` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp` (active, isLatest=true · **0.3.9**，2026-08-28 发布，`registry.modelcontextprotocol.io` 直查核实)
@@ -328,7 +339,7 @@ pyobfus/
 │   ├── transformers/   # AST 变换器
 │   └── cross_file/    # 跨文件混淆
 ├── pyobfus_pro/       # Pro Edition (商业许可)
-├── tests/             # 1201 passed + 1 skipped (0.5.18 发布前验证)
+├── tests/             # 1208 passed + 1 skipped (0.5.19 发布前验证)
 ├── examples/          # 示例代码
 ├── docs/              # 项目文档
 └── cloudflare-worker/ # 许可验证 Worker

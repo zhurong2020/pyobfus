@@ -1,6 +1,6 @@
 # pyobfus 当前计划
 
-更新时间：2026-08-30（`pyobfus` 0.5.18 / `pyobfus-mcp` 0.3.9 已发布；
+更新时间：2026-08-30（`pyobfus` 0.5.19 已发布；`pyobfus-mcp` 最新仍为 0.3.9；
 `vscode-extension` 最新仍为 0.4.1。既有付款
 现已成功关联，Dashboard 显示 Paid / US$0.00 remaining，且 Stripe 生成的收据
 正确；但 2026-08-30 按 Stripe Support 指示从实时 Dashboard 再次下载的新
@@ -9,10 +9,13 @@ invoice PDF，在付款关联成功 84+ 小时后仍错误显示全额应付，�
 附件回复原 Support 线程，请 Billing/Invoicing 工程团队重生成 PDF；不得开
 贷项通知单、退款、解除付款或重新扣款。客户此前已收到澄清邮件，冷启动无需
 再发例行进度更新；客户已确认未收到 Stripe 的错误自动邮件，并已获告知无需
-付款或操作，正确 paid invoice 就绪后再发送。本次正式发布已获用户明确批准
-并完成。结构化 dry-run plan 与 syntax-only 构建后验证已作为两个独立 commit
-实现并通过完整质量门，当前 held 在 `[Unreleased]`；版本号、tag 与正式发布均
-未动，后续正式发布仍须单独取得用户同意）
+付款或操作，正确 paid invoice 就绪后再发送。0.5.18 正式发布已获用户明确批准
+并完成。结构化 dry-run plan 与 syntax-only 构建后验证随后作为两个独立 commit
+实现，经用户明确批准于 2026-08-30 组成 `pyobfus 0.5.19` 发布：tag `v0.5.19`
+经 OIDC workflow 发到 PyPI，wheel/sdist 两个 Integrity provenance endpoint 均
+HTTP 200，全新虚拟环境 `pip install pyobfus==0.5.19` 已核实带上两个新 flag，
+GitHub Release 已建，Release / CI 全矩阵 / CodeQL 均绿。后续正式发布仍须单独
+取得用户同意）
 
 这份文档是当前项目状态和后续计划的中文单一入口，面向维护者日常查看。旧的
 `ROADMAP.md` 和 `POST_V0.4_TODO.md` 保留为历史归档和详细来源，但后续日常
@@ -41,6 +44,13 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
   发布并公开核实为 `active` / `isLatest=true`。VS Code 扩展 `[Unreleased]`
   为空，本轮保持 0.4.1 不动。
 
+- **2026-08-30 发布完成**：`pyobfus 0.5.19` 已通过 tag `v0.5.19` 触发的
+  OIDC workflow 发布到 PyPI——`--dry-run --json` 新增 versioned `plan` 对象
+  （effective config / 选中与排除文件及原因 / artifacts 交付角色，只给
+  cwd-relative label，`apply_supported=false`），以及 opt-in `--verify-syntax`
+  构建后内存 `compile()` 验证（不 import、不执行、不写 `__pycache__`，JSON 只
+  声明 `syntax_valid`）。两个 wheel/sdist Integrity provenance endpoint 均
+  HTTP 200；MCP 与 VS Code 扩展本轮无改动（`[Unreleased]` 均为空）。
 - 主包：`pyobfus 0.5.18` 已发布（2026-08-28）——`--check` 可解析有效项目
   配置并报告 `effective_config` / `excluded_findings`，在不改变 high finding 与
   exit code 的前提下解释配置已缓解的风险。
@@ -549,7 +559,7 @@ provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
      `use_project_config` 可同波或后续 `pyobfus-mcp` 版本。
 
 2. **结构化保护计划 `--dry-run --json` plan 对象**
-   - ✅ **2026-08-30 已实现，held 在 `[Unreleased]`，未发版**：沿用现有
+   - ✅ **2026-08-30 已随 `pyobfus 0.5.19` 发布**：沿用现有
      `--dry-run --json`，新增 versioned `plan` 对象；commit `3758482`。
      JSON 列 effective config 摘要/哈希、选中与排除文件及原因、planned
      artifacts，并用 `ship` / `retain-internal` / `optional` 标明交付角色。
@@ -563,7 +573,7 @@ provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
      plan 不可保存后直接 apply，避免引入第二套状态管理。
 
 3. **受控的构建后验证**
-   - ✅ **2026-08-30 已实现，held 在 `[Unreleased]`，未发版**：新增显式
+   - ✅ **2026-08-30 已随 `pyobfus 0.5.19` 发布**：新增显式
      `--verify-syntax`；commit `1a1b18c`。构建写出后逐个读取生成的 `.py` 并在
      内存调用 `compile(..., "exec", dont_inherit=True)`，不 import、不执行、
      不生成 `__pycache__`。JSON 只报告 `mode=syntax-only`、`syntax_valid`、
@@ -781,7 +791,8 @@ provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
    发布前运行 `scripts/check_unreleased_changelogs.py`，固定先 Core、后 MCP，
    并逐次取得用户明确批准。
 6. **候选 2/3**（`--dry-run --json` plan 对象、syntax-only 验证 spike）：
-   ✅ 已于 2026-08-30 按两个独立 commit 实现并 held 在 `[Unreleased]`；完整
-   质量门为 Core 1208 passed/1 skipped、MCP 93 passed、端到端 7 passed，
-   Black/Ruff/联合 mypy 全绿。当前仍是 `pyobfus 0.5.18`，没有版本 bump、tag、
-   build 或 publish；是否组成下一 Core 小版本须再次经过用户发布 gate。
+   ✅ 已于 2026-08-30 按两个独立 commit 实现，经用户明确批准组成
+   `pyobfus 0.5.19` 发布（tag `v0.5.19`，OIDC + PEP 740，PyPI/GitHub Release/
+   全矩阵 CI/CodeQL 均绿，全新 venv 安装核实带两个新 flag）。发布前质量门为
+   Core 1208 passed/1 skipped、MCP 93 passed、端到端 7 passed，Black/Ruff/
+   联合 mypy 全绿。MCP 与 VS Code 扩展本轮 `[Unreleased]` 均为空，未动。
