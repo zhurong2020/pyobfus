@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.19] - 2026-08-30
+
 ### Added
 
 - `--dry-run --json` now includes a versioned `plan` object describing the

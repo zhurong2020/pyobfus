@@ -20,12 +20,14 @@ A Python code obfuscator built with AST-based transformations. **Supports Python
 
 > **🔒 Pro Edition available** — 6 patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator, $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
 
-> **🔧 What's new in v0.5.18** — `pyobfus --check` now honors your explicit or
-> discovered `pyobfus.yaml` and presets. Risks in files excluded from the build
-> are reported separately without blocking the primary result, while configured
-> name preservation is reflected as mitigation. Use `--no-config` for the
-> previous unfiltered scan. MCP callers get the same behavior by default and can
-> opt out with `use_project_config=false`.
+> **🔧 What's new in v0.5.19** — `--dry-run --json` now emits a versioned
+> `plan` object: effective config, selected/excluded files with reasons, and
+> artifacts tagged `ship` / `retain-internal` / `optional`. It uses relative
+> labels only — no source, secrets, or absolute paths — and is a preview, not
+> a saved apply file. New opt-in `--verify-syntax` compiles the generated
+> output in memory after a build (no import, no execution, no `__pycache__`)
+> and reports `syntax_valid` in JSON; a failure blocks delivery. It makes no
+> runtime-correctness claim.
 
 > 🔔 **Starring this repo doesn't notify you about new releases** — GitHub only
 > sends release notifications to people who explicitly **Watch** it. Click
