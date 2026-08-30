@@ -7,9 +7,11 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-**Last updated**: 2026-08-28 (pyobfus 0.5.18 and pyobfus-mcp 0.3.9 published
-through OIDC; GitHub Releases, provenance, MCP Registry and a clean public-PyPI
-install verified. VS Code extension remains 0.4.1.)
+**Last updated**: 2026-08-30 (pyobfus 0.5.19 published through OIDC —
+`--dry-run --json` versioned plan + opt-in `--verify-syntax`; both Integrity
+provenance endpoints HTTP 200, fresh public-PyPI install verified, GitHub
+Release created. pyobfus-mcp remains 0.3.9 and VS Code extension remains 0.4.1;
+neither had `[Unreleased]` content this round.)
 
 > **Note (2026-05-09)**: most of the per-channel facts below are now current as of Session 23. Outside of the launch wave (HN 5-11 / Reddit 5-12 / CN trio 5-8/9), the live state is reflected here. Consult `docs/POST_V0.4_TODO.md` for forward TODO and `docs/V0.4_EXECUTION_LOG.md` for session-by-session deltas.
 
@@ -19,8 +21,9 @@ install verified. VS Code extension remains 0.4.1.)
 
 ### PyPI — `pyobfus`
 - URL: https://pypi.org/project/pyobfus/
-- Current version: **0.5.18** (released 2026-08-28) · ships with PEP 740 attestations via OIDC trusted publishing
-- Current headline: config-aware `--check` reports the effective project configuration and findings already mitigated by it, while preserving high-risk findings and exit-code semantics.
+- Current version: **0.5.19** (released 2026-08-30) · ships with PEP 740 attestations via OIDC trusted publishing
+- Current headline: `--dry-run --json` emits a versioned `plan` object (effective config, selected/excluded files with reasons, artifacts tagged ship/retain-internal/optional; relative labels only, not applyable); opt-in `--verify-syntax` compiles generated output in memory post-build (no import/execute, no `__pycache__`) and reports `syntax_valid` with no runtime-correctness claim.
+- Prior headline (0.5.18): config-aware `--check` reports the effective project configuration and findings already mitigated by it, while preserving high-risk findings and exit-code semantics.
 - Pre-v0.4 baseline: ~324 downloads / month, ~30% real users (rest is mirror noise)
 - 2026-08-24 pypistats snapshot (data through 08-23, known mirrors excluded):
   day/week/month `27 / 502 / 2,059`. Weekly growth is dominated by release-day
@@ -66,7 +69,7 @@ install verified. VS Code extension remains 0.4.1.)
   prior is not evidence of an actual review. Continue tracking installs and
   real reviews, not raw update/download count alone.
 - Wiki: disabled · Discussions: enabled · Issues: open
-- Releases: latest `v0.5.18` (2026-08-28); earlier releases `v0.3.3` … `v0.5.17`, plus `mcp-v0.3.x` and `vscode-v0.x` tags (mcp releases attach wheel+sdist).
+- Releases: latest `v0.5.19` (2026-08-30); earlier releases `v0.3.3` … `v0.5.18`, plus `mcp-v0.3.x` and `vscode-v0.x` tags (mcp releases attach wheel+sdist).
 
 ### 有心工坊 (personal blog)
 - URL: https://www.arong.eu.org
