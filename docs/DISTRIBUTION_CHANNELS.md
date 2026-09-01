@@ -116,6 +116,11 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 ### MCP Registry — `io.github.zhurong2020/pyobfus-mcp` 🟢 LIVE
 - URL: https://registry.modelcontextprotocol.io/v0/servers?search=pyobfus
 - Latest confirmed published: **0.3.9** (2026-08-28) · status: `active` · `isLatest=true`. Publishing 0.3.10 was attempted 2026-09-01 after PyPI release, but Registry publish/auth/public GET all failed at TLS/EOF; retry when the public endpoint recovers, then verify `active` / `isLatest=true` before marking complete.
+- **Open verification TODO**: retry Registry authentication/publication only
+  after its public endpoint recovers. No package rebuild, retag, PyPI re-upload,
+  or source change is required. The companion docs-only commit `289752a` also
+  has CI run `33521916080` awaiting a final status check; its CodeQL and Pages
+  runs already succeeded, and both release workflows are complete.
 - 0.3.9 contents: default-on project-config awareness and runtime floor `pyobfus>=0.5.18`; see the PyPI section above. Previous 0.3.6 hardening: `pyobfus_mcp/server.json` validates against the official `2025-12-11` schema and includes GitHub repository stable ID `1093960892`; `fileSha256` remains omitted because the PyPI wheel/sdist multi-artifact model makes a single optional hash ambiguous.
 - Implications: Claude Desktop / Claude Code / Cursor / Windsurf / Zed users querying the registry for "pyobfus" or "python obfuscator" will discover this server without manual config file edits.
 

@@ -670,6 +670,21 @@ provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
 
 ## 下次工作建议
 
+### 外部状态复查 TODO（2026-09-01 收口）
+
+- [ ] **MCP Registry 0.3.10**：官方端点恢复后，在
+  `pyobfus_mcp/` 执行 `mcp-publisher login github -token "$(gh auth token)"`
+  与 `mcp-publisher publish`；再用公开 version endpoint 确认
+  `0.3.10` 为 `active` / `isLatest=true`。完成前不得把 Registry
+  写成已发布；不需重打 tag、重发 PyPI 或改代码。
+- [ ] **收尾 docs commit CI**：查询 run `33521916080`（commit
+  `289752a`）最终结果。当前 CI 仍 queued；同 commit 的 CodeQL
+  run `33521916546` 和 Pages run `33521903903` 已 success。这只是文档
+  提交的状态复查；Core/MCP 两个发布 workflow 已 success，不阻塞版本使用。
+- [ ] 上述两项完成后，同步本文、
+  `docs/DISTRIBUTION_CHANNELS.md`、`CLAUDE.md`、本地 project memory 与
+  `home/CROSS_PROJECT_INDEX.md`，然后关闭本 TODO。
+
 1. `dependency_advisory` 已随 `pyobfus 0.5.17` / `pyobfus-mcp 0.3.8` 发布并
    完成 PyPI、PEP 740 provenance、GitHub Release、MCP Registry 全渠道核实。
    下一步按下方毕业标准收集真实使用反馈；`vscode-extension` 本轮无待发布
@@ -774,7 +789,7 @@ provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
     邮件，不主动追发；若收到实际使用功能或大项目/CI/CD/团队工作流反馈，作为上方 P2 候选
     排序证据。`--plan` 已随 0.5.19 发布；delivery bundle、mapping 加密、团队
     license UX 仍需真实重复需求才做。
-11. **🆕 长尾词 / AI 搜索优化 rollout（2026-08-31 用户请求，已列入 TODO）**：
+11. **✅ 长尾词 / AI 搜索优化 rollout（2026-09-01 完成）**：
     完整规划 = [`docs/SEO_AND_COMPETITOR_SCAN_2026-08-31.md`](SEO_AND_COMPETITOR_SCAN_2026-08-31.md)
     §2（15 个 surface + 目标意图短语 + Wave A/B/C + 红线）。用户意向：**过几天
     就这些内容发一个小版本（或与其它功能合并发布）**。执行拆分：
@@ -805,6 +820,9 @@ provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
       `provenance`/`slopsquatting`/`obfuscate-before-shipping` 簇；README FAQ
       加 3 条 + 引言段确保含 "obfuscate before shipping" / "debug obfuscated
       stack traces"（**必须在打 tag 前的同一 commit**）。
+      ✅ **已经用户明确批准作为独立 SEO 版本发布**：Core
+      0.5.20 / MCP 0.3.10 的 PyPI、PEP 740 与 GitHub Releases 已核实；
+      仅 MCP Registry 分发因官方 TLS/EOF 故障转入上方独立 TODO。
     - 红线：同一短语不跨 >2 surface、不堆砌；发版前复核 "50% lower cost"
       对 PyArmor 现价是否仍成立（`COMPARISON.md` 仍写 $89）。
     - 附带的 `dependency_advisory` #8 判断：slopsquatting 检测赛道已拥挤
@@ -855,7 +873,6 @@ provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
    Core 1208 passed/1 skipped、MCP 93 passed、端到端 7 passed，Black/Ruff/
    联合 mypy 全绿。MCP 与 VS Code 扩展本轮 `[Unreleased]` 均为空，未动。
 7. **长尾词 / AI 搜索优化 rollout**（见上方"下次工作建议" #11 + scan doc §2）：
-   ⏳ 已列入 TODO，用户意向"过几天发一个小版本（或与其它功能合并）"。到点时
-   按 Wave B（docs-only，可先做）→ Wave C（keywords/README/`server.json`，进
-   发版 commit）执行；Wave A 交用户在 GitHub 设置里操作，Claude 只出文案。
-   发版仍走 `check_unreleased_changelogs.py` → 先 Core 后 MCP → 用户逐次批准。
+   ✅ Wave A/B/C 均完成；Core 0.5.20 / MCP 0.3.10 已发布。剩余
+   查询已单独收入上方「外部状态复查 TODO」，不再把 SEO rollout
+   本身标为未完成。

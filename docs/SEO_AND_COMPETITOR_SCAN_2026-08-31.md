@@ -5,6 +5,11 @@ standalone SEO releases `pyobfus 0.5.20` and `pyobfus-mcp 0.3.10`; runtime and
 MCP tool schemas are unchanged. PyPI and GitHub Releases are verified. MCP
 Registry publication is pending because its public endpoint is currently
 failing TLS/EOF requests.
+
+Remaining external checks are tracked centrally in
+`docs/CURRENT_PLAN_ZH.md` under **外部状态复查 TODO**: publish/verify
+MCP Registry 0.3.10 after recovery, and record the final result of docs CI run
+`33521916080`. The SEO implementation itself is complete.
 Trigger: user request (competitor recheck + SEO/GEO keyword planning), post
 0.5.19 release. Previous competitor scan: 2026-08-22 (`docs/CURRENT_PLAN_ZH.md`
 "2026-08-22 扫描" section).
