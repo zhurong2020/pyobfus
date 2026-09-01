@@ -12,6 +12,10 @@ A comprehensive comparison of Python code obfuscation tools to help you choose t
 | **Cython** | Free / $270/yr Commercial | Compile to C | Performance + obfuscation |
 | **Nuitka** | Free / $270/yr Commercial | Compile to binary | Standalone executables |
 | **PyLocket** | Subscription + $4/license | Per-function bytecode encryption + commerce platform | Selling a desktop app with built-in licensing |
+| **CodeEnigma** | Free | AES-GCM encrypted bytecode + Cython loader | Loader-based protected applications |
+| **python-obfuscator** | Free | Toggleable AST transformations | Small scripts and experimentation |
+| **SOURCEdefender** | Commercial | Encrypted `.pye` files + import hook | Encrypting selected modules at rest |
+| **Online obfuscators** | Free / freemium | Browser-hosted transformation | Non-sensitive, one-off scripts |
 
 ## Detailed Comparison
 
@@ -276,6 +280,32 @@ below for how the two tradeoffs coexist rather than compete head-on.
   and maximum per-function tamper resistance matters more than
   post-deployment debuggability
 - You only need to support **Python 3.12+**
+
+---
+
+### Other AST, loader, and online tools
+
+**CodeEnigma** compiles, compresses, encrypts, and wraps Python bytecode behind
+an AES-GCM/Cython loader. It shares pyobfus's transparent-alternative
+positioning, but serves a different workflow: pyobfus is AST source-to-source,
+emits ordinary `.py` files, and retains a reverse mapping for production
+tracebacks instead of requiring a custom encrypted loader.
+
+**`python-obfuscator` by davidteather** is a small MIT-licensed AST tool with
+independent toggles for renaming, hexadecimal strings, dead code, and an exec
+wrapper. It is useful for experiments and simple scripts; pyobfus adds
+scope-aware multi-file rewriting, framework presets, configuration, stable JSON
+interfaces, reverse mapping, and MCP integration.
+
+**SOURCEdefender** encrypts selected modules into `.pye` files loaded through an
+import hook. It can be composed after pyobfus when encryption at rest is the
+priority; it is not a source-to-source replacement for pyobfus's project-wide
+mapping and debugging workflow.
+
+**Browser-based Python obfuscators** are convenient for non-sensitive one-off
+scripts, but require source upload and are generally not designed for repeatable
+multi-file or CI/CD builds. pyobfus runs locally, so protected source does not
+need to leave the development environment.
 
 ---
 

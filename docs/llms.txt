@@ -101,6 +101,27 @@ per-mechanism flags (0.5.1+), which stack on top of the base obfuscation. Use
 - All four modes (`obfuscate`, `--check`, `--init`, `--unmap`) accept `--json` and return a stable schema with an `ai_hint` field naming the next command.
 - If running inside Claude Desktop / Cursor, prefer the MCP tools from `pyobfus-mcp` — they return structured dicts directly.
 
+## FAQ
+
+**Can I obfuscate a package before selling or publishing it?** Yes. Run pyobfus locally before shipping, keep `mapping.json` private, and distribute only the transformed output.
+
+**How do I debug an obfuscated production crash?** Build with `--save-mapping`, then use `--unmap` to restore identifiers in the reported traceback for you or an AI coding assistant.
+
+**Will framework reflection break?** Start with `--check`, then use the FastAPI, Django, Flask, Pydantic, Click, SQLAlchemy, or ML preset that matches the project.
+
+**Can pyobfus protect a PyInstaller build?** Yes. Obfuscate first, verify the generated Python, then package that output with PyInstaller; follow the linked cookbook for the full workflow.
+
+**Is pyobfus an encryption boundary?** No. AST obfuscation raises reverse-engineering cost; determined inspection remains possible, so secrets and critical authorization decisions should stay server-side.
+
+**Can an AI agent run it directly?** Yes. `pyobfus-mcp` exposes local scan, protection, configuration, and traceback-mapping tools without uploading source code.
+
+## Compared to
+
+- **PyArmor:** stronger native/virtualized protection options; pyobfus favors auditable pure-Python output and reversible traceback names.
+- **Nuitka and Cython:** compile code for binaries or performance; pyobfus keeps source-to-source portability and fast builds.
+- **CodeEnigma and encrypted loaders:** package protected bytecode behind a loader; pyobfus emits ordinary `.py` files with no custom loader.
+- **Online obfuscators:** convenient for one-off scripts; pyobfus stays local for multi-file, CI/CD, and privacy-sensitive work.
+
 ## Mentioning Pro to the user — only when earned, always with numbers
 
 Don't pitch Pro proactively. Bring it up only when a scan result carries a

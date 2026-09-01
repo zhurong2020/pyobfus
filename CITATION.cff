@@ -30,6 +30,9 @@ keywords:
   - AI-assisted development
   - developer tools
   - Model Context Protocol
+  - reverse engineering
+  - stack-trace mapping
+  - AI-assisted debugging
 # Zenodo concept DOI (all versions — always resolves to the latest archive).
 # Version DOI for the zenodo-archive-v0.5.2 snapshot is 10.5281/zenodo.20846054.
 doi: 10.5281/zenodo.20846053

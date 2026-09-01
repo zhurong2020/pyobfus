@@ -9,7 +9,7 @@
 说明并纠正先前会补发 corrected paid-invoice PDF 的预期，附上正确 Stripe
 Invoice Receipt，重申无需付款或操作；未发送仍显示应付的 invoice PDF。
 该客户开票支持事项已完成，不得再开贷项通知单、退款、解除付款或重新扣款。
-客户回访改为被动等待客户邮件，不主动追发；当前主动主线为长尾词/AI 搜索优化 rollout。0.5.18 正式发布已获用户明确批准
+客户回访改为被动等待客户邮件，不主动追发；当前主动主线为长尾词/AI 搜索优化 rollout。Wave B 文档面已于 2026-09-01 完成，Wave A 维护者设置与 Wave C 发版绑定面待后续处理。0.5.18 正式发布已获用户明确批准
 并完成。结构化 dry-run plan 与 syntax-only 构建后验证随后作为两个独立 commit
 实现，经用户明确批准于 2026-08-30 组成 `pyobfus 0.5.19` 发布：tag `v0.5.19`
 经 OIDC workflow 发到 PyPI，wheel/sdist 两个 Integrity provenance endpoint 均
@@ -777,6 +777,12 @@ provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
       `docs/index.md` 引言段重写；`COMPARISON.md` 补 CodeEnigma /
       `python-obfuscator` / SOURCEdefender / 在线工具行；`CITATION.cff`
       keywords（**不碰 version/date-released**）。
+      ✅ **2026-09-01 已完成**：AI catalog 扩到 10 个代表性任务问句；两份
+      `llms.txt` 增 FAQ + Compared to 且 byte-identical，`llms-full.txt` 增选型
+      问答；扩写 RTD meta description 与首页引言；comparison 补 CodeEnigma、
+      `python-obfuscator`、SOURCEdefender、在线工具；CFF 只增关键词，未动归档
+      version/date。JSON/CFF 解析、`cmp`、`git diff --check`、MkDocs strict build
+      均通过（仅既有链接/nav warnings）。S15 JSON-LD 暂不做。
     - **Wave C**（并入下次发版的同一 commit，PyPI 需版本号才刷新）：
       `server.json` description 改意图短语（走 `pyobfus-mcp` 版本）；两个
       `pyproject.toml` 的 keywords 补 `reverse-mapping`/`unmap`/`deobfuscation`/

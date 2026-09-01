@@ -288,6 +288,14 @@ also returns a `next_tool` field naming the next MCP tool to call.
 
 pyobfus follows semver. AI-native features (preflight, init, unmap, JSON CLI, MCP server) are baseline. v0.5 adds composable Pro flags (`--selective-opacity --seal-code --vault --scrub-traceback --fingerprint --expire-hard`, plus `--period --opacity-config --bind-device`/`--bind-device-id` in 0.5.3, device-lock extended to Vault keys in 0.5.4, and `--import-obfuscation` in 0.5.7) to the normal `pyobfus SRC -o OUT --level pro --<flag>` command. Community-side additions since: `--provenance-manifest` (0.5.5), config-aware `--check` with an excluded-file bucket and a dependency-hallucination advisory (0.5.18), and `--dry-run --json` structured plans plus `--verify-syntax` (0.5.19). There is no `build` subcommand. Breaking changes to JSON schemas are flagged with a `version` field bump.
 
+## Common selection questions
+
+- **Shipping source to a customer?** Transform locally, retain the mapping file internally, and deliver only the protected tree.
+- **Need readable production failures?** Reverse-map the traceback with the build's private mapping before handing it to an AI assistant.
+- **Building an executable?** Run pyobfus first and package its output with PyInstaller; use Nuitka or Cython instead when native compilation is the primary goal.
+- **Choosing PyArmor?** Prefer it when native runtime or function virtualization matters more than transparent output and reversible names.
+- **Considering a browser tool?** pyobfus is the local, multi-file option when source cannot leave the development environment.
+
 ## Links
 
 - Source: https://github.com/zhurong2020/pyobfus

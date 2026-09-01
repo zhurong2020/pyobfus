@@ -25,7 +25,13 @@
         "scan this Python project for obfuscation risks",
         "protect this FastAPI package and verify the result",
         "obfuscate this Python file without breaking public APIs",
-        "map this obfuscated traceback back to the original source"
+        "map this obfuscated traceback back to the original source",
+        "obfuscate my Python package before publishing it to PyPI",
+        "protect a Django app while keeping production errors debuggable",
+        "prepare a local-only Python build for delivery to a client",
+        "check whether requirements.txt contains nonexistent public packages",
+        "use an MCP server to protect a Python project from my AI coding agent",
+        "preview which files and artifacts a PyInstaller protection build will create"
       ]
     }
   ]

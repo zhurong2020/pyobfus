@@ -1,6 +1,7 @@
 # Competitor scan + long-tail keyword / AI-search plan — 2026-08-31
 
-Status: research + plan only. No code or metadata changed by this document.
+Status: Wave B docs rollout completed 2026-09-01; Wave A maintainer settings and
+Wave C release-bundled surfaces remain pending.
 Trigger: user request (competitor recheck + SEO/GEO keyword planning), post
 0.5.19 release. Previous competitor scan: 2026-08-22 (`docs/CURRENT_PLAN_ZH.md`
 "2026-08-22 扫描" section).
@@ -97,7 +98,11 @@ S1 repo description · S2 homepageUrl · S3 topics · S14 pinned FAQ discussion 
 **Wave B — docs-only, no release gate, one `docs:` commit each or grouped:**
 S4 ai-catalog queries · S8 llms.txt FAQ + "compared to" (twins byte-identical) ·
 S10 mkdocs site_description · S11 index.md intro · S12 COMPARISON.md new rows ·
-S13 CITATION keywords. (S15 optional, after S8/S9.)
+S13 CITATION keywords. **Completed 2026-09-01** as one docs batch; `llms.txt`
+twins remain byte-identical, the catalog parses as JSON, `CITATION.cff` parses
+with its archive-pinned version/date unchanged, and `mkdocs build --strict`
+completes with only the repository's pre-existing link/nav warnings. S15 remains
+optional and was not added because real FAQ content is the higher-value surface.
 
 **Wave C — bundle into the next natural release (PyPI needs a version to pick up):**
 S5 server.json description (mcp release) · S6 core keywords (pyobfus release) ·
@@ -120,7 +125,7 @@ commit per the banner-before-tag rule).
 ## 3. Open decisions for the maintainer
 
 1. Approve the S1 repo-description rewrite wording (or supply your own).
-2. Wave B: do it now as a batch, or fold into the next docs pass?
+2. Wave B: **resolved — completed as a docs batch on 2026-09-01.**
 3. Wave C: hold until there is a functional reason to release, or is a
    keywords/README/`server.json`-only release acceptable on its own?
 4. `dependency_advisory` graduation (#8): the standalone slopsquatting-detector
