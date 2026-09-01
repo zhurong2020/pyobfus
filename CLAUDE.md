@@ -73,7 +73,8 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - 2026-08-30/31 session 的产出已 push（自 `b39e0b0` 起一串 `docs:`/`release:` commit：
   0.5.19 发布 → 两轮 docs cleanup（llms 孪生对账 + Home 页刷新）→ 竞品扫描 +
   SEO/长尾词规划 → 把 SEO rollout 排入 TODO），tag `v0.5.19` 在 origin，工作区
-  当时干净。2026-09-01 客户 receipt 交付后的文档同步尚待提交。**逐轮明细与活的 `origin/main` tip 一律以 `docs/CURRENT_PLAN_ZH.md` +
+  当时干净。2026-09-01 客户 receipt 交付后的文档同步已由 commit `f2f691a`
+  推送。**逐轮明细与活的 `origin/main` tip 一律以 `docs/CURRENT_PLAN_ZH.md` +
   `~/projects/WORK_LOG_INDEX.md` 顶行为准**（每轮追加）。此前 session 的 Stripe
   交接、配置感知实现和 HOME 隔离测试也均已 push。冷启动后先读
   `docs/CURRENT_PLAN_ZH.md`；发票事项已结案，客户回访只等待来信，当前主动主线
