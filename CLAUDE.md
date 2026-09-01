@@ -12,7 +12,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### ⏳ 2026-08-30 — 客户 paid-invoice PDF 已升级 Stripe 工程处理
+### ✅ 2026-09-01 — 客户 Invoice Receipt 已交付；进入后续任务队列
 
 - **`pyobfus 0.5.19` 已发布（2026-08-30，用户明确批准）**：把此前 held 的两个
   独立 commit 组成 Core 小版本——`3758482` 的 `--dry-run --json` versioned
@@ -49,19 +49,14 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   “发布/自动化噪音，尚无有机增长”判断。证据已追加到
   [`docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md`](docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md)。
 - 一位真实 Pro 客户确认使用进展良好，并要求为既有 Payment Link 购买开票。
-  客户已回复收票主体（公司实体）；开具发票时撞上 Stripe 的 guest-customer /
-  付款应用不匹配问题（Payment Link 一次性购买记在 guest customer 名下，
-  无法把既有付款应用到 regular Customer 的发票），已于 2026-08-27 联系
-  Stripe Support 等待回复。不把单次开票需求提前解释为团队许可或企业功能
-  需求。（2026-08-30 追加：既有付款现已成功关联，Dashboard 与 receipt 均为
-  已付/US$0.00 remaining；但按 Support 指示从实时 Dashboard 新下载的 invoice
-  PDF，在付款关联 84+ 小时后仍错误显示全额应付，已排除误开旧文件和其所称的
-  24 小时 CDN 延迟。新 PDF 与实时状态截图已附回原线程，请 Billing/Invoicing
-  工程团队重生成。不得开贷项通知单、退款、解除付款或重扣。客户确认未收到
-  Stripe 的错误自动邮件，且已获告知无需付款或操作；冷启动无需再发例行进度
-  更新。）当前状态、hold 清单与后续
-  步骤以 `docs/CURRENT_PLAN_ZH.md` 为准；具体客户/支付信息只留在 Git 忽略
-  的 `docs/internal/` 运营记录，绝不进入公开提交。
+  付款已成功关联，Dashboard 为 Paid / US$0.00 remaining。2026-09-01 Stripe
+  Support 最终确认：`send invoice` 的 invoice PDF 按设计保留原始应付金额与
+  条款，无法重生成零余额或 `Paid` 样式；Invoice Receipt 才是正式付款证明。
+  用户已在原客户线程解释并纠正先前预期，附上正确 receipt，错误 invoice PDF
+  未发送；该支持事项已完成。不得贷记、退款、解除付款或重扣。客户回访改为
+  被动等待客户邮件，不主动追发；不能把单次开票需求提前解释为团队许可或企业功能
+  需求。当前状态以 `docs/CURRENT_PLAN_ZH.md` 为准；具体客户/支付信息只留在
+  Git 忽略的 `docs/internal/` 运营记录，绝不进入公开提交。
 - 下一轮功能方向已完成代码审计与官方资料调研，见
   [`docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md`](docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md)。
   配置感知 `--check`（0.5.18）、`--dry-run --json` versioned plan 与
@@ -75,13 +70,14 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   工作清单" #7。Wave B（纯 docs）可先做；Wave C（keywords/README/`server.json`）
   进发版 commit；Wave A（GitHub 仓库 description/topics/homepageUrl）交用户
   在 GitHub 设置里操作，Claude 只出文案。除此之外下一功能方向仍须用户 gate。
-- 本 session 全部产出已 push（自 `b39e0b0` 起一串 `docs:`/`release:` commit：
+- 2026-08-30/31 session 的产出已 push（自 `b39e0b0` 起一串 `docs:`/`release:` commit：
   0.5.19 发布 → 两轮 docs cleanup（llms 孪生对账 + Home 页刷新）→ 竞品扫描 +
   SEO/长尾词规划 → 把 SEO rollout 排入 TODO），tag `v0.5.19` 在 origin，工作区
-  干净。**逐轮明细与活的 `origin/main` tip 一律以 `docs/CURRENT_PLAN_ZH.md` +
+  当时干净。2026-09-01 客户 receipt 交付后的文档同步尚待提交。**逐轮明细与活的 `origin/main` tip 一律以 `docs/CURRENT_PLAN_ZH.md` +
   `~/projects/WORK_LOG_INDEX.md` 顶行为准**（每轮追加）。此前 session 的 Stripe
-  交接、配置感知实现、HOME 隔离测试、发票工程升级状态也均已 push。冷启动后先读 `docs/CURRENT_PLAN_ZH.md`，等待 Stripe Billing/Invoicing
-  工程团队提供正确 paid invoice PDF；除非用户明确 gate，不启动下一项功能实现
+  交接、配置感知实现和 HOME 隔离测试也均已 push。冷启动后先读
+  `docs/CURRENT_PLAN_ZH.md`；发票事项已结案，客户回访只等待来信，当前主动主线
+  是已排期的长尾词/AI 搜索优化 rollout。除非用户明确 gate，不启动其它功能实现
   或发布。外部手工项仍是 Canopii claim/rescan、Claude plugin pending 观察，并在
   1–2 周后复查下载；若 9 月 1–7 日仍无 advisory 反馈，再考虑 GitHub Discussion
   投票。
