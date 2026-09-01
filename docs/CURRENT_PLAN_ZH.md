@@ -1,6 +1,6 @@
 # pyobfus 当前计划
 
-更新时间：2026-09-01（`pyobfus` 0.5.19 已发布；`pyobfus-mcp` 最新仍为 0.3.9；
+更新时间：2026-09-01（`pyobfus` 0.5.20 与 `pyobfus-mcp` 0.3.10 已发布；
 `vscode-extension` 最新仍为 0.4.1。既有付款
 现已成功关联，Dashboard 显示 Paid / US$0.00 remaining，且 Stripe 生成的收据
 正确。2026-09-01 Stripe Support 最终确认：`send invoice` 流程的 invoice PDF
@@ -9,7 +9,10 @@
 说明并纠正先前会补发 corrected paid-invoice PDF 的预期，附上正确 Stripe
 Invoice Receipt，重申无需付款或操作；未发送仍显示应付的 invoice PDF。
 该客户开票支持事项已完成，不得再开贷项通知单、退款、解除付款或重新扣款。
-客户回访改为被动等待客户邮件，不主动追发；当前主动主线为长尾词/AI 搜索优化 rollout。Wave A 仓库设置与 Wave B 文档面已于 2026-09-01 完成，Wave C 发版绑定面待下一自然版本。0.5.18 正式发布已获用户明确批准
+客户回访改为被动等待客户邮件，不主动追发；长尾词/AI 搜索优化
+Wave A/B/C 均已于 2026-09-01 完成。Wave C 经用户明确批准作为独立
+SEO 小版本发布：Core 0.5.20 / MCP 0.3.10 已在 PyPI 和 GitHub
+Release 核实；MCP Registry 因官方端点 TLS/EOF 故障待恢复后重试。0.5.18 正式发布已获用户明确批准
 并完成。结构化 dry-run plan 与 syntax-only 构建后验证随后作为两个独立 commit
 实现，经用户明确批准于 2026-08-30 组成 `pyobfus 0.5.19` 发布：tag `v0.5.19`
 经 OIDC workflow 发到 PyPI，wheel/sdist 两个 Integrity provenance endpoint 均
@@ -31,6 +34,15 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
 “可调试、可验证、可被 AI 工具正确使用”的代码保护工作流上拉开差距。
 
 ## 当前状态
+
+- **2026-09-01 SEO 小版本发布**：`pyobfus 0.5.20` 与
+  `pyobfus-mcp 0.3.10` 已通过 OIDC 发布，四个 wheel/sdist Integrity
+  provenance endpoints 均 HTTP 200，全新环境同时安装两个 wheel 并
+  核实版本/manifest，GitHub Releases 已建。本次只改 README/FAQ、
+  PyPI keywords 与 MCP Registry description，运行时和 schemas 不变。
+  Registry 端 publish/login/public GET 都在 TLS/EOF 层失败，待官方端点
+  恢复后只需重试 `mcp-publisher publish` 并验证 0.3.10
+  `active` / `isLatest=true`。
 
 - **2026-08-28 发布完成**：`pyobfus 0.5.18` 与 `pyobfus-mcp 0.3.9` 已通过
   tag 触发的 OIDC workflow 发布到 PyPI，并分别创建 GitHub Release；四个

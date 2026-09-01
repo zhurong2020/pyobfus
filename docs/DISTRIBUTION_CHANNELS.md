@@ -7,11 +7,11 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-**Last updated**: 2026-08-30 (pyobfus 0.5.19 published through OIDC —
-`--dry-run --json` versioned plan + opt-in `--verify-syntax`; both Integrity
-provenance endpoints HTTP 200, fresh public-PyPI install verified, GitHub
-Release created. pyobfus-mcp remains 0.3.9 and VS Code extension remains 0.4.1;
-neither had `[Unreleased]` content this round.)
+**Last updated**: 2026-09-01 (standalone SEO releases: pyobfus 0.5.20 and
+pyobfus-mcp 0.3.10 published through OIDC; all four Integrity provenance
+endpoints HTTP 200, fresh wheel installation verified, GitHub Releases created.
+Runtime behavior and MCP schemas are unchanged. MCP Registry 0.3.10 publication
+is pending a Registry-side TLS/EOF outage. VS Code extension remains 0.4.1.)
 
 > **Note (2026-05-09)**: most of the per-channel facts below are now current as of Session 23. Outside of the launch wave (HN 5-11 / Reddit 5-12 / CN trio 5-8/9), the live state is reflected here. Consult `docs/POST_V0.4_TODO.md` for forward TODO and `docs/V0.4_EXECUTION_LOG.md` for session-by-session deltas.
 
@@ -21,8 +21,9 @@ neither had `[Unreleased]` content this round.)
 
 ### PyPI — `pyobfus`
 - URL: https://pypi.org/project/pyobfus/
-- Current version: **0.5.19** (released 2026-08-30) · ships with PEP 740 attestations via OIDC trusted publishing
-- Current headline: `--dry-run --json` emits a versioned `plan` object (effective config, selected/excluded files with reasons, artifacts tagged ship/retain-internal/optional; relative labels only, not applyable); opt-in `--verify-syntax` compiles generated output in memory post-build (no import/execute, no `__pycache__`) and reports `syntax_valid` with no runtime-correctness claim.
+- Current version: **0.5.20** (released 2026-09-01) · ships with PEP 740 attestations via OIDC trusted publishing
+- Current headline: discovery-focused metadata and README/FAQ improvements around pre-shipping protection, reverse mapping, provenance, and AI-assisted debugging; runtime behavior unchanged.
+- Prior headline (0.5.19): `--dry-run --json` emits a versioned `plan` object (effective config, selected/excluded files with reasons, artifacts tagged ship/retain-internal/optional; relative labels only, not applyable); opt-in `--verify-syntax` compiles generated output in memory post-build (no import/execute, no `__pycache__`) and reports `syntax_valid` with no runtime-correctness claim.
 - Prior headline (0.5.18): config-aware `--check` reports the effective project configuration and findings already mitigated by it, while preserving high-risk findings and exit-code semantics.
 - Pre-v0.4 baseline: ~324 downloads / month, ~30% real users (rest is mirror noise)
 - 2026-08-24 pypistats snapshot (data through 08-23, known mirrors excluded):
@@ -36,7 +37,8 @@ neither had `[Unreleased]` content this round.)
 
 ### PyPI — `pyobfus-mcp`
 - URL: https://pypi.org/project/pyobfus-mcp/
-- Current version: **0.3.9** (released 2026-08-28) · ships with PEP 740 attestations via OIDC trusted publishing
+- Current version: **0.3.10** (released 2026-09-01) · ships with PEP 740 attestations via OIDC trusted publishing
+- 0.3.10 contents: intent-oriented Registry description and expanded PyPI discovery keywords; tool behavior and schemas unchanged.
 - 0.3.9 contents: `check_obfuscation_risks` adds default-on `use_project_config`, returns effective-config and excluded-finding context from Core, and moves the runtime dependency floor to `pyobfus>=0.5.18`.
 - 2026-08-24 pypistats snapshot (data through 08-23, known mirrors excluded):
   day/week/month `11 / 242 / 772`. Release-day spikes (08-17 `95`, 08-22 `110`)
@@ -50,7 +52,7 @@ neither had `[Unreleased]` content this round.)
 - URL: https://github.com/zhurong2020/pyobfus
 - Visibility: public
 - Stars: 6 (2026-08-24 snapshot; historical v0.4 target was 100+)
-- Topics (12): `python-obfuscator`, `code-obfuscator`, `ast-obfuscation`, `mcp-server`, `claude-code`, `cursor`, `llm-tools`, `ai-native`, `pyarmor-alternative`, `python-security`, `code-protection`, `source-protection`
+- Topics (19, updated 2026-09-01): includes `python-obfuscator`, `ast-obfuscation`, `mcp-server`, `reverse-mapping`, `stack-trace-deobfuscation`, `debuggable-obfuscation`, `github-copilot`, `codebuddy`, `provenance`, and `apache-2-0` discovery surfaces.
 - 2026-08-24 feedback snapshot: 6 stars, 2 forks, 0 open issues/PRs; six
   Discussions with no new external comment on the 0.5.x announcement or
   dependency advisory. 14-day Traffic: 155 views / 65 unique visitors and
@@ -69,7 +71,7 @@ neither had `[Unreleased]` content this round.)
   prior is not evidence of an actual review. Continue tracking installs and
   real reviews, not raw update/download count alone.
 - Wiki: disabled · Discussions: enabled · Issues: open
-- Releases: latest `v0.5.19` (2026-08-30); earlier releases `v0.3.3` … `v0.5.18`, plus `mcp-v0.3.x` and `vscode-v0.x` tags (mcp releases attach wheel+sdist).
+- Releases: latest `v0.5.20` and `mcp-v0.3.10` (2026-09-01), plus earlier Core, MCP, and VS Code tags (MCP releases attach wheel+sdist).
 
 ### 有心工坊 (personal blog)
 - URL: https://www.arong.eu.org
@@ -113,7 +115,7 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 
 ### MCP Registry — `io.github.zhurong2020/pyobfus-mcp` 🟢 LIVE
 - URL: https://registry.modelcontextprotocol.io/v0/servers?search=pyobfus
-- Latest published: **0.3.9** (2026-08-28) · status: `active` · `isLatest=true` confirmed via the direct public version endpoint after `mcp-publisher publish`.
+- Latest confirmed published: **0.3.9** (2026-08-28) · status: `active` · `isLatest=true`. Publishing 0.3.10 was attempted 2026-09-01 after PyPI release, but Registry publish/auth/public GET all failed at TLS/EOF; retry when the public endpoint recovers, then verify `active` / `isLatest=true` before marking complete.
 - 0.3.9 contents: default-on project-config awareness and runtime floor `pyobfus>=0.5.18`; see the PyPI section above. Previous 0.3.6 hardening: `pyobfus_mcp/server.json` validates against the official `2025-12-11` schema and includes GitHub repository stable ID `1093960892`; `fileSha256` remains omitted because the PyPI wheel/sdist multi-artifact model makes a single optional hash ambiguous.
 - Implications: Claude Desktop / Claude Code / Cursor / Windsurf / Zed users querying the registry for "pyobfus" or "python obfuscator" will discover this server without manual config file edits.
 

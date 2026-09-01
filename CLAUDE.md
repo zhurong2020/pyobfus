@@ -12,7 +12,18 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### ✅ 2026-09-01 — 客户 Invoice Receipt 已交付；进入后续任务队列
+### ✅ 2026-09-01 — SEO 小版本已发布；MCP Registry 待重试
+
+- **用户明确批准的独立 SEO 版本已发布**：Core `0.5.20` 与 MCP
+  `0.3.10` 在同一发行 commit `dbdf1a3` 中完成 README/FAQ、PyPI
+  keywords 及 Registry intent description 更新，运行时与 MCP schemas
+  不变。两个 OIDC workflows、PyPI latest、四个 PEP 740 provenance
+  endpoints、新 venv wheel 安装及 GitHub Releases 均已核实。官方 MCP
+  Registry 在 publish/login/public GET 三条路径均出现 TLS/EOF，因此
+  Registry 目前仍只能确认 0.3.9 `active` / `isLatest=true`；端点恢复后
+  重跑 `mcp-publisher publish` 并校验 0.3.10。
+- **客户 Invoice Receipt 已交付**：客户回访仅被动等待来信，不阻塞
+  开发主线。
 
 - **`pyobfus 0.5.19` 已发布（2026-08-30，用户明确批准）**：把此前 held 的两个
   独立 commit 组成 Core 小版本——`3758482` 的 `--dry-run --json` versioned

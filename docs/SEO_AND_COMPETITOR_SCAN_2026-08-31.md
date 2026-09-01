@@ -1,7 +1,10 @@
 # Competitor scan + long-tail keyword / AI-search plan — 2026-08-31
 
-Status: Wave A repository settings and Wave B docs rollout completed 2026-09-01;
-Wave C release-bundled surfaces remain pending.
+Status: Waves A/B completed 2026-09-01. Wave C shipped the same day as the
+standalone SEO releases `pyobfus 0.5.20` and `pyobfus-mcp 0.3.10`; runtime and
+MCP tool schemas are unchanged. PyPI and GitHub Releases are verified. MCP
+Registry publication is pending because its public endpoint is currently
+failing TLS/EOF requests.
 Trigger: user request (competitor recheck + SEO/GEO keyword planning), post
 0.5.19 release. Previous competitor scan: 2026-08-22 (`docs/CURRENT_PLAN_ZH.md`
 "2026-08-22 扫描" section).
@@ -115,6 +118,14 @@ S5 server.json description (mcp release) · S6 core keywords (pyobfus release) �
 S7 mcp keywords (mcp release) · S9 README FAQ + intro (must be in the release
 commit per the banner-before-tag rule).
 
+**Completed 2026-09-01:** the maintainer explicitly approved a standalone SEO
+release. Core 0.5.20 now carries 45 unique keywords and the revised README;
+MCP 0.3.10 carries 23 unique keywords and the 91-character intent-oriented
+Registry description. Both packages passed local suites, wheel/sdist builds,
+`twine check`, fresh-wheel installation, OIDC publishing, and both PEP 740
+provenance checks. The PyArmor Pro anchor was rechecked at $89 against its
+official cart before the dated comparison link was added.
+
 ### 2.5 Guardrails / verification
 
 - After any `llms.txt` edit: `cmp llms.txt docs/llms.txt` must stay silent; re-run
@@ -132,8 +143,8 @@ commit per the banner-before-tag rule).
 
 1. S1 wording: **resolved — recommended wording applied 2026-09-01.**
 2. Wave B: **resolved — completed as a docs batch on 2026-09-01.**
-3. Wave C: hold until there is a functional reason to release, or is a
-   keywords/README/`server.json`-only release acceptable on its own?
+3. Wave C: **resolved — standalone SEO release explicitly approved and shipped
+   as Core 0.5.20 / MCP 0.3.10 on 2026-09-01.**
 4. `dependency_advisory` graduation (#8): the standalone slopsquatting-detector
    space is now crowded/maturing (§1.2) — lean toward **keeping it inside
    `--check`** unless a clear differentiator appears. Confirm.
