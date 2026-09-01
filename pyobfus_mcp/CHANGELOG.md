@@ -6,6 +6,16 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+## [0.3.10] - 2026-09-01
+
+### Changed
+
+- Rephrased the MCP Registry description around agent search intent: protect
+  Python before shipping, reverse-map reported tracebacks, and stay local with
+  no phone-home behavior.
+- Expanded PyPI keywords for code protection, reverse mapping, AI-native tools,
+  GitHub Copilot, and CodeBuddy. Tool behavior and schemas are unchanged.
+
 ## [0.3.9] - 2026-08-28
 
 ### Added

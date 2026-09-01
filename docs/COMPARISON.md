@@ -25,7 +25,7 @@ PyArmor is the most established Python obfuscator. Here's how pyobfus compares:
 
 | Feature | pyobfus | PyArmor |
 |---------|---------|---------|
-| **Price (Pro)** | **$45** (one-time) | $89 (one-time) |
+| **Price (Pro)** | **$45** (one-time) | $89 (one-time; [official cart](https://jondy.github.io/paypal/index.html), verified 2026-09-01) |
 | **Price savings** | **50% cheaper** | - |
 | **Free tier** | Unlimited (Community features) | ~935-940 lines/file before `ERROR out of license` (PyArmor 9.2.4, verified 2026-05-09) |
 | **Pro trial** | **5 days free** (full features) | Same opaque trial limits as free; no documented threshold |

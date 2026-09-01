@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.20] - 2026-09-01
+
+### Changed
+
+- Expanded PyPI discovery keywords around reverse mapping, debuggable stack
+  traces, build provenance, dependency-hallucination checks, and protecting
+  Python before customer delivery.
+- Reworked the README introduction and added focused FAQ entries for commercial
+  delivery, AI-assisted production debugging, and the companion MCP server.
+  Runtime behavior is unchanged in this discovery-focused release.
+
 ## [0.5.19] - 2026-08-30
 
 ### Added

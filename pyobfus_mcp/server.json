@@ -2,20 +2,20 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.zhurong2020/pyobfus-mcp",
   "title": "pyobfus-mcp",
-  "description": "Obfuscate Python & reverse-map stack traces from your agent. AST-based, no phone-home. PyArmor alt.",
+  "description": "Obfuscate Python before shipping; reverse-map tracebacks with your AI agent. No phone-home.",
   "repository": {
     "url": "https://github.com/zhurong2020/pyobfus",
     "id": "1093960892",
     "source": "github",
     "subfolder": "pyobfus_mcp"
   },
-  "version": "0.3.9",
+  "version": "0.3.10",
   "packages": [
     {
       "registryType": "pypi",
       "registryBaseUrl": "https://pypi.org",
       "identifier": "pyobfus-mcp",
-      "version": "0.3.9",
+      "version": "0.3.10",
       "transport": { "type": "stdio" }
     }
   ],

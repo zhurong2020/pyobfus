@@ -4,7 +4,7 @@
   <img src="https://raw.githubusercontent.com/zhurong2020/pyobfus/main/docs/assets/logo.jpeg" alt="pyobfus Logo" width="200">
 </p>
 
-**pyobfus** (pronounced as "Python obfuscator") is a modern, AST-based **python-obfuscator / code-obfuscator** with framework-aware presets, reverse stack-trace mapping for AI-assisted debugging, and a machine-readable JSON CLI designed for [Claude Code](https://claude.com/claude-code), [Cursor](https://cursor.com/), [GitHub Copilot](https://github.com/features/copilot), [Codex](https://openai.com/codex/), [CodeBuddy](https://www.codebuddy.ai/), and any MCP-compatible AI agent. A transparent, open-source alternative to PyArmor.
+**pyobfus** (pronounced as "Python obfuscator") is a modern, AST-based **python-obfuscator / code-obfuscator** for developers who need to **obfuscate before shipping** while keeping failures diagnosable. Framework-aware presets, reverse stack-trace mapping, and a machine-readable JSON CLI let [Claude Code](https://claude.com/claude-code), [Cursor](https://cursor.com/), [GitHub Copilot](https://github.com/features/copilot), [Codex](https://openai.com/codex/), [CodeBuddy](https://www.codebuddy.ai/), and any MCP-compatible AI agent help **debug obfuscated stack traces**. A transparent, open-source alternative to PyArmor.
 
 [![PyPI version](https://img.shields.io/pypi/v/pyobfus.svg)](https://pypi.org/project/pyobfus/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/pyobfus.svg)](https://pypi.org/project/pyobfus/)
@@ -20,14 +20,10 @@ A Python code obfuscator built with AST-based transformations. **Supports Python
 
 > **🔒 Pro Edition available** — 6 patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator, $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
 
-> **🔧 What's new in v0.5.19** — `--dry-run --json` now emits a versioned
-> `plan` object: effective config, selected/excluded files with reasons, and
-> artifacts tagged `ship` / `retain-internal` / `optional`. It uses relative
-> labels only — no source, secrets, or absolute paths — and is a preview, not
-> a saved apply file. New opt-in `--verify-syntax` compiles the generated
-> output in memory after a build (no import, no execution, no `__pycache__`)
-> and reports `syntax_valid` in JSON; a failure blocks delivery. It makes no
-> runtime-correctness claim.
+> **🔎 What's new in v0.5.20** — discovery-focused release: clearer
+> pre-shipping and AI-debugging language in the README and package metadata,
+> expanded reverse-mapping / provenance / dependency-safety keywords, and a
+> more intent-focused MCP Registry description. Runtime behavior is unchanged.
 
 > 🔔 **Starring this repo doesn't notify you about new releases** — GitHub only
 > sends release notifications to people who explicitly **Watch** it. Click
@@ -641,6 +637,30 @@ pyobfus src/ -o dist/ --dry-run --json
 source in memory, creates no `__pycache__`, and reports `syntax_valid` in JSON.
 It does not import or execute the project and is not a runtime compatibility
 guarantee.
+
+### How do I obfuscate Python before selling or delivering it?
+
+Run `pyobfus --check` first, build into a separate output directory, and keep
+the optional `mapping.json` outside the customer artifact. Ship the transformed
+tree, then run your normal tests or packaging step against that exact output.
+The [PyInstaller](docs/PYINSTALLER_COOKBOOK.md),
+[compiled-packaging](docs/COMPILED_PACKAGING_COOKBOOK.md), and
+[import-hook](docs/IMPORT_HOOK_COOKBOOK.md) cookbooks cover common delivery
+formats.
+
+### How do I debug an obfuscated crash with an AI assistant?
+
+Build with `--save-mapping mapping.json`. When a production traceback arrives,
+run `pyobfus --unmap --trace error.log --mapping mapping.json`; the restored
+identifiers can then be read by you, Claude Code, Cursor, Copilot, or another AI
+assistant without giving the customer your private mapping file.
+
+### Is there an MCP server for Python obfuscation?
+
+Yes. `uvx pyobfus-mcp` exposes eight local tools for risk scanning, config
+generation, project protection, verification, preset guidance, and traceback
+mapping. Source paths are validated locally and pyobfus does not upload project
+code or require an API key.
 
 ### Will my code still work after obfuscation?
 

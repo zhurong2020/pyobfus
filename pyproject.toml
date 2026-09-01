@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyobfus"
-version = "0.5.19"
+version = "0.5.20"
 description = "pyobfus — the Python obfuscator. AST-based name mangling + framework presets (FastAPI/Django/Pydantic/Click/SQLAlchemy) + reverse stack-trace mapping for AI debugging in Claude Code / Cursor / GitHub Copilot / CodeBuddy. A transparent PyArmor alternative: AST-level protection with debuggable traces. Apache-2.0."
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.9"
@@ -17,13 +17,16 @@ maintainers = [
 ]
 keywords = [
     "obfuscation", "code-protection", "security", "python", "ast",
-    "code-obfuscator", "python-obfuscator", "py-obfuscator", "pyobfuscator",
+    "code-obfuscator", "python-obfuscator",
     "name-mangling", "string-encryption", "anti-debug", "control-flow-flattening",
     "pyarmor-alternative", "source-protection", "license-management",
     "python3.14", "python3.13", "python3.12", "python3.11",
     "fastapi", "django", "flask", "pydantic", "click", "sqlalchemy",
     "llm-tools", "mcp", "mcp-server", "claude-code", "cursor",
-    "ai-native", "ai-friendly", "vibe-coding",
+    "github-copilot", "codebuddy", "windsurf", "ai-native", "ai-friendly",
+    "reverse-mapping", "unmap", "deobfuscation", "stack-trace", "debuggable",
+    "provenance", "cyclonedx", "sbom", "dependency-hallucination",
+    "slopsquatting", "obfuscate-before-shipping",
 ]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
