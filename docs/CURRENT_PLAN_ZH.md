@@ -9,7 +9,7 @@
 说明并纠正先前会补发 corrected paid-invoice PDF 的预期，附上正确 Stripe
 Invoice Receipt，重申无需付款或操作；未发送仍显示应付的 invoice PDF。
 该客户开票支持事项已完成，不得再开贷项通知单、退款、解除付款或重新扣款。
-客户回访改为被动等待客户邮件，不主动追发；当前主动主线为长尾词/AI 搜索优化 rollout。Wave B 文档面已于 2026-09-01 完成，Wave A 维护者设置与 Wave C 发版绑定面待后续处理。0.5.18 正式发布已获用户明确批准
+客户回访改为被动等待客户邮件，不主动追发；当前主动主线为长尾词/AI 搜索优化 rollout。Wave A 仓库设置与 Wave B 文档面已于 2026-09-01 完成，Wave C 发版绑定面待下一自然版本。0.5.18 正式发布已获用户明确批准
 并完成。结构化 dry-run plan 与 syntax-only 构建后验证随后作为两个独立 commit
 实现，经用户明确批准于 2026-08-30 组成 `pyobfus 0.5.19` 发布：tag `v0.5.19`
 经 OIDC workflow 发到 PyPI，wheel/sdist 两个 Integrity provenance endpoint 均
@@ -768,8 +768,12 @@ provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
     就这些内容发一个小版本（或与其它功能合并发布）**。执行拆分：
     - **Wave A**（维护者操作，非代码，无需发版，可立即做）：改 GitHub 仓库
       description（去掉 "Enterprise-grade / 50% lower cost" 定位漂移）、补
-      `homepageUrl` = RTD、加约 7 个 topics。**Claude 做不了，需用户在
-      GitHub 设置里操作**——Claude 负责给出改写文案。
+      `homepageUrl` = RTD、加约 7 个 topics；可由维护者在 GitHub 设置页或
+      通过认证 API 完成。
+      ✅ **2026-09-01 已通过 GitHub API 完成**：description 已改为 AST + reverse
+      mapping + pre-shipping / AI-debuggable intent；homepage 指向 RTD；topics
+      13→19，新增计划中的发现词并移除易误导的 `python-obfuscator-online`。
+      可选 S14 置顶 FAQ Discussion 暂不创建，等待真实讨论触发。
     - **Wave B**（纯 docs，无发版 gate，可随时并入一轮 `docs:` commit）：
       `ai-catalog.json` `representativeQueries` 4→~10；`llms.txt` 三孪生加
       精简 `## FAQ` + `## Compared to`（改后 `cmp` 必须 byte-identical +
