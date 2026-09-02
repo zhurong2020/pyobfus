@@ -49,6 +49,12 @@ GitHub Release 已建，Release / CI 全矩阵 / CodeQL 均绿。后续正式发
   `ROADMAP.md`/`POST_V0.4_TODO.md` 是归档，不回填当前状态。活的仓内入口是本文，
   Claude 专属冷启动是根 `CLAUDE.md`，外部渠道看 `DISTRIBUTION_CHANNELS.md`；
   跨项目索引与两个 Claude project-memory namespace 需与本段同步。
+- **非阻塞维护债**：本轮 Actions 全绿，但 runner 已提示 SHA-pinned CodeQL
+  Action v3 将于 2026-12 弃用，当前 `actions/setup-python` 仍以 Node 20 action
+  运行并被 runner 强制切到 Node 24；后续独立维护 commit 应核实官方新 SHA 后
+  升级，不能为消 warning 放松 SHA pin。MkDocs 普通 build 成功；`--strict`
+  仍被 39 条既有历史/内部归档链接 warning 阻断，本轮已修唯一相关的 Canopii
+  失效锚点，其余按独立 docs-hygiene 批次处理，不与 0.5.21 功能实现捆绑。
 
 ## 一句话定位
 
