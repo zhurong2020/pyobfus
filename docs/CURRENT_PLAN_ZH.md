@@ -31,10 +31,18 @@ GitHub Release 已建，Release / CI 全矩阵 / CodeQL 均绿。后续正式发
   公开版本；0.5.20/0.3.10 全渠道发布已经收口。本 session 的 tracked 修订均已
   推送到 `main`；关闭前仍应以 `git status`、`origin/main` 和 GitHub Actions
   实时结果为准，不在文档冻结会自行过期的 tip。
-- **下一功能 gate**：0.5.21 已完成 SARIF preflight 设计与 release plan，尚未
-  实现，也未授权改版本/tag/发布。Community build marker 已完成设计，但仍为
-  P2；不能与 0.5.21 捆绑。国际 self-dogfooding 结论已进入 AGENTS、贡献指南与
-  provenance 文档，当前只允许 audit/manual lane，不得把 public wheel 自混淆。
+- **下一功能 gate**：`Core 0.5.21` 已在本地**实现完毕并全绿**——SARIF preflight
+  **加上**用户拍板一并纳入的两个 cross-file/preset bug 修复，代码/测试/文档
+  held 在 `[Unreleased]`；**尚未授权改版本/tag/发布，发版留待冷启动后单独批准，
+  不要自行发版**。详见下方「下一小版本」小节与
+  [`V0.5.21_RELEASE_PLAN.md`](V0.5.21_RELEASE_PLAN.md)。Community build marker 已
+  完成设计，但仍为 P2；不能与 0.5.21 捆绑。国际 self-dogfooding 结论已进入
+  AGENTS、贡献指南与 provenance 文档，当前只允许 audit/manual lane，不得把
+  public wheel 自混淆。
+- **本轮文档修订**：重写了描述废弃工作流的 `docs/INTEGRATION_TESTING.md`，修了
+  `docs/PACKAGE_INSPECTION.md` 与 INTEGRATION_TESTING 的死链，并把三个早已发布
+  却漏在发现面的 Community flag（`--numeric-obfuscation`/`--strip-ai-artifacts`/
+  `--incremental`）补录到 README/llms/index。
 - **本轮真实安全加固**：VS Code 生成配置增加 workspace/symlink containment；
   draft Worker 把 WordPress 管理员凭据目标限制为公共 HTTPS origin。对应测试、
   CHANGELOG/README 与公开提交均已完成；这两项不改变 pyobfus-mcp 包边界。
@@ -102,15 +110,37 @@ header**，另有 opt-in `--trace-marker`，Pro 还有独立 `--fingerprint` 法
 本节不授权版本号、tag 或正式发布；近期实现顺序仍以 SARIF、只读 review skill、
 Python 3.14 remote-debug advisory 为 P1，build report / marker 排在 P2。
 
-### 🎯 下一小版本：Core 0.5.21 SARIF preflight（计划中）
+### 🎯 下一小版本：Core 0.5.21 = SARIF preflight + 两个 bug 修复（已实现，待发布）
 
-用户于 2026-09-02 要求开始规划下一小版本，并明确希望通过持续发布维持项目
-流量。下一版锁定为 **`pyobfus 0.5.21`：`--check` SARIF 2.1.0 输出**，完整范围
-见 [`V0.5.21_RELEASE_PLAN.md`](V0.5.21_RELEASE_PLAN.md)。计划目标窗口为
-09-04～09-05，但日期不是发布理由；实现、真实 SARIF upload smoke、全质量门和
-用户单独批准缺一不可。
+用户于 2026-09-02 要求提前实现下一小版本，并拍板把本轮发现的两个 cross-file/
+preset bug 修复**一并纳入 `0.5.21` 一起发**。**代码、测试、文档均已在本地实现
+并全绿（core 1240 passed/1 skipped、MCP+integration 100 passed、black/ruff/mypy
+全清、`python -m build`+`twine check` 通过），held 在各自 `[Unreleased]`；版本号、
+tag、正式发布留待冷启动后单独批准，不要自行发版。** 目标窗口仍是 09-04～09-05
+量级，但日期不是发布理由；发布前仍需真实 SARIF upload smoke（audit-only，不作
+阻塞门）、一张 code scanning finding 截图和用户明确授权。
 
-范围纪律：
+本版内容 = ①SARIF preflight + ②两个 bug 修复：
+
+**① SARIF preflight**（`pyobfus/core/sarif.py` + `--check --sarif PATH`）：纯
+projection，消费现有 `PreflightReport`，不二次扫描、不改 detection/severity/
+`0-1-2` exit code；12 条 `PYOBFUS/<category>` 规则、severity→error/warning/note
+映射、0→1 基列号转换、config-excluded suppression、parse-error invocation
+notification；严禁 snippet/literal/绝对路径/license/mapping/secret 进入 SARIF，
+`--sarif` 仅 `--check` 有效、原子写、写失败走结构化 error envelope。24 个测试用
+vendored SARIF 2.1.0 schema 离线校验。文档 `docs/SARIF_CODE_SCANNING.md`（含
+least-privilege GitHub Actions recipe）+ README/llms/index/CHANGELOG 已同步。
+
+**② 两个真实 bug 修复**（`pyobfus/core/content_transforms.py` + `--level`
+tri-state）：默认 cross-file 目录模式此前只做 name/import 映射，**静默丢弃全部
+内容级变换**（`--string-encryption`/`--numeric-obfuscation`/`--strip-ai-artifacts`/
+`--control-flow`/`--anti-debug`/`--dead-code` 以及 commercial/library/trial/maximum
+等 Pro preset），退出码 0、无告警；另外 `--level` 默认值会把 preset 的 `pro`
+level 覆盖回 `community`，使所有 Pro preset 不加 `--level pro` 就降级为社区输出。
+两者均已修：单文件与 cross-file 现共用同一内容变换管线（不再分叉），`--level`
+改 tri-state（同 issue #25）。8 个回归测试含跨文件运行时正确性。
+
+SARIF 范围纪律（仍适用）：
 
 - 只新增 `pyobfus --check PATH --sarif FILE`；SARIF 写文件，原 text/`--json`
   stdout 与 `0/1/2` exit code 均保持兼容；

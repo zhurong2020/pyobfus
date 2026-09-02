@@ -17,10 +17,19 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - Core `0.5.20` / MCP `0.3.10` / VS Code `0.4.1` 为最新公开版本，SEO
   发版与 MCP Registry 0.3.10 已全渠道收口；客户 invoice 支持也已结案，只
   被动等待来信。
-- 下一小版本仅**规划**为 Core 0.5.21 SARIF preflight；设计见
-  [`docs/V0.5.21_RELEASE_PLAN.md`](docs/V0.5.21_RELEASE_PLAN.md)。尚未实现，版本号、
-  tag 和发布仍需用户单独批准。Community build marker 是已设计但 gated 的 P2，
-  不得顺手并入 0.5.21。
+- 下一小版本 **Core 0.5.21 = SARIF preflight + 两个 cross-file/preset bug 修复**
+  （用户拍板一并纳入）。代码/测试/文档已在本地实现并全绿，held 在
+  `[Unreleased]`；版本号、tag、发布留待冷启动后单独批准，**不要自行发版**。
+  SARIF：`pyobfus --check --sarif PATH` 纯 projection，不改 detection/severity/
+  exit code，设计与验收见
+  [`docs/V0.5.21_RELEASE_PLAN.md`](docs/V0.5.21_RELEASE_PLAN.md)。两个 bug：默认
+  cross-file 目录模式此前静默丢弃全部内容级变换（含 commercial/library 等 Pro
+  preset），以及 `--level` 默认值把 preset 的 pro level 覆盖回 community——均已
+  修（统一到 `pyobfus/core/content_transforms.py` + `--level` 改 tri-state）。
+  Community build marker 仍是已设计但 gated 的 P2，不得顺手并入 0.5.21。
+- 本轮还重写了废弃的 `docs/INTEGRATION_TESTING.md`、修了两处文档死链、补录三个
+  已发布 Community flag（`--numeric-obfuscation`/`--strip-ai-artifacts`/
+  `--incremental`）到 README/llms/index。逐轮明细见 `docs/CURRENT_PLAN_ZH.md`。
 - self-dogfooding 采用 audit/manual → N-1/N canary → wheel verification 的分阶段
   路线；不把公开 Core/Pro wheel 自混淆。规范见
   [`docs/SELF_DOGFOODING_BEST_PRACTICES.md`](docs/SELF_DOGFOODING_BEST_PRACTICES.md)。
