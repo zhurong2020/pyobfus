@@ -1,6 +1,7 @@
 # Feature Expansion Research — 2026-09-02
 
-Status: research complete; no feature implementation authorized by this document.
+Status: research complete; design direction expanded 2026-09-02; no feature
+implementation authorized by this document.
 
 This review refreshes the 2026-08-26 feature study after Core 0.5.18--0.5.20
 and MCP 0.3.9--0.3.10 shipped. It covers competitors, public user-demand
@@ -31,6 +32,19 @@ existing preflight engine**, not another obfuscation transform:
    MCP and new transforms.** Existing `protect_project` already byte-compiles
    and import-smoke-tests in isolated subprocesses; further expansion needs a
    concrete failure or repeated user request.
+
+The follow-up design review adds two longer-running product tracks without
+changing the immediate P1 order:
+
+6. **P2 — verifiable build report.** Borrow Nuitka's strongest delivery lesson:
+   produce a deterministic, privacy-safe report of what pyobfus selected,
+   transformed, excluded, verified and emitted. Extend the existing dry-run
+   plan/provenance data rather than inventing an unrelated report contract.
+7. **P2 — formalize the existing free-output header as a Community build
+   marker.** Keep transparent attribution, remove absolute-path leakage, make
+   the marker machine-readable and keep it strictly separate from the opt-in
+   trace marker and Pro forensic watermark. See
+   [COMMUNITY_BUILD_MARKER_DESIGN.md](COMMUNITY_BUILD_MARKER_DESIGN.md).
 
 ## Evidence reviewed
 
@@ -211,6 +225,55 @@ protection stage composed before PyInstaller/Nuitka/Cython. Improve recipes and
 evidence when a real combination fails. Do not build installer generation or
 put private mappings into an automatic archive.
 
+### 7. Nuitka-derived product practices — GO / staged P2
+
+Nuitka's useful lessons are not limited to native compilation. The following
+fit pyobfus's original AST/AI-verifiable direction:
+
+- **One report spine:** converge dry-run selection, effective config,
+  transformation counters, cache decisions, verification results, output
+  hashes and provenance relationships into one versioned data model. Human
+  summaries, JSON, SARIF and provenance should be projections of shared facts,
+  not four independently calculated answers.
+- **Explicit support matrix:** continuously publish Python/framework/platform
+  and packaging-backend verification evidence, distinguishing "supported",
+  "tested" and "advisory only".
+- **Reason-coded inclusion/exclusion:** every skipped module, preserved symbol
+  and disabled transform should have a stable reason code usable by humans,
+  CI and agents.
+- **Composable delivery profiles:** keep PyInstaller/Nuitka/Cython as external
+  backends, but provide checked recipes and report their hand-off artifacts.
+  pyobfus must not grow its own compiler or installer subsystem.
+- **Agent-operable diagnostics:** every proposed feature must define dry-run,
+  JSON, privacy, verification and recovery behavior before implementation.
+- **Community compatibility knowledge:** framework/package exceptions may grow
+  through reviewed data profiles and regression fixtures, rather than
+  accumulating opaque special cases in transformers.
+
+Recommended first increment: design a `build_report` schema that reuses the
+current `plan`, syntax verification and provenance builders. Do not expose a
+new flag until schema ownership, redaction and compatibility rules are written.
+
+### 8. Community build marker — GO / P2 design, implementation gated
+
+The free edition already emits a visible pyobfus attribution header. Adding a
+second covert "watermark" would duplicate Pro forensic watermarking, be
+trivially removable from open-source Core output and risk contradicting the
+unlimited free-tier promise.
+
+The approved direction is therefore to harden the existing header:
+
+- transparent, comment-only and zero-runtime-cost;
+- machine-readable format and edition label;
+- project-relative path only, fixing the current absolute-path privacy risk;
+- default-on behavior compatible with today's output plus an explicit policy
+  for banner-restricted environments;
+- no tracking, phone-home, buyer/device ID or authenticity claim;
+- independent from `--trace-marker` and from Pro `--fingerprint`.
+
+Detailed threat model, schema impact and acceptance criteria are in
+[COMMUNITY_BUILD_MARKER_DESIGN.md](COMMUNITY_BUILD_MARKER_DESIGN.md).
+
 ## Recommended implementation sequence
 
 1. Design `--check` SARIF as an additive contract; validate privacy and stable
@@ -219,7 +282,9 @@ put private mappings into an automatic archive.
    can ship independently, then prefer SARIF when available.
 3. Add the Python 3.14 remote-debug advisory and deployment recipe.
 4. Run MCP conformance as a research/CI spike.
-5. Reassess only after the 09-01 release download window and the planned user
+5. Design the shared build-report fact model, then implement the privacy-safe
+   Community marker as one consumer of that model.
+6. Reassess only after the 09-01 release download window and the planned user
    Discussion produce fresh demand evidence.
 
 Formal release remains separately gated by the maintainer. This document does

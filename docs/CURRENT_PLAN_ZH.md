@@ -34,6 +34,43 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
 核心策略不是追 PyArmor / Nuitka 的 native / bytecode VM 赛道，而是在
 “可调试、可验证、可被 AI 工具正确使用”的代码保护工作流上拉开差距。
 
+### 🆕 2026-09-02 Nuitka 借鉴方向与免费版水印决策
+
+在不偏离 AST、框架兼容、AI 可操作和可验证交付这条原定线路的前提下，后续
+持续吸收 Nuitka 的工程化优点，但不复制其编译器/安装器产品边界：
+
+1. **统一可验证 build report（P2）**：把现有 dry-run plan、effective config、
+   选中/排除原因、transform/保留统计、缓存判断、syntax/import 验证、输出摘要
+   与 provenance 关系收敛到一个 versioned fact model；人类摘要、JSON、SARIF、
+   provenance 都从同一事实源投影，避免口径漂移。
+2. **持续验证矩阵（P2）**：明确区分 supported / tested / advisory-only，覆盖
+   Python 版本、框架 preset、操作系统及 PyInstaller/Nuitka/Cython 交付组合。
+3. **reason code 与社区兼容数据（P2）**：每个 excluded file、preserved symbol、
+   disabled transform 都给稳定 reason code；框架例外优先沉淀为可审查 profile +
+   regression fixture，不在 transformer 中继续堆不可解释分支。
+4. **组合而非重造（长期原则）**：pyobfus 继续做保护前置层，由外部工具负责
+   native compilation、onefile 与 installer；真实组合失败才升级 recipe/adapter。
+
+关于“免费版增加水印”，代码审计确认 Community 输出**已经默认带可见 pyobfus
+header**，另有 opt-in `--trace-marker`，Pro 还有独立 `--fingerprint` 法证水印。
+决策不是新增隐蔽/强制防盗版层，而是把现有 header 正式升级为
+**Community build marker（P2，设计已定、实现仍 gated）**：
+
+- 默认保持透明 attribution，与当前行为兼容；comment-only、零运行时成本；
+- 增加 machine-readable format/edition，但不宣称不可删除或可证明真实性；
+- 原始文件字段只能是 project-relative path/basename，修复当前可能写入绝对路径
+  的隐私风险；严禁 buyer/license/device/mapping/secret/PII 与任何 phone-home；
+- 与 trace marker（AI 反向映射工作流）和 Pro forensic watermark（买家泄漏追踪）
+  三层严格分离，Core/Pro 源码边界不变；
+- 不把“删除一个开源注释”包装成 Pro 安全卖点；提供显式 policy 适配禁止 banner
+  的企业构建环境，状态进入 config hash / dry-run / provenance。
+
+完整设计、威胁模型、schema 影响与验收项见
+[`COMMUNITY_BUILD_MARKER_DESIGN.md`](COMMUNITY_BUILD_MARKER_DESIGN.md)；扩展调研已同步
+到 [`FEATURE_EXPANSION_RESEARCH_2026-09-02.md`](FEATURE_EXPANSION_RESEARCH_2026-09-02.md)。
+本节不授权版本号、tag 或正式发布；近期实现顺序仍以 SARIF、只读 review skill、
+Python 3.14 remote-debug advisory 为 P1，build report / marker 排在 P2。
+
 ## 当前状态
 
 - **2026-09-01 SEO 小版本发布**：`pyobfus 0.5.20` 与
