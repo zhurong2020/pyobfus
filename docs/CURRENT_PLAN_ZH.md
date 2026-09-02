@@ -71,6 +71,40 @@ header**，另有 opt-in `--trace-marker`，Pro 还有独立 `--fingerprint` 法
 本节不授权版本号、tag 或正式发布；近期实现顺序仍以 SARIF、只读 review skill、
 Python 3.14 remote-debug advisory 为 P1，build report / marker 排在 P2。
 
+### 🎯 下一小版本：Core 0.5.21 SARIF preflight（计划中）
+
+用户于 2026-09-02 要求开始规划下一小版本，并明确希望通过持续发布维持项目
+流量。下一版锁定为 **`pyobfus 0.5.21`：`--check` SARIF 2.1.0 输出**，完整范围
+见 [`V0.5.21_RELEASE_PLAN.md`](V0.5.21_RELEASE_PLAN.md)。计划目标窗口为
+09-04～09-05，但日期不是发布理由；实现、真实 SARIF upload smoke、全质量门和
+用户单独批准缺一不可。
+
+范围纪律：
+
+- 只新增 `pyobfus --check PATH --sarif FILE`；SARIF 写文件，原 text/`--json`
+  stdout 与 `0/1/2` exit code 均保持兼容；
+- 复用完整 `PreflightReport`，新增单向 projection，不二次扫描、不另算风险；
+- stable category rule ID、保守 severity mapping、deterministic fingerprint、
+  config-excluded suppression、parse-error invocation notification；
+- 只允许相对路径和固定安全消息，严禁 snippet/literal/绝对路径/license/mapping/
+  buyer/device/secret 进入 SARIF；pyobfus 不持有 GitHub token，也不负责上传；
+- 本版不捆 Community marker、build report、新 transform、MCP schema 或 VS Code
+  改动，避免为了发版扩大回归面。
+
+持续发布采用“有意义的小增量”而非空版本：
+
+1. `0.5.21`：SARIF preflight，预计 09-04/05；
+2. `0.5.22` 候选：间隔 3～5 天，Python 3.14 remote-debug 启动策略 advisory +
+   现有 Community header 绝对路径隐私修复，须先完成专项设计；
+3. `0.5.23` 候选：统一 verifiable build report MVP，只在 fact schema 批准后排期；
+4. `pyobfus-mcp 0.3.11` 独立节奏；当前 `[Unreleased]` 仅 Registry URL 修复，
+   单独发版价值不足，需与 MCP conformance evidence 或真实 MCP 增量组合。
+
+运营节奏目标约每周两个“可发布机会”，通常给每版至少 48～72 小时用于 CI、
+渠道索引和下载观察；若验收证据不完整则跳过窗口。持续记录非发布日下载基线，
+不得把 tag/CI/依赖解析尖峰误判为留存增长。正式版本号修改、tag、PyPI/GitHub
+Release 仍沿用现有 gate，必须再次取得用户明确授权。
+
 ## 当前状态
 
 - **2026-09-01 SEO 小版本发布**：`pyobfus 0.5.20` 与
