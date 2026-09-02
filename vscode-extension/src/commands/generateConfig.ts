@@ -4,6 +4,8 @@
  * already existed before this extension.
  */
 import * as vscode from "vscode";
+import * as fs from "fs/promises";
+import * as path from "path";
 import { resolveInterpreter } from "../cli/locate";
 import { runJsonCommand } from "../cli/runner";
 import { reportCliError } from "../cli/errorReporting";
@@ -52,7 +54,7 @@ async function generateConfig(outputChannel: vscode.OutputChannel): Promise<void
         ),
     );
 
-    await addSchemaModelineIfMissing(result.config_path);
+    await addSchemaModelineIfMissing(result.config_path, folder.uri.fsPath);
 
     const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(result.config_path));
     await vscode.window.showTextDocument(doc, { preview: false });
@@ -84,7 +86,27 @@ async function generateConfig(outputChannel: vscode.OutputChannel): Promise<void
  * hypothetical future where that stops being true, not a real steady
  * state today.
  */
-export async function addSchemaModelineIfMissing(configPath: string): Promise<void> {
+export async function validateGeneratedConfigPath(configPath: string, workspaceRoot: string): Promise<void> {
+  const [realConfigPath, realWorkspaceRoot] = await Promise.all([
+    fs.realpath(configPath),
+    fs.realpath(workspaceRoot),
+  ]);
+  const relative = path.relative(realWorkspaceRoot, realConfigPath);
+  if (
+    path.basename(realConfigPath) !== "pyobfus.yaml" ||
+    relative === "" ||
+    relative.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(relative)
+  ) {
+    throw new Error("pyobfus returned a config path outside the current workspace");
+  }
+}
+
+export async function addSchemaModelineIfMissing(
+  configPath: string,
+  workspaceRoot: string,
+): Promise<void> {
+  await validateGeneratedConfigPath(configPath, workspaceRoot);
   const uri = vscode.Uri.file(configPath);
   const bytes = await vscode.workspace.fs.readFile(uri);
   const text = Buffer.from(bytes).toString("utf-8");

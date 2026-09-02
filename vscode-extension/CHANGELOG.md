@@ -6,6 +6,12 @@ Independent version/release cadence from the main `pyobfus` and `pyobfus-mcp` Py
 
 ## [Unreleased]
 
+### Security
+
+- "Generate pyobfus.yaml" now canonicalizes the CLI-returned configuration
+  path and refuses to read or modify it unless it is a real `pyobfus.yaml`
+  contained by the current workspace, including rejection of symlink escapes.
+
 ## [0.4.1] - 2026-08-22
 
 ### Changed

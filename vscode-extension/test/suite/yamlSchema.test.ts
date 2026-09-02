@@ -4,7 +4,11 @@ import * as os from "node:os";
 import * as path from "node:path";
 import { randomUUID } from "node:crypto";
 import * as vscode from "vscode";
-import { addSchemaModelineIfMissing, SCHEMA_URL } from "../../src/commands/generateConfig";
+import {
+  addSchemaModelineIfMissing,
+  SCHEMA_URL,
+  validateGeneratedConfigPath,
+} from "../../src/commands/generateConfig";
 
 // M3 (pyobfus.yaml IntelliSense) has two independent mechanisms -- this
 // suite covers both:
@@ -43,15 +47,18 @@ suite("yamlValidation contribution (package.json)", () => {
 });
 
 suite("addSchemaModelineIfMissing", () => {
-  async function writeTemp(content: string): Promise<string> {
-    const tmp = path.join(os.tmpdir(), `pyobfus-yaml-modeline-${randomUUID()}.yaml`);
+  async function writeTemp(content: string): Promise<{ configPath: string; workspaceRoot: string }> {
+    const workspaceRoot = await fs.promises.mkdtemp(
+      path.join(os.tmpdir(), `pyobfus-yaml-modeline-${randomUUID()}-`),
+    );
+    const tmp = path.join(workspaceRoot, "pyobfus.yaml");
     await vscode.workspace.fs.writeFile(vscode.Uri.file(tmp), Buffer.from(content, "utf-8"));
-    return tmp;
+    return { configPath: tmp, workspaceRoot };
   }
 
   test("prepends the schema modeline to a freshly-generated file", async () => {
-    const configPath = await writeTemp("obfuscation:\n  preset: balanced\n");
-    await addSchemaModelineIfMissing(configPath);
+    const { configPath, workspaceRoot } = await writeTemp("obfuscation:\n  preset: balanced\n");
+    await addSchemaModelineIfMissing(configPath, workspaceRoot);
 
     const text = fs.readFileSync(configPath, "utf-8");
     assert.ok(text.startsWith(`# yaml-language-server: $schema=${SCHEMA_URL}\n`));
@@ -59,13 +66,27 @@ suite("addSchemaModelineIfMissing", () => {
   });
 
   test("is idempotent -- does not duplicate the modeline on a second call", async () => {
-    const configPath = await writeTemp("obfuscation:\n  preset: balanced\n");
-    await addSchemaModelineIfMissing(configPath);
-    await addSchemaModelineIfMissing(configPath);
+    const { configPath, workspaceRoot } = await writeTemp("obfuscation:\n  preset: balanced\n");
+    await addSchemaModelineIfMissing(configPath, workspaceRoot);
+    await addSchemaModelineIfMissing(configPath, workspaceRoot);
 
     const text = fs.readFileSync(configPath, "utf-8");
     const occurrences = text.split("# yaml-language-server:").length - 1;
     assert.strictEqual(occurrences, 1);
+  });
+
+  test("rejects a generated config path outside the workspace", async () => {
+    const { configPath } = await writeTemp("obfuscation: {}\n");
+    const otherWorkspace = await fs.promises.mkdtemp(path.join(os.tmpdir(), "pyobfus-other-workspace-"));
+    await assert.rejects(validateGeneratedConfigPath(configPath, otherWorkspace), /outside the current workspace/);
+  });
+
+  test("rejects a symlink that escapes the workspace", async () => {
+    const { configPath } = await writeTemp("obfuscation: {}\n");
+    const workspaceRoot = await fs.promises.mkdtemp(path.join(os.tmpdir(), "pyobfus-symlink-workspace-"));
+    const linkPath = path.join(workspaceRoot, "pyobfus.yaml");
+    await fs.promises.symlink(configPath, linkPath);
+    await assert.rejects(validateGeneratedConfigPath(linkPath, workspaceRoot), /outside the current workspace/);
   });
 
   test("SCHEMA_URL is a public https URL, not a local extension-install path", () => {
