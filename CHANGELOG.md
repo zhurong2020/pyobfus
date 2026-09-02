@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`pyobfus --check --sarif PATH`**: export the pre-flight risk scan as a
+  SARIF 2.1.0 report for GitHub Code Scanning and other SARIF consumers. It is
+  a pure projection of the existing report — detection, severity, config
+  handling, JSON output and exit codes are unchanged. Each stable preflight
+  category becomes a `PYOBFUS/<category>` rule; severity maps to SARIF
+  `error`/`warning`/`note`; config-excluded findings appear as suppressed
+  results without affecting the exit code; parse failures become invocation
+  notifications. The projection is privacy-preserving: no source snippets or
+  literals, no absolute/`file://` paths (input-root-relative POSIX only), and
+  no secrets, mappings or device IDs. `--sarif` is valid only with `--check`,
+  the file is written atomically, and a write failure is reported through the
+  standard structured error envelope. See
+  [docs/SARIF_CODE_SCANNING.md](docs/SARIF_CODE_SCANNING.md).
+
 ### Fixed
 
 - **Cross-file (default directory) mode no longer silently drops content-level

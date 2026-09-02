@@ -86,6 +86,7 @@ Error JSON schema (applies to LimitExceededError / PyObfusError / ParseError / g
 pyobfus --check src/                # human-readable
 pyobfus --check src/ --json         # for AI agents + CI
 pyobfus --check src/ --offline      # skip public-PyPI dependency verification
+pyobfus --check src/ --sarif pyobfus.sarif   # also emit SARIF 2.1.0 for GitHub Code Scanning (0.5.21)
 ```
 
 Detects:
@@ -286,7 +287,7 @@ also returns a `next_tool` field naming the next MCP tool to call.
 
 ## Versioning
 
-pyobfus follows semver. AI-native features (preflight, init, unmap, JSON CLI, MCP server) are baseline. v0.5 adds composable Pro flags (`--selective-opacity --seal-code --vault --scrub-traceback --fingerprint --expire-hard`, plus `--period --opacity-config --bind-device`/`--bind-device-id` in 0.5.3, device-lock extended to Vault keys in 0.5.4, and `--import-obfuscation` in 0.5.7) to the normal `pyobfus SRC -o OUT --level pro --<flag>` command. Community-side additions since: `--provenance-manifest` (0.5.5), config-aware `--check` with an excluded-file bucket and a dependency-hallucination advisory (0.5.18), and `--dry-run --json` structured plans plus `--verify-syntax` (0.5.19). There is no `build` subcommand. Breaking changes to JSON schemas are flagged with a `version` field bump.
+pyobfus follows semver. AI-native features (preflight, init, unmap, JSON CLI, MCP server) are baseline. v0.5 adds composable Pro flags (`--selective-opacity --seal-code --vault --scrub-traceback --fingerprint --expire-hard`, plus `--period --opacity-config --bind-device`/`--bind-device-id` in 0.5.3, device-lock extended to Vault keys in 0.5.4, and `--import-obfuscation` in 0.5.7) to the normal `pyobfus SRC -o OUT --level pro --<flag>` command. Community-side additions since: `--provenance-manifest` (0.5.5), config-aware `--check` with an excluded-file bucket and a dependency-hallucination advisory (0.5.18), and `--dry-run --json` structured plans plus `--verify-syntax` (0.5.19), and SARIF 2.1.0 export of `--check` findings via `--sarif` (0.5.21). There is no `build` subcommand. Breaking changes to JSON schemas are flagged with a `version` field bump.
 
 ## Common selection questions
 

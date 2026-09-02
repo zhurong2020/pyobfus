@@ -30,7 +30,7 @@ title: pyobfus - Modern Python Code Obfuscator
     <li><strong>String Encoding</strong>: Base64 encoding for string literals</li>
     <li><strong>Multi-file Support</strong>: Obfuscate entire projects</li>
     <li><strong>Reverse Stack-Trace Mapping</strong> (<code>--unmap</code>): translate an obfuscated production traceback back to original names, so you (or an AI assistant) can debug shipped code without un-obfuscating it</li>
-    <li><strong>Pre-flight Risk Check</strong> (<code>--check</code>): flags <code>eval</code>/<code>exec</code>, dynamic attribute access, framework reflection, and declared dependencies that do not resolve on public PyPI &mdash; config-aware, JSON output</li>
+    <li><strong>Pre-flight Risk Check</strong> (<code>--check</code>): flags <code>eval</code>/<code>exec</code>, dynamic attribute access, framework reflection, and declared dependencies that do not resolve on public PyPI &mdash; config-aware, JSON output, and <code>--sarif</code> export for GitHub Code Scanning</li>
     <li><strong>YAML Configuration</strong>: Flexible configuration system</li>
     <li><strong>Parameter Preservation</strong>: Keep function parameter names for keyword arguments</li>
     <li><strong>Build Provenance</strong>: Local provenance manifest with hashes and CycloneDX-compatible relationships; <code>--verify-provenance-manifest</code> validates it</li>

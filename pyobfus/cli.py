@@ -337,6 +337,15 @@ except ImportError:
     "outside --check.",
 )
 @click.option(
+    "--sarif",
+    "sarif_path",
+    type=click.Path(dir_okay=False, writable=False),
+    default=None,
+    help="With --check: also write a SARIF 2.1.0 report to this file (for "
+    "GitHub Code Scanning). Text/JSON output and exit code are unchanged. "
+    "Only valid with --check.",
+)
+@click.option(
     "--no-config",
     is_flag=True,
     help="With --check: skip config discovery and scan exactly as legacy --check did.",
@@ -448,6 +457,7 @@ def main(
     check_mode: bool,
     json_output: bool,
     offline: bool,
+    sarif_path: Optional[str],
     no_config: bool,
     save_mapping_path: Optional[str],
     provenance_manifest_path: Optional[str],
@@ -475,6 +485,11 @@ def main(
       pyobfus --validate-config pyobfus.yaml
       pyobfus --verify-provenance-manifest provenance.json
     """
+    # --sarif is only meaningful with --check.
+    if sarif_path is not None and not check_mode:
+        click.echo("Error: --sarif is only valid with --check.", err=True)
+        sys.exit(1)
+
     # Handle --check: pre-flight risk scan (no output files)
     if check_mode:
         if not input_path:
@@ -488,6 +503,7 @@ def main(
             preset=preset,
             level=level,
             no_config=no_config,
+            sarif_path=sarif_path,
         )
         return
 
@@ -2096,6 +2112,7 @@ def _handle_check(
     preset: Optional[str] = None,
     level: Optional[str] = None,
     no_config: bool = False,
+    sarif_path: Optional[str] = None,
 ) -> None:
     """
     Run pre-flight risk scan and print report.
@@ -2104,6 +2121,11 @@ def _handle_check(
     requirements*.txt / pyproject.toml dependencies) unless --offline is
     passed. Exits with code 0 (safe), 1 (high-severity findings), or
     2 (parse errors).
+
+    When ``sarif_path`` is given, a SARIF 2.1.0 report is also written to that
+    file (for GitHub Code Scanning). It is projected from the same report, so
+    the text/JSON output and the findings-based exit code are unchanged; only a
+    SARIF write failure aborts early with a structured error.
     """
     from pyobfus.core.config_resolve import resolve_effective_config
     from pyobfus.core.preflight import PreflightChecker, format_report_text
@@ -2125,6 +2147,28 @@ def _handle_check(
         offline=offline,
     )
     report = checker.check_path(input_path)
+
+    # Write SARIF (if requested) before printing the report, so a write failure
+    # is reported cleanly instead of after a "successful"-looking scan.
+    if sarif_path is not None:
+        from pyobfus import __version__
+        from pyobfus.core.sarif import write_sarif
+
+        try:
+            write_sarif(report, Path(sarif_path), __version__)
+        except OSError as e:
+            message = f"Could not write SARIF report to {sarif_path}: {e}"
+            if json_output:
+                _emit_error_json(
+                    error_type="sarif_write_error",
+                    message=message,
+                    suggestion="Check the path is writable and its directory exists.",
+                    ai_hint="SARIF output failed; the risk scan itself completed.",
+                    exit_code=1,
+                )
+            else:
+                click.echo(f"Error: {message}", err=True)
+            sys.exit(1)
 
     if json_output:
         click.echo(report.to_json())

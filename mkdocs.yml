@@ -22,6 +22,7 @@ nav:
   - Python 3.8 Compatibility: PYTHON38_COMPATIBILITY.md
   - License Activation: LICENSE_ACTIVATION_GUIDE.md
   - Project Structure: PROJECT_STRUCTURE.md
+  - SARIF Code Scanning: SARIF_CODE_SCANNING.md
   - Integration Testing: INTEGRATION_TESTING.md
   - LLM Resistance Benchmark: LLM_RESISTANCE_BENCHMARK.md
   - Next Feature Decision: NEXT_FEATURE_DECISION.md
