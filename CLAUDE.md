@@ -12,6 +12,28 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
+### 🟢 2026-09-02 — session 关账后的当前焦点
+
+- Core `0.5.20` / MCP `0.3.10` / VS Code `0.4.1` 为最新公开版本，SEO
+  发版与 MCP Registry 0.3.10 已全渠道收口；客户 invoice 支持也已结案，只
+  被动等待来信。
+- 下一小版本仅**规划**为 Core 0.5.21 SARIF preflight；设计见
+  [`docs/V0.5.21_RELEASE_PLAN.md`](docs/V0.5.21_RELEASE_PLAN.md)。尚未实现，版本号、
+  tag 和发布仍需用户单独批准。Community build marker 是已设计但 gated 的 P2，
+  不得顺手并入 0.5.21。
+- self-dogfooding 采用 audit/manual → N-1/N canary → wheel verification 的分阶段
+  路线；不把公开 Core/Pro wheel 自混淆。规范见
+  [`docs/SELF_DOGFOODING_BEST_PRACTICES.md`](docs/SELF_DOGFOODING_BEST_PRACTICES.md)。
+- Canopii 已显示 publisher/maintainer verified；合理的 VS Code/Worker 安全加固
+  已完成并推送，monorepo scope、v0.3.10 stale scan 与 8 tools 未提取已报
+  [canopii-cli#6](https://github.com/canopii-dev/canopii-cli/issues/6)。后续只按
+  CURRENT_PLAN P0 跟踪回复/重扫；14 天无回复 follow up 一次。MCP Trust Checker
+  登记仍待执行，Claude plugin 仍 pending。
+- 下载数据当前只到 08-31；等 pypistats 覆盖至少 09-02 再评价 09-01 SEO
+  发版。无新需求信号，不拆 `dependency_advisory`、不刷 trust score。
+- 冷启动先核实 `git status`、`origin/main`、Actions 与 #6 实时状态；不要依赖
+  下方历史段冻结的旧版本/commit/外部状态。
+
 ### ✅ 2026-09-02 — SEO 小版本全渠道发布收口
 
 - **用户明确批准的独立 SEO 版本已发布**：Core `0.5.20` 与 MCP
@@ -87,8 +109,8 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   `~/projects/WORK_LOG_INDEX.md` 顶行为准**（每轮追加）。此前 session 的 Stripe
   交接、配置感知实现和 HOME 隔离测试也均已 push。冷启动后先读
   `docs/CURRENT_PLAN_ZH.md`；发票与 SEO 发版均已结案，客户回访只等待来信。
-  除非用户明确 gate，不启动其它功能实现或发布。外部手工项仍是 Canopii
-  claim/rescan、Claude plugin pending 观察，并在
+  除非用户明确 gate，不启动其它功能实现或发布。外部事项现为 Canopii #6
+  回复/重扫、MCP Trust Checker 登记、Claude plugin pending 观察，并在
   1–2 周后复查下载；若 9 月 1–7 日仍无 advisory 反馈，再考虑 GitHub Discussion
   投票。
 
@@ -105,7 +127,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - Claude plugin 仍为 Aug 2 `Submitted and pending review`。MCP Skills 扫描为
   6.06 / established / no safety findings，因低采用和单作者未达 Verified。
   Canopii 的 39/F 来自扫描 sibling Pro runtime 的 `marshal.loads` 语法命中，
-  MCP 输入无可达路径；先 claim + 请求按 0.3.8 重扫，仍命中再报上游误报。
+  MCP 输入无可达路径；该历史待办现已推进为 upstream #6，见顶部当前焦点。
 - 冷启动的完整数字、证据边界与 2-3 天后复查清单见
   [`docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md`](docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md)。
   当前开发/产品优先级仍只看 `docs/CURRENT_PLAN_ZH.md`。

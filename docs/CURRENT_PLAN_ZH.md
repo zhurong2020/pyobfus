@@ -25,6 +25,31 @@ GitHub Release 已建，Release / CI 全矩阵 / CodeQL 均绿。后续正式发
 `ROADMAP.md` 和 `POST_V0.4_TODO.md` 保留为历史归档和详细来源，但后续日常
 决策优先看本文。
 
+## 2026-09-02 session 关账 / 下次 cold-start 交接
+
+- **仓库与发布状态**：Core 0.5.20、MCP 0.3.10、VS Code 0.4.1 仍是最新
+  公开版本；0.5.20/0.3.10 全渠道发布已经收口。本 session 的 tracked 修订均已
+  推送到 `main`；关闭前仍应以 `git status`、`origin/main` 和 GitHub Actions
+  实时结果为准，不在文档冻结会自行过期的 tip。
+- **下一功能 gate**：0.5.21 已完成 SARIF preflight 设计与 release plan，尚未
+  实现，也未授权改版本/tag/发布。Community build marker 已完成设计，但仍为
+  P2；不能与 0.5.21 捆绑。国际 self-dogfooding 结论已进入 AGENTS、贡献指南与
+  provenance 文档，当前只允许 audit/manual lane，不得把 public wheel 自混淆。
+- **本轮真实安全加固**：VS Code 生成配置增加 workspace/symlink containment；
+  draft Worker 把 WordPress 管理员凭据目标限制为公共 HTTPS origin。对应测试、
+  CHANGELOG/README 与公开提交均已完成；这两项不改变 pyobfus-mcp 包边界。
+- **外部跟踪**：Canopii maintainer 已验证，上游
+  [canopii-cli#6](https://github.com/canopii-dev/canopii-cli/issues/6) 等待回复/重扫；
+  按 P0 的四项标准验收，14 天无回复只 follow up 一次。MCP Trust Checker
+  登记尚未执行；Claude plugin 仍只观察 approve/reject/补材料状态。
+- **用户/流量证据**：最新 pypistats 数据只到 08-31，尚不能评价 09-01 SEO
+  发版；等覆盖至少 09-02 后再比较发布日与首个完整非发布日。没有新增 issue/
+  PR/Discussion 或 `dependency_advisory` 独立需求信号，不拆包、不刷评分。
+- **索引职责**：README/llms 面向已发布用户能力，本轮计划不应提前写入；
+  `ROADMAP.md`/`POST_V0.4_TODO.md` 是归档，不回填当前状态。活的仓内入口是本文，
+  Claude 专属冷启动是根 `CLAUDE.md`，外部渠道看 `DISTRIBUTION_CHANNELS.md`；
+  跨项目索引与两个 Claude project-memory namespace 需与本段同步。
+
 ## 一句话定位
 
 pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯 Python / AST
