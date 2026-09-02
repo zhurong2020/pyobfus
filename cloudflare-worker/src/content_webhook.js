@@ -97,10 +97,34 @@ function extractTier(session) {
  * NOTE: WP Application Password is recommended over Simple-JWT-Login token
  *       for server-to-server. This draft uses Application Password basic auth.
  */
+export function validateWordPressBaseUrl(value) {
+  let url;
+  try {
+    url = new URL(value);
+  } catch {
+    throw new Error('WP_BASE_URL must be a valid absolute URL');
+  }
+  if (url.protocol !== 'https:') {
+    throw new Error('WP_BASE_URL must use HTTPS');
+  }
+  if (url.username || url.password || url.search || url.hash || url.pathname !== '/') {
+    throw new Error('WP_BASE_URL must be an HTTPS origin without credentials, path, query, or fragment');
+  }
+
+  const hostname = url.hostname.replace(/^\[|\]$/g, '').toLowerCase();
+  const privateIpv4 = /^(10\.|127\.|169\.254\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/;
+  const privateIpv6 = hostname === '::1' || hostname.startsWith('fe80:') || /^[fd][0-9a-f]{1,2}:/.test(hostname);
+  if (hostname === 'localhost' || hostname.endsWith('.localhost') || privateIpv4.test(hostname) || privateIpv6) {
+    throw new Error('WP_BASE_URL must use a public hostname');
+  }
+  return url.origin;
+}
+
 async function grantWpRole(env, email, tier) {
   if (!env.WP_BASE_URL || !env.WP_ADMIN_USERNAME || !env.WP_ADMIN_APP_PASSWORD) {
     throw new Error('WP credentials not configured');
   }
+  const wpOrigin = validateWordPressBaseUrl(env.WP_BASE_URL);
 
   const role = tier === 'pro' ? 'rongshuo_pro' : 'rongshuo_member';
   const authHeader = 'Basic ' + btoa(
@@ -111,7 +135,7 @@ async function grantWpRole(env, email, tier) {
   let userId = null;
 
   // Search by email (requires admin auth)
-  const searchUrl = `${env.WP_BASE_URL}/wp-json/wp/v2/users?search=${encodeURIComponent(email)}&context=edit`;
+  const searchUrl = `${wpOrigin}/wp-json/wp/v2/users?search=${encodeURIComponent(email)}&context=edit`;
   const searchRes = await fetch(searchUrl, {
     headers: { 'Authorization': authHeader }
   });
@@ -128,7 +152,7 @@ async function grantWpRole(env, email, tier) {
       throw new Error('WP_JWT_AUTH_KEY not configured (required for new user registration)');
     }
     const registerRes = await fetch(
-      `${env.WP_BASE_URL}/?rest_route=/simple-jwt-login/v1/users&AUTH_KEY=${env.WP_JWT_AUTH_KEY}`,
+      `${wpOrigin}/?rest_route=/simple-jwt-login/v1/users&AUTH_KEY=${encodeURIComponent(env.WP_JWT_AUTH_KEY)}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -150,7 +174,7 @@ async function grantWpRole(env, email, tier) {
 
   // 3. Set role via WP REST (Application Password auth)
   const updateRes = await fetch(
-    `${env.WP_BASE_URL}/wp-json/wp/v2/users/${userId}`,
+    `${wpOrigin}/wp-json/wp/v2/users/${encodeURIComponent(String(userId))}`,
     {
       method: 'POST',
       headers: {

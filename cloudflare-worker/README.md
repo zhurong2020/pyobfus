@@ -2,6 +2,12 @@
 
 Serverless license verification and Stripe webhook handling for pyobfus Pro.
 
+The draft content-membership webhook requires `WP_BASE_URL` to be a public
+HTTPS origin only (for example, `https://www.example.com`): credentials,
+paths, query strings, fragments, localhost, and private/link-local addresses
+are rejected before WordPress administrator credentials are constructed or
+sent.
+
 ## 🎉 Production Status
 
 **Status**: ✅ **LIVE PRODUCTION** (Deployed 2025-11-12)
