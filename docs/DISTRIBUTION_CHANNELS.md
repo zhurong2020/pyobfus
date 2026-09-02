@@ -33,6 +33,9 @@ and publicly verified `active` / `isLatest=true`. VS Code extension remains 0.4.
 - 2026-08-26 recheck (data through 08-25): 08-24 release-day downloads were
   `137`, then returned to `27` on 08-25; latest day/week/month is
   `27 / 512 / 2,178`. No organic-baseline uplift established.
+- 2026-09-02 recheck (data through 08-31): latest day/week/month is
+  `31 / 376 / 2,338`; non-release days average `26.4`, median `27`, unchanged
+  from the quiet baseline. Data does not yet include the 09-01 release.
 - Tracker: `gh api repos/zhurong2020/pyobfus` + PePy
 
 ### PyPI — `pyobfus-mcp`
@@ -47,6 +50,9 @@ and publicly verified `active` / `isLatest=true`. VS Code extension remains 0.4.
 - 2026-08-26 recheck (data through 08-25): 08-24 release-day downloads were
   `99`, then returned to `8` on 08-25; latest day/week/month is
   `8 / 245 / 874`. No organic-baseline uplift established.
+- 2026-09-02 recheck (data through 08-31): latest day/week/month is
+  `6 / 232 / 1,090`; non-release days average `13.5`, median `12`. The slight
+  rise is too short and release-adjacent to classify as organic growth.
 
 ### GitHub — `zhurong2020/pyobfus`
 - URL: https://github.com/zhurong2020/pyobfus
@@ -64,6 +70,10 @@ and publicly verified `active` / `isLatest=true`. VS Code extension remains 0.4.
   1,751 clones / 182 unique. Release day 08-24 produced 268 clones / 31 unique;
   08-25 returned to 10 / 6. README and CHANGELOG each had only 3 unique views,
   so there is still no attributable `dependency_advisory` usage signal.
+- 2026-09-02 feedback recheck: 14-day traffic is 1,999 clones / 202 unique and
+  214 views / 85 unique. Clone spikes remain release-aligned (08-28: 188/28;
+  08-30: 414/29), followed by 08-29 `5/3` and 08-31 `20/9` quiet-day levels.
+  Still 6 stars, 2 forks, 0 open issue/PR, and no new Discussion reply.
 
 ### VS Code Marketplace — `zhurong2020.pyobfus`
 - 2026-08-24 public Gallery API: version 0.4.1, 3 installs, 124 downloads.
