@@ -205,7 +205,7 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   days if silent. Do not embed the F badge or change product behavior merely to
   silence the scanner.
 - Full evidence and the exact recheck sequence:
-  [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md#canopii-trust-index39100f-的处理结论).
+  [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
 ### Claude Plugin Marketplace 🟡 PENDING
 - Console entry: `pyobfus`
