@@ -181,8 +181,8 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   contributors, stars and real usage should improve the weak dimension
   honestly.
 
-### Canopii Trust Index — 🟡 FALSE POSITIVE / CLAIM + RESCAN PENDING
-- 2026-08-24 page state: latest scanned version is stale at MCP v0.3.7, score
+### Canopii Trust Index — 🟡 UPSTREAM ISSUE OPEN / RESCAN PENDING
+- 2026-08-24 initial page state: latest scanned version was stale at MCP v0.3.7, score
   39/100 (F), confidence 81%. Its sole high failure is a broad
   `marshal.loads(...)` match at `pyobfus_pro/runtime/opacity.py:147`.
 - The evidence is in the sibling Pro runtime, not `pyobfus_mcp/`, and follows a
@@ -190,10 +190,20 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   bytes/key/plaintext path. The public Canopii rule is syntax-only and scans the
   whole monorepo, so this is not evidence of an exploitable MCP deserialization
   path.
-- Next action: maintainer claims the listing with GitHub and requests a v0.3.8
-  rescan. If unchanged, file an upstream false-positive/scope issue with the
-  authenticated-data-flow and Registry subfolder evidence. Do not embed the F
-  badge or change product behavior merely to silence the scanner.
+- 2026-09-02 maintainer verification is already shown on the listing, but the
+  latest scan remains stale at v0.3.9 and reports `no tools extracted` despite
+  eight direct FastMCP registrations and the packaged `tool_manifest.json`.
+  Upstream issue [canopii-cli#6](https://github.com/canopii-dev/canopii-cli/issues/6)
+  now requests a v0.3.10 artifact/subfolder-scoped rescan and extractor fix.
+- Before filing, two useful repository-wide advisories were fixed independently:
+  VS Code generated-config workspace containment (`dd91387`) and the draft
+  Worker WordPress credential-target restriction (`450718c`). Those sibling
+  fixes do not make their paths part of the installable MCP package.
+- Follow-up acceptance criteria: latest version >=0.3.10, eight tools extracted,
+  sibling components excluded from MCP evidence, and PyPI provenance evaluated.
+  Check issue replies during external-status reviews; follow up once after 14
+  days if silent. Do not embed the F badge or change product behavior merely to
+  silence the scanner.
 - Full evidence and the exact recheck sequence:
   [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md#canopii-trust-index39100f-的处理结论).
 

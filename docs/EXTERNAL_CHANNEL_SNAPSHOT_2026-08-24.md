@@ -79,7 +79,7 @@ marshal.loads(plaintext)
   `pyobfus_mcp`。因此当前 F 更准确地说是“monorepo scope + 语法规则”的误报，
   不是已确认的 pyobfus-mcp 可利用漏洞。
 
-处理策略：
+原处理策略（下列 1--2 已于 2026-09-02 完成）与后续进展：
 
 1. 优先在 Canopii 用 GitHub claim maintainer 身份，并请求按最新 v0.3.8 重扫。
 2. 若分数不变，向 `canopii-dev/canopii-cli` 提交误报 issue：附上证据行、
@@ -87,6 +87,20 @@ marshal.loads(plaintext)
 3. 在上游确认支持的 suppression 机制前，不加入 `nosemgrep` 注释；不删除该
    Pro 功能、不改成 JSON，也不为评分改变安全边界。
 4. 当前不把 39/F badge 嵌入 README，避免向用户传播未经澄清的结论。
+
+**2026-09-02 更新**：页面已显示 publisher/maintainer verified，最新扫描推进到
+v0.3.9，但仍为 39/F，并新增暴露出 `no tools extracted`；因此无需再找 claim
+入口。维护者先复核全部 evidence，并完成两项本身合理的 sibling 组件加固：
+VS Code 配置写入限制在当前 workspace（`dd91387`），Worker WordPress 管理员
+凭据只发送到经验证的公共 HTTPS origin（`450718c`）。随后已提交
+[canopii-cli#6](https://github.com/canopii-dev/canopii-cli/issues/6)，请求按
+`pyobfus-mcp==0.3.10` PyPI artifact / `pyobfus_mcp` subfolder 重扫，并修复
+FastMCP 8 工具提取。提交时 issue 为 Open、暂无回复。
+
+后续跟踪口径：每次外部状态复查检查 #6 回复/state；若要求复现则及时提供；
+重扫后核对 latest version、8 tools、sibling scope 和 PEP 740 provenance 四项，
+不能只记录分数。14 天无回复只 follow up 一次；若上游明确不支持包/subfolder
+范围，记录局限后停止投入，不用 suppression 或产品行为改动换分。
 
 参考：
 
@@ -105,8 +119,8 @@ marshal.loads(plaintext)
 4. 查看 Glama 公开 API 的 `tools: []` 是否恢复，以及 Discord `#support` 是否
    有回复；无需重复验证已经成功的容器运行时。
 5. 查看 MCP Skills 是否仍为 6.06；没有真实采用/贡献变化时不必频繁重扫。
-6. 完成 Canopii claim/v0.3.8 rescan 后记录版本、分数和 evidence 是否变化；
-   若仍命中同一行，再决定是否正式提交上游 issue。
+6. 查看 Canopii upstream #6 的回复/state；重扫后记录版本、工具数、evidence
+   scope、provenance 与分数。若 14 天无回复，只做一次简短 follow-up。
 7. 一至两周仍无 `dependency_advisory` 主动反馈时，再开简短 GitHub Discussion
    投票；不要把“没有 issue”直接解释为“没有需求”。
 
@@ -136,13 +150,13 @@ GitHub 同期复查结果：
 - 最新 main CI、CodeQL、Pages 仍全部成功。
 
 外部渠道：Glama 公开页面仍可解析到完整 8 个工具；其旧公开 API 本轮返回
-HTTP 401，进一步说明该 API 已不适合作为无需认证的健康检查。Canopii claim/
-v0.3.8 rescan、Claude Plugin Console 和 Glama Discord 仍需维护者登录，未在
-本轮程序化代操作。
+HTTP 401，进一步说明该 API 已不适合作为无需认证的健康检查。当时 Canopii
+claim/rescan、Claude Plugin Console 和 Glama Discord 仍需维护者登录；其中
+Canopii 后续状态已由上方 2026-09-02 更新取代。
 
 **结论**：完成第一次复查，但不升级为有机增长或拆包信号。下一次下载量复查
 恢复到 1--2 周周期；若到 09-01 至 09-07 仍无主动反馈，按原计划发起一条简短
-GitHub Discussion 投票。Canopii claim/rescan 仍是当前最高优先级人工事项。
+GitHub Discussion 投票。Canopii 后续动作现为跟踪 upstream #6，而非再次 claim。
 
 ## 2026-09-02 第二次周期复查
 
