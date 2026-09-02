@@ -69,7 +69,7 @@ Homepage = "https://github.com/zhurong2020/pyobfus"
 Repository = "https://github.com/zhurong2020/pyobfus"
 "Main Package" = "https://pypi.org/project/pyobfus/"
 "AI Integration Guide" = "https://github.com/zhurong2020/pyobfus/blob/main/docs/AI_INTEGRATION_STRATEGY.md"
-"MCP Registry" = "https://github.com/modelcontextprotocol/servers"
+"MCP Registry" = "https://registry.modelcontextprotocol.io/v0/servers?search=pyobfus"
 "Citation" = "https://doi.org/10.5281/zenodo.20846053"
 
 [project.scripts]

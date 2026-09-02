@@ -109,7 +109,7 @@ tools = [
 ### Distribution path
 
 1. Publish `pyobfus-mcp` as standalone Python package
-2. Submit to [Anthropic MCP Registry](https://github.com/modelcontextprotocol/servers)
+2. Publish through the [official MCP Registry](https://registry.modelcontextprotocol.io/v0/servers?search=pyobfus)
 3. Documented install snippet for Claude Desktop `claude_desktop_config.json`
 4. Same snippet works in Cursor (`~/.cursor/mcp.json`), Windsurf, Zed
 

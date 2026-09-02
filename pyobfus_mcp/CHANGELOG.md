@@ -6,6 +6,12 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+### Fixed
+
+- Replaced the retired `modelcontextprotocol/servers` GitHub-directory URL in
+  package metadata with the live official Registry search endpoint, and added
+  the same direct entry link to the MCP README.
+
 ## [0.3.10] - 2026-09-01
 
 ### Changed

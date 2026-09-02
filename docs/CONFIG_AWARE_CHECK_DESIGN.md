@@ -10,9 +10,8 @@ and review record for the released increment.
 Release boundary confirmed 2026-08-28: that version contained config-aware
 `--check` only. The dry-run plan and syntax-only verification previews below
 were subsequently implemented as two separate commits on 2026-08-30 and are
-versioned as the local pyobfus 0.5.19 release candidate pending the final
-publish gate. Any future release still requires explicit user approval after
-reviewing tests and timing.
+released in pyobfus 0.5.19 after the final user publish gate. Any future
+release still requires explicit user approval after reviewing tests and timing.
 
 The config-resolution plumbing introduced by this plan is the prerequisite for
 candidate 2 (`--dry-run --json` plan object), so that is sketched at the end.
@@ -320,8 +319,8 @@ Run the three roots separately (`tests/`, `pyobfus_mcp/tests/`,
 - One `pyobfus` minor bump (shipped as 0.5.18): `config_resolve.py`, `preflight.py`,
   `cli.py`, docs, tests. Landed in CHANGELOG `[Unreleased]` first and was tagged
   only after the user gated the release (the standing rule for every release).
-- MCP change can ride the same wave as `pyobfus-mcp` 0.3.9 or a later bump;
-  it depends only on the new `pyobfus` version for the helper.
+- MCP change shipped in the same wave as `pyobfus-mcp` 0.3.9; it depends only
+  on pyobfus 0.5.18+ for the shared helper.
 - Docs: extend `docs/DEPENDENCY_ADVISORY_COOKBOOK.md` note; add a short
   "`--check` and your config" section to the README `--check` example block and
   `docs/llms.txt`; mention `effective_config` in

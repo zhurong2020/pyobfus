@@ -192,5 +192,6 @@ Apache-2.0. Same as the main pyobfus package. The pyobfus Pro features remain li
 
 - **Main package**: https://pypi.org/project/pyobfus/
 - **Source**: https://github.com/zhurong2020/pyobfus
+- **Official MCP Registry entry**: https://registry.modelcontextprotocol.io/v0/servers?search=pyobfus
 - **AI integration strategy**: [docs/AI_INTEGRATION_STRATEGY.md](https://github.com/zhurong2020/pyobfus/blob/main/docs/AI_INTEGRATION_STRATEGY.md)
 - **MCP specification**: https://modelcontextprotocol.io/
