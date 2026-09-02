@@ -472,7 +472,25 @@ bytecode 加密。
 
 ### P0：外部状态继续跟进
 
-1. Glama public API / listing 状态
+1. Canopii `canopii-cli#6` 回复与解决状态
+   - **2026-09-02 已提交**：<https://github.com/canopii-dev/canopii-cli/issues/6>，
+     请求按 `pyobfus-mcp==0.3.10` PyPI artifact / Registry 声明的
+     `pyobfus_mcp` subfolder 重扫，并修正 FastMCP 8 工具未提取的问题；提交时
+     issue 为 Open、暂无回复。
+   - 我方已先修复审计中确有价值的两项纵深防御：VS Code 生成配置的 workspace
+     containment（`dd91387`）及 Worker `WP_BASE_URL` 公共 HTTPS origin 限制
+     （`450718c`）；不把 sibling 路径误报当作不处理真实建议的理由。
+   - 后续外部状态复查时查看 issue 的 comment/state；若上游要求最小复现、
+     artifact 或 extractor fixture，优先提供，不等待下一次发版。
+   - 上游重扫后必须核实四项，而非只看总分：① latest 至少为 v0.3.10；
+     ② 识别 8 个 tools；③ `pyobfus_pro/`、`examples/`、VS Code/Worker 不再计入
+     MCP 包 evidence；④ PyPI PEP 740 provenance 是否被识别。把结果同步回
+     `DISTRIBUTION_CHANNELS.md` 与外部快照。
+   - 14 天无回复时只做一次简短 follow-up；若明确关闭且不支持 package/subfolder
+     scope，则记录工具局限并停止为分数投入。修正前不嵌 39/F badge，也不为
+     提分改变产品安全边界。
+
+2. Glama public API / listing 状态
    - 2026-08-17 手工复核 Discord 对应频道：暂未看到 Glama 回复。
    - 继续在 Glama Discord `#support` 等待 / 跟进，但本轮不阻塞本地工作。
    - 每次冷启动同时检查旧 API 路径和公开页面能否列出 8 个工具。
@@ -500,7 +518,7 @@ bytecode 加密。
      "Glama 侧目录同步陈旧"判断。Discord `#support` 与 Recent Tests 两项
      需 user 登录后手工查，本轮未变化。
 
-2. Claude plugin marketplace
+3. Claude plugin marketplace
    - 2026-08-20 user 再次核实 Console 页面：仍为 `Submitted and pending
      review`，日期 Aug 2，提交描述里的 `protected_project` typo 也仍在。
    - 2026-08-21：Console 登录墙，程序化无法核实，维持 user 手工复查。
@@ -854,18 +872,14 @@ pyobfus 不追 compiler/installer 主线的判断。
    CodeEnigma ~58★ 定位最像但走加密字节码 loader、无反向映射/AI/MCP）；
    在线混淆站是 comparison 关键词的真实 SERP 对手；slopsquatting 检测赛道
    已拥挤（喂给 #8 的 graduation 判断）。执行等用户 gate。
-7. **新增（2026-08-22，源自 `~/projects/NEXT_TOOL_OPPORTUNITY_SCAN.md`
-   机会扫描）：pyobfus-mcp 去申请 MCP 信任目录徽章**——扫描时发现 MCP
+7. **进展更新（源自 2026-08-22 `NEXT_TOOL_OPPORTUNITY_SCAN`）：
+   pyobfus-mcp MCP 信任目录**——扫描时发现 MCP
    信任评分赛道已有至少 4 个独立竞品（MCP Skills 的 Verified badge、
    Canopii Trust Index、MCP Trust Checker、企业级 MintMCP+SOC2），结论
-   是"不做新产品，去申请徽章"这个低成本分发动作。下次 cold-start 做：
-   ① 去 MCP Skills（mcpskills.io）用 pyobfus-mcp 的 repo/PyPI 包地址跑一次
-   trust score，若 composite score ≥7.0 门槛达标就申领 Verified badge；
-   ② 去 Canopii Trust Index（index.canopii.dev）和 MCP Trust Checker
-   （mcptrustchecker.com）确认 pyobfus-mcp 是否已被收录/评分，未收录则
-   提交登记。三个都是只读扫描 + 表单登记，不涉及代码改动，不占用现有
-   "1-2 天间隔"发布节奏。做完后把结果（score/badge 状态）记回
-   `docs/DISTRIBUTION_CHANNELS.md` 的 Glama 小节旁边。
+   是"不做新产品，低成本参与现有信任目录"。MCP Skills 已完成评分但未达
+   Verified；Canopii 已验证 maintainer、完成合理加固并提交 upstream #6，
+   后续按本页 P0 验收；MCP Trust Checker 的登记仍待执行。结果统一记录在
+   `docs/DISTRIBUTION_CHANNELS.md`，不占用现有"1-2 天间隔"发布节奏。
 8. **新增（2026-08-22）：`dependency_advisory` 发布后的"毕业标准"跟踪
    计划**——user 明确要求"先内部做、但一定要关注后续使用情况，可能还需要
    主动征求用户意见，并且观察网上同类竞品的情况"，同时表态自己倾向认为
@@ -899,13 +913,11 @@ pyobfus 不追 compiler/installer 主线的判断。
    - Claude plugin 仍 pending；Glama 21:09 测试已成功，二者本轮核实完成。
    - MCP Skills 已实跑：6.06 / established / 14 signals / no safety findings，
      但因 `SINGLE_AUTHOR_LOW_ADOPTION` + `low_legit` disqualifier 未达 Verified。
-     不花钱买 full report、不为评分刷指标，等真实采用/外部贡献后复评。下一步
-     转向 Canopii / MCP Trust Checker 的评分与收录流程。
-   - Canopii 当前只扫描到 MCP v0.3.7，显示 39/F；唯一 high evidence 是
-     sibling Pro runtime 的 `marshal.loads`，且位于认证 AES-GCM 解密之后，
-     MCP tool 输入无可达路径。按误报处理：先 claim + 请求 v0.3.8 rescan；
-     若仍命中，再向 Canopii CLI 提交带数据流和 monorepo subfolder 证据的
-     upstream issue。当前不嵌 F badge、不为扫描器改产品逻辑。
+     不花钱买 full report、不为评分刷指标，等真实采用/外部贡献后复评。
+   - Canopii 后续已扫描到 v0.3.9 但仍为 39/F，并显示 `no tools extracted`。
+     maintainer 已验证；合理的 sibling 防御已修，monorepo scope / FastMCP
+     extractor 问题已提交 upstream #6。回复、重扫与验收转入本页 P0；当前
+     不嵌 F badge、不为扫描器改产品逻辑。MCP Trust Checker 登记仍待执行。
    - 若 1-2 周仍无主动反馈，开一条简短 GitHub Discussion 投票，明确问：
      “留在 pyobfus --check / 独立 Python 包 / 暂无需求”，不能把无 Issue
      等同于无需求。
