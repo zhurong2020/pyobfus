@@ -7,11 +7,11 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-**Last updated**: 2026-09-01 (standalone SEO releases: pyobfus 0.5.20 and
+**Last updated**: 2026-09-02 (standalone SEO releases: pyobfus 0.5.20 and
 pyobfus-mcp 0.3.10 published through OIDC; all four Integrity provenance
 endpoints HTTP 200, fresh wheel installation verified, GitHub Releases created.
-Runtime behavior and MCP schemas are unchanged. MCP Registry 0.3.10 publication
-is pending a Registry-side TLS/EOF outage. VS Code extension remains 0.4.1.)
+Runtime behavior and MCP schemas are unchanged. MCP Registry 0.3.10 is published
+and publicly verified `active` / `isLatest=true`. VS Code extension remains 0.4.1.)
 
 > **Note (2026-05-09)**: most of the per-channel facts below are now current as of Session 23. Outside of the launch wave (HN 5-11 / Reddit 5-12 / CN trio 5-8/9), the live state is reflected here. Consult `docs/POST_V0.4_TODO.md` for forward TODO and `docs/V0.4_EXECUTION_LOG.md` for session-by-session deltas.
 
@@ -115,13 +115,18 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 
 ### MCP Registry — `io.github.zhurong2020/pyobfus-mcp` 🟢 LIVE
 - URL: https://registry.modelcontextprotocol.io/v0/servers?search=pyobfus
-- Latest confirmed published: **0.3.9** (2026-08-28) · status: `active` · `isLatest=true`. Publishing 0.3.10 was attempted 2026-09-01 after PyPI release, but Registry publish/auth/public GET all failed at TLS/EOF; retry when the public endpoint recovers, then verify `active` / `isLatest=true` before marking complete.
-- **Open verification TODO**: retry Registry authentication/publication only
-  after its public endpoint recovers. No package rebuild, retag, PyPI re-upload,
-  or source change is required. The companion docs-only commit `289752a` also
-  has CI run `33521916080` awaiting a final status check; its CodeQL and Pages
-  runs already succeeded, and both release workflows are complete.
-- 0.3.9 contents: default-on project-config awareness and runtime floor `pyobfus>=0.5.18`; see the PyPI section above. Previous 0.3.6 hardening: `pyobfus_mcp/server.json` validates against the official `2025-12-11` schema and includes GitHub repository stable ID `1093960892`; `fileSha256` remains omitted because the PyPI wheel/sdist multi-artifact model makes a single optional hash ambiguous.
+- Latest confirmed published: **0.3.10** (2026-09-02 Registry publication;
+  package released 2026-09-01) · status: `active` · `isLatest=true`. The public
+  version endpoint also confirms package version 0.3.10 and the updated
+  pre-shipping / reverse-traceback / no-phone-home description. The prior
+  TLS/EOF outage is resolved; no rebuild, retag, or PyPI re-upload was needed.
+- 0.3.10 contents: discovery metadata and Registry intent-description updates;
+  runtime behavior and schemas are unchanged. Prior 0.3.9 added default-on
+  project-config awareness and runtime floor `pyobfus>=0.5.18`. Previous 0.3.6
+  hardening: `pyobfus_mcp/server.json` validates against the official
+  `2025-12-11` schema and includes GitHub repository stable ID `1093960892`;
+  `fileSha256` remains omitted because the PyPI wheel/sdist multi-artifact model
+  makes a single optional hash ambiguous.
 - Implications: Claude Desktop / Claude Code / Cursor / Windsurf / Zed users querying the registry for "pyobfus" or "python obfuscator" will discover this server without manual config file edits.
 
 ### Glama — `zhurong2020/pyobfus` 🟡 LISTED / API STALE

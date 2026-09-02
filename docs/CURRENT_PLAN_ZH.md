@@ -1,6 +1,6 @@
 # pyobfus 当前计划
 
-更新时间：2026-09-01（`pyobfus` 0.5.20 与 `pyobfus-mcp` 0.3.10 已发布；
+更新时间：2026-09-02（`pyobfus` 0.5.20 与 `pyobfus-mcp` 0.3.10 已发布；
 `vscode-extension` 最新仍为 0.4.1。既有付款
 现已成功关联，Dashboard 显示 Paid / US$0.00 remaining，且 Stripe 生成的收据
 正确。2026-09-01 Stripe Support 最终确认：`send invoice` 流程的 invoice PDF
@@ -11,8 +11,9 @@ Invoice Receipt，重申无需付款或操作；未发送仍显示应付的 invo
 该客户开票支持事项已完成，不得再开贷项通知单、退款、解除付款或重新扣款。
 客户回访改为被动等待客户邮件，不主动追发；长尾词/AI 搜索优化
 Wave A/B/C 均已于 2026-09-01 完成。Wave C 经用户明确批准作为独立
-SEO 小版本发布：Core 0.5.20 / MCP 0.3.10 已在 PyPI 和 GitHub
-Release 核实；MCP Registry 因官方端点 TLS/EOF 故障待恢复后重试。0.5.18 正式发布已获用户明确批准
+SEO 小版本发布：Core 0.5.20 / MCP 0.3.10 已在 PyPI、GitHub Release 与
+MCP Registry 全渠道核实；Registry 0.3.10 为 `active` / `isLatest=true`。
+0.5.18 正式发布已获用户明确批准
 并完成。结构化 dry-run plan 与 syntax-only 构建后验证随后作为两个独立 commit
 实现，经用户明确批准于 2026-08-30 组成 `pyobfus 0.5.19` 发布：tag `v0.5.19`
 经 OIDC workflow 发到 PyPI，wheel/sdist 两个 Integrity provenance endpoint 均
@@ -40,9 +41,8 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
   provenance endpoints 均 HTTP 200，全新环境同时安装两个 wheel 并
   核实版本/manifest，GitHub Releases 已建。本次只改 README/FAQ、
   PyPI keywords 与 MCP Registry description，运行时和 schemas 不变。
-  Registry 端 publish/login/public GET 都在 TLS/EOF 层失败，待官方端点
-  恢复后只需重试 `mcp-publisher publish` 并验证 0.3.10
-  `active` / `isLatest=true`。
+  2026-09-02 Registry 端点恢复后已成功发布 0.3.10，公共 version endpoint
+  独立核实为 `active` / `isLatest=true`，新版 intent description 已生效。
 
 - **2026-08-28 发布完成**：`pyobfus 0.5.18` 与 `pyobfus-mcp 0.3.9` 已通过
   tag 触发的 OIDC workflow 发布到 PyPI，并分别创建 GitHub Release；四个
@@ -670,20 +670,13 @@ provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
 
 ## 下次工作建议
 
-### 外部状态复查 TODO（2026-09-01 收口）
+### ✅ 外部状态复查已收口（2026-09-02）
 
-- [ ] **MCP Registry 0.3.10**：官方端点恢复后，在
-  `pyobfus_mcp/` 执行 `mcp-publisher login github -token "$(gh auth token)"`
-  与 `mcp-publisher publish`；再用公开 version endpoint 确认
-  `0.3.10` 为 `active` / `isLatest=true`。完成前不得把 Registry
-  写成已发布；不需重打 tag、重发 PyPI 或改代码。
-- [ ] **收尾 docs commit CI**：查询 run `33521916080`（commit
-  `289752a`）最终结果。当前 CI 仍 queued；同 commit 的 CodeQL
-  run `33521916546` 和 Pages run `33521903903` 已 success。这只是文档
-  提交的状态复查；Core/MCP 两个发布 workflow 已 success，不阻塞版本使用。
-- [ ] 上述两项完成后，同步本文、
-  `docs/DISTRIBUTION_CHANNELS.md`、`CLAUDE.md`、本地 project memory 与
-  `home/CROSS_PROJECT_INDEX.md`，然后关闭本 TODO。
+- MCP Registry 0.3.10 已在端点恢复后成功发布，公共 version endpoint 核实
+  `active` / `isLatest=true`；无需重打 tag、重发 PyPI 或改代码。
+- docs commit `289752a` 的 CI run `33521916080` 已 success；其 CodeQL / Pages
+  以及最新收尾 commit `4b7bf9a` 的 CI / CodeQL / Pages 也全部 success。
+- 本轮 Core 0.5.20 / MCP 0.3.10 发版已完成全渠道验证，无剩余发布事项。
 
 1. `dependency_advisory` 已随 `pyobfus 0.5.17` / `pyobfus-mcp 0.3.8` 发布并
    完成 PyPI、PEP 740 provenance、GitHub Release、MCP Registry 全渠道核实。
@@ -821,8 +814,8 @@ provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
       加 3 条 + 引言段确保含 "obfuscate before shipping" / "debug obfuscated
       stack traces"（**必须在打 tag 前的同一 commit**）。
       ✅ **已经用户明确批准作为独立 SEO 版本发布**：Core
-      0.5.20 / MCP 0.3.10 的 PyPI、PEP 740 与 GitHub Releases 已核实；
-      仅 MCP Registry 分发因官方 TLS/EOF 故障转入上方独立 TODO。
+      0.5.20 / MCP 0.3.10 的 PyPI、PEP 740、GitHub Releases 与 MCP Registry
+      均已核实；Registry 0.3.10 为 `active` / `isLatest=true`。
     - 红线：同一短语不跨 >2 surface、不堆砌；发版前复核 "50% lower cost"
       对 PyArmor 现价是否仍成立（`COMPARISON.md` 仍写 $89）。
     - 附带的 `dependency_advisory` #8 判断：slopsquatting 检测赛道已拥挤
@@ -873,6 +866,5 @@ provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
    Core 1208 passed/1 skipped、MCP 93 passed、端到端 7 passed，Black/Ruff/
    联合 mypy 全绿。MCP 与 VS Code 扩展本轮 `[Unreleased]` 均为空，未动。
 7. **长尾词 / AI 搜索优化 rollout**（见上方"下次工作建议" #11 + scan doc §2）：
-   ✅ Wave A/B/C 均完成；Core 0.5.20 / MCP 0.3.10 已发布。剩余
-   查询已单独收入上方「外部状态复查 TODO」，不再把 SEO rollout
-   本身标为未完成。
+   ✅ Wave A/B/C 均完成；Core 0.5.20 / MCP 0.3.10 已完成 PyPI、PEP 740、
+   GitHub Releases 与 MCP Registry 全渠道核实，无剩余发布事项。

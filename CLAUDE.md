@@ -12,20 +12,17 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### ✅ 2026-09-01 — SEO 小版本已发布；MCP Registry 待重试
+### ✅ 2026-09-02 — SEO 小版本全渠道发布收口
 
 - **用户明确批准的独立 SEO 版本已发布**：Core `0.5.20` 与 MCP
   `0.3.10` 在同一发行 commit `dbdf1a3` 中完成 README/FAQ、PyPI
   keywords 及 Registry intent description 更新，运行时与 MCP schemas
   不变。两个 OIDC workflows、PyPI latest、四个 PEP 740 provenance
-  endpoints、新 venv wheel 安装及 GitHub Releases 均已核实。官方 MCP
-  Registry 在 publish/login/public GET 三条路径均出现 TLS/EOF，因此
-  Registry 目前仍只能确认 0.3.9 `active` / `isLatest=true`；端点恢复后
-  重跑 `mcp-publisher publish` 并校验 0.3.10。
-- **剩余查询已收入 TODO**：权威清单见
-  `docs/CURRENT_PLAN_ZH.md` 「外部状态复查 TODO」。只有两项：
-  ① Registry 恢复后发布/核实 0.3.10；② 查 docs commit `289752a` 的
-  CI run `33521916080` 最终结果（CodeQL/Pages 已 success）。
+  endpoints、新 venv wheel 安装及 GitHub Releases 均已核实。2026-09-02
+  官方 MCP Registry 端点恢复后已成功发布 0.3.10，公共 version endpoint
+  独立核实为 `active` / `isLatest=true`，且新版 intent description 生效。
+  昨日待查的 docs commit `289752a` CI run `33521916080` 也已 success；最新
+  收尾 commit `4b7bf9a` 的 CI / CodeQL / Pages 同样全绿。本轮发版无剩余项。
 - **客户 Invoice Receipt 已交付**：客户回访仅被动等待来信，不阻塞
   开发主线。
 
@@ -81,7 +78,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - **✅ 长尾词 / AI 搜索优化 rollout 已完成（2026-09-01）** —— 竞品扫描 + 15 个 surface 的关键词计划见
   [`docs/SEO_AND_COMPETITOR_SCAN_2026-08-31.md`](docs/SEO_AND_COMPETITOR_SCAN_2026-08-31.md)，
   Wave A/B/C 均已落地，Wave C 随 Core 0.5.20 / MCP 0.3.10 发布。
-  只剩上方两条外部状态复查 TODO；除此之外下一功能方向仍须用户 gate。
+  相关外部状态已于 2026-09-02 全部收口；下一功能方向仍须用户 gate。
 - 2026-08-30/31 session 的产出已 push（自 `b39e0b0` 起一串 `docs:`/`release:` commit：
   0.5.19 发布 → 两轮 docs cleanup（llms 孪生对账 + Home 页刷新）→ 竞品扫描 +
   SEO/长尾词规划 → 把 SEO rollout 排入 TODO），tag `v0.5.19` 在 origin，工作区
@@ -349,7 +346,7 @@ cardiac-manuscripts 仓库（不影响 pyobfus 仓库本身）。
 - **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.20，2026-09-01 发布**；完整版本历史见 `CHANGELOG.md`)
 - **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.1，2026-08-22 发布**（tag+GitHub Release+Marketplace 手工上传均已完成，`curl` 核实公开 listing 已返回 `"version":"0.4.1"`）；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`)
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.10，2026-09-01 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.18` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
-- **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp` (最新已核实为 **0.3.9** `active` / `isLatest=true`；0.3.10 因官方 TLS/EOF 故障待重试，见外部复查 TODO)
+- **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp`（最新已核实为 **0.3.10** `active` / `isLatest=true`）
 - **Smithery (Skill)**: https://smithery.ai/skills/zhurong2020/pyobfus-protect (2026-06-22 上线 · 本地工具走 Skill 渠道非 MCP 渠道) · **mcp.so**: 已收录
 - **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus (Quality A) — admin Build steps 已自动更新到 `pyobfus-mcp==0.3.8`；2026-08-24 测试 `01a033e4-3336-7e7b-9792-0d7e056d2dba` success（12.1s），实时枚举完整 8 工具。公开 API 仍 `tools: []`，属于 Glama 目录同步漂移，非包、Docker 或 MCP introspection 故障。后续只查公开 API/Discord 回复；历史排障见 memory `glama_introspection_dockerfile_pin_2026-06-05`、`glama_zero_tools_repro_2026-08-07`，最新证据见 `docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md`。
 - **GitHub**: https://github.com/zhurong2020/pyobfus (public)
