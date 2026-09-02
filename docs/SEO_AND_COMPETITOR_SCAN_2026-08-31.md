@@ -18,7 +18,7 @@ Trigger: user request (competitor recheck + SEO/GEO keyword planning), post
 
 | Tool | State | Delta vs last scan | Threat |
 |---|---|---|---|
-| **PyArmor** | 9.2.7 (docs dated 2026-08-14); last PyPI release 2026-07-23. Still the v9 line (RFT/BCC/VMC/ECC modes, "PyArmor CI" license, readonly obfuscated module). | Incremental only; no new architecture since v9 (Oct 2024). VMC/ECC function-body virtualization already captured in `COMPARISON.md`. | Unchanged. Still the "maximum protection" incumbent; still no AI-debuggability, no MCP, no VS Code extension. |
+| **PyArmor** | 9.2.6 (PyPI, 2026-07-23). Still the v9 line (RFT/BCC/VMC/ECC modes, "PyArmor CI" license, readonly obfuscated module). | Incremental only; no new architecture since v9 (Oct 2024). VMC/ECC function-body virtualization already captured in `COMPARISON.md`. The earlier 9.2.7 statement was corrected on 2026-09-02 against official PyPI metadata. | Unchanged. Still the "maximum protection" incumbent; still no AI-debuggability, no MCP, no VS Code extension. |
 | **Nuitka Commercial** | Traceback encryption still **symmetric-only** ("asymmetric planned"); data-hiding plugin encrypts constants. Core stays Apache-2.0. | No change — matches the P2-23 finding already in `COMPARISON.md` (pyobfus's RSA+AES hybrid `--scrub-traceback` is stronger on this one axis). | Unchanged. Different category (compile-to-C). |
 | **Cython** | No obfuscation-relevant change. | — | Unchanged. |
 | **Oxyry** (online) | Still online-only name mangling. | — | Unchanged. |

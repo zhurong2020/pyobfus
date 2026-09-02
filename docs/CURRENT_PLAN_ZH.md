@@ -663,6 +663,35 @@ provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
    - 必须有 rate limit、audit log、无 token passthrough。
    - 不牺牲本地 stdio MCP 的可靠性。
 
+### 🆕 2026-09-02 功能扩展调研
+
+完整证据与候选取舍见
+[`FEATURE_EXPANSION_RESEARCH_2026-09-02.md`](FEATURE_EXPANSION_RESEARCH_2026-09-02.md)。
+本轮覆盖 PyArmor/Nuitka 最新状态、公开用户问题、Python 3.14 远程调试、SARIF、
+GitHub Copilot Skills/MCP、长时 Agent 与 MCP 新路线；未发现支持新增混淆算法、
+delivery archive、hosted MCP 或 license portal 的真实需求。
+
+当前推荐顺序：
+
+1. **P1：`--check` SARIF 2.1.0 输出**——复用现有 preflight engine，把结果接入
+   PR/code scanning；保持 JSON/exit code 兼容，禁止在 SARIF 泄露 literal、绝对
+   路径、mapping 或 license 数据。先设计稳定 rule ID / fingerprint，再实现。
+2. **P1：只读 preflight review Skill/template**——面向 `.github/skills/` 与通用
+   Skill 客户端，只运行 check/读取 dry-run plan，不混淆、不写交付物、不执行
+   arbitrary verify command；与现有 mutating `pyobfus-protect` Skill 分工。
+3. **P1 small：Python 3.14 PEP 768 remote-debug advisory**——提示受保护部署使用
+   `-X disable_remote_debug` / `PYTHON_DISABLE_REMOTE_DEBUG=1`；不得声称现有
+   anti-debug 注入能关闭必须在解释器启动时控制的机制。
+4. **P2：MCP 官方 conformance evidence**——先跑测试并记录支持基线；当前 stdio
+   server 不因 roadmap 存在就实现 Tasks、elicitation、OAuth 或 Server Card。
+5. **继续 hold**：import/runtime verifier 扩展、installer/bundle、hosted MCP、
+   mapping 加密和新 transform，等待具体失败案例或重复用户需求。
+
+竞品事实纠正：官方 PyPI 当前 PyArmor 最新仍为 9.2.6（2026-07-23），上次扫描
+写成 9.2.7 属错误，已在扫描文档修正。Nuitka 4.2 新增 Python 3.14 正式支持、
+3.15 初步支持和跨平台 installer，但它强化的是“组合与验证报告”方向，不改变
+pyobfus 不追 compiler/installer 主线的判断。
+
 ## 明确不做
 
 - 不把 PyArmor-style BCC/JIT/Themida/VMC 作为 v0.6 主线。
