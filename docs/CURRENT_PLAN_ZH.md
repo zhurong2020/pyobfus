@@ -76,12 +76,12 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
   0.5.13→0.5.19。其余候选（`AGENTS.md` / `pyobfus_mcp/README.md` 8 工具表 /
   `skills/pyobfus-protect/SKILL.md` / `templates/ai-integration/` / `_drafts/`
   0.4.0 营销稿 / 归档 docs）逐个核实无需改。
-- 主包：`pyobfus 0.5.18` 已发布（2026-08-28）——`--check` 可解析有效项目
-  配置并报告 `effective_config` / `excluded_findings`，在不改变 high finding 与
-  exit code 的前提下解释配置已缓解的风险。
-- MCP 包：`pyobfus-mcp 0.3.9` 已发布（2026-08-28）——
-  `check_obfuscation_risks` 新增默认开启的 `use_project_config`，并将依赖下限
-  提升到 `pyobfus>=0.5.18`；VS Code 扩展本轮无改动。
+- 主包：当前 `pyobfus 0.5.20`（2026-09-01）；最新运行时能力仍来自 0.5.19
+  的结构化 dry-run plan 与 syntax-only 构建后验证，以及 0.5.18 的配置感知
+  `--check`。0.5.20 只更新发现元数据和 README/FAQ，不改变运行时。
+- MCP 包：当前 `pyobfus-mcp 0.3.10`（2026-09-01，Registry 于 09-02 补发布）；
+  最新工具能力仍来自 0.3.9 的默认开启 `use_project_config`，依赖下限为
+  `pyobfus>=0.5.18`。0.3.10 只更新发现元数据，工具行为和 schemas 不变。
 - VS Code 扩展：`0.4.1` 已 tag + GitHub Release 发布（P2-33，"Why trust this
   extension" 小节强化 Nx Console 事件对比 + CodeQL/CI 签名信号），**Marketplace
   手工上传也已由用户完成**——微软 "[Succeeded]" 确认邮件已收到，公开 listing

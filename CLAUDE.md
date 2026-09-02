@@ -79,16 +79,16 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   [`docs/SEO_AND_COMPETITOR_SCAN_2026-08-31.md`](docs/SEO_AND_COMPETITOR_SCAN_2026-08-31.md)，
   Wave A/B/C 均已落地，Wave C 随 Core 0.5.20 / MCP 0.3.10 发布。
   相关外部状态已于 2026-09-02 全部收口；下一功能方向仍须用户 gate。
-- 2026-08-30/31 session 的产出已 push（自 `b39e0b0` 起一串 `docs:`/`release:` commit：
-  0.5.19 发布 → 两轮 docs cleanup（llms 孪生对账 + Home 页刷新）→ 竞品扫描 +
-  SEO/长尾词规划 → 把 SEO rollout 排入 TODO），tag `v0.5.19` 在 origin，工作区
-  当时干净。2026-09-01 客户 receipt 交付后的文档同步已由 commit `f2f691a`
-  推送。**逐轮明细与活的 `origin/main` tip 一律以 `docs/CURRENT_PLAN_ZH.md` +
+- 2026-08-30 至 09-02 的发布与收尾均已 push：0.5.19 功能版、两轮 docs
+  cleanup、竞品/SEO 规划、Core 0.5.20 / MCP 0.3.10 SEO 小版本，以及
+  0.3.10 MCP Registry 补发布和文档收口。当前工作树与 `origin/main` 状态应在
+  cold-start 时重新核实，不依赖这里冻结的 commit 列表。**逐轮明细与活的
+  `origin/main` tip 一律以 `docs/CURRENT_PLAN_ZH.md` +
   `~/projects/WORK_LOG_INDEX.md` 顶行为准**（每轮追加）。此前 session 的 Stripe
   交接、配置感知实现和 HOME 隔离测试也均已 push。冷启动后先读
-  `docs/CURRENT_PLAN_ZH.md`；发票事项已结案，客户回访只等待来信，当前主动主线
-  是已排期的长尾词/AI 搜索优化 rollout。除非用户明确 gate，不启动其它功能实现
-  或发布。外部手工项仍是 Canopii claim/rescan、Claude plugin pending 观察，并在
+  `docs/CURRENT_PLAN_ZH.md`；发票与 SEO 发版均已结案，客户回访只等待来信。
+  除非用户明确 gate，不启动其它功能实现或发布。外部手工项仍是 Canopii
+  claim/rescan、Claude plugin pending 观察，并在
   1–2 周后复查下载；若 9 月 1–7 日仍无 advisory 反馈，再考虑 GitHub Discussion
   投票。
 
