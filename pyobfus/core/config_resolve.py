@@ -31,14 +31,14 @@ def resolve_effective_config(
     *,
     config_path: Optional[str],
     preset: Optional[str],
-    level: str,
+    level: Optional[str],
     cwd: Path,
     no_config: bool = False,
 ) -> Tuple[ObfuscationConfig, ConfigProvenance]:
     """Resolve config using the build CLI's explicit/discovery/preset precedence."""
     if no_config:
         config = ObfuscationConfig.community_edition()
-        return config, ConfigProvenance("none", None, None, level, None)
+        return config, ConfigProvenance("none", None, None, config.level, None)
 
     selected_path = Path(config_path) if config_path else None
     source = "explicit-config" if selected_path else ""

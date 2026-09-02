@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Cross-file (default directory) mode no longer silently drops content-level
+  transforms.** Running `pyobfus src/ -o dist/` previously applied only
+  name/import mapping and quietly skipped string encoding, numeric
+  obfuscation, AI-marker stripping, control-flow flattening, AES string
+  encryption, anti-debug and dead-code injection — the build reported
+  `status: success` with no warning, so `--string-encryption` and the
+  `commercial`/`library`/`trial`/`maximum` presets became no-ops on
+  directories. The per-file content pipeline is now shared between the
+  single-file and cross-file paths via `pyobfus.core.content_transforms`, so
+  the two modes cannot diverge, and directory-mode JSON stats report the same
+  transform counts as single-file mode. Build-fusion mechanisms
+  (`--selective-opacity`/`--seal-code`/`--vault`/`--scrub-traceback`/
+  `--fingerprint`) remain single-file / `--no-cross-file` only, and the CLI
+  note now says so accurately.
+- **Pro presets no longer degrade to community output without an explicit
+  `--level pro`.** `config.level` was overwritten unconditionally by the
+  `--level` default, so `--preset commercial` (and every other Pro preset)
+  produced only name-mangled output unless `--level pro` was also passed.
+  `--level` is now tri-state (default = not passed), matching the issue #25
+  fix for `--remove-docstrings`; a preset's or config file's level survives
+  when `--level` is omitted, while passing it still forces the level.
+
 ## [0.5.20] - 2026-09-01
 
 ### Changed

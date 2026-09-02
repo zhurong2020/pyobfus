@@ -587,7 +587,7 @@ class TestParallelProcessing:
         global_table = GlobalSymbolTable()
         global_table.register_export("module", "my_func", "I0")
 
-        module_name, error = _transform_single_file(
+        module_name, error, file_stats = _transform_single_file(
             tmp_path / "module.py",
             Path("module.py"),
             "module",
@@ -614,7 +614,7 @@ class TestParallelProcessing:
 
         global_table = GlobalSymbolTable()
 
-        module_name, error = _transform_single_file(
+        module_name, error, file_stats = _transform_single_file(
             tmp_path / "bad.py",
             Path("bad.py"),
             "bad",

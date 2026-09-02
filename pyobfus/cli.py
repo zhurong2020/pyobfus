@@ -23,6 +23,7 @@ from pyobfus.constants import (
 )
 from pyobfus.config_templates import get_template, list_templates
 from pyobfus.config_validator import validate_config_file, find_config_file
+from pyobfus.core import content_transforms
 from pyobfus.core.analyzer import SymbolAnalyzer
 from pyobfus.core.generator import CodeGenerator
 from pyobfus.core.parser import ASTParser
@@ -85,8 +86,8 @@ except ImportError:
 @click.option(
     "--level",
     type=click.Choice(["community", "pro"], case_sensitive=False),
-    default="community",
-    help="Obfuscation level (default: community)",
+    default=None,
+    help="Obfuscation level (default: community, or the preset/config level)",
 )
 @click.option(
     "--remove-docstrings/--keep-docstrings",
@@ -406,7 +407,7 @@ def main(
     init_config_template: Optional[str],
     validate_config_path: Optional[str],
     verify_provenance_manifest_path: Optional[str],
-    level: str,
+    level: Optional[str],
     remove_docstrings: Optional[bool],
     remove_comments: Optional[bool],
     name_prefix: str,
@@ -717,11 +718,14 @@ def main(
             else:
                 config = ObfuscationConfig.community_edition()
 
-        # Override config with CLI options. The three flags below are
-        # tri-state (None = not passed) so an explicit preset/config choice
-        # (e.g. preset_safe's remove_docstrings=False) survives when the
-        # user doesn't also pass the matching CLI flag. See issue #25.
-        config.level = level
+        # Override config with CLI options. The flags below are tri-state
+        # (None = not passed) so an explicit preset/config choice survives when
+        # the user doesn't also pass the matching CLI flag. See issue #25.
+        # --level is tri-state too: passing it forces the level, but omitting it
+        # must NOT clobber a preset's level (e.g. --preset commercial => pro),
+        # otherwise every Pro preset silently degrades to community output.
+        if level is not None:
+            config.level = level
         if remove_docstrings is not None:
             config.remove_docstrings = remove_docstrings
         if remove_comments is not None:
@@ -883,9 +887,14 @@ def main(
 
             if fusion_requested and cross_file and Path(input_path).is_dir():
                 click.echo(
-                    "Note: v0.5.1 Pro mechanisms run per-file and (like existing "
-                    "Pro features) are not applied in cross-file directory mode. "
-                    "Use --no-cross-file or a single file.",
+                    "Note: the v0.5.1 build-fusion mechanisms "
+                    "(--selective-opacity / --seal-code / --vault / "
+                    "--scrub-traceback / --fingerprint) operate on generated "
+                    "source and are not applied in cross-file directory mode. "
+                    "Use --no-cross-file or a single file for those. Other Pro "
+                    "and content transforms (control-flow, string encryption, "
+                    "anti-debug, dead-code, numeric, AI-marker stripping) do "
+                    "apply in directory mode.",
                     err=True,
                 )
 
@@ -1132,7 +1141,7 @@ def main(
             _display_stats(obfuscation_stats, config)
 
         # Subtle Pro feature hint (only for Community users without trial)
-        if level == "community" and not PRO_AVAILABLE and not is_trial_active():
+        if config.level == "community" and not PRO_AVAILABLE and not is_trial_active():
             click.echo("\nTip: Try Pro FREE for 5 days - AES-256 encryption & anti-debugging")
             click.echo("     Start trial: pyobfus-trial start")
 
@@ -1259,21 +1268,12 @@ def _obfuscate_file(
 
     # 0. Strip AI provenance markers (Community - if enabled). Runs first so it
     # sees original docstrings and dunder names before mangling rewrites them.
-    if config.strip_ai_artifacts:
-        from pyobfus.transformers.ai_artifact_stripper import AIArtifactStripper
-
-        ai_stripper = AIArtifactStripper(config, analyzer)
-        transformed_tree = ai_stripper.transform(transformed_tree)
-        ai_stats = ai_stripper.get_statistics()
-        file_stats["ai_docstrings_stripped"] = ai_stats.get("docstrings_stripped", 0)
-        file_stats["ai_attributions_stripped"] = ai_stats.get("attributions_stripped", 0)
-
-        if verbose:
-            click.echo(
-                f"  AI artifacts stripped: "
-                f"{ai_stats['docstrings_stripped']} docstring(s), "
-                f"{ai_stats['attributions_stripped']} attribution(s)"
-            )
+    # Shared with the cross-file path via pyobfus.core.content_transforms so the
+    # two modes cannot silently diverge on which transforms run.
+    _echo = click.echo if verbose else None
+    transformed_tree = content_transforms.strip_ai_markers(
+        transformed_tree, config, analyzer, file_stats, echo=_echo
+    )
 
     # 1. Name mangling (always applied)
     mangler = NameMangler(config, analyzer)
@@ -1296,131 +1296,22 @@ def _obfuscate_file(
         if verbose:
             click.echo(f"  Wrote mapping: {save_mapping_path}")
 
-    # 2. String encoding (Community Edition - if enabled)
-    if config.string_encoding and config.level == "community":
-        from pyobfus.transformers.string_encoder import StringEncoder
-
-        string_encoder = StringEncoder(config, analyzer)
-        transformed_tree = string_encoder.transform(transformed_tree)
-        encoder_stats = string_encoder.get_statistics()
-        file_stats["strings_encoded"] = encoder_stats.get("encoded_strings", 0)
-
+    # 2. Post-mangle content transforms: string encoding + numeric (Community)
+    #    then the Pro block (control-flow, import obfuscation, AES string
+    #    encryption, anti-debug, dead-code, license embedding). Shared with the
+    #    cross-file directory path via pyobfus.core.content_transforms.
+    transformed_tree = content_transforms.apply_content_transforms(
+        transformed_tree, config, analyzer, file_stats, echo=_echo
+    )
+    if file_stats.get("_pro_import_error"):
+        click.echo(
+            f"\n⚠️  Pro features not available: {file_stats.pop('_pro_import_error')}",
+            err=True,
+        )
+        click.echo("Please ensure pyobfus Pro is properly installed.", err=True)
         if verbose:
-            click.echo(f"  Encoded strings: {encoder_stats['encoded_strings']}")
-            if encoder_stats["skipped_fstrings"] > 0:
-                click.echo(f"  Skipped f-strings: {encoder_stats['skipped_fstrings']}")
-
-    # 2.5 Numeric / constant obfuscation (Community Edition - if enabled)
-    # Runs after string encoding so the float.fromhex() hex strings it emits
-    # are not themselves re-encoded; runs after name mangling so the injected
-    # `float` builtin reference is never renamed.
-    if config.numeric_obfuscation:
-        from pyobfus.transformers.numeric_obfuscator import NumericObfuscator
-
-        numeric_obfuscator = NumericObfuscator(config, analyzer)
-        transformed_tree = numeric_obfuscator.transform(transformed_tree)
-        numeric_stats = numeric_obfuscator.get_statistics()
-        file_stats["numbers_obfuscated"] = numeric_stats.get("numbers_obfuscated", 0)
-
-        if verbose:
-            click.echo(f"  Numbers obfuscated: {numeric_stats['numbers_obfuscated']}")
-
-    # 3. Pro features (if enabled)
-    if config.level == "pro":
-        try:
-            # Control Flow Flattening
-            if config.control_flow_flattening:
-                from pyobfus_pro.control_flow import ControlFlowFlattener
-
-                cff = ControlFlowFlattener()
-                transformed_tree = cff.visit(transformed_tree)
-                file_stats["control_flow_applied"] = 1
-
-                if verbose:
-                    click.echo("  Control flow flattening: Applied")
-
-            # Import obfuscation (runtime importlib + encrypted import strings)
-            if config.import_obfuscation:
-                from pyobfus_pro.import_obfuscation import ImportObfuscator
-
-                import_obfuscator = ImportObfuscator()
-                transformed_tree = import_obfuscator.transform(transformed_tree)
-                import_stats = import_obfuscator.get_statistics()
-                file_stats["imports_obfuscated"] = import_stats.get("imports_obfuscated", 0)
-
-                if verbose:
-                    click.echo(f"  Imports obfuscated: {import_stats['imports_obfuscated']}")
-
-            # String encryption (AES-256)
-            if config.string_encryption:
-                from pyobfus_pro.string_aes import StringAESEncryptor
-
-                string_encryptor = StringAESEncryptor(config, analyzer)
-                transformed_tree = string_encryptor.transform(transformed_tree)
-                encryptor_stats = string_encryptor.get_statistics()
-                file_stats["strings_encrypted"] = encryptor_stats.get("encrypted_strings", 0)
-
-                if verbose:
-                    click.echo(f"  Encrypted strings: {encryptor_stats['encrypted_strings']}")
-
-            # Anti-debugging checks
-            if config.anti_debug:
-                from pyobfus_pro.anti_debug import AntiDebugInjector
-
-                anti_debug = AntiDebugInjector(config, analyzer)
-                transformed_tree = anti_debug.transform(transformed_tree)
-                anti_debug_stats = anti_debug.get_statistics()
-                file_stats["anti_debug_checks"] = anti_debug_stats.get("injected_functions", 0) + 1
-
-                if verbose:
-                    click.echo(f"  Anti-debug checks: {anti_debug_stats['injected_functions'] + 1}")
-
-            # Dead Code Injection
-            if config.dead_code_injection:
-                from pyobfus_pro.dead_code import DeadCodeInjector
-
-                dead_code_injector = DeadCodeInjector()
-                transformed_tree = dead_code_injector.visit(transformed_tree)
-                dci_stats = dead_code_injector.get_statistics()
-                file_stats["dead_code_injected"] = dci_stats.get("injected_statements", 0)
-
-                if verbose:
-                    click.echo(
-                        f"  Dead code injection: {dci_stats['injected_statements']} statements"
-                    )
-
-            # License Embedding (applied last to inject at module start)
-            license_embed_enabled = (
-                config.license_expire or config.license_bind_machine or config.license_max_runs > 0
-            )
-            if license_embed_enabled:
-                from pyobfus_pro.license_embed import LicenseEmbedder, LicenseEmbedConfig
-
-                embed_config = LicenseEmbedConfig(
-                    expire_date=config.license_expire,
-                    bind_machine=config.license_bind_machine,
-                    max_runs=config.license_max_runs,
-                )
-                license_embedder = LicenseEmbedder(embed_config)
-                transformed_tree = license_embedder.visit(transformed_tree)
-
-                if verbose:
-                    embed_info = []
-                    if config.license_expire:
-                        embed_info.append(f"expires {config.license_expire}")
-                    if config.license_bind_machine:
-                        fp = license_embedder.get_current_fingerprint()
-                        embed_info.append(f"bound to {fp[:8]}...")
-                    if config.license_max_runs > 0:
-                        embed_info.append(f"max {config.license_max_runs} runs")
-                    click.echo(f"  License embedding: {', '.join(embed_info)}")
-
-        except ImportError as e:
-            click.echo(f"\n⚠️  Pro features not available: {e}", err=True)
-            click.echo("Please ensure pyobfus Pro is properly installed.", err=True)
-            if verbose:
-                click.echo("Pro features require additional modules in pyobfus_pro/", err=True)
-            # Continue with Community Edition features only
+            click.echo("Pro features require additional modules in pyobfus_pro/", err=True)
+        # Continue with Community Edition features only
 
     # Generate code
     obfuscated_code = CodeGenerator.generate(transformed_tree)
@@ -1655,6 +1546,13 @@ def _obfuscate_directory_crossfile(
             output_dir,
             progress_callback=_progress,
         )
+
+        # Merge the per-file content-transform counts (string encoding, numeric,
+        # control-flow, string encryption, anti-debug, dead-code, AI stripping)
+        # that phase2 aggregated, so directory-mode JSON stats report the same
+        # keys as single-file mode.
+        for key, value in orchestrator.content_stats.items():
+            dir_stats[key] = dir_stats.get(key, 0) + value
 
         if not verbose and total > 0:
             click.echo()  # newline after progress
@@ -2196,7 +2094,7 @@ def _handle_check(
     offline: bool = False,
     config_path: Optional[str] = None,
     preset: Optional[str] = None,
-    level: str = "community",
+    level: Optional[str] = None,
     no_config: bool = False,
 ) -> None:
     """

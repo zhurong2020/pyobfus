@@ -13,6 +13,7 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 from dataclasses import dataclass
 
 from pyobfus.config import ObfuscationConfig
+from pyobfus.core import content_transforms
 from pyobfus.core.global_table import GlobalSymbolTable
 from pyobfus.core.export_detector import ExportDetector
 from pyobfus.core.generator import CodeGenerator
@@ -35,21 +36,35 @@ def _transform_single_file(
     input_dir: Path,
     output_dir: Path,
     global_table: "GlobalSymbolTable",
-) -> Tuple[str, Optional[str]]:
+    config: Optional[ObfuscationConfig] = None,
+) -> Tuple[str, Optional[str], Dict[str, int]]:
     """
     Transform a single file using the global symbol table.
 
     This is a module-level function so it can be used with ProcessPoolExecutor.
 
+    Applies the cross-file name/import mapping AND — when ``config`` is given —
+    the shared per-file content transforms (AI-marker stripping, string
+    encoding, numeric obfuscation, and the Pro block) via
+    :mod:`pyobfus.core.content_transforms`, so directory mode matches
+    single-file mode instead of silently dropping those transforms.
+
     Returns:
-        Tuple of (module_name, error_message_or_None)
+        Tuple of (module_name, error_message_or_None, per_file_stats)
     """
+    file_stats: Dict[str, int] = {}
     try:
         with open(file_path, "r", encoding="utf-8") as f:
             source = f.read()
 
         original_tree = ast.parse(source)
         tree = ast.parse(source)
+
+        # Strip AI provenance markers BEFORE name mangling, so the stripper
+        # sees the original docstrings and attribution dunder names (matches
+        # the single-file transform order).
+        if config is not None:
+            tree = content_transforms.strip_ai_markers(tree, config, None, file_stats)
 
         # Collect imported names from original tree
         import_collector = ImportCollector(global_table, module_name)
@@ -94,6 +109,11 @@ def _transform_single_file(
         )
         tree = all_updater.visit(tree)
 
+        # Post-mangle content transforms (string encoding, numeric, Pro block).
+        # Shared with the single-file path so the two modes cannot diverge.
+        if config is not None:
+            tree = content_transforms.apply_content_transforms(tree, config, None, file_stats)
+
         ast.fix_missing_locations(tree)
         new_source = CodeGenerator.generate(tree)
 
@@ -102,9 +122,9 @@ def _transform_single_file(
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(new_source)
 
-        return (module_name, None)
+        return (module_name, None, file_stats)
     except Exception as e:
-        return (module_name, str(e))
+        return (module_name, str(e), file_stats)
 
 
 @dataclass
@@ -187,6 +207,11 @@ class CrossFileOrchestrator:
         # Name generator state
         self._name_counter: int = 0
         self._name_prefix: str = config.name_prefix
+
+        # Aggregated per-file content-transform stats from phase2 (string
+        # encoding, numeric, control-flow, string encryption, anti-debug,
+        # dead-code, AI-marker stripping). Populated by phase2_transform.
+        self.content_stats: Dict[str, int] = {}
 
     def obfuscate(self, input_dir: Path, output_dir: Path) -> ObfuscationResult:
         """
@@ -308,6 +333,7 @@ class CrossFileOrchestrator:
         """
         output_dir.mkdir(parents=True, exist_ok=True)
         errors: List[str] = []
+        self.content_stats = {}
 
         max_workers = self.config.max_workers
         use_parallel = max_workers != 1 and len(self.files) > 1
@@ -324,31 +350,46 @@ class CrossFileOrchestrator:
                         input_dir,
                         output_dir,
                         self.global_table,
+                        self.config,
                     ): fi
                     for fi in self.files
                 }
                 for future in as_completed(futures):
-                    module_name, error = future.result()
+                    module_name, error, file_stats = future.result()
+                    self._accumulate_content_stats(file_stats)
                     if error:
                         errors.append(f"{module_name}: {error}")
                     if progress_callback:
                         progress_callback(module_name, error)
         else:
             for file_info in self.files:
-                module_name, error = _transform_single_file(
+                module_name, error, file_stats = _transform_single_file(
                     file_info.path,
                     file_info.relative_path,
                     file_info.module_name,
                     input_dir,
                     output_dir,
                     self.global_table,
+                    self.config,
                 )
+                self._accumulate_content_stats(file_stats)
                 if error:
                     errors.append(f"{module_name}: {error}")
                 if progress_callback:
                     progress_callback(module_name, error)
 
         return errors
+
+    def _accumulate_content_stats(self, file_stats: Dict[str, int]) -> None:
+        """Sum per-file content-transform counts into ``self.content_stats``.
+
+        Skips private bookkeeping keys (leading underscore, e.g.
+        ``_pro_import_error``) and any non-numeric values.
+        """
+        for key, value in file_stats.items():
+            if key.startswith("_") or not isinstance(value, int):
+                continue
+            self.content_stats[key] = self.content_stats.get(key, 0) + value
 
     def _discover_files(self, input_dir: Path) -> List[FileInfo]:
         """
