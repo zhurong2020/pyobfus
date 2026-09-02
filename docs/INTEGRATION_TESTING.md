@@ -1,170 +1,95 @@
-# 跨项目集成测试指南
+# 集成测试指南
 
-本指南说明如何在 pyobfus 环境中直接测试 ml-research 或其他外部项目的模块。
+本指南说明如何在不发布到 PyPI 的前提下，用**真实项目代码**测试 pyobfus —— 既
+包括仓库自带的端到端测试，也包括拿你自己的代码库做验证的日常工作流。
 
 ## 🎯 目标
 
-- ✅ 不离开 pyobfus 开发环境
-- ✅ 不需要上传到 PyPI
-- ✅ 快速迭代和测试
-- ✅ 使用真实项目的代码
+- ✅ 不需要先上传 PyPI 再安装（用可编辑安装即时生效）
+- ✅ 用真实代码验证混淆是否**语法正确、可运行、行为不变**
+- ✅ 快速迭代：改完 pyobfus 源码立刻重测
 
-## 🚀 快速开始
-
-### 1. 配置路径
-
-编辑以下文件中的 `ML_RESEARCH_PATH`：
-
-```python
-# scripts/test_ml_research.py
-ML_RESEARCH_PATH = Path(r"c:\path\to\your\ml-research")
-
-# integration_tests/test_external_projects.py
-ML_RESEARCH_PATH = Path(r"c:\path\to\your\ml-research")
-```
-
-### 2. 安装开发版本
+## 🚀 环境准备
 
 ```bash
-# 在 pyobfus 目录中
-pip install -e .
+python -m venv venv && source venv/bin/activate
+pip install -e ".[dev]"
 ```
 
-### 3. 开始测试
+可编辑安装（`-e`）后，对 `pyobfus/` 源码的任何修改都会立即在 `pyobfus`
+命令与 `python -m pyobfus` 中生效，无需重新安装、无需版本号、不污染 PyPI。
+
+## 🧪 仓库自带的端到端测试
+
+集成测试位于 `integration_tests/test_cli_end_to_end.py`。它**以子进程方式驱动
+真实安装的 CLI**（`python -m pyobfus ...`），而不是直接调用内部函数，因此覆盖
+的是用户实际运行的路径。当前覆盖：
+
+- CLI 可用性：`--version` / `--help`
+- 单文件混淆：混淆后仍能执行、输出与源码不同、字节码可编译
+- 目录混淆：配合 `pyobfus.yaml` 的多文件项目
+- 错误处理：缺失输入等场景干净退出
+
+运行（作为独立 pytest 根，与核心套件分开收集）：
 
 ```bash
-# 方法 1: 使用便捷脚本（最简单）
-python scripts/test_ml_research.py your_module.py
-
-# 方法 2: 使用 pytest
-pytest integration_tests/ -v
-
-# 方法 3: 交互式测试
-jupyter notebook integration_tests/interactive_testing.ipynb
+venv/bin/pytest integration_tests/ -v
 ```
 
-## 📖 使用方法
+> 说明：核心套件 `tests/`、MCP 套件 `pyobfus_mcp/tests/`、端到端套件
+> `integration_tests/` 是**三个独立的 pytest 根**，CI 也分成独立 job 跑，不要
+> 用一次 `pytest` 同时指向多个根。详见 [`AGENTS.md`](https://github.com/zhurong2020/pyobfus/blob/main/AGENTS.md) 的 build/test 小节。
 
-### 方法 1: 便捷脚本（推荐日常使用）
+## 🔧 用你自己的代码库做验证
+
+不需要专门的辅助脚本 —— 直接对目标项目（的副本）跑 CLI 即可。建议按下面的
+顺序逐层加码：
+
+### 1. 先做预检（不写文件）
 
 ```bash
-# 测试单个文件
-python scripts/test_ml_research.py data_loader.py
-
-# 详细输出
-python scripts/test_ml_research.py data_loader.py -v
-
-# 保存混淆结果
-python scripts/test_ml_research.py data_loader.py -o output.py
-
-# 批量测试
-python scripts/test_ml_research.py --all
-python scripts/test_ml_research.py --all --max-files 20
+pyobfus --check /path/to/your/project --json
 ```
 
-### 方法 2: pytest（推荐自动化测试）
+`--check` 会在真正混淆前标出 `eval`/`exec`、动态属性访问、框架反射点，以及声明
+了却在公共 PyPI 上解析不到的依赖名。JSON 输出便于脚本化判断。
+
+### 2. 预览计划（不写文件）
 
 ```bash
-# 运行所有集成测试
-pytest integration_tests/ -v
-
-# 测试特定功能
-pytest integration_tests/test_external_projects.py::TestMLResearchModules -v
+pyobfus /path/to/your/project -o /tmp/out --dry-run --json
 ```
 
-### 方法 3: Python 脚本
+`--dry-run --json` 返回带版本号的 `plan` 对象：生效配置、被选中/被排除的文件
+及原因、以及产物的交付角色，全程不写盘。
 
-```python
-from integration_tests.test_external_projects import obfuscate_ml_research_module
-
-# 混淆单个模块
-code = obfuscate_ml_research_module("your_module.py")
-print(code)
-
-# 保存到文件
-code = obfuscate_ml_research_module(
-    "your_module.py",
-    output_path="obfuscated/output.py"
-)
-```
-
-### 方法 4: Jupyter Notebook（推荐探索和调试）
+### 3. 实际混淆 + 构建后语法校验
 
 ```bash
-# 启动 notebook
-jupyter notebook integration_tests/interactive_testing.ipynb
+pyobfus /path/to/your/project -o /tmp/out --verify-syntax --json
 ```
 
-在 notebook 中可以交互式地测试和调试。
+`--verify-syntax` 在写盘后于内存中 `compile()` 生成的 `.py`（不 import、不执行、
+不写 `__pycache__`），报告 `syntax_valid`。
 
-## 💡 典型工作流
+### 4. 验证行为不变（最重要的一步）
 
-### 场景 1: 开发新功能
-
-```bash
-# 1. 修改 pyobfus 代码
-vim pyobfus/transformers/new_feature.py
-
-# 2. 单元测试
-pytest tests/test_new_feature.py
-
-# 3. 集成测试（使用 ml-research）
-python scripts/test_ml_research.py test_module.py -v
-
-# 4. 发现问题，回到步骤 1
-# 5. 修改后立即重新测试（无需重新安装！）
-```
-
-### 场景 2: 修复 Bug
-
-```bash
-# 1. 复现问题
-python scripts/test_ml_research.py problematic_module.py -v
-
-# 2. 查看详细错误信息
-# 3. 修复代码
-# 4. 重新测试
-python scripts/test_ml_research.py problematic_module.py -v
-
-# 5. 验证修复
-python scripts/test_ml_research.py --all
-```
-
-### 场景 3: 发布前验证
-
-```bash
-# 1. 运行所有测试
-pytest tests/ -v
-pytest integration_tests/ -v
-
-# 2. 批量测试真实项目
-python scripts/test_ml_research.py --all --max-files 50
-
-# 3. 检查结果
-# ✅ Successful: 48/50
-# ❌ Failed: 2/50
-
-# 4. 修复失败的案例
-# 5. 重新测试
-```
-
-## 🔧 自定义测试
-
-### 添加特定模块测试
-
-编辑 `integration_tests/test_external_projects.py`：
-
-```python
-def test_specific_ml_modules(self):
-    modules_to_test = [
-        "data_loader.py",
-        "model_trainer.py",
-        "utils/preprocessing.py",
-    ]
-    # ... 测试逻辑
-```
+混淆的正确性最终要靠**运行目标项目自己的测试套件**来判断：把混淆产物放到
+`PYTHONPATH` 前面，或安装到一个干净的 venv，然后跑该项目的 pytest / 冒烟脚本，
+确认结果与混淆前一致。跨文件项目请注意：顶层公开名会被改名，用
+`--save-mapping mapping.json` 保存映射，需要反解生产环境 traceback 时配合
+`pyobfus --unmap --trace error.log --mapping mapping.json`。
 
 ### 自定义混淆配置
+
+日常用配置文件（`pyobfus.yaml`）或 preset 最省事：
+
+```bash
+pyobfus /path/to/your/project -o /tmp/out --config pyobfus.yaml
+pyobfus --init /path/to/your/project        # 自动探测框架，生成 pyobfus.yaml
+```
+
+也可以在 Python 里构造配置对象直接调库：
 
 ```python
 from pyobfus.config import ObfuscationConfig
@@ -172,75 +97,71 @@ from pyobfus.config import ObfuscationConfig
 config = ObfuscationConfig()
 config.string_encoding = True
 config.preserve_param_names = True
-config.add_exclude_name("important_function")
+config.exclude_names.add("important_function")
 ```
 
-## 📊 对比：传统方法 vs 新方法
+## 💡 典型工作流（改 pyobfus 源码时）
 
-| 特性 | 传统方法 | 新方法（集成测试） |
-|------|---------|-----------------|
-| **环境** | 需要切换项目 | 留在 pyobfus 中 |
-| **安装** | 上传 PyPI 再安装 | 可编辑安装 (pip install -e .) |
-| **迭代速度** | 慢（上传+安装） | 快（即时生效） |
-| **PyPI 污染** | 是 | 否 |
-| **版本管理** | 需要新版本号 | 无需版本号 |
-| **调试** | 困难 | 容易（详细输出） |
-| **自动化** | 困难 | 容易（pytest） |
+```bash
+# 1. 修改 pyobfus 代码（可编辑安装，改完即生效）
+vim pyobfus/transformers/some_transformer.py
 
-## 🎓 最佳实践
+# 2. 单元测试
+venv/bin/pytest tests/ -q
 
-1. **使用可编辑安装**: `pip install -e .`
-2. **先单元测试**: `pytest tests/`
-3. **再集成测试**: `python scripts/test_ml_research.py --all`
-4. **详细模式调试**: `-v` 标志查看详细信息
-5. **批量测试回归**: 发布前测试所有模块
-6. **保存测试结果**: 使用 `-o` 保存混淆后的代码
+# 3. 端到端测试
+venv/bin/pytest integration_tests/ -v
+
+# 4. 拿真实项目回归
+pyobfus --check /path/to/real/project --json
+pyobfus /path/to/real/project -o /tmp/out --verify-syntax --json
+#    然后在 /tmp/out 上跑该项目自己的测试确认行为不变
+```
+
+## ➕ 新增你自己的集成用例
+
+在 `integration_tests/` 下按现有 `test_cli_end_to_end.py` 的风格加测试即可 ——
+用 `run_cli(...)` 辅助函数以子进程驱动 CLI，断言退出码 / 输出 / 产物：
+
+```python
+def test_my_project_obfuscates_cleanly(tmp_path):
+    src = tmp_path / "src"
+    src.mkdir()
+    (src / "m.py").write_text("def f(x):\n    return x + 1\n")
+    out = tmp_path / "out"
+    result = run_cli(str(src), "-o", str(out), "--verify-syntax", "--json")
+    assert result.returncode == 0
+```
+
+## 📊 为什么用可编辑安装而不是「上传 PyPI 再装」
+
+| 特性 | 上传 PyPI 再安装 | 可编辑安装 (`pip install -e .`) |
+|------|------------------|-------------------------------|
+| 迭代速度 | 慢（上传 + 安装） | 快（改完即生效） |
+| PyPI 污染 | 是 | 否 |
+| 版本管理 | 需要新版本号 | 无需版本号 |
+| 调试 | 困难 | 容易（`-v` / `--json`） |
 
 ## 🐛 故障排除
 
-### 问题：找不到 ml-research
+**`ModuleNotFoundError: No module named 'pyobfus'`** —— 没做可编辑安装：
 
-```
-❌ ml-research project not found
-```
-
-**解决**: 更新脚本中的 `ML_RESEARCH_PATH`
-
-### 问题：导入错误
-
-```
-ModuleNotFoundError: No module named 'pyobfus'
-```
-
-**解决**: 
 ```bash
-pip install -e .
+pip install -e ".[dev]"
 ```
 
-### 问题：修改不生效
+**改了源码不生效** —— 当前环境不是可编辑安装：
 
-**原因**: 没有使用可编辑安装
-
-**解决**:
 ```bash
-pip uninstall pyobfus
-pip install -e .
+pip uninstall pyobfus && pip install -e ".[dev]"
 ```
+
+**`'pyobfus' is a package and cannot be directly executed`** —— 当前工作目录
+（或其兄弟目录）恰好叫 `pyobfus`，被 `python -m pyobfus` 抢先命中。换个工作
+目录运行，或直接用 `pyobfus` 命令而非 `python -m pyobfus`。
 
 ## 📚 相关文档
 
-- [integration_tests/README.md](integration_tests/README.md) - 详细使用说明
-- [scripts/test_ml_research.py](scripts/test_ml_research.py) - 便捷测试脚本
-- [integration_tests/test_external_projects.py](integration_tests/test_external_projects.py) - pytest 测试套件
-- [integration_tests/interactive_testing.ipynb](integration_tests/interactive_testing.ipynb) - 交互式测试
-
-## 🚀 下一步
-
-1. 配置你的 ml-research 路径
-2. 运行第一个测试
-3. 根据需要自定义测试
-4. 集成到 CI/CD（可选）
-
----
-
-**提示**: 这个测试方法适用于任何 Python 项目，不仅限于 ml-research！
+- [integration_tests/test_cli_end_to_end.py](https://github.com/zhurong2020/pyobfus/blob/main/integration_tests/test_cli_end_to_end.py) - 仓库内的端到端 CLI 集成测试
+- [AGENTS.md](https://github.com/zhurong2020/pyobfus/blob/main/AGENTS.md) - build/test/lint 约定（三个 pytest 根、Python 3.9–3.14 目标等）
+- [CURRENT_PLAN_ZH.md](CURRENT_PLAN_ZH.md) - 当前计划与冷启动入口

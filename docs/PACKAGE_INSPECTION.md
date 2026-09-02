@@ -318,10 +318,6 @@ for extra, deps in report['dependencies']['optional'].items():
 
 ## 示例脚本
 
-完整的示例脚本请参见：[examples/inspect_package.py](../examples/inspect_package.py)
-
-运行示例：
-```bash
-cd examples
-python inspect_package.py
-```
+本页各节的代码片段都是可直接运行的：把上面的 `generate_dependency_report`
+等函数复制到一个 `.py` 文件中，或粘进 `python` REPL 即可执行，无需额外的
+独立脚本。

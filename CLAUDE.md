@@ -91,8 +91,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   被动等待客户邮件，不主动追发；不能把单次开票需求提前解释为团队许可或企业功能
   需求。当前状态以 `docs/CURRENT_PLAN_ZH.md` 为准；具体客户/支付信息只留在
   Git 忽略的 `docs/internal/` 运营记录，绝不进入公开提交。
-- 下一轮功能方向已完成代码审计与官方资料调研，见
-  [`docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md`](docs/FEATURE_EXPANSION_RESEARCH_2026-08-26.md)。
+- 下一轮功能方向已完成代码审计与官方资料调研，最新一版见
+  [`docs/FEATURE_EXPANSION_RESEARCH_2026-09-02.md`](docs/FEATURE_EXPANSION_RESEARCH_2026-09-02.md)
+  （刷新并取代 2026-08-26 版）。
   配置感知 `--check`（0.5.18）、`--dry-run --json` versioned plan 与
   `--verify-syntax`（均 0.5.19，见本节首条）都已发布。暂不做任意
   `--verify-command`、zip/tar delivery bundle、mapping 内建加密或团队 license
