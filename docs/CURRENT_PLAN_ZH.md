@@ -105,6 +105,39 @@ Python 3.14 remote-debug advisory 为 P1，build report / marker 排在 P2。
 不得把 tag/CI/依赖解析尖峰误判为留存增长。正式版本号修改、tag、PyPI/GitHub
 Release 仍沿用现有 gate，必须再次取得用户明确授权。
 
+### 🆕 2026-09-02 国际 self-dogfooding / bootstrap 最佳实践调研
+
+专项结论见
+[`SELF_DOGFOODING_BEST_PRACTICES.md`](SELF_DOGFOODING_BEST_PRACTICES.md)。调研采用
+GCC/Rust bootstrap、OASIS SARIF 2.1.0、SLSA 1.2、GitHub Code Scanning/
+attestation 与 Reproducible Builds 官方资料，并参考 Diverse Double-Compiling
+对循环信任的处理。结论不是“正式包自混淆”，而是四条分离的 dogfood lane：
+
+1. **当前源码自分析**：先 artifact-only，再 SARIF audit-only；完成 triage、
+   suppression 和稳定 identity 后，只阻断新增未豁免 high 与 parse error。
+2. **稳定版 N-1 / checkout N 双通道 canary**：两版处理同一受控 fixture，比较
+   file selection/reason/exit/runtime/unmap/verification 等语义；只有显式确定性模式
+   才比较 bytes，避免把随机 Pro 输出差异误报为失败。
+3. **release-candidate wheel 验证**：fresh venv 安装真实 wheel 后跑 canary，不能
+   只测 editable checkout；发布后再核实 PyPI attestation/digest/public install。
+4. **reproducibility probe**：变化 temp path/locale/timezone/hash seed/file order，
+   将差异分类为预期随机性、版本变化或环境/path/time 泄漏。
+
+2026-09-02 已实际运行 `--check pyobfus --offline --no-config --json`：扫描 41 files、
+0 parse error、`8 high / 12 medium / 36 low / 3 info`。其中 `compile()`、规则定义内
+`.pt/.pyx/.pye` literal、动态 config/mapping access 与公共 `__all__` 多为工具自身
+有意行为，证明现在直接设 blocking gate 会误阻断；也证明不能把整个 `pyobfus/`
+glob 排除。正确顺序是人工 triage → 精确、带 reason/owner/review condition 的
+suppression → 两个观察窗口 → new-finding gate，且不得为 dashboard 变绿而削弱
+通用规则。
+
+`0.5.21` 产品范围仍只含 SARIF generator；自身仓库作为首个 manual/audit-only
+真实上传 smoke，不声明未经完整比较的 `baselineState`，不在本版直接改 CI gate。
+后续 maintenance increment 再加入 N-1/N canary + artifact-only self-SARIF job。
+公开 Core/Pro wheel 当前不做 self-obfuscation：源码已经公开，保护收益为零附近，
+却会破坏 auditability、source/wheel 对照、调试和可复现性。本文不授权 workflow、
+版本号、tag 或发布变更。
+
 ## 当前状态
 
 - **2026-09-01 SEO 小版本发布**：`pyobfus 0.5.20` 与
