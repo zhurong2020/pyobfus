@@ -93,6 +93,13 @@ developer's real `~/.pyobfus` directory or HOME, and do not make contributors
 override `HOME` merely to run the suite. See `AGENTS.md` for the canonical test
 isolation rule.
 
+Changes to preflight rules, SARIF/reporting, build planning, verification or
+provenance should also include an appropriate canary/regression case. The
+project dogfoods these capabilities in stages: self-scan findings are reviewed
+before they become blocking, intentional findings need precise reasons, and a
+current checkout is not treated as the sole authority over its own output. See
+[`docs/SELF_DOGFOODING_BEST_PRACTICES.md`](docs/SELF_DOGFOODING_BEST_PRACTICES.md).
+
 ### Development Workflow
 
 ```bash

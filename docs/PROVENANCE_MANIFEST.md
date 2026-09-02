@@ -59,6 +59,13 @@ Anyone who can edit the manifest can recompute this digest after changing the
 payload. For authenticity, pair the manifest with your normal release signing or
 attestation workflow.
 
+For pyobfus's own releases, the hosted PyPI/PEP 740 attestation is the stronger
+artifact-to-builder evidence; a local manifest or a successful self-dogfood run
+does not replace it. See
+[`RELEASE_PROVENANCE_VERIFICATION.md`](RELEASE_PROVENANCE_VERIFICATION.md) and
+[`SELF_DOGFOODING_BEST_PRACTICES.md`](SELF_DOGFOODING_BEST_PRACTICES.md) for the
+verification hierarchy and staged bootstrap boundary.
+
 ## Validation
 
 Use `--verify-provenance-manifest` to validate the pyobfus manifest shape, the

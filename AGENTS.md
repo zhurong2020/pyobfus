@@ -89,6 +89,23 @@ Targets: Python **3.9–3.14** must all pass. (Python 3.8 was dropped in 0.5.0 �
 EOL 2024-10 — which removed the old `astunparse`/`@requires_py39` flakiness;
 `docs/PYTHON38_COMPATIBILITY.md` is retained only as historical record.)
 
+## Self-dogfooding boundary
+
+Use pyobfus itself for read-only analysis/reporting and exercise obfuscation on
+maintained canary fixtures or freshly built wheels; do not replace the public
+package sources with a self-obfuscated tree. A current checkout must not be the
+only verifier of artifacts it produced: pair it with the latest public release,
+normal Python tooling, independent schema validation, hosted attestations, and
+fresh-environment install tests as appropriate.
+
+Self-scan findings are initially audit evidence, not an automatic blocking
+gate. Do not exclude the whole `pyobfus/` tree or weaken a general detection
+merely to make the repository's own report green. Suppress intentional patterns
+only through a reviewed, precise rule with a technical reason; claim SARIF
+`baselineState` only after a complete comparison. See
+[`docs/SELF_DOGFOODING_BEST_PRACTICES.md`](docs/SELF_DOGFOODING_BEST_PRACTICES.md)
+for the staged policy and current baseline.
+
 ## Repository layout
 
 ```
