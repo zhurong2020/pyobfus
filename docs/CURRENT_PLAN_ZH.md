@@ -1,6 +1,6 @@
 # pyobfus 当前计划
 
-更新时间：2026-09-02（`pyobfus` 0.5.20 与 `pyobfus-mcp` 0.3.10 已发布；
+更新时间：2026-09-03（`pyobfus` 0.5.20 与 `pyobfus-mcp` 0.3.10 已发布；
 `vscode-extension` 最新仍为 0.4.1。既有付款
 现已成功关联，Dashboard 显示 Paid / US$0.00 remaining，且 Stripe 生成的收据
 正确。2026-09-01 Stripe Support 最终确认：`send invoice` 流程的 invoice PDF
@@ -20,6 +20,11 @@ MCP Registry 全渠道核实；Registry 0.3.10 为 `active` / `isLatest=true`。
 HTTP 200，全新虚拟环境 `pip install pyobfus==0.5.19` 已核实带上两个新 flag，
 GitHub Release 已建，Release / CI 全矩阵 / CodeQL 均绿。后续正式发布仍须单独
 取得用户同意）
+
+**2026-09-03 12:41 客户回信确认**：客户在原邮件线程回复“Thanks for sharing
+the invoice. This should work.”，表示已接受此前发送的 Stripe Invoice Receipt，
+未提出替换 invoice PDF 或其他开票要求。开票支持事项继续保持已完成；不主动追发，
+除非客户提出新的具体需求。
 
 这份文档是当前项目状态和后续计划的中文单一入口，面向维护者日常查看。旧的
 `ROADMAP.md` 和 `POST_V0.4_TODO.md` 保留为历史归档和详细来源，但后续日常
