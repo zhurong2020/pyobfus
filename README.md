@@ -20,10 +20,12 @@ A Python code obfuscator built with AST-based transformations. **Supports Python
 
 > **🔒 Pro Edition available** — 6 patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator, $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
 
-> **🔎 What's new in v0.5.20** — discovery-focused release: clearer
-> pre-shipping and AI-debugging language in the README and package metadata,
-> expanded reverse-mapping / provenance / dependency-safety keywords, and a
-> more intent-focused MCP Registry description. Runtime behavior is unchanged.
+> **🔎 What's new in v0.5.21** — `pyobfus --check --sarif PATH` exports the
+> pre-flight risk scan as a SARIF 2.1.0 report for GitHub Code Scanning (a pure
+> projection — detection, severity and exit codes are unchanged). Plus two bug
+> fixes: cross-file directory mode no longer silently drops content-level
+> transforms and Pro presets, and `--level` no longer downgrades a preset's
+> `pro` level to community output.
 
 > 🔔 **Starring this repo doesn't notify you about new releases** — GitHub only
 > sends release notifications to people who explicitly **Watch** it. Click
