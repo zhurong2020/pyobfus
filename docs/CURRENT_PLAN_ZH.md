@@ -1,5 +1,9 @@
 # pyobfus 当前计划
 
+更新时间：2026-09-04（`pyobfus` **0.5.21 已发布**——SARIF preflight +
+两个 cross-file/preset bug 修复，见下方 gate 小节。`pyobfus-mcp` 仍 0.3.10、
+`vscode-extension` 仍 0.4.1，本轮均未动。以下历史段保留 09-03 关账内容。）
+
 更新时间：2026-09-03（`pyobfus` 0.5.20 与 `pyobfus-mcp` 0.3.10 已发布；
 `vscode-extension` 最新仍为 0.4.1。既有付款
 现已成功关联，Dashboard 显示 Paid / US$0.00 remaining，且 Stripe 生成的收据
@@ -36,11 +40,17 @@ the invoice. This should work.”，表示已接受此前发送的 Stripe Invoic
   公开版本；0.5.20/0.3.10 全渠道发布已经收口。本 session 的 tracked 修订均已
   推送到 `main`；关闭前仍应以 `git status`、`origin/main` 和 GitHub Actions
   实时结果为准，不在文档冻结会自行过期的 tip。
-- **下一功能 gate**：`Core 0.5.21` 已在本地**实现完毕并全绿**——SARIF preflight
-  **加上**用户拍板一并纳入的两个 cross-file/preset bug 修复，代码/测试/文档
-  held 在 `[Unreleased]`；**尚未授权改版本/tag/发布，发版留待冷启动后单独批准，
-  不要自行发版**。详见下方「下一小版本」小节与
-  [`V0.5.21_RELEASE_PLAN.md`](V0.5.21_RELEASE_PLAN.md)。Community build marker 已
+- **✅ `Core 0.5.21` 已于 2026-09-04 发布**（用户明确批准 push+tag）——SARIF
+  preflight **加上**一并纳入的两个 cross-file/preset bug 修复。tag `v0.5.21`
+  经 OIDC + PEP 740 发到 PyPI（`latest=0.5.21`，wheel/sdist 两个 provenance
+  endpoint 均 HTTP 200），全新 venv `pip install pyobfus==0.5.21` 已核实带上
+  `--sarif`，GitHub Release 已建，Release/CI 全矩阵/CodeQL 均绿。发布后首个
+  main CI 曾因一处**脆弱的测试断言**（numeric-obfuscation 目录模式用子串
+  `= 42` 检查，被随机 32 位 XOR 分量的十进制前缀 `42…` 误中）在单个 Py3.14
+  matrix job 红一次；已改成基于解析 AST 的整数字面量断言（20 万次压力测试零
+  误报），commit `1e62674` 推送后 main CI 转绿。产品代码正确、发布 wheel 不受
+  影响，无需重新发版。详见 [`V0.5.21_RELEASE_PLAN.md`](V0.5.21_RELEASE_PLAN.md)。
+  Community build marker 已
   完成设计，但仍为 P2；不能与 0.5.21 捆绑。国际 self-dogfooding 结论已进入
   AGENTS、贡献指南与 provenance 文档，当前只允许 audit/manual lane，不得把
   public wheel 自混淆。

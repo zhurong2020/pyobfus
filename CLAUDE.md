@@ -12,21 +12,22 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### 🟢 2026-09-02 — session 关账后的当前焦点
+### 🟢 2026-09-04 — Core 0.5.21 已发布后的当前焦点
 
-- Core `0.5.20` / MCP `0.3.10` / VS Code `0.4.1` 为最新公开版本，SEO
-  发版与 MCP Registry 0.3.10 已全渠道收口；客户 invoice 支持也已结案，只
-  被动等待来信。
-- 下一小版本 **Core 0.5.21 = SARIF preflight + 两个 cross-file/preset bug 修复**
-  （用户拍板一并纳入）。代码/测试/文档已在本地实现并全绿，held 在
-  `[Unreleased]`；版本号、tag、发布留待冷启动后单独批准，**不要自行发版**。
-  SARIF：`pyobfus --check --sarif PATH` 纯 projection，不改 detection/severity/
-  exit code，设计与验收见
-  [`docs/V0.5.21_RELEASE_PLAN.md`](docs/V0.5.21_RELEASE_PLAN.md)。两个 bug：默认
-  cross-file 目录模式此前静默丢弃全部内容级变换（含 commercial/library 等 Pro
-  preset），以及 `--level` 默认值把 preset 的 pro level 覆盖回 community——均已
-  修（统一到 `pyobfus/core/content_transforms.py` + `--level` 改 tri-state）。
-  Community build marker 仍是已设计但 gated 的 P2，不得顺手并入 0.5.21。
+- Core **`0.5.21`**（新发布）/ MCP `0.3.10` / VS Code `0.4.1` 为最新公开版本。
+- **✅ `Core 0.5.21` 已于 2026-09-04 发布**（用户明确批准 push+tag）= SARIF
+  preflight + 两个 cross-file/preset bug 修复。tag `v0.5.21` 经 OIDC + PEP 740
+  发到 PyPI（`latest=0.5.21`，两个 provenance endpoint HTTP 200），全新 venv
+  安装已核实带 `--sarif`，GitHub Release 已建，Release/CI 全矩阵/CodeQL 均绿。
+  SARIF `pyobfus --check --sarif PATH` 是纯 projection，不改 detection/severity/
+  exit code。两个 bug：默认 cross-file 目录模式此前静默丢弃全部内容级变换（含
+  commercial/library 等 Pro preset），以及 `--level` 默认值把 preset 的 pro
+  level 覆盖回 community——均已修（统一到 `pyobfus/core/content_transforms.py`
+  + `--level` 改 tri-state）。发布后 main CI 曾因一处脆弱测试断言在单个 Py3.14
+  job 红一次（numeric-obfuscation 目录模式用子串 `= 42` 检查被随机 XOR 分量前缀
+  误中），已改为 AST 断言（commit `1e62674`）后转绿；发布 wheel 不受影响，未重发。
+  验收见 [`docs/V0.5.21_RELEASE_PLAN.md`](docs/V0.5.21_RELEASE_PLAN.md)。
+  Community build marker 仍是已设计但 gated 的 P2，未随 0.5.21 发布。
 - 本轮还重写了废弃的 `docs/INTEGRATION_TESTING.md`、修了两处文档死链、补录三个
   已发布 Community flag（`--numeric-obfuscation`/`--strip-ai-artifacts`/
   `--incremental`）到 README/llms/index。逐轮明细见 `docs/CURRENT_PLAN_ZH.md`。
@@ -375,7 +376,7 @@ cardiac-manuscripts 仓库（不影响 pyobfus 仓库本身）。
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.9-3.14, AST, setuptools
-- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.20，2026-09-01 发布**；完整版本历史见 `CHANGELOG.md`)
+- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.21，2026-09-04 发布**；完整版本历史见 `CHANGELOG.md`)
 - **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.1，2026-08-22 发布**（tag+GitHub Release+Marketplace 手工上传均已完成，`curl` 核实公开 listing 已返回 `"version":"0.4.1"`）；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`)
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.10，2026-09-01 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.18` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp`（最新已核实为 **0.3.10** `active` / `isLatest=true`）
