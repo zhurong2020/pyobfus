@@ -244,6 +244,8 @@ After your trial, purchase a license to continue using Pro features.
 
 **Price**: $45.00 USD (one-time payment)
 
+**Payment methods**: credit/debit card, Apple Pay, and **WeChat Pay (微信支付)** for buyers in China, plus the other options Stripe shows for your region at checkout. Alipay (支付宝) is being enabled.
+
 ### How to Purchase
 
 **Visit our purchase page**: **[pyobfus.github.io/purchase](https://zhurong2020.github.io/pyobfus/#purchase-professional-edition)** for detailed information and secure checkout.

@@ -153,6 +153,7 @@ def I0(I1, I2):
 <div style="background: #f8f9fa; padding: 2em; border-radius: 8px; border-left: 4px solid #667eea; margin: 1.5em 0;">
   <h3 style="margin-top: 0; color: #2c3e50;">💎 Professional Edition - $45 USD</h3>
   <p style="color: #7f8c8d; font-size: 0.95em;">One-time payment • Lifetime access</p>
+  <p style="color: #555; font-size: 0.9em; margin-top: 0.4em;">💳 Pay by card, Apple Pay, or <strong>WeChat Pay (微信支付)</strong> for buyers in China — Stripe shows the methods available for your region at checkout. Alipay (支付宝) is being enabled.</p>
 
   <h4 style="color: #34495e; margin-top: 1.5em;">What's Included:</h4>
   <ul style="color: #555; line-height: 1.8;">
