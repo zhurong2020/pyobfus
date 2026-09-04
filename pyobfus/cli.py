@@ -2145,6 +2145,10 @@ def _handle_check(
         effective_config=provenance.to_dict(),
         check_dependencies=True,
         offline=offline,
+        # PEP 768 remote-debug advisory (narrow trigger): anti-debug protection
+        # requested AND the deployment targets Python 3.14+.
+        protection_intent=config.anti_debug,
+        target_python_min=config.requires_python_min,
     )
     report = checker.check_path(input_path)
 

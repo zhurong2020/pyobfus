@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Python 3.14 remote-debug hardening advisory in `pyobfus --check`.** When a
+  build both requests anti-debug protection (the `--anti-debug` Pro feature or a
+  protection preset such as `commercial`/`maximum`/`trial`) and targets Python
+  3.14+ (a declared `requires_python_min` of `3.14`+, otherwise the interpreter
+  running the scan), `--check` now emits an informational
+  `compatibility_advisory` explaining that Python 3.14's PEP 768 remote
+  debugging interface can only be disabled at interpreter startup — with
+  `-X disable_remote_debug`, `PYTHON_DISABLE_REMOTE_DEBUG=1`, or a CPython built
+  `--without-remote-debug`. pyobfus's runtime anti-debug heuristics
+  (`sys.gettrace`/TracerPid) cannot switch it off, and the advisory says so
+  rather than implying otherwise. It is severity `info`, does not change the
+  scan exit code, carries no source snippet/literal/secret, and is projected
+  into SARIF as a `PYOBFUS/compatibility_advisory` note. The trigger is narrow
+  and opt-in; a plain 3.14 target with no protection intent stays silent. See
+  [docs/REMOTE_DEBUG_HARDENING.md](docs/REMOTE_DEBUG_HARDENING.md).
+
 ## [0.5.21] - 2026-09-04
 
 ### Added

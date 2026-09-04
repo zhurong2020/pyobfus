@@ -38,6 +38,7 @@ uvx pyobfus-mcp
   skip network verification (for private indexes or offline workflows); JSON
   output with `--json`
 - `pyobfus --check src/ --sarif pyobfus.sarif` (0.5.21) — also emit a SARIF 2.1.0 report of the pre-flight findings for GitHub Code Scanning; only valid with `--check`, does not change detection/severity/exit codes, and never emits source snippets, absolute paths or secrets
+- `--check` also emits a Python 3.14 remote-debug hardening advisory (0.5.22) when a build both requests anti-debug protection and targets Python 3.14+: PEP 768 remote debugging can only be disabled at interpreter startup (`-X disable_remote_debug` / `PYTHON_DISABLE_REMOTE_DEBUG=1`); runtime anti-debug cannot switch it off. Informational only, does not change the exit code
 - `pyobfus --init src/` — auto-detect framework and generate `pyobfus.yaml`
 - `pyobfus --unmap --trace error.log --mapping mapping.json` — reverse obfuscated stack traces
 - `pyobfus src/ -o dist/ --save-mapping mapping.json` — obfuscate AND emit mapping

@@ -5,7 +5,8 @@ Scans Python source for constructs that may break after obfuscation
 (eval/exec, dynamic attribute access, framework reflection, __all__ exports,
 name-string references) and emits compatibility advisories for common delivery
 combinations (import-hook / encrypted-file tooling, compiled packaging,
-ML/model-serving). Produces a structured report with severity levels,
+ML/model-serving, Python 3.14+ remote-debug hardening). Produces a structured
+report with severity levels,
 per-file findings, and AI-consumable hints for the next command.
 
 Optionally (``check_dependencies=True``) also runs the dependency-
@@ -22,6 +23,7 @@ from __future__ import annotations
 
 import ast
 import json
+import sys
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
@@ -37,6 +39,26 @@ SEVERITY_LOW = "low"
 SEVERITY_INFO = "info"
 
 _SEVERITY_RANK = {SEVERITY_INFO: 0, SEVERITY_LOW: 1, SEVERITY_MEDIUM: 2, SEVERITY_HIGH: 3}
+
+# Python version at which PEP 768's remote debugging interface first ships.
+_REMOTE_DEBUG_MIN = (3, 14)
+
+
+def _parse_python_minor(spec: Optional[str]) -> Optional[Tuple[int, int]]:
+    """Parse a ``"X.Y"`` (or ``"X.Y.Z"``) version string into ``(major, minor)``.
+
+    Returns ``None`` for an empty or unparseable value so callers can fall back
+    to another signal rather than raising on user-supplied config.
+    """
+    if not spec:
+        return None
+    parts = str(spec).strip().split(".")
+    try:
+        major = int(parts[0])
+        minor = int(parts[1]) if len(parts) > 1 else 0
+    except (ValueError, IndexError):
+        return None
+    return (major, minor)
 
 
 # Risk categories. Stable string IDs — used in JSON output and docs.
@@ -607,6 +629,8 @@ class PreflightChecker:
         safe_preset: bool = False,
         report_excluded: bool = False,
         effective_config: Optional[Dict[str, object]] = None,
+        protection_intent: bool = False,
+        target_python_min: Optional[str] = None,
     ) -> None:
         self.exclude_patterns: List[str] = list(exclude_patterns or [])
         # Opt-in dependency-hallucination advisory (see
@@ -621,6 +645,11 @@ class PreflightChecker:
         self.safe_preset = safe_preset
         self.report_excluded = report_excluded
         self.effective_config = effective_config
+        # PEP 768 remote-debug advisory (narrow trigger): only when the build
+        # both requests anti-debug protection (protection_intent) and targets
+        # Python 3.14+ (target_python_min, else the running interpreter).
+        self.protection_intent = protection_intent
+        self.target_python_min = target_python_min
 
     def check_path(self, path: Path) -> PreflightReport:
         if path.is_file():
@@ -770,6 +799,9 @@ class PreflightChecker:
                 )
             )
 
+        # Python 3.14 (PEP 768) remote-debug hardening advisory.
+        self._maybe_add_remote_debug_advisory(report)
+
         # Dependency-hallucination advisory (opt-in, see dependency_advisory.py).
         # Lazy import: dependency_advisory.py imports Risk/severity constants
         # from this module, so importing it at module load time would cycle.
@@ -808,6 +840,54 @@ class PreflightChecker:
                 f" {len(report.excluded_risks)} finding(s) in excluded files are reported "
                 "separately and do not affect this result."
             )
+
+    def _targets_python_314_plus(self) -> bool:
+        """Whether the build targets Python 3.14+ (where PEP 768 ships).
+
+        Prefer the declared ``--requires-python-min`` floor; when none is
+        declared, fall back to the interpreter running the scan.
+        """
+        declared = _parse_python_minor(self.target_python_min)
+        if declared is not None:
+            return declared >= _REMOTE_DEBUG_MIN
+        return sys.version_info[:2] >= _REMOTE_DEBUG_MIN
+
+    def _maybe_add_remote_debug_advisory(self, report: PreflightReport) -> None:
+        """Advise disabling PEP 768 remote debugging for hardened 3.14+ deploys.
+
+        Narrow, opt-in trigger (design decision "A"): only when the effective
+        build both requests anti-debug protection *and* targets Python 3.14+.
+        This is an interpreter-startup deployment control — pyobfus's runtime
+        anti-debug heuristics (``sys.gettrace`` / TracerPid) cannot disable the
+        remote debugging interface, and the message says so rather than
+        implying the obfuscator turns it off.
+        """
+        if not self.protection_intent:
+            return
+        if not self._targets_python_314_plus():
+            return
+        report.risks.append(
+            Risk(
+                category=CAT_COMPAT_ADVISORY,
+                severity=SEVERITY_INFO,
+                file=report.root,
+                line=0,
+                col=0,
+                message=(
+                    "Anti-debug protection is requested and the deployment targets "
+                    "Python 3.14+. Runtime anti-debug heuristics do not disable the "
+                    "PEP 768 remote debugging interface, which can only be turned off "
+                    "at interpreter startup."
+                ),
+                suggestion=(
+                    "Start the protected process with `-X disable_remote_debug` or "
+                    "PYTHON_DISABLE_REMOTE_DEBUG=1 (or build CPython with "
+                    "--without-remote-debug). Attaching a remote debugger also "
+                    "normally requires OS-level privileges. "
+                    "See docs/REMOTE_DEBUG_HARDENING.md."
+                ),
+            )
+        )
 
 
 # ---------------------------------------------------------------------------
