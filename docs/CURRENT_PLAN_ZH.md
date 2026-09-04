@@ -2,7 +2,10 @@
 
 更新时间：2026-09-04（`pyobfus` **0.5.21 已发布**——SARIF preflight +
 两个 cross-file/preset bug 修复，见下方 gate 小节。`pyobfus-mcp` 仍 0.3.10、
-`vscode-extension` 仍 0.4.1，本轮均未动。以下历史段保留 09-03 关账内容。）
+`vscode-extension` 仍 0.4.1，本轮均未动。**下一小版本 `0.5.22` 内容已实现并
+held 在 `[Unreleased]`：Python 3.14 remote-debug 硬化 advisory（触发条件方案
+A）——用户决定过几天再发，发版四步（版本号/CHANGELOG/README 横幅/tag）待用户
+通知，不自行发版。** 以下历史段保留 09-03 关账内容。）
 
 更新时间：2026-09-03（`pyobfus` 0.5.20 与 `pyobfus-mcp` 0.3.10 已发布；
 `vscode-extension` 最新仍为 0.4.1。既有付款
@@ -54,6 +57,18 @@ the invoice. This should work.”，表示已接受此前发送的 Stripe Invoic
   完成设计，但仍为 P2；不能与 0.5.21 捆绑。国际 self-dogfooding 结论已进入
   AGENTS、贡献指南与 provenance 文档，当前只允许 audit/manual lane，不得把
   public wheel 自混淆。
+- **⏳ `Core 0.5.22`（held，未发版）= Python 3.14 remote-debug 硬化 advisory**
+  （`FEATURE_EXPANSION_RESEARCH_2026-09-02.md` 推荐顺序 #3，用户 2026-09-04
+  拍板做这个、触发条件用方案 A）。给 `pyobfus --check` 复用现有
+  `compatibility_advisory` 类别新增一条 INFO advisory：当 effective build **同时**
+  ①请求反调试保护（`config.anti_debug` = `--anti-debug` 或 commercial/maximum/
+  trial 保护型 preset）**和**②目标 Python ≥ 3.14（`config.requires_python_min`
+  楼层，否则回落运行解释器）时触发，提示用 `-X disable_remote_debug` /
+  `PYTHON_DISABLE_REMOTE_DEBUG=1` 在解释器启动时关闭 PEP 768，诚实说明现有
+  anti-debug 注入无法替代。不改 exit code、无源码/密钥泄露、SARIF 自动投影为
+  note。代码/13 测试/docs（新 `REMOTE_DEBUG_HARDENING.md` + mkdocs nav + CHANGELOG
+  `[Unreleased]` + README/llms/index）均已推 `origin/main`（commit `fe898c7`），
+  三测试根全绿、CI 全矩阵/CodeQL 绿。**用户决定过几天再发，发版待通知，不自行发版。**
 - **本轮文档修订**：重写了描述废弃工作流的 `docs/INTEGRATION_TESTING.md`，修了
   `docs/PACKAGE_INSPECTION.md` 与 INTEGRATION_TESTING 的死链，并把三个早已发布
   却漏在发现面的 Community flag（`--numeric-obfuscation`/`--strip-ai-artifacts`/
