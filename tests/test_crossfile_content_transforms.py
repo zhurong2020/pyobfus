@@ -19,6 +19,7 @@ Both paths are now routed through ``pyobfus.core.content_transforms`` so the
 single-file and cross-file pipelines cannot diverge again.
 """
 
+import ast
 import json
 import subprocess
 import sys
@@ -79,13 +80,21 @@ class TestCrossFileCommunityContentTransforms:
         )
         assert payload["status"] == "success"
         assert payload["stats"]["numbers_obfuscated"] > 0
-        # The original numeric expression must no longer appear verbatim; the
-        # obfuscator picks a random XOR/add/sub identity per literal, so we
-        # assert the disappearance of the source form rather than a specific
-        # output shape.
-        text = (out / "mathlib.py").read_text()
-        assert "* 42 + 100" not in text
-        assert "= 42" not in text
+        # The obfuscator replaces each integer literal with a random,
+        # value-preserving expression (e.g. ``42`` -> ``(42 ^ k) ^ k``), so the
+        # source constants must be gone. Assert on the *parsed AST* rather than
+        # the raw text: a random 32-bit XOR/add/sub component can itself begin
+        # with the digits "42"/"100", which would make a substring check flake.
+        module = ast.parse((out / "mathlib.py").read_text())
+        int_literals = {
+            n.value
+            for n in ast.walk(module)
+            if isinstance(n, ast.Constant)
+            and isinstance(n.value, int)
+            and not isinstance(n.value, bool)
+        }
+        assert 42 not in int_literals
+        assert 100 not in int_literals
 
     def test_strip_ai_artifacts_applies_in_directory_mode(self, runner, tmp_path):
         src = _project(tmp_path)
