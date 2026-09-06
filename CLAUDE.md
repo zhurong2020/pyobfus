@@ -12,17 +12,30 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### 🟢 2026-09-04 — Core 0.5.21 已发布后的当前焦点
+### 🟢 2026-09-06 — Core 0.5.22 + VS Code 0.4.2 已发布后的当前焦点
 
-- Core **`0.5.21`**（新发布）/ MCP `0.3.10` / VS Code `0.4.1` 为最新公开版本。
-- **⏳ 下一小版本 `0.5.22` 已实现并 held（未发版）= Python 3.14 remote-debug
-  硬化 advisory**（触发条件方案 A：`config.anti_debug` 且目标 Python ≥ 3.14 →
-  给 `--check` 加一条复用 `compatibility_advisory` 类别的 INFO advisory，提示
+- Core **`0.5.22`**（新发布）/ MCP `0.3.10` / VS Code **`0.4.2`**（新发布）为最新公开版本。
+- **✅ `Core 0.5.22` 已于 2026-09-06 发布**（用户明确批准）= Python 3.14
+  remote-debug 硬化 advisory（触发条件方案 A：`config.anti_debug` 且目标 Python
+  ≥ 3.14 → `--check` 加一条 `compatibility_advisory` 类别的 INFO advisory，提示
   `-X disable_remote_debug`/`PYTHON_DISABLE_REMOTE_DEBUG=1`，诚实说明 anti-debug
-  注入无法关闭 PEP 768）。代码/13 测试/docs 均已推 `origin/main`（`fe898c7`），
-  三测试根全绿、CI 全矩阵/CodeQL 绿。**用户决定过几天再发，发版待用户通知，
-  不自行发版。** 详见 `docs/CURRENT_PLAN_ZH.md` gate 小节 +
-  `docs/REMOTE_DEBUG_HARDENING.md`。
+  注入无法关闭 PEP 768）。tag `v0.5.22` 经 OIDC + PEP 740 发到 PyPI
+  （`latest=0.5.22`，wheel/sdist 两个 provenance endpoint 均 HTTP 200），
+  GitHub Release 已建，Release/CI 全矩阵/CodeQL/Pages 均绿，发布前三测试根
+  1253+93+7 全过。**验证注意点**：全新无许可 venv 跑 `--check` 看不到这条
+  advisory 是**正确行为**——`anti_debug` 是 Pro 功能，无许可时 `level` 降级为
+  `community`；改用直接调 `PreflightChecker(protection_intent=True,
+  target_python_min="3.14")` 验证发布包，三种组合（3.14 触发 / 3.12 不触发 /
+  无保护意图不触发）均符合设计。详见 `docs/REMOTE_DEBUG_HARDENING.md`。
+- **✅ `vscode-extension 0.4.2` 已于 2026-09-06 发布**（Security：
+  "Generate pyobfus.yaml" 现在对 CLI 返回的配置路径做 realpath 规范化，要求
+  文件名为 `pyobfus.yaml` 且必须落在工作区内，拒绝符号链接逃逸）。53 测试全过、
+  lint/typecheck/打包干净，tag `vscode-v0.4.2` + GitHub Release（附
+  `pyobfus-0.4.2.vsix`）已建，且已核实该 tag **未误触发** PyPI Release
+  workflow（08-04 tag-glob 修复仍有效）。**Marketplace 手工上传待维护者执行**。
+- **⏸️ `pyobfus-mcp 0.3.11` 刻意未发**：`[Unreleased]` 只有一条元数据 URL 修复，
+  无功能影响；而 Glama admin「Build steps」不会自动跟版，每发一版都要维护者手工
+  改一次，且其构建当前仍在连续失败。等下次 MCP 有实质改动再一起发。
 - **✅ `Core 0.5.21` 已于 2026-09-04 发布**（用户明确批准 push+tag）= SARIF
   preflight + 两个 cross-file/preset bug 修复。tag `v0.5.21` 经 OIDC + PEP 740
   发到 PyPI（`latest=0.5.21`，两个 provenance endpoint HTTP 200），全新 venv
@@ -384,8 +397,8 @@ cardiac-manuscripts 仓库（不影响 pyobfus 仓库本身）。
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.9-3.14, AST, setuptools
-- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.21，2026-09-04 发布**；完整版本历史见 `CHANGELOG.md`)
-- **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.1，2026-08-22 发布**（tag+GitHub Release+Marketplace 手工上传均已完成，`curl` 核实公开 listing 已返回 `"version":"0.4.1"`）；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`)
+- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.22，2026-09-06 发布**；完整版本历史见 `CHANGELOG.md`)
+- **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.2，2026-09-06 发布**（tag + GitHub Release 已完成；**Marketplace 手工上传待维护者执行**，上传后用 `curl` 核实公开 listing 返回 `"version":"0.4.2"`）；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`)
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.10，2026-09-01 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.18` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp`（最新已核实为 **0.3.10** `active` / `isLatest=true`）
 - **Smithery (Skill)**: https://smithery.ai/skills/zhurong2020/pyobfus-protect (2026-06-22 上线 · 本地工具走 Skill 渠道非 MCP 渠道) · **mcp.so**: 已收录

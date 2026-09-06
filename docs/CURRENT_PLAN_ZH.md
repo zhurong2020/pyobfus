@@ -1,5 +1,40 @@
 # pyobfus 当前计划
 
+更新时间：2026-09-06（**`pyobfus 0.5.22` 与 `vscode-extension 0.4.2` 已发布**，
+均经用户明确批准。`pyobfus-mcp` 仍 0.3.10、刻意未发。）
+
+- **Core `0.5.22`** = Python 3.14 remote-debug 硬化 advisory（此前 held 的
+  `fe898c7`）。发布前三测试根 1253+93+7 全过、black/ruff/mypy 干净；tag
+  `v0.5.22` 经 OIDC + PEP 740 发到 PyPI（`latest=0.5.22`，wheel/sdist 两个
+  provenance endpoint 均 HTTP 200），GitHub Release 已建，Release/CI 全矩阵/
+  CodeQL/Pages 均绿。README「What's new」横幅按流程写进了打 tag 前的同一 commit
+  （`b17a50d`），PyPI 页面描述未落后。功能文档 09-04 那轮已同步，双份 `llms.txt`
+  仍 byte-identical，本轮未再动。
+  - **验证注意点**：全新无许可 venv 跑 `--check` **看不到**这条 advisory 属正确
+    行为——`anti_debug` 是 Pro 功能，无许可时 `level` 被降级成 `community`。改用
+    直接调 `PreflightChecker(protection_intent=True, target_python_min="3.14")`
+    验证发布包，三种组合（3.14 触发 / 3.12 不触发 / 无保护意图不触发）均符合
+    设计。下次验证这类 Pro 语境的 advisory 时直接走 API，别只看 CLI 输出。
+- **`vscode-extension 0.4.2`** = Security 修复（`dd91387`，09-02 起 held 4 天）：
+  "Generate pyobfus.yaml" 对 CLI 返回的配置路径做 realpath 规范化，要求文件名为
+  `pyobfus.yaml` 且必须落在工作区内，拒绝符号链接逃逸。份量诚实说是防御性收紧，
+  不是在堵正在被利用的洞。53 测试全过、lint/typecheck/打包干净，tag
+  `vscode-v0.4.2` + GitHub Release（附 `pyobfus-0.4.2.vsix`）已建，并已核实该
+  tag **未误触发** PyPI Release workflow。**Marketplace 手工上传待维护者执行**，
+  上传后用 `curl` 核实公开 listing 返回 `"version":"0.4.2"`。
+- **`pyobfus-mcp 0.3.11` 刻意未发**：`[Unreleased]` 只有一条元数据 URL 修复
+  （退役的 `modelcontextprotocol/servers` 目录 URL → 现行 Registry 端点），无
+  功能影响；而今天新确认 Glama admin「Build steps」不会自动跟版，每发一版都要
+  维护者手工改一次，且其构建仍在连续失败。等下次 MCP 有实质改动再一起发。
+- **下载量复查（数据截止 09-05）**：`pyobfus` 日/周/月 52 / 520 / 1,796；
+  `pyobfus-mcp` 10 / 199 / 824。每日序列显示发布日一律 117–151、非发布日一律
+  6–52，五次发布形状完全一致。**09-01 的 SEO 小版本没有带来可观测的有机增长**
+  （09-01 冲到 146/107，09-02 立刻回落到 19/6，09-03 为 18/19，与发版前非发布日
+  无区别）——CLAUDE.md 里挂着的那个「等数据覆盖 09-02 再评价」待评项就此结案。
+  09-05 的 52 是窗口内最高非发布日，但紧跟 0.5.21 发布且同日 MCP 已回落到 10，
+  更像发布尾巴，需再看 2–3 个干净日。结论：下载量目前给不出需求信号，发版决策
+  不应以它为依据。
+
 更新时间：2026-09-06（**Glama listing 状态被推翻并已更正**。Frank Fiegel
 2026-09-05 邮件确认：2026-05-03 那次提交**被拒后从未批准**，不存在可复审的
 listing，需走正常提交流程重新提交。此前「页面正常但公开 API `tools: []` =
