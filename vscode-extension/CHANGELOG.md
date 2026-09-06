@@ -6,6 +6,8 @@ Independent version/release cadence from the main `pyobfus` and `pyobfus-mcp` Py
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-09-06
+
 ### Security
 
 - "Generate pyobfus.yaml" now canonicalizes the CLI-returned configuration
