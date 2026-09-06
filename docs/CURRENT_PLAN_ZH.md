@@ -1,5 +1,26 @@
 # pyobfus 当前计划
 
+更新时间：2026-09-06（**Glama listing 状态被推翻并已更正**。Frank Fiegel
+2026-09-05 邮件确认：2026-05-03 那次提交**被拒后从未批准**，不存在可复审的
+listing，需走正常提交流程重新提交。此前「页面正常但公开 API `tools: []` =
+Glama 目录同步漂移」的判断因此作废——更可能的解释是该记录从未进入已批准目录；
+且该公开端点现已要求 API key（匿名 `curl` 返回 `unauthorized`），不再是可用的
+健康检查口径。另两处经证伪的旧结论：admin「Build steps」**不会自动跟版**（停在
+`0.3.8`、跨过 0.3.9/0.3.10，2026-09-06 由维护者手工改到 `0.3.10`）；Glama 构建
+**不读仓库里的 `pyobfus_mcp/Dockerfile`**，而是用 admin Build Spec 合成一份
+Dockerfile（`debian:trixie-slim` + uv + mcp-proxy + `git clone` 后 checkout 当时
+的 main tip），仓库那份只对人工审核有意义。仓库侧两处过期物料已修并推送
+（`e967754`）：Dockerfile pin `0.2.0`→`0.3.10`、`glama.yaml` 由「Seven tools」
+改为八工具并补上 `protect_project` 与 Copilot/CodeBuddy 客户端。已实测验证：干净
+venv 装 `pyobfus-mcp==0.3.10` 后跑真实 MCP `initialize` + `tools/list` 握手，
+8 工具齐全，introspection 侧无问题。构建仍连续失败于 Glama 自家 BuildKit 拉
+`debian:trixie-slim`：09-05 `01a06fa7-…`（7 分钟，`context deadline exceeded`）、
+09-06 `01a074ae-…`（1m38s，Glama 自述 "platform-side fault"）、09-06 手工重试
+`01a074b6-…`（2m，`AbortError: Build aborted`，其构建超时），三次均在任何 build
+step 执行前挂掉。**下一步**：已就「重新提交是否会产生重复条目或改动 URL」（README
+徽章依赖现路径）去信 Frank 并附上最新构建证据；重新提交与后台重试均需维护者手工
+操作，不阻塞本地开发主线。）
+
 更新时间：2026-09-04（`pyobfus` **0.5.21 已发布**——SARIF preflight +
 两个 cross-file/preset bug 修复，见下方 gate 小节。`pyobfus-mcp` 仍 0.3.10、
 `vscode-extension` 仍 0.4.1，本轮均未动。**下一小版本 `0.5.22` 内容已实现并

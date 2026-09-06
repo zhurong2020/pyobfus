@@ -168,6 +168,41 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   names. The formerly public API path now returns HTTP 401, so it is no longer a
   usable unauthenticated health check; continue treating the listing plus the
   successful live `ListToolsRequest` as the available evidence.
+- 2026-09-05 (email from frank@glama.ai, replying to the 2026-05-03 rejection):
+  the original submission was **rejected and never approved**, so there is no
+  listing to re-review; the instruction is to resubmit through the normal
+  submission flow now that the README, `glama.yaml` and the Dockerfile are in
+  place. This supersedes the "directory sync drift" reading recorded above — the
+  public API record most likely stayed empty because the entry never entered the
+  approved directory, even though the server page renders and builds run. Note
+  the tension: `https://glama.ai/mcp/servers/zhurong2020/pyobfus` is live and
+  current (all 8 tools, a quality grade, references v0.5.21), so Frank may be
+  answering from the May ticket rather than the present page state. Open question
+  put to him: whether resubmitting duplicates the entry or moves the URL, which
+  would break the Glama score badge carried in the root README.
+- 2026-09-06 build evidence: the admin **Build steps** field does *not* follow new
+  releases — it sat at `pyobfus-mcp==0.3.8` through 0.3.9 and 0.3.10 until the
+  maintainer bumped it manually to `0.3.10`. Builds still fail before any build
+  step executes: `01a06fa7-39aa-70ed-8186-b98260d7eb24` (2026-09-05, 7 min,
+  `failed to resolve source metadata for docker.io/library/debian:trixie-slim …
+  context deadline exceeded`); `01a074ae-6150-7ce8-b2cf-e20ce70b7361` (2026-09-06,
+  1m38s, same metadata timeout, and Glama's own error text now reads "The Glama
+  builder lost its BuildKit session before any build step ran. This is a
+  platform-side fault, not a problem with your build spec, base image or
+  repository"); and the manual retry `01a074b6-361f-732c-adc8-e876f9c7f501`
+  (2026-09-06, 2 min, `AbortError: Build aborted` raised by Glama's own build
+  timeout). "Retrying usually succeeds" has not held across 08-07, 08-17, 09-05
+  and two attempts on 09-06.
+- 2026-09-06 correction to an earlier assumption: Glama does **not** build from
+  the repository's `pyobfus_mcp/Dockerfile`. It synthesises its own Dockerfile
+  from the admin Build Spec (`debian:trixie-slim` + uv + `mcp-proxy` + `git clone`
+  followed by a checkout of the main tip) and then runs `buildSteps`. The repo
+  Dockerfile matters for submission review only. Both stale artifacts were
+  refreshed anyway in `e967754` — Dockerfile pin `0.2.0` → `0.3.10`, and
+  `glama.yaml` from "Seven tools" to eight, adding `protect_project` and the
+  Copilot/CodeBuddy clients. Verified by installing `pyobfus-mcp==0.3.10` into a
+  clean venv and completing a real MCP `initialize` + `tools/list` handshake that
+  returned all 8 tools, so server-side introspection is sound.
 
 ### MCP Skills trust score — 🟡 ESTABLISHED / NOT VERIFIED
 - 2026-08-24 official free score API scan for `zhurong2020/pyobfus`: composite
