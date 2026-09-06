@@ -113,7 +113,7 @@ the invoice. This should work.”，表示已接受此前发送的 Stripe Invoic
   完成设计，但仍为 P2；不能与 0.5.21 捆绑。国际 self-dogfooding 结论已进入
   AGENTS、贡献指南与 provenance 文档，当前只允许 audit/manual lane，不得把
   public wheel 自混淆。
-- **⏳ `Core 0.5.22`（held，未发版）= Python 3.14 remote-debug 硬化 advisory**
+- **✅ `Core 0.5.22`（当时 held，已于 2026-09-06 发布——详见本文顶部 09-06 块）= Python 3.14 remote-debug 硬化 advisory**
   （`FEATURE_EXPANSION_RESEARCH_2026-09-02.md` 推荐顺序 #3，用户 2026-09-04
   拍板做这个、触发条件用方案 A）。给 `pyobfus --check` 复用现有
   `compatibility_advisory` 类别新增一条 INFO advisory：当 effective build **同时**
@@ -124,7 +124,7 @@ the invoice. This should work.”，表示已接受此前发送的 Stripe Invoic
   anti-debug 注入无法替代。不改 exit code、无源码/密钥泄露、SARIF 自动投影为
   note。代码/13 测试/docs（新 `REMOTE_DEBUG_HARDENING.md` + mkdocs nav + CHANGELOG
   `[Unreleased]` + README/llms/index）均已推 `origin/main`（commit `fe898c7`），
-  三测试根全绿、CI 全矩阵/CodeQL 绿。**用户决定过几天再发，发版待通知，不自行发版。**
+  三测试根全绿、CI 全矩阵/CodeQL 绿。（当时的 gate「用户决定过几天再发、发版待通知」已于 2026-09-06 由用户批准并执行，此处不再是生效指令。）
 - **本轮文档修订**：重写了描述废弃工作流的 `docs/INTEGRATION_TESTING.md`，修了
   `docs/PACKAGE_INSPECTION.md` 与 INTEGRATION_TESTING 的死链，并把三个早已发布
   却漏在发现面的 Community flag（`--numeric-obfuscation`/`--strip-ai-artifacts`/
