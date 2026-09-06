@@ -3,11 +3,13 @@ version: 1
 server:
   name: pyobfus-mcp
   description: >-
-    Official MCP server for the pyobfus Python obfuscator. Seven tools:
+    Official MCP server for the pyobfus Python obfuscator. Eight tools:
+    one-call self-verifying protect_project pipeline, config-aware
     pre-flight risk scan, zero-config init, reverse stack-trace mapping,
     list presets, explain preset, recommend tier, and start Pro trial.
     Built for AI-assisted Python development workflows in Claude Desktop,
-    Claude Code, Cursor, Windsurf, and Zed.
+    Claude Code, Cursor, GitHub Copilot, Windsurf, Zed, Codex, and
+    CodeBuddy.
 
 startCommand:
   type: stdio
