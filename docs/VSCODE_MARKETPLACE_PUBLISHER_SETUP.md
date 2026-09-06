@@ -138,6 +138,31 @@ obvious success banner, so success was confirmed two ways:
 > `marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus`) returned
 > `"version":"0.4.1"`.
 
+**Hand the maintainer these three things together, as soon as the `.vsix` is
+built — don't just describe the steps and let them assemble the URL**
+(maintainer request, 2026-09-06):
+
+1. Clickable management page:
+   <https://marketplace.visualstudio.com/manage/publishers/zhurong2020>
+2. Sign-in reminder: `wuxiami@hotmail.com`.
+3. The `.vsix` **Windows** path (the upload happens in a Windows browser, so a
+   WSL `/mnt/c/...` path is not directly usable):
+   `C:\onedrive\msft\OneDrive - MSFT\rong\3-job\program\pyobfus\vscode-extension\pyobfus-<version>.vsix`
+
+After the upload, verify the public listing independently rather than relying
+on the page display:
+
+```bash
+curl -s -A "Mozilla/5.0" \
+  "https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus" \
+  | grep -o '"version":"[0-9.]*"' | head -3
+```
+
+The publisher management page has been observed rendering with an **empty
+extension list** (publisher name and footer only) right around an upload —
+transient, not a delisting. Confirm against the public listing above before
+treating it as a problem.
+
 The update flow is **not** the "New extension" button — that's for a
 brand-new listing. Instead:
 

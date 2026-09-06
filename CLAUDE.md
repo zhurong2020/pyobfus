@@ -32,7 +32,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   文件名为 `pyobfus.yaml` 且必须落在工作区内，拒绝符号链接逃逸）。53 测试全过、
   lint/typecheck/打包干净，tag `vscode-v0.4.2` + GitHub Release（附
   `pyobfus-0.4.2.vsix`）已建，且已核实该 tag **未误触发** PyPI Release
-  workflow（08-04 tag-glob 修复仍有效）。**Marketplace 手工上传待维护者执行**。
+  workflow（08-04 tag-glob 修复仍有效）。Marketplace 手工上传已由用户完成，`curl` 核实公开 listing 已返回 `"version":"0.4.2"`。
 - **⏸️ `pyobfus-mcp 0.3.11` 刻意未发**：`[Unreleased]` 只有一条元数据 URL 修复，
   无功能影响；而 Glama admin「Build steps」不会自动跟版，每发一版都要维护者手工
   改一次，且其构建当前仍在连续失败。等下次 MCP 有实质改动再一起发。
@@ -398,7 +398,7 @@ cardiac-manuscripts 仓库（不影响 pyobfus 仓库本身）。
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.9-3.14, AST, setuptools
 - **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.22，2026-09-06 发布**；完整版本历史见 `CHANGELOG.md`)
-- **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.2，2026-09-06 发布**（tag + GitHub Release 已完成；**Marketplace 手工上传待维护者执行**，上传后用 `curl` 核实公开 listing 返回 `"version":"0.4.2"`）；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`)
+- **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.2，2026-09-06 发布**（tag + GitHub Release + Marketplace 手工上传均已完成；`curl` 独立核实公开 listing 返回 `"version":"0.4.2"`，lastUpdated 04:07:50 GMT）；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`)
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.10，2026-09-01 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.18` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp`（最新已核实为 **0.3.10** `active` / `isLatest=true`）
 - **Smithery (Skill)**: https://smithery.ai/skills/zhurong2020/pyobfus-protect (2026-06-22 上线 · 本地工具走 Skill 渠道非 MCP 渠道) · **mcp.so**: 已收录
