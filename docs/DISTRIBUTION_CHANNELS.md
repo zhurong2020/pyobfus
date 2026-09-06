@@ -7,11 +7,16 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-**Last updated**: 2026-09-02 (standalone SEO releases: pyobfus 0.5.20 and
-pyobfus-mcp 0.3.10 published through OIDC; all four Integrity provenance
-endpoints HTTP 200, fresh wheel installation verified, GitHub Releases created.
-Runtime behavior and MCP schemas are unchanged. MCP Registry 0.3.10 is published
-and publicly verified `active` / `isLatest=true`. VS Code extension remains 0.4.1.)
+**Last updated**: 2026-09-06 (pyobfus 0.5.22 published through OIDC — Python
+3.14 remote-debug hardening advisory in `--check`; PyPI `latest=0.5.22`, both
+Integrity provenance endpoints HTTP 200, GitHub Release created, and the
+advisory verified against a fresh install. vscode-extension 0.4.2 published in
+the same round — a Security fix containing "Generate pyobfus.yaml" writes to the
+workspace; tag, GitHub Release with the vsix, and the maintainer's manual
+Marketplace upload are all done, with the public listing independently
+re-checked as `"version":"0.4.2"`. pyobfus-mcp remains 0.3.10 and was
+deliberately not released: its only pending change is a metadata URL fix, while
+every MCP release costs a manual Glama Build-steps bump.)
 
 > **Note (2026-05-09)**: most of the per-channel facts below are now current as of Session 23. Outside of the launch wave (HN 5-11 / Reddit 5-12 / CN trio 5-8/9), the live state is reflected here. Consult `docs/POST_V0.4_TODO.md` for forward TODO and `docs/V0.4_EXECUTION_LOG.md` for session-by-session deltas.
 
