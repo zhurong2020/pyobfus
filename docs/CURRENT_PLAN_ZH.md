@@ -1,7 +1,32 @@
 # pyobfus 当前计划
 
-更新时间：2026-09-06（**`pyobfus 0.5.22` 与 `vscode-extension 0.4.2` 已发布**，
-均经用户明确批准。`pyobfus-mcp` 仍 0.3.10、刻意未发。）
+更新时间：2026-09-07（**`pyobfus 0.5.22` 与 `vscode-extension 0.4.2` 已发布**，
+均经用户明确批准。**Open VSX 已发布上线并复核通过**。`pyobfus-mcp` 仍 0.3.10、
+刻意未发。**Glama 收到 Frank 第二封邮件：构建错误据称已修，我方尚未验证。**）
+
+- **✅ Open VSX 已发布上线**：`zhurong2020.pyobfus` **v0.4.2**，页面
+  <https://open-vsx.org/extension/zhurong2020/pyobfus>。同日独立复核：页面与
+  API 均 HTTP 200，`version=0.4.2`、`license=Apache-2.0`、
+  `timestamp=2026-09-07T00:59:01Z`、`allVersions=[latest, 0.4.2]`。
+  上传后**立即**查询返回的 `Extension not found` 已确认只是索引传播延迟，同日
+  自行追上——**不要因首次 404 就下"发布失败"的结论**。API 里的
+  `verified: false` 是 namespace **归属验证**标记（公开 namespace 默认 false），
+  与发布成败无关；`downloadCount=0` 是发布当天的正常起点。至此 Marketplace 与
+  Open VSX 两边同为 `0.4.2`，一致。发布记录 + 再发布 runbook 见
+  [`OPEN_VSX_PUBLISH_PLAN.md`](OPEN_VSX_PUBLISH_PLAN.md)，凭证存 Vaultwarden
+  条目 `Open VSX Access Token (pyobfus)`（唯一副本，不进仓库/CI，维护者定期
+  轮换）。
+- **🟡 Glama：2026-09-07 Frank 第二封邮件「Build errors should be fixed now」**。
+  这是**上游口径，我方未验证**——那封邮件之后没有重跑过任何构建，所以在真看到
+  一次构建跑完之前，任何文档都不要写成"构建已恢复"。同时 Frank **没有回答**
+  重新提交是否会产生重复条目或改动 URL 的问题（README 的 Glama 评分徽章挂在现
+  路径上，URL 一动就断），09-05「走正常流程重新提交」的指示继续有效。
+  **下一步（维护者手工，不阻塞本地开发）**：① 用已 pin 好的
+  `pyobfus-mcp==0.3.10` 在后台触发一次构建并留证；② 若跑通，按 09-05 指示重新
+  提交；③ 提交后核对公开 URL 是否仍是 `glama.ai/mcp/servers/zhurong2020/pyobfus`，
+  若变了要同步改 README 徽章和 `DISTRIBUTION_CHANNELS.md` 里的全部链接。
+  其余政策不变：不为 Glama 改 pyobfus-mcp 代码；MCP 0.3.11 继续压着不发。
+- **分发扩展调研已记录**：见 [`DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md`](DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md)。结论是不提交 `free-for.dev`，后续顺序为 Open VSX、GitHub Action、`awesome-python`、安全类 awesome-list、AlternativeTo、Smithery、Product Hunt。**其中 Open VSX 已于本日完成**，队列下一个是 GitHub Action。
 
 - **Core `0.5.22`** = Python 3.14 remote-debug 硬化 advisory（此前 held 的
   `fe898c7`）。发布前三测试根 1253+93+7 全过、black/ruff/mypy 干净；tag

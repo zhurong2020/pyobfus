@@ -12,9 +12,24 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### 🟢 2026-09-06 — Core 0.5.22 + VS Code 0.4.2 已发布后的当前焦点
+### 🟢 2026-09-07 — Core 0.5.22 + VS Code 0.4.2 已发布、Open VSX 已上线后的当前焦点
 
-- Core **`0.5.22`**（新发布）/ MCP `0.3.10` / VS Code **`0.4.2`**（新发布）为最新公开版本。
+- Core **`0.5.22`** / MCP `0.3.10` / VS Code **`0.4.2`** 为最新公开版本；VS Code
+  扩展同时在 **Microsoft Marketplace 与 Open VSX** 上架，两边同为 `0.4.2`。
+- **✅ Open VSX 已上线（2026-09-07）**：`zhurong2020.pyobfus` v0.4.2，
+  <https://open-vsx.org/extension/zhurong2020/pyobfus>，页面与 API 均已独立复核
+  HTTP 200。两个易误读的字段：上传后**立即**查询返回 404 只是索引传播延迟（同日
+  自愈，别据此判失败）；API 的 `verified: false` 是 namespace 归属验证标记、与
+  发布成败无关。发布记录 + 再发布 runbook：
+  [`docs/OPEN_VSX_PUBLISH_PLAN.md`](docs/OPEN_VSX_PUBLISH_PLAN.md)。发布 token 存
+  Vaultwarden 条目 `Open VSX Access Token (pyobfus)`（唯一副本，**不进仓库/CI**，
+  维护者定期轮换）。
+- **🟡 Glama（2026-09-07 Frank 第二封邮件）**：「Build errors should be fixed
+  now」——**上游口径，我方未验证**，此后未重跑过构建，看到一次真跑通之前不要在
+  任何文档写"构建已恢复"。重新提交是否产生重复条目 / 改动 URL 仍**无回复**
+  （README 徽章挂在现路径）。下一步与完整证据链见
+  [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md) 与
+  [`docs/DISTRIBUTION_CHANNELS.md`](docs/DISTRIBUTION_CHANNELS.md) 的 Glama 小节。
 - **✅ `Core 0.5.22` 已于 2026-09-06 发布**（用户明确批准）= Python 3.14
   remote-debug 硬化 advisory（触发条件方案 A：`config.anti_debug` 且目标 Python
   ≥ 3.14 → `--check` 加一条 `compatibility_advisory` 类别的 INFO advisory，提示
@@ -35,7 +50,8 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   workflow（08-04 tag-glob 修复仍有效）。Marketplace 手工上传已由用户完成，`curl` 核实公开 listing 已返回 `"version":"0.4.2"`。
 - **⏸️ `pyobfus-mcp 0.3.11` 刻意未发**：`[Unreleased]` 只有一条元数据 URL 修复，
   无功能影响；而 Glama admin「Build steps」不会自动跟版，每发一版都要维护者手工
-  改一次，且其构建当前仍在连续失败。等下次 MCP 有实质改动再一起发。
+  改一次，其构建 09-05/09-06 连续失败（上游 09-07 称已修，未验证）。等下次 MCP
+  有实质改动再一起发。
 - **✅ `Core 0.5.21` 已于 2026-09-04 发布**（用户明确批准 push+tag）= SARIF
   preflight + 两个 cross-file/preset bug 修复。tag `v0.5.21` 经 OIDC + PEP 740
   发到 PyPI（`latest=0.5.21`，两个 provenance endpoint HTTP 200），全新 venv

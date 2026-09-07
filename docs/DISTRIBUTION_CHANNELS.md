@@ -7,7 +7,13 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-**Last updated**: 2026-09-06 (pyobfus 0.5.22 published through OIDC — Python
+**Last updated**: 2026-09-07 (**Open VSX is LIVE** — `zhurong2020.pyobfus`
+v0.4.2, independently re-checked at HTTP 200 on both the extension page and the
+API after the immediate post-upload 404 turned out to be index propagation lag.
+**Glama**: frank@glama.ai followed up with "Build errors should be fixed now";
+the duplicate-listing / badge-URL question is still unanswered and no build has
+been retried on our side yet. Earlier the same day: distribution expansion
+research recorded. pyobfus 0.5.22 published through OIDC — Python
 3.14 remote-debug hardening advisory in `--check`; PyPI `latest=0.5.22`, both
 Integrity provenance endpoints HTTP 200, GitHub Release created, and the
 advisory verified against a fresh install. vscode-extension 0.4.2 published in
@@ -26,7 +32,7 @@ every MCP release costs a manual Glama Build-steps bump.)
 
 ### PyPI — `pyobfus`
 - URL: https://pypi.org/project/pyobfus/
-- Current version: **0.5.20** (released 2026-09-01) · ships with PEP 740 attestations via OIDC trusted publishing
+- Current version: **0.5.22** (released 2026-09-06) · ships with PEP 740 attestations via OIDC trusted publishing
 - Current headline: discovery-focused metadata and README/FAQ improvements around pre-shipping protection, reverse mapping, provenance, and AI-assisted debugging; runtime behavior unchanged.
 - Prior headline (0.5.19): `--dry-run --json` emits a versioned `plan` object (effective config, selected/excluded files with reasons, artifacts tagged ship/retain-internal/optional; relative labels only, not applyable); opt-in `--verify-syntax` compiles generated output in memory post-build (no import/execute, no `__pycache__`) and reports `syntax_valid` with no runtime-correctness claim.
 - Prior headline (0.5.18): config-aware `--check` reports the effective project configuration and findings already mitigated by it, while preserving high-risk findings and exit-code semantics.
@@ -81,12 +87,41 @@ every MCP release costs a manual Glama Build-steps bump.)
   Still 6 stars, 2 forks, 0 open issue/PR, and no new Discussion reply.
 
 ### VS Code Marketplace — `zhurong2020.pyobfus`
+- Current published version: **0.4.2** (2026-09-06). The same VSIX is now also
+  on Open VSX — see the dedicated section below.
 - 2026-08-24 public Gallery API: version 0.4.1, 3 installs, 124 downloads.
 - No identifiable user rating/review signal yet; the API's weighted-rating
   prior is not evidence of an actual review. Continue tracking installs and
   real reviews, not raw update/download count alone.
 - Wiki: disabled · Discussions: enabled · Issues: open
 - Releases: latest `v0.5.20` and `mcp-v0.3.10` (2026-09-01), plus earlier Core, MCP, and VS Code tags (MCP releases attach wheel+sdist).
+
+### Open VSX — `zhurong2020.pyobfus` 🟢 LIVE
+- Public page: https://open-vsx.org/extension/zhurong2020/pyobfus
+- API: https://open-vsx.org/api/zhurong2020/pyobfus
+- **Published 2026-09-07**, version **0.4.2** (same VSIX as the Marketplace
+  release, so the two registries are in sync). `ovsx` returned
+  `Published zhurong2020.pyobfus v0.4.2`.
+- **Independently re-checked 2026-09-07**: both URLs HTTP 200; API reports
+  `version=0.4.2`, `license=Apache-2.0`, `timestamp=2026-09-07T00:59:01Z`,
+  `allVersions=[latest, 0.4.2]`, `downloadCount=0`, `reviewCount=0`. The
+  maintainer's browser view matches (Versions table `0.4.2 / Universal`,
+  1-1 of 1).
+- The immediate post-upload "Extension not found" from the CLI/API was **index
+  propagation lag**, not a failed publish; it resolved on its own the same day.
+  Record the lag, do not conclude failure from a first 404.
+- `verified: false` in the API is Open VSX's **namespace ownership** flag, not
+  a publish or content-review verdict — public namespaces default to false.
+  Not a defect, and not something to chase unless we want the ownership badge.
+- `downloadCount=0` is the day-one baseline; look for real installs at the next
+  periodic channel recheck rather than reading zero as a problem.
+- Publish credential: Vaultwarden entry `Open VSX Access Token (pyobfus)`
+  (folder `Publishing`). Sole copy — no local dotfile cache, never in the repo
+  or CI. Rotated periodically by the maintainer; a rotation only changes that
+  entry's password. Re-publish runbook and usage:
+  [OPEN_VSX_PUBLISH_PLAN.md](OPEN_VSX_PUBLISH_PLAN.md).
+- Why this channel: reaches VSCodium / Gitpod / Eclipse Theia / code-server
+  users who cannot install from the Microsoft Marketplace.
 
 ### 有心工坊 (personal blog)
 - URL: https://www.arong.eu.org
@@ -144,7 +179,7 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   makes a single optional hash ambiguous.
 - Implications: Claude Desktop / Claude Code / Cursor / Windsurf / Zed users querying the registry for "pyobfus" or "python obfuscator" will discover this server without manual config file edits.
 
-### Glama — `zhurong2020/pyobfus` 🟡 LISTED / API STALE
+### Glama — `zhurong2020/pyobfus` 🟡 PAGE RENDERS / NEVER APPROVED — RESUBMIT PENDING
 - Public page: https://glama.ai/mcp/servers/zhurong2020/pyobfus
 - 2026-08-21 recheck: the public page is reachable and still exposes 8 tool names, but its version metadata is stale (shows v0.5.13; current is 0.5.16); the older API path `/api/mcp/v1/servers/io.github.zhurong2020/pyobfus-mcp` still returns `not_found`.
 - 2026-08-20: third-party maintainers independently reproduced both symptoms (build stuck on `debian:trixie-slim`, page OK but public API stale) — confirms this is Glama-side infra/sync, not a pyobfus-mcp code issue. Discord `#support` still unanswered as of 08-21; policy is passive-wait, no code change, no re-pin until Glama responds.
@@ -208,6 +243,28 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   Copilot/CodeBuddy clients. Verified by installing `pyobfus-mcp==0.3.10` into a
   clean venv and completing a real MCP `initialize` + `tools/list` handshake that
   returned all 8 tools, so server-side introspection is sound.
+- 2026-09-07 (second email from frank@glama.ai, replying to the build evidence
+  above): **"Build errors should be fixed now."** Glama therefore treats the
+  BuildKit/base-image failures as a platform-side fault they have addressed.
+  **Not verified on our side** — no build has been retried since that email, so
+  record this as an upstream claim, not observed behaviour. Do not write "builds
+  work again" anywhere until a real build run is seen to complete.
+- 2026-09-07 open question, still unanswered: Frank did **not** address whether
+  resubmitting creates a duplicate entry or moves the URL. The README score
+  badge (`README.md`, the `glama.ai/mcp/servers/zhurong2020/pyobfus/badges/
+  score.svg` link) is pinned to the current path, so a URL move breaks it. His
+  2026-09-05 instruction to resubmit through the normal flow still stands.
+- **Next action** (maintainer, manual, does not block local work), in order:
+  1. Trigger a build from the Glama admin panel with Build steps already pinned
+     at `pyobfus-mcp==0.3.10`, and capture the result either way.
+  2. If it completes, resubmit through the normal submission flow per the
+     2026-09-05 instruction.
+  3. After resubmission, check whether the public URL is still
+     `glama.ai/mcp/servers/zhurong2020/pyobfus`; if it moved, update the README
+     badge and every link recorded in this file.
+  Policy unchanged otherwise: no pyobfus-mcp code change for Glama, and MCP
+  0.3.11 stays unreleased until there is substantive MCP work to ship (each
+  release costs a manual Build-steps bump).
 
 ### MCP Skills trust score — 🟡 ESTABLISHED / NOT VERIFIED
 - 2026-08-24 official free score API scan for `zhurong2020/pyobfus`: composite
