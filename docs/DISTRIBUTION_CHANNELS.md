@@ -265,6 +265,28 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   Policy unchanged otherwise: no pyobfus-mcp code change for Glama, and MCP
   0.3.11 stays unreleased until there is substantive MCP work to ship (each
   release costs a manual Build-steps bump).
+- 2026-09-07 admin panel (maintainer-supplied dump), read in three tiers of
+  evidence rather than as one conclusion:
+  - **Fact.** Build steps read `pyobfus-mcp==0.3.10`, so the manual bump held.
+    Pinned commit SHA is now `d2f5d75` and the page reports
+    `Current head commit: d2f5d75 (sync)`, so the pin is current — the first
+    time it has not lagged HEAD. (Later doc commits move HEAD again; this does
+    not affect the build, which installs the PyPI artifact, not the checkout.)
+  - **Fact.** Recent Tests has a new entry `01a07845-bc57-7c91-905f-
+    df27d33ea885`, 2026-09-07 03:50, labelled `0.5.21` — the first run after
+    Frank's "build errors should be fixed now".
+  - **Inference, not evidence.** The panel exposes **no pass/fail field**, the
+    same limitation recorded on 2026-08-24, so this is *not* logged as a
+    success. What is suggestive: the three known-failed runs (`01a06fa7`,
+    `01a074ae`, `01a074b6`) carry no version label at all, while `01a07845`
+    carries one, matching `01a06066`/`0.5.20` from 09-02; and "Recent
+    Releases" gained a `0.5.21` dated 2026-09-07. Since that panel is Glama's
+    internal counter rather than the MCP version, a fresh counter entry on the
+    same date suggests the run got far enough to produce a release. Suggestive
+    of recovery — still short of the status field.
+  - **To confirm**: open that test's own detail/log view for an explicit
+    result, as was done for `01a033e4` on 2026-08-24. Only then record the
+    build side as recovered.
 
 ### MCP Skills trust score — 🟡 ESTABLISHED / NOT VERIFIED
 - 2026-08-24 official free score API scan for `zhurong2020/pyobfus`: composite
@@ -307,6 +329,7 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 ### Claude Plugin Marketplace 🟡 PENDING
 - Console entry: `pyobfus`
 - 2026-08-24 maintainer recheck: still `Submitted and pending review`, submission date Aug 2.
+- 2026-09-07 maintainer recheck (console dump): unchanged — still `Submitted and pending review`, still dated Aug 2, now **36 days** in queue with no state transition and no request for changes. Nothing actionable; keep the passive-wait policy and re-check on the next periodic sweep.
 - Known copy issue: submitted description says `protected_project`; correct tool name is `protect_project`. Do not resubmit only for this typo; fix opportunistically if Anthropic exposes an edit/request-changes path.
 
 ### OpenSSF Best Practices passing badge 🟢 LIVE

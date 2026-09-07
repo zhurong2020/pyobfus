@@ -82,6 +82,47 @@ npx ovsx publish pyobfus-<version>.vsix -p "$OPEN_VSX_TOKEN"
 7. 上传后**不要**用"立即查询返回 404"下结论——索引传播有延迟，隔一段时间
    用上面那两个 URL 再核一次（0.4.2 这次就是先 404、后自行追上）。
 
+## 账号与常用入口
+
+发布链路横跨两个账号系统：Eclipse Foundation 账号是身份根，Open VSX 用它登录。
+
+**Eclipse Foundation**（身份根）
+
+| 用途 | 入口 |
+|---|---|
+| 账号管理 / 登录 | <https://accounts.eclipse.org/> |
+| 个人主页 | <https://accounts.eclipse.org/users/zhurong2020> |
+| Eclipse Contributor Agreement (ECA) | <https://accounts.eclipse.org/user/eca> |
+
+用户名 `zhurong2020`。目前 Committer / Projects / Marketplace favorites 均为空
+——发布 VS Code 扩展到 Open VSX **不需要**成为 Eclipse committer 或建 Eclipse
+项目，这些计数为 0 是正常的，不是缺步骤。
+
+**Open VSX Registry**
+
+| 用途 | 入口 |
+|---|---|
+| 注册表首页 / 搜索 | <https://open-vsx.org/> |
+| 个人资料 | <https://open-vsx.org/user-settings/profile> |
+| **Access Tokens**（发布凭证在此签发/吊销） | <https://open-vsx.org/user-settings/tokens> |
+| **Namespaces**（归属验证在此申请） | <https://open-vsx.org/user-settings/namespaces> |
+| 本人已发布扩展 | <https://open-vsx.org/user-settings/extensions> |
+| 本扩展公开页 | <https://open-vsx.org/extension/zhurong2020/pyobfus> |
+| 官方发布文档 | <https://github.com/eclipse-openvsx/openvsx/wiki/Publishing-Extensions> |
+| Namespace 归属说明 | <https://github.com/eclipse-openvsx/openvsx/wiki/Namespace-Access> |
+
+登录名 `zhurong2020`。**Open VSX Publisher Agreement 已签署**（profile 页显示
+"You signed the Eclipse Foundation Open VSX Publisher Agreement."）——这是发布
+的前置条件，已满足，后续版本不需要重签。
+
+Namespace `zhurong2020` 状态为 **not verified**。这是"未申请归属验证"，不是
+"被拒"或"有问题"：公开 namespace 默认如此，任何人都能正常安装扩展。要拿归属
+标记需按上面的 Namespace 归属说明另行申请，属可选项。
+
+⚠️ Open VSX 已启用**分级限流**（rate limiting tiers，站顶横幅公告）。批量脚本
+化访问其 API 前先看 <https://open-vsx.org/> 顶部横幅指向的说明，别当成无限额
+接口。
+
 ## 外部操作边界
 
 Open VSX 账号注册、协议接受和 token 创建需要维护者在外部账户中操作。本轮

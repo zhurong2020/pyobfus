@@ -26,6 +26,15 @@
   提交；③ 提交后核对公开 URL 是否仍是 `glama.ai/mcp/servers/zhurong2020/pyobfus`，
   若变了要同步改 README 徽章和 `DISTRIBUTION_CHANNELS.md` 里的全部链接。
   其余政策不变：不为 Glama 改 pyobfus-mcp 代码；MCP 0.3.11 继续压着不发。
+  - **09-07 后台面板新证据（分三层，别混为一谈）**：*事实*——Build steps 确为
+    `pyobfus-mcp==0.3.10`（手工改的那次生效了）；Pinned SHA 已是 `d2f5d75` 且
+    页面标 `(sync)`，是历来第一次不落后 HEAD；Recent Tests 新增
+    `01a07845-…`（09-07 03:50，标 `0.5.21`），是 Frank 那封邮件之后的第一条。
+    *推断*——面板**没有 pass/fail 字段**（与 08-24 同一局限），所以**不记成功**；
+    但三条已知失败的记录都没有版本标签，这条有，且 Recent Releases 同日多了
+    `0.5.21`，形状上像是跑到了产出 release，属**倾向性证据**。*待确认*——点进
+    该条 test 的详情/日志看显式结果（08-24 对 `01a033e4` 就是这么坐实的），
+    确认后才可把构建侧记为恢复。
 - **分发扩展调研已记录**：见 [`DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md`](DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md)。结论是不提交 `free-for.dev`，后续顺序为 Open VSX、GitHub Action、`awesome-python`、安全类 awesome-list、AlternativeTo、Smithery、Product Hunt。**其中 Open VSX 已于本日完成**，队列下一个是 GitHub Action。
 
 - **Core `0.5.22`** = Python 3.14 remote-debug 硬化 advisory（此前 held 的
