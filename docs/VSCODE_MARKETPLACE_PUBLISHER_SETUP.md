@@ -193,6 +193,32 @@ This is the same manifest-identity-based mechanism `vsce publish` (the CLI
 path) would use — the web UI's "Update" entry point is the GUI equivalent,
 still fully sidestepping Azure DevOps/PAT.
 
+### Do not stop here — also publish to Open VSX
+
+Since 2026-09-07 the extension is listed on **two** registries, and the
+Marketplace upload above only covers one of them. Publishing one without the
+other silently drifts the two listings apart, which is exactly the failure
+this note exists to prevent.
+
+After the Marketplace upload succeeds, publish the **same `.vsix`** to Open
+VSX:
+
+```bash
+cd vscode-extension
+export OPEN_VSX_TOKEN=$(bw get password "Open VSX Access Token (pyobfus)")
+npx ovsx publish pyobfus-<version>.vsix -p "$OPEN_VSX_TOKEN"
+```
+
+Then confirm both public pages report the new version:
+
+- <https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus>
+- <https://open-vsx.org/api/zhurong2020/pyobfus>
+
+Open VSX has its own propagation lag — an immediate "Extension not found"
+right after upload is normal and is **not** a failed publish. Full runbook,
+credential handling and the two fields that read like failures but are not:
+[OPEN_VSX_PUBLISH_PLAN.md](OPEN_VSX_PUBLISH_PLAN.md).
+
 ## Implication for M4 (CI auto-publish on `vscode-v*.*.*` tags)
 
 A classic PAT is off the table until the Azure DevOps org-creation issue
