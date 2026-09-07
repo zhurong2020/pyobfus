@@ -61,10 +61,24 @@
 1. ~~**Glama 构建确认**~~ ✅ **2026-09-07 已完成** — test
    `01a07845-…` 详情页 `Status: success` / 14s，8 工具握手正常。构建侧不再是
    阻塞项。
-2. **⭐Glama 重新提交（当前唯一未完成的外部动作）** — 构建已坐实跑通，按 Frank
-   2026-09-05 指示走正常提交流程。提交后**必须**核对公开 URL 是否仍是
-   `glama.ai/mcp/servers/zhurong2020/pyobfus`；若变了，同步改 README 的
-   Glama 评分徽章 + `DISTRIBUTION_CHANNELS.md` 里全部链接。
+2. ~~**Glama 重新提交**~~ ❌ **2026-09-07 撤销：前提被证伪，不要做** —— 查了此前
+   一直没人查的那一项：**公开目录搜索本身**。
+   `https://glama.ai/mcp/servers?query=pyobfus` 返回 `pyobfus-mcp`（owner
+   `zhurong2020`），带 **A license / A quality / A maintenance** 三项评分，
+   单个工具被逐个索引并各自评分，**没有任何 pending / unapproved /
+   under-review 标记**；详情页与徽章均 HTTP 200。在一个 83,209 条目的目录里
+   可搜索、有评分、持续重建的记录，就是**已上架**。
+   - Frank 09-05 邮件的主题行是 `Re: Your MCP server "pyobfus-mcp" was not
+     approved on Glama`——**那是 5 月的拒信 thread**，他很可能照旧工单回复，
+     未核对当前状态（收信当天就记下过这个疑点）。
+   - **方法教训（比结论更重要）**：`/api/mcp/v1/servers/...` 先返回
+     `not_found`、后返回 **HTTP 401**，被我们当作「条目不在目录里」的证据用了
+     好几周。**它不是。** 401 是认证失败（该端点现已对所有人要求 API key），
+     废弃路径上的 `not_found` 也说明不了上架状态。**拿不到访问权 ≠ 东西不存在。**
+     正确探针是公开搜索页，一个请求的成本，却一直没跑。
+   - 撤销理由：重新提交有真实下行风险（可能产生重复条目、或改动 URL 从而
+     打断 README 评分徽章），换来的却是修一个并不存在的问题。
+
 3. **Claude Plugin Marketplace** — Aug 2 提交，09-07 复查仍 `Submitted and
    pending review`，已 36 天无状态变化。政策不变：被动等待，不为
    `protected_project` → `protect_project` 笔误单独重新提交，除非 Anthropic

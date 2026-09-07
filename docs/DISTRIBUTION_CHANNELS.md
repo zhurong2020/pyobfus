@@ -217,7 +217,7 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   makes a single optional hash ambiguous.
 - Implications: Claude Desktop / Claude Code / Cursor / Windsurf / Zed users querying the registry for "pyobfus" or "python obfuscator" will discover this server without manual config file edits.
 
-### Glama — `zhurong2020/pyobfus` 🟡 BUILD CONFIRMED / NEVER APPROVED — RESUBMIT READY
+### Glama — `zhurong2020/pyobfus` 🟢 LISTED AND HEALTHY (resubmission is NOT needed)
 - Public page: https://glama.ai/mcp/servers/zhurong2020/pyobfus
 - 2026-08-21 recheck: the public page is reachable and still exposes 8 tool names, but its version metadata is stale (shows v0.5.13; current is 0.5.16); the older API path `/api/mcp/v1/servers/io.github.zhurong2020/pyobfus-mcp` still returns `not_found`.
 - 2026-08-20: third-party maintainers independently reproduced both symptoms (build stuck on `debian:trixie-slim`, page OK but public API stale) — confirms this is Glama-side infra/sync, not a pyobfus-mcp code issue. Discord `#support` still unanswered as of 08-21; policy is passive-wait, no code change, no re-pin until Glama responds.
@@ -397,6 +397,32 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   The "Release Created" panel called this build `0.5.22` — the core package's
   version, again confirming that counter tracks GitHub release tags from the
   shared repo rather than the MCP package's 0.3.x line.
+- 2026-09-07 **the "never approved" premise is falsified — do NOT resubmit.**
+  Checked the one thing nobody had checked: the public directory search itself.
+  `https://glama.ai/mcp/servers?query=pyobfus` returns `pyobfus-mcp` under owner
+  `zhurong2020` with grades **A license / A quality / A maintenance**, its
+  individual tools indexed and separately graded, and **no pending /
+  unapproved / under-review label of any kind**. Detail page and badge both
+  HTTP 200. A record that is searchable, graded and continuously rebuilt inside
+  an 83,209-server directory is a live listing, whatever the May ticket says.
+  - Most likely explanation for the 2026-09-05 email: its subject line is
+    `Re: Your MCP server "pyobfus-mcp" was not approved on Glama` — the
+    **May** rejection thread. Frank appears to have answered from that ticket
+    without re-checking the present state, which is exactly the tension already
+    flagged when the mail arrived.
+  - **Method lesson, worth more than the conclusion**: `/api/mcp/v1/servers/...`
+    returning `not_found` and later **HTTP 401** was treated for weeks as
+    evidence the entry was missing from the directory. It is not. 401 is an
+    authentication failure — the endpoint now requires an API key for everyone
+    — and `not_found` on a deprecated path says nothing about listing state.
+    **Absence of access is not evidence of absence.** The correct probe is the
+    public search page, which costs one request and was never run.
+  - Consequence: resubmission is removed from the action list. It carried real
+    downside (a possible duplicate entry, or a moved URL breaking the README
+    score badge) in exchange for fixing a problem that does not exist.
+  - Residual drift, harmless: the search card reads
+    `Updated a day ago (2026-09-06 04:31 UTC)`, predating today's 0.3.12 build,
+    so the card's timestamp lags the build pipeline.
 
 ### MCP Skills trust score — 🟡 ESTABLISHED / NOT VERIFIED
 - 2026-08-24 official free score API scan for `zhurong2020/pyobfus`: composite
