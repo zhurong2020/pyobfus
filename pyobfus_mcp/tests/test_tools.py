@@ -334,6 +334,68 @@ def test_build_server_attaches_meta_to_each_tool() -> None:
         ), f"{tool.name} meta.tier={meta.get('tier')!r}, expected {expected_tier!r}"
 
 
+def test_build_server_advertises_this_packages_version() -> None:
+    """The `initialize` handshake must report pyobfus-mcp's own version.
+
+    Regression guard for a defect found 2026-09-07 in a Glama build's instance
+    logs: the handshake returned `serverInfo: {name: "pyobfus", version:
+    "1.29.1"}` — the mcp SDK's version, not this package's 0.3.10. Clients saw
+    a version pyobfus-mcp has never had, changing on every SDK bump.
+
+    `FastMCP.__init__` takes no `version=` kwarg (removed between mcp 1.0 and
+    1.20+, see CHANGELOG 0.1.2) and does not inherit it from package metadata;
+    it leaves the inner low-level `Server.version` at None and the SDK then
+    advertises its own.
+    """
+    pytest = __import__("pytest")
+    try:
+        from pyobfus_mcp.server import _build_server
+    except ImportError:  # pragma: no cover — only when mcp SDK isn't installed
+        pytest.skip("mcp SDK not installed in this test env")
+
+    import pyobfus_mcp
+
+    app = _build_server()
+
+    inner = getattr(app, "_mcp_server", None)
+    assert inner is not None, (
+        "FastMCP no longer exposes `_mcp_server`; _set_server_version() has lost "
+        "its seam and the advertised version has silently regressed"
+    )
+    assert inner.version == pyobfus_mcp.__version__
+
+    # What the client actually receives on `initialize`.
+    opts = inner.create_initialization_options()
+    assert opts.server_version == pyobfus_mcp.__version__, (
+        f"handshake advertises {opts.server_version!r}, expected "
+        f"{pyobfus_mcp.__version__!r} — the SDK version is leaking again"
+    )
+
+
+def test_set_server_version_is_fail_soft() -> None:
+    """A moved SDK internal must degrade the version, never crash startup.
+
+    `_mcp_server` is private. If a future SDK renames it, the server has to
+    keep starting — a cosmetic version regression is acceptable, a startup
+    crash is not (that is exactly what 0.1.2 had to hot-fix).
+    """
+    pytest = __import__("pytest")
+    try:
+        from pyobfus_mcp.server import _set_server_version
+    except ImportError:  # pragma: no cover — only when mcp SDK isn't installed
+        pytest.skip("mcp SDK not installed in this test env")
+
+    class _NoInner:
+        pass
+
+    class _InnerWithoutVersion:
+        def __init__(self) -> None:
+            self._mcp_server = object()
+
+    assert _set_server_version(_NoInner(), "9.9.9") is False
+    assert _set_server_version(_InnerWithoutVersion(), "9.9.9") is False
+
+
 # ---------------------------------------------------------------------------
 # Phase 3: Pro funnel via MCP
 # ---------------------------------------------------------------------------

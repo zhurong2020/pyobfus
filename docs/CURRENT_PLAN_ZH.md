@@ -88,7 +88,17 @@
 8. **GitHub Action / GitHub Marketplace** — 分发扩展队列的下一项。建议独立
    `pyobfus-action` 仓库，不塞进当前多包仓库。见
    [`DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md`](DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md)。
-9. **🐛 `serverInfo` 版本号报错（2026-09-07 由 Glama instance 日志发现）** —
+9. ~~**🐛 `serverInfo` 版本号报错**~~ ✅ **2026-09-07 已修复**（未发版，在
+   `[Unreleased]`）——修法：`_build_server()` 构造后调用新的 fail-soft helper
+   `_set_server_version(app, __version__)` 给内层 lowlevel `Server.version`
+   打戳；`_mcp_server` 是私有属性，helper 用 `getattr` + `hasattr` 保护，SDK
+   内部若改名则服务器照常启动、仅版本号退回旧的错误行为（**绝不能让装饰性缺陷
+   变成启动崩溃**——0.1.2 就是被这个坑过）。补 2 条回归测试：一条断言握手
+   `create_initialization_options().server_version` 等于本包版本并显式报出
+   "SDK 版本又泄漏了"，一条断言 helper 在缺 `_mcp_server` / 缺 `version` 两种
+   情形下返回 `False` 且不抛。验证：MCP 测试根 **95 passed**、black/ruff 干净、
+   mypy 按 CI 口径 `Success: no issues found in 84 source files`（与改动前一致）。
+   下面是原始取证，保留备查：
    握手返回 `serverInfo: {name: "pyobfus", version: "1.29.1"}`，而 `1.29.1`
    是**该镜像里 mcp SDK 的版本**，不是 `pyobfus-mcp` 的 0.3.10。也就是说每个
    MCP 客户端看到的都是一个本包从未有过的版本号，且会随 SDK 升级而变。

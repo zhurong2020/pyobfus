@@ -8,6 +8,21 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ### Fixed
 
+- **`initialize` advertised the mcp SDK's version instead of this package's.**
+  The handshake returned `serverInfo: {name: "pyobfus", version: "1.29.1"}` —
+  the installed SDK version, not `pyobfus-mcp`'s own — so every MCP client saw
+  a version this package has never had, changing on each SDK bump. Found in a
+  Glama build's instance logs on 2026-09-07.
+
+  Cause: `FastMCP.__init__` has taken no `version=` kwarg since mcp SDK 1.20+
+  (removing it is what fixed the 0.1.2 startup crash), and it does **not**
+  inherit the version from package metadata as the code comment had claimed —
+  it leaves the inner low-level `Server.version` at `None`, and the SDK then
+  reports its own. The server now stamps `__version__` onto that inner server
+  after construction, via a fail-soft helper: `_mcp_server` is private, so if a
+  future SDK moves it the server still starts and only the advertised version
+  regresses. Two regression tests cover the handshake value and the fail-soft
+  path.
 - Replaced the retired `modelcontextprotocol/servers` GitHub-directory URL in
   package metadata with the live official Registry search endpoint, and added
   the same direct entry link to the MCP README.

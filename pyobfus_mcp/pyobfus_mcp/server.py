@@ -31,6 +31,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
+from pyobfus_mcp import __version__
 from pyobfus_mcp.tools import (
     check_obfuscation_risks,
     explain_preset,
@@ -41,6 +42,33 @@ from pyobfus_mcp.tools import (
     start_pro_trial,
     unmap_stack_trace,
 )
+
+
+def _set_server_version(app: Any, version: str) -> bool:
+    """Stamp `version` onto the FastMCP instance's inner low-level Server.
+
+    Returns True if it was set, False if the SDK's internals have moved.
+
+    Why this is needed: `FastMCP.__init__` accepts no `version=` kwarg (it was
+    removed between mcp SDK 1.0 and 1.20+, see CHANGELOG 0.1.2) and it does
+    **not** fall back to this package's metadata — it leaves the inner
+    `mcp.server.lowlevel.Server.version` at None, and the SDK then advertises
+    its *own* version in the `initialize` handshake. Observed live on
+    2026-09-07: a Glama build running mcp 1.29.1 reported
+    `serverInfo: {name: "pyobfus", version: "1.29.1"}`, a version this package
+    has never had.
+
+    `_mcp_server` is private, so this is deliberately defensive. If a future
+    SDK renames it, the server still starts and only the advertised version
+    regresses to the old (wrong) behaviour — a cosmetic defect must never
+    become a startup crash. The accompanying test asserts the seam still
+    exists, so the regression surfaces in CI rather than in a client.
+    """
+    inner = getattr(app, "_mcp_server", None)
+    if inner is None or not hasattr(inner, "version"):
+        return False
+    inner.version = version
+    return True
 
 
 def _build_server() -> Any:
@@ -59,10 +87,12 @@ def _build_server() -> Any:
             f"(Original error: {e})"
         )
 
-    # FastMCP dropped the `version=` kwarg between mcp SDK 1.0 and 1.20+.
-    # The MCP protocol surfaces server version via the InitializeResult
-    # capabilities object; FastMCP populates that from package metadata.
+    # FastMCP dropped the `version=` kwarg between mcp SDK 1.0 and 1.20+, so
+    # the version cannot be passed at construction. It is NOT inherited from
+    # package metadata either — see `_set_server_version` for what the SDK
+    # actually does and how this was caught.
     app = FastMCP(name="pyobfus")
+    _set_server_version(app, __version__)
 
     # Per-tool metadata carried via the `meta` kwarg (mcp 1.27 SDK-native).
     # We use it for tool versioning ("version": "1") and tier classification
