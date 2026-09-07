@@ -127,6 +127,14 @@
    跑的仍是旧版。
    📌 **流程认知修正**：`release.yml` **不含** MCP Registry 步骤，Registry 是
    独立的 `mcp-publisher publish`（本轮已执行）。别以为打 tag 就两边都发了。
+   🔴 **0.3.11 引入启动崩溃回归，已由 0.3.12 同日修复**：版本查找当时写成模块
+   顶层 `from pyobfus_mcp import __version__`，cwd 含无 `__init__.py` 的
+   `pyobfus_mcp/` 目录时（本仓库布局 + editable 安装）合并成 namespace package、
+   `__init__.py` 不执行 → 导入期 `ImportError`，服务器起不来。**正常安装不受
+   影响**，所以干净 venv 验收没发现，是 CI 冒烟 job 抓到的。教训写进
+   §C-9 结论：本地那次同样的 `ImportError` 曾被误判为「测试环境伪影」——它不是。
+   0.3.12 改为全程受保护的 `_package_version()`（包属性 → dist 元数据 → None
+   跳过），补 subprocess 回归测试复刻 CI 命令，并验证过该测试真能抓住此 bug。
 
 **已完成（2026-09-07，勿重复做）**：Open VSX 发布 + 上线复核 · 全量文档同步 ·
 pre-commit 凭证扫描 · 两份归档文档的更正横幅 · 09-07 下载量快照 ·

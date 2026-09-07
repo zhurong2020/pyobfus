@@ -52,7 +52,16 @@ Glama's Build steps still need a manual bump to 0.3.11.)
 
 ### PyPI — `pyobfus-mcp`
 - URL: https://pypi.org/project/pyobfus-mcp/
-- Current version: **0.3.11** (released 2026-09-07) · ships with PEP 740 attestations via OIDC trusted publishing
+- Current version: **0.3.12** (released 2026-09-07) · ships with PEP 740 attestations via OIDC trusted publishing
+- 0.3.12 contents: fixes a startup-crash regression introduced hours earlier in
+  0.3.11. That release resolved its version through a module-level
+  `from pyobfus_mcp import __version__`, which raises `ImportError` when the cwd
+  holds a `pyobfus_mcp/` directory with no `__init__.py` — the two merge into a
+  namespace package and `__init__.py` never runs. Normal installs were
+  unaffected; the CI smoke job, which runs from the repo root with an editable
+  install, was not. Version lookup is now fully guarded and falls through to
+  skipping the stamp. Same-day release despite the 1-2 day spacing rule, on the
+  precedent of vscode-extension 0.2.1: a genuine crash fix jumps the gate.
 - 0.3.11 contents: two fixes, no schema change. (1) The `initialize` handshake
   advertised the mcp SDK's version instead of this package's, so clients saw a
   version pyobfus-mcp never had — found in a Glama build's instance logs. (2)

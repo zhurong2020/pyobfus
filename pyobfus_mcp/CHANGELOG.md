@@ -6,6 +6,8 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+## [0.3.12] - 2026-09-07
+
 ### Fixed
 
 - **Server could fail to start from a cwd that shadows the package.** 0.3.11

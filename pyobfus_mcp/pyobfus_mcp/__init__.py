@@ -7,7 +7,7 @@ Code, Cursor, Windsurf, Zed, and anything else that speaks MCP.
 See README.md in this directory for install + configuration snippets.
 """
 
-__version__ = "0.3.11"
+__version__ = "0.3.12"
 
 from pyobfus_mcp.tools import (
     check_obfuscation_risks,
