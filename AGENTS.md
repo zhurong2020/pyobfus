@@ -32,7 +32,7 @@ its executables. Either activate `venv/` first, or call tools through
 ```bash
 python -m venv venv && source venv/bin/activate
 pip install -e ".[dev]"
-git config core.hooksPath .githooks   # once per clone — enables the PII pre-commit guard
+git config core.hooksPath .githooks   # once per clone — enables the pre-commit guard (PII + credentials)
 ```
 
 ## Build / test / lint — run before every commit
@@ -127,9 +127,16 @@ cloudflare-worker/  # Pro license verification Worker
 - **Dual license, separated source.** Never move Pro logic into the Apache-2.0
   core or vice-versa. Never commit Pro license keys or the Stripe webhook secret
   to this public repo.
-- **Public repo.** This is `zhurong2020/pyobfus`, public. The PII pre-commit
-  hook blocks a fixed set of personal identifiers — keep them out of code,
-  commits, and docs.
+- **Public repo.** This is `zhurong2020/pyobfus`, public. The pre-commit hook
+  runs two independent scans: a fixed set of personal identifiers, and
+  credential shapes (Open VSX / PyPI / GitHub / GitLab / npm / Anthropic /
+  OpenAI / AWS / Slack / Google tokens, PEM private keys). Keep both out of
+  code, commits, and docs. Each scan has its own bypass
+  (`PYOBFUS_ALLOW_PII=1` / `PYOBFUS_ALLOW_SECRET=1`) — waving through a
+  documented PII string does not wave through a token. Credential hits print
+  `file:line` only, never the value. If a blocked credential was ever real,
+  **rotate it**; deleting it from the file is not a rotation. Details:
+  `.githooks/README.md`.
 
 ## 🟢 Patent gate — CLEARED 2026-06-17 (v0.5 Pro mechanisms now releasable)
 
