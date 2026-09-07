@@ -372,6 +372,56 @@ def test_build_server_advertises_this_packages_version() -> None:
     )
 
 
+def test_server_imports_from_a_shadowing_cwd() -> None:
+    """Importing the server must survive a cwd that shadows the package.
+
+    Regression guard for a self-inflicted break on 2026-09-07: the version
+    lookup was added as a module-level `from pyobfus_mcp import __version__`,
+    which raises ImportError when the repo root is on sys.path — the
+    directory `pyobfus_mcp/` has no `__init__.py`, so it merges with an
+    editable install into a namespace package and `__init__.py` never runs.
+    The server then died at import instead of merely mis-reporting a version.
+
+    This runs the CI smoke command verbatim, from the repo root, in a
+    subprocess — the only faithful way to reproduce the sys.path condition.
+    """
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    pytest = __import__("pytest")
+
+    repo_root = Path(__file__).resolve().parents[2]
+    if not (repo_root / "pyobfus_mcp").is_dir():
+        pytest.skip("repo layout not present (installed-package test run)")
+
+    proc = subprocess.run(
+        [sys.executable, "-c", "from pyobfus_mcp.server import _build_server; _build_server()"],
+        cwd=repo_root,
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
+    if "No module named" in proc.stderr and "mcp" in proc.stderr:
+        pytest.skip("mcp SDK not installed in this test env")
+    assert proc.returncode == 0, (
+        "server import/startup failed from a shadowing cwd — a version lookup "
+        f"must never be able to prevent startup.\nstderr:\n{proc.stderr}"
+    )
+
+
+def test_package_version_never_raises() -> None:
+    """`_package_version()` must degrade to None rather than propagate."""
+    pytest = __import__("pytest")
+    try:
+        from pyobfus_mcp.server import _package_version
+    except ImportError:  # pragma: no cover — only when mcp SDK isn't installed
+        pytest.skip("mcp SDK not installed in this test env")
+
+    value = _package_version()
+    assert value is None or isinstance(value, str)
+
+
 def test_set_server_version_is_fail_soft() -> None:
     """A moved SDK internal must degrade the version, never crash startup.
 

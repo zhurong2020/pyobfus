@@ -31,7 +31,6 @@ from __future__ import annotations
 
 from typing import Any, Dict, Optional
 
-from pyobfus_mcp import __version__
 from pyobfus_mcp.tools import (
     check_obfuscation_risks,
     explain_preset,
@@ -42,6 +41,36 @@ from pyobfus_mcp.tools import (
     start_pro_trial,
     unmap_stack_trace,
 )
+
+
+def _package_version() -> Optional[str]:
+    """Best-effort version of this package. Never raises.
+
+    Deliberately not a module-level `from pyobfus_mcp import __version__`:
+    a cwd containing a `pyobfus_mcp/` directory merges with an editable
+    install into a *namespace* package, in which case `__init__.py` never
+    runs and that import raises ImportError at module load — taking the whole
+    server down before it starts.
+
+    That is not hypothetical. It is how this repo is laid out, so the CI smoke
+    test (`python -c "from pyobfus_mcp.server import _build_server"` run from
+    the repo root, with `pip install -e ./pyobfus_mcp`) reproduces it exactly,
+    and it is the same shadowing class that the VS Code extension had to fix
+    in 0.2.1. Advertising the right version is cosmetic; refusing to start is
+    not, so every lookup here is guarded and falls through to None.
+    """
+    try:
+        from pyobfus_mcp import __version__ as pkg_version
+
+        return str(pkg_version)
+    except Exception:  # pragma: no cover — namespace-shadowed layouts only
+        pass
+    try:
+        from importlib.metadata import version as dist_version
+
+        return dist_version("pyobfus-mcp")
+    except Exception:  # pragma: no cover — package not installed as a dist
+        return None
 
 
 def _set_server_version(app: Any, version: str) -> bool:
@@ -92,7 +121,9 @@ def _build_server() -> Any:
     # package metadata either — see `_set_server_version` for what the SDK
     # actually does and how this was caught.
     app = FastMCP(name="pyobfus")
-    _set_server_version(app, __version__)
+    _version = _package_version()
+    if _version:
+        _set_server_version(app, _version)
 
     # Per-tool metadata carried via the `meta` kwarg (mcp 1.27 SDK-native).
     # We use it for tool versioning ("version": "1") and tier classification

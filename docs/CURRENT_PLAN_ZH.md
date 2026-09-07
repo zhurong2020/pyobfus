@@ -116,9 +116,17 @@
 10. ~~**`pyobfus-mcp 0.3.11` 是否发版重新评估**~~ ✅ **2026-09-07 已发布**（用户
    明确批准）。含两条 Fixed：握手 `serverInfo.version` 修复 + 退役的 Registry
    URL 替换。发布间隔合规（0.3.10 是 09-01，隔 6 天，远超「1-2 天」门槛）。
-   **发布后必做（维护者手工）**：把 Glama admin 的 Build steps 从
+   **发布结果（均已独立核验）**：PyPI `latest=0.3.11`、wheel+sdist 两个 PEP 740
+   provenance 端点 HTTP 200；MCP Registry `0.3.11` `active`/`isLatest=true`；
+   GitHub Release `mcp-v0.3.11` 已建并附上**从 PyPI 下载的**两个产物（与线上
+   字节一致）；Release workflow 全绿。**端到端验收**：全新 venv 从 PyPI 装
+   0.3.11，解析到的 mcp SDK 恰是 **1.29.1**（正是当初泄漏的那个版本），握手
+   现在正确报 `0.3.11`、8 工具齐全——同条件下旧 bug 不复现。
+   ⚠️ **发布后仍需维护者手工做一件事**：把 Glama admin 的 Build steps 从
    `pyobfus-mcp==0.3.10` 改到 `==0.3.11`——它不会自动跟版，不改的话 Glama 那边
    跑的仍是旧版。
+   📌 **流程认知修正**：`release.yml` **不含** MCP Registry 步骤，Registry 是
+   独立的 `mcp-publisher publish`（本轮已执行）。别以为打 tag 就两边都发了。
 
 **已完成（2026-09-07，勿重复做）**：Open VSX 发布 + 上线复核 · 全量文档同步 ·
 pre-commit 凭证扫描 · 两份归档文档的更正横幅 · 09-07 下载量快照 ·

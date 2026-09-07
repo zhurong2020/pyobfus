@@ -173,9 +173,23 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 
 ### MCP Registry — `io.github.zhurong2020/pyobfus-mcp` 🟢 LIVE
 - URL: https://registry.modelcontextprotocol.io/v0/servers?search=pyobfus
-- **0.3.11 released 2026-09-07** — Registry `active` / `isLatest=true` and the
-  public version endpoint still need confirming after the release workflow
-  completes; do not record either as verified until independently checked.
+- **0.3.11 published 2026-09-07, independently confirmed**: the versions
+  endpoint reports `0.3.11` `active` / `isLatest=true`, published
+  `2026-09-07T06:10:07Z`. Published manually with `mcp-publisher` — the release
+  workflow covers PyPI only, it has **no** Registry step, so a Registry
+  publication never happens automatically on a tag.
+  - Retrieval note: immediately after publishing, the `?search=pyobfus`
+    endpoint still returned 0.3.10 as `isLatest` and did not list 0.3.11 at
+    all; the `/v0/servers/<name>/versions` endpoint already had it. The search
+    index caught up on a re-query minutes later. Same failure-to-conclude trap
+    as Open VSX's post-upload 404 — **query the versions endpoint, and never
+    read a stale search index as a failed publish.**
+  - Auth: the cached `~/.config/mcp-publisher/token.json` JWT is short-lived
+    (~80 min), so a re-login is needed almost every time. Non-interactive path
+    works: `mcp-publisher login github --token "$(gh auth token)"` (note the
+    modern `--token` spelling; the older docs show `-token`).
+  - The publisher-claimed `_meta.io.github.zhurong2020.pyobfus_mcp` namespace
+    is still stripped server-side, unchanged since 0.2.0.
 - Latest previously confirmed: **0.3.10** (2026-09-02 Registry publication;
   package released 2026-09-01) · status: `active` · `isLatest=true`. The public
   version endpoint also confirms package version 0.3.10 and the updated

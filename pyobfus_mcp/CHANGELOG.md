@@ -6,6 +6,21 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+### Fixed
+
+- **Server could fail to start from a cwd that shadows the package.** 0.3.11
+  resolved its version through a module-level
+  `from pyobfus_mcp import __version__`. When the working directory contains a
+  `pyobfus_mcp/` folder without `__init__.py` — the layout of this repo, and
+  reproducible with an editable install — the two merge into a namespace
+  package, `__init__.py` never runs, and that import raised `ImportError` at
+  module load, killing the server before startup. Normal installs were
+  unaffected. Version lookup is now fully guarded (`_package_version()`,
+  falling back to distribution metadata and then to skipping the stamp), so a
+  cosmetic version detail can no longer prevent the server from starting.
+  Covered by a subprocess regression test that runs the CI smoke command from
+  the repo root.
+
 ## [0.3.11] - 2026-09-07
 
 ### Fixed
