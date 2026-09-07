@@ -179,7 +179,7 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   makes a single optional hash ambiguous.
 - Implications: Claude Desktop / Claude Code / Cursor / Windsurf / Zed users querying the registry for "pyobfus" or "python obfuscator" will discover this server without manual config file edits.
 
-### Glama — `zhurong2020/pyobfus` 🟡 PAGE RENDERS / NEVER APPROVED — RESUBMIT PENDING
+### Glama — `zhurong2020/pyobfus` 🟡 BUILD CONFIRMED / NEVER APPROVED — RESUBMIT READY
 - Public page: https://glama.ai/mcp/servers/zhurong2020/pyobfus
 - 2026-08-21 recheck: the public page is reachable and still exposes 8 tool names, but its version metadata is stale (shows v0.5.13; current is 0.5.16); the older API path `/api/mcp/v1/servers/io.github.zhurong2020/pyobfus-mcp` still returns `not_found`.
 - 2026-08-20: third-party maintainers independently reproduced both symptoms (build stuck on `debian:trixie-slim`, page OK but public API stale) — confirms this is Glama-side infra/sync, not a pyobfus-mcp code issue. Discord `#support` still unanswered as of 08-21; policy is passive-wait, no code change, no re-pin until Glama responds.
@@ -287,6 +287,56 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   - **To confirm**: open that test's own detail/log view for an explicit
     result, as was done for `01a033e4` on 2026-08-24. Only then record the
     build side as recovered.
+- 2026-09-07 **build side CONFIRMED RECOVERED** — the test detail view for
+  `01a07845-bc57-7c91-905f-df27d33ea885` reports an explicit `Status: success`
+  in `14s`. The inference logged above is now settled by the status field, so
+  Frank's "build errors should be fixed now" is verified, not just claimed.
+  Evidence from that run:
+  - All five Docker stages completed through `exporting to image`. The failure
+    mode of 09-05/09-06 — dying at `load metadata for debian:trixie-slim`
+    before any build step — did not recur.
+  - Installed `pyobfus-mcp==0.3.10` plus `pyobfus==0.5.22`, i.e. the pinned MCP
+    release pulling the current core.
+  - Live handshake succeeded: `initialize` returned protocol `2025-11-25`, and
+    `ListToolsRequest` enumerated **all 8 tools**. `ListPromptsRequest` and
+    `ListResourcesRequest` returned empty, which is correct — this server
+    exposes tools only.
+  - `Release Created ... Version 0.5.21, Published 2026-09-07 03:50` confirms
+    the "Recent Releases" panel is generated *by builds*, which is why the
+    earlier version-label pattern was a usable signal.
+  - Timezone note for future readers: the log lines read `2026-09-06T19:50`
+    (UTC) while the panel header reads `2026-09-07 03:50` (UTC+8). Same run,
+    not two.
+- 2026-09-07 two discrepancies visible in that same successful run, neither
+  blocking, both worth not re-discovering later:
+  - **`pinnedCommit: null` in the Build Spec while the clone log checks out
+    `d2f5d75e74…`.** Identical to the 2026-08-24 observation (then `e44e687`),
+    so this is a standing Glama metadata inconsistency, not a new fault. No
+    runtime impact — the image installs the PyPI artifact, not the checkout.
+  - **The configured Python version does not govern the install.** Admin sets
+    `Python version: 3.12` and the synthesised Dockerfile runs
+    `uv python install 3.12 --default`, but the install step logs
+    `Using Python 3.13.5 environment at: /usr` — `uv pip install --system`
+    landed the package in Debian's system Python instead. No functional impact
+    observed (server started, 8 tools enumerated), but do not read that admin
+    field as controlling the runtime interpreter.
+- 2026-09-07 **a defect of ours, surfaced by Glama's instance logs**: the
+  handshake returns `serverInfo: {name: "pyobfus", version: "1.29.1"}`, and
+  `1.29.1` is the **mcp SDK version** installed in that image — not
+  `pyobfus-mcp` 0.3.10, and not `pyobfus` 0.5.22. Every MCP client sees a
+  version this package has never had, and it changes whenever the SDK updates.
+  Root cause verified in the code, not guessed: `server.py` carries a comment
+  claiming "FastMCP populates that from package metadata", which is false.
+  `FastMCP(name=...)` leaves the inner low-level `Server.version` at `None`
+  and the SDK then reports its own. Confirmed against the installed SDK
+  (mcp 1.27.0): `FastMCP.__init__` has no `version` parameter — so the 0.1.2
+  removal that fixed the startup crash was correct — while
+  `mcp.server.lowlevel.Server.__init__` does. Setting
+  `app._mcp_server.version = __version__` after construction makes
+  `create_initialization_options().server_version` return `0.3.10`, verified
+  end to end. Caveat: `_mcp_server` is private, so the fix needs a guard
+  rather than a bare assignment. Not yet applied — see the follow-up list in
+  `CURRENT_PLAN_ZH.md`.
 
 ### MCP Skills trust score — 🟡 ESTABLISHED / NOT VERIFIED
 - 2026-08-24 official free score API scan for `zhurong2020/pyobfus`: composite

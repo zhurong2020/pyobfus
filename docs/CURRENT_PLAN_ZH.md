@@ -26,7 +26,24 @@
   提交；③ 提交后核对公开 URL 是否仍是 `glama.ai/mcp/servers/zhurong2020/pyobfus`，
   若变了要同步改 README 徽章和 `DISTRIBUTION_CHANNELS.md` 里的全部链接。
   其余政策不变：不为 Glama 改 pyobfus-mcp 代码；MCP 0.3.11 继续压着不发。
-  - **09-07 后台面板新证据（分三层，别混为一谈）**：*事实*——Build steps 确为
+  - **✅ 09-07 构建侧已坐实恢复**：test `01a07845-…` 详情页显式
+    `Status: success`、耗时 14s。五个 Docker 阶段全过、导出镜像；09-05/09-06
+    那种「拉 `debian:trixie-slim` 元数据阶段就死」未复现；装上
+    `pyobfus-mcp==0.3.10` + `pyobfus==0.5.22`；真实握手 `initialize`
+    （协议 2025-11-25）+ `ListToolsRequest` 返回**全部 8 工具**。同时
+    `Release Created ... 0.5.21` 说明 Recent Releases 面板是**由构建产生**的，
+    这也解释了为什么之前那个版本标签能当信号用。**所以 Frank 的说法已被验证，
+    不再是"上游口径"。** 时区提示：日志 `2026-09-06T19:50`(UTC) 与面板
+    `2026-09-07 03:50`(+8) 是同一次，别当成两次。
+  - **同次构建里的两处不一致（不阻塞，但别重复发现）**：① Build Spec 写
+    `pinnedCommit: null`，克隆日志却 checkout `d2f5d75e74…`——与 08-24 那次
+    （当时是 `e44e687`）同款，是 Glama 长期元数据不一致，非新故障，无运行时
+    影响。② **后台的 Python 版本设置不决定实际安装位置**：配置写 3.12、
+    Dockerfile 也跑 `uv python install 3.12`，但安装日志是
+    `Using Python 3.13.5 environment at: /usr`——`uv pip install --system`
+    装进了 Debian 系统 Python。未观察到功能影响，但别把那个字段读成"运行时
+    解释器由我控制"。
+  - **09-07 旧证据留档（已被上面的 status 字段取代）**：*事实*——Build steps 确为
     `pyobfus-mcp==0.3.10`（手工改的那次生效了）；Pinned SHA 已是 `d2f5d75` 且
     页面标 `(sync)`，是历来第一次不落后 HEAD；Recent Tests 新增
     `01a07845-…`（09-07 03:50，标 `0.5.21`），是 Frank 那封邮件之后的第一条。
@@ -41,21 +58,21 @@
 
 **A. 需维护者手工操作（外部账号，均不阻塞本地开发）**
 
-1. **Glama 构建确认** — 点开 test `01a07845-bc57-7c91-905f-df27d33ea885`
-   （09-07 03:50）的详情/日志看**显式结果**。面板列表页没有 pass/fail 字段，
-   目前只是倾向性证据，不能当成功。确认跑通后再往下走第 2 步。
-2. **Glama 重新提交** — 构建确认跑通后，按 Frank 2026-09-05 指示走正常提交
-   流程。提交后**必须**核对公开 URL 是否仍是
+1. ~~**Glama 构建确认**~~ ✅ **2026-09-07 已完成** — test
+   `01a07845-…` 详情页 `Status: success` / 14s，8 工具握手正常。构建侧不再是
+   阻塞项。
+2. **⭐Glama 重新提交（当前最高优先，已解除阻塞）** — 构建已坐实跑通，按 Frank
+   2026-09-05 指示走正常提交流程。提交后**必须**核对公开 URL 是否仍是
    `glama.ai/mcp/servers/zhurong2020/pyobfus`；若变了，同步改 README 的
    Glama 评分徽章 + `DISTRIBUTION_CHANNELS.md` 里全部链接。
 3. **Claude Plugin Marketplace** — Aug 2 提交，09-07 复查仍 `Submitted and
    pending review`，已 36 天无状态变化。政策不变：被动等待，不为
    `protected_project` → `protect_project` 笔误单独重新提交，除非 Anthropic
    给出编辑入口。下轮周期复查。
-4. **Vaultwarden 条目补账号元数据** — 本轮因金库上锁未完成，需补进
-   `Open VSX Access Token (pyobfus)` 的 notes：token 标签
-   `pyobfus-local-publish`、**expires: never**、Eclipse 身份根、namespace
-   未验证的含义。
+4. ~~**Vaultwarden 条目补账号元数据**~~ ✅ **2026-09-07 已完成** — notes 已
+   补 Eclipse 身份根、token 标签 `pyobfus-local-publish`、**expires: never**、
+   namespace 未验证的准确含义、限流提示与三份文档指针；写前写后各核一次
+   password 指纹未变。
 5. **Open VSX namespace 归属验证**（可选）— 现为 `not verified`，是"未申请"
    不是"被拒"，不影响安装。想要归属标记才需申请。
 
@@ -71,12 +88,29 @@
 8. **GitHub Action / GitHub Marketplace** — 分发扩展队列的下一项。建议独立
    `pyobfus-action` 仓库，不塞进当前多包仓库。见
    [`DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md`](DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md)。
-9. **`pyobfus-mcp 0.3.11` 继续压着** — `[Unreleased]` 只有一条元数据 URL
-   修复，且每发一版都要手工改 Glama Build steps。等有实质 MCP 改动再一起发。
+9. **🐛 `serverInfo` 版本号报错（2026-09-07 由 Glama instance 日志发现）** —
+   握手返回 `serverInfo: {name: "pyobfus", version: "1.29.1"}`，而 `1.29.1`
+   是**该镜像里 mcp SDK 的版本**，不是 `pyobfus-mcp` 的 0.3.10。也就是说每个
+   MCP 客户端看到的都是一个本包从未有过的版本号，且会随 SDK 升级而变。
+   根因已在代码中证实（非推测）：`server.py:62-64` 的注释声称「FastMCP 会从包
+   元数据填充版本」，**该说法为假**——`FastMCP(name=...)` 会把内层 lowlevel
+   `Server.version` 留成 `None`，SDK 于是报自己的版本。对照已装 SDK
+   （mcp 1.27.0）核实：`FastMCP.__init__` **无** `version` 参数（所以 0.1.2
+   那次移除是对的），而 `mcp.server.lowlevel.Server.__init__` **有**。构造后设
+   `app._mcp_server.version = __version__` 可让
+   `create_initialization_options().server_version` 正确返回 `0.3.10`，已端到端
+   验证。**注意**：`_mcp_server` 是私有属性，落地时要加保护性判断（`getattr`
+   + 存在性检查）并补一条断言测试，不要裸赋值。
+   → 这条使 `0.3.11` 从「只有一条元数据 URL 修复」变成**有实质内容**，值得
+   重新评估是否发版。
+10. **`pyobfus-mcp 0.3.11` 是否发版重新评估** — 原判断是「`[Unreleased]` 只有
+   一条元数据 URL 修复，不值得为它付一次手工 Glama Build-steps bump」。加入上面
+   第 9 条后，内容分量变了；且构建侧已恢复，发版风险比前几天低。由维护者决定。
 
-**已完成（本轮，勿重复做）**：Open VSX 发布 + 上线复核 · 全量文档同步 ·
+**已完成（2026-09-07，勿重复做）**：Open VSX 发布 + 上线复核 · 全量文档同步 ·
 pre-commit 凭证扫描 · 两份归档文档的更正横幅 · 09-07 下载量快照 ·
-发版 runbook 补 Open VSX 步骤。
+发版 runbook 补 Open VSX 步骤 · **Glama 构建成功坐实** · Vaultwarden 账号
+元数据补全 · 注册表账号入口落档。
 
 ---
 

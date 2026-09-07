@@ -24,12 +24,16 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   [`docs/OPEN_VSX_PUBLISH_PLAN.md`](docs/OPEN_VSX_PUBLISH_PLAN.md)。发布 token 存
   Vaultwarden 条目 `Open VSX Access Token (pyobfus)`（唯一副本，**不进仓库/CI**，
   维护者定期轮换）。
-- **🟡 Glama（2026-09-07 Frank 第二封邮件）**：「Build errors should be fixed
-  now」——**上游口径，我方未验证**，此后未重跑过构建，看到一次真跑通之前不要在
-  任何文档写"构建已恢复"。重新提交是否产生重复条目 / 改动 URL 仍**无回复**
-  （README 徽章挂在现路径）。下一步与完整证据链见
-  [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md) 与
-  [`docs/DISTRIBUTION_CHANNELS.md`](docs/DISTRIBUTION_CHANNELS.md) 的 Glama 小节。
+- **🟡 Glama（2026-09-07）**：**构建侧已坐实恢复**——test `01a07845-…` 详情页
+  显式 `Status: success`/14s，8 工具握手正常，Frank 的说法已验证。**但目录条目
+  仍未获批**：09-05 邮件确认 2026-05-03 那次提交被拒后从未批准，需走正常流程
+  **重新提交**（当前最高优先的外部动作），且他仍**未回答**重新提交会不会产生
+  重复条目或改动 URL——README 徽章挂在现路径上。
+- **🐛 已知未修（2026-09-07 由 Glama 日志发现）**：`pyobfus-mcp` 握手返回的
+  `serverInfo.version` 是 **mcp SDK 的版本**（如 `1.29.1`）而非本包的 `0.3.10`；
+  `server.py:62-64` 那条「FastMCP 从包元数据填版本」的注释为假。修法已端到端
+  验证（构造后设内层 `Server.version`，需加私有属性保护 + 断言测试）。细节与
+  取证见 [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md) 后续待办 §C-9。
 - **✅ `Core 0.5.22` 已于 2026-09-06 发布**（用户明确批准）= Python 3.14
   remote-debug 硬化 advisory（触发条件方案 A：`config.anti_debug` 且目标 Python
   ≥ 3.14 → `--check` 加一条 `compatibility_advisory` 类别的 INFO advisory，提示
