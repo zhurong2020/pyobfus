@@ -4,6 +4,17 @@
 > [`CURRENT_PLAN_ZH.md`](CURRENT_PLAN_ZH.md). This file remains as historical
 > execution context and raw handoff detail, not the daily source of truth.
 
+> ⚠️ **Superseded conclusions inside — do not quote this file on Glama.** Its
+> Glama passages predate the 2026-09-05 correction and state the opposite of
+> what is now known. Three specific claims below are false: that the listing
+> was approved and merely suffering "directory sync drift" (the 2026-05-03
+> submission was **rejected and never approved**); that the admin Build-steps
+> pin follows new releases (it does **not** — it is manual every time); and
+> that Glama builds from the repo's `pyobfus_mcp/Dockerfile` (it synthesises
+> its own from the admin Build Spec). The MCP tool count is also 8, not 7.
+> Current state: [`CURRENT_PLAN_ZH.md`](CURRENT_PLAN_ZH.md) and the Glama
+> section of [`DISTRIBUTION_CHANNELS.md`](DISTRIBUTION_CHANNELS.md).
+
 **Snapshot**: 2026-05-09 (after pyobfus-mcp 0.2.0 ship + mcpservers.org listing live + 2026-05-09 strategy review added P0.5/P0.6/P0.7 + N7/N8/N9 + single-tier pricing guardrail).
 
 **Use as cold-start cheat sheet** when resuming work after a session break. This doc supersedes ad-hoc TODO scattered in chat; future Claude sessions should read this first.

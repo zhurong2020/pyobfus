@@ -4,6 +4,17 @@
 > live in [`CURRENT_PLAN_ZH.md`](CURRENT_PLAN_ZH.md). Keep this file only as
 > historical roadmap context unless a future cleanup deliberately removes it.
 
+> ⚠️ **Superseded conclusions inside — do not quote this file on Glama.** Its
+> Glama passages predate the 2026-09-05 correction and state the opposite of
+> what is now known. Three specific claims below are false: that the listing
+> was approved and merely suffering "directory sync drift" (the 2026-05-03
+> submission was **rejected and never approved**); that the admin Build-steps
+> pin follows new releases (it does **not** — it is manual every time); and
+> that Glama builds from the repo's `pyobfus_mcp/Dockerfile` (it synthesises
+> its own from the admin Build Spec). The MCP tool count is also 8, not 7.
+> Current state: [`CURRENT_PLAN_ZH.md`](CURRENT_PLAN_ZH.md) and the Glama
+> section of [`DISTRIBUTION_CHANNELS.md`](DISTRIBUTION_CHANNELS.md).
+
 This document outlines **future plans** for pyobfus. For released version history, see [CHANGELOG.md](../CHANGELOG.md). For the detailed AI-era positioning strategy, see [AI_INTEGRATION_STRATEGY.md](AI_INTEGRATION_STRATEGY.md). For execution tracking, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTION_LOG.md).
 
 **Target Users**: Individual developers and small teams shipping Python code in the AI-assisted development era
