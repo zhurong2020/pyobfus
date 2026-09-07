@@ -4,6 +4,18 @@ Inline obfuscation-risk diagnostics and reverse-mapped stack traces for
 [pyobfus](https://github.com/zhurong2020/pyobfus), the open-source
 AST-based Python code obfuscator.
 
+## Install
+
+Published to both registries at the same version:
+
+- **VS Code Marketplace** — <https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus>
+- **Open VSX** — <https://open-vsx.org/extension/zhurong2020/pyobfus> (for
+  VSCodium, Gitpod, Eclipse Theia, code-server and other builds that cannot
+  reach the Microsoft Marketplace)
+
+Publisher is `zhurong2020` on both. The extension shells out to your own
+locally-installed `pyobfus` — see [Requirements](#requirements).
+
 ## Why trust this extension
 
 This category has a documented trust problem, and it's getting worse, not

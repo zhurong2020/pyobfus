@@ -6,6 +6,13 @@ Independent version/release cadence from the main `pyobfus` and `pyobfus-mcp` Py
 
 ## [Unreleased]
 
+### Documentation
+
+- README now has an Install section listing both registries. The extension was
+  published to Open VSX (`zhurong2020.pyobfus` 0.4.2) on 2026-09-07, alongside
+  the existing VS Code Marketplace listing; this README change reaches both
+  listing pages with the next release.
+
 ## [0.4.2] - 2026-09-06
 
 ### Security
