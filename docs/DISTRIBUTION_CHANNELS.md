@@ -20,9 +20,10 @@ advisory verified against a fresh install. vscode-extension 0.4.2 published in
 the same round — a Security fix containing "Generate pyobfus.yaml" writes to the
 workspace; tag, GitHub Release with the vsix, and the maintainer's manual
 Marketplace upload are all done, with the public listing independently
-re-checked as `"version":"0.4.2"`. pyobfus-mcp remains 0.3.10 and was
-deliberately not released: its only pending change is a metadata URL fix, while
-every MCP release costs a manual Glama Build-steps bump.)
+re-checked as `"version":"0.4.2"`. **pyobfus-mcp 0.3.11 released** — the hold
+was lifted once a real defect joined the pending metadata fix: the initialize
+handshake was advertising the mcp SDK's version rather than the package's.
+Glama's Build steps still need a manual bump to 0.3.11.)
 
 > **Note (2026-05-09)**: most of the per-channel facts below are now current as of Session 23. Outside of the launch wave (HN 5-11 / Reddit 5-12 / CN trio 5-8/9), the live state is reflected here. Consult `docs/POST_V0.4_TODO.md` for forward TODO and `docs/V0.4_EXECUTION_LOG.md` for session-by-session deltas.
 
@@ -51,7 +52,14 @@ every MCP release costs a manual Glama Build-steps bump.)
 
 ### PyPI — `pyobfus-mcp`
 - URL: https://pypi.org/project/pyobfus-mcp/
-- Current version: **0.3.10** (released 2026-09-01) · ships with PEP 740 attestations via OIDC trusted publishing
+- Current version: **0.3.11** (released 2026-09-07) · ships with PEP 740 attestations via OIDC trusted publishing
+- 0.3.11 contents: two fixes, no schema change. (1) The `initialize` handshake
+  advertised the mcp SDK's version instead of this package's, so clients saw a
+  version pyobfus-mcp never had — found in a Glama build's instance logs. (2)
+  Replaced the retired `modelcontextprotocol/servers` directory URL in package
+  metadata with the live Registry endpoint. Released once (1) gave the version
+  real content; the metadata fix alone had not justified the manual Glama
+  Build-steps bump each MCP release costs.
 - 0.3.10 contents: intent-oriented Registry description and expanded PyPI discovery keywords; tool behavior and schemas unchanged.
 - 0.3.9 contents: `check_obfuscation_risks` adds default-on `use_project_config`, returns effective-config and excluded-finding context from Core, and moves the runtime dependency floor to `pyobfus>=0.5.18`.
 - 2026-08-24 pypistats snapshot (data through 08-23, known mirrors excluded):
@@ -165,7 +173,10 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 
 ### MCP Registry — `io.github.zhurong2020/pyobfus-mcp` 🟢 LIVE
 - URL: https://registry.modelcontextprotocol.io/v0/servers?search=pyobfus
-- Latest confirmed published: **0.3.10** (2026-09-02 Registry publication;
+- **0.3.11 released 2026-09-07** — Registry `active` / `isLatest=true` and the
+  public version endpoint still need confirming after the release workflow
+  completes; do not record either as verified until independently checked.
+- Latest previously confirmed: **0.3.10** (2026-09-02 Registry publication;
   package released 2026-09-01) · status: `active` · `isLatest=true`. The public
   version endpoint also confirms package version 0.3.10 and the updated
   pre-shipping / reverse-traceback / no-phone-home description. The prior

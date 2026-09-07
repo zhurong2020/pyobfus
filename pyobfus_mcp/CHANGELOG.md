@@ -6,6 +6,8 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+## [0.3.11] - 2026-09-07
+
 ### Fixed
 
 - **`initialize` advertised the mcp SDK's version instead of this package's.**

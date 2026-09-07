@@ -14,7 +14,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ### 🟢 2026-09-07 — Core 0.5.22 + VS Code 0.4.2 已发布、Open VSX 已上线后的当前焦点
 
-- Core **`0.5.22`** / MCP `0.3.10` / VS Code **`0.4.2`** 为最新公开版本；VS Code
+- Core **`0.5.22`** / MCP **`0.3.11`**（新发布）/ VS Code **`0.4.2`** 为最新公开版本；VS Code
   扩展同时在 **Microsoft Marketplace 与 Open VSX** 上架，两边同为 `0.4.2`。
 - **✅ Open VSX 已上线（2026-09-07）**：`zhurong2020.pyobfus` v0.4.2，
   <https://open-vsx.org/extension/zhurong2020/pyobfus>，页面与 API 均已独立复核
@@ -52,10 +52,11 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   lint/typecheck/打包干净，tag `vscode-v0.4.2` + GitHub Release（附
   `pyobfus-0.4.2.vsix`）已建，且已核实该 tag **未误触发** PyPI Release
   workflow（08-04 tag-glob 修复仍有效）。Marketplace 手工上传已由用户完成，`curl` 核实公开 listing 已返回 `"version":"0.4.2"`。
-- **⏸️ `pyobfus-mcp 0.3.11` 刻意未发**：`[Unreleased]` 只有一条元数据 URL 修复，
-  无功能影响；而 Glama admin「Build steps」不会自动跟版，每发一版都要维护者手工
-  改一次，其构建 09-05/09-06 连续失败（上游 09-07 称已修，未验证）。等下次 MCP
-  有实质改动再一起发。
+- **✅ `pyobfus-mcp 0.3.11` 已于 2026-09-07 发布**：原本因「只有一条元数据 URL
+  修复、不值得付一次手工 Glama Build-steps bump」而压着；当天从 Glama instance
+  日志查出 `serverInfo.version` 广播的是 mcp SDK 版本而非本包版本并修复后，内容
+  分量改变、且 Glama 构建侧已确认恢复，遂发版。含两条 Fixed：握手版本号 +
+  退役的 Registry URL。**发布后维护者需手工把 Glama Build steps 改到 0.3.11。**
 - **✅ `Core 0.5.21` 已于 2026-09-04 发布**（用户明确批准 push+tag）= SARIF
   preflight + 两个 cross-file/preset bug 修复。tag `v0.5.21` 经 OIDC + PEP 740
   发到 PyPI（`latest=0.5.21`，两个 provenance endpoint HTTP 200），全新 venv
@@ -420,9 +421,9 @@ cardiac-manuscripts 仓库（不影响 pyobfus 仓库本身）。
 - **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.22，2026-09-06 发布**；完整版本历史见 `CHANGELOG.md`)
 - **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.2，2026-09-06 发布**（tag + GitHub Release + Marketplace 手工上传均已完成；`curl` 独立核实公开 listing 返回 `"version":"0.4.2"`，lastUpdated 04:07:50 GMT）；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`)
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.10，2026-09-01 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.18` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
-- **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp`（最新已核实为 **0.3.10** `active` / `isLatest=true`）
+- **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp`（**0.3.11** 已于 2026-09-07 发布，需核实 `active` / `isLatest=true`）
 - **Smithery (Skill)**: https://smithery.ai/skills/zhurong2020/pyobfus-protect (2026-06-22 上线 · 本地工具走 Skill 渠道非 MCP 渠道) · **mcp.so**: 已收录
-- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus — 页面在线且渲染完整 8 工具，但 **2026-09-05 Frank Fiegel 邮件确认：2026-05-03 那次提交被拒后从未批准，不存在可复审的 listing**，需按正常提交流程重新提交。这推翻了此前「公开 API `tools: []` = 目录同步漂移」的判断（该端点现已要求 API key，匿名 `curl` 返回 `unauthorized`，不再是可用的健康检查口径）。admin「Build steps」**不会自动跟版**（停在 0.3.8、跨过 0.3.9/0.3.10，2026-09-06 由维护者手工改到 0.3.10）；Glama 构建**不读仓库里的 `pyobfus_mcp/Dockerfile`**，而是用 admin Build Spec 合成一份。构建连续失败于其自家 BuildKit 拉 `debian:trixie-slim`（08-07 / 08-17 / 09-05 / 09-06 ×2），09-06 的报错已由 Glama 自述为 platform-side fault。历史排障见 memory `glama_introspection_dockerfile_pin_2026-06-05`、`glama_zero_tools_repro_2026-08-07`，最新证据见 `docs/DISTRIBUTION_CHANNELS.md`。
+- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus — 页面在线且渲染完整 8 工具，但 **2026-09-05 Frank Fiegel 邮件确认：2026-05-03 那次提交被拒后从未批准，不存在可复审的 listing**，需按正常提交流程重新提交。这推翻了此前「公开 API `tools: []` = 目录同步漂移」的判断（该端点现已要求 API key，匿名 `curl` 返回 `unauthorized`，不再是可用的健康检查口径）。admin「Build steps」**不会自动跟版**（停在 0.3.8、跨过 0.3.9/0.3.10，2026-09-06 由维护者手工改到 0.3.10；**0.3.11 发布后需再手工改一次**）；Glama 构建**不读仓库里的 `pyobfus_mcp/Dockerfile`**，而是用 admin Build Spec 合成一份。构建曾连续失败于其自家 BuildKit 拉 `debian:trixie-slim`（08-07 / 08-17 / 09-05 / 09-06 ×2），**2026-09-07 已确认修复**：test `01a07845-…` 详情页显式 `Status: success`/14s，8 工具握手正常。构建侧不再是阻塞项，当前唯一外部动作是**重新提交**。历史排障见 memory `glama_introspection_dockerfile_pin_2026-06-05`、`glama_zero_tools_repro_2026-08-07`，最新证据见 `docs/DISTRIBUTION_CHANNELS.md`。
 - **GitHub**: https://github.com/zhurong2020/pyobfus (public)
 - **文档**: https://pyobfus.readthedocs.io
 - **许可**: Apache 2.0 (Core) + Proprietary (Pro)
