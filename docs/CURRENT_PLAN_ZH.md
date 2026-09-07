@@ -1,8 +1,11 @@
 # pyobfus 当前计划
 
-更新时间：2026-09-07（**`pyobfus 0.5.22` 与 `vscode-extension 0.4.2` 已发布**，
-均经用户明确批准。**Open VSX 已发布上线并复核通过**。`pyobfus-mcp` 仍 0.3.10、
-刻意未发。**Glama 收到 Frank 第二封邮件：构建错误据称已修，我方尚未验证。**）
+更新时间：2026-09-07（当前公开版本：Core **`0.5.22`** / MCP **`0.3.12`** /
+VS Code **`0.4.2`**。本日完成：**Open VSX 首发上线并复核**（扩展现同时在
+Marketplace 与 Open VSX，同版本）；**`pyobfus-mcp` 0.3.11 → 0.3.12 当日两发**
+（修 `serverInfo` 版本广播 + 修 0.3.11 引入的启动崩溃回归）；**Glama 两条线
+全部结清**——构建已恢复（连续两次 success），目录条目本就正常上架、
+**不需要重新提交**。）
 
 - **✅ Open VSX 已发布上线**：`zhurong2020.pyobfus` **v0.4.2**，页面
   <https://open-vsx.org/extension/zhurong2020/pyobfus>。同日独立复核：页面与
@@ -16,16 +19,15 @@
   [`OPEN_VSX_PUBLISH_PLAN.md`](OPEN_VSX_PUBLISH_PLAN.md)，凭证存 Vaultwarden
   条目 `Open VSX Access Token (pyobfus)`（唯一副本，不进仓库/CI，维护者定期
   轮换）。
-- **🟡 Glama：2026-09-07 Frank 第二封邮件「Build errors should be fixed now」**。
-  这是**上游口径，我方未验证**——那封邮件之后没有重跑过任何构建，所以在真看到
-  一次构建跑完之前，任何文档都不要写成"构建已恢复"。同时 Frank **没有回答**
-  重新提交是否会产生重复条目或改动 URL 的问题（README 的 Glama 评分徽章挂在现
-  路径上，URL 一动就断），09-05「走正常流程重新提交」的指示继续有效。
-  **下一步（维护者手工，不阻塞本地开发）**：① 用已 pin 好的
-  `pyobfus-mcp==0.3.10` 在后台触发一次构建并留证；② 若跑通，按 09-05 指示重新
-  提交；③ 提交后核对公开 URL 是否仍是 `glama.ai/mcp/servers/zhurong2020/pyobfus`，
-  若变了要同步改 README 徽章和 `DISTRIBUTION_CHANNELS.md` 里的全部链接。
-  其余政策不变：不为 Glama 改 pyobfus-mcp 代码；MCP 0.3.11 继续压着不发。
+- **🟢 Glama：2026-09-07 全线结清，无待办**。两条线分别收口：
+  **① 构建**——Frank 第二封邮件「Build errors should be fixed now」已由实测验证，
+  连续两次 `Status: success`（`01a07845` 14s / `01a07aa2` 14.2s），后者跑的是
+  0.3.12、8 工具握手正常；Build steps 已由维护者手工改到 `==0.3.12`。
+  **② 目录条目**——09-05 那封「被拒后从未批准、需重新提交」**已被证伪**：公开
+  搜索 `?query=pyobfus` 返回该 server，**A license / A quality / A maintenance**，
+  工具逐个索引评分，无任何 pending/unapproved 标记，详情页与徽章均 200。
+  **不要重新提交**（有产生重复条目 / 改动 URL 打断 README 徽章的风险）。
+  其余政策不变：不为 Glama 改 pyobfus-mcp 代码。
   - **✅ 09-07 构建侧已坐实恢复**：test `01a07845-…` 详情页显式
     `Status: success`、耗时 14s。五个 Docker 阶段全过、导出镜像；09-05/09-06
     那种「拉 `debian:trixie-slim` 元数据阶段就死」未复现；装上
@@ -186,10 +188,14 @@ pre-commit 凭证扫描 · 两份归档文档的更正横幅 · 09-07 下载量�
   `vscode-v0.4.2` + GitHub Release（附 `pyobfus-0.4.2.vsix`）已建，并已核实该
   tag **未误触发** PyPI Release workflow。**Marketplace 手工上传待维护者执行**，
   上传后用 `curl` 核实公开 listing 返回 `"version":"0.4.2"`。
-- **`pyobfus-mcp 0.3.11` 刻意未发**：`[Unreleased]` 只有一条元数据 URL 修复
-  （退役的 `modelcontextprotocol/servers` 目录 URL → 现行 Registry 端点），无
-  功能影响；而今天新确认 Glama admin「Build steps」不会自动跟版，每发一版都要
-  维护者手工改一次，且其构建仍在连续失败。等下次 MCP 有实质改动再一起发。
+- **`pyobfus-mcp` 当日两发 `0.3.11` → `0.3.12`（均已完成全链路核验）**：原计划
+  压着不发（`[Unreleased]` 只有一条退役 Registry URL 的元数据修复，不值得付一次
+  手工 Glama Build-steps bump）。当天从 Glama instance 日志查出
+  `serverInfo.version` 广播的是 mcp SDK 版本而非本包版本，内容分量改变 → 发
+  **0.3.11**；随后 CI 抓到 0.3.11 引入的启动崩溃回归（版本查找写在模块顶层导入，
+  遇 namespace 遮蔽即 `ImportError`）→ 同日发 **0.3.12**（崩溃类跳过间隔门，
+  先例 vscode-extension 0.2.1）。PyPI `latest=0.3.12` + 两个 provenance 200、
+  MCP Registry `isLatest`、GitHub Release 附 PyPI 原始产物，均已独立核验。
 - **下载量复查（数据截止 09-05）**：`pyobfus` 日/周/月 52 / 520 / 1,796；
   `pyobfus-mcp` 10 / 199 / 824。每日序列显示发布日一律 117–151、非发布日一律
   6–52，五次发布形状完全一致。**09-01 的 SEO 小版本没有带来可观测的有机增长**

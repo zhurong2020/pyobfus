@@ -246,7 +246,10 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   names. The formerly public API path now returns HTTP 401, so it is no longer a
   usable unauthenticated health check; continue treating the listing plus the
   successful live `ListToolsRequest` as the available evidence.
-- 2026-09-05 (email from frank@glama.ai, replying to the 2026-05-03 rejection):
+- 2026-09-05 (email from frank@glama.ai, replying to the 2026-05-03 rejection)
+  — ⚠️ **superseded 2026-09-07: its premise was falsified and the resubmission
+  it asks for must NOT be done; see the 09-07 entries at the end of this
+  section before acting on anything below**:
   the original submission was **rejected and never approved**, so there is no
   listing to re-review; the instruction is to resubmit through the normal
   submission flow now that the README, `glama.yaml` and the Dockerfile are in

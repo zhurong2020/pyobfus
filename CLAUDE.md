@@ -24,16 +24,25 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   [`docs/OPEN_VSX_PUBLISH_PLAN.md`](docs/OPEN_VSX_PUBLISH_PLAN.md)。发布 token 存
   Vaultwarden 条目 `Open VSX Access Token (pyobfus)`（唯一副本，**不进仓库/CI**，
   维护者定期轮换）。
-- **🟡 Glama（2026-09-07）**：**构建侧已坐实恢复**——test `01a07845-…` 详情页
-  显式 `Status: success`/14s，8 工具握手正常，Frank 的说法已验证。**但目录条目
-  仍未获批**：09-05 邮件确认 2026-05-03 那次提交被拒后从未批准，需走正常流程
-  **重新提交**（当前最高优先的外部动作），且他仍**未回答**重新提交会不会产生
-  重复条目或改动 URL——README 徽章挂在现路径上。
-- **🐛 已知未修（2026-09-07 由 Glama 日志发现）**：`pyobfus-mcp` 握手返回的
-  `serverInfo.version` 是 **mcp SDK 的版本**（如 `1.29.1`）而非本包的 `0.3.10`；
-  `server.py:62-64` 那条「FastMCP 从包元数据填版本」的注释为假。修法已端到端
-  验证（构造后设内层 `Server.version`，需加私有属性保护 + 断言测试）。细节与
-  取证见 [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md) 后续待办 §C-9。
+- **🟢 Glama（2026-09-07 全线结清，无待办）**：① **构建已恢复**——连续两次
+  `Status: success`（`01a07845` 14s / `01a07aa2` 14.2s），跑的是 0.3.12，
+  8 工具握手正常，Build steps 已由维护者手工改到 `==0.3.12`。② **目录条目本就
+  正常上架，不需要重新提交**——公开搜索 `?query=pyobfus` 返回该 server，
+  **A license / A quality / A maintenance**，工具逐个索引评分，无任何 pending/
+  unapproved 标记；详情页与徽章均 200。Frank 09-05「从未批准」那封的主题行是
+  5 月拒信 thread，应属照旧工单回复。
+  ⚠️ **方法教训**：`/api/mcp/v1/...` 的 `not_found`/**401** 被当成「条目不在
+  目录里」的证据用了数周——401 是**认证失败**（该端点现对所有人要 API key），
+  **拿不到访问权 ≠ 东西不存在**。正确探针是公开搜索页，一个请求的成本。
+- **✅ 已修（2026-09-07 由 Glama 日志发现并当日闭环）**：`pyobfus-mcp` 握手曾
+  把 `serverInfo.version` 报成 **mcp SDK 的版本**（`1.29.1`）而非本包版本；
+  `server.py` 那条「FastMCP 从包元数据填版本」的注释为假——`FastMCP` 不收
+  `version=`，会把内层 lowlevel `Server.version` 留成 `None`。**0.3.11** 修此
+  问题，**0.3.12** 修 0.3.11 引入的启动崩溃回归（版本查找曾写在模块顶层导入，
+  遇 namespace 遮蔽即 `ImportError`；现走全程受保护的 `_package_version()`）。
+  生产闭环证据：Glama 最新构建的 instance log 已读作
+  `serverInfo: {name: "pyobfus", version: "0.3.12"}`，而镜像里 `mcp` 仍是
+  1.29.1——同环境同 SDK，旧 bug 不复现。
 - **✅ `Core 0.5.22` 已于 2026-09-06 发布**（用户明确批准）= Python 3.14
   remote-debug 硬化 advisory（触发条件方案 A：`config.anti_debug` 且目标 Python
   ≥ 3.14 → `--check` 加一条 `compatibility_advisory` 类别的 INFO advisory，提示
@@ -430,7 +439,7 @@ cardiac-manuscripts 仓库（不影响 pyobfus 仓库本身）。
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.10，2026-09-01 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.18` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp`（**0.3.12** 2026-09-07 发布，需核实 `active` / `isLatest=true`）
 - **Smithery (Skill)**: https://smithery.ai/skills/zhurong2020/pyobfus-protect (2026-06-22 上线 · 本地工具走 Skill 渠道非 MCP 渠道) · **mcp.so**: 已收录
-- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus — 页面在线且渲染完整 8 工具，但 **2026-09-05 Frank Fiegel 邮件确认：2026-05-03 那次提交被拒后从未批准，不存在可复审的 listing**，需按正常提交流程重新提交。这推翻了此前「公开 API `tools: []` = 目录同步漂移」的判断（该端点现已要求 API key，匿名 `curl` 返回 `unauthorized`，不再是可用的健康检查口径）。admin「Build steps」**不会自动跟版**（停在 0.3.8、跨过 0.3.9/0.3.10，2026-09-06 由维护者手工改到 0.3.10；**已于 2026-09-07 手工改到 0.3.12**）；Glama 构建**不读仓库里的 `pyobfus_mcp/Dockerfile`**，而是用 admin Build Spec 合成一份。构建曾连续失败于其自家 BuildKit 拉 `debian:trixie-slim`（08-07 / 08-17 / 09-05 / 09-06 ×2），**2026-09-07 已确认修复**：test `01a07845-…` 详情页显式 `Status: success`/14s，8 工具握手正常。构建侧不再是阻塞项，当前唯一外部动作是**重新提交**。历史排障见 memory `glama_introspection_dockerfile_pin_2026-06-05`、`glama_zero_tools_repro_2026-08-07`，最新证据见 `docs/DISTRIBUTION_CHANNELS.md`。
+- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus — 页面在线且渲染完整 8 工具，**状态：已上架且健康**（2026-09-07 核验：公开搜索 `?query=pyobfus` 返回该 server，A license / A quality / A maintenance，无 pending/unapproved 标记，详情页与徽章均 200）。2026-09-05 Frank Fiegel 邮件曾称「2026-05-03 被拒后从未批准、需重新提交」，**该说法已被公开目录证据证伪**——那封信的主题行是 5 月拒信 thread，应属照旧工单回复；**不要重新提交**（有产生重复条目 / 改动 URL 打断 README 徽章的风险）。⚠️ 方法教训：`/api/mcp/v1/...` 返回 `not_found`/`401` 曾被当作「不在目录里」的证据用了数周，401 只是**认证失败**（现对所有人要 API key），**拿不到访问权 ≠ 东西不存在**，正确探针是公开搜索页。admin「Build steps」**不会自动跟版**（停在 0.3.8、跨过 0.3.9/0.3.10，2026-09-06 由维护者手工改到 0.3.10；**已于 2026-09-07 手工改到 0.3.12**）；Glama 构建**不读仓库里的 `pyobfus_mcp/Dockerfile`**，而是用 admin Build Spec 合成一份。构建曾连续失败于其自家 BuildKit 拉 `debian:trixie-slim`（08-07 / 08-17 / 09-05 / 09-06 ×2），**2026-09-07 已确认修复**：test `01a07845-…` 详情页显式 `Status: success`/14s，8 工具握手正常。构建侧不再是阻塞项；**Glama 这条线已无待办**。历史排障见 memory `glama_introspection_dockerfile_pin_2026-06-05`、`glama_zero_tools_repro_2026-08-07`，最新证据见 `docs/DISTRIBUTION_CHANNELS.md`。
 - **GitHub**: https://github.com/zhurong2020/pyobfus (public)
 - **文档**: https://pyobfus.readthedocs.io
 - **许可**: Apache 2.0 (Core) + Proprietary (Pro)
