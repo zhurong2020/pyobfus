@@ -57,9 +57,13 @@ Glama's Build steps still need a manual bump to 0.3.11.)
   0.3.11. That release resolved its version through a module-level
   `from pyobfus_mcp import __version__`, which raises `ImportError` when the cwd
   holds a `pyobfus_mcp/` directory with no `__init__.py` — the two merge into a
-  namespace package and `__init__.py` never runs. Normal installs were
-  unaffected; the CI smoke job, which runs from the repo root with an editable
-  install, was not. Version lookup is now fully guarded and falls through to
+  namespace package and `__init__.py` never runs. **Impact was
+  development-scoped, measured not assumed**: a regular `pip install` is fine
+  even from a shadowing cwd (the site-packages package outranks the namespace
+  portion — verified against 0.3.11 and 0.3.12 side by side); the crash needs
+  an *editable* install, whose `__editable__` finder resolves submodules while
+  the directory captures the top-level name. That is the CI smoke job's layout,
+  which is what caught it. Version lookup is now fully guarded and falls through to
   skipping the stamp. Same-day release despite the 1-2 day spacing rule, on the
   precedent of vscode-extension 0.2.1: a genuine crash fix jumps the gate.
 - 0.3.11 contents: two fixes, no schema change. (1) The `initialize` handshake

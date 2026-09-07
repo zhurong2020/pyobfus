@@ -23,6 +23,13 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
   Covered by a subprocess regression test that runs the CI smoke command from
   the repo root.
 
+  Scope, measured against both versions rather than reasoned about: a regular
+  `pip install pyobfus-mcp` is **not** affected even from a shadowing working
+  directory, because the real package in `site-packages` outranks a namespace
+  portion. The crash needs an **editable** install (`pip install -e`), whose
+  `__editable__` finder resolves submodules while the directory captures the
+  top-level name. That is the development and CI layout, not how users install.
+
 ## [0.3.11] - 2026-09-07
 
 ### Fixed

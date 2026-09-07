@@ -130,8 +130,13 @@
    🔴 **0.3.11 引入启动崩溃回归，已由 0.3.12 同日修复**：版本查找当时写成模块
    顶层 `from pyobfus_mcp import __version__`，cwd 含无 `__init__.py` 的
    `pyobfus_mcp/` 目录时（本仓库布局 + editable 安装）合并成 namespace package、
-   `__init__.py` 不执行 → 导入期 `ImportError`，服务器起不来。**正常安装不受
-   影响**，所以干净 venv 验收没发现，是 CI 冒烟 job 抓到的。教训写进
+   `__init__.py` 不执行 → 导入期 `ImportError`，服务器起不来。
+   ⚠️ **影响范围经实测更正（别沿用最初的判断）**：发 0.3.12 时曾按「启动崩溃、
+   PyPI 上的 0.3.11 带此缺陷」定性并据此跳过间隔门。事后同环境对照实测发现：
+   **普通 `pip install` 即使在遮蔽 cwd 下也不崩**（site-packages 的正规包优先于
+   namespace portion，0.3.11/0.3.12 两版均验证）；崩溃**需要 editable 安装**——
+   其 `__editable__` finder 解析子模块、而目录抢走顶层名。**即影响面是开发/CI，
+   不是用户**。0.3.12 本身仍是正确修复，但当初传达的紧迫性被夸大了。教训写进
    §C-9 结论：本地那次同样的 `ImportError` 曾被误判为「测试环境伪影」——它不是。
    0.3.12 改为全程受保护的 `_package_version()`（包属性 → dist 元数据 → None
    跳过），补 subprocess 回归测试复刻 CI 命令，并验证过该测试真能抓住此 bug。
