@@ -37,6 +37,49 @@
     确认后才可把构建侧记为恢复。
 - **分发扩展调研已记录**：见 [`DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md`](DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md)。结论是不提交 `free-for.dev`，后续顺序为 Open VSX、GitHub Action、`awesome-python`、安全类 awesome-list、AlternativeTo、Smithery、Product Hunt。**其中 Open VSX 已于本日完成**，队列下一个是 GitHub Action。
 
+## 后续待办（2026-09-07 整理 · 冷启动看这里）
+
+**A. 需维护者手工操作（外部账号，均不阻塞本地开发）**
+
+1. **Glama 构建确认** — 点开 test `01a07845-bc57-7c91-905f-df27d33ea885`
+   （09-07 03:50）的详情/日志看**显式结果**。面板列表页没有 pass/fail 字段，
+   目前只是倾向性证据，不能当成功。确认跑通后再往下走第 2 步。
+2. **Glama 重新提交** — 构建确认跑通后，按 Frank 2026-09-05 指示走正常提交
+   流程。提交后**必须**核对公开 URL 是否仍是
+   `glama.ai/mcp/servers/zhurong2020/pyobfus`；若变了，同步改 README 的
+   Glama 评分徽章 + `DISTRIBUTION_CHANNELS.md` 里全部链接。
+3. **Claude Plugin Marketplace** — Aug 2 提交，09-07 复查仍 `Submitted and
+   pending review`，已 36 天无状态变化。政策不变：被动等待，不为
+   `protected_project` → `protect_project` 笔误单独重新提交，除非 Anthropic
+   给出编辑入口。下轮周期复查。
+4. **Vaultwarden 条目补账号元数据** — 本轮因金库上锁未完成，需补进
+   `Open VSX Access Token (pyobfus)` 的 notes：token 标签
+   `pyobfus-local-publish`、**expires: never**、Eclipse 身份根、namespace
+   未验证的含义。
+5. **Open VSX namespace 归属验证**（可选）— 现为 `not verified`，是"未申请"
+   不是"被拒"，不影响安装。想要归属标记才需申请。
+
+**B. 有明确时间点**
+
+6. **下载量干净日复查（09-08 之后）** — 09-06 是 0.5.22 发布日、被污染；
+   干净日自 09-07 起算。届时才能判断「09-05 的 52 是否代表基线抬升」。
+7. **Open VSX 首次安装量** — 目前 `downloadCount=0`（发布当天正常）。下次
+   周期性渠道复查时看有没有真实安装。
+
+**C. 本地可做**
+
+8. **GitHub Action / GitHub Marketplace** — 分发扩展队列的下一项。建议独立
+   `pyobfus-action` 仓库，不塞进当前多包仓库。见
+   [`DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md`](DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md)。
+9. **`pyobfus-mcp 0.3.11` 继续压着** — `[Unreleased]` 只有一条元数据 URL
+   修复，且每发一版都要手工改 Glama Build steps。等有实质 MCP 改动再一起发。
+
+**已完成（本轮，勿重复做）**：Open VSX 发布 + 上线复核 · 全量文档同步 ·
+pre-commit 凭证扫描 · 两份归档文档的更正横幅 · 09-07 下载量快照 ·
+发版 runbook 补 Open VSX 步骤。
+
+---
+
 - **Core `0.5.22`** = Python 3.14 remote-debug 硬化 advisory（此前 held 的
   `fe898c7`）。发布前三测试根 1253+93+7 全过、black/ruff/mypy 干净；tag
   `v0.5.22` 经 OIDC + PEP 740 发到 PyPI（`latest=0.5.22`，wheel/sdist 两个
