@@ -1,43 +1,59 @@
 #!/usr/bin/env bash
-# pre-commit: block PII patterns from sneaking into commits.
+# pre-commit: block PII patterns and credential material from entering commits.
 #
-# Origin: 2026-05-03 PII cleanup (V0.4_EXECUTION_LOG Sessions 13-15) removed
-# CCPC software-copyright filing materials from public history. This hook
-# prevents reintroduction by scanning staged blob content before each commit.
+# Two independent scans, each with its own allowlist and its own bypass:
+#
+#   1. PII      — Origin: 2026-05-03 PII cleanup (V0.4_EXECUTION_LOG Sessions
+#                 13-15) removed CCPC software-copyright filing materials from
+#                 public history. This scan prevents reintroduction.
+#   2. SECRETS  — Origin: 2026-09-07. The PII scan had no coverage for tokens,
+#                 so a credential pasted into a file would have committed
+#                 cleanly to this PUBLIC repo. Added after an Open VSX publish
+#                 token was handled by hand and caught only by an ad-hoc grep.
 #
 # Setup (one-time per clone):
 #     git config core.hooksPath .githooks
 #
-# Bypass once for a legitimate reference:
+# Bypass one scan for a legitimate reference (they are separate on purpose —
+# waving through a documented PII string must not also wave through a token):
 #     PYOBFUS_ALLOW_PII=1 git commit ...
+#     PYOBFUS_ALLOW_SECRET=1 git commit ...
 
 set -eu
 
-if [[ "${PYOBFUS_ALLOW_PII:-0}" == "1" ]]; then
-    exit 0
-fi
-
-PATTERN='诸嵘|陈启稚|qizhi_chen|身份证|/home/wuxia/'
+PII_PATTERN='诸嵘|陈启稚|qizhi_chen|身份证|/home/wuxia/'
 
 # Allowlisted paths: files that legitimately discuss the cleanup itself.
 # Anchored to repo root with -x for full-line match.
-ALLOWLIST_RE='docs/V0\.4_EXECUTION_LOG\.md|\.githooks/pre-commit|\.githooks/README\.md|CLAUDE\.md'
+PII_ALLOWLIST_RE='docs/V0\.4_EXECUTION_LOG\.md|\.githooks/pre-commit|\.githooks/README\.md|CLAUDE\.md'
 
-mapfile -t staged < <(
+# High-signal credential prefixes/shapes only. Deliberately NOT generic
+# entropy matching: this repo ships a secret *detector*, so broad heuristics
+# would fight its own source and fixtures. Verified 2026-09-07 against every
+# tracked file — zero pre-existing matches.
+SECRET_PATTERN='ovsxat_|pypi-AgEIcHlwaS5vcmc|gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|glpat-[A-Za-z0-9_-]{15,}|npm_[A-Za-z0-9]{30,}|sk-ant-api[0-9]{2}-|sk-proj-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16}|xox[baprs]-[0-9A-Za-z-]{10,}|AIza[0-9A-Za-z_-]{35}|-----BEGIN [A-Z ]*PRIVATE KEY-----'
+
+# Only the files that enumerate the patterns themselves.
+SECRET_ALLOWLIST_RE='\.githooks/pre-commit|\.githooks/README\.md'
+
+staged_files() {
     git diff --cached --name-only --diff-filter=AM \
-        | grep -vxE "$ALLOWLIST_RE" \
+        | grep -vxE "$1" \
         || true
-)
+}
 
-if (( ${#staged[@]} == 0 )); then
-    exit 0
-fi
+fail_banner() {
+    printf '============================================================\n' >&2
+}
 
-hits=$(git grep --cached -nE "$PATTERN" -- "${staged[@]}" 2>/dev/null || true)
-
-if [[ -n "$hits" ]]; then
-    cat >&2 <<EOF
-============================================================
+# ---------------------------------------------------------------- PII scan
+if [[ "${PYOBFUS_ALLOW_PII:-0}" != "1" ]]; then
+    mapfile -t pii_staged < <(staged_files "$PII_ALLOWLIST_RE")
+    if (( ${#pii_staged[@]} > 0 )); then
+        hits=$(git grep --cached -nE "$PII_PATTERN" -- "${pii_staged[@]}" 2>/dev/null || true)
+        if [[ -n "$hits" ]]; then
+            fail_banner
+            cat >&2 <<EOF
 ERROR: pre-commit blocked — PII pattern detected in staged content
 ============================================================
 
@@ -51,12 +67,52 @@ Why this hook exists:
   This hook prevents accidental reintroduction.
 
 If the match is legitimate (e.g. you are documenting the cleanup):
-  1. add the file path to ALLOWLIST_RE in .githooks/pre-commit, or
+  1. add the file path to PII_ALLOWLIST_RE in .githooks/pre-commit, or
   2. bypass once with: PYOBFUS_ALLOW_PII=1 git commit ...
 
 ============================================================
 EOF
-    exit 1
+            exit 1
+        fi
+    fi
+fi
+
+# ------------------------------------------------------------ secret scan
+if [[ "${PYOBFUS_ALLOW_SECRET:-0}" != "1" ]]; then
+    mapfile -t sec_staged < <(staged_files "$SECRET_ALLOWLIST_RE")
+    if (( ${#sec_staged[@]} > 0 )); then
+        # Location only — never echo the matched line, or the banner itself
+        # would print the credential into the terminal and the shell history.
+        locs=$(git grep --cached -nE "$SECRET_PATTERN" -- "${sec_staged[@]}" 2>/dev/null \
+                 | cut -d: -f1,2 || true)
+        if [[ -n "$locs" ]]; then
+            fail_banner
+            cat >&2 <<EOF
+ERROR: pre-commit blocked — credential material detected in staged content
+============================================================
+
+Locations (content deliberately not printed):
+
+$locs
+
+Recognised shapes: Open VSX / PyPI / GitHub / GitLab / npm / Anthropic /
+OpenAI / AWS / Slack / Google API tokens, and PEM private keys.
+
+Why this hook exists:
+  This is a PUBLIC repo. Credentials belong in Vaultwarden, read at use
+  time into an env var — never in a tracked file, and never in CI config.
+
+What to do:
+  1. remove the credential from the file and unstage it;
+  2. if it was ever real, ROTATE it — a local remove is not a rotation;
+  3. only if this is a documented example, bypass once with:
+     PYOBFUS_ALLOW_SECRET=1 git commit ...
+
+============================================================
+EOF
+            exit 1
+        fi
+    fi
 fi
 
 exit 0
