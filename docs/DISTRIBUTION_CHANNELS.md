@@ -373,8 +373,30 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   `app._mcp_server.version = __version__` after construction makes
   `create_initialization_options().server_version` return `0.3.10`, verified
   end to end. Caveat: `_mcp_server` is private, so the fix needs a guard
-  rather than a bare assignment. Not yet applied — see the follow-up list in
-  `CURRENT_PLAN_ZH.md`.
+  rather than a bare assignment. **Fixed and released** the same day in
+  pyobfus-mcp 0.3.11, with the follow-on startup-crash regression fixed in
+  0.3.12 — see the confirmation below.
+- 2026-09-07 **the serverInfo fix is confirmed in production, in the very
+  environment that exposed it.** After the maintainer bumped Build steps to
+  `pyobfus-mcp==0.3.12`, test `01a07aa2-fd8e-7831-9088-b43ecb585f54`
+  (14:51 UTC+8 / 06:51 UTC) reports `Status: success` in 14.2s, and its instance
+  log now reads `serverInfo: {name: "pyobfus", version: "0.3.12"}` where it
+  previously read `"1.29.1"` — with `mcp==1.29.1` still installed in that image,
+  so the SDK version that was leaking is the same one present now. All 8 tools
+  enumerated. The defect was found in Glama's logs and closed against Glama's
+  logs, same environment, same SDK.
+- 2026-09-07 build recovery is now a **pattern, not a single data point**: two
+  consecutive successful builds (`01a07845` 14s, `01a07aa2` 14.2s) after five
+  consecutive failures across 08-07 / 08-17 / 09-05 / 09-06 ×2.
+- 2026-09-07 the two standing Glama-side quirks recurred unchanged in this run,
+  now observed three times, so treat them as permanent background rather than
+  investigating again: Build Spec reports `pinnedCommit: null` while the clone
+  log checks out `d2f5d75`, and the install logs `Using Python 3.13.5` despite
+  the admin field reading 3.12. Also note the pinned commit is now well behind
+  HEAD, which remains harmless because the image installs the PyPI artifact.
+  The "Release Created" panel called this build `0.5.22` — the core package's
+  version, again confirming that counter tracks GitHub release tags from the
+  shared repo rather than the MCP package's 0.3.x line.
 
 ### MCP Skills trust score — 🟡 ESTABLISHED / NOT VERIFIED
 - 2026-08-24 official free score API scan for `zhurong2020/pyobfus`: composite

@@ -61,7 +61,7 @@
 1. ~~**Glama 构建确认**~~ ✅ **2026-09-07 已完成** — test
    `01a07845-…` 详情页 `Status: success` / 14s，8 工具握手正常。构建侧不再是
    阻塞项。
-2. **⭐Glama 重新提交（当前最高优先，已解除阻塞）** — 构建已坐实跑通，按 Frank
+2. **⭐Glama 重新提交（当前唯一未完成的外部动作）** — 构建已坐实跑通，按 Frank
    2026-09-05 指示走正常提交流程。提交后**必须**核对公开 URL 是否仍是
    `glama.ai/mcp/servers/zhurong2020/pyobfus`；若变了，同步改 README 的
    Glama 评分徽章 + `DISTRIBUTION_CHANNELS.md` 里全部链接。
@@ -122,9 +122,14 @@
    字节一致）；Release workflow 全绿。**端到端验收**：全新 venv 从 PyPI 装
    0.3.11，解析到的 mcp SDK 恰是 **1.29.1**（正是当初泄漏的那个版本），握手
    现在正确报 `0.3.11`、8 工具齐全——同条件下旧 bug 不复现。
-   ⚠️ **发布后仍需维护者手工做一件事**：把 Glama admin 的 Build steps 从
-   `pyobfus-mcp==0.3.10` 改到 `==0.3.11`——它不会自动跟版，不改的话 Glama 那边
-   跑的仍是旧版。
+   ✅ **Glama Build steps 已由维护者手工改到 `==0.3.12`（2026-09-07）**，并触发
+   test `01a07aa2-…`（14:51，`Status: success`/14.2s）。**该次日志给出了 C-9 的
+   生产级闭环证据**：instance log 的 `serverInfo` now 读作
+   `{name: "pyobfus", version: "0.3.12"}`，此前读作 `"1.29.1"`——而该镜像里装的
+   仍是 `mcp==1.29.1`，即当初泄漏的那个 SDK 版本原样还在，只是不再被误报了。
+   8 工具齐全。**bug 从 Glama 日志发现，也在 Glama 日志闭环，同环境同 SDK。**
+   另：这已是**连续第二次**构建成功（`01a07845` 14s / `01a07aa2` 14.2s），
+   对照此前连续五次失败，构建恢复从单点变成了模式。
    📌 **流程认知修正**：`release.yml` **不含** MCP Registry 步骤，Registry 是
    独立的 `mcp-publisher publish`（本轮已执行）。别以为打 tag 就两边都发了。
    🔴 **0.3.11 引入启动崩溃回归，已由 0.3.12 同日修复**：版本查找当时写成模块
