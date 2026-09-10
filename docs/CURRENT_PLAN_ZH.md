@@ -1,7 +1,14 @@
 # pyobfus 当前计划
 
-更新时间：2026-09-07（当前公开版本：Core **`0.5.22`** / MCP **`0.3.12`** /
-VS Code **`0.4.2`**。本日完成：**Open VSX 首发上线并复核**（扩展现同时在
+更新时间：2026-09-10（当前公开版本：Core **`0.5.23`** / MCP **`0.3.12`** /
+VS Code **`0.4.2`**。本轮完成：**09-10 下载与渠道复查**——三个 0.5.22 发布后的
+干净日 `65 / 48 / 31` 单调回落进安静区间，**09-08 悬置的「基线是否抬升」问题
+已有答案：没有抬升**；MCP 09-07 的 235 已由 `16 / 23` 坐实为发版/重建自动化流量。
+**本轮已发布 `Core 0.5.23`**（Community build marker + 绝对路径泄漏修复，
+见下方 C.7.5）；MCP `[Unreleased]` 为空、未动；VS Code 仍有一条待发的 README
+文档条目，外加本轮重新生成的 `pyobfus.schema.json`（含新字段
+`community_marker`），下次发扩展时一并带上。此前已完成
+**Open VSX 首发上线并复核**（扩展现同时在
 Marketplace 与 Open VSX，同版本）；**`pyobfus-mcp` 0.3.11 → 0.3.12 当日两发**
 （修 `serverInfo` 版本广播 + 修 0.3.11 引入的启动崩溃回归）；**Glama 两条线
 全部结清**——构建已恢复（连续两次 success），目录条目本就正常上架、
@@ -55,6 +62,31 @@ Marketplace 与 Open VSX，同版本）；**`pyobfus-mcp` 0.3.11 → 0.3.12 当�
     该条 test 的详情/日志看显式结果（08-24 对 `01a033e4` 就是这么坐实的），
     确认后才可把构建侧记为恢复。
 - **分发扩展调研已记录**：见 [`DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md`](DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md)。结论是不提交 `free-for.dev`，后续顺序为 Open VSX、GitHub Action、`awesome-python`、安全类 awesome-list、AlternativeTo、Smithery、Product Hunt。**其中 Open VSX 已于本日完成**，队列下一个是 GitHub Action。
+- **2026-09-10 下载与渠道复查（数据截止 09-09）**：Core `31 / 509 / 1,874`
+  （日/周/月，`without_mirrors`）。0.5.22 发布日 09-06 为 `158`，其后三个干净
+  非发布日 `65`(09-07) → `48`(09-08) → `31`(09-09) 单调回落到 20–40 安静区间，
+  与历次发布尾巴形状一致（09-01 `146`、09-04 `137`、08-28 `127`）。**因此
+  09-08 那条「65 偏高、可能是基线抬升」的观察在两个新数据点下不成立。**
+  9 月至今 9 天合计 `674`（均值 74.9、中位数 52），8 月 31 天合计 `2,426`
+  （均值 78.3、中位数 38）——剔除发布尖峰后月环比基本持平。MCP 09-07 的 `235`
+  之后是 `16` / `23`，回到 8 月中位数 `10` 的量级，明确归类为发版与 Glama
+  重建产生的自动化流量。VS Code Marketplace `183 downloads / 7 installs`
+  （两天 +6，installs 未变）；Open VSX `228 downloads / 0 reviews`（两天 +8）。
+  GitHub 7 stars / 2 forks / 0 open issue / 0 PR，CI 与 CodeQL 全绿。
+  口径与分渠道明细见 [`DISTRIBUTION_CHANNELS.md`](DISTRIBUTION_CHANNELS.md)。
+- **2026-09-08 下载与渠道快照（数据截止 09-07）**：pypistats
+  `without_mirrors` 口径下，`pyobfus` 日/周/月为 **65 / 595 / 1,840**；8 月
+  合计 2,426（日均 78.3、中位数 38），09-01～09-07 合计 595（日均 85、
+  中位数 65），可查区间 2026-03-11～09-07 累计 6,418。09-07 是 0.5.22
+  发布后的首个非发布日，65 高于此前安静日常见的 20～40，但**单个干净日不足以
+  宣称基线抬升**。`pyobfus-mcp` 09-01～09-07 合计 **414**（日均 59.1、
+  中位数 19），09-07 单日 **235**；该日与 0.3.11/0.3.12 发版、公开安装验收和
+  Glama 重建重合，不能解释为自然采用；可查区间 2026-04-22～09-07 累计
+  2,686。VS Code Marketplace API 为 **177 downloads / 7 installs**，Open VSX
+  为 **220 downloads / 0 reviews**；Open VSX 的 downloadCount 不是独立安装数，
+  两个 registry 的计数也不能相加。GitHub 为 **7 stars / 2 forks / 0 open
+  issues**；48 个 Release 的显式附件累计下载 40，说明主要安装入口仍是 PyPI。
+  口径与分渠道明细同步在 [`DISTRIBUTION_CHANNELS.md`](DISTRIBUTION_CHANNELS.md)。
 
 ## 后续待办（2026-09-07 整理 · 冷启动看这里）
 
@@ -94,12 +126,41 @@ Marketplace 与 Open VSX，同版本）；**`pyobfus-mcp` 0.3.11 → 0.3.12 当�
 
 **B. 有明确时间点**
 
-6. **下载量干净日复查（09-08 之后）** — 09-06 是 0.5.22 发布日、被污染；
-   干净日自 09-07 起算。届时才能判断「09-05 的 52 是否代表基线抬升」。
-7. **Open VSX 首次安装量** — 目前 `downloadCount=0`（发布当天正常）。下次
-   周期性渠道复查时看有没有真实安装。
+6. ~~**下载量干净日复查**~~ ✅ **2026-09-10 已结案** — 三个干净日
+   `65 / 48 / 31` 单调回落进 20–40 安静区间，**基线未抬升**，09-08 的偏高读数
+   是发布尾巴而非新信号。MCP 的 235 也已由 `16 / 23` 证实为发版/重建流量。
+   本项转为常规周期复查，不再作为有时间点的待办。
+7. ~~**Open VSX 首次数据复查**~~ ✅ **2026-09-08 已完成**，09-10 续测
+   `downloadCount=228`（两天 +8）、`reviewCount=0`。该字段是下载计数而非独立
+   安装用户，**不与 Marketplace 相加**；Marketplace 同期 183 downloads /
+   7 installs。后续并入周期性渠道复查。
 
 **C. 本地可做**
+
+7.5. **✅ `Core 0.5.23` 已于 2026-09-10 发布**（用户明确批准「按照流程发版」）
+   = Community build marker。**实现前先实测了当前行为，发现设计
+   文档的前提是错的，且错在两个方向**：
+   - Community 输出**根本没有 marker**——`add_header_comment` 在单文件路径上
+     是死代码（非 fusion 分支用 `generate_to_file` 从 AST 重新生成，把加好
+     header 的字符串丢掉了），目录模式则从未调用它。
+   - **只有 Pro build-fusion 路径真的写出了那个 header**，而且写的正是
+     `# Original: <绝对路径>`——所以「绝对路径泄漏」是 **Pro 侧的真实缺陷**，
+     不是设计文档以为的免费版行为。
+   因此本次实现做了两件事而非一件：**删掉绝对路径**（改成项目相对 POSIX 路径
+   → 落到 basename → 省略字段），**并让 marker 真正落到每条输出路径**。
+   marker 为 `# pyobfus:generated format=1 edition=<community|pro>`，prologue
+   安全（shebang 保持首行、PEP 263 cookie 保持前两行内）、幂等、与
+   `# pyobfus:obfuscated` 前缀刻意区分。新增 `--community-marker/
+   --no-community-marker`（tri-state，不覆盖 preset/config）与配置键
+   `community_marker: auto|on|off`；`output_marker` 以**附加字段**进 dry-run
+   plan 与 provenance manifest（旧 manifest 仍能通过校验）。
+   **验收**：36 个新测试（`tests/test_build_marker.py`），四个测试根全绿
+   （core 1289 / MCP 97 / integration 7 / vscode-extension 53），
+   black/ruff/mypy 干净，Pro fusion 产物实测仍可执行且无绝对路径，跨文件产物
+   实测 import + 执行结果正确。README「What's new」横幅按发布流程写在**打 tag
+   之前**的提交里（吸取 0.5.14 教训），已核实存在于被 tag 的树内。
+   设计文档已就地更正前提，见
+   [`COMMUNITY_BUILD_MARKER_DESIGN.md`](COMMUNITY_BUILD_MARKER_DESIGN.md)。
 
 8. **GitHub Action / GitHub Marketplace** — 分发扩展队列的下一项。建议独立
    `pyobfus-action` 仓库，不塞进当前多包仓库。见
