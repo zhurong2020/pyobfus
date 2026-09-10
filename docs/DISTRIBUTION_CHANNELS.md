@@ -7,23 +7,17 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-**Last updated**: 2026-09-07 (**Open VSX is LIVE** — `zhurong2020.pyobfus`
-v0.4.2, independently re-checked at HTTP 200 on both the extension page and the
-API after the immediate post-upload 404 turned out to be index propagation lag.
-**Glama**: frank@glama.ai followed up with "Build errors should be fixed now";
-the duplicate-listing / badge-URL question is still unanswered and no build has
-been retried on our side yet. Earlier the same day: distribution expansion
-research recorded. pyobfus 0.5.22 published through OIDC — Python
-3.14 remote-debug hardening advisory in `--check`; PyPI `latest=0.5.22`, both
-Integrity provenance endpoints HTTP 200, GitHub Release created, and the
-advisory verified against a fresh install. vscode-extension 0.4.2 published in
-the same round — a Security fix containing "Generate pyobfus.yaml" writes to the
-workspace; tag, GitHub Release with the vsix, and the maintainer's manual
-Marketplace upload are all done, with the public listing independently
-re-checked as `"version":"0.4.2"`. **pyobfus-mcp 0.3.11 released** — the hold
-was lifted once a real defect joined the pending metadata fix: the initialize
-handshake was advertising the mcp SDK's version rather than the package's.
-Glama's Build steps still need a manual bump to 0.3.11.)
+**Last updated**: 2026-09-10. Download/channel snapshot: Core PyPI
+`31 / 509 / 1,874` day/week/month through 09-09; three clean post-0.5.22 days
+(`65 / 48 / 31`) decay back into the quiet band, so the 09-08 open question is
+answered — no baseline uplift. MCP is back to quiet levels (`16 / 23`) after its
+release-contaminated 09-07 spike. Marketplace `183 downloads / 7 installs`;
+Open VSX `228 downloads / 0 reviews`. Current public versions are pyobfus
+`0.5.22`, pyobfus-mcp `0.3.12`, and VS Code/Open VSX `0.4.2` — all three have an
+empty or docs-only `[Unreleased]`, so nothing is queued for release. Open VSX is
+live; Glama is listed, searchable and healthy, with two consecutive successful
+builds and all 8 tools. No Glama resubmission or Build-steps change remains
+pending.
 
 > **Note (2026-05-09)**: most of the per-channel facts below are now current as of Session 23. Outside of the launch wave (HN 5-11 / Reddit 5-12 / CN trio 5-8/9), the live state is reflected here. Consult `docs/POST_V0.4_TODO.md` for forward TODO and `docs/V0.4_EXECUTION_LOG.md` for session-by-session deltas.
 
@@ -48,6 +42,28 @@ Glama's Build steps still need a manual bump to 0.3.11.)
 - 2026-09-02 recheck (data through 08-31): latest day/week/month is
   `31 / 376 / 2,338`; non-release days average `26.4`, median `27`, unchanged
   from the quiet baseline. Data does not yet include the 09-01 release.
+- 2026-09-08 recheck (data through 09-07, known mirrors excluded): latest
+  day/week/month is `65 / 595 / 1,840`. August total was `2,426` (31 days;
+  mean `78.3`, median `38`); 09-01 through 09-07 totals `595` (mean `85.0`,
+  median `65`). The available `overall` series totals `6,418` from 2026-03-11
+  through 09-07; this is not a lifetime count. 09-07 is the first full
+  non-release day after 0.5.22 and its `65` exceeds the earlier 20–40 quiet-day
+  range, but one clean observation is not enough to establish organic uplift.
+  Continue collecting 7–14 non-release days and label release/CI verification
+  traffic separately.
+- 2026-09-10 recheck (data through 09-09, known mirrors excluded): latest
+  day/week/month is `31 / 509 / 1,874` (trailing 7- and 30-day sums computed
+  from the `overall` series; the 7-day figure matches the `recent` endpoint). **This closes the baseline question the
+  09-08 entry left open.** 0.5.22 shipped 09-06 (`158`); the three following
+  clean non-release days run `65` (09-07), `48` (09-08), `31` (09-09) — a
+  monotonic decay landing back inside the 20–40 quiet band, which is the same
+  shape as every prior release tail (09-01 `146`, 09-04 `137`, 08-28 `127`,
+  08-30 `117`). The elevated `65` read as a possible uplift with one data point
+  and does not survive two more. September so far totals `674` over 9 days
+  (mean `74.9`, median `52`), against August's `2,426` over 31 days (mean
+  `78.3`, median `38`) — flat month over month once release spikes are
+  discounted. The `overall` series totals `6,491` from 2026-03-13 through
+  09-09; this is not a lifetime count.
 - Tracker: `gh api repos/zhurong2020/pyobfus` + PePy
 
 ### PyPI — `pyobfus-mcp`
@@ -85,6 +101,19 @@ Glama's Build steps still need a manual bump to 0.3.11.)
 - 2026-09-02 recheck (data through 08-31): latest day/week/month is
   `6 / 232 / 1,090`; non-release days average `13.5`, median `12`. The slight
   rise is too short and release-adjacent to classify as organic growth.
+- 2026-09-08 recheck (data through 09-07, known mirrors excluded): 09-01
+  through 09-07 totals `414` (mean `59.1`, median `19`); 09-07 alone is `235`.
+  That day overlaps the 0.3.11/0.3.12 releases, fresh-install verification and
+  Glama rebuilds, so it is explicitly classified as contaminated automation /
+  release traffic, not organic adoption. The available `overall` series totals
+  `2,686` from 2026-04-22 through 09-07; this is not a lifetime count.
+- 2026-09-10 recheck (data through 09-09, known mirrors excluded): the 09-07
+  spike of `235` was followed by `16` (09-08) and `23` (09-09), confirming it as
+  release/rebuild automation rather than adoption — the package is back at its
+  quiet level (August median `10`). September totals `453` over 9 days, but the
+  median is `19`, so the mean of `50.3` is carried almost entirely by the three
+  release days. The `overall` series totals `2,725` from 2026-04-22 through
+  09-09; this is not a lifetime count.
 
 ### GitHub — `zhurong2020/pyobfus`
 - URL: https://github.com/zhurong2020/pyobfus
@@ -106,11 +135,22 @@ Glama's Build steps still need a manual bump to 0.3.11.)
   214 views / 85 unique. Clone spikes remain release-aligned (08-28: 188/28;
   08-30: 414/29), followed by 08-29 `5/3` and 08-31 `20/9` quiet-day levels.
   Still 6 stars, 2 forks, 0 open issue/PR, and no new Discussion reply.
+- 2026-09-08 public API snapshot: 7 stars, 2 forks, 0 open issues and 0
+  subscribers. Across 48 GitHub Releases, explicitly attached assets have 40
+  recorded downloads in total (the generated source archives use a different
+  counter). This is far below PyPI traffic and confirms PyPI remains the main
+  package-install channel.
 
 ### VS Code Marketplace — `zhurong2020.pyobfus`
 - Current published version: **0.4.2** (2026-09-06). The same VSIX is now also
   on Open VSX — see the dedicated section below.
 - 2026-08-24 public Gallery API: version 0.4.1, 3 installs, 124 downloads.
+- 2026-09-08 public Gallery API: version 0.4.2, **7 installs, 177 downloads**,
+  no identifiable real review. `updateCount=13` is update activity, not an
+  independent-user count.
+- 2026-09-10 public Gallery API: version 0.4.2, **7 installs, 183 downloads**
+  (`+6` downloads in two days, installs unchanged), still no identifiable real
+  review. `lastUpdated` remains 2026-09-06.
 - No identifiable user rating/review signal yet; the API's weighted-rating
   prior is not evidence of an actual review. Continue tracking installs and
   real reviews, not raw update/download count alone.
@@ -136,6 +176,14 @@ Glama's Build steps still need a manual bump to 0.3.11.)
   Not a defect, and not something to chase unless we want the ownership badge.
 - `downloadCount=0` is the day-one baseline; look for real installs at the next
   periodic channel recheck rather than reading zero as a problem.
+- **2026-09-08 first post-publication recheck**: `downloadCount=220`,
+  `reviewCount=0`, still version 0.4.2. Open VSX exposes a download counter, not
+  a distinct install-user metric; indexing, automated clients and repeated
+  downloads may contribute. Do not add this number to Marketplace installs or
+  treat it as 220 users.
+- **2026-09-10 recheck**: `downloadCount=228` (`+8` in two days),
+  `reviewCount=0`, still version 0.4.2. The same caveat applies — this is a
+  download counter, not distinct users, and it is not additive with Marketplace.
 - Publish credential: Vaultwarden entry `Open VSX Access Token (pyobfus)`
   (folder `Publishing`). Sole copy — no local dotfile cache, never in the repo
   or CI. Rotated periodically by the maintainer; a rotation only changes that
