@@ -6,12 +6,23 @@ Independent version/release cadence from the main `pyobfus` and `pyobfus-mcp` Py
 
 ## [Unreleased]
 
+## [0.4.3] - 2026-09-10
+
+### Changed
+
+- `pyobfus.yaml` IntelliSense now knows the `community_marker` key introduced
+  by pyobfus 0.5.23 (`auto` | `on` | `off`, controlling the transparent
+  `# pyobfus:generated` build marker on generated files). The bundled schema is
+  generated from the obfuscator's own config dataclass, so it picked the field
+  up automatically; without this release, editors would flag a valid key as
+  unknown.
+
 ### Documentation
 
 - README now has an Install section listing both registries. The extension was
   published to Open VSX (`zhurong2020.pyobfus` 0.4.2) on 2026-09-07, alongside
   the existing VS Code Marketplace listing; this README change reaches both
-  listing pages with the next release.
+  listing pages with this release.
 
 ## [0.4.2] - 2026-09-06
 
