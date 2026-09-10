@@ -12,7 +12,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### 🟢 2026-09-10 — Core 0.5.23 + VS Code 0.4.3 已发布后的当前焦点
+### 🟢 2026-09-10 — Core 0.5.23 + VS Code 0.4.3 已发布、GitHub Action 已上架后的当前焦点
 
 - Core **`0.5.23`** / MCP **`0.3.12`** / VS Code **`0.4.3`** 为最新公开版本；VS Code
   扩展同时在 **Microsoft Marketplace 与 Open VSX** 上架，两边同为 `0.4.3`（均已 curl 独立复核）。
@@ -27,6 +27,14 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   + 扩展 CI 全绿**。新增 `--community-marker/--no-community-marker` + 配置键
   `community_marker: auto|on|off`，`output_marker` 附加进 dry-run plan 与 provenance
   manifest（旧 manifest 仍通过校验）。36 个新测试 `tests/test_build_marker.py`。
+- **✅ GitHub Action `pyobfus-action v1.0.1` 已于 2026-09-10 建仓、发版并上架 Marketplace**
+  （详见下方渠道清单）。**做它的理由是归因，不是再加一个功能**：09-10 的下载复查
+  坐实曝光面在涨但自然用户不可观测，而 PyPI 下载计数不带任何身份来源；用了这个
+  action 的公开仓库会把 `uses: zhurong2020/pyobfus-action` 提交进 workflow 文件，
+  可被 GitHub 代码搜索枚举。**技术卖点是消掉 `|| true` 陷阱**：pyobfus 高危 findings
+  退出码 1 会在 SARIF 上传前杀掉 job，官方绕法 `|| true` 连工具错误一并吞掉；该
+  action 先写产物后判定，并把 findings（`fail-on` 可调）与工具错误（恒失败）分开。
+  8-job CI 覆盖三平台，且已从外部仓库实测 `@v1` 可消费。
 - **✅ `vscode-extension 0.4.3` 已于 2026-09-10 发布**：schema 现认识 0.5.23 的
   `community_marker` 键（**实测坐实有效**：同一份配置 0.4.2 schema 报未知键、0.4.3 通过），
   外加此前 held 的双 registry Install 段。tag `vscode-v0.4.3` 未误触发 PyPI Release
@@ -458,6 +466,7 @@ cardiac-manuscripts 仓库（不影响 pyobfus 仓库本身）。
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp`（**0.3.12** 2026-09-07 发布，需核实 `active` / `isLatest=true`）
 - **Smithery (Skill)**: https://smithery.ai/skills/zhurong2020/pyobfus-protect (2026-06-22 上线 · 本地工具走 Skill 渠道非 MCP 渠道) · **mcp.so**: 已收录
 - **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus — 页面在线且渲染完整 8 工具，**状态：已上架且健康**（2026-09-07 核验：公开搜索 `?query=pyobfus` 返回该 server，A license / A quality / A maintenance，无 pending/unapproved 标记，详情页与徽章均 200）。2026-09-05 Frank Fiegel 邮件曾称「2026-05-03 被拒后从未批准、需重新提交」，**该说法已被公开目录证据证伪**——那封信的主题行是 5 月拒信 thread，应属照旧工单回复；**不要重新提交**（有产生重复条目 / 改动 URL 打断 README 徽章的风险）。⚠️ 方法教训：`/api/mcp/v1/...` 返回 `not_found`/`401` 曾被当作「不在目录里」的证据用了数周，401 只是**认证失败**（现对所有人要 API key），**拿不到访问权 ≠ 东西不存在**，正确探针是公开搜索页。admin「Build steps」**不会自动跟版**（停在 0.3.8、跨过 0.3.9/0.3.10，2026-09-06 由维护者手工改到 0.3.10；**已于 2026-09-07 手工改到 0.3.12**）；Glama 构建**不读仓库里的 `pyobfus_mcp/Dockerfile`**，而是用 admin Build Spec 合成一份。构建曾连续失败于其自家 BuildKit 拉 `debian:trixie-slim`（08-07 / 08-17 / 09-05 / 09-06 ×2），**2026-09-07 已确认修复**：test `01a07845-…` 详情页显式 `Status: success`/14s，8 工具握手正常。构建侧不再是阻塞项；**Glama 这条线已无待办**。历史排障见 memory `glama_introspection_dockerfile_pin_2026-06-05`、`glama_zero_tools_repro_2026-08-07`，最新证据见 `docs/DISTRIBUTION_CHANNELS.md`。
+- **GitHub Action**: https://github.com/zhurong2020/pyobfus-action (**v1.0.1**，2026-09-10 建仓发版并上架 Marketplace：<https://github.com/marketplace/actions/pyobfus-scan-and-build>)。独立仓库**是硬性要求**——Marketplace 要求 `action.yml` 在仓库根目录且一仓一 action；另外 action 的移动 `v1` tag 会与 Core 的 `v*` 命名空间冲突并重新触发 `release.yml`。⚠️ 两个只会在上架页面才暴露的限制：**listing 名不能与已有 GitHub 用户重名**（`github.com/pyobfus` 是第三方账号，故名为 `pyobfus scan and build`；GitHub **不因不活跃释放用户名**，只受理商标投诉，此事已定论），以及 **description 上限 125 字符**（首版 151 被拒 → v1.0.1）。两条现均由该仓库 CI 断言拦截。**归因查询**（本 action 存在的理由，周期性复盘时与下载量一起看）：<https://github.com/search?q=%22zhurong2020%2Fpyobfus-action%22+path%3A.github%2Fworkflows&type=code>
 - **GitHub**: https://github.com/zhurong2020/pyobfus (public)
 - **文档**: https://pyobfus.readthedocs.io
 - **许可**: Apache 2.0 (Core) + Proprietary (Pro)

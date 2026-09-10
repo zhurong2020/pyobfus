@@ -22,8 +22,9 @@ Marketplace 为 `183 downloads / 7 installs`，Open VSX 为
 本轮执行顺序确定为：
 
 1. Open VSX（**✅ 2026-09-07 已发布上线**，见 `OPEN_VSX_PUBLISH_PLAN.md`）；
-2. 独立的 GitHub Action / GitHub Marketplace 入口（**✅ 2026-09-10 已建仓并发
-   v1.0.0**，见 `DISTRIBUTION_CHANNELS.md` 的 GitHub Action 小节）；
+2. 独立的 GitHub Action / GitHub Marketplace 入口（**✅ 2026-09-10 已建仓、发
+   v1.0.1 并上架 Marketplace**，见 `DISTRIBUTION_CHANNELS.md` 的 GitHub Action
+   小节。队列因此推进到第 3 项 `awesome-python`）；
 3. `awesome-python`；
 4. `awesome-security` 或 `awesome-devsecops`（择一尝试）；
 5. AlternativeTo；

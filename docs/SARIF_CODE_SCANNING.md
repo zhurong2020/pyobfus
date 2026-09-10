@@ -47,9 +47,9 @@ Findings excluded by your effective config are still included, but as
 code. Parse failures are reported as invocation notifications, not as invented
 source rules.
 
-## GitHub Actions example
+## GitHub Actions
 
-Upload the SARIF to Code Scanning with least privilege:
+### With the pyobfus action (recommended)
 
 ```yaml
 name: pyobfus preflight
@@ -63,19 +63,55 @@ jobs:
   preflight:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - id: scan
+        uses: zhurong2020/pyobfus-action@v1
+        with:
+          source: src/
+          fail-on: never        # let the upload run first
+          offline: "true"
+
+      - uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif-file }}
+          category: pyobfus-preflight
+
+      - name: Gate after uploading
+        if: steps.scan.outputs.findings-high != '0'
+        run: exit 1
+```
+
+The action is at
+[zhurong2020/pyobfus-action](https://github.com/zhurong2020/pyobfus-action)
+([Marketplace](https://github.com/marketplace/actions/pyobfus-scan-and-build)).
+It also exposes per-severity counts, `files-scanned` and the pyobfus `version`
+as step outputs, and renders a findings table in the job summary.
+
+### Raw steps, and the pitfall they carry
+
+Without the action, the same workflow needs a workaround:
+
+```yaml
       - run: pip install pyobfus
       # `|| true` keeps a high-severity finding (exit 1) from failing the job
-      # before the SARIF is uploaded; drop it if you want findings to block.
+      # before the SARIF is uploaded.
       - run: pyobfus --check src/ --sarif pyobfus.sarif --offline || true
       - uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: pyobfus.sarif
           category: pyobfus-preflight
 ```
+
+This works, but `|| true` suppresses **every** non-zero exit, not just
+findings. A mistyped path, an unreadable config or a crash exits `2` and is
+swallowed exactly like a clean scan, after which the upload step uploads a file
+that was never written. If you use this form, assert the SARIF exists before
+uploading. The action exists to remove that trade-off: it separates findings
+(gated by `fail-on`) from tool errors (always fatal).
 
 > **Private repositories**: uploading to Code Scanning requires GitHub Advanced
 > Security (or a public repository). On a private repo without it, the

@@ -29,6 +29,11 @@ pyobfus src/ -o dist/ --dry-run                    # preview without writing
 pyobfus src/ -o dist/ --dry-run --json             # + versioned `plan` object (0.5.19)
 pyobfus src/ -o dist/ --verify-syntax --json       # compile output in memory after writing (0.5.19)
 pyobfus src/ -o dist/ --no-community-marker        # suppress the '# pyobfus:generated' marker (0.5.23)
+
+# In GitHub Actions, prefer the action over raw steps -- it separates findings
+# from tool errors, which `|| true` cannot do:
+#   - uses: zhurong2020/pyobfus-action@v1
+#     with: {source: src/, fail-on: never}
 pyobfus src/ -o dist/ --json                       # machine-readable result
 pyobfus src/ -o dist/ -j 4                         # 4 parallel workers
 pyobfus src/ -o dist/ -c pyobfus.yaml              # explicit config file

@@ -1,7 +1,7 @@
 # pyobfus 当前计划
 
 更新时间：2026-09-10（当前公开版本：Core **`0.5.23`** / MCP **`0.3.12`** /
-VS Code **`0.4.3`**。本轮完成：**09-10 下载与渠道复查**——三个 0.5.22 发布后的
+VS Code **`0.4.3`**；**GitHub Action `pyobfus-action v1.0.1` 已上架 Marketplace**。本轮完成：**09-10 下载与渠道复查**——三个 0.5.22 发布后的
 干净日 `65 / 48 / 31` 单调回落进安静区间，**09-08 悬置的「基线是否抬升」问题
 已有答案：没有抬升**；MCP 09-07 的 235 已由 `16 / 23` 坐实为发版/重建自动化流量。
 **本轮已发布 `Core 0.5.23`**（Community build marker + 绝对路径泄漏修复，
@@ -173,9 +173,19 @@ Marketplace 与 Open VSX，同版本）；**`pyobfus-mcp` 0.3.11 → 0.3.12 当�
    断言）。**分仓是硬性要求**：Marketplace 要求 `action.yml` 在仓库根目录且一仓
    一 action。**上架名为 `pyobfus scan and build`**：`github.com/pyobfus` 是
    第三方账号，GitHub 拒绝与已有用户重名的 listing，且**不因不活跃释放用户名**
-   （只受理商标投诉），此事已定论。**Marketplace 仅影响可发现性**，不上架也能
-   用。剩余：需维护者开 2FA + 接受 Developer Agreement 后勾选上架；另有私有
-   测试仓库 `pyobfus-action-consumer-test` 待手动删除。原调研见
+   （只受理商标投诉），此事已定论。**已于同日上架 Marketplace**：
+   <https://github.com/marketplace/actions/pyobfus-scan-and-build>（Security +
+   Continuous integration 两个分类，显示 v1.0.1）。⚠️ **第二个只在上架页面才暴露
+   的限制：description 上限 125 字符**，首版 151 被拒 → 发 **v1.0.1**（111 字符）
+   并把 `v1` 移过去；**v1.0.0 未强推**——精确版本 tag 只有不可变才值得被 pin。
+   两条限制现均由该仓库 CI 断言。测试仓库已删除。
+   **归因查询（本 action 存在的理由，周期性复盘时与下载量一起看）**：
+
+   <https://github.com/search?q=%22zhurong2020%2Fpyobfus-action%22+path%3A.github%2Fworkflows&type=code>
+
+   诚实边界：它量的是**可见性不是采纳量**；结果为 0 也是一个确定答案，而不是
+   现在这种无法归因的数字——这才是本轮真正的交付物，别把「上架了」当成增长。
+   原调研见
    [`DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md`](DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md)。
 9. ~~**🐛 `serverInfo` 版本号报错**~~ ✅ **2026-09-07 已修复**（未发版，在
    `[Unreleased]`）——修法：`_build_server()` 构造后调用新的 fail-soft helper

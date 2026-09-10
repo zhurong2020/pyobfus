@@ -163,16 +163,32 @@ pending.
   action works from `uses: zhurong2020/pyobfus-action@v1` whether or not it is
   ever listed. Publishing is a checkbox on a release, self-service, no review,
   no artifact upload; it needs 2FA and a one-time Developer Agreement.
+- **Listed on Marketplace 2026-09-10**:
+  https://github.com/marketplace/actions/pyobfus-scan-and-build (HTTP 200,
+  categories Security + Continuous integration, showing v1.0.1 and
+  `uses: zhurong2020/pyobfus-action@v1`).
+- ⚠️ **A second limit only visible at the publish page: the description is
+  capped at 125 characters.** The first attempt was 151 and was refused; every
+  other field validated. Fixed in **v1.0.1** (111 chars), with `v1` moved to
+  it. v1.0.0 was left untouched rather than force-moved — an exact version tag
+  is only worth pinning if it is immutable. Both this and the name rule are now
+  asserted by that repo's CI, so neither can resurface at a browser form.
 - Verified from an external private repo: `@v1` resolved and returned
-  `status=findings`, `findings-high=1`, `version=0.5.23`, SARIF written.
+  `status=findings`, `findings-high=1`, `version=0.5.23`, SARIF written. That
+  throwaway repo has since been deleted.
 - 8-job CI covers Ubuntu/macOS/Windows, both modes, both gates, the
   tool-error path and version pinning.
-- **Attribution is the point.** Unlike PyPI download counts, a public repo
-  using this action commits `uses: zhurong2020/pyobfus-action` to a workflow
-  file, which GitHub code search can enumerate. That is the measurable
-  acquisition signal the 2026-09-10 download review said was missing.
-- ⚠️ Leftover: private repo `zhurong2020/pyobfus-action-consumer-test` was
-  created for the external verification above and still needs manual deletion.
+- **Attribution is the point, and this is the query that delivers it.** Unlike
+  PyPI download counts, a public repo using this action commits
+  `uses: zhurong2020/pyobfus-action` to a workflow file, which GitHub code
+  search enumerates. Run this alongside the download numbers at each periodic
+  review:
+
+  <https://github.com/search?q=%22zhurong2020%2Fpyobfus-action%22+path%3A.github%2Fworkflows&type=code>
+
+  Honest limit: this measures *visibility*, not adoption. A result of zero is a
+  definite answer rather than the unattributable numbers it replaces, and that
+  is the whole deliverable — do not read the listing itself as traction.
 
 ### VS Code Marketplace — `zhurong2020.pyobfus`
 - Current published version: **0.4.2** (2026-09-06). The same VSIX is now also
