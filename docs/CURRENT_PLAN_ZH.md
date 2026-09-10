@@ -162,8 +162,20 @@ Marketplace 与 Open VSX，同版本）；**`pyobfus-mcp` 0.3.11 → 0.3.12 当�
    设计文档已就地更正前提，见
    [`COMMUNITY_BUILD_MARKER_DESIGN.md`](COMMUNITY_BUILD_MARKER_DESIGN.md)。
 
-8. **GitHub Action / GitHub Marketplace** — 分发扩展队列的下一项。建议独立
-   `pyobfus-action` 仓库，不塞进当前多包仓库。见
+8. ~~**GitHub Action / GitHub Marketplace**~~ ✅ **2026-09-10 已建仓发版**
+   —— https://github.com/zhurong2020/pyobfus-action ，**v1.0.0** + 移动的 `v1`
+   tag，8-job CI 全绿（Ubuntu/macOS/Windows × 两种模式 × 两种 gate ×
+   工具错误路径 × 版本钉住），并已从**外部私有仓库**实测 `@v1` 可消费。
+   核心价值不是包一层命令，而是消掉 `|| true` 陷阱：pyobfus 发现高危问题退出码
+   为 1，会在 SARIF 上传步骤之前杀掉 job，官方文档的绕法 `|| true` 会连真正的
+   工具错误一起吞掉。该 action 先写产物与输出、后判定成败，并把「findings」与
+   「工具错误」分开——`fail-on: never` 只压前者，路径写错照样失败（CI 有专门
+   断言）。**分仓是硬性要求**：Marketplace 要求 `action.yml` 在仓库根目录且一仓
+   一 action。**上架名为 `pyobfus scan and build`**：`github.com/pyobfus` 是
+   第三方账号，GitHub 拒绝与已有用户重名的 listing，且**不因不活跃释放用户名**
+   （只受理商标投诉），此事已定论。**Marketplace 仅影响可发现性**，不上架也能
+   用。剩余：需维护者开 2FA + 接受 Developer Agreement 后勾选上架；另有私有
+   测试仓库 `pyobfus-action-consumer-test` 待手动删除。原调研见
    [`DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md`](DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md)。
 9. ~~**🐛 `serverInfo` 版本号报错**~~ ✅ **2026-09-07 已修复**（未发版，在
    `[Unreleased]`）——修法：`_build_server()` 构造后调用新的 fail-soft helper

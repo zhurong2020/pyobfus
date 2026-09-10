@@ -141,6 +141,39 @@ pending.
   counter). This is far below PyPI traffic and confirms PyPI remains the main
   package-install channel.
 
+### GitHub Action — `zhurong2020/pyobfus-action`
+- Repo: https://github.com/zhurong2020/pyobfus-action (public, Apache-2.0)
+- Released **v1.0.0** on 2026-09-10, with a moving `v1` major tag per the
+  Actions convention. A composite action wrapping `--check` (SARIF + JSON) and
+  `build` (`--verify-syntax`, provenance manifest).
+- **Deliberately a separate repo, not a directory in this one.** Marketplace
+  requires `action.yml` at the repository *root* and one action per repo, this
+  repo's root is the Python package, an action's moving `v1` tag would collide
+  with Core's `v*` namespace and re-trigger `release.yml` (the 2026-08-04
+  `vscode-v0.1.0` misfire, again), and `uses:` fetches the whole repo — 68 KB
+  versus 3,773 KB.
+- **Marketplace listing name is `pyobfus scan and build`, not `pyobfus`.**
+  GitHub refuses a listing whose name matches an existing user or org, and
+  `github.com/pyobfus` is a third-party account (created 2023-02-25, 0 public
+  repos). Caught before publishing rather than at review. The repo name, the
+  `uses:` path and the PyPI package are unaffected. GitHub does **not** release
+  usernames for inactivity — trademark complaints are the only route — so this
+  is settled, not a pending item.
+- **Marketplace listing is discovery only.** Unlike a VS Code extension, the
+  action works from `uses: zhurong2020/pyobfus-action@v1` whether or not it is
+  ever listed. Publishing is a checkbox on a release, self-service, no review,
+  no artifact upload; it needs 2FA and a one-time Developer Agreement.
+- Verified from an external private repo: `@v1` resolved and returned
+  `status=findings`, `findings-high=1`, `version=0.5.23`, SARIF written.
+- 8-job CI covers Ubuntu/macOS/Windows, both modes, both gates, the
+  tool-error path and version pinning.
+- **Attribution is the point.** Unlike PyPI download counts, a public repo
+  using this action commits `uses: zhurong2020/pyobfus-action` to a workflow
+  file, which GitHub code search can enumerate. That is the measurable
+  acquisition signal the 2026-09-10 download review said was missing.
+- ⚠️ Leftover: private repo `zhurong2020/pyobfus-action-consumer-test` was
+  created for the external verification above and still needs manual deletion.
+
 ### VS Code Marketplace — `zhurong2020.pyobfus`
 - Current published version: **0.4.2** (2026-09-06). The same VSIX is now also
   on Open VSX — see the dedicated section below.
