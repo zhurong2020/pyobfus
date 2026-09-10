@@ -12,10 +12,28 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### 🟢 2026-09-07 — Core 0.5.22 + VS Code 0.4.2 已发布、Open VSX 已上线后的当前焦点
+### 🟢 2026-09-10 — Core 0.5.23 + VS Code 0.4.3 已发布后的当前焦点
 
-- Core **`0.5.22`** / MCP **`0.3.12`**（新发布）/ VS Code **`0.4.2`** 为最新公开版本；VS Code
-  扩展同时在 **Microsoft Marketplace 与 Open VSX** 上架，两边同为 `0.4.2`。
+- Core **`0.5.23`** / MCP **`0.3.12`** / VS Code **`0.4.3`** 为最新公开版本；VS Code
+  扩展同时在 **Microsoft Marketplace 与 Open VSX** 上架，两边同为 `0.4.3`（均已 curl 独立复核）。
+- **✅ `Core 0.5.23` 已于 2026-09-10 发布**（用户批准「按照流程发版」）= Community
+  build marker。**实现前先实测当前行为，发现设计文档前提错在两个方向**：Community
+  输出**根本没有 marker**（单文件路径把加好 header 的字符串丢掉、目录模式从未调用），
+  而**只有 Pro build-fusion 真的写出 header**、写的正是 `# Original: <绝对路径>`——
+  所以绝对路径泄漏是 **Pro 侧真实缺陷**，不是设计以为的免费版行为。本次因此做了两件事：
+  删掉绝对路径 + 让 marker 真正落到每条输出路径。tag `v0.5.23` 经 OIDC + PEP 740 发
+  PyPI（`latest=0.5.23`，两个 provenance endpoint 均 200），全新 venv 安装实跑混淆
+  确认 marker 正确且无绝对路径，GitHub Release 已建，**完整 23-job CI 矩阵 + CodeQL
+  + 扩展 CI 全绿**。新增 `--community-marker/--no-community-marker` + 配置键
+  `community_marker: auto|on|off`，`output_marker` 附加进 dry-run plan 与 provenance
+  manifest（旧 manifest 仍通过校验）。36 个新测试 `tests/test_build_marker.py`。
+- **✅ `vscode-extension 0.4.3` 已于 2026-09-10 发布**：schema 现认识 0.5.23 的
+  `community_marker` 键（**实测坐实有效**：同一份配置 0.4.2 schema 报未知键、0.4.3 通过），
+  外加此前 held 的双 registry Install 段。tag `vscode-v0.4.3` 未误触发 PyPI Release
+  workflow。**Open VSX 由 Claude 用 `ovsx publish` 直接发布**（token 取自 Vaultwarden，
+  只走环境变量）；⚠️ **上传后 API 约 160 秒才索引到新版本，其间版本端点持续 404**——
+  与 09-07 记录一致，**是传播延迟不是发布失败，别据此重试**。Marketplace 手工上传已由
+  用户完成，curl 核实 `0.4.3`。
 - **✅ Open VSX 已上线（2026-09-07）**：`zhurong2020.pyobfus` v0.4.2，
   <https://open-vsx.org/extension/zhurong2020/pyobfus>，页面与 API 均已独立复核
   HTTP 200。两个易误读的字段：上传后**立即**查询返回 404 只是索引传播延迟（同日
@@ -434,8 +452,8 @@ cardiac-manuscripts 仓库（不影响 pyobfus 仓库本身）。
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.9-3.14, AST, setuptools
-- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.22，2026-09-06 发布**；完整版本历史见 `CHANGELOG.md`)
-- **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.2，2026-09-06 发布**（tag + GitHub Release + Marketplace 手工上传均已完成；`curl` 独立核实公开 listing 返回 `"version":"0.4.2"`，lastUpdated 04:07:50 GMT）；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`)
+- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.23，2026-09-10 发布**；完整版本历史见 `CHANGELOG.md`)
+- **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.3，2026-09-10 发布**；Marketplace 与 Open VSX 两边同版本，均已 `curl` 独立复核；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`。**发版必须两个 registry 都发**：Marketplace 手工上传 + `ovsx publish`，runbook 见 `docs/OPEN_VSX_PUBLISH_PLAN.md`)
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.10，2026-09-01 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.18` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp`（**0.3.12** 2026-09-07 发布，需核实 `active` / `isLatest=true`）
 - **Smithery (Skill)**: https://smithery.ai/skills/zhurong2020/pyobfus-protect (2026-06-22 上线 · 本地工具走 Skill 渠道非 MCP 渠道) · **mcp.so**: 已收录
@@ -454,7 +472,7 @@ pyobfus/
 │   ├── transformers/   # AST 变换器
 │   └── cross_file/    # 跨文件混淆
 ├── pyobfus_pro/       # Pro Edition (商业许可)
-├── tests/             # 1253 passed + 1 skipped (0.5.22 发布前验证)
+├── tests/             # 1289 passed + 1 skipped (0.5.23 发布前验证)
 ├── examples/          # 示例代码
 ├── docs/              # 项目文档
 └── cloudflare-worker/ # 许可验证 Worker

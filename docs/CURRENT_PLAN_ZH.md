@@ -1,13 +1,13 @@
 # pyobfus 当前计划
 
 更新时间：2026-09-10（当前公开版本：Core **`0.5.23`** / MCP **`0.3.12`** /
-VS Code **`0.4.2`**。本轮完成：**09-10 下载与渠道复查**——三个 0.5.22 发布后的
+VS Code **`0.4.3`**。本轮完成：**09-10 下载与渠道复查**——三个 0.5.22 发布后的
 干净日 `65 / 48 / 31` 单调回落进安静区间，**09-08 悬置的「基线是否抬升」问题
 已有答案：没有抬升**；MCP 09-07 的 235 已由 `16 / 23` 坐实为发版/重建自动化流量。
 **本轮已发布 `Core 0.5.23`**（Community build marker + 绝对路径泄漏修复，
-见下方 C.7.5）；MCP `[Unreleased]` 为空、未动；VS Code 仍有一条待发的 README
-文档条目，外加本轮重新生成的 `pyobfus.schema.json`（含新字段
-`community_marker`），下次发扩展时一并带上。此前已完成
+见下方 C.7.5）；MCP `[Unreleased]` 为空、未动；**`vscode-extension 0.4.3` 也已发布**
+（schema 认识新键 `community_marker` + 此前 held 的双 registry Install 段；
+Marketplace 与 Open VSX 两边均已 curl 复核为 0.4.3）。此前已完成
 **Open VSX 首发上线并复核**（扩展现同时在
 Marketplace 与 Open VSX，同版本）；**`pyobfus-mcp` 0.3.11 → 0.3.12 当日两发**
 （修 `serverInfo` 版本广播 + 修 0.3.11 引入的启动崩溃回归）；**Glama 两条线

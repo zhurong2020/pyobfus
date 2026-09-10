@@ -13,8 +13,8 @@ For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 answered — no baseline uplift. MCP is back to quiet levels (`16 / 23`) after its
 release-contaminated 09-07 spike. Marketplace `183 downloads / 7 installs`;
 Open VSX `228 downloads / 0 reviews`. Current public versions are pyobfus
-`0.5.22`, pyobfus-mcp `0.3.12`, and VS Code/Open VSX `0.4.2` — all three have an
-empty or docs-only `[Unreleased]`, so nothing is queued for release. Open VSX is
+**`0.5.23`**, pyobfus-mcp `0.3.12`, and VS Code/Open VSX **`0.4.3`**, all
+released on 09-10 and independently re-checked on both registries. Open VSX is
 live; Glama is listed, searchable and healthy, with two consecutive successful
 builds and all 8 tools. No Glama resubmission or Build-steps change remains
 pending.
@@ -151,6 +151,15 @@ pending.
 - 2026-09-10 public Gallery API: version 0.4.2, **7 installs, 183 downloads**
   (`+6` downloads in two days, installs unchanged), still no identifiable real
   review. `lastUpdated` remains 2026-09-06.
+- 2026-09-10 after the 0.4.3 upload: version **0.4.3**, `lastUpdated`
+  11:26:26 GMT, 7 installs / 187 downloads / `updateCount=14`. Installs did not
+  move on a release, which is the expected shape — an update reaches existing
+  installs rather than creating new ones.
+- **Publishing is a two-registry job.** Marketplace is a manual `.vsix` upload
+  by the maintainer (extension name → `⋯` → Update); Open VSX is
+  `ovsx publish` with the Vaultwarden token. Shipping only one silently drifts
+  the two listings apart. Runbook:
+  [OPEN_VSX_PUBLISH_PLAN.md](OPEN_VSX_PUBLISH_PLAN.md).
 - No identifiable user rating/review signal yet; the API's weighted-rating
   prior is not evidence of an actual review. Continue tracking installs and
   real reviews, not raw update/download count alone.
@@ -184,6 +193,12 @@ pending.
 - **2026-09-10 recheck**: `downloadCount=228` (`+8` in two days),
   `reviewCount=0`, still version 0.4.2. The same caveat applies — this is a
   download counter, not distinct users, and it is not additive with Marketplace.
+- **2026-09-10 publish of 0.4.3**: `ovsx publish` reported success immediately,
+  but the API kept returning **HTTP 404 on the version endpoint for ~160
+  seconds** before `0.4.3` appeared and `allVersions` grew to
+  `[latest, 0.4.3, 0.4.2]`. This is the same index-propagation lag recorded at
+  first publication on 09-07 — **a 404 straight after upload is not a failed
+  publish, and must not trigger a retry.** Poll until it resolves.
 - Publish credential: Vaultwarden entry `Open VSX Access Token (pyobfus)`
   (folder `Publishing`). Sole copy — no local dotfile cache, never in the repo
   or CI. Rotated periodically by the maintainer; a rotation only changes that
