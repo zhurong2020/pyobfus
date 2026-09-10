@@ -234,6 +234,11 @@
           ],
           "description": "Path to a resource file to AES-256-GCM encrypt and embed as a module constant (Pro). Requires level: pro."
         },
+        "community_marker": {
+          "type": "string",
+          "default": "auto",
+          "description": "Transparent build marker on generated files: \"auto\" (emit), \"on\" (always emit) or \"off\" (suppress). Attribution only -- not a license check or authenticity proof."
+        },
         "max_workers": {
           "type": [
             "integer",

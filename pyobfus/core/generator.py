@@ -9,8 +9,10 @@ import ast
 import re
 import sys
 from pathlib import Path
-from typing import Union, cast
+from typing import Optional, Union, cast
 
+from pyobfus import __version__
+from pyobfus.core.build_marker import apply_marker, safe_source_label
 from pyobfus.exceptions import GenerationError
 
 
@@ -284,27 +286,41 @@ class CodeGenerator:
             return source_code
 
     @staticmethod
-    def add_header_comment(source_code: str, original_file: str = "") -> str:
+    def add_header_comment(
+        source_code: str,
+        original_file: str = "",
+        *,
+        edition: str = "community",
+        source_root: Optional[Union[str, Path]] = None,
+    ) -> str:
         """
-        Add a header comment to obfuscated code.
+        Stamp obfuscated code with the transparent build marker.
+
+        Prologue-safe (a shebang stays first, a PEP 263 encoding cookie stays
+        within the first two lines) and idempotent, so re-stamping an
+        already-marked file is a no-op.
+
+        `original_file` is reduced to a project-relative POSIX path or a bare
+        basename. Before 0.5.23 this method emitted the caller's absolute path
+        verbatim, which leaked the build machine's directory layout -- and
+        usually a username -- into every shipped file.
 
         Args:
             source_code: Generated source code
             original_file: Original filename (optional)
+            edition: Build edition recorded in the marker
+            source_root: Root to make `original_file` relative to
 
         Returns:
-            str: Source code with header
+            str: Source code with the marker
         """
-        header_lines = [
-            "# Obfuscated with pyobfus",
-            "# https://github.com/zhurong2020/pyobfus",
-        ]
-
+        label: Optional[str] = None
         if original_file:
-            header_lines.append(f"# Original: {original_file}")
-
-        header_lines.append("# DO NOT EDIT - Generated code")
-        header_lines.append("")
-
-        header = "\n".join(header_lines)
-        return f"{header}\n{source_code}"
+            root = Path(source_root) if source_root else None
+            label = safe_source_label(Path(original_file), root)
+        return apply_marker(
+            source_code,
+            tool_version=__version__,
+            edition=edition,
+            source_label=label,
+        )

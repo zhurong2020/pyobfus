@@ -25,6 +25,7 @@ from pyobfus.config_templates import get_template, list_templates
 from pyobfus.config_validator import validate_config_file, find_config_file
 from pyobfus.core import content_transforms
 from pyobfus.core.analyzer import SymbolAnalyzer
+from pyobfus.core.build_marker import marker_enabled
 from pyobfus.core.generator import CodeGenerator
 from pyobfus.core.parser import ASTParser
 from pyobfus.core.orchestrator import CrossFileOrchestrator
@@ -374,6 +375,16 @@ except ImportError:
     "Requires --save-mapping. Default: off.",
 )
 @click.option(
+    "--community-marker/--no-community-marker",
+    "community_marker",
+    default=None,
+    help="Emit the transparent '# pyobfus:generated' build marker at the top of "
+    "each generated file (tool version, edition, project-relative source). "
+    "Attribution only -- it is a comment, not a license check. Use "
+    "--no-community-marker where generated banners are forbidden. Distinct from "
+    "--trace-marker, which is about reversing tracebacks. Default: on.",
+)
+@click.option(
     "--unmap",
     "unmap_mode",
     is_flag=True,
@@ -462,6 +473,7 @@ def main(
     save_mapping_path: Optional[str],
     provenance_manifest_path: Optional[str],
     trace_marker: bool,
+    community_marker: Optional[bool],
     unmap_mode: bool,
     trace_path: Optional[str],
     mapping_path: Optional[str],
@@ -749,6 +761,8 @@ def main(
         config.name_prefix = name_prefix
         if preserve_param_names is not None:
             config.preserve_param_names = preserve_param_names
+        if community_marker is not None:
+            config.community_marker = "on" if community_marker else "off"
         if numeric_obfuscation:
             config.numeric_obfuscation = True
         if strip_ai_artifacts:
@@ -1220,6 +1234,7 @@ def _obfuscate_file(
     verbose: bool,
     dry_run: bool = False,
     save_mapping_path: Optional[str] = None,
+    source_root: Optional[Path] = None,
 ) -> dict:
     """
     Obfuscate a single Python file.
@@ -1230,6 +1245,9 @@ def _obfuscate_file(
         config: Obfuscation configuration
         verbose: Verbose output
         dry_run: Preview mode without writing files
+        source_root: Project root the build marker's source label is made
+            relative to. Defaults to the input file's own directory, which
+            yields a bare basename.
 
     Returns:
         Dictionary with obfuscation statistics
@@ -1351,18 +1369,23 @@ def _obfuscate_file(
             if config.scrub_traceback:
                 click.echo(f"  Scrub keypair: {scrub_key_path} (keep private)")
 
-    # Add header comment
-    obfuscated_code = CodeGenerator.add_header_comment(obfuscated_code, str(input_file))
+    # Transparent build marker. Applied to the generated *string* so it lands in
+    # the file whichever write path runs below -- before 0.5.23 the non-fusion
+    # branch regenerated from the tree and silently dropped it, so Community
+    # output carried no marker at all while Pro fusion output carried one with
+    # the caller's absolute path in it.
+    if marker_enabled(getattr(config, "community_marker", "auto")):
+        obfuscated_code = CodeGenerator.add_header_comment(
+            obfuscated_code,
+            str(input_file),
+            edition=config.level,
+            source_root=source_root if source_root is not None else input_file.parent,
+        )
 
     # Write output
     if not dry_run:
-        if _fusion:
-            # The fusion post-passes transformed the source string, so write it
-            # directly rather than regenerating from the (pre-fusion) tree.
-            output_file.parent.mkdir(parents=True, exist_ok=True)
-            output_file.write_text(obfuscated_code, encoding="utf-8")
-        else:
-            CodeGenerator.generate_to_file(transformed_tree, output_file)
+        output_file.parent.mkdir(parents=True, exist_ok=True)
+        output_file.write_text(obfuscated_code, encoding="utf-8")
         if verbose:
             click.echo(f"  Output: {output_file}")
     else:
@@ -1446,7 +1469,9 @@ def _obfuscate_directory(
             click.echo(f"\r  Processing: {idx}/{total} ({pct}%)", nl=False)
 
         try:
-            file_stats = _obfuscate_file(python_file, output_file, config, verbose, dry_run)
+            file_stats = _obfuscate_file(
+                python_file, output_file, config, verbose, dry_run, source_root=input_dir
+            )
             dir_stats["files_processed"] += 1
             for key, value in file_stats.items():
                 if key in dir_stats:

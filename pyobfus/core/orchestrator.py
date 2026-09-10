@@ -16,6 +16,8 @@ from pyobfus.config import ObfuscationConfig
 from pyobfus.core import content_transforms
 from pyobfus.core.global_table import GlobalSymbolTable
 from pyobfus.core.export_detector import ExportDetector
+from pyobfus import __version__
+from pyobfus.core.build_marker import apply_marker, marker_enabled
 from pyobfus.core.generator import CodeGenerator
 from pyobfus.core.parser import ASTParser
 from pyobfus.transformers.import_rewriter import ImportRewriter
@@ -116,6 +118,16 @@ def _transform_single_file(
 
         ast.fix_missing_locations(tree)
         new_source = CodeGenerator.generate(tree)
+
+        # Transparent build marker. `relative_path` is already project-relative,
+        # so no absolute build path can reach the shipped file.
+        if config is None or marker_enabled(getattr(config, "community_marker", "auto")):
+            new_source = apply_marker(
+                new_source,
+                tool_version=__version__,
+                edition=getattr(config, "level", "community") if config else "community",
+                source_label=Path(relative_path).as_posix(),
+            )
 
         output_file = output_dir / relative_path
         output_file.parent.mkdir(parents=True, exist_ok=True)

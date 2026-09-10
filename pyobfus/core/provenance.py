@@ -25,6 +25,7 @@ from typing import Any, Dict, Iterable, List, Optional, Union
 
 from pyobfus import __version__ as PYOBFUS_VERSION
 from pyobfus.config import ObfuscationConfig
+from pyobfus.core.build_marker import marker_enabled, marker_state
 
 PROVENANCE_FORMAT_VERSION = 1
 
@@ -140,6 +141,14 @@ def build_provenance_manifest(
             "path": str(mapping_path) if mapping_path else None,
             "sha256": mapping_digest,
         },
+        # Additive since 0.5.23. Records how the transparent build marker was
+        # configured for this run. It is build provenance, never proof that an
+        # artifact is authentic -- sign or attest the artifact for that.
+        "output_marker": marker_state(
+            mode=getattr(config, "community_marker", "auto"),
+            edition=config.level,
+            emitted=marker_enabled(getattr(config, "community_marker", "auto")),
+        ),
         "files": file_records,
         "cyclonedx": {
             "bomFormat": "CycloneDX",

@@ -111,6 +111,13 @@ class ObfuscationConfig:
     )
     embed_data: Optional[str] = None  # P2-14: path to a resource file to AES-256-GCM embed
 
+    # Output policy
+    # Transparent build marker on generated files: "auto" | "on" | "off".
+    # "auto" emits it (today's transparent-attribution default); "off" is for
+    # environments that forbid generated banners. Changing this never alters
+    # transformation semantics -- only whether a comment block is emitted.
+    community_marker: str = "auto"
+
     # Performance options
     max_workers: Optional[int] = None  # None = auto (cpu_count), 1 = sequential
 

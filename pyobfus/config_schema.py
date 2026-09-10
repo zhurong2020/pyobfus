@@ -49,6 +49,9 @@ _FIELD_DESCRIPTIONS: Dict[str, str] = {
     'Claude", etc.) from docstrings and attribution dunders (Community).',
     "preserve_param_names": "Keep function parameter names intact so "
     "keyword arguments survive obfuscation.",
+    "community_marker": 'Transparent build marker on generated files: "auto" '
+    '(emit), "on" (always emit) or "off" (suppress). Attribution only -- not a '
+    "license check or authenticity proof.",
     "string_encryption": "AES-256 string encryption (Pro).",
     "import_obfuscation": "Rewrite imports to runtime importlib calls + "
     "encrypted import strings (Pro).",

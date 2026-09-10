@@ -159,6 +159,12 @@ def _render_yaml(
 
     lines.append("  # Remove docstrings (framework presets keep them by default).")
     lines.append("  remove_docstrings: false")
+    lines.append("")
+
+    lines.append("  # Transparent build marker on generated files: auto | on | off.")
+    lines.append('  # Attribution only -- a comment, not a license check. Set to "off"')
+    lines.append("  # if your delivery process forbids generated banners.")
+    lines.append('  community_marker: "auto"')
 
     return "\n".join(lines) + "\n"
 

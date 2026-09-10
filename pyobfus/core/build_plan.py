@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from pyobfus.config import ObfuscationConfig
+from pyobfus.core.build_marker import marker_enabled, marker_state
 from pyobfus.core.provenance import config_hash
 from pyobfus.utils import filter_python_files, should_exclude_file
 
@@ -84,6 +85,16 @@ def build_obfuscation_plan(
                 "path": "embedded-in-output",
             }
         )
+    marker_mode = getattr(config, "community_marker", "auto")
+    marker_emitted = marker_enabled(marker_mode)
+    if marker_emitted:
+        artifacts.append(
+            {
+                "kind": "build-marker",
+                "role": "ship",
+                "path": "embedded-in-output",
+            }
+        )
 
     return {
         "version": BUILD_PLAN_VERSION,
@@ -104,6 +115,11 @@ def build_obfuscation_plan(
             "excluded_count": len(excluded),
         },
         "artifacts": artifacts,
+        "output_marker": marker_state(
+            mode=marker_mode,
+            edition=config.level,
+            emitted=marker_emitted,
+        ),
         "apply_supported": False,
     }
 

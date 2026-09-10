@@ -114,6 +114,13 @@ def test_dry_run_plan_reports_config_excludes_and_artifact_roles(tmp_path: Path)
         "debug-mapping": "retain-internal",
         "provenance-manifest": "optional",
         "trace-marker": "ship",
+        "build-marker": "ship",
+    }
+    assert plan["output_marker"] == {
+        "format": 1,
+        "edition": "community",
+        "mode": "auto",
+        "emitted": True,
     }
     serialized = json.dumps(plan)
     assert str(tmp_path) not in serialized
