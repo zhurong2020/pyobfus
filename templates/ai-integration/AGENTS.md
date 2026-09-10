@@ -57,6 +57,8 @@ the trace with that mapping file: `pyobfus --unmap --trace <log> --mapping
 obfuscating with `--trace-marker` (the `protect_project` MCP tool sets it by
 default).
 
+A file that instead opens with `# pyobfus:generated format=1 edition=…` is pyobfus output too, but that marker names no mapping — ask where the mapping was saved rather than guessing. Both markers are plain comments, not proof of origin.
+
 ## Safety invariants
 
 1. `mapping.json` must NOT be committed to the distributed artifact.

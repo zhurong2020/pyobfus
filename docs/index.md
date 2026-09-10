@@ -38,6 +38,7 @@ title: pyobfus - Modern Python Code Obfuscator
     <li><strong>Parameter Preservation</strong>: Keep function parameter names for keyword arguments</li>
     <li><strong>Build Provenance</strong>: Local provenance manifest with hashes and CycloneDX-compatible relationships; <code>--verify-provenance-manifest</code> validates it</li>
     <li><strong>Structured Dry-Run Plan &amp; Syntax Verification</strong> (v0.5.19): <code>--dry-run --json</code> previews a versioned plan; <code>--verify-syntax</code> compiles generated output in memory after a build (no import, no execution)</li>
+    <li><strong>Transparent Build Marker</strong> (v0.5.23): generated files open with a versioned <code>#&nbsp;pyobfus:generated</code> marker (tool version, edition, project-relative source) and no longer embed the input file's absolute path; <code>--no-community-marker</code> suppresses it</li>
   </ul>
 </div>
 

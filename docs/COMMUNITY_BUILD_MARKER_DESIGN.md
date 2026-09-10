@@ -1,7 +1,38 @@
 # Community Build Marker Design
 
-Status: design approved for the roadmap; implementation and release remain
+Status: **implemented** (2026-09-10, held in `[Unreleased]`); release remains
 separately gated.
+
+## Correction: what the output actually did before implementation
+
+This document was written from the assumption that Core output already began
+with an attribution header, and that the work was to formalize it. Measured
+against the code before implementation, that premise was wrong in both
+directions, and the corrected picture is what shipped:
+
+- **Community output carried no marker at all.** `CodeGenerator.add_header_comment`
+  was effectively dead code on that path: the single-file branch built the
+  header string and then wrote the file by regenerating from the AST, silently
+  discarding it. Directory mode never called it.
+- **Pro build-fusion output was the only path that emitted the header** — and
+  it was the leaky one, writing `# Original: <absolute path>` verbatim.
+
+So the absolute-path disclosure was a Pro-path defect, not a free-tier one, and
+the "existing free-output header" being formalized did not exist in shipped
+output. The implementation therefore does two things rather than one: it
+removes the absolute path, and it makes the marker actually reach output on
+every path.
+
+Two other decisions follow from that correction:
+
+- **`auto` emits on every edition**, with `edition=` reflecting the real level.
+  This preserves the Pro fusion path's existing banner (minus the leak) instead
+  of silently removing it, and starts honouring the Community promise. The
+  "suppress for a non-Community distribution" option below is left open but not
+  taken.
+- **The config key stays `community_marker`** as specified here, even though
+  the marker is not Community-only, rather than inventing a second vocabulary
+  mid-implementation. The help text says it governs all editions.
 
 ## Decision
 
@@ -145,3 +176,27 @@ needed, sign or attest the manifest/artifact outside this comment marker.
 5. Run all Python/MCP/integration/extension gates plus packaging smoke tests.
 
 No version bump, tag or release is authorized by this design document.
+
+## Implementation record (2026-09-10)
+
+- `pyobfus/core/build_marker.py` — new module owning the marker block, the
+  privacy-safe source label, mode resolution and the shared prologue-safe
+  insertion helper that `pyobfus.cli`'s trace marker now imports.
+- `pyobfus/constants.py` — `BUILD_MARKER_PREFIX` / `BUILD_MARKER_FORMAT`.
+- `pyobfus/config.py` + `config_schema.py` — the `community_marker` key; the
+  VS Code JSON schema regenerates from the dataclass, so it picked the field up
+  automatically.
+- `pyobfus/cli.py` — `--community-marker/--no-community-marker` (tri-state),
+  and the single-file write path no longer regenerates from the tree, which is
+  what dropped the marker.
+- `pyobfus/core/orchestrator.py` — cross-file write path stamps the marker
+  using the already-project-relative path.
+- `pyobfus/core/build_plan.py` + `core/provenance.py` — additive
+  `output_marker` state.
+- `tests/test_build_marker.py` — 36 tests covering the acceptance criteria
+  below.
+
+Deliberately not done: the PyInstaller/Nuitka cookbook smoke tests are covered
+indirectly by `--verify-syntax` on marked output plus a real import-and-execute
+check of cross-file output; a full bundler matrix was judged disproportionate
+for a comment block that provably adds no runtime object.

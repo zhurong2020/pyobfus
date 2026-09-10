@@ -20,13 +20,13 @@ A Python code obfuscator built with AST-based transformations. **Supports Python
 
 > **🔒 Pro Edition available** — 6 patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator, $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
 
-> **🔎 What's new in v0.5.22** — `pyobfus --check` now emits a Python 3.14
-> remote-debug hardening advisory when a build both requests anti-debug protection
-> and targets Python 3.14+: PEP 768 remote debugging can only be disabled at
-> interpreter startup (`-X disable_remote_debug` /
-> `PYTHON_DISABLE_REMOTE_DEBUG=1`), and the obfuscator's runtime anti-debug
-> heuristics cannot switch it off. Informational only — detection, severity and
-> exit codes are unchanged.
+> **🔎 What's new in v0.5.23** — generated files no longer embed the absolute
+> path of the input file, which previously disclosed the build machine's
+> directory layout in every shipped file. Output now carries a versioned
+> `# pyobfus:generated` attribution marker naming the tool version and a
+> project-relative source path; `--no-community-marker` (or
+> `community_marker: "off"`) suppresses it where generated banners are
+> forbidden. Transformation behavior is unchanged.
 
 > 🔔 **Starring this repo doesn't notify you about new releases** — GitHub only
 > sends release notifications to people who explicitly **Watch** it. Click
@@ -78,6 +78,7 @@ pyobfus is also on the [VS Code Marketplace](https://marketplace.visualstudio.co
 - **`pyobfus --init src/`** — zero-config onboarding: scans the project, detects FastAPI/Django/Pydantic/Click/SQLAlchemy, and writes a ready-to-use `pyobfus.yaml`.
 - **`pyobfus --unmap --trace error.log --mapping mapping.json`** — reverse obfuscated identifiers in a production stack trace so you can debug (or hand the trace to an AI assistant) without reversing the obfuscation itself.
 - **`pyobfus … --save-mapping mapping.json --trace-marker`** — stamp each obfuscated file with a `# pyobfus:obfuscated` header (id + mapping filename + the exact `--unmap` command) so an AI agent that lands in an obfuscated file from a traceback immediately knows it's pyobfus output and how to reverse the names.
+- **`pyobfus … --no-community-marker`** — generated files normally open with a versioned `# pyobfus:generated` marker naming the tool version, edition, and the project-relative source path, so anyone (or any agent) opening the file knows it is generated output rather than something to edit. It never contains an absolute path, buyer id, licence key or hash. It is transparent attribution — a plain comment you can delete — not a licence check or an anti-piracy measure, and suppressing it is a free-tier feature, not a paid one. Distinct from `--trace-marker`, which is about reversing tracebacks.
 - **`pyobfus … --provenance-manifest provenance.json`** — write a local JSON manifest (input/output hashes, config hash, pyobfus version, git commit when available, mapping digest, CycloneDX-compatible component relationships, and a self-consistency integrity digest — not a cryptographic signature) for offline build provenance. See [`docs/PROVENANCE_MANIFEST.md`](docs/PROVENANCE_MANIFEST.md).
 - **`pyobfus --verify-provenance-manifest provenance.json --json`** — validate the manifest structure, CycloneDX-compatible relationships, and local integrity digest before archiving or shipping it.
 - **`pyobfus … --dry-run --json`** — preview a versioned `plan` object before anything is written: the effective configuration, which files are selected or excluded (and why), and the artifacts a build would produce, each tagged `ship` / `retain-internal` / `optional`. Relative labels only (no source, secrets, or absolute paths); it is a preview, not a saved apply file.

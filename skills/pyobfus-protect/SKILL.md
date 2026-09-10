@@ -99,6 +99,12 @@ puzzle over the mangled `I0`/`I1` names — go straight to unmap with the named
 mapping file. (`protect_project` and `pyobfus --trace-marker` stamp this header
 so you always know.)
 
+A file may instead open with `# pyobfus:generated format=1 edition=…`. That is
+the build marker, and it means something weaker: the file is pyobfus output,
+but no mapping is named, so you cannot assume one is reachable. Ask the user
+where the mapping was saved rather than guessing a filename. Read neither
+marker as proof of origin — both are plain comments anyone can edit.
+
 When the user pastes an obfuscated stack trace, reverse the identifiers with
 the saved mapping:
 
