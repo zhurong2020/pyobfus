@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Pro licence verification works again.** Every `pyobfus-license register`
+  had started failing with `License verification failed and no valid cache
+  available: Access denied`, on every platform and every installed version.
+  The licence itself was fine and the licence server was up: the request
+  never reached it. `urllib` sends `User-Agent: Python-urllib/X.Y` by default,
+  and the CDN in front of the licence server now rejects that signature with
+  HTTP 403 and a plain-text `error code: 1010` body. Since that body is not
+  the server's JSON, the client fell back to its hardcoded `"Access denied"`,
+  which named neither the cause nor a way forward.
+
+  Verification requests now identify themselves as
+  `pyobfus-license/<version>`. Confirmed against the live endpoint: requests
+  differing only in `User-Agent` get a 403 block (`Python-urllib`) versus the
+  server's own response (anything else).
+
+- **A 403 that did not come from the licence server now says so.** The client
+  distinguishes the server's own 403s, which always carry a JSON `error`
+  naming the reason (revoked, expired, device limit), from a 403 injected by
+  anything in between. The latter now reports that the request was blocked
+  before it arrived, states that the licence may still be valid, and gives
+  the offline command (`pyobfus-license register <KEY> --no-verify`).
+
+- The PyPI lookup behind `dependency_advisory` also sent the default
+  `Python-urllib` User-Agent. It now identifies itself as `pyobfus/<version>`,
+  which PyPI asks clients to do and which keeps this check clear of the same
+  class of edge block.
+
 ## [0.5.25] - 2026-09-12
 
 ### Fixed

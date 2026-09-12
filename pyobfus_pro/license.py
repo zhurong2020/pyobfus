@@ -35,6 +35,26 @@ CACHE_DURATION = timedelta(days=3)  # Reduced from 30 days to 3 days in v0.1.4
 # Timeout for network requests
 REQUEST_TIMEOUT = 5  # seconds
 
+
+def _package_version() -> str:
+    """Best-effort package version, never raising during import."""
+    try:
+        from importlib.metadata import version
+
+        return version("pyobfus")
+    except Exception:  # pragma: no cover - metadata missing or unreadable
+        return "unknown"
+
+
+# Identify ourselves on every outbound request. urllib's default
+# "Python-urllib/X.Y" User-Agent is blocked at the Cloudflare edge with
+# HTTP 403 "error code: 1010" (browser integrity check / banned signature),
+# so the request never reaches the Worker and every verification fails with
+# an opaque "Access denied". Confirmed 2026-09-12: identical requests differing
+# only in User-Agent get 403 (Python-urllib) vs the Worker's own JSON response
+# (anything else, including no User-Agent at all).
+USER_AGENT = f"pyobfus-license/{_package_version()} (+https://github.com/zhurong2020/pyobfus)"
+
 # License secret for HMAC signing
 LICENSE_SECRET = os.getenv(
     "PYOBFUS_LICENSE_SECRET",
@@ -194,7 +214,7 @@ def _verify_online(license_key: str) -> Dict[str, Any]:
     req = urllib.request.Request(
         LICENSE_API_URL,
         data=request_data,
-        headers={"Content-Type": "application/json"},
+        headers={"Content-Type": "application/json", "User-Agent": USER_AGENT},
         method="POST",
     )
 
@@ -227,14 +247,25 @@ def _verify_online(license_key: str) -> Dict[str, Any]:
         if e.code == 404:
             raise LicenseVerificationError("License key not found")
         elif e.code == 403:
-            # Read error message from response
-            error_msg = "Access denied"
+            # A 403 from the license server itself always carries a JSON
+            # "error" field naming the reason (revoked, expired, device limit).
+            # A 403 with any other body did not come from the server: something
+            # between the client and the Worker rejected the request, and the
+            # license itself may be perfectly valid. Say so, and point at the
+            # offline path, instead of reporting a bare "Access denied".
             try:
                 error_data = json.loads(e.read())
-                error_msg = error_data.get("error", "Access denied")
+                server_msg = error_data.get("error")
             except (json.JSONDecodeError, ValueError, IOError):
-                pass
-            raise LicenseVerificationError(error_msg)
+                server_msg = None
+            if server_msg:
+                raise LicenseVerificationError(server_msg)
+            raise LicenseVerificationError(
+                "blocked by the network before reaching the license server "
+                "(HTTP 403, non-server response body). Your license may still be "
+                "valid. Try another network, or register offline with: "
+                f"pyobfus-license register {license_key} --no-verify"
+            )
         raise LicenseVerificationError(f"HTTP error: {e.code}")
     except urllib.error.URLError as e:
         raise LicenseVerificationError(f"Network error: {e.reason}")

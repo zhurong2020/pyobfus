@@ -46,6 +46,19 @@ from urllib.parse import quote
 from pyobfus.core.preflight import CAT_DEPENDENCY_ADVISORY, SEVERITY_INFO, SEVERITY_MEDIUM, Risk
 
 _PYPI_JSON_URL = "https://pypi.org/pypi/{name}/json"
+
+
+def _package_version() -> str:
+    """Best-effort package version, never raising during import."""
+    try:
+        from importlib.metadata import version
+
+        return version("pyobfus")
+    except Exception:  # pragma: no cover - metadata missing or unreadable
+        return "unknown"
+
+
+_USER_AGENT = f"pyobfus/{_package_version()} (+https://github.com/zhurong2020/pyobfus)"
 _DEFAULT_TIMEOUT = 3.0
 _DEFAULT_MAX_WORKERS = 8
 
@@ -185,8 +198,12 @@ def collect_declared_dependencies(root: Path) -> Dict[str, List[Path]]:
 def _pypi_exists(name: str, timeout: float) -> Optional[bool]:
     """True/False if PyPI definitively answered, None on network/lookup error."""
     url = _PYPI_JSON_URL.format(name=quote(name, safe=""))
+    # Identify ourselves: urllib's default "Python-urllib/X.Y" User-Agent is a
+    # known blocklist signature on CDN edges (it is what broke license
+    # verification in 2026-09), and PyPI asks clients to send a real one.
+    request = urllib.request.Request(url, headers={"User-Agent": _USER_AGENT})
     try:
-        with urllib.request.urlopen(url, timeout=timeout) as resp:  # noqa: S310
+        with urllib.request.urlopen(request, timeout=timeout) as resp:  # noqa: S310
             status: int = resp.status
             return 200 <= status < 300
     except urllib.error.HTTPError as e:

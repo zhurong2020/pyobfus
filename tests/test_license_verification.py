@@ -537,3 +537,83 @@ class TestCacheSigning:
         result = load_cached_license()
         assert result is not None
         assert result["key"] == "PYOB-TEST-TEST-TEST-TEST"
+
+
+class TestEdgeBlockRegression:
+    """Regression tests for the 2026-09-12 licence-verification outage.
+
+    Cloudflare's edge rejects urllib's default ``Python-urllib/X.Y``
+    User-Agent with HTTP 403 and the plain-text body ``error code: 1010``
+    (banned browser signature). The request never reached the Worker, so
+    every paying customer's ``pyobfus-license register`` failed with a bare
+    "Access denied" that named neither the real cause nor a way forward.
+    """
+
+    @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
+    @patch("pyobfus_pro.license.urllib.request.urlopen")
+    def test_request_carries_identifying_user_agent(self, mock_urlopen):
+        """The outbound request must not go out as Python-urllib."""
+        captured: dict[str, Any] = {}
+
+        def capture(req, *args, **kwargs):
+            captured["request"] = req
+            mock_response = MagicMock()
+            mock_response.read.return_value = json.dumps(
+                {"valid": True, "expires_at": None}
+            ).encode()
+            mock_response.__enter__.return_value = mock_response
+            mock_response.__exit__.return_value = None
+            return mock_response
+
+        mock_urlopen.side_effect = capture
+        verify_license("PYOB-AAAA-BBBB-CCCC-DDDD")
+
+        user_agent = captured["request"].get_header("User-agent")
+        assert user_agent, "request went out with no explicit User-Agent"
+        assert "Python-urllib" not in user_agent
+        assert user_agent.startswith("pyobfus-license/")
+
+    @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
+    @patch("pyobfus_pro.license.urllib.request.urlopen")
+    def test_non_server_403_is_reported_as_a_network_block(self, mock_urlopen):
+        """A 403 that is not the Worker's JSON must not read 'Access denied'."""
+        import urllib.error
+
+        mock_urlopen.side_effect = urllib.error.HTTPError(
+            url="",
+            code=403,
+            msg="Forbidden",
+            hdrs=None,  # type: ignore[arg-type]
+            fp=io.BytesIO(b"error code: 1010"),
+        )
+
+        with pytest.raises(LicenseVerificationError) as excinfo:
+            verify_license("PYOB-AAAA-BBBB-CCCC-DDDD")
+
+        message = str(excinfo.value)
+        assert "Access denied" not in message
+        assert "blocked by the network" in message
+        # Must hand the user the offline path, with their own key filled in.
+        assert "--no-verify" in message
+        assert "PYOB-AAAA-BBBB-CCCC-DDDD" in message
+
+    @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
+    @patch("pyobfus_pro.license.urllib.request.urlopen")
+    def test_server_403_still_reports_the_server_reason(self, mock_urlopen):
+        """A real Worker 403 must keep naming the actual licence problem."""
+        import urllib.error
+
+        mock_urlopen.side_effect = urllib.error.HTTPError(
+            url="",
+            code=403,
+            msg="Forbidden",
+            hdrs=None,  # type: ignore[arg-type]
+            fp=io.BytesIO(
+                json.dumps(
+                    {"valid": False, "error": "Device limit reached (max 3 devices)"}
+                ).encode()
+            ),
+        )
+
+        with pytest.raises(LicenseVerificationError, match="Device limit reached"):
+            verify_license("PYOB-AAAA-BBBB-CCCC-DDDD")
