@@ -6,6 +6,29 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+### Changed
+
+- **The server now runs on either mcp SDK major.** 2.x renamed `FastMCP` to
+  `MCPServer` and moved it to `mcp.server.mcpserver`, so the server could not
+  start there at all. It now loads whichever class is installed and passes
+  `version=` at construction when the SDK accepts it — 2.x does, which retires
+  the private `_mcp_server` write that 1.x needs. The eight tool registrations
+  are unchanged: 2.x still takes `meta=` on the decorator.
+
+  Two internals-dependent spots were made version-agnostic: the live tool
+  manifest (`Tool.inputSchema` became `input_schema`, though the schema JSON is
+  identical so the shipped digest still verifies) and the version test (2.x
+  exposes a public `.version`; the inner server was renamed
+  `_lowlevel_server`).
+
+  **The `mcp<2.0.0` dependency cap is unchanged**, so installs are unaffected.
+  Upgrading buys no protocol currency for a stdio server — both majors
+  negotiate `2025-11-25`, and 2.x rejects a `2026-07-28`-enveloped request on a
+  stdio connection, because that protocol is reached through the stateless
+  transports this project does not implement. See
+  [docs/MCP_SDK_2X_SPIKE.md](../docs/MCP_SDK_2X_SPIKE.md) for the measurements
+  and for what would justify lifting the cap.
+
 ## [0.3.12] - 2026-09-07
 
 ### Fixed
