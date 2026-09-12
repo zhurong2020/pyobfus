@@ -7,12 +7,15 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-**Last updated**: 2026-09-10. Download/channel snapshot: Core PyPI
-`31 / 509 / 1,874` day/week/month through 09-09; three clean post-0.5.22 days
+**Last updated**: 2026-09-12. Download/channel snapshot: Core PyPI
+`123 / 614 / 1,947` day/week/month through 09-10; 09-10 is the 0.5.23
+release/verification day and is not an organic-baseline sample. MCP is
+`4 / 325 / 1,044`, back in its quiet range. Marketplace is
+`202 downloads / 7 installs`; Open VSX is `466 downloads / 0 reviews`.
+The two registry download counters are not additive user counts. The prior
+baseline conclusion remains unchanged: three clean post-0.5.22 days
 (`65 / 48 / 31`) decay back into the quiet band, so the 09-08 open question is
-answered — no baseline uplift. MCP is back to quiet levels (`16 / 23`) after its
-release-contaminated 09-07 spike. Marketplace `183 downloads / 7 installs`;
-Open VSX `228 downloads / 0 reviews`. Current public versions are pyobfus
+answered — no baseline uplift. Current public versions are pyobfus
 **`0.5.23`**, pyobfus-mcp `0.3.12`, and VS Code/Open VSX **`0.4.3`**, all
 released on 09-10 and independently re-checked on both registries. Open VSX is
 live; Glama is listed, searchable and healthy, with two consecutive successful
@@ -27,8 +30,8 @@ pending.
 
 ### PyPI — `pyobfus`
 - URL: https://pypi.org/project/pyobfus/
-- Current version: **0.5.22** (released 2026-09-06) · ships with PEP 740 attestations via OIDC trusted publishing
-- Current headline: discovery-focused metadata and README/FAQ improvements around pre-shipping protection, reverse mapping, provenance, and AI-assisted debugging; runtime behavior unchanged.
+- Current version: **0.5.23** (released 2026-09-10) · ships with PEP 740 attestations via OIDC trusted publishing
+- Current headline: generated Community output now carries a versioned, transparent build marker; generated output no longer embeds the input file's absolute path. Marker policy is configurable and recorded in dry-run/provenance facts.
 - Prior headline (0.5.19): `--dry-run --json` emits a versioned `plan` object (effective config, selected/excluded files with reasons, artifacts tagged ship/retain-internal/optional; relative labels only, not applyable); opt-in `--verify-syntax` compiles generated output in memory post-build (no import/execute, no `__pycache__`) and reports `syntax_valid` with no runtime-correctness claim.
 - Prior headline (0.5.18): config-aware `--check` reports the effective project configuration and findings already mitigated by it, while preserving high-risk findings and exit-code semantics.
 - Pre-v0.4 baseline: ~324 downloads / month, ~30% real users (rest is mirror noise)
@@ -64,6 +67,10 @@ pending.
   `78.3`, median `38`) — flat month over month once release spikes are
   discounted. The `overall` series totals `6,491` from 2026-03-13 through
   09-09; this is not a lifetime count.
+- 2026-09-12 recheck (data through 09-10): latest day/week/month is
+  `123 / 614 / 1,947`. The 09-10 value coincides with the 0.5.23 release,
+  fresh-install verification and channel checks, so it is release-contaminated
+  and does not reopen the already-closed organic-baseline question.
 - Tracker: `gh api repos/zhurong2020/pyobfus` + PePy
 
 ### PyPI — `pyobfus-mcp`
@@ -191,7 +198,7 @@ pending.
   is the whole deliverable — do not read the listing itself as traction.
 
 ### VS Code Marketplace — `zhurong2020.pyobfus`
-- Current published version: **0.4.2** (2026-09-06). The same VSIX is now also
+- Current published version: **0.4.3** (2026-09-10). The same VSIX is also
   on Open VSX — see the dedicated section below.
 - 2026-08-24 public Gallery API: version 0.4.1, 3 installs, 124 downloads.
 - 2026-09-08 public Gallery API: version 0.4.2, **7 installs, 177 downloads**,
@@ -204,6 +211,9 @@ pending.
   11:26:26 GMT, 7 installs / 187 downloads / `updateCount=14`. Installs did not
   move on a release, which is the expected shape — an update reaches existing
   installs rather than creating new ones.
+- 2026-09-12 recheck: still version **0.4.3**, 7 installs / 202 downloads /
+  `updateCount=17`. Installs remain flat; download/update traffic is not an
+  independent-user count.
 - **Publishing is a two-registry job.** Marketplace is a manual `.vsix` upload
   by the maintainer (extension name → `⋯` → Update); Open VSX is
   `ovsx publish` with the Vaultwarden token. Shipping only one silently drifts
@@ -213,7 +223,8 @@ pending.
   prior is not evidence of an actual review. Continue tracking installs and
   real reviews, not raw update/download count alone.
 - Wiki: disabled · Discussions: enabled · Issues: open
-- Releases: latest `v0.5.20` and `mcp-v0.3.10` (2026-09-01), plus earlier Core, MCP, and VS Code tags (MCP releases attach wheel+sdist).
+- Releases: latest Core `v0.5.23`, MCP `mcp-v0.3.12`, and VS Code
+  `vscode-v0.4.3`; MCP releases attach wheel+sdist.
 
 ### Open VSX — `zhurong2020.pyobfus` 🟢 LIVE
 - Public page: https://open-vsx.org/extension/zhurong2020/pyobfus
@@ -248,6 +259,9 @@ pending.
   `[latest, 0.4.3, 0.4.2]`. This is the same index-propagation lag recorded at
   first publication on 09-07 — **a 404 straight after upload is not a failed
   publish, and must not trigger a retry.** Poll until it resolves.
+- **2026-09-12 recheck**: version remains 0.4.3; `downloadCount=466`,
+  `reviewCount=0`. The jump is registry download traffic, not evidence of 466
+  distinct installs, and remains non-additive with Marketplace counters.
 - Publish credential: Vaultwarden entry `Open VSX Access Token (pyobfus)`
   (folder `Publishing`). Sole copy — no local dotfile cache, never in the repo
   or CI. Rotated periodically by the maintainer; a rotation only changes that

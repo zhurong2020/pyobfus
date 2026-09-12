@@ -1,6 +1,6 @@
 # pyobfus 当前计划
 
-更新时间：2026-09-10（当前公开版本：Core **`0.5.23`** / MCP **`0.3.12`** /
+更新时间：2026-09-12（当前公开版本：Core **`0.5.23`** / MCP **`0.3.12`** /
 VS Code **`0.4.3`**；**GitHub Action `pyobfus-action v1.0.1` 已上架 Marketplace**。本轮完成：**09-10 下载与渠道复查**——三个 0.5.22 发布后的
 干净日 `65 / 48 / 31` 单调回落进安静区间，**09-08 悬置的「基线是否抬升」问题
 已有答案：没有抬升**；MCP 09-07 的 235 已由 `16 / 23` 坐实为发版/重建自动化流量。
@@ -13,6 +13,17 @@ Marketplace 与 Open VSX，同版本）；**`pyobfus-mcp` 0.3.11 → 0.3.12 当�
 （修 `serverInfo` 版本广播 + 修 0.3.11 引入的启动崩溃回归）；**Glama 两条线
 全部结清**——构建已恢复（连续两次 success），目录条目本就正常上架、
 **不需要重新提交**。）
+
+**09-12 冷启动更新**：Core 最新日/周/月（`without_mirrors`）为
+`123 / 614 / 1,947`，09-10 单日 123 与 0.5.23 发版/验收重合，不作为自然采用；
+MCP 为 `4 / 325 / 1,044`，已回安静区间。Marketplace `202 downloads / 7 installs`，
+Open VSX `466 downloads / 0 reviews`，两者计数不可相加。GitHub 仍为 7 stars /
+2 forks / 0 issue，最近 main CI 与 CodeQL 全绿。原排为 0.5.23 的 unified
+verifiable build report 因版本号已由 marker 使用，顺延为 **0.5.24 候选**；v1
+schema 与 `--build-report` 已在 `[Unreleased]` 实现完成：原子写、输出 SHA-256、
+plan/config/transform/cache/verification/artifact/marker/provenance 统一投影，路径冲突
+保护及 exclusion-pattern 隐私回归均已覆盖；未改版本号、未 tag、未发布。见
+[`VERIFIABLE_BUILD_REPORT.md`](VERIFIABLE_BUILD_REPORT.md)。
 
 - **✅ Open VSX 已发布上线**：`zhurong2020.pyobfus` **v0.4.2**，页面
   <https://open-vsx.org/extension/zhurong2020/pyobfus>。同日独立复核：页面与
@@ -507,7 +518,8 @@ SARIF 范围纪律（仍适用）：
 1. `0.5.21`：SARIF preflight，预计 09-04/05；
 2. `0.5.22` 候选：间隔 3～5 天，Python 3.14 remote-debug 启动策略 advisory +
    现有 Community header 绝对路径隐私修复，须先完成专项设计；
-3. `0.5.23` 候选：统一 verifiable build report MVP，只在 fact schema 批准后排期；
+3. `0.5.24` 候选：统一 verifiable build report MVP；v1 schema 与实现已于
+   09-12 完成并留在 `[Unreleased]`，发版继续等待维护者明确通知；
 4. `pyobfus-mcp 0.3.11` 独立节奏；当前 `[Unreleased]` 仅 Registry URL 修复，
    单独发版价值不足，需与 MCP conformance evidence 或真实 MCP 增量组合。
 
