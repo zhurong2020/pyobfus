@@ -518,7 +518,7 @@ pyobfus/
 │   ├── transformers/   # AST 变换器
 │   └── cross_file/    # 跨文件混淆
 ├── pyobfus_pro/       # Pro Edition (商业许可)
-├── tests/             # 1319 passed + 1 skipped (0.5.25 发布前验证)
+├── tests/             # 1312 passed + 1 skipped (0.5.25 发布前验证；+ integration_tests/ 7 = 1319)
 ├── examples/          # 示例代码
 ├── docs/              # 项目文档
 └── cloudflare-worker/ # 许可验证 Worker
