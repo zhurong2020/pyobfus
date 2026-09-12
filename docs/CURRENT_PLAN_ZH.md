@@ -1,6 +1,6 @@
 # pyobfus 当前计划
 
-更新时间：2026-09-12（当前公开版本：Core **`0.5.23`** / MCP **`0.3.12`** /
+更新时间：2026-09-12（当前公开版本：Core **`0.5.24`** / MCP **`0.3.12`** /
 VS Code **`0.4.3`**；**GitHub Action `pyobfus-action v1.0.1` 已上架 Marketplace**。本轮完成：**09-10 下载与渠道复查**——三个 0.5.22 发布后的
 干净日 `65 / 48 / 31` 单调回落进安静区间，**09-08 悬置的「基线是否抬升」问题
 已有答案：没有抬升**；MCP 09-07 的 235 已由 `16 / 23` 坐实为发版/重建自动化流量。
@@ -19,10 +19,18 @@ Marketplace 与 Open VSX，同版本）；**`pyobfus-mcp` 0.3.11 → 0.3.12 当�
 MCP 为 `4 / 325 / 1,044`，已回安静区间。Marketplace `202 downloads / 7 installs`，
 Open VSX `466 downloads / 0 reviews`，两者计数不可相加。GitHub 仍为 7 stars /
 2 forks / 0 issue，最近 main CI 与 CodeQL 全绿。原排为 0.5.23 的 unified
-verifiable build report 因版本号已由 marker 使用，顺延为 **0.5.24 候选**；v1
-schema 与 `--build-report` 已在 `[Unreleased]` 实现完成：原子写、输出 SHA-256、
+verifiable build report 因版本号已由 marker 使用，顺延为 0.5.24，并已于
+**2026-09-12 发布**（用户批准「按照流程发版」）：原子写、输出 SHA-256、
 plan/config/transform/cache/verification/artifact/marker/provenance 统一投影，路径冲突
-保护及 exclusion-pattern 隐私回归均已覆盖；未改版本号、未 tag、未发布。见
+保护及 exclusion-pattern 隐私回归均已覆盖。tag `v0.5.24` 经 OIDC + PEP 740 发
+PyPI（`latest=0.5.24`，wheel/sdist 两个 provenance endpoint 均 200），全新 venv
+装已发布 wheel 实跑确认报告 `tool.version=0.5.24` 且无绝对路径，GitHub Release
+已建，Release / CI 全矩阵 / CodeQL / Pages 全绿。发版前四项实测覆盖了容易被
+「跑通就算」蒙混的路径：未请求验证记为 `requested=false` 而非通过、构建失败不留
+报告、dry-run 只列 planned artifact 不写文件、报告路径与 input/output/mapping/
+provenance 冲突时退出码 1。⚠️ 环境陷阱：本地 venv 的 editable dist-info 停在
+0.5.19，导致本地实跑的 marker/report 都写 0.5.19，**不是发布缺陷**（PyPI 安装读
+自己的元数据）；核验输出里的版本号前先 `pip install -e .` 刷新。见
 [`VERIFIABLE_BUILD_REPORT.md`](VERIFIABLE_BUILD_REPORT.md)。
 
 - **✅ Open VSX 已发布上线**：`zhurong2020.pyobfus` **v0.4.2**，页面
