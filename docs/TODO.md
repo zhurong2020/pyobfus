@@ -13,18 +13,34 @@
 - 任何一项做完后，把它从本文件移除，并在 `CURRENT_PLAN_ZH.md` 记状态；
   不要在这里留「✅ 已完成」的历史层。
 
-## 已完成（本轮，仅作交接，下次冷启动可删）
+## 本轮已完成的去处
 
-- ✅ 跨文件输出可复现 → `0.5.25`
-- ✅ 包 re-export / `import` 模块绑定两个缺陷 → `0.5.25`
-- ✅ mcp SDK 2.x 探路 + 兼容代码 + `mcp-sdk-2x` CI job → 已并入 main，**依赖上限
-  未动**（理由见 [`MCP_SDK_2X_SPIKE.md`](MCP_SDK_2X_SPIKE.md)）
-- ✅ 只读 `pyobfus-review` skill
-- ✅ `COMPARISON.md` 浏览器端混淆服务独立小节
-- ✅ 兼容性/验证矩阵 → [`SUPPORT_MATRIX.md`](SUPPORT_MATRIX.md)（最大缺口已写明：`examples/` 无一在 CI 中执行）
-- ✅ 抗 AI 分析措辞改写（`LLM_RESISTANCE_BENCHMARK.md` 引入 arXiv 2609.04220 + 新增「不得把社区版当 AI 抗性卖」红线）
+不在这里留历史层。2026-09-12 完成的六项（0.5.25 的三项修复、mcp 2.x 兼容与
+CI job、只读 review skill、浏览器端对比小节、抗 AI 措辞改写、支持矩阵）记在
+[`CURRENT_PLAN_ZH.md`](CURRENT_PLAN_ZH.md) 的「09-12 发布后续」段。
+
+## 节奏（2026-09-12 用户定）
+
+**过几天再动手，靠持续发版与更新吸引流量。** 下面的排序按这个前提写：**免发版的
+先做**，攒够一个有意义的增量再发版，不为发版而发版。
+
+一条要一起记住的事实，免得把噪音读成增长：本项目历史上每次发布当天下载都会尖峰，
+随后 2–3 天回落到安静区间，**至今没有观测到基线抬升**（0.5.22 后三个干净日
+`65 / 48 / 31` 是最近一次验证）。所以「发版吸流量」的收益要看**非发布日的基线**
+是否上移，而不是看发布当天的数字。下次复查见本文件「周期性」。
 
 ## 待办（按建议顺序）
+
+判断标准：**只动 `docs/` 或外部渠道 = 免发版**（改动一进 main 就在 GitHub 与文档
+站生效）；**动 `pyobfus/` 或 `pyobfus_mcp/` 的代码 = 要发版才到用户手里**。
+
+| # | 任务 | 要发版吗 | 谁来做 |
+|---|---|---|---|
+| 1 | CycloneDX 版本声明对齐 | **取决于选哪条**：升 1.7 改代码→要发版；保持 1.6 + 文档写明→免发版 | Claude |
+| 2 | 让 `examples/` 在 CI 里真的跑 | 免发版（只动 `.github/workflows/` 与 `examples/`） | Claude |
+| 3 | 稳定 reason code | **要发版**（改 `--check` / plan / build report 三处 JSON） | Claude |
+| 4 | OpenSSF OSPS Baseline 自评 | 免发版（产出差距表；个别项可能要改仓库设置） | Claude 出表，设置项需维护者 |
+| 5 | 对比可见度：拆分对比页 + 上架目录 | 免发版（拆页纯 docs；上架需对方站点提交） | 拆页 Claude；上架需维护者账号 |
 
 ### 1. CycloneDX 版本声明对齐（一两小时）
 
@@ -34,20 +50,36 @@
 顺带评估 1.7 的 **TLP 分发约束**对「交付给指定客户的受保护构建」是否有真实价值。
 验收：`--verify-provenance-manifest` 对新旧 manifest 均通过。
 
-### 2. 稳定 reason code（两三天 · 动 JSON 契约）
+### 2. 让 `examples/` 在 CI 里真的跑（半天到一天 · 免发版）
+
+`SUPPORT_MATRIX.md` 点名的最大缺口：**没有任何 `examples/` 在 CI 中执行**，它们
+只在写的时候人工跑通过。分两批，别一次全上：
+
+- **第一批（便宜，进常规 CI）**：`simple.py` / `string_encoding.py` /
+  `keyword_arguments.py` / `multifile/` / `ai_debugging/`（混淆 → 执行 → 
+  `--unmap` 还原）/ `import_hook/`（loader 是自包含的，不需要 SOURCEdefender）。
+  纯 Python，无重依赖，秒级。
+- **第二批（重，单独 job 或定时触发）**：`pyinstaller/` 与 `compiled_packaging/`
+  需要装 PyInstaller / Cython / Nuitka 并真正编译，分钟级且易受上游影响。
+  **建议先只跑第一批**，第二批视 CI 时长再定，或放到每周定时。
+
+验收：第一批每个示例都**执行生成的产物并断言输出**，不是只看退出码；跑通后把
+`SUPPORT_MATRIX.md` 对应格子从 advisory-only 提到 tested，并在表里写明是哪个 job。
+
+### 3. 稳定 reason code（两三天 · 动 JSON 契约）
 
 给每个 excluded file、preserved symbol、disabled transform 一个稳定的 reason
 code，替代现在的自由文本。涉及 `--check` / dry-run plan / build report 三处
 JSON，需要版本字段管理，**排在矩阵之后**，因为矩阵会暴露到底需要哪些 code（矩阵已完成，见 `SUPPORT_MATRIX.md`）。
 
-### 3. OpenSSF OSPS Baseline 自评（一天）
+### 4. OpenSSF OSPS Baseline 自评（一天）
 
 对照 [Baseline 2026-02-19](https://baseline.openssf.org/versions/2026-02-19.html)
 （Level 1 / Level 2，共 40 条，覆盖访问控制、构建发布、文档、治理、法务、质量、
 安全评估与漏洞处理）做一次差距清单。与已有的 OpenSSF Best Practices passing
 徽章互补，不重复。产出是差距表，不是一次性全部补齐。
 
-### 4. 对比可见度：拆分对比页 + 上架中立目录（一到两天 · 回答「怎么进对比矩阵」）
+### 5. 对比可见度：拆分对比页 + 上架中立目录（一到两天 · 回答「怎么进对比矩阵」）
 
 背景：在线混淆服务 `pyobfuscate.com` 针对 PyArmor / Nuitka / Cython / PyInstaller
 建了**一页一对**的对比矩阵，占住了 "python obfuscator comparison" 这一类查询，
@@ -72,9 +104,9 @@ JSON，需要版本字段管理，**排在矩阵之后**，因为矩阵会暴露
 
 1. ~~Open VSX~~ ✅ 2026-09-07
 2. ~~独立 GitHub Action + Marketplace~~ ✅ 2026-09-10
-3. **`awesome-python`** ← 当前队头
+3. **`awesome-python`** ← 当前队头（**需维护者账号提 PR**；文案可由 Claude 先备好）
 4. `awesome-security` 或 `awesome-devsecops`（择一尝试）
-5. **AlternativeTo**（同时服务上面第 6 项的对比可见度）
+5. **AlternativeTo**（**需维护者在对方站点提交**；同时服务上面第 5 项的对比可见度）
 6. 为 stdio MCP 准备 MCPB，之后再评估 Smithery
 7. Product Hunt——**等有真实用户信号再做**，不提前
 

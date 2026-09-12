@@ -24,6 +24,15 @@ stdio server **拿不到 `2026-07-28` 协议**，两个 major 都只协商到 `2
 `pyobfus-protect`）。`.github/skills/` 那条改为**教用户复制进自己仓库**——该约定
 是仓库作用域的，而我们 skill 的受众是用户的仓库，本仓库只留一份 canonical。
 ③ **`COMPARISON.md` 给浏览器端混淆服务独立小节**（竞品已建 comparison SEO 矩阵）。
+④ **抗 AI 措辞改写**——查后发现 README/COMPARISON/index/llms.txt **本来就没有**
+「AI 读不懂」这类说法（定位恰恰相反），真正要改的只有
+`LLM_RESISTANCE_BENCHMARK.md`：补进 arXiv 2609.04220（**直接在混淆代码上推理常常
+等于甚至优于先还原**，强模型约 90% Pass@1）+ 新增红线**「不得把社区版当 AI 抗性
+卖」**+ 修掉与 Acoda 自相矛盾的一句 + 目标句改为假设并点明 pilot 只有 5 样本。
+⑤ **新建 [`SUPPORT_MATRIX.md`](SUPPORT_MATRIX.md)**（tested / verified once /
+advisory-only 三档严格定义，指不到 CI job 或有日期记录的一律降级）。写表逼出三条
+以前没明说的事实：**运行**生成代码只在 Linux 证明过（变换本身 3 OS × 6 版本有测）、
+**框架 preset 只测排除清单不测真实应用能否跑**、**`examples/` 无一在 CI 执行**。
 **剩余任务的顺序、验收标准与周期性检查已收敛到 [`TODO.md`](TODO.md)。**
 ⚠️ 同轮两次自我纠错：先前说 COMPARISON「缺在线服务这一类」是**说过头**（本来就有
 一行一段，只是太薄）；更要紧的是一度把 pyobfus 的联网行为**写反**——
