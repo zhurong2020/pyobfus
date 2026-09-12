@@ -366,6 +366,13 @@ except ImportError:
     "not a cryptographic signature) for this obfuscation run.",
 )
 @click.option(
+    "--build-report",
+    "build_report_path",
+    type=click.Path(),
+    help="Write a deterministic, privacy-safe JSON report of selection, "
+    "transformations, verification, and generated artifacts.",
+)
+@click.option(
     "--trace-marker/--no-trace-marker",
     "trace_marker",
     default=False,
@@ -472,6 +479,7 @@ def main(
     no_config: bool,
     save_mapping_path: Optional[str],
     provenance_manifest_path: Optional[str],
+    build_report_path: Optional[str],
     trace_marker: bool,
     community_marker: Optional[bool],
     unmap_mode: bool,
@@ -931,9 +939,16 @@ def main(
         # Determine if input is file or directory
         input_path_obj = Path(input_path)
         output_path_obj = Path(output_path)
+        _validate_build_report_destination(
+            build_report_path=build_report_path,
+            input_path=input_path_obj,
+            output_path=output_path_obj,
+            mapping_path=save_mapping_path,
+            provenance_manifest_path=provenance_manifest_path,
+        )
 
         build_plan: Optional[Dict[str, Any]] = None
-        if dry_run and json_output:
+        if (dry_run and json_output) or build_report_path:
             from pyobfus.core.build_plan import build_obfuscation_plan
 
             if effective_config_path:
@@ -955,6 +970,7 @@ def main(
                 cross_file=cross_file,
                 mapping_path=save_mapping_path,
                 provenance_manifest_path=provenance_manifest_path,
+                build_report_path=build_report_path,
                 trace_marker=trace_marker,
                 cwd=Path.cwd(),
             )
@@ -1003,6 +1019,15 @@ def main(
                         verification=verification,
                         json_output=json_output,
                     )
+                written_report_path = _write_build_report(
+                    build_report_path=build_report_path,
+                    plan=build_plan,
+                    output_path=output_path_obj,
+                    stats=obfuscation_stats,
+                    verification=verification,
+                    provenance_manifest_path=None,
+                    cache_hit=True,
+                )
                 if json_output:
                     sys.stdout = _saved_stdout
                     _emit_obfuscate_success_json(
@@ -1014,6 +1039,7 @@ def main(
                         stats=obfuscation_stats,
                         mapping_path=save_mapping_path,
                         provenance_manifest_path=None,
+                        build_report_path=written_report_path,
                         verification=verification,
                     )
                     return
@@ -1144,6 +1170,22 @@ def main(
                     err=True,
                 )
 
+        written_report_path = _write_build_report(
+            build_report_path=build_report_path if not dry_run else None,
+            plan=build_plan,
+            output_path=output_path_obj,
+            stats=obfuscation_stats,
+            verification=verification,
+            provenance_manifest_path=written_manifest_path,
+            cache_hit=False,
+        )
+        if build_report_path and dry_run and not json_output:
+            click.echo(
+                "Warning: --build-report is skipped in --dry-run mode; "
+                "the JSON plan already describes the prospective build.",
+                err=True,
+            )
+
         if json_output:
             sys.stdout = _saved_stdout
             _emit_obfuscate_success_json(
@@ -1155,6 +1197,7 @@ def main(
                 stats=obfuscation_stats,
                 mapping_path=save_mapping_path,
                 provenance_manifest_path=written_manifest_path,
+                build_report_path=written_report_path,
                 trace_marker_id=trace_marker_id,
                 plan=build_plan,
                 verification=verification,
@@ -1899,6 +1942,7 @@ def _emit_obfuscate_success_json(
     stats: Dict[str, int],
     mapping_path: Optional[str],
     provenance_manifest_path: Optional[str] = None,
+    build_report_path: Optional[str] = None,
     trace_marker_id: Optional[str] = None,
     plan: Optional[Dict[str, Any]] = None,
     verification: Optional[Dict[str, Any]] = None,
@@ -1933,6 +1977,7 @@ def _emit_obfuscate_success_json(
         "stats": stats,
         "mapping": mapping_path,
         "provenance_manifest": provenance_manifest_path,
+        "build_report": build_report_path,
         "trace_marker_id": trace_marker_id,
         "ai_hint": ai_hint,
     }
@@ -1941,6 +1986,62 @@ def _emit_obfuscate_success_json(
     if verification is not None:
         payload["verification"] = verification
     _emit_success_json_payload(payload)
+
+
+def _write_build_report(
+    *,
+    build_report_path: Optional[str],
+    plan: Optional[Dict[str, Any]],
+    output_path: Path,
+    stats: Dict[str, int],
+    verification: Optional[Dict[str, Any]],
+    provenance_manifest_path: Optional[str],
+    cache_hit: bool,
+) -> Optional[str]:
+    """Write the optional unified report after all requested build evidence exists."""
+    if not build_report_path:
+        return None
+    if plan is None:  # Defensive: callers requesting a report must prepare a plan.
+        raise PyObfusError("Internal error: build report facts were not prepared.")
+
+    from pyobfus.core.build_report import build_report, save_build_report
+
+    report = build_report(
+        plan=plan,
+        output_path=output_path,
+        stats=stats,
+        verification=verification,
+        provenance_manifest_path=provenance_manifest_path,
+        cwd=Path.cwd(),
+        cache_hit=cache_hit,
+    )
+    save_build_report(report, build_report_path)
+    return build_report_path
+
+
+def _validate_build_report_destination(
+    *,
+    build_report_path: Optional[str],
+    input_path: Path,
+    output_path: Path,
+    mapping_path: Optional[str],
+    provenance_manifest_path: Optional[str],
+) -> None:
+    """Prevent the report from overwriting source, output, or sibling evidence."""
+    if not build_report_path:
+        return
+    destination = Path(build_report_path).resolve()
+    protected = [input_path.resolve(), output_path.resolve()]
+    protected.extend(
+        Path(path).resolve()
+        for path in (mapping_path, provenance_manifest_path)
+        if path is not None
+    )
+    if destination in protected:
+        raise PyObfusError(
+            "--build-report must use a path distinct from input, output, mapping, "
+            "and provenance manifest paths."
+        )
 
 
 def _verify_output_syntax(input_path: Path, output_path: Path) -> Dict[str, Any]:

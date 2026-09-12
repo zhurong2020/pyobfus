@@ -24,6 +24,7 @@ def build_obfuscation_plan(
     cross_file: bool,
     mapping_path: Optional[str],
     provenance_manifest_path: Optional[str],
+    build_report_path: Optional[str],
     trace_marker: bool,
     cwd: Path,
 ) -> Dict[str, Any]:
@@ -75,6 +76,14 @@ def build_obfuscation_plan(
                 "kind": "provenance-manifest",
                 "role": "optional",
                 "path": _safe_path_label(Path(provenance_manifest_path), cwd),
+            }
+        )
+    if build_report_path:
+        artifacts.append(
+            {
+                "kind": "build-report",
+                "role": "optional",
+                "path": _safe_path_label(Path(build_report_path), cwd),
             }
         )
     if trace_marker:
