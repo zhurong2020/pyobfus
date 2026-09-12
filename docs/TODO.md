@@ -61,6 +61,51 @@ JSON，需要版本字段管理，**排在矩阵之后**，因为矩阵会暴露
 安全评估与漏洞处理）做一次差距清单。与已有的 OpenSSF Best Practices passing
 徽章互补，不重复。产出是差距表，不是一次性全部补齐。
 
+### 6. 对比可见度：拆分对比页 + 上架中立目录（一到两天 · 回答「怎么进对比矩阵」）
+
+背景：在线混淆服务 `pyobfuscate.com` 针对 PyArmor / Nuitka / Cython / PyInstaller
+建了**一页一对**的对比矩阵，占住了 "python obfuscator comparison" 这一类查询，
+且**页面里完全没有我们**。那是他们的自有营销资产，我们进不去，也不该去要求进。
+2026-08-31 的扫描已定下策略：**不追 "online" 这个词**（我们刻意本地化，这是卖点
+不是短板），改为用自己的诚实对比内容去接同一批查询。可做的两件具体事：
+
+- **把 `COMPARISON.md` 的各节拆成独立页**，一页一个对手（PyArmor / Nuitka /
+  Cython / PyLocket / 浏览器端服务 / SOURCEdefender …），`COMPARISON.md` 退化成
+  索引页。**拆分而非复制**——同内容两处会互相稀释。head-to-head 查询按页排名，
+  这正是对手矩阵的结构优势。每页保留现有的诚实口径：不贬低对方、写清各自适用
+  场景。
+- **AlternativeTo 上架**（已在下方分发队列第 5 项）。那是**中立第三方**的
+  「PyArmor 替代品」清单，搜这类词的人真的会落到那里，是我们能进的「对比矩阵」。
+
+不做：在对手页面下留言/要求收录、买对比位、为排名写夸大文案。
+
+## 分发 / 上架队列
+
+来自 [`DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md`](DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md)
+的执行顺序，前两项（Open VSX、GitHub Action）已完成，队列推进到第 3 项：
+
+1. ~~Open VSX~~ ✅ 2026-09-07
+2. ~~独立 GitHub Action + Marketplace~~ ✅ 2026-09-10
+3. **`awesome-python`** ← 当前队头
+4. `awesome-security` 或 `awesome-devsecops`（择一尝试）
+5. **AlternativeTo**（同时服务上面第 6 项的对比可见度）
+6. 为 stdio MCP 准备 MCPB，之后再评估 Smithery
+7. Product Hunt——**等有真实用户信号再做**，不提前
+
+另有一项新增：**`pyobfus-review` skill 尚未在任何渠道上架**（Smithery 上的是
+`pyobfus-protect`）。等 skill 有实际使用反馈再考虑投递，不为上架而上架。
+
+## 已研究、明确延后（不在队列里，但别忘了）
+
+| 项 | 来源 | 解冻条件 |
+|---|---|---|
+| self-dogfooding 四条 lane 落地 | `SELF_DOGFOODING_BEST_PRACTICES.md` | 研究完成未执行；无外部压力，机会性做 |
+| MCP Resources / Prompts 原语拆分 | `MCP_PRIMITIVES_DESIGN.md` | 等真实 MCP 用户反馈 |
+| 放开 `mcp<2.0.0` 上限 | `MCP_SDK_2X_SPIKE.md` §5 | `mcp-sdk-2x` job 连绿数周 / 有人明确要 2.x / 1.x 停止维护，三者任一 |
+| `--output-pyc` 可行性 spike | `CURRENT_PLAN_ZH.md` P3-1 | 只做 spike，不承诺产品化 |
+| hosted / remote MCP endpoint | 同上 P3-2 | 明确不做（也因此拿不到 `2026-07-28` 协议） |
+| `dependency_advisory` 是否拆成独立工具 | `SEO_AND_COMPETITOR_SCAN_2026-08-31.md` §1.2 | 独立赛道已拥挤，**倾向不拆**，除非出现明确差异点 |
+
 ## 周期性
 
 - **下载量复查**：等数据覆盖 2026-09-12（当天发了 `0.5.24` 与 `0.5.25` 两版），
