@@ -12,7 +12,7 @@
     {
       "name": "pyobfus",
       "source": "./",
-      "description": "Obfuscate/protect Python before shipping and verify the output still runs. Ships the 'pyobfus-protect' skill; pairs with the pyobfus-mcp server for in-chat tool calls.",
+      "description": "Obfuscate/protect Python before shipping and verify the output still runs. Ships the 'pyobfus-protect' skill (builds) and 'pyobfus-review' (read-only readiness review); pairs with the pyobfus-mcp server for in-chat tool calls.",
       "category": "developer-tools",
       "keywords": [
         "python-obfuscator",
