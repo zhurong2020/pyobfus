@@ -30,6 +30,11 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   不同 `PYTHONHASHSEED` 的报告 digest 一致。⚠️ **PyPI JSON API 显示新版本后，
   pip 仍可能短时间 `No matching distribution`——是索引传播延迟，等一分钟重试，
   别据此判失败**（同 Open VSX 那条教训）。
+- **发布后同日又完成三件（均已 push、CI 全绿，未发版）**：mcp SDK 2.x 兼容代码 +
+  `mcp-sdk-2x` CI job 合并进 main（**依赖上限未动**；探路结论：升 2.x 对 stdio
+  server 拿不到 `2026-07-28` 协议，见 `docs/MCP_SDK_2X_SPIKE.md`）、新增只读
+  `pyobfus-review` skill、`COMPARISON.md` 补浏览器端混淆服务小节。
+  **下一步做什么看 [`docs/TODO.md`](docs/TODO.md)。**
 - Core **`0.5.25`** / MCP **`0.3.12`** / VS Code **`0.4.3`** 为最新公开版本；VS Code
   扩展同时在 **Microsoft Marketplace 与 Open VSX** 上架，两边同为 `0.4.3`（均已 curl 独立复核）。
 - **✅ `Core 0.5.24` 已于 2026-09-12 发布**（用户批准「按照流程发版」）= unified

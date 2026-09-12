@@ -15,16 +15,19 @@ Status: 调研完成；**本文件不授权任何实现或发布**。实现与�
 
 ## 1. 建议顺序（结论先行）
 
+> 剩余未完成项的执行顺序、验收标准与周期性任务，已收敛到
+> [`TODO.md`](TODO.md)；本表只保留本轮的排序依据。
+
 | # | 候选 | 包 | 依据强度 | 类型 |
 |---|---|---|---|---|
 | 1 | 跨文件模式输出可复现（确定性命名顺序） | Core | **本轮实测** | ✅ 已随 0.5.25 发布 |
-| 2 | `mcp` SDK 2.x 迁移 spike + 真实 2.x CI | MCP | **本轮实测** | 生态时限 |
+| 2 | `mcp` SDK 2.x 迁移 spike + 真实 2.x CI | MCP | **本轮实测** | ✅ 已完成并并入 main；**上限未动**，见 [`MCP_SDK_2X_SPIKE.md`](MCP_SDK_2X_SPIKE.md)（立项理由被实测推翻） |
 | 3 | CycloneDX 版本声明对齐（1.6 → 1.7 或如实降级说明） | Core | 外部标准复核 | 小修 |
 | 4 | 兼容性/验证矩阵（supported / tested / advisory-only） | 文档 | 存量 P2 | 零运行时风险 |
 | 5 | 稳定 reason code（excluded / preserved / disabled） | Core | 存量 P2 | schema 变更 |
-| 6 | 只读 review Skill + `.github/skills/` 落位 | 分发 | 存量 P1 + 外部复核 | 生态入口 |
+| 6 | 只读 review Skill | 分发 | 存量 P1 + 外部复核 | ✅ `skills/pyobfus-review/`；`.github/skills/` **改为教用户放进自己仓库**，本仓库不留第二份副本 |
 | 7 | OSPS Baseline 自评 | 工程基线 | 外部新标准 | 可验证credential |
-| 8 | 文档诚实性更新（LLM 论文、在线混淆站类别、PyArmor 版本纠正） | 文档 | 本轮复核 | 随手可做 |
+| 8 | 文档诚实性更新 | 文档 | 本轮复核 | 🟡 PyArmor 版本纠正 ✅、在线混淆服务小节 ✅；**LLM 措辞改写待做**（`docs/TODO.md` #1）|
 
 **第 1 项是唯一「补完刚发布功能」的候选**：0.5.24 刚把输出 SHA-256 作为交付
 证据写进报告，但当时跨文件模式重跑同一输入会得到不同哈希，第三方拿到报告无法

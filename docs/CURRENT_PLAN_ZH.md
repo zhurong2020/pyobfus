@@ -14,6 +14,22 @@ Marketplace 与 Open VSX，同版本）；**`pyobfus-mcp` 0.3.11 → 0.3.12 当�
 全部结清**——构建已恢复（连续两次 success），目录条目本就正常上架、
 **不需要重新提交**。）
 
+**09-12 发布后续（同日）**：`0.5.25` 发布之后又完成三件事，均已 push、CI 全绿。
+① **mcp SDK 2.x 兼容代码与 `mcp-sdk-2x` CI job 合并进 main**——该 job 在 main 上
+首次真实运行并通过（`ci.yml` 只在 `main`/`develop` push 与 PR 触发，探路分支上
+它从不运行）。**依赖上限仍为 `mcp<2.0.0`**；探路把立项理由推翻了：升 2.x 对
+stdio server **拿不到 `2026-07-28` 协议**，两个 major 都只协商到 `2025-11-25`，
+详见 [`MCP_SDK_2X_SPIKE.md`](MCP_SDK_2X_SPIKE.md)。② **新增只读
+`pyobfus-review` skill**（只跑 `--check`/`--dry-run`，要构建就交回
+`pyobfus-protect`）。`.github/skills/` 那条改为**教用户复制进自己仓库**——该约定
+是仓库作用域的，而我们 skill 的受众是用户的仓库，本仓库只留一份 canonical。
+③ **`COMPARISON.md` 给浏览器端混淆服务独立小节**（竞品已建 comparison SEO 矩阵）。
+**剩余任务的顺序、验收标准与周期性检查已收敛到 [`TODO.md`](TODO.md)。**
+⚠️ 同轮两次自我纠错：先前说 COMPARISON「缺在线服务这一类」是**说过头**（本来就有
+一行一段，只是太薄）；更要紧的是一度把 pyobfus 的联网行为**写反**——
+**CLI 的 `--check` 默认联网做 PyPI 依赖核对、`--offline` 才关**，只有 MCP 工具
+是默认关闭。两处已改正。
+
 **09-12 冷启动更新**：Core 最新日/周/月（`without_mirrors`）为
 `123 / 614 / 1,947`，09-10 单日 123 与 0.5.23 发版/验收重合，不作为自然采用；
 MCP 为 `4 / 325 / 1,044`，已回安静区间。Marketplace `202 downloads / 7 installs`，

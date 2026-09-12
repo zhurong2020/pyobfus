@@ -1,7 +1,9 @@
 # mcp SDK 2.x 迁移探路（2026-09-12）
 
-Status: 探路完成，代码在分支 `spike/mcp-sdk-2x`。**依赖上限未动、未发版**，
-两者都需要用户单独批准。
+Status: 探路完成，**兼容代码与 `mcp-sdk-2x` CI job 已于 2026-09-12 合并进
+`main`**（分支 `spike/mcp-sdk-2x` 保留作历史）。合并后该 job 在 main 上首次真实
+运行并通过——`ci.yml` 只在 `main`/`develop` push 与 PR 上触发，所以探路阶段它
+从未在云端跑过。**依赖上限仍为 `mcp<2.0.0`，未发版**，两者都需要用户单独批准。
 
 触发点：`FEATURE_EXPANSION_RESEARCH_2026-09-12.md` §3.2 实测到
 `pyobfus-mcp` 在 `mcp 2.x` 下根本起不来（`FastMCP` 已更名 `MCPServer`），
