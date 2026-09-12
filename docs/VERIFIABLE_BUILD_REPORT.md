@@ -1,6 +1,6 @@
 # Verifiable Build Report
 
-Status: v1 contract implemented for the next Core release; not yet published.
+Status: v1 contract published in pyobfus 0.5.24.
 
 `pyobfus INPUT -o OUTPUT --build-report report.json` writes one versioned fact
 model after a successful build. It brings selection, effective configuration,

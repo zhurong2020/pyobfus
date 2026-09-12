@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.24] - 2026-09-12
+
 ### Added
 
 - **Versioned verifiable build report.** `--build-report PATH` atomically writes

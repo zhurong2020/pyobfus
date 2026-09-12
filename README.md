@@ -20,13 +20,13 @@ A Python code obfuscator built with AST-based transformations. **Supports Python
 
 > **🔒 Pro Edition available** — 6 patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator, $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
 
-> **🔎 What's new in v0.5.23** — generated files no longer embed the absolute
-> path of the input file, which previously disclosed the build machine's
-> directory layout in every shipped file. Output now carries a versioned
-> `# pyobfus:generated` attribution marker naming the tool version and a
-> project-relative source path; `--no-community-marker` (or
-> `community_marker: "off"`) suppresses it where generated banners are
-> forbidden. Transformation behavior is unchanged.
+> **🔎 What's new in v0.5.24** — `--build-report PATH` writes one versioned,
+> privacy-safe JSON fact model after a successful build: selected and excluded
+> files with reasons, the effective configuration, transform and cache
+> counters, syntax-verification evidence, output SHA-256 digests, artifact
+> roles, marker state, and provenance linkage. The digests are build evidence,
+> not signatures, and a syntax check that was never requested is recorded as
+> unrequested rather than passed. Nothing about transformation changes.
 
 > 🔔 **Starring this repo doesn't notify you about new releases** — GitHub only
 > sends release notifications to people who explicitly **Watch** it. Click
@@ -121,7 +121,7 @@ The following features are **fully implemented and available** in the current ve
 - **Provenance Validation** (`--verify-provenance-manifest`): validates manifest shape, CycloneDX-compatible relationships, and the local integrity digest; JSON output is available for CI/agent use
 - **Structured Dry-Run Plan** (`--dry-run --json`, v0.5.19+): versioned `plan` object — effective config, selected/excluded files with reasons, and artifacts tagged `ship` / `retain-internal` / `optional`; relative labels only, preview-only (not applyable)
 - **Syntax-Only Output Verification** (`--verify-syntax`, v0.5.19+): after a build, compiles generated Python in memory — no import, no execution, no `__pycache__` — and reports `syntax_valid` in JSON; a failure blocks delivery and it makes no runtime-correctness claim
-- **Verifiable Build Report** (`--build-report`, next release): deterministic, privacy-safe JSON facts linking the dry-run selection/config model to actual transform counters, verification evidence, output hashes, artifact roles, marker state, and provenance
+- **Verifiable Build Report** (`--build-report`, v0.5.24+): deterministic, privacy-safe JSON facts linking the dry-run selection/config model to actual transform counters, verification evidence, output hashes, artifact roles, marker state, and provenance
 - **Release Attestations**: PyPI Integrity API / PEP 740 runbook for verifying pyobfus and pyobfus-mcp release artifacts
 
 ### 🔒 Pro Edition
