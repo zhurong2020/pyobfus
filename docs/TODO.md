@@ -38,6 +38,7 @@ CI job、只读 review skill、浏览器端对比小节、抗 AI 措辞改写、
 |---|---|---|---|
 | 1 | CycloneDX 版本声明对齐 | **取决于选哪条**：升 1.7 改代码→要发版；保持 1.6 + 文档写明→免发版 | Claude |
 | 2 | 让 `examples/` 在 CI 里真的跑 | 免发版（只动 `.github/workflows/` 与 `examples/`） | Claude |
+| 2.5 | 测试 fixture 漏临时目录 | 免发版（只动测试） | Claude |
 | 3 | 稳定 reason code | **要发版**（改 `--check` / plan / build report 三处 JSON） | Claude |
 | 4 | OpenSSF OSPS Baseline 自评 | 免发版（产出差距表；个别项可能要改仓库设置） | Claude 出表，设置项需维护者 |
 | 5 | 对比可见度：拆分对比页 + 上架目录 | 免发版（拆页纯 docs；上架需对方站点提交） | 拆页 Claude；上架需维护者账号 |
@@ -65,6 +66,25 @@ CI job、只读 review skill、浏览器端对比小节、抗 AI 措辞改写、
 
 验收：第一批每个示例都**执行生成的产物并断言输出**，不是只看退出码；跑通后把
 `SUPPORT_MATRIX.md` 对应格子从 advisory-only 提到 tested，并在表里写明是哪个 job。
+
+### 2.5 测试 fixture 漏临时目录（一两小时 · 免发版 · 跨 session 发现）
+
+来源不是本 session：2026-09-12 另一个 session 做全工作区 `/tmp` 清理时统计到
+**pyobfus 测试残留 32 项 / 212 文件**，并把它列为该次台账的「结构性建议」第 1 条
+（`~/projects/home/archives/project_docs/TMP_CLEANUP_20260912.md`）。**本 session
+已逐条核实属实**，是代码缺陷不是操作疏忽：
+
+| 位置 | 症状 |
+|---|---|
+| `tests/test_license_embed.py:228` | `NamedTemporaryFile(delete=False, suffix=".pyobfus_test")`，零字节文件永不删除 |
+| `tests/test_license_verification.py:137` | `setup_method` 里 `mkdtemp()`，`teardown_method` 只清 license 缓存、**不删目录** |
+| `vscode-extension/test/suite/{obfuscateFile,validateConfig,yamlSchema}.test.ts` | 多处 `mkdtempSync` / `mkdtemp`（前缀 `pyobfus-config-test-` / `pyobfus-validate-test-` / `pyobfus-yaml-modeline-`）无清理 |
+| `vscode-extension/test/suite/integration.test.ts:168` | 手拼 `os.tmpdir()` 路径，同样无清理 |
+
+修法：Python 侧改用 pytest 的 `tmp_path`（本仓库其它测试已是这个写法），或在
+`teardown_method` 里 `shutil.rmtree(..., ignore_errors=True)`；TS 侧在 `suiteTeardown`
+统一 `rm -rf`。体积可忽略，值得修的原因是**每跑一次测试就留一批**，而我们一天
+可能跑几十次。
 
 ### 3. 稳定 reason code（两三天 · 动 JSON 契约）
 
