@@ -25,7 +25,7 @@ The v1 report is deterministic for the same effective configuration and output
 bytes. It intentionally contains no timestamp, random run identifier, or
 absolute-path field.
 
-Since the next release the *build* is reproducible too, which is what makes the
+Since 0.5.25 the *build* is reproducible too, which is what makes the
 recorded digests checkable by the person receiving them: the same input and
 configuration produce the same output bytes, so a recipient can rebuild and
 compare against `outputs[].sha256` instead of taking the value on trust.

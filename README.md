@@ -20,13 +20,15 @@ A Python code obfuscator built with AST-based transformations. **Supports Python
 
 > **🔒 Pro Edition available** — 6 patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator, $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
 
-> **🔎 What's new in v0.5.24** — `--build-report PATH` writes one versioned,
-> privacy-safe JSON fact model after a successful build: selected and excluded
-> files with reasons, the effective configuration, transform and cache
-> counters, syntax-verification evidence, output SHA-256 digests, artifact
-> roles, marker state, and provenance linkage. The digests are build evidence,
-> not signatures, and a syntax check that was never requested is recorded as
-> unrequested rather than passed. Nothing about transformation changes.
+> **🔎 What's new in v0.5.25** — correctness fixes. A package that re-exports
+> through `__init__.py` now produces a package that actually imports: the
+> re-exported name keeps the obfuscated name of its definition, so `__all__` no
+> longer lists an identifier that exists nowhere, and a consumer's
+> `from pkg import thing` resolves. A module bound by a plain `import json` is
+> no longer renamed out from under its own import statement. Builds are also
+> reproducible now: the same input and configuration produce the same output
+> bytes, so the digests in `--build-report` can be re-derived rather than
+> trusted.
 
 > 🔔 **Starring this repo doesn't notify you about new releases** — GitHub only
 > sends release notifications to people who explicitly **Watch** it. Click
@@ -85,8 +87,8 @@ pyobfus is also on the [VS Code Marketplace](https://marketplace.visualstudio.co
 - **`pyobfus … --dry-run --json`** — preview a versioned `plan` object before anything is written: the effective configuration, which files are selected or excluded (and why), and the artifacts a build would produce, each tagged `ship` / `retain-internal` / `optional`. Relative labels only (no source, secrets, or absolute paths); it is a preview, not a saved apply file.
 - **`pyobfus … --verify-syntax`** — opt-in post-build check: compiles every generated `.py` in memory (no import, no execution, no `__pycache__`) and reports `syntax_valid` in JSON. A failure blocks delivery; it makes no runtime-correctness claim.
 - **`pyobfus … --build-report build-report.json`** — write one deterministic, privacy-safe fact model after a successful build: selection/config, transformation and cache counters, verification evidence, output hashes, artifact roles, marker state, and provenance linkage. See [`docs/VERIFIABLE_BUILD_REPORT.md`](docs/VERIFIABLE_BUILD_REPORT.md).
-- **Packages that re-export** — an `__init__.py` that re-exports (`from .core import run`, with `run` in `__all__`) keeps the name its definition was given, so the generated package stays importable and `from pkg import *` still works. Names re-exported from third-party packages are left alone. (Fixed for the next release.)
-- **Reproducible builds** (next release) — the same input and configuration produce the same output bytes, so whoever receives a build can re-run it and compare against the digests in `--build-report` rather than trusting them. Scope is deliberate: `--numeric-obfuscation` and AES string encryption draw fresh randomness per build and are expected to differ.
+- **Packages that re-export** — an `__init__.py` that re-exports (`from .core import run`, with `run` in `__all__`) keeps the name its definition was given, so the generated package stays importable and `from pkg import *` still works. Names re-exported from third-party packages are left alone. (v0.5.25)
+- **Reproducible builds** (v0.5.25) — the same input and configuration produce the same output bytes, so whoever receives a build can re-run it and compare against the digests in `--build-report` rather than trusting them. Scope is deliberate: `--numeric-obfuscation` and AES string encryption draw fresh randomness per build and are expected to differ.
 - **Release provenance** — pyobfus and pyobfus-mcp are published through PyPI Trusted Publishing with PEP 740 attestations; see [`docs/RELEASE_PROVENANCE_VERIFICATION.md`](docs/RELEASE_PROVENANCE_VERIFICATION.md) for verification commands and the current snapshot.
 - **Framework-aware presets** — `--preset fastapi | django | flask | pydantic | click | sqlalchemy | ml` with built-in exclusions for dispatch methods, decorators, ORM fields, migrations, model-serving wrappers, and dependency-injection parameters.
 - **Compatibility cookbooks** — pair pyobfus with real delivery pipelines: import-hook / encrypted-file (SOURCEdefender `.pye`), compiled packaging (Nuitka / Cython), and ML model-serving. `pyobfus --check` also emits `compatibility_advisory` findings for these. See [`docs/IMPORT_HOOK_COOKBOOK.md`](docs/IMPORT_HOOK_COOKBOOK.md), [`docs/COMPILED_PACKAGING_COOKBOOK.md`](docs/COMPILED_PACKAGING_COOKBOOK.md), and [`docs/MODEL_SERVING_COOKBOOK.md`](docs/MODEL_SERVING_COOKBOOK.md). For a hardened Python 3.14+ deployment that uses anti-debug protection, `--check` also flags PEP 768 remote-debug exposure (which must be disabled at interpreter startup, not by the obfuscator) — see [`docs/REMOTE_DEBUG_HARDENING.md`](docs/REMOTE_DEBUG_HARDENING.md).

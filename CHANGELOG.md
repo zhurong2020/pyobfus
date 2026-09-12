@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.25] - 2026-09-12
+
 ### Fixed
 
 - **A package that re-exports through `__init__.py` now produces a package
