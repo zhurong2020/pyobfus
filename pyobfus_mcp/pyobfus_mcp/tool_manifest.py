@@ -76,11 +76,17 @@ def compute_live_manifest() -> Dict[str, Any]:
     entries: List[Dict[str, Any]] = []
     for t in sorted(live_tools, key=lambda tool: tool.name):
         meta = getattr(t, "meta", None) or getattr(t, "_meta", None) or {}
+        # mcp 1.x spells this `inputSchema`, 2.x `input_schema`. The schema
+        # itself is the same JSON, so the digest is unaffected by which SDK
+        # major computed it.
+        input_schema = getattr(t, "inputSchema", None)
+        if input_schema is None:
+            input_schema = getattr(t, "input_schema", None)
         entries.append(
             {
                 "name": t.name,
                 "description": t.description,
-                "input_schema": t.inputSchema,
+                "input_schema": input_schema,
                 "meta": dict(meta),
             }
         )

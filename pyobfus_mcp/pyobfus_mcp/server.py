@@ -73,8 +73,47 @@ def _package_version() -> Optional[str]:
         return None
 
 
+def _load_server_class() -> Any:
+    """Return the SDK's server class, whichever major version is installed.
+
+    mcp 2.x renamed `FastMCP` to `MCPServer` and moved it from
+    `mcp.server.fastmcp` to `mcp.server.mcpserver`. Both classes take the same
+    `@app.tool(name=, description=, meta=)` decorator and both default
+    `run()` to stdio, so only construction differs — see `_build_server`.
+    """
+    try:
+        from mcp.server.mcpserver import MCPServer  # type: ignore[import-not-found]
+
+        return MCPServer
+    except ImportError:
+        pass
+
+    from mcp.server.fastmcp import FastMCP  # type: ignore[import-not-found]
+
+    return FastMCP
+
+
+def _construct_server(server_class: Any, version: Optional[str]) -> Any:
+    """Build the server instance and give it this package's version.
+
+    mcp 2.x takes `version=` directly. On 1.x there is no such kwarg and the
+    SDK does not fall back to package metadata, so the version has to be
+    written onto the inner low-level server afterwards — see
+    `_set_server_version` for how that was caught in production.
+    """
+    try:
+        return server_class(name="pyobfus", version=version or "")
+    except TypeError:
+        pass
+
+    app = server_class(name="pyobfus")
+    if version:
+        _set_server_version(app, version)
+    return app
+
+
 def _set_server_version(app: Any, version: str) -> bool:
-    """Stamp `version` onto the FastMCP instance's inner low-level Server.
+    """Stamp `version` onto the 1.x FastMCP instance's inner low-level Server.
 
     Returns True if it was set, False if the SDK's internals have moved.
 
@@ -108,7 +147,7 @@ def _build_server() -> Any:
     tools.py).
     """
     try:
-        from mcp.server.fastmcp import FastMCP  # type: ignore[import-not-found]
+        server_class = _load_server_class()
     except ImportError as e:  # pragma: no cover — runtime-only
         raise SystemExit(
             "The 'mcp' package is required to run the pyobfus-mcp server.\n"
@@ -116,16 +155,10 @@ def _build_server() -> Any:
             f"(Original error: {e})"
         )
 
-    # FastMCP dropped the `version=` kwarg between mcp SDK 1.0 and 1.20+, so
-    # the version cannot be passed at construction. It is NOT inherited from
-    # package metadata either — see `_set_server_version` for what the SDK
-    # actually does and how this was caught.
-    app = FastMCP(name="pyobfus")
-    _version = _package_version()
-    if _version:
-        _set_server_version(app, _version)
+    app = _construct_server(server_class, _package_version())
 
-    # Per-tool metadata carried via the `meta` kwarg (mcp 1.27 SDK-native).
+    # Per-tool metadata carried via the `meta` kwarg (SDK-native since mcp
+    # 1.27; the 2.x `MCPServer.tool()` signature still accepts it unchanged).
     # We use it for tool versioning ("version": "1") and tier classification
     # ("tier": "community" | "pro_funnel"), which downstream aggregators
     # (Glama, Anthropic registry filters) can read to surface "production-
@@ -283,7 +316,7 @@ def _build_server() -> Any:
 def main() -> None:
     """Entry point invoked by the `pyobfus-mcp` console script."""
     app = _build_server()
-    # FastMCP.run() defaults to stdio transport, which is what Claude
+    # Both SDK majors default run() to stdio transport, which is what Claude
     # Desktop / Cursor / Windsurf expect for locally-spawned servers.
     app.run()
 
