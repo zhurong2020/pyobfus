@@ -16,7 +16,7 @@ The two registry download counters are not additive user counts. The prior
 baseline conclusion remains unchanged: three clean post-0.5.22 days
 (`65 / 48 / 31`) decay back into the quiet band, so the 09-08 open question is
 answered — no baseline uplift. Current public versions are pyobfus
-**`0.5.24`** (released 09-12), pyobfus-mcp `0.3.12`, and VS Code/Open VSX
+**`0.5.25`** (released 09-12), pyobfus-mcp `0.3.12`, and VS Code/Open VSX
 **`0.4.3`** (both released 09-10 and independently re-checked on both
 registries). Open VSX is
 live; Glama is listed, searchable and healthy, with two consecutive successful
@@ -31,8 +31,9 @@ pending.
 
 ### PyPI — `pyobfus`
 - URL: https://pypi.org/project/pyobfus/
-- Current version: **0.5.24** (released 2026-09-12) · ships with PEP 740 attestations via OIDC trusted publishing
-- Current headline: `--build-report` writes one versioned, privacy-safe fact model of a completed build — selection/config, transform and cache counters, verification evidence, output digests, artifact roles, marker state, and provenance linkage. Digests are evidence, not signatures; an unrequested syntax check is never reported as passed.
+- Current version: **0.5.25** (released 2026-09-12) · ships with PEP 740 attestations via OIDC trusted publishing
+- Current headline: correctness fixes — a package that re-exports through `__init__.py` now produces a package that imports, a module bound by a plain `import` is no longer renamed out from under its own import statement, and the same input now produces the same output bytes, so the digests `--build-report` records can be re-derived rather than trusted.
+- Prior headline (0.5.24): `--build-report` writes one versioned, privacy-safe fact model of a completed build — selection/config, transform and cache counters, verification evidence, output digests, artifact roles, marker state, and provenance linkage. Digests are evidence, not signatures; an unrequested syntax check is never reported as passed.
 - Prior headline (0.5.23): generated Community output carries a versioned, transparent build marker; generated output no longer embeds the input file's absolute path. Marker policy is configurable and recorded in dry-run/provenance facts.
 - Prior headline (0.5.19): `--dry-run --json` emits a versioned `plan` object (effective config, selected/excluded files with reasons, artifacts tagged ship/retain-internal/optional; relative labels only, not applyable); opt-in `--verify-syntax` compiles generated output in memory post-build (no import/execute, no `__pycache__`) and reports `syntax_valid` with no runtime-correctness claim.
 - Prior headline (0.5.18): config-aware `--check` reports the effective project configuration and findings already mitigated by it, while preserving high-risk findings and exit-code semantics.
@@ -225,7 +226,7 @@ pending.
   prior is not evidence of an actual review. Continue tracking installs and
   real reviews, not raw update/download count alone.
 - Wiki: disabled · Discussions: enabled · Issues: open
-- Releases: latest Core `v0.5.24`, MCP `mcp-v0.3.12`, and VS Code
+- Releases: latest Core `v0.5.25`, MCP `mcp-v0.3.12`, and VS Code
   `vscode-v0.4.3`; MCP releases attach wheel+sdist.
 
 ### Open VSX — `zhurong2020.pyobfus` 🟢 LIVE

@@ -12,9 +12,23 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### 🟢 2026-09-12 — Core 0.5.24 已发布后的当前焦点
+### 🟢 2026-09-12 — Core 0.5.25 已发布后的当前焦点
 
-- Core **`0.5.24`** / MCP **`0.3.12`** / VS Code **`0.4.3`** 为最新公开版本；VS Code
+- **✅ `Core 0.5.25` 已于 2026-09-12 发布**（同日第二发；用户批「发版」）= 三项
+  修复。**两个是同一根因族的既有缺陷，发现于验证 0.5.25 另一项改动时**：
+  ① 包 `__init__.py` re-export 三方名字不一致（生成的 `__all__` 里的标识符在包
+  里不存在 / 消费方 `from pkg import x` 未改写而调用点已改写 / 第三方
+  re-export 也被改名）；② 无 `__all__` 的模块里 `import json` 的模块绑定被改名，
+  运行即 `NameError`。贯穿两者的规则：**模块 import 来而非自己定义的名字，必须
+  保留 import 语句给它的名字**。③ 跨文件输出可复现（export 登记与文件发现改排序
+  迭代），补完 0.5.24 的证据链——digest 只有在别人能重建时才算证据。
+  验收：11 + 6 个新回归测试（**re-export 那 9 个在未修复树上全失败**），测试**执行
+  生成的包**而非检查文本；四测试根 1319/97/7；完整 23-job 矩阵 + CodeQL 绿；
+  全新 venv 装已发布 wheel 实跑确认 re-export 包可导入且结果与混淆前相同、两个
+  不同 `PYTHONHASHSEED` 的报告 digest 一致。⚠️ **PyPI JSON API 显示新版本后，
+  pip 仍可能短时间 `No matching distribution`——是索引传播延迟，等一分钟重试，
+  别据此判失败**（同 Open VSX 那条教训）。
+- Core **`0.5.25`** / MCP **`0.3.12`** / VS Code **`0.4.3`** 为最新公开版本；VS Code
   扩展同时在 **Microsoft Marketplace 与 Open VSX** 上架，两边同为 `0.4.3`（均已 curl 独立复核）。
 - **✅ `Core 0.5.24` 已于 2026-09-12 发布**（用户批准「按照流程发版」）= unified
   verifiable build report。`--build-report PATH` 在构建成功后原子写一份 v1 JSON
@@ -476,7 +490,7 @@ cardiac-manuscripts 仓库（不影响 pyobfus 仓库本身）。
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.9-3.14, AST, setuptools
-- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.24，2026-09-12 发布**；完整版本历史见 `CHANGELOG.md`)
+- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.25，2026-09-12 发布**；完整版本历史见 `CHANGELOG.md`)
 - **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.3，2026-09-10 发布**；Marketplace 与 Open VSX 两边同版本，均已 `curl` 独立复核；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`。**发版必须两个 registry 都发**：Marketplace 手工上传 + `ovsx publish`，runbook 见 `docs/OPEN_VSX_PUBLISH_PLAN.md`)
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.12，2026-09-07 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.18` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp`（**0.3.12** 2026-09-07 发布，2026-09-10 已核实 `active` / `isLatest=true`）
@@ -497,7 +511,7 @@ pyobfus/
 │   ├── transformers/   # AST 变换器
 │   └── cross_file/    # 跨文件混淆
 ├── pyobfus_pro/       # Pro Edition (商业许可)
-├── tests/             # 1295 passed + 1 skipped (0.5.24 发布前验证)
+├── tests/             # 1319 passed + 1 skipped (0.5.25 发布前验证)
 ├── examples/          # 示例代码
 ├── docs/              # 项目文档
 └── cloudflare-worker/ # 许可验证 Worker
