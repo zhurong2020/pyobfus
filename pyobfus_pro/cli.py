@@ -12,6 +12,8 @@ import click
 from pyobfus_pro import __version__
 from pyobfus_pro.license import (
     LicenseError,
+    LicenseServerUnreachableError,
+    deactivate_device,
     cache_license,
     generate_license_key,
     get_license_status,
@@ -211,10 +213,70 @@ def status(verify: bool, json_output: bool) -> None:
 
 
 @cli.command()
+@click.argument("license_key", required=False)
+def deactivate(license_key: str) -> None:
+    """
+    Release this machine from your license, freeing its device slot.
+
+    Run this before wiping or handing on a machine. Without a LICENSE_KEY the
+    registered one is used.
+
+    \b
+    Example:
+      pyobfus-license deactivate
+    """
+    try:
+        if not license_key:
+            status = get_license_status(masked=False)
+            if not status:
+                click.echo("✗ No license registered on this machine.", err=True)
+                click.echo(
+                    "  Pass the key explicitly: pyobfus-license deactivate YOUR-LICENSE-KEY",
+                    err=True,
+                )
+                sys.exit(1)
+            license_key = status["key"]
+
+        result = deactivate_device(license_key)
+
+        if result["released"]:
+            click.echo("✓ This machine has been released from your license.")
+        else:
+            # Honest about a no-op: the slot was already free, which is worth
+            # saying plainly rather than dressing up as a successful release.
+            click.echo("✓ This machine was not registered; nothing to release.")
+
+        registered = result.get("devices_registered")
+        allowed = result.get("devices_allowed")
+        if registered is not None and allowed is not None:
+            click.echo(f"  Devices now registered: {registered} of {allowed}")
+
+        remove_cached_license()
+        click.echo("  Local license removed. Register again to use Pro here.")
+
+    except LicenseServerUnreachableError as e:
+        # Deliberately leave the local licence alone. The slot is still taken,
+        # so clearing it here would cost the customer their working setup and
+        # gain them nothing.
+        click.echo(f"✗ Could not reach the license server: {e}", err=True)
+        click.echo(
+            "  Nothing was changed. Your license still works here; try again later.",
+            err=True,
+        )
+        sys.exit(1)
+    except LicenseError as e:
+        click.echo(f"✗ Error: {e}", err=True)
+        sys.exit(1)
+
+
+@cli.command()
 @click.confirmation_option(prompt="Are you sure you want to remove your cached license?")
 def remove() -> None:
     """
-    Remove the cached license key.
+    Remove the cached license key from this machine only.
+
+    This does not free the device slot on the license server. Use
+    'pyobfus-license deactivate' for that.
 
     This will require you to register your license again to use Pro features.
 

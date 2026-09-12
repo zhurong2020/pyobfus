@@ -793,3 +793,101 @@ class TestFailureModeRegression:
         with pytest.raises(LicenseVerificationError) as excinfo:
             verify_license("PYOB-AAAA-BBBB-CCCC-DDDD")
         assert not isinstance(excinfo.value, LicenseServerUnreachableError)
+
+
+class TestDeviceRelease:
+    """Tests for releasing a device, which customers could not do at all."""
+
+    @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
+    @patch("pyobfus_pro.license.urllib.request.urlopen")
+    def test_release_reports_the_server_result_and_identifies_itself(self, mock_urlopen):
+        import pyobfus_pro.license as lic
+
+        captured: dict[str, Any] = {}
+
+        def capture(req, *args, **kwargs):
+            captured["request"] = req
+            response = MagicMock()
+            response.read.return_value = json.dumps(
+                {"released": True, "devices_registered": 2, "devices_allowed": 3}
+            ).encode()
+            response.__enter__.return_value = response
+            response.__exit__.return_value = None
+            return response
+
+        mock_urlopen.side_effect = capture
+        result = lic.deactivate_device("PYOB-AAAA-BBBB-CCCC-DDDD")
+
+        assert result["released"] is True
+        assert result["devices_registered"] == 2
+        assert captured["request"].full_url.endswith("/api/deactivate")
+        assert "Python-urllib" not in captured["request"].get_header("User-agent")
+
+    @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
+    @patch("pyobfus_pro.license.urllib.request.urlopen")
+    def test_a_server_without_the_route_is_not_reported_as_a_bad_licence(self, mock_urlopen):
+        """A released client can reach a server deployed before this endpoint.
+
+        That answers 404 with plain text. Calling it "License key not found"
+        would send the customer hunting for a licence problem they do not have.
+        """
+        import urllib.error
+
+        import pyobfus_pro.license as lic
+
+        mock_urlopen.side_effect = urllib.error.HTTPError(
+            url="",
+            code=404,
+            msg="Not Found",
+            hdrs=None,  # type: ignore[arg-type]
+            fp=io.BytesIO(b"Not Found"),
+        )
+        with pytest.raises(LicenseServerUnreachableError, match="does not support"):
+            lic.deactivate_device("PYOB-AAAA-BBBB-CCCC-DDDD")
+
+    @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
+    @patch("pyobfus_pro.license.urllib.request.urlopen")
+    def test_an_unknown_key_is_reported_as_such(self, mock_urlopen):
+        import urllib.error
+
+        import pyobfus_pro.license as lic
+
+        mock_urlopen.side_effect = urllib.error.HTTPError(
+            url="",
+            code=404,
+            msg="Not Found",
+            hdrs=None,  # type: ignore[arg-type]
+            fp=io.BytesIO(
+                json.dumps({"code": "invalid_key", "error": "Invalid license key"}).encode()
+            ),
+        )
+        with pytest.raises(LicenseVerificationError) as excinfo:
+            lic.deactivate_device("PYOB-AAAA-BBBB-CCCC-DDDD")
+        assert not isinstance(excinfo.value, LicenseServerUnreachableError)
+
+    @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
+    @patch("pyobfus_pro.license.urllib.request.urlopen")
+    def test_an_outage_leaves_the_local_licence_alone(self, mock_urlopen):
+        """The CLI must not clear a working licence when the slot is still taken."""
+        import urllib.error
+
+        from click.testing import CliRunner
+
+        import pyobfus_pro.license as lic
+        from pyobfus_pro.cli import cli
+
+        lic.cache_license(
+            {
+                "key": "PYOB-AAAA-BBBB-CCCC-DDDD",
+                "type": "pro",
+                "expires": "2099-12-31",
+                "verified": datetime.now().isoformat(),
+            }
+        )
+        mock_urlopen.side_effect = urllib.error.URLError("no route to host")
+
+        result = CliRunner().invoke(cli, ["deactivate"])
+
+        assert result.exit_code == 1
+        assert "Nothing was changed" in result.output
+        assert lic.load_cached_license() is not None

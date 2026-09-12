@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`pyobfus-license deactivate` releases this machine from your licence.**
+  Nothing could free a device slot before, so retiring a machine meant writing
+  to the maintainer, who then edited production data by hand. If the server
+  cannot be reached the command changes nothing at all, local licence
+  included: the slot would still be taken, so discarding the working local
+  licence would leave you strictly worse off. `remove` is unchanged and still
+  clears only the local cache; its help text now says so.
+
 ### Fixed
 
 - **Pro licence verification works again.** Every `pyobfus-license register`

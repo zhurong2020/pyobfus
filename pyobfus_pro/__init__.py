@@ -26,6 +26,7 @@ from .dead_code import DeadCodeInjector, DCIConfig
 from .license_embed import LicenseEmbedder, LicenseEmbedConfig, embed_license_checks
 from .license import (
     verify_license,
+    deactivate_device,
     get_license_status,
     remove_cached_license,
     LicenseError,
@@ -106,6 +107,7 @@ __all__ = [
     "remove_cached_license",
     "get_device_fingerprint",
     "get_device_info",
+    "deactivate_device",
     "LicenseError",
     "LicenseVerificationError",
     "LicenseServerUnreachableError",

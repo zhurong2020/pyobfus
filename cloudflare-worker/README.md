@@ -237,10 +237,17 @@ Visit: https://dash.cloudflare.com/workers/pyobfus-license-server
   "created_at": "2025-11-12T00:00:00Z",
   "stripe_session_id": "cs_xxx",
   "stripe_customer_id": "cus_xxx",
-  "devices": ["device-id-1", "device-id-2"],
+  "devices": [
+    {"id": "device-id-1", "last_seen": "2026-09-13T00:00:00.000Z"},
+    {"id": "device-id-2", "last_seen": null}
+  ],
   "expires_at": null
 }
 ```
+
+Records written before `last_seen` existed hold bare id strings. Those are
+still read; they are normalised on the next write and, having no date, are the
+first to be retired.
 
 **Status Values**:
 - `active`: License is valid
@@ -248,4 +255,43 @@ Visit: https://dash.cloudflare.com/workers/pyobfus-license-server
 - `revoked`: License permanently disabled
 - `expired`: License past expiration date
 
-**Device Limit**: Maximum 3 devices per license
+Every error response carries a stable `code` (`invalid_key`, `revoked`,
+`inactive`, `expired`, `bad_request`, `unauthorized`) alongside its prose
+`error`. Clients branch on the code: only `revoked` and `expired` are
+definitive enough to override a client's offline cache.
+
+**Device limit**: 3 per licence, and reaching it is not an error. A fourth
+device retires the least recently used one. Refusing instead made lockout
+inevitable, because nothing ever removed a device: reinstalls, replacement
+machines and drifting fingerprints each permanently consumed a slot the
+customer could not reclaim.
+
+## Releasing devices
+
+`POST /api/deactivate` with `{license_key, device_id}` removes one device.
+This is what `pyobfus-license deactivate` calls, so retiring a machine is a
+customer operation rather than a support ticket.
+
+`POST /api/admin/reset-devices` sets the list outright, for when the customer
+cannot reach the machine. It requires `Authorization: Bearer $ADMIN_TOKEN`,
+compared in constant time, and checks that **before** touching storage so an
+unauthenticated caller cannot learn whether a licence exists. The reset is
+recorded on the licence in `devices_reset` with the previous list, an optional
+reason, and a timestamp.
+
+```bash
+wrangler secret put ADMIN_TOKEN        # a long random string, not a Cloudflare API token
+
+curl -X POST https://<worker>/api/admin/reset-devices \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
+  -H 'Content-Type: application/json' \
+  -d '{"license_key":"PYOB-...","reason":"customer request"}'
+```
+
+With no `ADMIN_TOKEN` configured the endpoint answers 401 to everything, which
+is the correct resting state. Use a dedicated secret: a Cloudflare API token
+can also read every customer record and deploy code, and an application
+endpoint has no business holding infrastructure credentials.
+
+**Before editing licence data by any other means, export it.** KV is the only
+copy, and a bad write cannot be undone.

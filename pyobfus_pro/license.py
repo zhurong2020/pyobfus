@@ -22,7 +22,9 @@ import urllib.error
 from .fingerprint import get_device_fingerprint
 
 # Cloudflare Worker API for license verification
-LICENSE_API_URL = "https://pyobfus-license-server.zhurong0525.workers.dev/api/verify"
+LICENSE_API_BASE = "https://pyobfus-license-server.zhurong0525.workers.dev"
+LICENSE_API_URL = f"{LICENSE_API_BASE}/api/verify"
+DEACTIVATE_API_URL = f"{LICENSE_API_BASE}/api/deactivate"
 
 # Legacy: GitHub repository for license data (deprecated, kept for reference)
 LICENSE_REPO_URL = "https://raw.githubusercontent.com/zhurong2020/pyobfus-licenses/main"
@@ -314,6 +316,72 @@ def _verify_online(license_key: str) -> Dict[str, Any]:
         raise LicenseServerUnreachableError(f"Network error: {e.reason}")
     except json.JSONDecodeError:
         raise LicenseServerUnreachableError("Invalid response from license server")
+
+
+def deactivate_device(license_key: str) -> Dict[str, Any]:
+    """Release this machine's slot on the licence server.
+
+    A licence allows a limited number of devices and nothing used to remove
+    one, so retiring a machine meant emailing the maintainer, who then had to
+    edit production data by hand. This makes it the customer's own one-line
+    operation.
+
+    Returns:
+        dict: {"released": bool, "devices_registered": int, "device_id": str}
+
+    Raises:
+        LicenseVerificationError: the key is malformed, or the server does not
+            know it.
+        LicenseServerUnreachableError: no answer was obtained. The caller must
+            not clear anything locally in that case: the slot is still taken,
+            so discarding the local licence too would leave the customer
+            strictly worse off.
+    """
+    if not _validate_license_format(license_key):
+        raise LicenseVerificationError(
+            "Invalid license key format. Expected: PYOB-XXXX-XXXX-XXXX-XXXX"
+        )
+
+    device_id = get_device_fingerprint()
+    request_data = json.dumps({"license_key": license_key, "device_id": device_id}).encode("utf-8")
+    req = urllib.request.Request(
+        DEACTIVATE_API_URL,
+        data=request_data,
+        headers={"Content-Type": "application/json", "User-Agent": USER_AGENT},
+        method="POST",
+    )
+
+    try:
+        with urllib.request.urlopen(req, timeout=REQUEST_TIMEOUT) as response:
+            data = json.loads(response.read())
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            # Two very different things arrive as 404 here: the server saying
+            # it has no such licence (JSON), and a server old enough not to
+            # have this route at all (plain text). Reporting the second as
+            # "License key not found" would send the customer hunting for a
+            # problem with their licence that does not exist.
+            try:
+                code = json.loads(e.read()).get("code")
+            except (json.JSONDecodeError, ValueError, IOError):
+                code = None
+            if code == "invalid_key":
+                raise LicenseVerificationError("License key not found")
+            raise LicenseServerUnreachableError(
+                "this license server does not support releasing a device yet"
+            )
+        raise LicenseServerUnreachableError(f"HTTP error: {e.code}")
+    except urllib.error.URLError as e:
+        raise LicenseServerUnreachableError(f"Network error: {e.reason}")
+    except json.JSONDecodeError:
+        raise LicenseServerUnreachableError("Invalid response from license server")
+
+    return {
+        "released": bool(data.get("released")),
+        "devices_registered": data.get("devices_registered"),
+        "devices_allowed": data.get("devices_allowed"),
+        "device_id": device_id,
+    }
 
 
 def _validate_license_format(license_key: str) -> bool:

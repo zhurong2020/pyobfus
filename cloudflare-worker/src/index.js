@@ -28,6 +28,14 @@ export default {
         return await handleVerify(request, env, corsHeaders);
       }
 
+      if (url.pathname === '/api/deactivate' && request.method === 'POST') {
+        return await handleDeactivate(request, env, corsHeaders);
+      }
+
+      if (url.pathname === '/api/admin/reset-devices' && request.method === 'POST') {
+        return await handleAdminResetDevices(request, env, corsHeaders);
+      }
+
       if (url.pathname === '/api/webhook/stripe' && request.method === 'POST') {
         return await handleStripeWebhook(request, env, corsHeaders);
       }
@@ -91,7 +99,7 @@ export const MAX_DEVICES = 3;
  * @param {number} maxDevices
  * @returns {{devices: Array<{id: string, last_seen: ?string}>, evicted: string[]}}
  */
-export function reconcileDevices(existing, deviceId, nowIso, maxDevices = MAX_DEVICES) {
+export function normalizeDevices(existing) {
   const seen = new Set();
   const devices = [];
   for (const entry of Array.isArray(existing) ? existing : []) {
@@ -101,6 +109,27 @@ export function reconcileDevices(existing, deviceId, nowIso, maxDevices = MAX_DE
     const lastSeen = typeof entry === 'string' ? null : (entry.last_seen ?? null);
     devices.push({ id, last_seen: lastSeen });
   }
+  return devices;
+}
+
+/**
+ * Compare two strings without leaking where they differ.
+ *
+ * Lengths are compared first, so this reveals length but not content, which
+ * is the same trade the Stripe signature check already makes.
+ */
+export function constantTimeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return mismatch === 0;
+}
+
+export function reconcileDevices(existing, deviceId, nowIso, maxDevices = MAX_DEVICES) {
+  const devices = normalizeDevices(existing);
 
   const known = devices.find((d) => d.id === deviceId);
   if (known) {
@@ -275,6 +304,143 @@ async function handleStripeWebhook(request, env, corsHeaders) {
   }
 
   return new Response(JSON.stringify({ received: true }), {
+    status: 200,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+  });
+}
+
+/**
+ * Release one device from a licence.
+ * POST /api/deactivate
+ * Body: { license_key: string, device_id: string }
+ *
+ * Exists so that retiring a machine is something a customer does, not
+ * something they email about. Until this shipped the only way to free a slot
+ * was for the maintainer to widen an API token and edit the production record
+ * by hand, which is unrepeatable, unlogged, and one typo away from corrupting
+ * a paying customer's licence.
+ *
+ * Knowing both the licence key and a device id is the same bar /api/verify
+ * already sets, and the damage an attacker could do is bounded: a device that
+ * is removed is simply re-added the next time that machine verifies.
+ */
+async function handleDeactivate(request, env, corsHeaders) {
+  const body = await request.json();
+  const { license_key, device_id } = body;
+
+  if (!license_key || !device_id) {
+    return new Response(JSON.stringify({
+      released: false,
+      code: 'bad_request',
+      error: 'Missing license_key or device_id'
+    }), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+
+  const licenseData = await env.LICENSES.get(license_key, { type: 'json' });
+  if (!licenseData) {
+    return new Response(JSON.stringify({
+      released: false,
+      code: 'invalid_key',
+      error: 'Invalid license key'
+    }), {
+      status: 404,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+
+  const before = normalizeDevices(licenseData.devices);
+  const remaining = before.filter((d) => d.id !== device_id);
+  const released = remaining.length !== before.length;
+
+  if (released) {
+    licenseData.devices = remaining;
+    licenseData.last_released = { at: new Date().toISOString(), device: device_id };
+    await env.LICENSES.put(license_key, JSON.stringify(licenseData));
+  }
+
+  return new Response(JSON.stringify({
+    released,
+    devices_registered: remaining.length,
+    devices_allowed: MAX_DEVICES
+  }), {
+    status: 200,
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+  });
+}
+
+/**
+ * Set a licence's device list.
+ * POST /api/admin/reset-devices
+ * Header: Authorization: Bearer <ADMIN_TOKEN>
+ * Body: { license_key: string, devices?: string[], reason?: string }
+ *
+ * The maintainer-facing counterpart to /api/deactivate, for when the customer
+ * cannot reach the machine they need to release. Authentication is checked
+ * before storage is touched, so an unauthenticated caller cannot use response
+ * codes to discover whether a licence key exists.
+ *
+ * ADMIN_TOKEN is a Worker secret (`wrangler secret put ADMIN_TOKEN`) and is
+ * deliberately not a Cloudflare API token: that one can also read every
+ * customer record and deploy code, and an application endpoint has no
+ * business holding infrastructure credentials. With no secret configured this
+ * endpoint answers 401 to everything, which is the right resting state.
+ */
+async function handleAdminResetDevices(request, env, corsHeaders) {
+  const presented = (request.headers.get('authorization') || '').replace(/^Bearer\s+/i, '');
+  if (!env.ADMIN_TOKEN || !constantTimeEqual(presented, env.ADMIN_TOKEN)) {
+    return new Response(JSON.stringify({
+      code: 'unauthorized',
+      error: 'Unauthorized'
+    }), {
+      status: 401,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+
+  const body = await request.json();
+  const { license_key, devices, reason } = body;
+
+  if (!license_key) {
+    return new Response(JSON.stringify({
+      code: 'bad_request',
+      error: 'Missing license_key'
+    }), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+
+  const licenseData = await env.LICENSES.get(license_key, { type: 'json' });
+  if (!licenseData) {
+    return new Response(JSON.stringify({
+      code: 'invalid_key',
+      error: 'Invalid license key'
+    }), {
+      status: 404,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+    });
+  }
+
+  const previous = normalizeDevices(licenseData.devices).map((d) => d.id);
+  licenseData.devices = normalizeDevices(devices);
+  // Leave a trail. A reset is a change to a paying customer's record, and
+  // "who changed this and why" should not live only in someone's memory.
+  licenseData.devices_reset = {
+    at: new Date().toISOString(),
+    reason: typeof reason === 'string' ? reason.slice(0, 200) : null,
+    previous
+  };
+  await env.LICENSES.put(license_key, JSON.stringify(licenseData));
+
+  return new Response(JSON.stringify({
+    license_key,
+    devices: licenseData.devices.map((d) => d.id),
+    previous,
+    devices_allowed: MAX_DEVICES
+  }), {
     status: 200,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' }
   });
