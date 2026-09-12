@@ -9,6 +9,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **A package that re-exports through `__init__.py` now produces a package
+  that imports.** Three inconsistencies came from the same root cause. A name
+  a module re-exported (`from .core import run`, with `run` in `__all__`) was
+  given a *fresh* obfuscated name, while the rewritten import statement used
+  the name from the defining module, so the generated `__all__` advertised an
+  identifier that existed nowhere and `from pkg import *` failed. A package's
+  exports were registered under its `__init__` module name, so a consumer's
+  `from pkg import run` resolved to nothing and was left untouched while its
+  call sites were renamed, leaving one symbol with several identities. And a
+  name re-exported from a third-party package (`from json import dumps`) was
+  renamed too, breaking the import it came from.
+
+  Export registration now runs in two passes: definitions are named first,
+  then re-exports resolve to the defining module's name, following chains
+  (`pkg` → `pkg.api` → `pkg.core`) until they settle. A source outside the
+  project is deliberately left unregistered and therefore unrenamed. Packages
+  are also reachable by their own name, not only by their `__init__` module
+  name. The regression tests execute the generated package rather than
+  inspecting it, because the old output looked plausible and did not run.
+
 - **The same input now produces the same output bytes.** In directory /
   cross-file mode the obfuscated names were handed out by iterating a `set` of
   detected exports, so the interpreter's per-process string hash seed decided

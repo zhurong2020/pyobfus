@@ -145,10 +145,11 @@ renamed to MCPServer (from mcp.server.mcpserver import MCPServer) ...
 文档里写明「对齐的是 1.6，未使用 1.7 新增字段」。**不可接受的是继续默认
 读者以为我们跟着最新版。**
 
-### 3.3b 🔴 实现候选 1 时发现的既有缺陷：包 re-export 三方不一致
+### 3.3b ✅ 实现候选 1 时发现的既有缺陷：包 re-export 三方不一致（已修）
 
-**不是本轮改动引入的**（在未改动的树上复现过），也**不在本轮修复范围内**，
-但比「不可复现」更严重，单独记下来等决定。
+**不是可复现性改动引入的**（在未改动的树上复现过）。发现当日记录、用户拍板
+「先修这个」后**已修复并 held 在 `[Unreleased]`**，与可复现性改动是各自独立的
+commit。修法与验收见本节末尾。
 
 最小复现（两个文件）：
 
@@ -184,7 +185,26 @@ export 并分配了**新**的混淆名，而 import 改写走的是 `pkg.core` �
 
 影响面不小：`__init__.py` 做 re-export 是最常见的包结构之一。
 `--cross-file`、`--no-cross-file`、`--preset safe` 三种组合都复现。
-处置建议：作为独立缺陷单独排期修，不要与可复现性改动混在一个版本里。
+
+**✅ 修复（2026-09-12，held 在 `[Unreleased]`）**。三个症状同一个根因，实际改了
+三处：
+
+1. `ExportDetector` 新增 `imported_from`，记下每个名字是不是 import 来的、
+   来自哪个模块（含相对层级与 `as` 之前的原名）。
+2. `orchestrator.phase1_scan` 改为**两趟**：第一趟只给**本模块定义的**导出取新
+   名；第二趟把 re-export 解析到定义处的名字，并**循环到不再有新解析**，从而支持
+   链式（`pkg` → `pkg.api` → `pkg.core`）。**源在项目之外的（如
+   `from json import dumps`）刻意不登记**——那属于我们不改写的第三方包，改名只会
+   把它来的那条 import 弄坏。
+3. `GlobalSymbolTable` 新增 `register_reexport`（**不**在 reverse mapping 里
+   占用该混淆名，定义方保持所有权，因此复用不是 `register_export` 会拒绝的冲突）
+   与 `register_module_alias`（让 `pkg` 解析到 `pkg.__init__` 的导出表，消费方
+   那一侧的症状由此消失）。
+
+验收：9 个新回归测试 `tests/test_reexport_consistency.py`，覆盖绝对/相对/链式/
+第三方 re-export + 消费方端到端 + 符号表三条单测；**它们在未修复的树上 9 个全
+失败**，修复后全过。四个测试根：core 1310 / MCP 97 / integration 7。多包样例
+混淆后实跑结果与混淆前逐字相同（`18.0`）。
 
 ### 3.4 竞品版本事实纠正（我们自己的记载错了）
 
