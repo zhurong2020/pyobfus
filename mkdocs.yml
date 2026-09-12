@@ -18,6 +18,7 @@ nav:
   - Comparison: COMPARISON.md
   - PyInstaller Cookbook: PYINSTALLER_COOKBOOK.md
   - 当前计划: CURRENT_PLAN_ZH.md
+  - Support Matrix: SUPPORT_MATRIX.md
   - TODO: TODO.md
   - MCP SDK 2.x Spike: MCP_SDK_2X_SPIKE.md
   - Feature Expansion Research: FEATURE_EXPANSION_RESEARCH_2026-09-12.md

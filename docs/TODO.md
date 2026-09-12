@@ -21,6 +21,7 @@
   未动**（理由见 [`MCP_SDK_2X_SPIKE.md`](MCP_SDK_2X_SPIKE.md)）
 - ✅ 只读 `pyobfus-review` skill
 - ✅ `COMPARISON.md` 浏览器端混淆服务独立小节
+- ✅ 兼容性/验证矩阵 → [`SUPPORT_MATRIX.md`](SUPPORT_MATRIX.md)（最大缺口已写明：`examples/` 无一在 CI 中执行）
 - ✅ 抗 AI 分析措辞改写（`LLM_RESISTANCE_BENCHMARK.md` 引入 arXiv 2609.04220 + 新增「不得把社区版当 AI 抗性卖」红线）
 
 ## 待办（按建议顺序）
@@ -33,28 +34,20 @@
 顺带评估 1.7 的 **TLP 分发约束**对「交付给指定客户的受保护构建」是否有真实价值。
 验收：`--verify-provenance-manifest` 对新旧 manifest 均通过。
 
-### 2. 兼容性 / 验证矩阵（一天 · 零运行时风险）
-
-一张表把 Python 版本 × 框架 preset × 操作系统 × 交付组合（PyInstaller /
-Nuitka / Cython / import-hook / 模型服务）标为
-**supported / tested / advisory-only**，每格指明证据来源（哪个 CI job、哪篇
-cookbook、哪条用户报告，或「未验证」）。**点不到具体证据的一律降级为
-advisory-only。** 纯文档，可随任意版本发布。
-
-### 3. 稳定 reason code（两三天 · 动 JSON 契约）
+### 2. 稳定 reason code（两三天 · 动 JSON 契约）
 
 给每个 excluded file、preserved symbol、disabled transform 一个稳定的 reason
 code，替代现在的自由文本。涉及 `--check` / dry-run plan / build report 三处
-JSON，需要版本字段管理，**排在矩阵之后**，因为矩阵会暴露到底需要哪些 code。
+JSON，需要版本字段管理，**排在矩阵之后**，因为矩阵会暴露到底需要哪些 code（矩阵已完成，见 `SUPPORT_MATRIX.md`）。
 
-### 4. OpenSSF OSPS Baseline 自评（一天）
+### 3. OpenSSF OSPS Baseline 自评（一天）
 
 对照 [Baseline 2026-02-19](https://baseline.openssf.org/versions/2026-02-19.html)
 （Level 1 / Level 2，共 40 条，覆盖访问控制、构建发布、文档、治理、法务、质量、
 安全评估与漏洞处理）做一次差距清单。与已有的 OpenSSF Best Practices passing
 徽章互补，不重复。产出是差距表，不是一次性全部补齐。
 
-### 5. 对比可见度：拆分对比页 + 上架中立目录（一到两天 · 回答「怎么进对比矩阵」）
+### 4. 对比可见度：拆分对比页 + 上架中立目录（一到两天 · 回答「怎么进对比矩阵」）
 
 背景：在线混淆服务 `pyobfuscate.com` 针对 PyArmor / Nuitka / Cython / PyInstaller
 建了**一页一对**的对比矩阵，占住了 "python obfuscator comparison" 这一类查询，
