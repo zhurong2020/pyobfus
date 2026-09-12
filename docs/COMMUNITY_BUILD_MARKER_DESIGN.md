@@ -1,7 +1,6 @@
 # Community Build Marker Design
 
-Status: **implemented** (2026-09-10, held in `[Unreleased]`); release remains
-separately gated.
+Status: **released** in pyobfus 0.5.23 (2026-09-10).
 
 ## Correction: what the output actually did before implementation
 

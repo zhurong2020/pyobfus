@@ -24,6 +24,8 @@ nav:
   - Python 3.8 Compatibility: PYTHON38_COMPATIBILITY.md
   - License Activation: LICENSE_ACTIVATION_GUIDE.md
   - Project Structure: PROJECT_STRUCTURE.md
+  - Verifiable Build Report: VERIFIABLE_BUILD_REPORT.md
+  - Provenance Manifest: PROVENANCE_MANIFEST.md
   - SARIF Code Scanning: SARIF_CODE_SCANNING.md
   - Remote-Debug Hardening (Py3.14): REMOTE_DEBUG_HARDENING.md
   - Integration Testing: INTEGRATION_TESTING.md

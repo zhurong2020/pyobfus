@@ -17,8 +17,8 @@ authors:
     given-names: Rong
     orcid: "https://orcid.org/0009-0008-6087-0581"
     affiliation: "Independent Researcher, Shanghai, China"
-version: 0.5.2
-date-released: "2026-06-22"
+version: 0.5.24
+date-released: "2026-09-12"
 license: Apache-2.0
 repository-code: "https://github.com/zhurong2020/pyobfus"
 url: "https://github.com/zhurong2020/pyobfus"
@@ -34,5 +34,6 @@ keywords:
   - stack-trace mapping
   - AI-assisted debugging
 # Zenodo concept DOI (all versions — always resolves to the latest archive).
-# Version DOI for the zenodo-archive-v0.5.2 snapshot is 10.5281/zenodo.20846054.
+# Zenodo archives each GitHub release automatically; the concept DOI currently
+# resolves to the v0.5.24 archive, whose version DOI is 10.5281/zenodo.22719510.
 doi: 10.5281/zenodo.20846053

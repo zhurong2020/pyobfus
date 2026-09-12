@@ -447,7 +447,7 @@ pyobfus 是面向 AI 辅助开发时代的 Python 代码保护工具：保留纯
 在不偏离 AST、框架兼容、AI 可操作和可验证交付这条原定线路的前提下，后续
 持续吸收 Nuitka 的工程化优点，但不复制其编译器/安装器产品边界：
 
-1. **统一可验证 build report（P2）**：把现有 dry-run plan、effective config、
+1. **统一可验证 build report（P2 · v1 已随 0.5.24 发布）**：把现有 dry-run plan、effective config、
    选中/排除原因、transform/保留统计、缓存判断、syntax/import 验证、输出摘要
    与 provenance 关系收敛到一个 versioned fact model；人类摘要、JSON、SARIF、
    provenance 都从同一事实源投影，避免口径漂移。
@@ -526,8 +526,8 @@ SARIF 范围纪律（仍适用）：
 1. `0.5.21`：SARIF preflight，预计 09-04/05；
 2. `0.5.22` 候选：间隔 3～5 天，Python 3.14 remote-debug 启动策略 advisory +
    现有 Community header 绝对路径隐私修复，须先完成专项设计；
-3. `0.5.24` 候选：统一 verifiable build report MVP；v1 schema 与实现已于
-   09-12 完成并留在 `[Unreleased]`，发版继续等待维护者明确通知；
+3. `0.5.24`：统一 verifiable build report MVP；v1 schema 与实现 09-12 完成，
+   同日经用户批准发布（PyPI `latest=0.5.24`，两个 provenance endpoint 200）；
 4. `pyobfus-mcp 0.3.11` 独立节奏；当前 `[Unreleased]` 仅 Registry URL 修复，
    单独发版价值不足，需与 MCP conformance evidence 或真实 MCP 增量组合。
 

@@ -254,15 +254,14 @@ Recommended first increment: design a `build_report` schema that reuses the
 current `plan`, syntax verification and provenance builders. Do not expose a
 new flag until schema ownership, redaction and compatibility rules are written.
 
-**Implementation update (2026-09-12): complete in `[Unreleased]`, planned for
-Core 0.5.24.** The rules are now explicit in
+**Implementation update (2026-09-12): released in Core 0.5.24.** The rules are
+explicit in
 [VERIFIABLE_BUILD_REPORT.md](VERIFIABLE_BUILD_REPORT.md), and
 `--build-report PATH` implements the v1 completed-build projection. It is
 deterministic for identical facts/output bytes, writes atomically, hashes only
 generated `.py` output, strips user-authored exclusion-pattern contents, uses
 relative-or-basename labels, records omitted verification as unrequested, and
-refuses path collisions with input/output/mapping/provenance artifacts. Version
-bump, tag and publication remain separately gated.
+refuses path collisions with input/output/mapping/provenance artifacts.
 
 ### 8. Community build marker — GO / P2 design, implementation gated
 
