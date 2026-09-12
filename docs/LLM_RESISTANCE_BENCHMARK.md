@@ -7,9 +7,12 @@ Roadmap item P2-18.
 
 **One-line goal**: publish a reproducible *semantic-recovery rate* — the fraction
 of obfuscated code samples whose original behavior an LLM can reconstruct — for
-pyobfus across a ladder of obfuscation strengths, and show that the Pro L3
-mechanisms (Selective Opacity / String Vault) drive it toward zero because the
-semantics are no longer present in the shipped artifact.
+pyobfus across a ladder of obfuscation strengths, and test whether the Pro L3
+mechanisms (Selective Opacity / String Vault) hold it near zero because the
+semantics are no longer present in the shipped artifact. The pilot measured 0%
+recovery at C2/C3/C5 on the non-public-knowledge samples; that is a five-sample
+pilot, not a published rate, and the question stays open until the corpus is
+bigger.
 
 This is the "benchmark-only first cut" the ROADMAP scopes at 2–3 days. It is
 both launch content ("no competitor can credibly quantify resistance *to AI*")
@@ -20,9 +23,11 @@ an arXiv cs.CR preprint) — distinct from the desk-rejected JOSS software paper
 
 ## Why this is on-brand and defensible
 
-pyobfus is an **AST-based, AI-native** obfuscator. Every competitor markets
-against human reverse-engineering; none quantifies resistance against an LLM
-analyst, which is the 2025–26 threat that actually matters:
+pyobfus is an **AST-based, AI-native** obfuscator. Competitors market against
+human reverse-engineering and none of them publishes a resistance number
+against an LLM analyst — the research community does, and that literature is
+where this benchmark has to be honest, because some of it cuts against the
+obvious sales pitch:
 
 - LLM code-deobfuscation moved from fringe to a research hotspot: fine-tuned
   models unwind up to 7 chained transforms and beat compiler-based deobfuscation
@@ -41,6 +46,16 @@ analyst, which is the 2025–26 threat that actually matters:
 - **CodeCipher** ([arXiv 2410.05797](https://arxiv.org/abs/2410.05797)) —
   token-level perturbation to hide code from LLMs; a related but different
   (privacy-of-prompt) angle worth citing for completeness.
+- 🔴 **The finding that constrains our claims**:
+  [arXiv 2609.04220](https://arxiv.org/abs/2609.04220) (2026-09) evaluates seven
+  code LLMs on translation and completion over five obfuscation techniques in
+  four languages, and reports that **inference directly on obfuscated code often
+  matches or beats inference on deobfuscated code** — GPT-4.1 and
+  Qwen3-Coder-30B hold around 90% Pass@1 on obfuscated translation. Model
+  capability dominates; the obfuscation technique is a secondary effect. Read
+  plainly: for a capable model, renaming and reshaping source is close to no
+  barrier at all. That is *why* this benchmark separates the rungs — a number
+  reported for the whole tool would be meaningless.
 
 The pyobfus angle Acoda cannot claim: its transforms are all
 *semantics-preserving source rewrites* — the meaning is still in the artifact,
@@ -231,6 +246,14 @@ benchmarks/llm_resistance/
 
 ## Honesty guardrails (non-negotiable)
 
+- **Never market Community-tier obfuscation as AI resistance.** Renaming,
+  literal encoding and control-flow reshaping keep the semantics in the shipped
+  artifact, and published 2026 results show capable models reason over exactly
+  that kind of output at close to their normal accuracy (arXiv 2609.04220
+  above). What the free tier defends against is casual reading and cheap
+  copying. Only the L3 mechanisms, which remove the semantics from the
+  artifact, are defensible as an answer to an LLM analyst, and only for source
+  recovery.
 - Report the exact sample count; never imply a broader corpus than was run.
 - Exclude C4/C5-ineligible samples from C4/C5 aggregates *visibly*.
 - State the attacker model + date; LLM capability moves, so every number is

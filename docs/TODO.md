@@ -21,18 +21,11 @@
   未动**（理由见 [`MCP_SDK_2X_SPIKE.md`](MCP_SDK_2X_SPIKE.md)）
 - ✅ 只读 `pyobfus-review` skill
 - ✅ `COMPARISON.md` 浏览器端混淆服务独立小节
+- ✅ 抗 AI 分析措辞改写（`LLM_RESISTANCE_BENCHMARK.md` 引入 arXiv 2609.04220 + 新增「不得把社区版当 AI 抗性卖」红线）
 
 ## 待办（按建议顺序）
 
-### 1. 抗 AI 分析的措辞改写（半天 · 诚实性）
-
-`LLM_RESISTANCE_BENCHMARK.md` 的定位从「能不能挡住 LLM」改写为「在什么任务上
-挡住多少、代价是什么」，并引用 2026 年的公开实证（arXiv 2609.04220：七个 code
-LLM、四语言、五种混淆手法，**直接在混淆代码上推理往往等于甚至优于先还原**，强
-模型仍保持约 90% Pass@1）。`COMPARISON.md` 与 README 不得出现「AI 读不懂」这类
-表述。新写的 `pyobfus-review` skill 已先行加了这条诚实边界，其余 surface 待同步。
-
-### 2. CycloneDX 版本声明对齐（一两小时）
+### 1. CycloneDX 版本声明对齐（一两小时）
 
 `pyobfus/core/provenance.py` 写死 `"specVersion": "1.6"`，现行是 1.7
 （ECMA-424 第 2 版）。二选一，都诚实：升到 1.7 且只填真实字段；或保持 1.6 但在
@@ -40,7 +33,7 @@ LLM、四语言、五种混淆手法，**直接在混淆代码上推理往往等
 顺带评估 1.7 的 **TLP 分发约束**对「交付给指定客户的受保护构建」是否有真实价值。
 验收：`--verify-provenance-manifest` 对新旧 manifest 均通过。
 
-### 3. 兼容性 / 验证矩阵（一天 · 零运行时风险）
+### 2. 兼容性 / 验证矩阵（一天 · 零运行时风险）
 
 一张表把 Python 版本 × 框架 preset × 操作系统 × 交付组合（PyInstaller /
 Nuitka / Cython / import-hook / 模型服务）标为
@@ -48,20 +41,20 @@ Nuitka / Cython / import-hook / 模型服务）标为
 cookbook、哪条用户报告，或「未验证」）。**点不到具体证据的一律降级为
 advisory-only。** 纯文档，可随任意版本发布。
 
-### 4. 稳定 reason code（两三天 · 动 JSON 契约）
+### 3. 稳定 reason code（两三天 · 动 JSON 契约）
 
 给每个 excluded file、preserved symbol、disabled transform 一个稳定的 reason
 code，替代现在的自由文本。涉及 `--check` / dry-run plan / build report 三处
 JSON，需要版本字段管理，**排在矩阵之后**，因为矩阵会暴露到底需要哪些 code。
 
-### 5. OpenSSF OSPS Baseline 自评（一天）
+### 4. OpenSSF OSPS Baseline 自评（一天）
 
 对照 [Baseline 2026-02-19](https://baseline.openssf.org/versions/2026-02-19.html)
 （Level 1 / Level 2，共 40 条，覆盖访问控制、构建发布、文档、治理、法务、质量、
 安全评估与漏洞处理）做一次差距清单。与已有的 OpenSSF Best Practices passing
 徽章互补，不重复。产出是差距表，不是一次性全部补齐。
 
-### 6. 对比可见度：拆分对比页 + 上架中立目录（一到两天 · 回答「怎么进对比矩阵」）
+### 5. 对比可见度：拆分对比页 + 上架中立目录（一到两天 · 回答「怎么进对比矩阵」）
 
 背景：在线混淆服务 `pyobfuscate.com` 针对 PyArmor / Nuitka / Cython / PyInstaller
 建了**一页一对**的对比矩阵，占住了 "python obfuscator comparison" 这一类查询，
