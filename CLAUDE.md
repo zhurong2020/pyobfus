@@ -10,6 +10,8 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 **Single source of truth for current plan**: [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md) — 重启 session 第一份必读
 
+**下一步做什么**: [`docs/TODO.md`](docs/TODO.md) — 排期清单（顺序 + 验收标准 + 周期性任务），依据见 `docs/FEATURE_EXPANSION_RESEARCH_2026-09-12.md`
+
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
 ### 🟢 2026-09-12 — Core 0.5.25 已发布后的当前焦点
