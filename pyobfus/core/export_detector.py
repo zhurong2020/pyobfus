@@ -21,6 +21,7 @@ class ReExportSource(NamedTuple):
     module: Optional[str]  # module as written, None for ``from . import x``
     level: int  # leading dots; 0 for an absolute import
     original_name: str  # name in the source module, before any ``as`` alias
+    is_module_binding: bool = False  # ``import json`` binds a module, not a symbol
 
 
 class ExportDetector(ast.NodeVisitor):
@@ -191,6 +192,16 @@ class ExportDetector(ast.NodeVisitor):
 
                 if not name.startswith("_"):
                     self.potential_exports.add(name)
+                    # `import json` binds the module object under this name.
+                    # The import statement keeps the real module name, so
+                    # renaming the binding leaves `json.dumps` calls pointing
+                    # at an identifier that was never defined.
+                    self.imported_from[name] = ReExportSource(
+                        module=alias.name,
+                        level=0,
+                        original_name=name,
+                        is_module_binding=True,
+                    )
 
         self.generic_visit(node)
 

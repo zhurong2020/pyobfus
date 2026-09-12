@@ -202,6 +202,52 @@ class TestExternalReExport:
         assert reported == '{"a": 1}'
 
 
+class TestModuleBinding:
+    def test_a_module_bound_by_import_keeps_its_name(self, tmp_path):
+        """`import json` binds a module; the statement keeps the real name."""
+        src = tmp_path / "src"
+        src.mkdir()
+        (src / "a.py").write_text(
+            "import json\n\n\ndef dump(obj):\n    return json.dumps(obj)\n",
+            encoding="utf-8",
+        )
+        (src / "b.py").write_text(
+            "from a import dump\n"
+            "\n"
+            "if __name__ == '__main__':\n"
+            "    print(dump({'k': 1}))\n",
+            encoding="utf-8",
+        )
+        out = tmp_path / "out"
+
+        _build(tmp_path, src, out)
+
+        proc = subprocess.run(
+            [sys.executable, "b.py"],
+            capture_output=True,
+            text=True,
+            timeout=60,
+            cwd=str(out),
+        )
+        assert proc.returncode == 0, f"generated code failed to run: {proc.stderr}"
+        assert proc.stdout.strip() == '{"k": 1}'
+
+    def test_aliased_module_import_keeps_its_alias(self, tmp_path):
+        src = tmp_path / "src"
+        src.mkdir()
+        (src / "a.py").write_text(
+            "import json as encoder\n\n\ndef dump(obj):\n    return encoder.dumps(obj)\n",
+            encoding="utf-8",
+        )
+        out = tmp_path / "out"
+
+        _build(tmp_path, src, out)
+
+        generated = (out / "a.py").read_text(encoding="utf-8")
+        assert "import json as encoder" in generated
+        assert "encoder.dumps(obj)" in generated
+
+
 class TestSymbolTableSupport:
     def test_reexport_registration_is_not_treated_as_a_collision(self):
         table = GlobalSymbolTable()

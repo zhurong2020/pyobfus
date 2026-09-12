@@ -29,6 +29,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   name. The regression tests execute the generated package rather than
   inspecting it, because the old output looked plausible and did not run.
 
+- **A module bound by `import x` is no longer renamed.** The same root cause
+  one step over: in a module with no `__all__`, a plain `import json` made
+  `json` a candidate export, so it was given an obfuscated name and every
+  `json.dumps(...)` call was rewritten to use it while the import statement
+  kept the real module name, raising `NameError` at runtime. Such a binding is
+  now left alone, including its `as` alias.
+
 - **The same input now produces the same output bytes.** In directory /
   cross-file mode the obfuscated names were handed out by iterating a `set` of
   detected exports, so the interpreter's per-process string hash seed decided

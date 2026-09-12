@@ -331,6 +331,10 @@ class CrossFileOrchestrator:
                     continue
 
                 source = detector.imported_from.get(export_name)
+                if source is not None and source.is_module_binding:
+                    # A module bound by `import x`: the import statement keeps
+                    # the real module name, so this name must keep it too.
+                    continue
                 if source is not None:
                     # Defined elsewhere; resolved in pass 2.
                     pending_reexports.append((file_info, export_name, source))
