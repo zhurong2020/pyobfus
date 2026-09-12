@@ -36,6 +36,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   which PyPI asks clients to do and which keeps this check clear of the same
   class of edge block.
 
+- **An operating-system update no longer takes a registered licence away.**
+  The cached licence was bound to a device fingerprint that hashes the OS
+  release, so a macOS point update alone changed the machine's identity. The
+  cache was then refused, the CLI reported `No license key found`, and
+  re-registering consumed another of three device slots that nothing could
+  free. A customer described exactly this in June 2026. A changed fingerprint
+  is now recorded rather than punished; the cache's HMAC signature, which is
+  what actually resists tampering, is unchanged and still rejects an edited
+  cache. The device check had been standing in as an anti-copy measure that
+  the documented `--no-verify` path already nullified.
+
+- **Revocation now works.** A revoked licence kept working indefinitely. The
+  server's rejection arrived as a generic verification error, the offline
+  cache fallback swallowed it, and the client reported the licence as valid
+  while printing the server's own word "revoked" in its message. Definitive
+  answers (revoked, expired) are now distinguished from conditions that say
+  nothing about the licence (an outage, a blocked request, a device limit),
+  and only the former bypass the cache. Verification responses carry a stable
+  `code` field for this; the client also reads the older text-only form, since
+  a released client can reach a server that predates the field.
+
+- **The licence server no longer refuses a fourth device.** Nothing ever
+  removed a device, so every reinstall, replacement machine or drifting
+  fingerprint permanently consumed one of three slots. Lockout was not a risk
+  but a certainty, reachable only by asking the maintainer to edit production
+  data by hand. The least recently used device now makes way for the newest.
+
 ## [0.5.25] - 2026-09-12
 
 ### Fixed

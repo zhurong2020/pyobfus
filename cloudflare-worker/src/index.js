@@ -67,6 +67,66 @@ export default {
 };
 
 /**
+ * Maximum devices kept per licence. Reaching it is no longer an error.
+ */
+export const MAX_DEVICES = 3;
+
+/**
+ * Decide the device list for a verification.
+ *
+ * This used to refuse the request once three devices were registered, which
+ * made lockout inevitable rather than merely possible: nothing ever removed a
+ * device, so every reinstall, replacement machine or drifting fingerprint
+ * permanently consumed a slot the customer could not reclaim. A customer hit
+ * exactly that in 2026-06.
+ *
+ * Now the oldest device makes way for the newest, so a paying customer is
+ * never blocked, while a single key still cannot be used across an unbounded
+ * number of machines at once. Legacy records stored bare id strings; those are
+ * normalised here and treated as never-seen, so they are evicted first.
+ *
+ * @param {Array<string|{id: string, last_seen: ?string}>} existing
+ * @param {string} deviceId - the device making this request
+ * @param {string} nowIso - timestamp to record for it
+ * @param {number} maxDevices
+ * @returns {{devices: Array<{id: string, last_seen: ?string}>, evicted: string[]}}
+ */
+export function reconcileDevices(existing, deviceId, nowIso, maxDevices = MAX_DEVICES) {
+  const seen = new Set();
+  const devices = [];
+  for (const entry of Array.isArray(existing) ? existing : []) {
+    const id = typeof entry === 'string' ? entry : entry && entry.id;
+    if (typeof id !== 'string' || id.length === 0 || seen.has(id)) continue;
+    seen.add(id);
+    const lastSeen = typeof entry === 'string' ? null : (entry.last_seen ?? null);
+    devices.push({ id, last_seen: lastSeen });
+  }
+
+  const known = devices.find((d) => d.id === deviceId);
+  if (known) {
+    known.last_seen = nowIso;
+    return { devices, evicted: [] };
+  }
+
+  devices.push({ id: deviceId, last_seen: nowIso });
+  if (devices.length <= maxDevices) {
+    return { devices, evicted: [] };
+  }
+
+  // Oldest first. A device with no last_seen has not been used since the field
+  // existed, so it goes before any dated one.
+  const rank = (d) => (d.last_seen ? Date.parse(d.last_seen) || 0 : 0);
+  const byAge = [...devices].sort((a, b) => rank(a) - rank(b));
+  const doomed = new Set(byAge.slice(0, devices.length - maxDevices).map((d) => d.id));
+  doomed.delete(deviceId); // never evict the device we are answering right now
+
+  return {
+    devices: devices.filter((d) => !doomed.has(d.id)),
+    evicted: [...doomed],
+  };
+}
+
+/**
  * Handle license verification request
  * POST /api/verify
  * Body: { license_key: string, device_id: string }
@@ -79,6 +139,7 @@ async function handleVerify(request, env, corsHeaders) {
   if (!license_key || !device_id) {
     return new Response(JSON.stringify({
       valid: false,
+      code: 'bad_request',
       error: 'Missing license_key or device_id'
     }), {
       status: 400,
@@ -92,6 +153,7 @@ async function handleVerify(request, env, corsHeaders) {
   if (!licenseData) {
     return new Response(JSON.stringify({
       valid: false,
+      code: 'invalid_key',
       error: 'Invalid license key'
     }), {
       status: 404,
@@ -103,6 +165,7 @@ async function handleVerify(request, env, corsHeaders) {
   if (licenseData.status !== 'active') {
     return new Response(JSON.stringify({
       valid: false,
+      code: licenseData.status === 'revoked' ? 'revoked' : 'inactive',
       error: `License is ${licenseData.status}`
     }), {
       status: 403,
@@ -116,6 +179,7 @@ async function handleVerify(request, env, corsHeaders) {
     if (expiresAt < new Date()) {
       return new Response(JSON.stringify({
         valid: false,
+        code: 'expired',
         error: 'License has expired'
       }), {
         status: 403,
@@ -124,29 +188,17 @@ async function handleVerify(request, env, corsHeaders) {
     }
   }
 
-  // Check device limit (allow up to 3 devices)
-  if (!licenseData.devices) {
-    licenseData.devices = [];
+  // Record this device. Exceeding the cap retires the least recently used
+  // device instead of refusing a paying customer (see reconcileDevices).
+  const now = new Date().toISOString();
+  const { devices, evicted } = reconcileDevices(licenseData.devices, device_id, now);
+  licenseData.devices = devices;
+  licenseData.last_verified = now;
+  if (evicted.length > 0) {
+    licenseData.last_evicted = { at: now, devices: evicted };
   }
 
-  if (!licenseData.devices.includes(device_id)) {
-    if (licenseData.devices.length >= 3) {
-      return new Response(JSON.stringify({
-        valid: false,
-        error: 'Device limit reached (max 3 devices)'
-      }), {
-        status: 403,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
-    }
-
-    // Add new device
-    licenseData.devices.push(device_id);
-    await env.LICENSES.put(license_key, JSON.stringify(licenseData));
-  }
-
-  // Update last verified timestamp
-  licenseData.last_verified = new Date().toISOString();
+  // One write, not two: the previous code stored the record twice per request.
   await env.LICENSES.put(license_key, JSON.stringify(licenseData));
 
   // Return success

@@ -30,6 +30,7 @@ from .license import (
     remove_cached_license,
     LicenseError,
     LicenseVerificationError,
+    LicenseServerUnreachableError,
     LicenseExpiredError,
     LicenseRevokedError,
 )
@@ -107,6 +108,7 @@ __all__ = [
     "get_device_info",
     "LicenseError",
     "LicenseVerificationError",
+    "LicenseServerUnreachableError",
     "LicenseExpiredError",
     "LicenseRevokedError",
     # --- v0.5 Pro mechanisms ---

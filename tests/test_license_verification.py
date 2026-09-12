@@ -7,6 +7,7 @@ These tests verify the license verification, caching, and management functionali
 import hashlib
 import io
 import json
+import platform
 import sys
 import tempfile
 from datetime import datetime, timedelta
@@ -20,6 +21,8 @@ import pytest
 # Pylance/mypy may show type conflicts between real and stub implementations - this is expected
 try:
     from pyobfus_pro.license import (  # type: ignore[import-not-found,import-untyped]
+        LicenseRevokedError,
+        LicenseServerUnreachableError,
         CACHE_FILE,  # type: ignore[no-redef]
         LicenseExpiredError,  # type: ignore[no-redef]
         LicenseRevokedError,  # type: ignore[no-redef]
@@ -49,6 +52,11 @@ except ImportError:
 
     class LicenseRevokedError(Exception):  # type: ignore[no-redef]
         """Stub for LicenseRevokedError."""
+
+        pass
+
+    class LicenseServerUnreachableError(Exception):  # type: ignore[no-redef]
+        """Stub for LicenseServerUnreachableError."""
 
         pass
 
@@ -304,8 +312,11 @@ class TestLicenseVerification:
             url="", code=403, msg="Forbidden", hdrs=None, fp=error_body  # type: ignore[arg-type]
         )
 
-        # Should raise LicenseVerificationError (revoked is handled as verification failure)
-        with pytest.raises(LicenseVerificationError, match="revoked"):
+        # Revocation gets its own exception because it is the one answer that
+        # must survive a valid cache. While it arrived as a generic
+        # verification failure, the cache fallback swallowed it and the client
+        # went on reporting the licence as valid.
+        with pytest.raises(LicenseRevokedError, match="revoked"):
             verify_license("PYOB-AAAA-BBBB-CCCC-DDDD")
 
     @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
@@ -324,8 +335,8 @@ class TestLicenseVerification:
             url="", code=403, msg="Forbidden", hdrs=None, fp=error_body  # type: ignore[arg-type]
         )
 
-        # Should raise LicenseVerificationError
-        with pytest.raises(LicenseVerificationError, match="expired"):
+        # Likewise expiry: a definitive answer, not a transient condition.
+        with pytest.raises(LicenseExpiredError, match="expired"):
             verify_license("PYOB-AAAA-BBBB-CCCC-DDDD")
 
     @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
@@ -508,9 +519,15 @@ class TestCacheSigning:
         with open(lic.CACHE_FILE, "w") as f:
             json.dump(cached, f)
 
-        # Try to load - should return None due to device mismatch
+        # A device mismatch is recorded, not punished. Until 2026-09-13 this
+        # returned None, which meant a machine whose identity merely drifted
+        # (an OS point update was enough) lost its licence and had to
+        # re-register, burning one of three slots that nothing could free.
+        # The signature check above is what guards the contents, and it still
+        # runs; see test_cache_still_rejects_a_tampered_signature.
         result = load_cached_license()
-        assert result is None
+        assert result is not None
+        assert result["device_changed"] is True
 
         # Cache file should NOT be deleted (might be network drive)
         assert lic.CACHE_FILE.exists()
@@ -617,3 +634,162 @@ class TestEdgeBlockRegression:
 
         with pytest.raises(LicenseVerificationError, match="Device limit reached"):
             verify_license("PYOB-AAAA-BBBB-CCCC-DDDD")
+
+
+class TestFailureModeRegression:
+    """Regression tests for the 2026-09-13 licensing reliability work.
+
+    The system failed in both directions at once. It refused paying customers
+    over conditions that said nothing about their licence, and it let a
+    revoked licence keep working indefinitely.
+    """
+
+    @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
+    def test_cache_survives_a_changed_device_fingerprint(self):
+        """An OS update must not make a registered licence disappear.
+
+        The fingerprint hashes the OS release, so a macOS point update alone
+        changed the device identity. The cache was then rejected, the CLI said
+        "No license key found", and re-registering consumed another of three
+        device slots that nothing could free.
+        """
+        import pyobfus_pro.license as lic
+
+        lic.cache_license(
+            {
+                "key": "PYOB-AAAA-BBBB-CCCC-DDDD",
+                "type": "pro",
+                "expires": "2099-12-31",
+                "verified": datetime.now().isoformat(),
+            }
+        )
+
+        real_release = platform.release()
+        with patch("platform.release", return_value=real_release + ".1"):
+            cached = lic.load_cached_license()
+            assert cached is not None, "an OS update wiped the cached licence"
+            assert cached["key"] == "PYOB-AAAA-BBBB-CCCC-DDDD"
+            assert cached["device_changed"] is True
+            assert lic.get_license_status() is not None
+
+    @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
+    def test_cache_still_rejects_a_tampered_signature(self):
+        """Dropping the device check must not weaken the signature check."""
+        import pyobfus_pro.license as lic
+
+        lic.cache_license(
+            {
+                "key": "PYOB-AAAA-BBBB-CCCC-DDDD",
+                "type": "pro",
+                "expires": "2099-12-31",
+                "verified": datetime.now().isoformat(),
+            }
+        )
+        raw = json.loads(lic.CACHE_FILE.read_text())
+        raw["data"]["expires"] = "2199-12-31"  # extend the licence by hand
+        lic.CACHE_FILE.write_text(json.dumps(raw))
+
+        assert lic.load_cached_license() is None
+
+    @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
+    @patch("pyobfus_pro.license.urllib.request.urlopen")
+    def test_revocation_defeats_a_valid_cache(self, mock_urlopen):
+        """A revoked licence must stop working even with a fresh cache.
+
+        It did not. The server's rejection arrived as a generic error, the
+        cache fallback swallowed it, and the client reported the licence as
+        valid while printing the server's own word "revoked" in the message.
+        """
+        import urllib.error
+
+        import pyobfus_pro.license as lic
+
+        lic.cache_license(
+            {
+                "key": "PYOB-AAAA-BBBB-CCCC-DDDD",
+                "type": "pro",
+                "expires": "2099-12-31",
+                "verified": datetime.now().isoformat(),
+            }
+        )
+
+        for payload in (
+            {"valid": False, "code": "revoked", "error": "License is revoked"},
+            # A client can be newer than the deployed Worker, so the text-only
+            # form has to be understood too.
+            {"valid": False, "error": "License is revoked"},
+        ):
+            mock_urlopen.side_effect = urllib.error.HTTPError(
+                url="",
+                code=403,
+                msg="Forbidden",
+                hdrs=None,  # type: ignore[arg-type]
+                fp=io.BytesIO(json.dumps(payload).encode()),
+            )
+            with patch.object(lic, "CACHE_DURATION", timedelta(seconds=0)):
+                with pytest.raises(LicenseRevokedError):
+                    verify_license("PYOB-AAAA-BBBB-CCCC-DDDD")
+
+    @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
+    @patch("pyobfus_pro.license.urllib.request.urlopen")
+    def test_a_condition_that_is_not_about_the_licence_keeps_it_working(self, mock_urlopen):
+        """Device limits and outages must not block someone who has paid."""
+        import urllib.error
+
+        import pyobfus_pro.license as lic
+
+        lic.cache_license(
+            {
+                "key": "PYOB-AAAA-BBBB-CCCC-DDDD",
+                "type": "pro",
+                "expires": "2099-12-31",
+                "verified": datetime.now().isoformat(),
+            }
+        )
+
+        for side_effect in (
+            urllib.error.HTTPError(
+                url="",
+                code=403,
+                msg="Forbidden",
+                hdrs=None,  # type: ignore[arg-type]
+                fp=io.BytesIO(
+                    json.dumps(
+                        {"valid": False, "code": "device_limit", "error": "Device limit reached"}
+                    ).encode()
+                ),
+            ),
+            urllib.error.HTTPError(
+                url="",
+                code=403,
+                msg="Forbidden",
+                hdrs=None,  # type: ignore[arg-type]
+                fp=io.BytesIO(b"error code: 1010"),
+            ),
+            urllib.error.URLError("no route to host"),
+        ):
+            mock_urlopen.side_effect = side_effect
+            with patch.object(lic, "CACHE_DURATION", timedelta(seconds=0)):
+                result = verify_license("PYOB-AAAA-BBBB-CCCC-DDDD")
+            assert result["valid"] is True
+
+    @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
+    @patch("pyobfus_pro.license.urllib.request.urlopen")
+    def test_an_unreachable_server_is_a_distinct_failure(self, mock_urlopen):
+        """With no cache, "we could not ask" must be distinguishable."""
+        import urllib.error
+
+        mock_urlopen.side_effect = urllib.error.URLError("no route to host")
+        with pytest.raises(LicenseServerUnreachableError):
+            verify_license("PYOB-AAAA-BBBB-CCCC-DDDD")
+
+        mock_urlopen.side_effect = urllib.error.HTTPError(
+            url="",
+            code=404,
+            msg="Not Found",
+            hdrs=None,  # type: ignore[arg-type]
+            fp=None,
+        )
+        with pytest.raises(LicenseVerificationError) as excinfo:
+            verify_license("PYOB-AAAA-BBBB-CCCC-DDDD")
+        assert not isinstance(excinfo.value, LicenseServerUnreachableError)

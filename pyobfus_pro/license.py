@@ -74,6 +74,19 @@ class LicenseVerificationError(LicenseError):
     pass
 
 
+class LicenseServerUnreachableError(LicenseVerificationError):
+    """Raised when no definitive answer could be obtained from the server.
+
+    This is deliberately distinct from an answer the server actually gave.
+    A network failure, an edge that blocks the request before it arrives, or
+    an unparseable response all mean "we do not know", not "this licence is
+    bad". A paying customer must not be blocked because of our own
+    infrastructure, so callers treat this as a warning rather than a refusal.
+    """
+
+    pass
+
+
 class LicenseExpiredError(LicenseError):
     """Raised when license has expired."""
 
@@ -186,10 +199,38 @@ def verify_license(license_key: str) -> Dict[str, Any]:
                 "message": f"License valid (cached, verification failed: {str(e)[:50]})",
             }
 
-        # No cached license and verification failed
-        raise LicenseVerificationError(
-            f"License verification failed and no valid cache available: {str(e)}"
+        # No cached license and verification failed. Keep the distinction
+        # between "the server rejected this licence" and "we never got an
+        # answer": the caller decides very differently on each.
+        failure = (
+            LicenseServerUnreachableError
+            if isinstance(e, LicenseServerUnreachableError)
+            else LicenseVerificationError
         )
+        raise failure(f"License verification failed and no valid cache available: {str(e)}")
+
+
+def _definitive_failure(code: Optional[str], message: Optional[str]) -> LicenseError:
+    """Map an answer the server actually gave onto the right exception.
+
+    Revocation is the one control that must survive a cached licence, so it has
+    to arrive as ``LicenseRevokedError``: ``verify_license`` re-raises that
+    without consulting the cache, while anything else falls back to the cache
+    and keeps the customer working. Before this mapping existed the server
+    could answer "License is revoked" and the client would carry on, reporting
+    the licence as valid, because the rejection arrived as a generic error and
+    was swallowed by that same fallback.
+
+    ``code`` is the stable machine-readable field. The text fallback is not
+    decoration: a newly released client reaches whatever Worker is deployed at
+    the time, which may predate the field.
+    """
+    text = (message or "").lower()
+    if code == "revoked" or (not code and "revoked" in text):
+        return LicenseRevokedError(message or "License has been revoked")
+    if code == "expired" or (not code and "expired" in text):
+        return LicenseExpiredError(message or "License has expired")
+    return LicenseVerificationError(message or "License verification failed")
 
 
 def _verify_online(license_key: str) -> Dict[str, Any]:
@@ -240,8 +281,7 @@ def _verify_online(license_key: str) -> Dict[str, Any]:
                 "features": data.get("features", {}),
             }
         else:
-            error_msg = data.get("error", "License verification failed")
-            raise LicenseVerificationError(error_msg)
+            raise _definitive_failure(data.get("code"), data.get("error"))
 
     except urllib.error.HTTPError as e:
         if e.code == 404:
@@ -253,24 +293,27 @@ def _verify_online(license_key: str) -> Dict[str, Any]:
             # between the client and the Worker rejected the request, and the
             # license itself may be perfectly valid. Say so, and point at the
             # offline path, instead of reporting a bare "Access denied".
+            server_code = None
+            server_msg = None
             try:
                 error_data = json.loads(e.read())
+                server_code = error_data.get("code")
                 server_msg = error_data.get("error")
             except (json.JSONDecodeError, ValueError, IOError):
-                server_msg = None
+                pass
             if server_msg:
-                raise LicenseVerificationError(server_msg)
-            raise LicenseVerificationError(
+                raise _definitive_failure(server_code, server_msg)
+            raise LicenseServerUnreachableError(
                 "blocked by the network before reaching the license server "
                 "(HTTP 403, non-server response body). Your license may still be "
                 "valid. Try another network, or register offline with: "
                 f"pyobfus-license register {license_key} --no-verify"
             )
-        raise LicenseVerificationError(f"HTTP error: {e.code}")
+        raise LicenseServerUnreachableError(f"HTTP error: {e.code}")
     except urllib.error.URLError as e:
-        raise LicenseVerificationError(f"Network error: {e.reason}")
+        raise LicenseServerUnreachableError(f"Network error: {e.reason}")
     except json.JSONDecodeError:
-        raise LicenseVerificationError("Invalid response from license server")
+        raise LicenseServerUnreachableError("Invalid response from license server")
 
 
 def _validate_license_format(license_key: str) -> bool:
@@ -347,16 +390,24 @@ def load_cached_license() -> Optional[Dict[str, Any]]:
                 CACHE_FILE.unlink()  # Delete corrupted cache
                 return None
 
-            # Verify device fingerprint
-            current_device = get_device_fingerprint()
-            cached_device = cached["data"].get("device_id")
-
-            if cached_device != current_device:
-                # Different device - cache not valid here
-                # Don't delete (might be network drive), just return None
-                return None
-
-            return cast(Dict[str, Any], cached["data"])
+            # The device fingerprint is recorded, but a mismatch is NOT
+            # fatal. It used to be, and that reliably locked out paying
+            # customers: the fingerprint changes when the machine's identity
+            # merely drifts (an OS point update alone is enough), at which
+            # point the cache vanished, the CLI announced "No license key
+            # found", and re-registering burned another of three device slots
+            # that nothing can free. A customer reported exactly this in
+            # 2026-06 ("it keeps thinking I'm different devices").
+            #
+            # Dropping the check costs no protection it was actually
+            # providing. The HMAC signature above is what resists tampering,
+            # and it still runs. The device check was standing in as an
+            # anti-copy measure, which the documented offline path
+            # (`pyobfus-license register KEY --no-verify`) already nullifies:
+            # anyone willing to copy this file can simply register instead.
+            data = cast(Dict[str, Any], cached["data"])
+            data["device_changed"] = data.get("device_id") != get_device_fingerprint()
+            return data
 
         else:
             # Unknown version - ignore
