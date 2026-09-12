@@ -342,10 +342,12 @@ def test_build_server_advertises_this_packages_version() -> None:
     "1.29.1"}` — the mcp SDK's version, not this package's 0.3.10. Clients saw
     a version pyobfus-mcp has never had, changing on every SDK bump.
 
-    `FastMCP.__init__` takes no `version=` kwarg (removed between mcp 1.0 and
-    1.20+, see CHANGELOG 0.1.2) and does not inherit it from package metadata;
-    it leaves the inner low-level `Server.version` at None and the SDK then
-    advertises its own.
+    On mcp 1.x, `FastMCP.__init__` takes no `version=` kwarg (removed between
+    mcp 1.0 and 1.20+, see CHANGELOG 0.1.2) and does not inherit it from
+    package metadata; it leaves the inner low-level `Server.version` at None
+    and the SDK then advertises its own. mcp 2.x accepts `version=` directly,
+    so the seam differs by SDK major and this test checks whichever exists —
+    the assertion that matters is what a client receives either way.
     """
     pytest = __import__("pytest")
     try:
@@ -357,17 +359,25 @@ def test_build_server_advertises_this_packages_version() -> None:
 
     app = _build_server()
 
+    # mcp 2.x: `version` is a public attribute set from the constructor.
+    # mcp 1.x: it lives on the private inner low-level server, written by
+    # `_set_server_version`. Exactly one of these exists per SDK major.
+    advertised = getattr(app, "version", None)
     inner = getattr(app, "_mcp_server", None)
-    assert inner is not None, (
-        "FastMCP no longer exposes `_mcp_server`; _set_server_version() has lost "
-        "its seam and the advertised version has silently regressed"
-    )
-    assert inner.version == pyobfus_mcp.__version__
 
-    # What the client actually receives on `initialize`.
-    opts = inner.create_initialization_options()
-    assert opts.server_version == pyobfus_mcp.__version__, (
-        f"handshake advertises {opts.server_version!r}, expected "
+    assert advertised or inner is not None, (
+        "the SDK exposes neither a public `version` nor the `_mcp_server` seam; "
+        "the advertised version has silently regressed"
+    )
+
+    if inner is not None:
+        assert inner.version == pyobfus_mcp.__version__
+        # What the client actually receives on `initialize`.
+        opts = inner.create_initialization_options()
+        advertised = opts.server_version
+
+    assert advertised == pyobfus_mcp.__version__, (
+        f"handshake advertises {advertised!r}, expected "
         f"{pyobfus_mcp.__version__!r} — the SDK version is leaking again"
     )
 

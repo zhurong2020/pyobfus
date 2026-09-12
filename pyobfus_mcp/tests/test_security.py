@@ -26,7 +26,6 @@ from pyobfus_mcp._security import (
     validate_path,
 )
 
-
 # ---------------------------------------------------------------------------
 # validate_path
 # ---------------------------------------------------------------------------
@@ -214,9 +213,7 @@ def test_audit_log_file_failure_falls_back_to_stderr(
     # exist and isn't creatable as a directory). audit_log should swallow
     # the OSError and emit to stderr instead — we never want to silently
     # drop an audit record.
-    monkeypatch.setenv(
-        "PYOBFUS_MCP_AUDIT_LOG", "/nonexistent_root_xyz_12345/cant/write/here.jsonl"
-    )
+    monkeypatch.setenv("PYOBFUS_MCP_AUDIT_LOG", "/nonexistent_root_xyz_12345/cant/write/here.jsonl")
 
     audit_log("test_tool", {"x": 1}, "success", 1.0)
 
