@@ -254,6 +254,16 @@ Recommended first increment: design a `build_report` schema that reuses the
 current `plan`, syntax verification and provenance builders. Do not expose a
 new flag until schema ownership, redaction and compatibility rules are written.
 
+**Implementation update (2026-09-12): complete in `[Unreleased]`, planned for
+Core 0.5.24.** The rules are now explicit in
+[VERIFIABLE_BUILD_REPORT.md](VERIFIABLE_BUILD_REPORT.md), and
+`--build-report PATH` implements the v1 completed-build projection. It is
+deterministic for identical facts/output bytes, writes atomically, hashes only
+generated `.py` output, strips user-authored exclusion-pattern contents, uses
+relative-or-basename labels, records omitted verification as unrequested, and
+refuses path collisions with input/output/mapping/provenance artifacts. Version
+bump, tag and publication remain separately gated.
+
 ### 8. Community build marker — GO / P2 design, implementation gated
 
 The free edition already emits a visible pyobfus attribution header. Adding a
@@ -282,8 +292,8 @@ Detailed threat model, schema impact and acceptance criteria are in
    can ship independently, then prefer SARIF when available.
 3. Add the Python 3.14 remote-debug advisory and deployment recipe.
 4. Run MCP conformance as a research/CI spike.
-5. Design the shared build-report fact model, then implement the privacy-safe
-   Community marker as one consumer of that model.
+5. ✅ Design and implement the shared build-report fact model; the Community
+   marker shipped first in 0.5.23 and is now one of the report's fact inputs.
 6. Reassess only after the 09-01 release download window and the planned user
    Discussion produce fresh demand evidence.
 

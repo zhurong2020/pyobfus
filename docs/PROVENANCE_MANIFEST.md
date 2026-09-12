@@ -11,6 +11,13 @@ The manifest is designed for offline audit and reproducibility records. It does
 not call a network service, and it does not prove that the generated code is
 safe or trustworthy.
 
+For a privacy-safe operational summary that links these provenance facts to
+the dry-run selection model, transformation/cache counters and verification
+evidence, combine it with `--build-report`; see
+[VERIFIABLE_BUILD_REPORT.md](VERIFIABLE_BUILD_REPORT.md). The provenance
+manifest remains the richer supply-chain record and retains its existing v1
+contract.
+
 ## Recorded Data
 
 The top-level manifest keeps pyobfus's native provenance contract:

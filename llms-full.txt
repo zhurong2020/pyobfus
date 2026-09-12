@@ -28,6 +28,7 @@ pyobfus src/ -o dist/ --save-mapping mapping.json  # for later unmap
 pyobfus src/ -o dist/ --dry-run                    # preview without writing
 pyobfus src/ -o dist/ --dry-run --json             # + versioned `plan` object (0.5.19)
 pyobfus src/ -o dist/ --verify-syntax --json       # compile output in memory after writing (0.5.19)
+pyobfus src/ -o dist/ --build-report report.json   # completed-build fact model (next release)
 pyobfus src/ -o dist/ --no-community-marker        # suppress the '# pyobfus:generated' marker (0.5.23)
 
 # In GitHub Actions, prefer the action over raw steps -- it separates findings
@@ -60,6 +61,9 @@ Success JSON schema (when `--json` is set):
     "anti_debug_checks": 0
   },
   "mapping": "mapping.json",
+  "provenance_manifest": "provenance.json",
+  "build_report": "report.json",
+  "trace_marker_id": null,
   "ai_hint": "Obfuscation complete. To reverse a production traceback: pyobfus --unmap --trace error.log --mapping mapping.json"
 }
 ```
@@ -71,6 +75,15 @@ false`). With `--verify-syntax` it adds a `verification` object (`mode:
 "syntax-only"`, `syntax_valid`, `files_checked`, `execution_performed: false`,
 `pycache_written: false`); a syntax failure exits non-zero with
 `error_type: "SyntaxVerificationError"`.
+
+With `--build-report PATH`, pyobfus atomically writes a separate versioned
+`pyobfus-build-report` JSON artifact after the build and any requested syntax
+verification/provenance work succeed. It joins selection/config facts,
+transform/cache counters, verification evidence, generated-file SHA-256 values,
+artifact roles, marker state, and provenance linkage. Paths are relative labels
+or basenames; source content, user-authored exclusion patterns, secrets, and
+license/buyer/device values are excluded. Hashes are not signatures, and an
+unrequested syntax check is recorded as `mode: "none"`, never as passed.
 
 Error JSON schema (applies to LimitExceededError / PyObfusError / ParseError / generic):
 
@@ -293,7 +306,7 @@ also returns a `next_tool` field naming the next MCP tool to call.
 
 ## Versioning
 
-pyobfus follows semver. AI-native features (preflight, init, unmap, JSON CLI, MCP server) are baseline. v0.5 adds composable Pro flags (`--selective-opacity --seal-code --vault --scrub-traceback --fingerprint --expire-hard`, plus `--period --opacity-config --bind-device`/`--bind-device-id` in 0.5.3, device-lock extended to Vault keys in 0.5.4, and `--import-obfuscation` in 0.5.7) to the normal `pyobfus SRC -o OUT --level pro --<flag>` command. Community-side additions since: `--provenance-manifest` (0.5.5), config-aware `--check` with an excluded-file bucket and a dependency-hallucination advisory (0.5.18), and `--dry-run --json` structured plans plus `--verify-syntax` (0.5.19), SARIF 2.1.0 export of `--check` findings via `--sarif` (0.5.21), a Python 3.14 remote-debug hardening advisory in `--check` for builds that request anti-debug protection (0.5.22), and a versioned `# pyobfus:generated` build marker with `--community-marker/--no-community-marker` plus the `community_marker` config key (0.5.23, which also stopped generated output from embedding the input file's absolute path). There is no `build` subcommand. Breaking changes to JSON schemas are flagged with a `version` field bump.
+pyobfus follows semver. AI-native features (preflight, init, unmap, JSON CLI, MCP server) are baseline. v0.5 adds composable Pro flags (`--selective-opacity --seal-code --vault --scrub-traceback --fingerprint --expire-hard`, plus `--period --opacity-config --bind-device`/`--bind-device-id` in 0.5.3, device-lock extended to Vault keys in 0.5.4, and `--import-obfuscation` in 0.5.7) to the normal `pyobfus SRC -o OUT --level pro --<flag>` command. Community-side additions since: `--provenance-manifest` (0.5.5), config-aware `--check` with an excluded-file bucket and a dependency-hallucination advisory (0.5.18), and `--dry-run --json` structured plans plus `--verify-syntax` (0.5.19), SARIF 2.1.0 export of `--check` findings via `--sarif` (0.5.21), a Python 3.14 remote-debug hardening advisory in `--check` for builds that request anti-debug protection (0.5.22), a versioned `# pyobfus:generated` build marker with `--community-marker/--no-community-marker` plus the `community_marker` config key (0.5.23, which also stopped generated output from embedding the input file's absolute path), and the `[Unreleased]` `--build-report` completed-build fact model planned for 0.5.24. There is no `build` subcommand. Breaking changes to JSON schemas are flagged with a `version` field bump.
 
 ## Common selection questions
 

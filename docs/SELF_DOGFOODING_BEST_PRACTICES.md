@@ -289,9 +289,12 @@ Rules:
    design and turn parse errors + new unsuppressed high findings into a PR gate.
 4. **0.5.22 marker work:** add path/time/environment variance tests and remove
    the current absolute-path header leak.
-5. **Build-report MVP:** report lane/tool version, artifact digests,
-   deterministic comparison status and verification outcomes from the shared
-   fact model without overstating trust.
+5. **Build-report MVP — implemented in `[Unreleased]` 2026-09-12:** report
+   tool version, artifact digests, cache outcome and verification evidence from
+   the shared fact model without overstating trust. The v1 report deliberately
+   does not claim cross-run reproducibility for randomized transforms; it is
+   byte-stable only for identical facts and output bytes. See
+   [VERIFIABLE_BUILD_REPORT.md](VERIFIABLE_BUILD_REPORT.md).
 
 Promotion criteria between phases: stable fingerprint/rule IDs, zero secret or
 absolute-path leakage, explainable baseline changes, acceptable CI time, and at

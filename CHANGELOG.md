@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Versioned verifiable build report.** `--build-report PATH` atomically writes
+  a deterministic, privacy-safe JSON fact model after a successful build. It
+  unifies the existing dry-run selection/config facts, transformation and cache
+  counters, syntax-verification evidence, generated-file hashes, artifact
+  roles, build-marker state, and provenance-manifest linkage. Paths are relative
+  labels or basenames; source content, secrets, license/buyer/device data, and
+  absolute home paths are excluded. The report makes evidence-scoped claims
+  only: output hashes are not signatures, and an omitted syntax check is
+  recorded as unrequested rather than passed. See
+  [docs/VERIFIABLE_BUILD_REPORT.md](docs/VERIFIABLE_BUILD_REPORT.md).
+
 ## [0.5.23] - 2026-09-10
 
 ### Fixed

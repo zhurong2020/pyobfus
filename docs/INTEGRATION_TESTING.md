@@ -72,6 +72,19 @@ pyobfus /path/to/your/project -o /tmp/out --verify-syntax --json
 `--verify-syntax` 在写盘后于内存中 `compile()` 生成的 `.py`（不 import、不执行、
 不写 `__pycache__`），报告 `syntax_valid`。
 
+如需保存统一的构建证据，可组合：
+
+```bash
+pyobfus /path/to/your/project -o /tmp/out \
+  --verify-syntax \
+  --provenance-manifest /tmp/provenance.json \
+  --build-report /tmp/build-report.json \
+  --json
+```
+
+`--build-report` 只在成功构建后原子写入，汇总选择、配置、变换/缓存统计、验证、
+输出哈希、artifact role、marker 与 provenance 关联；不含源码、绝对路径或敏感配置值。
+
 ### 4. 验证行为不变（最重要的一步）
 
 混淆的正确性最终要靠**运行目标项目自己的测试套件**来判断：把混淆产物放到
