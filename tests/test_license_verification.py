@@ -7,7 +7,6 @@ These tests verify the license verification, caching, and management functionali
 import hashlib
 import io
 import json
-import platform
 import sys
 import tempfile
 from datetime import datetime, timedelta
@@ -21,7 +20,6 @@ import pytest
 # Pylance/mypy may show type conflicts between real and stub implementations - this is expected
 try:
     from pyobfus_pro.license import (  # type: ignore[import-not-found,import-untyped]
-        LicenseRevokedError,
         LicenseServerUnreachableError,
         CACHE_FILE,  # type: ignore[no-redef]
         LicenseExpiredError,  # type: ignore[no-redef]
@@ -646,12 +644,15 @@ class TestFailureModeRegression:
 
     @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
     def test_cache_survives_a_changed_device_fingerprint(self):
-        """An OS update must not make a registered licence disappear.
+        """A machine whose identity changed must not lose its licence.
 
-        The fingerprint hashes the OS release, so a macOS point update alone
-        changed the device identity. The cache was then rejected, the CLI said
-        "No license key found", and re-registering consumed another of three
-        device slots that nothing could free.
+        The fingerprint used to hash the OS release, so a macOS point update
+        alone changed the device identity. The cache was then rejected, the
+        CLI said "No license key found", and re-registering consumed another
+        of three device slots that nothing could free. The fingerprint is
+        stable now (see TestFingerprintStability), but the cache must still
+        tolerate a mismatch: restored backups and recreated containers get a
+        new identifier, and neither is a reason to revoke someone's licence.
         """
         import pyobfus_pro.license as lic
 
@@ -664,10 +665,9 @@ class TestFailureModeRegression:
             }
         )
 
-        real_release = platform.release()
-        with patch("platform.release", return_value=real_release + ".1"):
+        with patch.object(lic, "get_device_fingerprint", return_value="0123456789abcdef"):
             cached = lic.load_cached_license()
-            assert cached is not None, "an OS update wiped the cached licence"
+            assert cached is not None, "a changed identity wiped the cached licence"
             assert cached["key"] == "PYOB-AAAA-BBBB-CCCC-DDDD"
             assert cached["device_changed"] is True
             assert lic.get_license_status() is not None

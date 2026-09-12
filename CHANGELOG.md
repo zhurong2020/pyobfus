@@ -67,6 +67,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `code` field for this; the client also reads the older text-only form, since
   a released client can reach a server that predates the field.
 
+- **A machine keeps the same identity across operating-system updates.** The
+  device identifier was derived from the MAC address, the hostname and the OS
+  release, so a routine update changed it. `uuid.getnode()` made this worse:
+  Python returns a *random* number when no hardware address is readable, and
+  modern systems randomise MAC addresses anyway. A random identifier is now
+  generated once and kept in `~/.pyobfus/device_id`, stable across OS
+  upgrades, virtual environments and rebuilt containers. Nothing needs to be
+  re-registered: an identifier that has changed no longer invalidates the
+  local licence, and the server retires the oldest device rather than refusing
+  a new one.
+
+  That file can be copied to another machine. So could the licence cache
+  beside it, and `register --no-verify` already registers a licence without
+  contacting the server, so hardware guessing was resisting nobody while
+  costing real customers their licences. Device limits keep one key from
+  spreading across an organisation; revocation, which now works, handles
+  abuse.
+
 - **The licence server no longer refuses a fourth device.** Nothing ever
   removed a device, so every reinstall, replacement machine or drifting
   fingerprint permanently consumed one of three slots. Lockout was not a risk
