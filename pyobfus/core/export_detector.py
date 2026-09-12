@@ -6,7 +6,21 @@ exported by a Python module using AST analysis.
 """
 
 import ast
-from typing import Set
+from typing import Dict, NamedTuple, Optional, Set
+
+
+class ReExportSource(NamedTuple):
+    """Where a re-exported name is actually defined.
+
+    A module that does ``from .core import run`` and lists ``run`` in
+    ``__all__`` exports a name it does not define. The obfuscated name has to
+    come from the defining module, otherwise the package advertises an
+    identifier that does not exist in it.
+    """
+
+    module: Optional[str]  # module as written, None for ``from . import x``
+    level: int  # leading dots; 0 for an absolute import
+    original_name: str  # name in the source module, before any ``as`` alias
 
 
 class ExportDetector(ast.NodeVisitor):
@@ -37,6 +51,10 @@ class ExportDetector(ast.NodeVisitor):
 
         # Names in __all__ list
         self.all_names: Set[str] = set()
+
+        # Names this module imported rather than defined, keyed by the local
+        # name. Used to resolve re-exports back to their defining module.
+        self.imported_from: Dict[str, ReExportSource] = {}
 
         # Track nesting level (only process top-level)
         self._nesting_level: int = 0
@@ -152,6 +170,11 @@ class ExportDetector(ast.NodeVisitor):
                 if name != "*" and not name.startswith("_"):
                     # This could be a re-export
                     self.potential_exports.add(name)
+                    self.imported_from[name] = ReExportSource(
+                        module=node.module,
+                        level=node.level,
+                        original_name=alias.name,
+                    )
 
         self.generic_visit(node)
 

@@ -62,6 +62,13 @@ class GlobalSymbolTable:
         # Used for debugging and validation
         self._reverse_mapping: Dict[str, Tuple[str, str]] = {}
 
+        # Importable alias -> registered module name.
+        # A package's exports live under the module name of its __init__ file
+        # ("pkg.__init__"), but consumers import them from the package itself
+        # ("from pkg import thing"). Without this, such an import resolves to
+        # nothing and is left untouched while its uses are renamed.
+        self._module_aliases: Dict[str, str] = {}
+
     def register_export(self, module: str, original_name: str, obfuscated_name: str) -> None:
         """
         Register a name exported by a module.
@@ -92,6 +99,30 @@ class GlobalSymbolTable:
         self.used_names.add(obfuscated_name)
         self._reverse_mapping[obfuscated_name] = (module, original_name)
 
+    def register_reexport(self, module: str, original_name: str, obfuscated_name: str) -> None:
+        """Point a re-exported name at the obfuscated name of its definition.
+
+        Unlike :meth:`register_export` this does not claim ownership of the
+        obfuscated name: the defining module keeps it in the reverse mapping,
+        and reusing it here is an alias rather than a collision.
+        """
+        if module not in self.module_exports:
+            self.module_exports[module] = {}
+
+        self.module_exports[module][original_name] = obfuscated_name
+        self.used_names.add(obfuscated_name)
+
+    def register_module_alias(self, alias: str, target: str) -> None:
+        """Let ``alias`` resolve to the exports registered under ``target``."""
+        if alias != target:
+            self._module_aliases[alias] = target
+
+    def _resolve_module(self, module: str) -> str:
+        """Return the registered module name for an importable module name."""
+        if module in self.module_exports:
+            return module
+        return self._module_aliases.get(module, module)
+
     def get_obfuscated_import(self, module: str, original_name: str) -> Optional[str]:
         """
         Get the obfuscated name for an import.
@@ -103,7 +134,7 @@ class GlobalSymbolTable:
         Returns:
             Obfuscated name (e.g., "I0"), or None if not found
         """
-        return self.module_exports.get(module, {}).get(original_name)
+        return self.module_exports.get(self._resolve_module(module), {}).get(original_name)
 
     def resolve_import(self, from_module: str, import_name: str) -> Optional[str]:
         """
@@ -145,7 +176,7 @@ class GlobalSymbolTable:
         Returns:
             Dictionary mapping original names to obfuscated names
         """
-        return self.module_exports.get(module, {}).copy()
+        return self.module_exports.get(self._resolve_module(module), {}).copy()
 
     def get_all_modules(self) -> List[str]:
         """
