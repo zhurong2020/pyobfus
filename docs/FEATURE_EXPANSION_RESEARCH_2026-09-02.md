@@ -63,8 +63,13 @@ to more workflows are preferable.
 
 ### Competitors and adjacent tools
 
-- **PyArmor remains 9.2.6**, released 2026-07-23; the prior 08-31 scan's 9.2.7
-  statement was incorrect. Its public 9.3 plan is still developing and names
+- **PyArmor is at 9.2.7** (uploaded 2026-08-29; 9.2.6 was 2026-07-27). This
+  line originally claimed 9.2.6 and called the 08-31 scan's 9.2.7 statement
+  incorrect — that correction was itself wrong, and PyPI's immutable
+  `upload_time` settles it (re-checked 2026-09-12; see
+  `FEATURE_EXPANSION_RESEARCH_2026-09-12.md` §3.4). 9.2.7 adds
+  `ProcessPoolExecutor` generation support and read-only obfuscated modules.
+  Its public 9.3 plan is still developing and names
   RFT performance/refactoring and `build --pack`, not an AI-debug or structured
   review surface. Open issues continue to show the cost of opaque transforms:
   RFT crashes, stochastic `frame.f_code` crashes, slow RFT, group-device

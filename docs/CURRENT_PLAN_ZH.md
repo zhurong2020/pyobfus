@@ -1216,6 +1216,22 @@ provenance endpoint、两个 GitHub Release、MCP Registry `active` / `isLatest`
    - 必须有 rate limit、audit log、无 token passthrough。
    - 不牺牲本地 stdio MCP 的可靠性。
 
+### 🆕 2026-09-12 功能扩展与最佳实践调研（最新一轮，优先读这份）
+
+完整证据、优先级与验收标准见
+[`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
+0.5.24 发布当日按用户要求做的规划轮。两条**实测**结论决定了新顺序：
+① **跨文件模式输出不可复现**（同输入三次构建，哈希随 `PYTHONHASHSEED` 变化；
+单文件模式稳定），意味着 0.5.24 刚发布的 `outputs[].sha256` 第三方无法重建复核
+→ 建议作为下一个功能版本，补完这条证据链；② **`mcp` SDK 2.x 下服务器构建失败**
+（`FastMCP` 已更名 `MCPServer`），当前 `<2.0.0` 上限正在保护用户，但规范
+`2026-07-28` 已 GA、我们停在最高协商 `2025-11-25`，且 CI 那个叫
+`mcp-sdk-latest` 的 job 因本包上限实际并没有在测 2.x → 建议做 spike + 真 2.x
+CI，该 spike 同时就是存量 P2「MCP conformance evidence」。其余顺序：CycloneDX
+版本声明对齐（现写死 1.6，1.7 已是 ECMA-424 第 2 版）、兼容性矩阵、稳定 reason
+code、只读 review Skill 落位 `.github/skills/`、OSPS Baseline 自评、文档诚实性
+更新。**本轮不授权任何实现或发布。**
+
 ### 🆕 2026-09-02 功能扩展调研
 
 完整证据与候选取舍见
@@ -1240,8 +1256,12 @@ delivery archive、hosted MCP 或 license portal 的真实需求。
 5. **继续 hold**：import/runtime verifier 扩展、installer/bundle、hosted MCP、
    mapping 加密和新 transform，等待具体失败案例或重复用户需求。
 
-竞品事实纠正：官方 PyPI 当前 PyArmor 最新仍为 9.2.6（2026-07-23），上次扫描
-写成 9.2.7 属错误，已在扫描文档修正。Nuitka 4.2 新增 Python 3.14 正式支持、
+竞品事实纠正（**此条本身已于 2026-09-12 被推翻，保留原文以记录教训**）：
+当时写「PyArmor 最新仍为 9.2.6（2026-07-23），上次扫描写成 9.2.7 属错误」。
+按 PyPI 不可变的 `upload_time`，9.2.6 是 2026-07-27、**9.2.7 是 2026-08-29**，
+所以 08-31 那轮写 9.2.7 是对的，这条「更正」才是错的、连日期也不对。
+教训与本项目既有的一致：更正（包括更正自己）之前先取证。详见
+[`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md) §3.4。Nuitka 4.2 新增 Python 3.14 正式支持、
 3.15 初步支持和跨平台 installer，但它强化的是“组合与验证报告”方向，不改变
 pyobfus 不追 compiler/installer 主线的判断。
 
