@@ -53,9 +53,13 @@ The scan is config-aware by default: it reads the project's `pyobfus.yaml` and
 reports findings that the configuration already mitigates separately from the
 ones that still stand. Do not present a mitigated finding as an open risk.
 
-Dependency checking is **off** by default and makes no network calls unless
-the user opts in (`--check` has no network step; the MCP tool takes
-`verify_dependencies_online=true`). Ask before turning it on.
+**The two front ends differ on network access, so check which one you are
+using before telling the user anything about it.** The CLI's `--check` runs
+the dependency-hallucination advisory **by default**, which looks each declared
+dependency up on PyPI; pass `--offline` to skip it. The MCP tool is the
+opposite: it makes no network call unless you pass
+`verify_dependencies_online=true`. If the user is on a restricted network or
+cares that nothing leaves the machine, say `--offline` explicitly.
 
 ## Step 2 — preview what a build would produce
 
