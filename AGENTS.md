@@ -5,8 +5,11 @@ the pyobfus codebase. Tool-specific files defer here: `CLAUDE.md` imports this
 file; Cursor / Windsurf / Aider / Codex read `AGENTS.md` natively.
 
 > Looking to *use* pyobfus to protect your own code, not develop it? See the
-> [`pyobfus-protect` skill](skills/pyobfus-protect/SKILL.md) and the
-> [`templates/ai-integration/`](templates/ai-integration/) rule files instead.
+> [`pyobfus-review`](skills/pyobfus-review/SKILL.md) skill (read-only: should
+> we obfuscate this, and what breaks?), the
+> [`pyobfus-protect`](skills/pyobfus-protect/SKILL.md) skill (do it, and verify
+> the result), and the [`templates/ai-integration/`](templates/ai-integration/)
+> rule files instead.
 
 ## What this project is
 
@@ -112,7 +115,7 @@ for the staged policy and current baseline.
 pyobfus/            # core obfuscator: cli.py, config.py, core/, transformers/
 pyobfus_mcp/        # MCP server (FastMCP): pyobfus_mcp/{server,tools,_security}.py
 pyobfus_pro/        # Pro edition (commercial license) — kept separate from core
-skills/             # Claude Code skill (pyobfus-protect) + plugin marketplace
+skills/             # agent skills (pyobfus-review, pyobfus-protect) + plugin marketplace
 templates/          # copy-in AI rule files + python-baseline bootstrap
 tests/ · pyobfus_mcp/tests/ · integration_tests/
 docs/               # CURRENT_PLAN_ZH.md (current plan), archived roadmap/TODO, threat model

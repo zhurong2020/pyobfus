@@ -61,14 +61,21 @@ The server is registered in the **official [MCP Registry](https://registry.model
 
 ### 🧩 Claude Code skill / plugin
 
-This repo is also a **Claude Code plugin marketplace**. The `pyobfus-protect` skill teaches an agent the full "protect Python before shipping — obfuscate **and** verify it still runs" workflow (MCP-first, CLI fallback):
+This repo is also a **Claude Code plugin marketplace**, shipping two skills split by whether they change anything:
+
+| Skill | What it does | Writes? |
+|---|---|---|
+| `pyobfus-protect` | The full "protect Python before shipping — obfuscate **and** verify it still runs" workflow (MCP-first, CLI fallback) | Yes, produces a build |
+| `pyobfus-review` | Answers the question that comes first: is this project safe to obfuscate, what would break, and which artifacts would a build emit. Config-aware `--check` plus `--dry-run`, nothing else | No, read-only |
+
+Both follow the [agentskills.io](https://agentskills.io) `SKILL.md` format, so they also work in GitHub Copilot agent mode, Cursor and Codex CLI, which read skills from `.github/skills/` in your own repository.
 
 ```
 /plugin marketplace add zhurong2020/pyobfus
 /plugin install pyobfus@pyobfus
 ```
 
-See [`skills/`](skills/) for the skill and install details. (This is distinct from [`templates/ai-integration/`](templates/ai-integration/), which are copy-in rule files for *your* project.)
+See [`skills/`](skills/) for both skills and install details. (This is distinct from [`templates/ai-integration/`](templates/ai-integration/), which are copy-in rule files for *your* project.)
 
 ### 🧑‍💻 VS Code extension
 
