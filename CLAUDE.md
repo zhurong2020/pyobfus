@@ -567,6 +567,13 @@ pytest integration_tests/ -v
    `docs/CURRENT_PLAN_ZH.md` 当前状态块）。
 4. `python -m build && twine upload dist/*`（或走 `git tag vX.Y.Z && git push --tags`
    触发 `.github/workflows/release.yml` 的 OIDC 自动发布，是当前实际使用的路径）
+5. **发布后**更新 `CITATION.cff` 的 `version` / `date-released`：Zenodo 的 GitHub
+   集成会**自动归档每个 GitHub Release**，concept DOI 随即指向新归档，cff 落后就
+   与实际归档对不上。先查证再改，别照抄版本号：
+   `curl -sL -H "Accept: application/json" https://doi.org/10.5281/zenodo.20846053`
+   看重定向到哪个 record，再拉 `https://zenodo.org/api/records/<id>` 读
+   `metadata.version`，同时把注释里的 version DOI 换成该 record 的 DOI。
+   （0.5.24 与 0.5.25 各漏过一次，均为事后补。）
 
 **⚠️ 区分两类内容，别把动态徽标误判成需要手动更新的静态文案**（2026-08-17
 教训）：README 顶部 `[![PyPI version](https://img.shields.io/pypi/v/pyobfus.svg)]`

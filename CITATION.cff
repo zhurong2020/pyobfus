@@ -17,7 +17,7 @@ authors:
     given-names: Rong
     orcid: "https://orcid.org/0009-0008-6087-0581"
     affiliation: "Independent Researcher, Shanghai, China"
-version: 0.5.24
+version: 0.5.25
 date-released: "2026-09-12"
 license: Apache-2.0
 repository-code: "https://github.com/zhurong2020/pyobfus"
@@ -35,5 +35,5 @@ keywords:
   - AI-assisted debugging
 # Zenodo concept DOI (all versions — always resolves to the latest archive).
 # Zenodo archives each GitHub release automatically; the concept DOI currently
-# resolves to the v0.5.24 archive, whose version DOI is 10.5281/zenodo.22719510.
+# resolves to the v0.5.25 archive, whose version DOI is 10.5281/zenodo.22721487.
 doi: 10.5281/zenodo.20846053
