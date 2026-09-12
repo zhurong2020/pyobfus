@@ -23,7 +23,19 @@ optional field does not.
 
 The v1 report is deterministic for the same effective configuration and output
 bytes. It intentionally contains no timestamp, random run identifier, or
-absolute-path field. Reports are written atomically only after all requested
+absolute-path field.
+
+Since the next release the *build* is reproducible too, which is what makes the
+recorded digests checkable by the person receiving them: the same input and
+configuration produce the same output bytes, so a recipient can rebuild and
+compare against `outputs[].sha256` instead of taking the value on trust.
+Previously the obfuscated names were assigned from an unordered set, so two
+builds of an unchanged project disagreed. The guarantee is scoped:
+`--numeric-obfuscation` and AES string encryption draw from a CSPRNG per build
+and are expected to differ; a saved mapping carries a `created_at` timestamp,
+although its `marker_id` and name map are stable. The report does not assert
+reproducibility; it records digests, and this property is what lets someone
+else test them. Reports are written atomically only after all requested
 verification and provenance work has succeeded. A failed build therefore never
 leaves a new report that could be mistaken for success. With `--dry-run`, the
 report is listed as a planned optional artifact but is not written.
