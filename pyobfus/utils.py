@@ -82,7 +82,12 @@ def filter_python_files(
     if exclude_patterns is None:
         exclude_patterns = []
 
-    all_py_files = list(directory.rglob("*.py"))
+    # Sorted, not raw rglob order: rglob yields directory-entry order, which
+    # varies by filesystem and machine. Callers use this list to assign
+    # obfuscated names, to build the incremental-cache signature and to order
+    # manifest entries, so an unstable order makes identical inputs produce
+    # different builds on different machines.
+    all_py_files = sorted(directory.rglob("*.py"))
 
     # Filter out excluded files
     filtered_files = [
