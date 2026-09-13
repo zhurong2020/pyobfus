@@ -20,15 +20,17 @@ A Python code obfuscator built with AST-based transformations. **Supports Python
 
 > **🔒 Pro Edition available** — 6 patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator, $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
 
-> **🔎 What's new in v0.5.25** — correctness fixes. A package that re-exports
-> through `__init__.py` now produces a package that actually imports: the
-> re-exported name keeps the obfuscated name of its definition, so `__all__` no
-> longer lists an identifier that exists nowhere, and a consumer's
-> `from pkg import thing` resolves. A module bound by a plain `import json` is
-> no longer renamed out from under its own import statement. Builds are also
-> reproducible now: the same input and configuration produce the same output
-> bytes, so the digests in `--build-report` can be re-derived rather than
-> trusted.
+> **🔎 What's new in v0.5.26** — licensing reliability. Pro activation had been
+> failing for every customer since roughly July: a CDN began rejecting Python's
+> default network signature, so `pyobfus-license register` never reached the
+> licence server and reported a bare "Access denied". Requests now identify
+> themselves, and a block that happens before the server is reached says so and
+> points at `--no-verify`. Four long-standing faults went with it: an operating
+> system update no longer takes a registered licence away, revocation actually
+> takes effect, the server retires the least recently used device instead of
+> refusing a fourth, and `pyobfus-license deactivate` lets you release a machine
+> yourself. **Already installed and stuck?** `pyobfus-license register YOUR-KEY
+> --no-verify` works today, without upgrading.
 
 > 🔔 **Starring this repo doesn't notify you about new releases** — GitHub only
 > sends release notifications to people who explicitly **Watch** it. Click
