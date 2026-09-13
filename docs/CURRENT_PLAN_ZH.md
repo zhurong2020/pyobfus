@@ -226,6 +226,37 @@ Cookbooks / Verifying a build / Distribution，文件仍在仓库、URL 仍可�
 **不学竞品的部分**：他们那 20 多个浏览器端小工具与在线混淆器是流量漏斗式商业模式，
 对我们要养一个 Web 应用，且**直接抵触唯一真正的差异点——代码不离开你的机器**。
 
+### 同日续：用户逐个点过一遍公开门面，查出五处（前四处已修）
+
+**① README 的链接在 PyPI 上全是坏的。** 用户点 `pyobfus-mcp` 得到 404。README 是包的
+long_description，PyPI 把相对链接按 `pypi.org/project/pyobfus/` 解析，**46 条全部落空**。
+它们在 GitHub 上显示完美，而那正是我们平时看的视图。已全改绝对 URL +
+`scripts/check_readme_links.py` 进 CI（正负两向验过）。
+
+**② PyPI 侧边栏推的是内部文档。** "AI Integration Guide" 指向一份四月的内部策略备忘录
+（开头自报我们的下载量与 star 数），"Current Plan" 指向中文内部排期。**后者不该翻译而该撤掉**
+——陌生人从「计划」链接想看的是 Changelog，而它本来就在列表里。前者改指
+`templates/ai-integration/`（那才是它一直承诺的可拷贝说明），腾出的位置给了对比页与 MCP 包。
+⚠️ **要发版才会到 PyPI**，项目 URL 是打包时固化的。
+
+**③ GitHub Pages 站「没渲染」，根因是两个生成器在构建同一个 `docs/`。** RTD 用 mkdocs+Material，
+Pages 用 Jekyll+cayman，后者根本不读 `mkdocs.yml`，所以文档站的所有改进对它无效。
+**而 README 把「购买页」指向的正是这个站**——最该体面的一页是文档构建的副产品。
+已分离：Pages 改 Actions 构建独立的 `landing/index.html`（10 KB，零依赖、零外部请求、
+响应式、跟随深浅色），`docs/_config.yml` 删除，workflow 在部署前断言 README 依赖的
+`#purchase-professional-edition` 锚点仍在。**重复内容也随之消失**（`/COMPARISON.html`
+等旧路径现返回 404）。价格与条款取自 `pyobfus/constants.py` 与既有购买段，未自拟。
+
+**④ README 购买链接的显示文字是 `pyobfus.github.io/purchase`**——那不是我们的域名，已改。
+
+**⑤ Discussions 沉寂**：6 个主题全部由维护者发起，5 个零评论，唯一评论也是自己回的，
+最后两条停在 8 月 1 日。**这不是维护问题而是还没有社区**，多发公告不会改变它，
+暂不投精力，等真实外部提问再顺势开。
+
+**遗留（未做，不急）**：`docs/index.md` 的购买段仍是当年为 Jekyll 写的内联 HTML，
+配色是旧的紫色渐变，与落地页和 logo 的品牌色不一致。Material 能正常渲染，只是不好看。
+
+
 ### 运维缺口（未闭合）
 
 Worker 曾经没有任何重置设备的接口，所以 09-13 清理那位客户的槽位走的是「临时放开
