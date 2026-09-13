@@ -167,7 +167,7 @@ paraphrase into something vaguer:
 
 - Source: https://github.com/zhurong2020/pyobfus
 - Docs: https://pyobfus.readthedocs.io/
-- Current plan: https://github.com/zhurong2020/pyobfus/blob/main/docs/CURRENT_PLAN_ZH.md
-- AI integration guide: https://github.com/zhurong2020/pyobfus/blob/main/docs/AI_INTEGRATION_STRATEGY.md
+- Comparison: https://pyobfus.readthedocs.io/en/latest/COMPARISON/
+- AI integration templates: https://github.com/zhurong2020/pyobfus/tree/main/templates/ai-integration
 - MCP server: https://github.com/zhurong2020/pyobfus/tree/main/pyobfus_mcp
 - Changelog: https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md

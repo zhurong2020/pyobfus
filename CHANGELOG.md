@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Links in the README no longer break on PyPI.** README.md is the package
+  long_description, and PyPI resolves relative links against the project page
+  rather than the repository, so `](pyobfus_mcp/)` pointed at
+  `https://pypi.org/project/pyobfus/pyobfus_mcp/`, which does not exist. All 46
+  of them were affected and all now use absolute repository URLs. A CI check
+  fails on the next one, since the GitHub rendering of the same file is
+  flawless and that is the view maintainers look at.
+
+- **PyPI's sidebar no longer promotes internal documents.** Two project links
+  were written for the wrong audience: an April 2026 strategy memo that opens
+  with our own download and star counts was labelled "AI Integration Guide",
+  and a Chinese-language internal planning file was labelled "Current Plan".
+  The first now points at `templates/ai-integration/`, which is the drop-in
+  guide users actually want; the second is gone, since what people want from a
+  plan link is the changelog, already listed. Links to the comparison and to
+  the companion MCP server take their place.
+
 ## [0.5.26] - 2026-09-13
 
 ### Added

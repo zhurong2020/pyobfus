@@ -90,8 +90,16 @@ Repository = "https://github.com/zhurong2020/pyobfus"
 "Discussions" = "https://github.com/zhurong2020/pyobfus/discussions"
 "Funding" = "https://www.buymeacoffee.com/zhurong052Q"
 "Citation" = "https://doi.org/10.5281/zenodo.20846053"
-"AI Integration Guide" = "https://github.com/zhurong2020/pyobfus/blob/main/docs/AI_INTEGRATION_STRATEGY.md"
-"Current Plan" = "https://github.com/zhurong2020/pyobfus/blob/main/docs/CURRENT_PLAN_ZH.md"
+# These appear in PyPI's sidebar, so they have to be things a stranger
+# evaluating the package would want. Two of them were not: an April 2026
+# internal strategy memo (opening with our own download count and star count)
+# was labelled "AI Integration Guide", and a Chinese-language internal planning
+# file was labelled "Current Plan". Neither was written for this audience.
+# What people actually want from a plan link is the changelog, which is already
+# here.
+"AI Integration Guide" = "https://github.com/zhurong2020/pyobfus/tree/main/templates/ai-integration"
+"Comparison" = "https://pyobfus.readthedocs.io/en/latest/COMPARISON/"
+"MCP Server" = "https://pypi.org/project/pyobfus-mcp/"
 
 [project.scripts]
 pyobfus = "pyobfus.cli:main"
