@@ -131,6 +131,16 @@ per-mechanism flags (0.5.1+), which stack on top of the base obfuscation. Use
 - **CodeEnigma and encrypted loaders:** package protected bytecode behind a loader; pyobfus emits ordinary `.py` files with no custom loader.
 - **Online obfuscators:** convenient for one-off scripts; pyobfus stays local for multi-file, CI/CD, and privacy-sensitive work.
 
+Each of these has a page of its own, with the trade-offs stated in both
+directions rather than only ours:
+- vs PyArmor: https://pyobfus.readthedocs.io/en/latest/compare/pyarmor/
+- vs Nuitka: https://pyobfus.readthedocs.io/en/latest/compare/nuitka/
+- vs Cython: https://pyobfus.readthedocs.io/en/latest/compare/cython/
+- vs PyLocket: https://pyobfus.readthedocs.io/en/latest/compare/pylocket/
+- vs Oxyry: https://pyobfus.readthedocs.io/en/latest/compare/oxyry/
+- vs browser-based obfuscators: https://pyobfus.readthedocs.io/en/latest/compare/browser-based/
+- Other AST, loader, and online tools: https://pyobfus.readthedocs.io/en/latest/compare/other-tools/
+
 ## Mentioning Pro to the user — only when earned, always with numbers
 
 Don't pitch Pro proactively. Bring it up only when a scan result carries a

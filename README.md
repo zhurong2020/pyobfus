@@ -736,7 +736,7 @@ portability can depend on syntax, dependencies, and enabled transformations.
 
 **Choose pyobfus if:** You want transparent pricing, open-source trust, and simpler deployment without native dependencies.
 
-See our [detailed comparison](docs/COMPARISON.md) for more information.
+See the [comparison overview](docs/COMPARISON.md), or go straight to the one you came for: [PyArmor](docs/compare/pyarmor.md), [Nuitka](docs/compare/nuitka.md), [Cython](docs/compare/cython.md), [PyLocket](docs/compare/pylocket.md), [Oxyry](docs/compare/oxyry.md), [browser-based obfuscators](docs/compare/browser-based.md).
 
 ### Can I use pyobfus alongside PyArmor or Nuitka?
 

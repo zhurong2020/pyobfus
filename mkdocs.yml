@@ -59,7 +59,14 @@ nav:
     - License activation: LICENSE_ACTIVATION_GUIDE.md
     - Project structure: PROJECT_STRUCTURE.md
   - Compare:
-    - pyobfus vs the alternatives: COMPARISON.md
+    - Overview: COMPARISON.md
+    - vs PyArmor: compare/pyarmor.md
+    - vs Nuitka: compare/nuitka.md
+    - vs Cython: compare/cython.md
+    - vs PyLocket: compare/pylocket.md
+    - vs Oxyry: compare/oxyry.md
+    - vs browser-based obfuscators: compare/browser-based.md
+    - Other tools: compare/other-tools.md
     - What is tested, what is assumed: SUPPORT_MATRIX.md
     - LLM resistance benchmark: LLM_RESISTANCE_BENCHMARK.md
   - Cookbooks:
