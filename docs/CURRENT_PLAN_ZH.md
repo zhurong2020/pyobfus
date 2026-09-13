@@ -204,6 +204,28 @@ Cloudflare 边缘拦 `urllib` 默认的 `Python-urllib/*` User-Agent（403 +
 `pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]` 有 mcp SDK 2.x 兼容一条，**刻意没有
 捆绑**进这次的紧急修复；且每发一次 MCP 都要手工改 Glama Build steps。
 
+### 同日顺带（文档站与仓库门面）
+
+对着竞品 `pyobfuscate.com` 复看了自家门面，结论是**问题不在缺花哨网站，在导航是
+一份文件清单**：24 条里 7 条是内部规划文档（TODO、当前计划、两份带日期的 feature
+research、distribution research、SDK spike、next-feature decision），公开挂在产品
+文档站目录上，比主题老旧更伤。已按读者意图重组为 Getting started / Compare /
+Cookbooks / Verifying a build / Distribution，文件仍在仓库、URL 仍可访问，不断旧链接。
+
+- **主题 readthedocs → Material**。此前那个选择其实是**默认造成的**：RTD 在没有
+  声明依赖时只装裸 mkdocs。现已建 `docs/requirements.txt` 并在 `.readthedocs.yaml`
+  显式声明，版本钉死，免得主题发版悄悄改线上站。
+- **`docs/internal/` 在构建层排除**。该目录已 gitignore，但有一个归档文件早于该
+  规则、一直在被发布。构建层排除让本地构建与线上一致，不再让 ignore 规则兼两份工作。
+- **修了 7 条一直断着的站内链接**（指向 `../README.md`/`../CHANGELOG.md`/
+  `../CONTRIBUTING.md`/`../pyobfus.yaml` 这些不在文档树里的文件），并新增
+  `mkdocs build --strict` 的 CI job——此前**没有任何 CI 检查文档构建**，所以没人发现。
+- **社交预览图**（`scripts/generate_social_preview.py` + `docs/assets/social-preview.png`）
+  由维护者上传，已核实生效。刻意不用生图模型：卡片的正文全是字，拼错产品名比没有图更糟。
+
+**不学竞品的部分**：他们那 20 多个浏览器端小工具与在线混淆器是流量漏斗式商业模式，
+对我们要养一个 Web 应用，且**直接抵触唯一真正的差异点——代码不离开你的机器**。
+
 ### 运维缺口（未闭合）
 
 Worker 曾经没有任何重置设备的接口，所以 09-13 清理那位客户的槽位走的是「临时放开
