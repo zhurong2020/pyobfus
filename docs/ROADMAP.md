@@ -15,7 +15,7 @@
 > Current state: [`CURRENT_PLAN_ZH.md`](CURRENT_PLAN_ZH.md) and the Glama
 > section of [`DISTRIBUTION_CHANNELS.md`](DISTRIBUTION_CHANNELS.md).
 
-This document outlines **future plans** for pyobfus. For released version history, see [CHANGELOG.md](../CHANGELOG.md). For the detailed AI-era positioning strategy, see [AI_INTEGRATION_STRATEGY.md](AI_INTEGRATION_STRATEGY.md). For execution tracking, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTION_LOG.md).
+This document outlines **future plans** for pyobfus. For released version history, see [CHANGELOG.md](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md). For the detailed AI-era positioning strategy, see [AI_INTEGRATION_STRATEGY.md](AI_INTEGRATION_STRATEGY.md). For execution tracking, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTION_LOG.md).
 
 **Target Users**: Individual developers and small teams shipping Python code in the AI-assisted development era
 **Positioning**: The AI-native Python obfuscator — MCP-ready, framework-aware, open-source alternative to PyArmor
@@ -127,7 +127,7 @@ VS Code trace/config workflow polish once the external queue is stable.
 
 ### Snapshot (2026-05-07, historical)
 
-See [CHANGELOG.md](../CHANGELOG.md) for the latest release and version history.
+See [CHANGELOG.md](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md) for the latest release and version history.
 
 - **pyobfus 0.4.0** released 2026-04-22 (AI-native CLI + framework presets + reverse stack-trace mapping)
 - **pyobfus-mcp 0.1.2** released 2026-05-07 (emergency fix for `FastMCP.__init__()` `version=` kwarg drift in mcp SDK ≥ 1.20; see `pyobfus_mcp/CHANGELOG.md`)
@@ -640,7 +640,7 @@ To maintain focus on core users (individual developers/small teams in the AI-ass
 ## Contributing
 
 Feature requests: GitHub issues with `enhancement` tag.
-See [CONTRIBUTING.md](../CONTRIBUTING.md) for guidelines.
+See [CONTRIBUTING.md](https://github.com/zhurong2020/pyobfus/blob/main/CONTRIBUTING.md) for guidelines.
 
 ---
 

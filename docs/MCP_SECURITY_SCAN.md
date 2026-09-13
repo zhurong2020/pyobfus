@@ -3,7 +3,7 @@
 Public MCP directories currently host servers of widely varying security
 quality, and as of mid-2026 there is no widely adopted certification or
 vetting system for publicly distributed MCP servers. `pyobfus-mcp-verify`
-(see the [main README](../pyobfus_mcp/README.md#verifying-tool-integrity))
+(see the [main README](https://github.com/zhurong2020/pyobfus/blob/main/pyobfus_mcp/README.md#verifying-tool-integrity))
 already answers one part of that gap — proving the installed package's tool
 descriptions match what was shipped at release. This document covers a
 different, complementary question: does an independent, third-party scanner

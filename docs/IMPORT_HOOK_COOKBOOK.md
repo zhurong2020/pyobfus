@@ -41,7 +41,7 @@ is the obfuscated form, not your originals.
 ## Multi-module projects
 
 Obfuscate the whole project directory before pointing the import hook at the
-entry script — write a project-level [`pyobfus.yaml`](../pyobfus.yaml) and
+entry script — write a project-level [`pyobfus.yaml`](https://github.com/zhurong2020/pyobfus/blob/main/pyobfus.yaml) and
 run:
 
 ```bash

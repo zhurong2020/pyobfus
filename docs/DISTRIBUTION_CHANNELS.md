@@ -555,6 +555,13 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   - Residual drift, harmless: the search card reads
     `Updated a day ago (2026-09-06 04:31 UTC)`, predating today's 0.3.12 build,
     so the card's timestamp lags the build pipeline.
+- 2026-09-13 **loop closed with Frank in writing.** Replied on the same thread:
+  thanked him for the build fix, confirmed two consecutive successful builds
+  with all eight tools enumerated, and stated plainly that the listing is live
+  and needs no resubmission — including the correction that the earlier doubt
+  came from our side, reading an authentication failure as evidence of
+  absence. Until then the thread's last message had been his, unanswered for
+  six days. Nothing further is owed on this channel.
 
 ### MCP Skills trust score — 🟡 ESTABLISHED / NOT VERIFIED
 - 2026-08-24 official free score API scan for `zhurong2020/pyobfus`: composite

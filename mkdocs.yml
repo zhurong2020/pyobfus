@@ -6,36 +6,73 @@ site_description: AST-based Python obfuscator with reverse stack-trace mapping f
 # well-known path, so opt it back into the generated site.
 exclude_docs: |
   !/.well-known/
+  # Maintainer-only material. The directory is gitignored, so Read the Docs
+  # never saw most of it, but one archived file predates that rule and was
+  # being published. Excluding the directory makes a local build match what
+  # actually ships, instead of relying on the ignore rule to do two jobs.
+  internal/
 
 repo_name: zhurong2020/pyobfus
 repo_url: https://github.com/zhurong2020/pyobfus
 
 theme:
-  name: readthedocs
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.instant
+    - content.code.copy
+    - search.suggest
+    - search.highlight
+  icon:
+    repo: fontawesome/brands/github
 
+plugins:
+  - search
+
+# Navigation is organised by what a reader came to do, not by which files
+# happen to exist. Internal planning documents (TODO, the Chinese current-plan
+# file, dated feature/distribution research, the SDK spike, the next-feature
+# decision) are deliberately NOT listed: they are working notes for maintainers
+# and reading as a public product page's table of contents made the project
+# look like a scratchpad. The files stay in the repository and their built URLs
+# still resolve, so nothing that ever linked to them breaks.
 nav:
   - Home: index.md
-  - Comparison: COMPARISON.md
-  - PyInstaller Cookbook: PYINSTALLER_COOKBOOK.md
-  - 当前计划: CURRENT_PLAN_ZH.md
-  - Support Matrix: SUPPORT_MATRIX.md
-  - TODO: TODO.md
-  - MCP SDK 2.x Spike: MCP_SDK_2X_SPIKE.md
-  - Feature Expansion Research: FEATURE_EXPANSION_RESEARCH_2026-09-12.md
-  - Feature Expansion Research (2026-09-02): FEATURE_EXPANSION_RESEARCH_2026-09-02.md
-  - Distribution Expansion Research: DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md
-  - Open VSX Publish: OPEN_VSX_PUBLISH_PLAN.md
-  - Python 3.8 Compatibility: PYTHON38_COMPATIBILITY.md
-  - License Activation: LICENSE_ACTIVATION_GUIDE.md
-  - Project Structure: PROJECT_STRUCTURE.md
-  - Verifiable Build Report: VERIFIABLE_BUILD_REPORT.md
-  - Provenance Manifest: PROVENANCE_MANIFEST.md
-  - SARIF Code Scanning: SARIF_CODE_SCANNING.md
-  - Remote-Debug Hardening (Py3.14): REMOTE_DEBUG_HARDENING.md
-  - Integration Testing: INTEGRATION_TESTING.md
-  - LLM Resistance Benchmark: LLM_RESISTANCE_BENCHMARK.md
-  - Next Feature Decision: NEXT_FEATURE_DECISION.md
-  - How to Cite: CITATION.md
+  - Getting started:
+    - How to cite: CITATION.md
+    - License activation: LICENSE_ACTIVATION_GUIDE.md
+    - Project structure: PROJECT_STRUCTURE.md
+  - Compare:
+    - pyobfus vs the alternatives: COMPARISON.md
+    - What is tested, what is assumed: SUPPORT_MATRIX.md
+    - LLM resistance benchmark: LLM_RESISTANCE_BENCHMARK.md
+  - Cookbooks:
+    - PyInstaller: PYINSTALLER_COOKBOOK.md
+    - Integration testing: INTEGRATION_TESTING.md
+    - Remote-debug hardening (Python 3.14): REMOTE_DEBUG_HARDENING.md
+    - Python 3.8 compatibility (historical): PYTHON38_COMPATIBILITY.md
+  - Verifying a build:
+    - Verifiable build report: VERIFIABLE_BUILD_REPORT.md
+    - Provenance manifest: PROVENANCE_MANIFEST.md
+    - SARIF code scanning: SARIF_CODE_SCANNING.md
+  - Distribution:
+    - Open VSX publishing: OPEN_VSX_PUBLISH_PLAN.md
 
 markdown_extensions:
   - admonition

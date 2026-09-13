@@ -1,0 +1,8 @@
+# Docs build dependencies for Read the Docs.
+#
+# Read the Docs installs plain mkdocs when nothing is declared, which is why
+# the site sat on the default `readthedocs` theme. The Material theme needs to
+# be requested explicitly. Pinned so a theme release cannot change the
+# published site without a commit here.
+mkdocs>=1.6,<2
+mkdocs-material>=9.7,<10

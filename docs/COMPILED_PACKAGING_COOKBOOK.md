@@ -44,7 +44,7 @@ so the recovered symbol names are the obfuscated ones, not your originals.
 ## Multi-module projects
 
 Obfuscate the whole project directory before compiling, via a project-level
-[`pyobfus.yaml`](../pyobfus.yaml):
+[`pyobfus.yaml`](https://github.com/zhurong2020/pyobfus/blob/main/pyobfus.yaml):
 
 ```bash
 pyobfus src/ -o obf/ --save-mapping module.map.json

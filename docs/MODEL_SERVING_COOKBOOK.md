@@ -37,7 +37,7 @@ pyobfus --unmap traceback.txt --mapping serve.map.json
 The output maps each obfuscated symbol back to its original, readable name.
 This is what makes pyobfus "AI-debuggable" — the workflow survives
 obfuscation instead of fighting it. See
-[`pyobfus --unmap`](../README.md) and the VS Code *Reverse Stack Trace*
+[`pyobfus --unmap`](https://github.com/zhurong2020/pyobfus/blob/main/README.md) and the VS Code *Reverse Stack Trace*
 command (which auto-locates the mapping via the trace marker).
 
 ## Hide weight / model paths (Pro)
