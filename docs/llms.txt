@@ -56,6 +56,18 @@ uvx pyobfus-mcp
 - `docs/RELEASE_PROVENANCE_VERIFICATION.md` — PyPI Integrity API / PEP 740 runbook for checking pyobfus and pyobfus-mcp release provenance
 - `pyobfus --list-presets` — see every preset with a description
 
+## Licence commands (Pro)
+
+- `pyobfus-license register KEY` — activate on this machine. Add `--no-verify`
+  to register offline without contacting the licence server; the licence keeps
+  working, and it consumes no device slot.
+- `pyobfus-license deactivate` (0.5.26) — release this machine so another can
+  take the slot. If the server cannot be reached it changes nothing, since the
+  slot would still be held. Distinct from `remove`, which only clears the local
+  cache and frees nothing.
+- `pyobfus-license status --json` / `pyobfus-trial status --json` — machine-
+  readable licence and trial state.
+
 ## Framework-aware presets (community, free)
 
 - `--preset fastapi` — preserves dependency-injection params, HTTP verbs, router paths

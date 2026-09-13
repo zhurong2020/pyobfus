@@ -221,6 +221,12 @@ pip install --upgrade pyobfus
 pyobfus-license register PYOB-XXXX-XXXX-XXXX-XXXX
 ```
 
+Replacing or retiring a machine? `pyobfus-license deactivate` releases the
+current one so another can take its place. (`pyobfus-license remove` only
+clears the local cache and does not free the slot.) If the licence server
+cannot be reached, `pyobfus-license register YOUR-KEY --no-verify` activates
+locally and keeps working.
+
 ### Activation Guide
 Full activation instructions: [License Activation Guide](https://github.com/zhurong2020/pyobfus/blob/main/docs/LICENSE_ACTIVATION_GUIDE.md)
 
