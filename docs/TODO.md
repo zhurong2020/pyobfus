@@ -172,11 +172,59 @@ JSON，需要版本字段管理，**排在矩阵之后**，因为矩阵会暴露
 
 ## 周期性
 
+- **Alipay 文案复查**：Stripe 上 Alipay 自 2026-09-04 起一直是 `Pending approval`
+  （Cartes Bancaires 同时挂起，更像账号级审核排队而非 Alipay 单独被卡；微信支付已
+  Enabled，中国买家主路径已通）。README 与落地页现写「Alipay (支付宝) is being
+  enabled」——**若到 2026-09-27 仍是 Pending，把这句删掉**，等真 Enabled 再加回来。
+  我们在对外文案上守「说得准」这条线，这里不该例外。可向 Stripe 支持直接问审核在等什么。
+
 - **下载量复查**：等数据覆盖 2026-09-12（当天发了 `0.5.24` 与 `0.5.25` 两版），
   约 09-15 后看基线有没有抬升。注意发布日与验收流量不能当自然增长。
 - **归因查询**：GitHub 代码搜索 `uses: zhurong2020/pyobfus-action`，量的是
   可见性不是采纳量。
 - **竞品扫描**：有触发点再做（新对手 / 生态政策变化 / 临近发布），不定期盯梢。
+
+## 第三方授权（2026-09-13 审计 · 因一封 Vercel 邮件触发）
+
+**判断标准不是「还在用吗」，而是「它能对 pyobfus 做什么」。** `release.yml` 由推送
+`v*.*.*` 标签触发，走 OIDC 直接发布 PyPI 并生成 PEP 740 签名——**任何对本仓库有
+`contents: write` 的第三方，等于对 PyPI 有以你名义发布的能力**。这不是假设某个厂商
+会作恶，是授权本身就该按「能不能」而非「会不会」来给。
+
+已处理：
+
+- **GitHub Learning Lab — 已卸载**。它 2022-09-01 就已关停、课程仓库同年归档，
+  GitHub 自己让人改用 GitHub Skills。装着一个停服四年的 App 只剩一份仍然生效的授权。
+- **Google Labs Jules — 已卸载**（同样带着一个待批的权限升级请求）。
+- **Vercel — 权限升级请求已拒绝**，仓库范围已由 All 收窄到 `pyobfus` 与
+  `pyobfus-action` 两个。它请求的是对 administration / code / repository hooks 的
+  **读写**，而它的用途是自动部署 PR 预览，我们这两个仓库都不由它部署（文档站在
+  Read the Docs，落地页在 GitHub Pages Actions，pyobfus-action 是 Action 仓库）。
+- **giscus — 保留**，用于旧博客的评论（基于 GitHub Discussions）。pyobfus 仓库内无
+  任何引用。
+
+仍待办：
+
+- [ ] **确认 Vercel 是否还需要装着**。若这两个仓库都不由它部署，卸载最干净；留着也
+  **不要批那个权限升级**。当前已授予的权限集无法用 `gh` 枚举（需 GitHub App 自身的
+  token），只能在 <https://github.com/settings/installations> 页面看。
+- [ ] **确认 giscus 的仓库范围只含博客仓库**，不含 pyobfus。同上，需页面查看。
+- [ ] **不要导入 Vercel 提示的那个 "docs" 项目**。它检测到的是 `docs/_config.yml`，
+  该文件已于 2026-09-13 随落地页拆分删除；导入会让同一份 `docs/` 长出第三个公开
+  站点，正是刚消掉的重复内容问题。
+
+## Zenodo webhook token —— 决定「只验证不轮换」
+
+`repos/.../hooks` 的 Zenodo 条目 URL 里内嵌一个 Zenodo 个人访问令牌（通常带 deposit
+写权限）。2026-09-13 排查 Vercel 时曾把 hook 配置整段打印到终端。
+
+**结论：不轮换。** 该值未进仓库、未公开，GitHub 的 webhook 配置本就只有仓库管理员可读；
+而轮换要在 Zenodo 关掉再打开仓库以重新生成 webhook，**concept DOI 与仓库的关联一旦
+出问题，影响的是 `CITATION.cff`、README 徽章和已发出的学术引用**。用一个确定的风险换
+一个很小的风险不划算。
+
+- [ ] 改为**每次发版后验证**：concept DOI 是否指向了新 record。0.5.26 那次正常
+      （record `22731176`），链路健康。
 
 ## 外部等待（不阻塞本地开发）
 
