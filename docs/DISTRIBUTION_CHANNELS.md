@@ -31,8 +31,8 @@ pending.
 
 ### PyPI — `pyobfus`
 - URL: https://pypi.org/project/pyobfus/
-- Current version: **0.5.25** (released 2026-09-12) · ships with PEP 740 attestations via OIDC trusted publishing
-- Current headline: correctness fixes — a package that re-exports through `__init__.py` now produces a package that imports, a module bound by a plain `import` is no longer renamed out from under its own import statement, and the same input now produces the same output bytes, so the digests `--build-report` records can be re-derived rather than trusted.
+- Current version: **0.5.26** (released 2026-09-13) · ships with PEP 740 attestations via OIDC trusted publishing
+- Current headline: licensing reliability — Pro activation had been failing for every customer since roughly 2026-07-08 because a CDN rejected Python's default network signature; alongside that, an OS update no longer takes a registered licence away, revocation now takes effect, the server retires the least recently used device instead of refusing a fourth, and `pyobfus-license deactivate` lets a customer release a machine themselves.
 - Prior headline (0.5.24): `--build-report` writes one versioned, privacy-safe fact model of a completed build — selection/config, transform and cache counters, verification evidence, output digests, artifact roles, marker state, and provenance linkage. Digests are evidence, not signatures; an unrequested syntax check is never reported as passed.
 - Prior headline (0.5.23): generated Community output carries a versioned, transparent build marker; generated output no longer embeds the input file's absolute path. Marker policy is configurable and recorded in dry-run/provenance facts.
 - Prior headline (0.5.19): `--dry-run --json` emits a versioned `plan` object (effective config, selected/excluded files with reasons, artifacts tagged ship/retain-internal/optional; relative labels only, not applyable); opt-in `--verify-syntax` compiles generated output in memory post-build (no import/execute, no `__pycache__`) and reports `syntax_valid` with no runtime-correctness claim.
@@ -226,7 +226,7 @@ pending.
   prior is not evidence of an actual review. Continue tracking installs and
   real reviews, not raw update/download count alone.
 - Wiki: disabled · Discussions: enabled · Issues: open
-- Releases: latest Core `v0.5.25`, MCP `mcp-v0.3.12`, and VS Code
+- Releases: latest Core `v0.5.26`, MCP `mcp-v0.3.12`, and VS Code
   `vscode-v0.4.3`; MCP releases attach wheel+sdist.
 
 ### Open VSX — `zhurong2020.pyobfus` 🟢 LIVE

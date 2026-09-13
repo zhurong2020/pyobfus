@@ -35,7 +35,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   server 拿不到 `2026-07-28` 协议，见 `docs/MCP_SDK_2X_SPIKE.md`）、新增只读
   `pyobfus-review` skill、`COMPARISON.md` 补浏览器端混淆服务小节。
   **下一步做什么看 [`docs/TODO.md`](docs/TODO.md)。**
-- Core **`0.5.25`** / MCP **`0.3.12`** / VS Code **`0.4.3`** 为最新公开版本；VS Code
+- Core **`0.5.26`**（2026-09-13 · 许可系统可靠性）/ MCP **`0.3.12`** / VS Code **`0.4.3`** 为最新公开版本；VS Code
   扩展同时在 **Microsoft Marketplace 与 Open VSX** 上架，两边同为 `0.4.3`（均已 curl 独立复核）。
 - **✅ `Core 0.5.24` 已于 2026-09-12 发布**（用户批准「按照流程发版」）= unified
   verifiable build report。`--build-report PATH` 在构建成功后原子写一份 v1 JSON
@@ -497,7 +497,7 @@ cardiac-manuscripts 仓库（不影响 pyobfus 仓库本身）。
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.9-3.14, AST, setuptools
-- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.25，2026-09-12 发布**；完整版本历史见 `CHANGELOG.md`)
+- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.26，2026-09-13 发布**；完整版本历史见 `CHANGELOG.md`)
 - **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.3，2026-09-10 发布**；Marketplace 与 Open VSX 两边同版本，均已 `curl` 独立复核；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`。**发版必须两个 registry 都发**：Marketplace 手工上传 + `ovsx publish`，runbook 见 `docs/OPEN_VSX_PUBLISH_PLAN.md`)
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.12，2026-09-07 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.18` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp`（**0.3.12** 2026-09-07 发布，2026-09-10 已核实 `active` / `isLatest=true`）
