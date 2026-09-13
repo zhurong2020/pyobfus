@@ -14,6 +14,29 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
+### 🔴 2026-09-13 — 许可系统可靠性（最新 · 冷启动先读这段，再往下看历史）
+
+一位新客户报激活失败，查出**与他无关的全线故障**：Cloudflare 边缘拦 `urllib` 默认
+UA（403 + `error code: 1010`），请求到不了 Worker，**所有付费客户自约 2026-07-08 起
+都激活不了、近两个月无人察觉**。排查中又挖出四个更早的缺陷（8 月那位客户其实也从未
+成功激活、一封求助邮件躺了三个月、设备指纹含 `platform.release()` 导致 OS 升级即丢
+许可、吊销从未生效）。四项修复已全部发布为 **`0.5.26`**（先部署 Worker 再发客户端，
+顺序是硬约束）。真正的产出是两个**机制**：合成监控（`.github/workflows/license-endpoint-monitor.yml`，
+用不存在的 key 打生产端点、零副作用）与 KV 每日自动导出并入 OneDrive 备份
+（`~/scripts/pyobfus_kv_export.sh`，失败拒绝落盘）。
+
+同日另两条线：**公开门面审计**（README 46 条相对链接在 PyPI 上全 404、PyPI 侧边栏推
+内部文档、GitHub Pages 与 RTD 在构建同一个 `docs/` → 拆出独立 `landing/`、对比页拆成
+一页一对手、文档站改 Material）与**第三方授权审计**（判断标准=**对本仓库的写权限即
+等于 PyPI 发布权**，因为 `release.yml` 由推送标签触发走 OIDC）。
+
+**这三条线的完整记述在 [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md) 的 09-13
+段，待办与「明确不做」在 [`docs/TODO.md`](docs/TODO.md)。本文件不复制细节。**
+
+⚠️ 两条会咬人的事实：**`[project.urls]` 与 README 链接修复要发版才会到 PyPI**
+（项目 URL 打包时固化）；**`pyobfus-license deactivate` 需要 Worker 已部署**，
+客户端先于服务端发布会让客户打到不存在的路由。
+
 ### 🟢 2026-09-12 — Core 0.5.25 已发布后的当前焦点
 
 - **✅ `Core 0.5.25` 已于 2026-09-12 发布**（同日第二发；用户批「发版」）= 三项
@@ -518,7 +541,7 @@ pyobfus/
 │   ├── transformers/   # AST 变换器
 │   └── cross_file/    # 跨文件混淆
 ├── pyobfus_pro/       # Pro Edition (商业许可)
-├── tests/             # 1312 passed + 1 skipped (0.5.25 发布前验证；+ integration_tests/ 7 = 1319)
+├── tests/             # 1329 passed + 1 skipped (0.5.26 发布前验证；+ pyobfus_mcp/tests 97 + integration_tests/ 7)
 ├── examples/          # 示例代码
 ├── docs/              # 项目文档
 └── cloudflare-worker/ # 许可验证 Worker
