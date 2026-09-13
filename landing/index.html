@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pyobfus — obfuscate Python before you ship it</title>
+<meta name="description" content="AST-based Python obfuscator. Ships portable .py files, and reverse-maps production stack traces back to your original names so you can still debug what you shipped. Apache-2.0 core, $45 one-time Pro.">
+<link rel="icon" href="logo.jpeg">
+<meta property="og:title" content="pyobfus — obfuscate Python before you ship it">
+<meta property="og:description" content="Ships portable .py files, and reverse-maps production stack traces back to your original names.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://zhurong2020.github.io/pyobfus/">
+<style>
+  :root{
+    --navy:#1a2a5e; --cyan:#22c7e8; --ink:#1c2130; --muted:#5d6b84;
+    --line:#dfe5ee; --bg:#f7f9fc; --card:#fff; --code:#0f1729;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --ink:#e8edf6; --muted:#9aa8bf; --line:#28324a; --bg:#0d1320; --card:#141c2d; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+       -webkit-font-smoothing:antialiased}
+  .bar{height:5px;background:linear-gradient(90deg,var(--navy),var(--cyan))}
+  .wrap{max-width:980px;margin:0 auto;padding:0 24px}
+  a{color:#1668c7} @media (prefers-color-scheme: dark){a{color:var(--cyan)}}
+
+  header{padding:64px 0 48px;text-align:center}
+  header img{width:104px;height:auto;border-radius:14px}
+  h1{font-size:clamp(38px,7vw,62px);margin:18px 0 6px;letter-spacing:-.02em}
+  .lede{font-size:clamp(17px,2.4vw,21px);max-width:640px;margin:0 auto;color:var(--muted)}
+  .cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:32px 0 10px}
+  .btn{display:inline-block;padding:13px 26px;border-radius:8px;text-decoration:none;font-weight:600}
+  .btn-primary{background:var(--navy);color:#fff}
+  .btn-secondary{background:transparent;color:inherit;border:1px solid var(--line)}
+  .note{font-size:14px;color:var(--muted)}
+
+  section{padding:44px 0;border-top:1px solid var(--line)}
+  h2{font-size:clamp(23px,3.4vw,30px);margin:0 0 6px;letter-spacing:-.01em}
+  .sub{color:var(--muted);margin:0 0 26px}
+  .grid{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px}
+  .card h3{margin:0 0 10px;font-size:17px}
+  .card ul{margin:0;padding-left:19px} .card li{margin:7px 0}
+  .price{font-size:36px;font-weight:700;margin:2px 0 2px}
+  .price small{font-size:15px;font-weight:400;color:var(--muted)}
+
+  pre{background:var(--code);color:#e6edf7;padding:18px 20px;border-radius:10px;
+      overflow-x:auto;font-size:14px;line-height:1.6;margin:0}
+  code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .c{color:#8aa0bd}
+
+  .facts{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+         list-style:none;padding:0;margin:0;font-size:14.5px}
+  .facts li{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:12px 14px}
+
+  .honest{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--cyan);
+          border-radius:9px;padding:18px 20px;color:var(--muted);font-size:15px}
+  footer{padding:34px 0 56px;border-top:1px solid var(--line);color:var(--muted);font-size:14.5px}
+  footer a{margin-right:16px;display:inline-block;line-height:2}
+</style>
+</head>
+<body>
+<div class="bar"></div>
+
+<header class="wrap">
+  <img src="logo.jpeg" alt="pyobfus">
+  <h1>pyobfus</h1>
+  <p class="lede">Obfuscate Python before you ship it, and still be able to debug
+  what you shipped.</p>
+  <div class="cta">
+    <a class="btn btn-primary" href="#purchase-professional-edition">Professional Edition — $45</a>
+    <a class="btn btn-secondary" href="https://pyobfus.readthedocs.io/">Read the docs</a>
+    <a class="btn btn-secondary" href="https://github.com/zhurong2020/pyobfus">GitHub</a>
+  </div>
+  <p class="note">Community Edition is free and has no file or line limits.
+  <code>pip install pyobfus</code></p>
+</header>
+
+<section class="wrap">
+  <h2>The problem it actually solves</h2>
+  <p class="sub">Protecting source is easy. Supporting it afterwards is the hard part.</p>
+  <div class="grid">
+    <div class="card">
+      <h3>A traceback you can still read</h3>
+      <p>Obfuscation normally makes production reports useless: a customer sends
+      you a stack trace full of <code>I0</code> and <code>I7</code>. pyobfus keeps
+      a mapping, so <code>--unmap</code> turns that trace back into your original
+      names. The mapping stays with you; the customer only ever gets the
+      obfuscated build.</p>
+    </div>
+    <div class="card">
+      <h3>Output that runs everywhere</h3>
+      <p>The result is ordinary <code>.py</code> files. No native runtime to
+      install, no per-platform build, nothing extra to ship. One build works on
+      every platform your Python already works on.</p>
+    </div>
+    <div class="card">
+      <h3>Checks before you ship, not after</h3>
+      <p><code>--check</code> flags what obfuscation tends to break — <code>eval</code>,
+      dynamic attribute access, framework reflection — and exports SARIF for
+      GitHub Code Scanning. <code>--dry-run --json</code> shows exactly what a
+      build would do before it does it.</p>
+    </div>
+  </div>
+</section>
+
+<section class="wrap">
+  <h2>Start in two commands</h2>
+  <p class="sub">Nothing to sign up for.</p>
+  <pre><code><span class="c"># Free, no limits on files or lines</span>
+pip install pyobfus
+pyobfus src/ -o dist/ --save-mapping mapping.json
+
+<span class="c"># Later, when a customer sends you an obfuscated traceback</span>
+pyobfus --unmap trace.txt --mapping mapping.json</code></pre>
+</section>
+
+<section class="wrap">
+  <h2>Community and Professional</h2>
+  <p class="sub">The free edition is a complete tool, not a demo.</p>
+  <div class="grid">
+    <div class="card">
+      <h3>Community — free, Apache-2.0</h3>
+      <ul>
+        <li>Name obfuscation across a whole project, imports included</li>
+        <li>Reverse stack-trace mapping (<code>--unmap</code>)</li>
+        <li>Pre-flight risk check with SARIF export</li>
+        <li>Reproducible builds and a verifiable build report</li>
+        <li>Framework-aware presets and YAML configuration</li>
+        <li>MCP server, VS Code extension, GitHub Action</li>
+        <li><strong>No file or line limits</strong></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Professional — $45 one-time</h3>
+      <ul>
+        <li>AES-256 string encryption</li>
+        <li>Control-flow flattening</li>
+        <li>Dead-code injection</li>
+        <li>Anti-debugging checks</li>
+        <li>License embedding: expiry, machine binding, run limits</li>
+        <li>Lifetime updates, up to 3 devices</li>
+        <li>Email support</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="wrap" id="purchase-professional-edition">
+  <h2>Purchase Professional Edition</h2>
+  <p class="sub">One payment. No subscription, no renewal.</p>
+  <div class="card">
+    <p class="price">$45 <small>USD, one time</small></p>
+    <p class="note">Card, Apple Pay, or WeChat Pay (微信支付) for buyers in China.
+    Stripe shows the methods available in your region at checkout. Alipay (支付宝)
+    is being enabled.</p>
+    <div class="cta" style="justify-content:flex-start;margin:22px 0 6px">
+      <a class="btn btn-primary" href="https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400">Buy now</a>
+      <a class="btn btn-secondary" href="https://pyobfus.readthedocs.io/en/latest/LICENSE_ACTIVATION_GUIDE/">Activation guide</a>
+    </div>
+    <p class="note">Secure checkout via Stripe. Your licence key arrives by email.
+    30-day money-back guarantee.</p>
+  </div>
+
+  <h3 style="margin:30px 0 8px;font-size:18px">Try it first</h3>
+  <pre><code><span class="c"># 5 days, no registration, no credit card</span>
+pyobfus-trial start
+
+<span class="c"># After you buy</span>
+pyobfus-license register PYOB-XXXX-XXXX-XXXX-XXXX</code></pre>
+</section>
+
+<section class="wrap">
+  <h2>Why you can check our claims</h2>
+  <p class="sub">Every item here is verifiable without taking our word for it.</p>
+  <ul class="facts">
+    <li>Core is Apache-2.0 and readable on GitHub</li>
+    <li>Releases carry PEP&nbsp;740 attestations on PyPI</li>
+    <li>Archived with a DOI at Zenodo</li>
+    <li>OpenSSF Best Practices badge</li>
+    <li>CodeQL on every push</li>
+    <li>Your source never leaves your machine</li>
+  </ul>
+  <p style="margin-top:22px"></p>
+  <div class="honest">
+    <strong>What obfuscation is not.</strong> It raises the cost of reading your
+    code; it is not encryption and it does not make reverse engineering
+    impossible. Anything that must stay secret — keys, licensing decisions, the
+    algorithm itself — belongs behind a server boundary. Our
+    <a href="https://pyobfus.readthedocs.io/en/latest/COMPARISON/">comparison pages</a>
+    say the same thing about the alternatives, including where they beat us.
+  </div>
+</section>
+
+<footer class="wrap">
+  <div>
+    <a href="https://pyobfus.readthedocs.io/">Documentation</a>
+    <a href="https://github.com/zhurong2020/pyobfus">Source</a>
+    <a href="https://pypi.org/project/pyobfus/">PyPI</a>
+    <a href="https://pyobfus.readthedocs.io/en/latest/COMPARISON/">Comparison</a>
+    <a href="https://github.com/zhurong2020/pyobfus/issues">Issues</a>
+  </div>
+  <div>
+    <a href="https://github.com/zhurong2020/pyobfus/blob/main/docs/legal/TERMS_OF_SERVICE.md">Terms</a>
+    <a href="https://github.com/zhurong2020/pyobfus/blob/main/docs/legal/REFUND_POLICY.md">Refunds</a>
+    <a href="https://github.com/zhurong2020/pyobfus/blob/main/docs/legal/PRIVACY_POLICY.md">Privacy</a>
+    <a href="https://github.com/zhurong2020/pyobfus/blob/main/SECURITY.md">Security</a>
+  </div>
+  <p style="margin-top:18px">Apache-2.0 core · Professional Edition is proprietary ·
+  Python 3.9–3.14</p>
+</footer>
+</body>
+</html>

@@ -267,7 +267,7 @@ After your trial, purchase a license to continue using Pro features.
 
 ### How to Purchase
 
-**Visit our purchase page**: **[pyobfus.github.io/purchase](https://zhurong2020.github.io/pyobfus/#purchase-professional-edition)** for detailed information and secure checkout.
+**Visit our purchase page**: **[zhurong2020.github.io/pyobfus](https://zhurong2020.github.io/pyobfus/#purchase-professional-edition)** for detailed information and secure checkout.
 
 **Quick purchase**: **[🚀 Buy Now](https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400)** - Direct checkout link (Instant delivery • 30-day money-back guarantee)
 

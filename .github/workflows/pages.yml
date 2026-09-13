@@ -1,0 +1,55 @@
+# Publishes the landing page at https://zhurong2020.github.io/pyobfus/
+#
+# GitHub Pages used to build `docs/` with Jekyll while Read the Docs built the
+# same directory with MkDocs. Two generators, one source, two public sites with
+# the same content and different themes. Everything done to the MkDocs config
+# was invisible here, because Jekyll never reads it.
+#
+# That mattered more than it looks: the README advertises this URL as the
+# purchase page, so the page where money changes hands was an accidental
+# by-product of the documentation build.
+#
+# So the two are now separated. Read the Docs owns the documentation; this
+# workflow owns a single hand-written landing page under `landing/`, which
+# depends on nothing and builds in seconds.
+
+name: Pages
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'landing/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never cancel a half-finished deployment of the purchase page.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd  # v5 (pinned 2026-05-09 for Socket supply-chain score)
+
+    # The README links straight to this anchor. Losing it would send buyers to
+    # the top of the page with no idea what they were meant to find.
+    - name: Check the purchase anchor the README points at still exists
+      run: grep -q 'id="purchase-professional-edition"' landing/index.html
+
+    - uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b  # v5
+    - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa  # v3
+      with:
+        path: landing
+    - id: deployment
+      uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e  # v4
