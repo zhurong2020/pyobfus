@@ -176,15 +176,33 @@ Cloudflare 边缘拦 `urllib` 默认的 `Python-urllib/*` User-Agent（403 +
    `register --no-verify` 本来就能不联网注册——硬件指纹挡不住任何人，却真的让客户
    丢了许可证。设备上限的作用是防止一个 key 传遍整个组织，滥用由吊销处理。
 
-### 剩下两件，需要用户批准，且有先后顺序
+### 已发布（2026-09-13，用户批准）
 
-**先部署 Worker，再发客户端。** 新客户端会调 `/api/deactivate`；顺序反了，客户跑
-`deactivate` 会打到一个没有该路由的服务器。部署前先导出 KV 现状（唯一副本，写坏
-不可恢复），并 `wrangler secret put ADMIN_TOKEN`（独立随机串）。
+按正确顺序执行：**先部署 Worker，再发客户端**（新客户端会调 `/api/deactivate`，
+顺序反了客户会打到没有该路由的服务器）。
 
-发 `0.5.26` 的验收与平时不同：全新 venv 装完要**真的对生产端点跑一次激活**，因为
-这个版本修的就是这条路径。GitHub Release 说明必须写上 `--no-verify`——升级只救新
-安装，已装在客户机器上的版本看不到修复。
+- **KV 已备份**到 `~/.pyobfus-backups/kv_backup_20260913T005504Z`（5 份，逐份校验
+  `license_key` 与文件名一致）。刻意放在仓库外：含客户邮箱与序列号。
+- **Worker 已部署**（Version ID `212bf0ad-…`），`ADMIN_TOKEN` 经
+  `wrangler secret put` 写入，明文只存 Vaultwarden 条目
+  `pyobfus Worker ADMIN_TOKEN (license reset endpoint)`（Worker secret 只写不可读，
+  那是唯一可读副本）。生产逐项验证：未知 key 两个端点均返回带 `code` 的 JSON；
+  管理端点无 token / 错 token 均 401，且**真假序列号响应逐字相同**（不泄露存在性）。
+- **`0.5.26` 已发布**。tag `v0.5.26` 经 OIDC 发 PyPI，两个 PEP 740 provenance
+  endpoint 均 200，全新 venv 装已发布 wheel 后**对生产端点真实激活成功**并跑通
+  Pro 构建，随后用 `deactivate` 收尾、未留测试设备。GitHub Release 已建，说明里
+  写明 `--no-verify`（升级只救新安装）。`CITATION.cff` 已同步到 Zenodo record
+  `22731176`。
+- **合成监控已在 CI 环境实跑通过**（push 时按 paths 触发，`success`）。
+
+⚠️ **踩到一次已记录在案的坑**：PyPI JSON API 已显示 `0.5.26`，但 `pip install` 仍
+报 `No matching distribution` 约一分钟——**是 simple index 传播延迟，不是发布失败**，
+等一会重试即可。
+
+### 未随本轮发布
+
+`pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]` 有 mcp SDK 2.x 兼容一条，**刻意没有
+捆绑**进这次的紧急修复；且每发一次 MCP 都要手工改 Glama Build steps。
 
 ### 运维缺口（未闭合）
 
