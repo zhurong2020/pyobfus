@@ -16,6 +16,128 @@ from pyobfus.core.generator import CodeGenerator
 from pyobfus.core.global_table import GlobalSymbolTable
 
 
+def _target_names(target: ast.expr, out: Set[str]) -> None:
+    """Collect the names an assignment/for/with target binds (handles tuples/stars)."""
+    if isinstance(target, ast.Name):
+        out.add(target.id)
+    elif isinstance(target, (ast.Tuple, ast.List)):
+        for elt in target.elts:
+            _target_names(elt, out)
+    elif isinstance(target, ast.Starred):
+        _target_names(target.value, out)
+    # Attribute / Subscript targets bind no local name
+
+
+class _ScopeBindingCollector(ast.NodeVisitor):
+    """Collect the names bound in ONE function scope (Python function-scope semantics).
+
+    A name assigned anywhere in a function body is local to that function, so it
+    shadows a module-level symbol of the same name. This collector gathers those
+    names -- assignments, augmented/annotated assignments, walrus targets, for /
+    with / except targets, local imports, and the *names* of nested def/class
+    definitions -- without descending into nested function/class/lambda or
+    comprehension scopes (those are separate scopes). Names declared ``global``
+    or ``nonlocal`` are excluded, since they resolve to an outer scope and must
+    still be renamed.
+    """
+
+    def __init__(self) -> None:
+        self.bound: Set[str] = set()
+        self.declared_outer: Set[str] = set()
+
+    def visit_Assign(self, node: ast.Assign) -> None:
+        for target in node.targets:
+            _target_names(target, self.bound)
+        self.visit(node.value)
+
+    def visit_AnnAssign(self, node: ast.AnnAssign) -> None:
+        _target_names(node.target, self.bound)
+        if node.value is not None:
+            self.visit(node.value)
+
+    def visit_AugAssign(self, node: ast.AugAssign) -> None:
+        _target_names(node.target, self.bound)
+        self.visit(node.value)
+
+    def visit_NamedExpr(self, node: ast.NamedExpr) -> None:  # walrus :=
+        _target_names(node.target, self.bound)
+        self.visit(node.value)
+
+    def visit_For(self, node) -> None:
+        _target_names(node.target, self.bound)
+        self.visit(node.iter)
+        for stmt in node.body + node.orelse:
+            self.visit(stmt)
+
+    visit_AsyncFor = visit_For
+
+    def visit_With(self, node) -> None:
+        for item in node.items:
+            if item.optional_vars is not None:
+                _target_names(item.optional_vars, self.bound)
+            self.visit(item.context_expr)
+        for stmt in node.body:
+            self.visit(stmt)
+
+    visit_AsyncWith = visit_With
+
+    def visit_ExceptHandler(self, node: ast.ExceptHandler) -> None:
+        if node.name:
+            self.bound.add(node.name)
+        for stmt in node.body:
+            self.visit(stmt)
+
+    def visit_Import(self, node: ast.Import) -> None:
+        for alias in node.names:
+            self.bound.add((alias.asname or alias.name).split(".")[0])
+
+    def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
+        for alias in node.names:
+            if alias.name != "*":
+                self.bound.add(alias.asname or alias.name)
+
+    def visit_Global(self, node: ast.Global) -> None:
+        self.declared_outer.update(node.names)
+
+    def visit_Nonlocal(self, node: ast.Nonlocal) -> None:
+        self.declared_outer.update(node.names)
+
+    # Nested scopes: record the bound name but do not descend into their bodies.
+    def visit_FunctionDef(self, node) -> None:
+        self.bound.add(node.name)
+
+    visit_AsyncFunctionDef = visit_FunctionDef
+
+    def visit_ClassDef(self, node: ast.ClassDef) -> None:
+        self.bound.add(node.name)
+
+    def visit_Lambda(self, node: ast.Lambda) -> None:
+        pass  # own scope; binds nothing in the enclosing scope
+
+    def visit_ListComp(self, node) -> None:
+        pass
+
+    visit_SetComp = visit_ListComp
+    visit_DictComp = visit_ListComp
+    visit_GeneratorExp = visit_ListComp
+
+
+def _function_scope_names(node) -> Set[str]:
+    """All names local to a function/async-function scope (params + bound - global/nonlocal)."""
+    names: Set[str] = set()
+    args = node.args
+    for arg in args.posonlyargs + args.args + args.kwonlyargs:
+        names.add(arg.arg)
+    if args.vararg:
+        names.add(args.vararg.arg)
+    if args.kwarg:
+        names.add(args.kwarg.arg)
+    collector = _ScopeBindingCollector()
+    for stmt in node.body:
+        collector.visit(stmt)
+    return (names | collector.bound) - collector.declared_outer
+
+
 class LocalNameTransformer(ast.NodeTransformer):
     """
     Transform local references to exported names.
@@ -116,8 +238,10 @@ class LocalNameTransformer(ast.NodeTransformer):
         """
         Visit function definition.
 
-        We collect parameter names and create a new scope to avoid
-        renaming references to parameters inside the function.
+        We push a scope holding every name local to this function -- parameters
+        AND names bound anywhere in its body -- so a local that reuses the name
+        of a renamed module-level symbol is not rewritten (Python function-scope
+        semantics; the parameter-only version wrongly renamed such locals).
 
         Args:
             node: FunctionDef AST node
@@ -125,48 +249,20 @@ class LocalNameTransformer(ast.NodeTransformer):
         Returns:
             Modified or original FunctionDef node
         """
-        # Collect all parameter names for this function
-        param_names: Set[str] = set()
-
-        # Regular args
-        for arg in node.args.args:
-            param_names.add(arg.arg)
-
-        # Positional-only args
-        for arg in node.args.posonlyargs:
-            param_names.add(arg.arg)
-
-        # Keyword-only args
-        for arg in node.args.kwonlyargs:
-            param_names.add(arg.arg)
-
-        # *args
-        if node.args.vararg:
-            param_names.add(node.args.vararg.arg)
-
-        # **kwargs
-        if node.args.kwarg:
-            param_names.add(node.args.kwarg.arg)
-
-        # Push new scope with parameter names
-        self._local_scopes.append(param_names)
-
-        # Visit decorators (before entering function body)
+        # Decorators are evaluated in the enclosing scope, before the body scope.
         for decorator in node.decorator_list:
             self.visit(decorator)
 
-        # Visit body with parameters in scope
+        self._local_scopes.append(_function_scope_names(node))
         for stmt in node.body:
             self.visit(stmt)
-
-        # Pop scope
         self._local_scopes.pop()
 
         return node
 
     def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> ast.AsyncFunctionDef:
         """
-        Visit async function definition.
+        Visit async function definition. Same scope handling as visit_FunctionDef.
 
         Args:
             node: AsyncFunctionDef AST node
@@ -174,35 +270,47 @@ class LocalNameTransformer(ast.NodeTransformer):
         Returns:
             Modified or original AsyncFunctionDef node
         """
-        # Same logic as FunctionDef - collect parameter names
-        param_names: Set[str] = set()
-
-        for arg in node.args.args:
-            param_names.add(arg.arg)
-        for arg in node.args.posonlyargs:
-            param_names.add(arg.arg)
-        for arg in node.args.kwonlyargs:
-            param_names.add(arg.arg)
-        if node.args.vararg:
-            param_names.add(node.args.vararg.arg)
-        if node.args.kwarg:
-            param_names.add(node.args.kwarg.arg)
-
-        # Push new scope
-        self._local_scopes.append(param_names)
-
-        # Visit decorators
         for decorator in node.decorator_list:
             self.visit(decorator)
 
-        # Visit body
+        self._local_scopes.append(_function_scope_names(node))
         for stmt in node.body:
             self.visit(stmt)
-
-        # Pop scope
         self._local_scopes.pop()
 
         return node
+
+    def visit_Lambda(self, node: ast.Lambda) -> ast.Lambda:
+        """A lambda is its own scope; its parameters shadow module-level names."""
+        args = node.args
+        params: Set[str] = {a.arg for a in args.posonlyargs + args.args + args.kwonlyargs}
+        if args.vararg:
+            params.add(args.vararg.arg)
+        if args.kwarg:
+            params.add(args.kwarg.arg)
+        # Defaults are evaluated in the enclosing scope.
+        for default in args.defaults + [d for d in args.kw_defaults if d is not None]:
+            self.visit(default)
+        self._local_scopes.append(params)
+        self.visit(node.body)
+        self._local_scopes.pop()
+        return node
+
+    def _visit_comprehension(self, node):
+        """List/set/dict/generator comprehensions are their own scope in Python 3;
+        their loop targets shadow module-level names."""
+        targets: Set[str] = set()
+        for generator in node.generators:
+            _target_names(generator.target, targets)
+        self._local_scopes.append(targets)
+        self.generic_visit(node)
+        self._local_scopes.pop()
+        return node
+
+    visit_ListComp = _visit_comprehension
+    visit_SetComp = _visit_comprehension
+    visit_DictComp = _visit_comprehension
+    visit_GeneratorExp = _visit_comprehension
 
     def visit_ClassDef(self, node: ast.ClassDef) -> ast.ClassDef:
         """

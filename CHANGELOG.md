@@ -9,6 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Cross-file name mangling no longer rewrites a function-local variable that
+  reuses a renamed module-level name.** `LocalNameTransformer` tracked only a
+  function's *parameters* as local, so a local bound by assignment (or by
+  `for` / `with` / `except` / walrus, a local import, or a nested def/class
+  name) that happened to share the name of a renamed module-level symbol had
+  its Load references rewritten to the module symbol's mangled name -- while
+  its own binding kept the original name. The result was
+  `NameError: name 'Ixx' is not defined` at runtime, e.g. a function with a
+  local `result` in a module that also binds `result` at top level. The
+  transformer now pushes the function's full local scope (parameters plus all
+  names bound in its body, minus `global`/`nonlocal`-declared names, following
+  Python function-scope semantics), and gives lambdas and comprehensions their
+  own scopes too. Found running Pro cross-file obfuscation over a real
+  multi-module scientific package. Regression tests:
+  `TestLocalShadowingRenamedGlobal` (obfuscated output executes) and
+  `TestFunctionScopeNames` (the binding collector) in
+  `tests/test_crossfile_content_transforms.py`.
+
+
 - **Links in the README no longer break on PyPI.** README.md is the package
   long_description, and PyPI resolves relative links against the project page
   rather than the repository, so `](pyobfus_mcp/)` pointed at

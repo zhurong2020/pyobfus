@@ -196,3 +196,93 @@ class TestCrossFileProRuntimeCorrectness:
         )
         assert proc.returncode == 0, proc.stderr
         assert "True" in proc.stdout
+
+
+class TestLocalShadowingRenamedGlobal:
+    """A function/comprehension/lambda local that reuses the name of a renamed
+    module-level symbol must keep its own binding -- the parameter-only scope
+    tracking rewrote such locals' Load references to the global's mangled name,
+    producing ``NameError: name 'Ixx' is not defined`` in obfuscated output.
+    """
+
+    def _shadow_project(self, tmp_path):
+        src = tmp_path / "src"
+        src.mkdir()
+        # ``result`` is a module-level export (renamed) AND a function local.
+        (src / "mod.py").write_text(
+            "def prep(x):\n"
+            "    result = _make(x)\n"
+            "    total = result.value + 1\n"          # local read must stay 'result'
+            "    doubled = [result.value for _ in range(2)]\n"  # comprehension over local
+            "    f = lambda result: result.value\n"    # lambda param shadows
+            "    return total + doubled[0] + f(result)\n"
+            "\n"
+            "def _make(x):\n"
+            "    class R:\n"
+            "        value = x * 10\n"
+            "    return R()\n"
+            "\n"
+            "result = None\n"                          # module-level binding of the same name
+            "def entry():\n"
+            "    return prep(2)\n"                     # 21 + 20 + 20 == 61
+        )
+        return src
+
+    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    def test_local_shadowing_executes(self, _trial, runner, tmp_path):
+        src = self._shadow_project(tmp_path)
+        out = tmp_path / "out"
+        _run_json(runner, [str(src), "-o", str(out), "--level", "pro",
+                           "--cross-file", "--string-encryption", "--control-flow", "--json"])
+        # entry() is a module-level export and gets renamed, so scan callables
+        # for the expected cross-scope result (21 + 20 + 20 == 61).
+        script = (
+            "import sys; sys.path.insert(0, %r); import mod\n"
+            "vals=[]\n"
+            "for n in dir(mod):\n"
+            "    o=getattr(mod,n)\n"
+            "    if callable(o) and getattr(o,'__module__',None)=='mod' and not n.startswith('__'):\n"
+            "        try: vals.append(o())\n"
+            "        except TypeError: pass\n"
+            "print(61 in vals)" % str(out)
+        )
+        proc = subprocess.run(
+            [sys.executable, "-c", script], capture_output=True, text=True, timeout=60
+        )
+        assert proc.returncode == 0, proc.stderr
+        assert "True" in proc.stdout, proc.stdout
+
+
+class TestFunctionScopeNames:
+    """Unit coverage for the bound-name collector behind the fix."""
+
+    def test_collects_all_binding_forms(self):
+        from pyobfus.transformers.local_name_transformer import _function_scope_names
+
+        node = ast.parse(
+            "def f(a, *rest, **kw):\n"
+            "    b = 1\n"
+            "    c: int = 2\n"
+            "    d += 3\n"
+            "    for e in xs:\n"
+            "        pass\n"
+            "    with ctx() as g:\n"
+            "        pass\n"
+            "    try:\n"
+            "        pass\n"
+            "    except Exception as h:\n"
+            "        pass\n"
+            "    import os as i\n"
+            "    from p import q\n"
+            "    def nested():\n"
+            "        inner = 9\n"      # must NOT leak to f's scope
+            "        return inner\n"
+            "    if (j := 5):\n"
+            "        pass\n"
+            "    global glob\n"
+            "    glob = 1\n"           # declared global -> excluded
+        ).body[0]
+        names = _function_scope_names(node)
+        assert {"a", "rest", "kw", "b", "c", "d", "e", "g", "h", "i", "q", "nested", "j"} <= names
+        assert "inner" not in names   # nested-function local does not leak
+        assert "glob" not in names    # global-declared name resolves outward
