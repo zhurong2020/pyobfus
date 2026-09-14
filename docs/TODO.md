@@ -159,6 +159,20 @@ JSON，需要版本字段管理，**排在矩阵之后**，因为矩阵会暴露
 另有一项新增：**`pyobfus-review` skill 尚未在任何渠道上架**（Smithery 上的是
 `pyobfus-protect`）。等 skill 有实际使用反馈再考虑投递，不为上架而上架。
 
+## 真实交付场景暴露的 Pro 缺口（2026-09-14 · 待排期，优先级待维护者定）
+
+来自一个把 Pro 输出交付到第三方离线 Windows 机器的内部下游项目（torch/MONAI +
+Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机器上。详细背景在本地私有的
+`docs/internal/DOWNSTREAM_DEMAND_2026-09-14.md`。**不改动上面的排期顺序**，只登记。
+
+| # | 缺口 | 证据 | 方向 |
+|---|---|---|---|
+| **Y-1** 🔴 | **Pro 运行时无法合法随输出分发**，影响所有使用 L3 opacity / `--scrub-traceback` / `--expire-hard` 的客户 | 2026-09-14 实验：L3 输出保留 `from pyobfus_pro import opacity, Layer` 和 `from pyobfus_pro.runtime import _l3_dispatch`，scrub 与 expire 同样注入 `pyobfus_pro` import；在没有 pyobfus_pro 的解释器上运行报 `ModuleNotFoundError`。而 `pyobfus_pro/LICENSE` §2a 禁止分发，没有运行时例外条款。标记 import 还会连带加载整个 `pyobfus_pro/__init__` | ① 独立的最小 `pyobfus-runtime` 包（运行时不需要许可证 key）；② 许可证加运行时再分发例外；③ 后处理时剥掉标记 import；④ 在 README 和 SUPPORT_MATRIX 写明交付要求 |
+| Y-2 | `--expire-hard` 没有到期前提醒，不能不重新构建就延期 | `build_fusion._inject_expire_check` 在模块顶部直接抛 `LicenseExpired` | `--expire-warn-days N` 或提醒回调 |
+| Y-3 | 设备绑定只认 pyobfus 自己的 `current_machine_id()` | 自带授权体系（JWT 加自有机器码）的应用，无法在不逐机器构建的前提下把 L3 密钥绑定到自己的授权上 | 运行时"密钥提供者"钩子，应用验签后提供密钥材料 |
+| Y-4 | Windows 上运行混淆输出没有 CI 验证 | `SUPPORT_MATRIX.md`："only proven on Linux" | 下游项目的 Windows 实测结果回填为带日期的记录；再评估是否加 windows integration job |
+| Y-5 | 文档漂移 | `pyobfus.yaml.example` 仍写社区版 `max_files: 5` / `max_total_loc: 1000`，并把 `string_encoding` 标为 Pro，与 README 的"社区版无文件和行数限制"矛盾；`opacity.toml` 规则格式没有面向用户的文档 | 修正示例配置，给 `--opacity-config` 补格式说明（免发版） |
+
 ## 已研究、明确延后（不在队列里，但别忘了）
 
 | 项 | 来源 | 解冻条件 |
