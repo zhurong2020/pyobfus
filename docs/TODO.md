@@ -171,6 +171,8 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
 | Y-2 | `--expire-hard` 没有到期前提醒，不能不重新构建就延期 | `build_fusion._inject_expire_check` 在模块顶部直接抛 `LicenseExpired` | `--expire-warn-days N` 或提醒回调 |
 | Y-3 | 设备绑定只认 pyobfus 自己的 `current_machine_id()` | 自带授权体系（JWT 加自有机器码）的应用，无法在不逐机器构建的前提下把 L3 密钥绑定到自己的授权上 | 运行时"密钥提供者"钩子，应用验签后提供密钥材料 |
 | Y-4 | Windows 上运行混淆输出没有 CI 验证 | `SUPPORT_MATRIX.md`："only proven on Linux" | 下游项目的 Windows 实测结果回填为带日期的记录；再评估是否加 windows integration job |
+| Y-6 | name-mangling 打断运行时注解 | 重命名类后 eager `-> Cls` 注解引用旧名 → NameError（真实多模块包实测） | mangling 同步改写注解名，或对缺 `from __future__ import annotations` 的 eager 注解告警 |
+| **Y-7** 🔴 | **cross-file mangler 作用域 bug** | 不同作用域的同名局部变量被分配同一 mangled 名且引用解析错误 → `NameError: name 'I89' is not defined`；确定性正确性缺陷，无法用 exclude 规避 | 修 `--cross-file` 作用域解析；复现=一模块两作用域同名局部变量 |
 | Y-5 | 文档漂移 | `pyobfus.yaml.example` 仍写社区版 `max_files: 5` / `max_total_loc: 1000`，并把 `string_encoding` 标为 Pro，与 README 的"社区版无文件和行数限制"矛盾；`opacity.toml` 规则格式没有面向用户的文档 | 修正示例配置，给 `--opacity-config` 补格式说明（免发版） |
 
 ## 已研究、明确延后（不在队列里，但别忘了）
