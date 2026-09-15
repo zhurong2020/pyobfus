@@ -298,3 +298,62 @@ class TestFunctionScopeNames:
         assert {"a", "rest", "kw", "b", "c", "d", "e", "g", "h", "i", "q", "nested", "j"} <= names
         assert "inner" not in names  # nested-function local does not leak
         assert "glob" not in names  # global-declared name resolves outward
+
+
+class TestRuntimeAnnotationsFollowRenamedClasses:
+    """Eager annotations must use the same names as renamed class bindings."""
+
+    def test_same_module_and_imported_annotations_execute(self, runner, tmp_path):
+        src = tmp_path / "src"
+        src.mkdir()
+        (src / "models.py").write_text("class Record:\n" "    pass\n")
+        (src / "service.py").write_text(
+            "from models import Record\n"
+            "\n"
+            "class LocalResult:\n"
+            "    pass\n"
+            "\n"
+            "def convert(item: Record, fallback=LocalResult) -> LocalResult:\n"
+            "    return fallback()\n"
+            "\n"
+            "def identity(Record: Record) -> Record:\n"
+            "    return Record\n"
+            "\n"
+            "def annotation_types():\n"
+            "    return convert.__annotations__\n"
+        )
+
+        out = tmp_path / "out"
+        _run_json(runner, [str(src), "-o", str(out), "--json"])
+
+        script = (
+            "import importlib.util, json, pathlib, sys\n"
+            "root = pathlib.Path(sys.argv[1])\n"
+            "sys.path.insert(0, str(root))\n"
+            "spec = importlib.util.spec_from_file_location('service', root / 'service.py')\n"
+            "module = importlib.util.module_from_spec(spec)\n"
+            "spec.loader.exec_module(module)\n"
+            "found = 0\n"
+            "for value in vars(module).values():\n"
+            "    if callable(value):\n"
+            "        annotations = getattr(value, '__annotations__', {})\n"
+            "        if set(annotations) == {'item', 'return'}:\n"
+            "            print(json.dumps({key: val.__module__ for key, val in annotations.items()}))\n"
+            "            found += 1\n"
+            "            continue\n"
+            "        if set(annotations) == {'Record', 'return'}:\n"
+            "            imported_type = annotations['Record']\n"
+            "            assert value(imported_type) is imported_type\n"
+            "            print(json.dumps({key: val.__module__ for key, val in annotations.items()}))\n"
+            "            found += 1\n"
+            "assert found == 2, found\n"
+        )
+        proc = subprocess.run(
+            [sys.executable, "-c", script, str(out)],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        lines = [json.loads(line) for line in proc.stdout.splitlines()]
+        assert {"item": "models", "return": "service"} in lines
+        assert {"Record": "models", "return": "models"} in lines

@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Cross-file name mangling keeps eager runtime annotations executable.**
+  Function annotations and default values are evaluated in the enclosing
+  scope when a function is defined, but the cross-file transformers either
+  skipped those expressions or treated parameter names as already shadowing
+  them. References to renamed same-module or imported classes could therefore
+  retain their old names and raise `NameError` at import time. Definition-time
+  expressions are now rewritten before the function-local scope is pushed,
+  including positional-only, keyword-only, variadic and Python 3.12+ generic
+  signatures. An end-to-end package test covers same-module types, imported
+  types, defaults, and a parameter that deliberately shares an imported type's
+  name.
+
 - **Control-flow flattening preserves Python's implicit `None` return on
   fallthrough paths.** When one branch returned explicitly but another
   reached the end of the function, the generated final

@@ -176,20 +176,17 @@ class ImportedNameTransformer(ast.NodeTransformer):
         Returns:
             Transformed FunctionDef node
         """
-        # Collect function parameter names (don't transform these)
-        param_names = set()
-        for arg in node.args.args:
-            param_names.add(arg.arg)
-        if node.args.vararg:
-            param_names.add(node.args.vararg.arg)
-        if node.args.kwarg:
-            param_names.add(node.args.kwarg.arg)
+        # Decorators, defaults and annotations are evaluated in the enclosing
+        # scope, before parameter names begin shadowing imports.
+        for decorator in node.decorator_list:
+            self.visit(decorator)
+        self._visit_function_signature(node)
 
         # Push new scope
-        self._scope_stack.append(param_names)
+        self._scope_stack.append(self._parameter_names(node))
 
-        # Visit children
-        self.generic_visit(node)
+        for stmt in node.body:
+            self.visit(stmt)
 
         # Pop scope
         self._scope_stack.pop()
@@ -198,20 +195,45 @@ class ImportedNameTransformer(ast.NodeTransformer):
 
     def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> ast.AsyncFunctionDef:
         """Visit async function definition."""
-        # Same logic as FunctionDef
-        param_names = set()
-        for arg in node.args.args:
-            param_names.add(arg.arg)
-        if node.args.vararg:
-            param_names.add(node.args.vararg.arg)
-        if node.args.kwarg:
-            param_names.add(node.args.kwarg.arg)
+        for decorator in node.decorator_list:
+            self.visit(decorator)
+        self._visit_function_signature(node)
 
-        self._scope_stack.append(param_names)
-        self.generic_visit(node)
+        self._scope_stack.append(self._parameter_names(node))
+        for stmt in node.body:
+            self.visit(stmt)
         self._scope_stack.pop()
 
         return node
+
+    @staticmethod
+    def _parameter_names(node) -> Set[str]:
+        args = node.args
+        names = {arg.arg for arg in args.posonlyargs + args.args + args.kwonlyargs}
+        if args.vararg:
+            names.add(args.vararg.arg)
+        if args.kwarg:
+            names.add(args.kwarg.arg)
+        return names
+
+    def _visit_function_signature(self, node) -> None:
+        """Rewrite imported references in definition-time expressions."""
+        args = node.args
+        for arg in args.posonlyargs + args.args + args.kwonlyargs:
+            if arg.annotation is not None:
+                arg.annotation = self.visit(arg.annotation)
+        if args.vararg and args.vararg.annotation is not None:
+            args.vararg.annotation = self.visit(args.vararg.annotation)
+        if args.kwarg and args.kwarg.annotation is not None:
+            args.kwarg.annotation = self.visit(args.kwarg.annotation)
+        args.defaults = [self.visit(default) for default in args.defaults]
+        args.kw_defaults = [
+            self.visit(default) if default is not None else None for default in args.kw_defaults
+        ]
+        if node.returns is not None:
+            node.returns = self.visit(node.returns)
+        for type_param in getattr(node, "type_params", []):
+            self.visit(type_param)
 
     def visit_ClassDef(self, node: ast.ClassDef) -> ast.ClassDef:
         """

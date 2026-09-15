@@ -252,6 +252,7 @@ class LocalNameTransformer(ast.NodeTransformer):
         # Decorators are evaluated in the enclosing scope, before the body scope.
         for decorator in node.decorator_list:
             self.visit(decorator)
+        self._visit_function_signature(node)
 
         self._local_scopes.append(_function_scope_names(node))
         for stmt in node.body:
@@ -272,6 +273,7 @@ class LocalNameTransformer(ast.NodeTransformer):
         """
         for decorator in node.decorator_list:
             self.visit(decorator)
+        self._visit_function_signature(node)
 
         self._local_scopes.append(_function_scope_names(node))
         for stmt in node.body:
@@ -279,6 +281,36 @@ class LocalNameTransformer(ast.NodeTransformer):
         self._local_scopes.pop()
 
         return node
+
+    def _visit_function_signature(self, node) -> None:
+        """Rewrite signature expressions in the enclosing scope.
+
+        Defaults and annotations are evaluated when the function is defined,
+        before its parameter/local scope exists.  Visiting them only after
+        pushing that scope would incorrectly treat a parameter that shares a
+        name with a module export as shadowing the annotation/default.
+        """
+        args = node.args
+        for arg in args.posonlyargs + args.args + args.kwonlyargs:
+            if arg.annotation is not None:
+                arg.annotation = self.visit(arg.annotation)
+        if args.vararg and args.vararg.annotation is not None:
+            args.vararg.annotation = self.visit(args.vararg.annotation)
+        if args.kwarg and args.kwarg.annotation is not None:
+            args.kwarg.annotation = self.visit(args.kwarg.annotation)
+
+        args.defaults = [self.visit(default) for default in args.defaults]
+        args.kw_defaults = [
+            self.visit(default) if default is not None else None for default in args.kw_defaults
+        ]
+        if node.returns is not None:
+            node.returns = self.visit(node.returns)
+
+        # Python 3.12+ generic type-parameter expressions also live outside
+        # the ordinary function-local scope.  getattr keeps this source
+        # importable on every supported Python version.
+        for type_param in getattr(node, "type_params", []):
+            self.visit(type_param)
 
     def visit_Lambda(self, node: ast.Lambda) -> ast.Lambda:
         """A lambda is its own scope; its parameters shadow module-level names."""

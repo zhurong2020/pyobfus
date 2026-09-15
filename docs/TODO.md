@@ -172,7 +172,7 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
 | Y-2 | `--expire-hard` 没有到期前提醒，不能不重新构建就延期 | `build_fusion._inject_expire_check` 在模块顶部直接抛 `LicenseExpired` | `--expire-warn-days N` 或提醒回调 |
 | Y-3 | 设备绑定只认 pyobfus 自己的 `current_machine_id()` | 自带授权体系（JWT 加自有机器码）的应用，无法在不逐机器构建的前提下把 L3 密钥绑定到自己的授权上 | 运行时"密钥提供者"钩子，应用验签后提供密钥材料 |
 | Y-4 | Windows 上运行混淆输出没有 CI 验证 | `SUPPORT_MATRIX.md`："only proven on Linux" | 下游项目的 Windows 实测结果回填为带日期的记录；再评估是否加 windows integration job |
-| Y-6 | name-mangling 打断运行时注解 | 重命名类后 eager `-> Cls` 注解引用旧名 → NameError（真实多模块包实测） | mangling 同步改写注解名，或对缺 `from __future__ import annotations` 的 eager 注解告警 |
+| ~~Y-6~~ ✅ | ~~name-mangling 打断运行时注解~~ **已修** | 函数签名表达式此前被跳过，或在参数局部作用域压栈后才遍历，导致同模块/导入类改名后 eager annotation 仍引用旧名 | 注解和默认值现在按 Python 语义在函数局部作用域压栈前改写；端到端测试覆盖同模块、跨模块、默认值及参数名遮蔽导入类型 |
 | ~~Y-7~~ ✅ | ~~cross-file mangler 作用域 bug~~ **已修** (`069a820`) | 函数局部变量复用被重命名的模块级名字时 Load 引用被误改 → `NameError: name 'Ixx'`。`LocalNameTransformer` 现按 Python 作用域收集函数体内全部绑定名（含 lambda/推导式作用域）| 已修 + 2 回归测试 |
 | ~~Y-8~~ ✅ | ~~control-flow flattening 的 `_cff_return_N` 未绑定~~ **已修** | 根因并非函数大小本身：一条路径显式 `return`、另一条路径自然落底时，统一生成的 `return _cff_return_N` 会读取未初始化变量。大型 `try/finally` 只是更容易出现这种路径组合 | 状态机启动前将共享 return slot 初始化为 Python 隐式返回值 `None`；已补最小条件分支与 `try/finally` early-return 两个回归测试 |
 | ~~Y-5~~ ✅ | ~~文档漂移~~ **已修** | `pyobfus.yaml.example` 已与社区版无文件/行数限制和 Community Base64 encoding 的现状对齐 | 新增 `OPACITY_CONFIG.md`，记录 TOML 字段、匹配/优先级、CLI 只物化 encrypted 顶层函数的边界和 Y-1 交付限制 |
