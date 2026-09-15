@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **`pyobfus --help` renders on the default Windows console.** The help text
+  no longer contains a Unicode arrow that raises `UnicodeEncodeError` when
+  Click writes through a CP1252 console. Integration coverage now verifies the
+  complete help is CP1252-safe.
+
 - **Cross-file name mangling keeps eager runtime annotations executable.**
   Function annotations and default values are evaluated in the enclosing
   scope when a function is defined, but the cross-file transformers either

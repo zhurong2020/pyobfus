@@ -355,7 +355,7 @@ except ImportError:
     "--save-mapping",
     "save_mapping_path",
     type=click.Path(),
-    help="Write original→obfuscated name mapping to a JSON file. "
+    help="Write original-to-obfuscated name mapping to a JSON file. "
     "Use with `pyobfus --unmap` to reverse obfuscated stack traces.",
 )
 @click.option(

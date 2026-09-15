@@ -50,6 +50,12 @@ class TestCliAvailability:
         result = run_cli("--help")
         assert result.returncode == 0, result.stderr
 
+    def test_help_is_windows_console_safe(self):
+        """Default Windows consoles must be able to render the complete help."""
+        result = run_cli("--help")
+        assert result.returncode == 0, result.stderr
+        result.stdout.encode("cp1252")
+
 
 class TestSingleFileObfuscation:
     def test_obfuscated_output_still_executes(self, tmp_path):
