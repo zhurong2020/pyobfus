@@ -24,7 +24,8 @@ encrypted 层。Y-4 基础合同已补：integration job 扩到 Ubuntu + Windows
 跨文件生成物均执行并与原输出比较。首次 Windows 实跑进一步发现 `--help` 的 Unicode
 箭头不能写入默认 CP1252 控制台；已改为 ASCII 并增加编码回归测试。Core 版本已升到
 **`0.5.27` 已按用户授权发版**，README/llms、Changelog 与 `CITATION.cff` 已同步；
-PyPI 与 GitHub Release 的最终公开验证待 workflow 完成。此前推送的 Y-8 批次远端 CI 与
+PyPI OIDC workflow、GitHub Release、公开安装和两个 PyPI Integrity API provenance
+endpoint 均已验证通过。此前推送的 Y-8 批次远端 CI 与
 CodeQL 已恢复全绿；候选版本地验收为 Core `1334 passed, 1 skipped`、MCP `97 passed`、
 integration `8 passed`，Black、Ruff、mypy、MkDocs strict、构建/Twine 与全新 venv wheel
 安装均通过；候选提交推送后的完整 CI、Windows 生成物执行与 CodeQL 也已全部通过。

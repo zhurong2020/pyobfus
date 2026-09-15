@@ -123,13 +123,9 @@ JSON，需要版本字段管理，**排在矩阵之后**，因为矩阵会暴露
 发版本身是独立 gate。下面内容已经合进 `main` 或进入本轮 release-candidate 提交，
 但要发布才会到用户手里：
 
-- **Core `0.5.27` 已发布**：Y-7 函数局部绑定遮蔽、Y-8
+- **Core `0.5.27` 已发布并完成公开安装/完整性验证**：Y-7 函数局部绑定遮蔽、Y-8
   CFF 隐式 `None` 返回和 Y-6 eager annotation/default 同步改名三项正确性修复；README
-  的 46 条相对链接改为绝对 URL（在 PyPI 上原本全部
-  404），以及 `[project.urls]` 的修正（原先把一份四月的内部策略备忘录标为
-  "AI Integration Guide"、把中文内部排期标为 "Current Plan"）。**项目 URL 是打包时
-  固化进分发包的，所以侧边栏要等下次发版才会变**；README 链接同理。Y-5 文档漂移和
-  Y-4 Windows 基础执行合同无需等包发布即可在 main/CI 生效。
+  的 46 条相对链接和 `[project.urls]` 修正也已随包公开。
 - **`pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]`**：mcp SDK 2.x 兼容。**刻意没有随
   0.5.26 一起发**——那是 Core 的紧急修复，不该捆绑无关内容；且每发一次 MCP 都要
   手工改一次 Glama 的 Build steps。攒够增量或有人明确要 2.x 时再发。
