@@ -212,9 +212,9 @@ class TestLocalShadowingRenamedGlobal:
         (src / "mod.py").write_text(
             "def prep(x):\n"
             "    result = _make(x)\n"
-            "    total = result.value + 1\n"          # local read must stay 'result'
+            "    total = result.value + 1\n"  # local read must stay 'result'
             "    doubled = [result.value for _ in range(2)]\n"  # comprehension over local
-            "    f = lambda result: result.value\n"    # lambda param shadows
+            "    f = lambda result: result.value\n"  # lambda param shadows
             "    return total + doubled[0] + f(result)\n"
             "\n"
             "def _make(x):\n"
@@ -222,9 +222,9 @@ class TestLocalShadowingRenamedGlobal:
             "        value = x * 10\n"
             "    return R()\n"
             "\n"
-            "result = None\n"                          # module-level binding of the same name
+            "result = None\n"  # module-level binding of the same name
             "def entry():\n"
-            "    return prep(2)\n"                     # 21 + 20 + 20 == 61
+            "    return prep(2)\n"  # 21 + 20 + 20 == 61
         )
         return src
 
@@ -232,8 +232,20 @@ class TestLocalShadowingRenamedGlobal:
     def test_local_shadowing_executes(self, _trial, runner, tmp_path):
         src = self._shadow_project(tmp_path)
         out = tmp_path / "out"
-        _run_json(runner, [str(src), "-o", str(out), "--level", "pro",
-                           "--cross-file", "--string-encryption", "--control-flow", "--json"])
+        _run_json(
+            runner,
+            [
+                str(src),
+                "-o",
+                str(out),
+                "--level",
+                "pro",
+                "--cross-file",
+                "--string-encryption",
+                "--control-flow",
+                "--json",
+            ],
+        )
         # entry() is a module-level export and gets renamed, so scan callables
         # for the expected cross-scope result (21 + 20 + 20 == 61).
         script = (
@@ -275,14 +287,14 @@ class TestFunctionScopeNames:
             "    import os as i\n"
             "    from p import q\n"
             "    def nested():\n"
-            "        inner = 9\n"      # must NOT leak to f's scope
+            "        inner = 9\n"  # must NOT leak to f's scope
             "        return inner\n"
             "    if (j := 5):\n"
             "        pass\n"
             "    global glob\n"
-            "    glob = 1\n"           # declared global -> excluded
+            "    glob = 1\n"  # declared global -> excluded
         ).body[0]
         names = _function_scope_names(node)
         assert {"a", "rest", "kw", "b", "c", "d", "e", "g", "h", "i", "q", "nested", "j"} <= names
-        assert "inner" not in names   # nested-function local does not leak
-        assert "glob" not in names    # global-declared name resolves outward
+        assert "inner" not in names  # nested-function local does not leak
+        assert "glob" not in names  # global-declared name resolves outward
