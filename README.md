@@ -212,6 +212,10 @@ the bound device.
 
 > Requires Python ≥ 3.9 as of v0.5.0 (3.8 dropped, EOL 2024-10).
 
+See the [selective opacity configuration guide](https://github.com/zhurong2020/pyobfus/blob/main/docs/OPACITY_CONFIG.md)
+for the complete `opacity.toml` format, matching rules, precedence, and current
+CLI limitations.
+
 See [CURRENT_PLAN_ZH.md](https://github.com/zhurong2020/pyobfus/blob/main/docs/CURRENT_PLAN_ZH.md) for the current project plan and priorities.
 
 ## Try Pro Features FREE

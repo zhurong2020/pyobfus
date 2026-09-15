@@ -175,7 +175,7 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
 | Y-6 | name-mangling 打断运行时注解 | 重命名类后 eager `-> Cls` 注解引用旧名 → NameError（真实多模块包实测） | mangling 同步改写注解名，或对缺 `from __future__ import annotations` 的 eager 注解告警 |
 | ~~Y-7~~ ✅ | ~~cross-file mangler 作用域 bug~~ **已修** (`069a820`) | 函数局部变量复用被重命名的模块级名字时 Load 引用被误改 → `NameError: name 'Ixx'`。`LocalNameTransformer` 现按 Python 作用域收集函数体内全部绑定名（含 lambda/推导式作用域）| 已修 + 2 回归测试 |
 | ~~Y-8~~ ✅ | ~~control-flow flattening 的 `_cff_return_N` 未绑定~~ **已修** | 根因并非函数大小本身：一条路径显式 `return`、另一条路径自然落底时，统一生成的 `return _cff_return_N` 会读取未初始化变量。大型 `try/finally` 只是更容易出现这种路径组合 | 状态机启动前将共享 return slot 初始化为 Python 隐式返回值 `None`；已补最小条件分支与 `try/finally` early-return 两个回归测试 |
-| Y-5 | 文档漂移 | `pyobfus.yaml.example` 仍写社区版 `max_files: 5` / `max_total_loc: 1000`，并把 `string_encoding` 标为 Pro，与 README 的"社区版无文件和行数限制"矛盾；`opacity.toml` 规则格式没有面向用户的文档 | 修正示例配置，给 `--opacity-config` 补格式说明（免发版） |
+| ~~Y-5~~ ✅ | ~~文档漂移~~ **已修** | `pyobfus.yaml.example` 已与社区版无文件/行数限制和 Community Base64 encoding 的现状对齐 | 新增 `OPACITY_CONFIG.md`，记录 TOML 字段、匹配/优先级、CLI 只物化 encrypted 顶层函数的边界和 Y-1 交付限制 |
 
 ## 已研究、明确延后（不在队列里，但别忘了）
 

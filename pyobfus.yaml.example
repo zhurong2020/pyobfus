@@ -32,12 +32,13 @@ obfuscation:
   # Remove comments from code
   remove_comments: true
 
-  # Simple string encoding (Pro feature)
+  # Simple Base64 string encoding (Community feature; not encryption)
   string_encoding: false
 
-  # Community Edition limits (set to null for Pro)
-  max_files: 5              # Maximum files to obfuscate
-  max_total_loc: 1000       # Maximum total lines of code
+  # Optional self-imposed project caps. Community and Pro are unlimited by
+  # default; set a positive integer only when your own build policy needs one.
+  max_files: null
+  max_total_loc: null
 
 # Example configurations for different use cases:
 
@@ -56,8 +57,6 @@ obfuscation:
 #   remove_docstrings: true
 #   remove_comments: true
 #   string_encoding: true
-#   max_files: null
-#   max_total_loc: null
 
 # Medical AI / Research project:
 # obfuscation:

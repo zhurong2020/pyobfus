@@ -70,6 +70,7 @@ nav:
     - What is tested, what is assumed: SUPPORT_MATRIX.md
     - LLM resistance benchmark: LLM_RESISTANCE_BENCHMARK.md
   - Cookbooks:
+    - Selective opacity config: OPACITY_CONFIG.md
     - PyInstaller: PYINSTALLER_COOKBOOK.md
     - Integration testing: INTEGRATION_TESTING.md
     - Remote-debug hardening (Python 3.14): REMOTE_DEBUG_HARDENING.md
