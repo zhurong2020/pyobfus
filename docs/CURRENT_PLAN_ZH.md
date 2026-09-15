@@ -14,12 +14,22 @@ Marketplace 与 Open VSX，同版本）；**`pyobfus-mcp` 0.3.11 → 0.3.12 当�
 全部结清**——构建已恢复（连续两次 success），目录条目本就正常上架、
 **不需要重新提交**。）
 
-**09-15 开发与运营复查**：Y-8 已修——控制流扁平化遇到“一条路径显式 return、
+**09-15 开发、候选版与运营复查**：Y-8 已修——控制流扁平化遇到“一条路径显式 return、
 另一条路径自然落底”时，生成的共享 return slot 过去可能未初始化并抛
 `UnboundLocalError`；现在状态机启动前按 Python 语义初始化为 `None`，并有最小分支和
-`try/finally` early-return 两个回归测试。核心套件 `1333 passed, 1 skipped`，Black、
-Ruff、mypy 均通过。09-14 的远端 CI 红灯仅为此前测试文件未格式化，修复已在本地提交，
-尚未 push。pypistats `without_mirrors` 数据已覆盖 09-14：Core 09-13 / 09-14 为
+`try/finally` early-return 两个回归测试。Y-6 已修：同模块/跨模块类改名后，eager
+annotation 与默认值现在按 Python 定义时作用域同步改写；覆盖参数名遮蔽导入类型。
+Y-5 文档漂移已清完，并新增 `OPACITY_CONFIG.md` 如实说明 CLI 只物化顶层函数的
+encrypted 层。Y-4 基础合同已补：integration job 扩到 Ubuntu + Windows，单文件与
+跨文件生成物均执行并与原输出比较。首次 Windows 实跑进一步发现 `--help` 的 Unicode
+箭头不能写入默认 CP1252 控制台；已改为 ASCII 并增加编码回归测试。Core 版本已升到
+**`0.5.27` release candidate**，
+README/llms 已同步，但 Changelog 仍保留 `[Unreleased]`，`CITATION.cff` 仍指向当前
+公开版 0.5.26；**未 tag、未发布，等待用户明确通知**。此前推送的 Y-8 批次远端 CI 与
+CodeQL 已恢复全绿；候选版本地验收为 Core `1334 passed, 1 skipped`、MCP `97 passed`、
+integration `8 passed`，Black、Ruff、mypy、MkDocs strict、构建/Twine 与全新 venv wheel
+安装均通过；候选提交推送后的 Windows job 仍是最终 gate。
+pypistats `without_mirrors` 数据已覆盖 09-14：Core 09-13 / 09-14 为
 `122 / 41`（前者与 0.5.26 发布及验收重合，后者回到安静区间）；MCP 为 `5 / 9`，仍在
 安静区间，没有自然采用抬升证据。Gmail 近三天无新客户回复；Glama 自动邮件却把
 09-13 的目录 release 称为 `pyobfus-mcp 0.5.27`，与真实 MCP 包版本 `0.3.12` 不一致，

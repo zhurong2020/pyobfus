@@ -20,17 +20,14 @@ A Python code obfuscator built with AST-based transformations. **Supports Python
 
 > **🔒 Pro Edition available** — 6 patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator, $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
 
-> **🔎 What's new in v0.5.26** — licensing reliability. Pro activation had been
-> failing for every customer since roughly July: a CDN began rejecting Python's
-> default network signature, so `pyobfus-license register` never reached the
-> licence server and reported a bare "Access denied". Requests now identify
-> themselves, and a block that happens before the server is reached says so and
-> points at `--no-verify`. Four long-standing faults went with it: an operating
-> system update no longer takes a registered licence away, revocation actually
-> takes effect, the server retires the least recently used device instead of
-> refusing a fourth, and `pyobfus-license deactivate` lets you release a machine
-> yourself. **Already installed and stuck?** `pyobfus-license register YOUR-KEY
-> --no-verify` works today, without upgrading.
+> **🔎 Next: v0.5.27 release candidate (not published yet)** — three correctness
+> fixes found by running Pro over a real multi-module scientific package.
+> Cross-file mangling now respects every form of function-local binding and
+> rewrites eager annotations/defaults using the renamed same-module or imported
+> class. Control-flow flattening now preserves Python's implicit `None` return
+> when only some branches return explicitly. Basic generated output is also
+> executed on Windows in CI, not merely transformed there. The current PyPI
+> release remains v0.5.26 until the release gate is explicitly approved.
 
 > 🔔 **Starring this repo doesn't notify you about new releases** — GitHub only
 > sends release notifications to people who explicitly **Watch** it. Click

@@ -31,6 +31,11 @@ uvx pyobfus-mcp
 
 ## Core commands
 
+- Next Core release candidate: `0.5.27` (not yet published) fixes cross-file
+  local-scope shadowing, eager annotation/default rewriting after class
+  renaming, and control-flow fallthrough paths that previously read an
+  uninitialized return slot. Windows CI now executes generated output.
+
 - `pyobfus src/ -o dist/` — obfuscate a project
 - `pyobfus --check src/` (0.5.18) — config-aware pre-flight risk scan,
   including a separate non-blocking bucket for excluded-file findings and declared
