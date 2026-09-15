@@ -5,8 +5,8 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-09-15（Y-8 已修且回归测试通过；P0 许可系统可靠性四项已全部发布为
-`0.5.26`；公开门面审计状态及本轮运营复查见 `CURRENT_PLAN_ZH.md`）。
+最后更新：2026-09-16（Core `0.5.27` 已发布并完成公开安装/完整性验证；公开门面审计
+状态及本轮运营复查见 `CURRENT_PLAN_ZH.md`）。
 
 ## 状态口径
 
@@ -123,11 +123,8 @@ JSON，需要版本字段管理，**排在矩阵之后**，因为矩阵会暴露
 发版本身是独立 gate。下面内容已经合进 `main` 或进入本轮 release-candidate 提交，
 但要发布才会到用户手里：
 
-- **Core `0.5.27` 已发布并完成公开安装/完整性验证**：Y-7 函数局部绑定遮蔽、Y-8
-  CFF 隐式 `None` 返回和 Y-6 eager annotation/default 同步改名三项正确性修复；README
-  的 46 条相对链接和 `[project.urls]` 修正也已随包公开。
 - **`pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]`**：mcp SDK 2.x 兼容。**刻意没有随
-  0.5.26 一起发**——那是 Core 的紧急修复，不该捆绑无关内容；且每发一次 MCP 都要
+  Core 0.5.27 一起发**——这是独立 MCP 增量，不应捆绑到 Core 发布；且每发一次 MCP 都要
   手工改一次 Glama 的 Build steps。攒够增量或有人明确要 2.x 时再发。
 
 ## 本轮留下的小尾巴（都不急，按顺手程度做）
