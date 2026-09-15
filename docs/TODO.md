@@ -123,7 +123,7 @@ JSON，需要版本字段管理，**排在矩阵之后**，因为矩阵会暴露
 发版本身是独立 gate。下面内容已经合进 `main` 或进入本轮 release-candidate 提交，
 但要发布才会到用户手里：
 
-- **Core `0.5.27` release candidate / `[Unreleased]`**：Y-7 函数局部绑定遮蔽、Y-8
+- **Core `0.5.27` 已发布**：Y-7 函数局部绑定遮蔽、Y-8
   CFF 隐式 `None` 返回和 Y-6 eager annotation/default 同步改名三项正确性修复；README
   的 46 条相对链接改为绝对 URL（在 PyPI 上原本全部
   404），以及 `[project.urls]` 的修正（原先把一份四月的内部策略备忘录标为

@@ -1,6 +1,6 @@
 # pyobfus 当前计划
 
-更新时间：2026-09-15（当前公开版本：Core **`0.5.26`** / MCP **`0.3.12`** /
+更新时间：2026-09-16（当前公开版本：Core **`0.5.27`** / MCP **`0.3.12`** /
 VS Code **`0.4.3`**；**GitHub Action `pyobfus-action v1.0.1` 已上架 Marketplace**。本轮完成：**09-10 下载与渠道复查**——三个 0.5.22 发布后的
 干净日 `65 / 48 / 31` 单调回落进安静区间，**09-08 悬置的「基线是否抬升」问题
 已有答案：没有抬升**；MCP 09-07 的 235 已由 `16 / 23` 坐实为发版/重建自动化流量。
@@ -23,9 +23,8 @@ Y-5 文档漂移已清完，并新增 `OPACITY_CONFIG.md` 如实说明 CLI 只�
 encrypted 层。Y-4 基础合同已补：integration job 扩到 Ubuntu + Windows，单文件与
 跨文件生成物均执行并与原输出比较。首次 Windows 实跑进一步发现 `--help` 的 Unicode
 箭头不能写入默认 CP1252 控制台；已改为 ASCII 并增加编码回归测试。Core 版本已升到
-**`0.5.27` release candidate**，
-README/llms 已同步，但 Changelog 仍保留 `[Unreleased]`，`CITATION.cff` 仍指向当前
-公开版 0.5.26；**未 tag、未发布，等待用户明确通知**。此前推送的 Y-8 批次远端 CI 与
+**`0.5.27` 已按用户授权发版**，README/llms、Changelog 与 `CITATION.cff` 已同步；
+PyPI 与 GitHub Release 的最终公开验证待 workflow 完成。此前推送的 Y-8 批次远端 CI 与
 CodeQL 已恢复全绿；候选版本地验收为 Core `1334 passed, 1 skipped`、MCP `97 passed`、
 integration `8 passed`，Black、Ruff、mypy、MkDocs strict、构建/Twine 与全新 venv wheel
 安装均通过；候选提交推送后的完整 CI、Windows 生成物执行与 CodeQL 也已全部通过。
