@@ -19,6 +19,6 @@ obfuscation:
   remove_comments: true
   string_encoding: false
 
-  # Community Edition limits
-  max_files: 5
-  max_total_loc: 1000
+  # Optional self-imposed project caps (all editions are unlimited by default)
+  max_files: null
+  max_total_loc: null

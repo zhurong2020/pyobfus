@@ -121,9 +121,9 @@ class ObfuscationConfig:
     # Performance options
     max_workers: Optional[int] = None  # None = auto (cpu_count), 1 = sequential
 
-    # Community Edition limits
-    max_files: Optional[int] = None  # None = unlimited for Pro
-    max_total_loc: Optional[int] = None  # None = unlimited for Pro
+    # Optional project limits (None = unlimited at every tier)
+    max_files: Optional[int] = None
+    max_total_loc: Optional[int] = None
 
     @classmethod
     def from_file(cls, config_path: Path) -> "ObfuscationConfig":

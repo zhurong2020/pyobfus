@@ -51,7 +51,7 @@ class ConfigurationError(PyObfusError):
 
 class LimitExceededError(PyObfusError):
     """
-    Raised when Community Edition limits are exceeded.
+    Raised when an explicitly configured project limit is exceeded.
 
     Provides clear upgrade path to Pro edition.
     """

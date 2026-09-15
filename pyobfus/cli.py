@@ -1325,7 +1325,7 @@ def _obfuscate_file(
     else:
         tree = ASTParser.parse_file(input_file)
 
-    # Count lines for Community Edition limits
+    # Enforce an explicitly configured line-count limit.
     line_count = ASTParser.count_lines(tree)
     if config.max_total_loc and line_count > config.max_total_loc:
         raise LimitExceededError("lines_of_code", line_count, config.max_total_loc)
