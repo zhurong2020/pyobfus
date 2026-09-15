@@ -7,16 +7,17 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-**Last updated**: 2026-09-12. Download/channel snapshot: Core PyPI
-`123 / 614 / 1,947` day/week/month through 09-10; 09-10 is the 0.5.23
-release/verification day and is not an organic-baseline sample. MCP is
-`4 / 325 / 1,044`, back in its quiet range. Marketplace is
+**Last updated**: 2026-09-15. Download/channel snapshot: pypistats
+`without_mirrors` data now runs through 09-14. Core recorded `122 / 41` on
+09-13 / 09-14; 09-13 overlaps the 0.5.26 release and verification, while the
+first clean day returned to the quiet range. MCP recorded `5 / 9` and remains
+quiet. Marketplace was last checked at
 `202 downloads / 7 installs`; Open VSX is `466 downloads / 0 reviews`.
 The two registry download counters are not additive user counts. The prior
 baseline conclusion remains unchanged: three clean post-0.5.22 days
 (`65 / 48 / 31`) decay back into the quiet band, so the 09-08 open question is
 answered — no baseline uplift. Current public versions are pyobfus
-**`0.5.25`** (released 09-12), pyobfus-mcp `0.3.12`, and VS Code/Open VSX
+**`0.5.26`** (released 09-13), pyobfus-mcp `0.3.12`, and VS Code/Open VSX
 **`0.4.3`** (both released 09-10 and independently re-checked on both
 registries). Open VSX is
 live; Glama is listed, searchable and healthy, with two consecutive successful
@@ -74,6 +75,12 @@ pending.
   `123 / 614 / 1,947`. The 09-10 value coincides with the 0.5.23 release,
   fresh-install verification and channel checks, so it is release-contaminated
   and does not reopen the already-closed organic-baseline question.
+- 2026-09-15 recheck (data through 09-14, known mirrors excluded): 09-12 through
+  09-14 recorded `225 / 122 / 41`. The first two days overlap the 0.5.24/0.5.25
+  and 0.5.26 release/verification activity respectively; the first clean day,
+  09-14, is back at `41`. The trailing seven-day sum is `627`, but `470` (75%)
+  comes from the three release-contaminated days 09-10, 09-12 and 09-13. This
+  does not establish an organic-baseline uplift.
 - Tracker: `gh api repos/zhurong2020/pyobfus` + PePy
 
 ### PyPI — `pyobfus-mcp`
@@ -124,6 +131,9 @@ pending.
   median is `19`, so the mean of `50.3` is carried almost entirely by the three
   release days. The `overall` series totals `2,725` from 2026-04-22 through
   09-09; this is not a lifetime count.
+- 2026-09-15 recheck (data through 09-14, known mirrors excluded): 09-13 and
+  09-14 recorded `5 / 9`; the trailing seven-day sum is `77` (median `9`). The
+  package remains in its quiet range with no adoption uplift signal.
 
 ### GitHub — `zhurong2020/pyobfus`
 - URL: https://github.com/zhurong2020/pyobfus
@@ -529,6 +539,13 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   The "Release Created" panel called this build `0.5.22` — the core package's
   version, again confirming that counter tracks GitHub release tags from the
   shared repo rather than the MCP package's 0.3.x line.
+- 2026-09-15 Gmail recheck confirms the same metadata quirk is still active:
+  Glama sent authenticated automatic notices for a successful build and
+  "Release 0.5.27 published for pyobfus-mcp" on 09-13, while PyPI's actual MCP
+  package remains `0.3.12` and the latest Core tag is `v0.5.26`. Glama's value
+  is therefore a catalog-side release counter or metadata signal, not a package
+  version; its exact derivation is unverified. It is not an MCP publication and
+  not a reason to change the package version or rebuild.
 - 2026-09-07 **the "never approved" premise is falsified — do NOT resubmit.**
   Checked the one thing nobody had checked: the public directory search itself.
   `https://glama.ai/mcp/servers?query=pyobfus` returns `pyobfus-mcp` under owner
