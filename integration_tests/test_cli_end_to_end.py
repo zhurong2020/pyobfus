@@ -105,6 +105,12 @@ class TestDirectoryObfuscation:
         assert result.returncode == 0, result.stderr
         assert list(output_dir.rglob("*.py")), "no Python files were emitted"
 
+        baseline = run_script(source_dir / "main.py")
+        assert baseline.returncode == 0, baseline.stderr
+        obfuscated = run_script(output_dir / "main.py")
+        assert obfuscated.returncode == 0, obfuscated.stderr
+        assert obfuscated.stdout == baseline.stdout
+
 
 class TestErrorHandling:
     def test_missing_input_fails_cleanly(self, tmp_path):

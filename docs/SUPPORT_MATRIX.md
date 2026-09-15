@@ -1,6 +1,6 @@
 # Support matrix
 
-What is actually verified, by what, as of 2026-09-12 (`pyobfus` 0.5.25 /
+What is actually verified, by what, as of 2026-09-15 (`pyobfus` 0.5.26 /
 `pyobfus-mcp` 0.3.12 / VS Code extension 0.4.3).
 
 Three labels, used strictly:
@@ -20,15 +20,15 @@ confident anyone feels about it.
 | Surface | Linux | macOS | Windows | Evidence |
 |---|---|---|---|---|
 | Core obfuscator, 3.9–3.14 | tested | tested | tested | `ci.yml` job `test`, 3 OS × 6 versions |
-| End-to-end CLI (obfuscate, execute output) | tested (3.11) | advisory-only | advisory-only | `ci.yml` job `integration` runs `integration_tests/` on ubuntu + 3.11 only |
+| End-to-end CLI (obfuscate, execute output) | tested (3.11) | advisory-only | tested (3.11) | `ci.yml` job `integration` runs `integration_tests/` on Ubuntu and Windows; single-file and cross-file outputs are executed and compared with the originals |
 | `pyobfus-mcp` server | tested (3.11, 3.13) | advisory-only | advisory-only | `ci.yml` jobs `mcp-tests` (3.11), `mcp-sdk-latest` and `mcp-sdk-2x` (3.13) |
 | VS Code extension | tested (Node 22, Python 3.12) | advisory-only | advisory-only | `vscode-extension-ci.yml`, headless xvfb |
 | Free-threaded 3.14 (`--disable-gil`) | verified once, 2026-08-20 | advisory-only | advisory-only | Manual run of the full core suite plus an end-to-end smoke on a downloaded free-threaded build; not in CI. See [`PYTHON314_FREETHREADING.md`](PYTHON314_FREETHREADING.md) |
 
-Reading this honestly: the **transformation** is broadly tested, while
-**running the generated code** is only proven on Linux. Nothing here says
-macOS or Windows execution is broken; it says nobody has automated the check,
-so a platform-specific breakage would reach a user before it reached us.
+Reading this honestly: the **transformation** is broadly tested, and basic
+generated-code execution is now enforced on Linux and Windows. macOS output
+execution remains advisory-only, as do heavyweight framework and packaging
+combinations; those platform-specific failures can still reach users first.
 
 ## Framework presets
 
@@ -61,10 +61,10 @@ generated output; `--verify-syntax` compiles it, which is weaker than running.
 | Model serving | advisory-only | [`MODEL_SERVING_COOKBOOK.md`](MODEL_SERVING_COOKBOOK.md) |
 | Reverse stack-trace mapping workflow | tested | `tests/test_unmap_cli.py`, plus `examples/ai_debugging/` |
 
-**No `examples/` directory is executed in CI.** They were reproduced by hand
-when written and are correct as recipes, but nothing re-runs them, so a
-breaking change elsewhere would not fail a build. That is the single largest
-gap in this table and the obvious next thing to close.
+`examples/simple.py` and `examples/multifile/` are executed by the
+`integration` job on Ubuntu and Windows, and their generated output is compared
+with the original output. The remaining examples are still advisory-only and
+should move up only when a named CI check executes them.
 
 ## Dependency and SDK ranges
 
