@@ -158,6 +158,17 @@ class ControlFlowFlattener(ast.NodeTransformer):
 
         # If we have returns, add the final return statement
         if return_var:
+            # A Python function implicitly returns None when execution reaches
+            # the end.  Some paths may do that even when another path contains
+            # an explicit return, so initialize the shared return slot before
+            # entering the state machine.
+            result.insert(
+                0,
+                ast.Assign(
+                    targets=[ast.Name(id=return_var, ctx=ast.Store())],
+                    value=ast.Constant(value=None),
+                ),
+            )
             result.append(ast.Return(value=ast.Name(id=return_var, ctx=ast.Load())))
 
         return result

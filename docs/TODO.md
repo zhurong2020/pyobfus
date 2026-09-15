@@ -5,7 +5,8 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-09-13（P0 许可系统可靠性四项已全部发布为 `0.5.26`；同日又做了公开门面审计，五处问题四处已修，去处均见 `CURRENT_PLAN_ZH.md`）。
+最后更新：2026-09-15（Y-8 已修且回归测试通过；P0 许可系统可靠性四项已全部发布为
+`0.5.26`；公开门面审计状态及本轮运营复查见 `CURRENT_PLAN_ZH.md`）。
 
 ## 状态口径
 
@@ -173,7 +174,7 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
 | Y-4 | Windows 上运行混淆输出没有 CI 验证 | `SUPPORT_MATRIX.md`："only proven on Linux" | 下游项目的 Windows 实测结果回填为带日期的记录；再评估是否加 windows integration job |
 | Y-6 | name-mangling 打断运行时注解 | 重命名类后 eager `-> Cls` 注解引用旧名 → NameError（真实多模块包实测） | mangling 同步改写注解名，或对缺 `from __future__ import annotations` 的 eager 注解告警 |
 | ~~Y-7~~ ✅ | ~~cross-file mangler 作用域 bug~~ **已修** (`069a820`) | 函数局部变量复用被重命名的模块级名字时 Load 引用被误改 → `NameError: name 'Ixx'`。`LocalNameTransformer` 现按 Python 作用域收集函数体内全部绑定名（含 lambda/推导式作用域）| 已修 + 2 回归测试 |
-| Y-8 | control-flow flattening 的 `_cff_return_N` 未绑定 | 大函数（try/finally + 多个分支内 early return，如 400 行的 `run_inference_on_dicom_folder`）混淆后 `UnboundLocalError: _cff_return_2`；小样例（for/try-finally + early return）未复现，触发形态=大而复杂的函数 | 排查 CFF 状态机对 return-var 的初始化/跨状态可见性；需要更接近真实的大函数复现 |
+| ~~Y-8~~ ✅ | ~~control-flow flattening 的 `_cff_return_N` 未绑定~~ **已修** | 根因并非函数大小本身：一条路径显式 `return`、另一条路径自然落底时，统一生成的 `return _cff_return_N` 会读取未初始化变量。大型 `try/finally` 只是更容易出现这种路径组合 | 状态机启动前将共享 return slot 初始化为 Python 隐式返回值 `None`；已补最小条件分支与 `try/finally` early-return 两个回归测试 |
 | Y-5 | 文档漂移 | `pyobfus.yaml.example` 仍写社区版 `max_files: 5` / `max_total_loc: 1000`，并把 `string_encoding` 标为 Pro，与 README 的"社区版无文件和行数限制"矛盾；`opacity.toml` 规则格式没有面向用户的文档 | 修正示例配置，给 `--opacity-config` 补格式说明（免发版） |
 
 ## 已研究、明确延后（不在队列里，但别忘了）

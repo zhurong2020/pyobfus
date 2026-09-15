@@ -374,6 +374,49 @@ def tiny(x):
 class TestEdgeCases:
     """Tests for edge cases and special scenarios."""
 
+    def test_conditional_return_with_implicit_none_fallthrough(self):
+        """A non-returning path must retain Python's implicit None return."""
+        code = """
+def example(x):
+    marker = 1
+    if x:
+        return marker
+    marker += 1
+"""
+        tree = ast.parse(code)
+        result = ControlFlowFlattener().visit(tree)
+
+        ast.fix_missing_locations(result)
+        namespace = {}
+        exec(compile(result, "<test>", "exec"), namespace)
+
+        assert namespace["example"](True) == 1
+        assert namespace["example"](False) is None
+
+    def test_try_finally_early_return_with_implicit_none_fallthrough(self):
+        """A try/finally early return must not leave the return slot unbound."""
+        code = """
+def example(x, events):
+    marker = 1
+    if x:
+        try:
+            return marker
+        finally:
+            events.append("cleanup")
+    marker += 1
+"""
+        tree = ast.parse(code)
+        result = ControlFlowFlattener().visit(tree)
+
+        ast.fix_missing_locations(result)
+        namespace = {}
+        exec(compile(result, "<test>", "exec"), namespace)
+
+        events = []
+        assert namespace["example"](True, events) == 1
+        assert events == ["cleanup"]
+        assert namespace["example"](False, events) is None
+
     def test_empty_if_body(self):
         """Test handling of empty if body (pass statement)."""
         code = """

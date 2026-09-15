@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Control-flow flattening preserves Python's implicit `None` return on
+  fallthrough paths.** When one branch returned explicitly but another
+  reached the end of the function, the generated final
+  `return _cff_return_N` could read an uninitialized slot and raise
+  `UnboundLocalError`. The shared return slot is now initialized to `None`
+  before the state machine starts. Regression coverage includes both a
+  minimal conditional return and an early return inside `try/finally`.
+
 - **Cross-file name mangling no longer rewrites a function-local variable that
   reuses a renamed module-level name.** `LocalNameTransformer` tracked only a
   function's *parameters* as local, so a local bound by assignment (or by
