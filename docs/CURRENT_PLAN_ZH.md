@@ -28,7 +28,7 @@ README/llms 已同步，但 Changelog 仍保留 `[Unreleased]`，`CITATION.cff` 
 公开版 0.5.26；**未 tag、未发布，等待用户明确通知**。此前推送的 Y-8 批次远端 CI 与
 CodeQL 已恢复全绿；候选版本地验收为 Core `1334 passed, 1 skipped`、MCP `97 passed`、
 integration `8 passed`，Black、Ruff、mypy、MkDocs strict、构建/Twine 与全新 venv wheel
-安装均通过；候选提交推送后的 Windows job 仍是最终 gate。
+安装均通过；候选提交推送后的完整 CI、Windows 生成物执行与 CodeQL 也已全部通过。
 pypistats `without_mirrors` 数据已覆盖 09-14：Core 09-13 / 09-14 为
 `122 / 41`（前者与 0.5.26 发布及验收重合，后者回到安静区间）；MCP 为 `5 / 9`，仍在
 安静区间，没有自然采用抬升证据。Gmail 近三天无新客户回复；Glama 自动邮件却把
