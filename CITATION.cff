@@ -34,6 +34,6 @@ keywords:
   - stack-trace mapping
   - AI-assisted debugging
 # Zenodo concept DOI (all versions — always resolves to the latest archive).
-# Zenodo archives each GitHub release automatically; the concept DOI currently
-# resolves to the v0.5.26 archive, whose version DOI is 10.5281/zenodo.22731176.
+# Zenodo archives each GitHub release automatically; verify the concept DOI
+# after indexing completes before recording a version-specific DOI here.
 doi: 10.5281/zenodo.20846053
