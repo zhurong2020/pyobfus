@@ -8,9 +8,9 @@ For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
 **Last updated**: 2026-09-16. Download/channel snapshot: pypistats
-`without_mirrors` data now runs through 09-14. Core recorded `122 / 41` on
-09-13 / 09-14; 09-13 overlaps the 0.5.26 release and verification, while the
-first clean day returned to the quiet range. MCP recorded `5 / 9` and remains
+`without_mirrors` data now runs through 09-15. Core recorded `99` on 09-15,
+above the historical 20–40 quiet band; 09-13/09-14 (`122`/`41`) bracket the
+0.5.26 release and verification. MCP recorded `5 / 9` on 09-13/09-14 and remains
 quiet. Marketplace was last checked at
 `202 downloads / 7 installs`; Open VSX is `466 downloads / 0 reviews`.
 The two registry download counters are not additive user counts. The prior
@@ -24,7 +24,7 @@ live; Glama is listed, searchable and healthy, with two consecutive successful
 builds and all 8 tools. No Glama resubmission or Build-steps change remains
 pending.
 
-The current download snapshot ends on 2026-09-14, before the 0.5.27 release;
+The current download snapshot ends on 2026-09-15, before the 0.5.27 release;
 do not interpret the next release-day spike as an organic baseline change.
 
 > **Note (2026-05-09)**: most of the per-channel facts below are now current as of Session 23. Outside of the launch wave (HN 5-11 / Reddit 5-12 / CN trio 5-8/9), the live state is reflected here. Consult `docs/POST_V0.4_TODO.md` for forward TODO and `docs/V0.4_EXECUTION_LOG.md` for session-by-session deltas.
@@ -84,6 +84,13 @@ do not interpret the next release-day spike as an organic baseline change.
   09-14, is back at `41`. The trailing seven-day sum is `627`, but `470` (75%)
   comes from the three release-contaminated days 09-10, 09-12 and 09-13. This
   does not establish an organic-baseline uplift.
+- 2026-09-16 recheck (data through 09-15, known mirrors excluded): trailing
+  seven days (09-09 through 09-15) recorded `31 / 123 / 37 / 225 / 122 / 41 /
+  99`; latest day/week/month is `99 / 678 / 2,336`. The 0.5.27 release day
+  (09-16) is not yet in pypistats (≈1-day lag). 09-15's `99` sits above the
+  historical 20–40 quiet band — the first reading after the 0.5.26 tail — so
+  wait for 2–3 clean days from 09-17 before judging organic uplift. This does
+  not yet establish a baseline change.
 - Tracker: `gh api repos/zhurong2020/pyobfus` + PePy
 
 ### PyPI — `pyobfus-mcp`
@@ -137,6 +144,9 @@ do not interpret the next release-day spike as an organic baseline change.
 - 2026-09-15 recheck (data through 09-14, known mirrors excluded): 09-13 and
   09-14 recorded `5 / 9`; the trailing seven-day sum is `77` (median `9`). The
   package remains in its quiet range with no adoption uplift signal.
+- 2026-09-16 recheck (data through 09-15, known mirrors excluded): 09-13 and
+  09-14 recorded `5 / 9`; the package remains in its quiet range with no
+  adoption uplift signal. 09-15 still quiet (no separate spike).
 
 ### GitHub — `zhurong2020/pyobfus`
 - URL: https://github.com/zhurong2020/pyobfus
