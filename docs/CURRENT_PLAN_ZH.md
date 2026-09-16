@@ -31,7 +31,7 @@ integration `8 passed`，Black、Ruff、mypy、MkDocs strict、构建/Twine 与�
 安装均通过；候选提交推送后的完整 CI、Windows 生成物执行与 CodeQL 也已全部通过。
 pypistats `without_mirrors` 数据已覆盖 09-14：Core 09-13 / 09-14 为
 `122 / 41`（前者与 0.5.26 发布及验收重合，后者回到安静区间）；MCP 为 `5 / 9`，仍在
-安静区间，没有自然采用抬升证据。Gmail 近三天无新客户回复；Glama 自动邮件却把
+安静区间，没有自然采用抬升证据；该数据尚未包含 09-16 的 0.5.27 发布日。Gmail 近三天无新客户回复；Glama 自动邮件却把
 09-13 的目录 release 称为 `pyobfus-mcp 0.5.27`，与真实 MCP 包版本 `0.3.12` 不一致，
 属于其目录版本信号漂移，不代表 PyPI 发版。
 

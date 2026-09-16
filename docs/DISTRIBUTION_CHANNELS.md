@@ -24,6 +24,9 @@ live; Glama is listed, searchable and healthy, with two consecutive successful
 builds and all 8 tools. No Glama resubmission or Build-steps change remains
 pending.
 
+The current download snapshot ends on 2026-09-14, before the 0.5.27 release;
+do not interpret the next release-day spike as an organic baseline change.
+
 > **Note (2026-05-09)**: most of the per-channel facts below are now current as of Session 23. Outside of the launch wave (HN 5-11 / Reddit 5-12 / CN trio 5-8/9), the live state is reflected here. Consult `docs/POST_V0.4_TODO.md` for forward TODO and `docs/V0.4_EXECUTION_LOG.md` for session-by-session deltas.
 
 ---
