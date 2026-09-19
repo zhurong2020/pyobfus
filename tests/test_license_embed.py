@@ -8,7 +8,6 @@ into obfuscated code.
 import ast
 import os
 import sys
-import tempfile
 from datetime import datetime, timedelta
 
 import pytest
@@ -224,9 +223,10 @@ def hello():
         code = """
 result = "success"
 """
-        # Use a unique counter file for this test
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pyobfus_test") as f:
-            counter_file = os.path.basename(f.name)
+        # Unique counter filename for this test. HOME is monkeypatched to
+        # tmp_path, so the counter itself lives in pytest's per-test directory
+        # and is discarded with it.
+        counter_file = f"{tmp_path.name}_counter.json"
 
         try:
             tree = ast.parse(code)

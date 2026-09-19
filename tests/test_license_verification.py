@@ -8,7 +8,6 @@ import hashlib
 import io
 import json
 import sys
-import tempfile
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -135,19 +134,13 @@ class TestLicenseKeyGeneration:
 
 
 class TestLicenseCaching:
-    """Test license caching functionality."""
+    """Test license caching functionality.
 
-    def setup_method(self):
-        """Set up test fixtures."""
-        # Use temporary directory for cache
-        self.temp_dir = tempfile.mkdtemp()
-        self.original_cache_file = CACHE_FILE
-
-    def teardown_method(self):
-        """Clean up test fixtures."""
-        # Remove any cached license
-        if PRO_AVAILABLE:
-            remove_cached_license()
+    The module-level ``isolated_license_cache`` fixture (autouse) binds the
+    Pro license cache to pytest's per-test ``tmp_path``; there is nothing left
+    to set up or tear down here. The previous ``setup_method`` created a
+    ``mkdtemp()`` directory that nothing ever used or removed.
+    """
 
     @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not available")
     def test_cache_and_load_license(self):

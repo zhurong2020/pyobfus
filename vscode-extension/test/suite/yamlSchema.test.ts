@@ -9,6 +9,7 @@ import {
   SCHEMA_URL,
   validateGeneratedConfigPath,
 } from "../../src/commands/generateConfig";
+import { cleanupTrackedTempDirs, trackTempDir } from "./helpers/tempdir";
 
 // M3 (pyobfus.yaml IntelliSense) has two independent mechanisms -- this
 // suite covers both:
@@ -47,9 +48,11 @@ suite("yamlValidation contribution (package.json)", () => {
 });
 
 suite("addSchemaModelineIfMissing", () => {
+  suiteTeardown(cleanupTrackedTempDirs);
+
   async function writeTemp(content: string): Promise<{ configPath: string; workspaceRoot: string }> {
-    const workspaceRoot = await fs.promises.mkdtemp(
-      path.join(os.tmpdir(), `pyobfus-yaml-modeline-${randomUUID()}-`),
+    const workspaceRoot = trackTempDir(
+      await fs.promises.mkdtemp(path.join(os.tmpdir(), `pyobfus-yaml-modeline-${randomUUID()}-`)),
     );
     const tmp = path.join(workspaceRoot, "pyobfus.yaml");
     await vscode.workspace.fs.writeFile(vscode.Uri.file(tmp), Buffer.from(content, "utf-8"));
@@ -77,13 +80,17 @@ suite("addSchemaModelineIfMissing", () => {
 
   test("rejects a generated config path outside the workspace", async () => {
     const { configPath } = await writeTemp("obfuscation: {}\n");
-    const otherWorkspace = await fs.promises.mkdtemp(path.join(os.tmpdir(), "pyobfus-other-workspace-"));
+    const otherWorkspace = trackTempDir(
+      await fs.promises.mkdtemp(path.join(os.tmpdir(), "pyobfus-other-workspace-")),
+    );
     await assert.rejects(validateGeneratedConfigPath(configPath, otherWorkspace), /outside the current workspace/);
   });
 
   test("rejects a symlink that escapes the workspace", async () => {
     const { configPath } = await writeTemp("obfuscation: {}\n");
-    const workspaceRoot = await fs.promises.mkdtemp(path.join(os.tmpdir(), "pyobfus-symlink-workspace-"));
+    const workspaceRoot = trackTempDir(
+      await fs.promises.mkdtemp(path.join(os.tmpdir(), "pyobfus-symlink-workspace-")),
+    );
     const linkPath = path.join(workspaceRoot, "pyobfus.yaml");
     await fs.promises.symlink(configPath, linkPath);
     await assert.rejects(validateGeneratedConfigPath(linkPath, workspaceRoot), /outside the current workspace/);

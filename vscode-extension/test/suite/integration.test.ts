@@ -18,6 +18,7 @@ import {
 import { DiagnosticsProvider } from "../../src/diagnostics/diagnosticsProvider";
 import { deriveTier } from "../../src/status/tierStatus";
 import { cwdForTarget } from "../../src/commands/obfuscateFile";
+import { cleanupTrackedTempDirs, trackTempDir } from "./helpers/tempdir";
 
 // Real contract test: runs against an actually-installed `pyobfus` (CI
 // installs it from the parent repo before running this suite; see
@@ -36,6 +37,8 @@ import { cwdForTarget } from "../../src/commands/obfuscateFile";
 
 suite("integration: real pyobfus contract", () => {
   const fixtureFile = path.join(__dirname, "..", "fixtures", "sample_project", "risky.py");
+
+  suiteTeardown(cleanupTrackedTempDirs);
 
   test("pyobfus --check --json produces the documented shape for the fixture's eval()", async function () {
     this.timeout(20_000);
@@ -98,8 +101,24 @@ suite("integration: real pyobfus contract", () => {
 suite("integration: M2 real pyobfus contracts", () => {
   const fixtureFile = path.join(__dirname, "..", "fixtures", "sample_project", "risky.py");
 
+  suiteTeardown(cleanupTrackedTempDirs);
+
   test("pyobfus.trial_cli status --json and pyobfus_pro.cli status --json feed deriveTier without throwing", async function () {
     this.timeout(20_000);
+
+    // The subprocesses resolve trial/license state from Path.home(), i.e.
+    // HOME/USERPROFILE of this extension host. Point those at an empty temp
+    // dir so the "community" expectation holds on dev machines that carry a
+    // real Pro license -- tests must never read a developer's real ~/.pyobfus
+    // state (AGENTS.md). CI runners are always clean; this makes the test
+    // deterministic everywhere else too.
+    const fakeHome = trackTempDir(fs.mkdtempSync(path.join(os.tmpdir(), "pyobfus-status-home-")));
+    const savedEnv: Record<string, string | undefined> = {
+      HOME: process.env.HOME,
+      USERPROFILE: process.env.USERPROFILE,
+    };
+    process.env.HOME = fakeHome;
+    process.env.USERPROFILE = fakeHome;
 
     const interpreter = await resolveInterpreter(vscode.Uri.file(fixtureFile));
     let trial: TrialStatusResult | undefined;
@@ -120,14 +139,22 @@ suite("integration: M2 real pyobfus contracts", () => {
         return;
       }
       throw err;
+    } finally {
+      for (const [name, value] of Object.entries(savedEnv)) {
+        if (value === undefined) {
+          delete process.env[name];
+        } else {
+          process.env[name] = value;
+        }
+      }
     }
 
     assert.strictEqual(trial.version, 1);
     assert.strictEqual(license.version, 1);
     assert.ok(license.device.fingerprint.length > 0);
-    // A fresh CI runner has no trial/license state -- both should report
-    // absent (null), which deriveTier must turn into "community" without
-    // throwing, not an untested edge case.
+    // HOME pointed at an empty dir, so both statuses report absent (null),
+    // which deriveTier must turn into "community" without throwing -- not
+    // an untested edge case.
     const status = deriveTier(license, trial);
     assert.strictEqual(status.tier, "community");
   });
@@ -135,7 +162,7 @@ suite("integration: M2 real pyobfus contracts", () => {
   test("pyobfus --init --json produces the documented shape", async function () {
     this.timeout(20_000);
 
-    const tmpDir = path.join(os.tmpdir(), `pyobfus-init-test-${randomUUID()}`);
+    const tmpDir = trackTempDir(path.join(os.tmpdir(), `pyobfus-init-test-${randomUUID()}`));
     await vscode.workspace.fs.createDirectory(vscode.Uri.file(tmpDir));
     await vscode.workspace.fs.writeFile(
       vscode.Uri.file(path.join(tmpDir, "app.py")),
@@ -165,7 +192,7 @@ suite("integration: M2 real pyobfus contracts", () => {
   test("pyobfus --validate-config --json produces the documented shape", async function () {
     this.timeout(20_000);
 
-    const tmpDir = path.join(os.tmpdir(), `pyobfus-validate-test-${randomUUID()}`);
+    const tmpDir = trackTempDir(path.join(os.tmpdir(), `pyobfus-validate-test-${randomUUID()}`));
     const configPath = path.join(tmpDir, "pyobfus.yaml");
     await vscode.workspace.fs.createDirectory(vscode.Uri.file(tmpDir));
     await vscode.workspace.fs.writeFile(
@@ -244,7 +271,7 @@ suite("integration: M2 real pyobfus contracts", () => {
   test("cwdForTarget resolves pyobfus.yaml auto-discovery correctly outside any open workspace folder", async function () {
     this.timeout(20_000);
 
-    const projectDir = path.join(os.tmpdir(), `pyobfus-cwd-test-${randomUUID()}`);
+    const projectDir = trackTempDir(path.join(os.tmpdir(), `pyobfus-cwd-test-${randomUUID()}`));
     await vscode.workspace.fs.createDirectory(vscode.Uri.file(projectDir));
     const targetFile = path.join(projectDir, "app.py");
     await vscode.workspace.fs.writeFile(vscode.Uri.file(targetFile), Buffer.from("def foo():\n    return 1\n", "utf-8"));
