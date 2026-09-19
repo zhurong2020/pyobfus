@@ -21,6 +21,8 @@ OIDC PyPI 发布、PEP 740 provenance、GitHub Release 与公开 PyPI 全新环�
 本版本修复跨文件局部绑定、eager 注解/默认值改写、控制流隐式 `None` 返回和 Windows
 CP1252 help 输出。后续开发优先级见 `docs/CURRENT_PLAN_ZH.md` 与 `docs/TODO.md`。
 
+**当前状态一句话（2026-09-19）**：`0.5.27` 仍是最新公开版本；`CHANGELOG.md` 的 `[Unreleased]` 里**攒着一个待发增量**（provenance 的 CycloneDX 声明升到 1.7，校验侧兼容 1.6）。按用户定的节奏**免发版的先做、攒够增量再发**，发版是独立 gate、须用户明确批准。`examples/` 第一批现已在 `integration` job 里真实执行（Ubuntu + Windows）。
+
 ### 🔴 2026-09-13 — 许可系统可靠性（历史记录）
 
 一位新客户报激活失败，查出**与他无关的全线故障**：Cloudflare 边缘拦 `urllib` 默认
@@ -548,7 +550,7 @@ pyobfus/
 │   ├── transformers/   # AST 变换器
 │   └── cross_file/    # 跨文件混淆
 ├── pyobfus_pro/       # Pro Edition (商业许可)
-├── tests/             # 1334 passed + 1 skipped (0.5.27 发布前验证；+ pyobfus_mcp/tests 97 + integration_tests/ 8)
+├── tests/             # 1336 passed + 1 skipped (2026-09-19 实测；+ pyobfus_mcp/tests 97 + integration_tests/ 12 + vscode-extension 53)
 ├── examples/          # 示例代码
 ├── docs/              # 项目文档
 └── cloudflare-worker/ # 许可验证 Worker
