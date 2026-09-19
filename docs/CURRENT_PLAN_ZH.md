@@ -166,6 +166,14 @@ provenance 冲突时退出码 1。⚠️ 环境陷阱：本地 venv 的 editable
     断言失败；现指向空临时 HOME，与 `AGENTS.md` 那条红线一致。
   - **四个测试根全绿**：core 1336 passed/1 skipped、MCP 97、integration 12、
     扩展 53；CI 同口径的 black/ruff/mypy 全过。
+  - **已 push，CI 实跑确认**（run `35442045181`）：CI / CodeQL / VSCode Extension CI
+    三条全绿，且 `Integration Tests (windows-latest)` 与 `(ubuntu-latest)` 两个 job
+    里**四个新 examples 测试都是 PASSED、无一 skip**——跨平台执行这一层不再是本机
+    口头结论。
+  - **顺带查出一条到期未办的外部事项**：Canopii `canopii-cli#6` 仍 `OPEN`、0 条回复、
+    最后更新 2026-09-02（距今 17 天），**已越过既定的 14 天 follow-up 窗口**。根因是
+    它此前只写在本文件深处、没进 `TODO.md` 的「外部等待」，到期了也没人看见——已连同
+    MCP Trust Checker 一起登记进 `TODO.md`。
 - **2026-09-19 下载量复查（数据截止 09-18，含 09-16 的 0.5.27 发布日）**：Core
   recent 口径日/周/月 `32 / 605 / 2,274`。09-14～09-18 逐日（`without_mirrors`）：
   `41` → `99`(09-15) → `68`(09-16, 0.5.27 发布日) → `18`(09-17) → `32`(09-18)。

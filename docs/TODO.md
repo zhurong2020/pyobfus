@@ -213,6 +213,15 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
 - Claude Plugin Marketplace：2026-08-02 提交，至今 `Submitted and pending
   review`。策略不变：被动等待，不为文案笔误重新提交。
 - Open VSX namespace 归属验证：可选，`not verified` 是「未申请」不是「被拒」。
+- **Canopii [`canopii-cli#6`](https://github.com/canopii-dev/canopii-cli/issues/6)
+  —— ⏰ follow-up 已到期**。2026-09-19 实测：仍 `OPEN`、**0 条回复**、最后更新
+  停在 2026-09-02，距今 17 天，已越过既定的「14 天无回复只做一次简短 follow-up」。
+  **这条此前只写在 `CURRENT_PLAN_ZH.md` 深处、没有进本文件**，所以到期了也没人看见——
+  现在登记在此。follow-up 只发一次，不反复催。上游重扫后按四项验收（latest ≥ v0.3.10 /
+  识别 8 tools / 不再把 `pyobfus_pro/`、`examples/`、VS Code/Worker 计入 MCP 包
+  evidence / PEP 740 provenance 是否被识别），**不是只看总分**。
+- **MCP Trust Checker 登记**：尚未执行，无外部依赖，想做随时可做。同上，此前也只在
+  `CURRENT_PLAN_ZH.md` 里。
 
 ## 明确不做
 
