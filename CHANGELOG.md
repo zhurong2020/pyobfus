@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- **The provenance manifest's embedded CycloneDX section now declares
+  `specVersion: "1.7"`.** The emitted field subset is unchanged and valid
+  under both 1.6 and 1.7; the current spec version (ECMA-424 2nd edition) is
+  simply declared honestly instead of pinning the superseded 1.6.
+  `--verify-provenance-manifest` accepts both `"1.6"` and `"1.7"`, so
+  manifests written by earlier releases remain valid. CycloneDX 1.7's new TLP
+  distribution constraints are deliberately not used: TLP is a sharing label,
+  not access control — see
+  [PROVENANCE_MANIFEST.md](docs/PROVENANCE_MANIFEST.md).
+
 ## [0.5.27] - 2026-09-16
 
 ### Fixed

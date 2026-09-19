@@ -29,6 +29,14 @@ from pyobfus.core.build_marker import marker_enabled, marker_state
 
 PROVENANCE_FORMAT_VERSION = 1
 
+# CycloneDX spec version the embedded BOM section declares. The field subset
+# pyobfus emits (metadata.tools/components/dependencies with file components)
+# is valid under both 1.6 and 1.7; 1.7 is the current spec (ECMA-424 2nd
+# edition). Manifests written by older pyobfus releases declare 1.6 and stay
+# valid, so the verifier accepts both.
+CYCLONEDX_SPEC_VERSION = "1.7"
+SUPPORTED_CYCLONEDX_SPEC_VERSIONS = ("1.6", "1.7")
+
 
 def sha256_file(path: Union[str, Path]) -> Optional[str]:
     """Return the SHA-256 hex digest of a file, or None when it is absent."""
@@ -152,7 +160,7 @@ def build_provenance_manifest(
         "files": file_records,
         "cyclonedx": {
             "bomFormat": "CycloneDX",
-            "specVersion": "1.6",
+            "specVersion": CYCLONEDX_SPEC_VERSION,
             "version": 1,
             "metadata": {
                 "timestamp": created_at,
@@ -357,8 +365,12 @@ def _validate_cyclonedx_section(cyclonedx: Any, errors: List[str], warnings: Lis
         return
     if cyclonedx.get("bomFormat") != "CycloneDX":
         errors.append("cyclonedx.bomFormat must be 'CycloneDX'.")
-    if cyclonedx.get("specVersion") != "1.6":
-        errors.append("cyclonedx.specVersion must be '1.6'.")
+    if cyclonedx.get("specVersion") not in SUPPORTED_CYCLONEDX_SPEC_VERSIONS:
+        errors.append(
+            "cyclonedx.specVersion must be one of: "
+            + ", ".join(repr(v) for v in SUPPORTED_CYCLONEDX_SPEC_VERSIONS)
+            + "."
+        )
 
     components = cyclonedx.get("components")
     if not isinstance(components, list):

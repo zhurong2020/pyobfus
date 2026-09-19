@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import json
 from pathlib import Path
 
@@ -61,7 +62,7 @@ def test_cli_writes_provenance_manifest_with_mapping_digest(tmp_path: Path) -> N
     assert "source_control" in data
     assert "git_commit" in data["source_control"]
     assert data["cyclonedx"]["bomFormat"] == "CycloneDX"
-    assert data["cyclonedx"]["specVersion"] == "1.6"
+    assert data["cyclonedx"]["specVersion"] == "1.7"
     component_refs = {component["bom-ref"] for component in data["cyclonedx"]["components"]}
     assert component_refs == {"input:app.py", "output:app.py", "mapping:mapping.json"}
     assert data["cyclonedx"]["dependencies"] == [
@@ -156,6 +157,77 @@ def test_validate_provenance_manifest_reports_shape_and_integrity_errors(
     assert "Missing required field: cyclonedx" in result["errors"]
     assert "integrity digest does not match manifest payload." in result["errors"]
     assert result["warnings"] == ["files is empty; no obfuscated file records are present."]
+
+
+def _rebuild_integrity(manifest: dict) -> dict:
+    """Return a copy of ``manifest`` with a freshly computed integrity digest.
+
+    ``_integrity_digest_for`` ignores any existing ``integrity`` value, so the
+    input may carry a stale digest from an edited payload.
+    """
+    from pyobfus.core.provenance import _integrity_digest_for
+
+    rebuilt = copy.deepcopy(manifest)
+    rebuilt["integrity"] = _integrity_digest_for(rebuilt)
+    return rebuilt
+
+
+def test_verifier_accepts_legacy_cyclonedx_1_6_manifests(tmp_path: Path) -> None:
+    """Manifests written by releases that declared specVersion 1.6 stay valid."""
+    src = tmp_path / "app.py"
+    src.write_text("def predict(x):\n    return x + 1\n", encoding="utf-8")
+    manifest_path = tmp_path / "provenance.json"
+
+    CliRunner().invoke(
+        main,
+        [
+            str(src),
+            "-o",
+            str(tmp_path / "out.py"),
+            "--provenance-manifest",
+            str(manifest_path),
+            "--json",
+        ],
+    )
+    data = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+    legacy = copy.deepcopy(data)
+    legacy["cyclonedx"]["specVersion"] = "1.6"
+    legacy = _rebuild_integrity(legacy)
+
+    result = validate_provenance_manifest(legacy)
+    assert result["valid"], result["errors"]
+    assert verify_manifest_integrity(legacy)
+
+
+def test_verifier_rejects_unknown_cyclonedx_spec_version(tmp_path: Path) -> None:
+    src = tmp_path / "app.py"
+    src.write_text("def predict(x):\n    return x + 1\n", encoding="utf-8")
+    manifest_path = tmp_path / "provenance.json"
+
+    CliRunner().invoke(
+        main,
+        [
+            str(src),
+            "-o",
+            str(tmp_path / "out.py"),
+            "--provenance-manifest",
+            str(manifest_path),
+            "--json",
+        ],
+    )
+    data = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+    unknown = copy.deepcopy(data)
+    unknown["cyclonedx"]["specVersion"] = "1.8"
+    unknown = _rebuild_integrity(unknown)
+
+    result = validate_provenance_manifest(unknown)
+    assert not result["valid"]
+    assert any(
+        "cyclonedx.specVersion" in error and "1.6" in error and "1.7" in error
+        for error in result["errors"]
+    ), result["errors"]
 
 
 def test_cli_verify_provenance_manifest_json_success(tmp_path: Path) -> None:

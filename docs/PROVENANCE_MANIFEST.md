@@ -42,7 +42,7 @@ The top-level manifest keeps pyobfus's native provenance contract:
 The manifest also embeds a `cyclonedx` object:
 
 - `bomFormat: "CycloneDX"`
-- `specVersion: "1.6"`
+- `specVersion: "1.7"` (see below for 1.6 compatibility)
 - `metadata.tools.components[]`: the pyobfus tool component.
 - `metadata.component`: the obfuscated output artifact, including pyobfus
   properties for config hash and mode.
@@ -55,6 +55,31 @@ This section intentionally lives inside the pyobfus manifest rather than
 replacing it. The native fields remain the stable pyobfus contract; the
 CycloneDX-compatible section gives supply-chain tools a familiar component and
 relationship shape.
+
+### Spec version: 1.7, with 1.6 compatibility
+
+Since the release after 0.5.27, new manifests declare `specVersion: "1.7"`
+(ECMA-424 2nd edition). The field subset pyobfus emits is unchanged and valid
+under both 1.6 and 1.7 — the upgrade declares the current spec, it does not
+start using 1.7-only fields. `--verify-provenance-manifest` accepts both
+`"1.6"` and `"1.7"`, so manifests written by older releases remain valid.
+
+That dual validity is measured, not assumed: an emitted `cyclonedx` section was
+validated against the official published `bom-1.7.schema.json` and — with only
+the `specVersion` string swapped — against `bom-1.6.schema.json`, and both
+passed with no errors. The check is a one-time external conformance
+verification, deliberately not a CI test, because it would make every run
+depend on fetching a third-party schema over the network.
+
+**Why CycloneDX 1.7's TLP distribution constraints are not used.** 1.7 adds
+`metadata.distributionConstraints.tlp` (FIRST.org Traffic Light Protocol:
+CLEAR / GREEN / AMBER / AMBER+STRICT / RED). It is a *sharing label* that tells
+recipients how the BOM itself may be redistributed — it is not access control
+and does not encrypt or restrict anything. For protected builds delivered to a
+designated customer, the delivery problem that actually matters is licensing
+and runtime shape (whether Pro runtime can legally ship with the output), not
+how the manifest is labelled. If that delivery story is ever formalized, a
+TLP marking would be a one-field addition on top, not a foundation for it.
 
 ## Integrity Digest
 
@@ -111,7 +136,7 @@ The JSON mode returns `valid`, `errors`, `warnings`, `summary`, `ai_hint`, and
   ],
   "cyclonedx": {
     "bomFormat": "CycloneDX",
-    "specVersion": "1.6",
+    "specVersion": "1.7",
     "components": [],
     "dependencies": []
   },
