@@ -1,6 +1,6 @@
 # Support matrix
 
-What is actually verified, by what, as of 2026-09-16 (`pyobfus` 0.5.27 /
+What is actually verified, by what, as of 2026-09-19 (`pyobfus` 0.5.27 /
 `pyobfus-mcp` 0.3.12 / VS Code extension 0.4.3).
 
 Three labels, used strictly:
@@ -57,14 +57,19 @@ generated output; `--verify-syntax` compiles it, which is weaker than running.
 |---|---|---|
 | PyInstaller | advisory-only | [`PYINSTALLER_COOKBOOK.md`](PYINSTALLER_COOKBOOK.md) + `examples/pyinstaller/`; `--check` emits a `compatibility_advisory` for it |
 | Nuitka / Cython compiled packaging | advisory-only | [`COMPILED_PACKAGING_COOKBOOK.md`](COMPILED_PACKAGING_COOKBOOK.md) + `examples/compiled_packaging/` |
-| Import hook / encrypted files (e.g. SOURCEdefender `.pye`) | advisory-only | [`IMPORT_HOOK_COOKBOOK.md`](IMPORT_HOOK_COOKBOOK.md) + `examples/import_hook/` |
+| Import hook — stdlib `importlib` loader | tested | `integration_tests/test_examples.py` — obfuscated module loads through the custom hook; original identifiers never reach the loaded source |
+| Import hook — SOURCEdefender `.pye` encrypted files | advisory-only | [`IMPORT_HOOK_COOKBOOK.md`](IMPORT_HOOK_COOKBOOK.md); the stdlib path above is what CI covers |
 | Model serving | advisory-only | [`MODEL_SERVING_COOKBOOK.md`](MODEL_SERVING_COOKBOOK.md) |
-| Reverse stack-trace mapping workflow | tested | `tests/test_unmap_cli.py`, plus `examples/ai_debugging/` |
+| Reverse stack-trace mapping workflow | tested | `tests/test_unmap_cli.py`, plus `integration_tests/test_examples.py` — the `examples/ai_debugging/` round trip (obfuscated crash → `--unmap` restores originals) runs on every push |
 
-`examples/simple.py` and `examples/multifile/` are executed by the
-`integration` job on Ubuntu and Windows, and their generated output is compared
-with the original output. The remaining examples are still advisory-only and
-should move up only when a named CI check executes them.
+First-batch examples executed by the `integration` job (Ubuntu and Windows),
+each obfuscated, run, and compared against the original behavior:
+`simple.py` and `multifile/` via `test_cli_end_to_end.py`; `string_encoding.py`,
+`keyword_arguments.py` (`--preserve-param-names`), `ai_debugging/`, and
+`import_hook/` via `test_examples.py`. The remaining examples
+(`pyinstaller/`, `compiled_packaging/`, Pro) need external toolchains or a
+license and are still advisory-only; they move up only when a named CI check
+executes them.
 
 ## Dependency and SDK ranges
 
