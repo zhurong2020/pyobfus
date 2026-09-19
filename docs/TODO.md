@@ -5,8 +5,9 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-09-16（Core `0.5.27` 已发布并完成公开安装/完整性验证；公开门面审计
-状态及本轮运营复查见 `CURRENT_PLAN_ZH.md`）。
+最后更新：2026-09-19（原排在前三位的 CycloneDX 版本对齐、`examples/` 进 CI、测试
+fixture 漏临时目录已全部做完并移出本文件，队列前移；Core `0.5.27` 仍是当前公开版本，
+公开门面审计状态及运营复查见 `CURRENT_PLAN_ZH.md`）。
 
 ## 状态口径
 
@@ -25,6 +26,10 @@
 CI job、只读 review skill、浏览器端对比小节、抗 AI 措辞改写、支持矩阵）记在
 [`CURRENT_PLAN_ZH.md`](CURRENT_PLAN_ZH.md) 的「09-12 发布后续」段。
 
+2026-09-19 完成的三项（CycloneDX 1.7 对齐、`examples/` 第一批进 CI 实跑、测试
+fixture 漏临时目录）记在同一文件的「09-19」段。其中只有 CycloneDX 那项改了
+`pyobfus/` 代码，因此 held 在 `CHANGELOG.md` 的 `[Unreleased]`，要发版才到用户手里。
+
 ## 节奏（2026-09-12 用户定）
 
 **过几天再动手，靠持续发版与更新吸引流量。** 下面的排序按这个前提写：**免发版的
@@ -42,70 +47,24 @@ CI job、只读 review skill、浏览器端对比小节、抗 AI 措辞改写、
 
 | # | 任务 | 要发版吗 | 谁来做 |
 |---|---|---|---|
-| 1 | CycloneDX 版本声明对齐 | **取决于选哪条**：升 1.7 改代码→要发版；保持 1.6 + 文档写明→免发版 | Claude |
-| 2 | 让 `examples/` 在 CI 里真的跑 | 免发版（只动 `.github/workflows/` 与 `examples/`） | Claude |
-| 2.5 | 测试 fixture 漏临时目录 | 免发版（只动测试） | Claude |
-| 3 | 稳定 reason code | **要发版**（改 `--check` / plan / build report 三处 JSON） | Claude |
-| 4 | OpenSSF OSPS Baseline 自评 | 免发版（产出差距表；个别项可能要改仓库设置） | Claude 出表，设置项需维护者 |
-| 5 | 对比可见度：拆分对比页 + 上架目录 | 免发版（拆页纯 docs；上架需对方站点提交） | 拆页 Claude；上架需维护者账号 |
+| 1 | 稳定 reason code | **要发版**（改 `--check` / plan / build report 三处 JSON） | Claude |
+| 2 | OpenSSF OSPS Baseline 自评 | 免发版（产出差距表；个别项可能要改仓库设置） | Claude 出表，设置项需维护者 |
+| 3 | 对比可见度：拆分对比页 + 上架目录 | 免发版（拆页纯 docs；上架需对方站点提交） | 拆页 Claude；上架需维护者账号 |
 
-### 1. CycloneDX 版本声明对齐（一两小时）
-
-`pyobfus/core/provenance.py` 写死 `"specVersion": "1.6"`，现行是 1.7
-（ECMA-424 第 2 版）。二选一，都诚实：升到 1.7 且只填真实字段；或保持 1.6 但在
-`PROVENANCE_MANIFEST.md` 写明「对齐 1.6，未使用 1.7 新增字段」。
-顺带评估 1.7 的 **TLP 分发约束**对「交付给指定客户的受保护构建」是否有真实价值。
-验收：`--verify-provenance-manifest` 对新旧 manifest 均通过。
-
-### 2. 让 `examples/` 在 CI 里真的跑（半天到一天 · 免发版）
-
-`SUPPORT_MATRIX.md` 点名的最大缺口：**没有任何 `examples/` 在 CI 中执行**，它们
-只在写的时候人工跑通过。分两批，别一次全上：
-
-- **第一批（便宜，进常规 CI）**：`simple.py` / `string_encoding.py` /
-  `keyword_arguments.py` / `multifile/` / `ai_debugging/`（混淆 → 执行 → 
-  `--unmap` 还原）/ `import_hook/`（loader 是自包含的，不需要 SOURCEdefender）。
-  纯 Python，无重依赖，秒级。
-- **第二批（重，单独 job 或定时触发）**：`pyinstaller/` 与 `compiled_packaging/`
-  需要装 PyInstaller / Cython / Nuitka 并真正编译，分钟级且易受上游影响。
-  **建议先只跑第一批**，第二批视 CI 时长再定，或放到每周定时。
-
-验收：第一批每个示例都**执行生成的产物并断言输出**，不是只看退出码；跑通后把
-`SUPPORT_MATRIX.md` 对应格子从 advisory-only 提到 tested，并在表里写明是哪个 job。
-
-### 2.5 测试 fixture 漏临时目录（一两小时 · 免发版 · 跨 session 发现）
-
-来源不是本 session：2026-09-12 另一个 session 做全工作区 `/tmp` 清理时统计到
-**pyobfus 测试残留 32 项 / 212 文件**，并把它列为该次台账的「结构性建议」第 1 条
-（`~/projects/home/archives/project_docs/TMP_CLEANUP_20260912.md`）。**本 session
-已逐条核实属实**，是代码缺陷不是操作疏忽：
-
-| 位置 | 症状 |
-|---|---|
-| `tests/test_license_embed.py:228` | `NamedTemporaryFile(delete=False, suffix=".pyobfus_test")`，零字节文件永不删除 |
-| `tests/test_license_verification.py:137` | `setup_method` 里 `mkdtemp()`，`teardown_method` 只清 license 缓存、**不删目录** |
-| `vscode-extension/test/suite/{obfuscateFile,validateConfig,yamlSchema}.test.ts` | 多处 `mkdtempSync` / `mkdtemp`（前缀 `pyobfus-config-test-` / `pyobfus-validate-test-` / `pyobfus-yaml-modeline-`）无清理 |
-| `vscode-extension/test/suite/integration.test.ts:168` | 手拼 `os.tmpdir()` 路径，同样无清理 |
-
-修法：Python 侧改用 pytest 的 `tmp_path`（本仓库其它测试已是这个写法），或在
-`teardown_method` 里 `shutil.rmtree(..., ignore_errors=True)`；TS 侧在 `suiteTeardown`
-统一 `rm -rf`。体积可忽略，值得修的原因是**每跑一次测试就留一批**，而我们一天
-可能跑几十次。
-
-### 3. 稳定 reason code（两三天 · 动 JSON 契约）
+### 1. 稳定 reason code（两三天 · 动 JSON 契约）
 
 给每个 excluded file、preserved symbol、disabled transform 一个稳定的 reason
 code，替代现在的自由文本。涉及 `--check` / dry-run plan / build report 三处
 JSON，需要版本字段管理，**排在矩阵之后**，因为矩阵会暴露到底需要哪些 code（矩阵已完成，见 `SUPPORT_MATRIX.md`）。
 
-### 4. OpenSSF OSPS Baseline 自评（一天）
+### 2. OpenSSF OSPS Baseline 自评（一天）
 
 对照 [Baseline 2026-02-19](https://baseline.openssf.org/versions/2026-02-19.html)
 （Level 1 / Level 2，共 40 条，覆盖访问控制、构建发布、文档、治理、法务、质量、
 安全评估与漏洞处理）做一次差距清单。与已有的 OpenSSF Best Practices passing
 徽章互补，不重复。产出是差距表，不是一次性全部补齐。
 
-### 5. 对比可见度 —— 拆页已完成，只剩上架
+### 3. 对比可见度 —— 拆页已完成，只剩上架
 
 **已完成 2026-09-13**：`COMPARISON.md` 由 490 行的单页拆成索引页 + `docs/compare/`
 下 7 个一页一对手的页面（PyArmor / Nuitka / Cython / PyLocket / Oxyry /
@@ -198,11 +157,11 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
   enabled」——**若到 2026-09-27 仍是 Pending，把这句删掉**，等真 Enabled 再加回来。
   我们在对外文案上守「说得准」这条线，这里不该例外。可向 Stripe 支持直接问审核在等什么。
 
-- **下载量复查**：2026-09-16 已查，数据覆盖至 2026-09-15（见
-  `CURRENT_PLAN_ZH.md` 09-16 条目）。**09-16 的 `0.5.27` 发布日数据尚未入
-  pypistats**（约 1 天延迟）；**关键观察**：09-15 单日 `99` 高于既往 20–40 安静
-  区间，需等 09-17 起 2–3 个干净日复查才能判断是否基线抬升。下一次复查需至少覆盖
-  一个完整非发布日。注意发布日与验收流量不能当自然增长。
+- **下载量复查**：**2026-09-19 已查**，数据覆盖至 09-18（见
+  `CURRENT_PLAN_ZH.md` 09-19 条目）。结论：09-16 的 0.5.27 发布日为 `68`（低于
+  历史尖峰），其后两个干净日 `18 / 32` 回落 20–40 安静区间——**09-15 的 `99`
+  判定为 0.5.26 长尾，基线未抬升**，该悬置问题已关闭。下次复查照旧看非发布日
+  基线是否上移；注意发布日与验收流量不能当自然增长。
 - **归因查询**：GitHub 代码搜索 `uses: zhurong2020/pyobfus-action`，量的是
   可见性不是采纳量。
 - **竞品扫描**：有触发点再做（新对手 / 生态政策变化 / 临近发布），不定期盯梢。

@@ -1,6 +1,6 @@
 # pyobfus 当前计划
 
-更新时间：2026-09-16（当前公开版本：Core **`0.5.27`** / MCP **`0.3.12`** /
+更新时间：2026-09-19（当前公开版本：Core **`0.5.27`** / MCP **`0.3.12`** /
 VS Code **`0.4.3`**；**GitHub Action `pyobfus-action v1.0.1` 已上架 Marketplace**。本轮完成：**09-10 下载与渠道复查**——三个 0.5.22 发布后的
 干净日 `65 / 48 / 31` 单调回落进安静区间，**09-08 悬置的「基线是否抬升」问题
 已有答案：没有抬升**；MCP 09-07 的 235 已由 `16 / 23` 坐实为发版/重建自动化流量。
@@ -127,6 +127,54 @@ provenance 冲突时退出码 1。⚠️ 环境陷阱：本地 venv 的 editable
     该条 test 的详情/日志看显式结果（08-24 对 `01a033e4` 就是这么坐实的），
     确认后才可把构建侧记为恢复。
 - **分发扩展调研已记录**：见 [`DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md`](DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md)。结论是不提交 `free-for.dev`，后续顺序为 Open VSX、GitHub Action、`awesome-python`、安全类 awesome-list、AlternativeTo、Smithery、Product Hunt。**其中 Open VSX 已于本日完成**，队列下一个是 GitHub Action。
+- **2026-09-19 完成 TODO 前三项（队列因此前移）**：三项都已实测验收，已从
+  `TODO.md` 移出。
+  - **① CycloneDX 版本声明对齐 —— 选了「升 1.7」，因此要发版**。
+    `provenance.py` 的 `specVersion` 由写死 `"1.6"` 改为常量
+    `CYCLONEDX_SPEC_VERSION = "1.7"`，校验侧改为接受
+    `SUPPORTED_CYCLONEDX_SPEC_VERSIONS = ("1.6", "1.7")`，**旧版本写出的
+    manifest 继续有效**。**证据不是自说自话**：把真实产出的 `cyclonedx` 段拿去
+    对官方 `bom-1.7.schema.json` 跑 JSON Schema 校验通过，只改 `specVersion`
+    字符串后对 `bom-1.6.schema.json` 同样通过——坐实了「字段子集未变、两版都
+    合法」这句话。同时核实 `bom-1.8.schema.json` 返回 404，1.7 确为现行最新。
+    **1.7 的 TLP 分发约束评估结论是不用**：`metadata.distributionConstraints.tlp`
+    确实存在（schema 枚举 `CLEAR/GREEN/AMBER/AMBER_AND_STRICT/RED`），但它是
+    *共享标签* 不是访问控制，对「交付给指定客户的受保护构建」真正卡住的是
+    Y-1 那个运行时分发问题，不是清单上贴什么标。理由写进
+    [`PROVENANCE_MANIFEST.md`](PROVENANCE_MANIFEST.md)。改动 held 在
+    `CHANGELOG.md` 的 `[Unreleased]`，**发版仍是独立 gate**。
+  - **② `examples/` 第一批进 CI 实跑 —— 免发版，`SUPPORT_MATRIX.md` 最大缺口已补**。
+    新增 `integration_tests/test_examples.py`；**不需要改 workflow**，因为
+    `integration` job 本来就跑 `pytest integration_tests/`，且该 job 已是
+    Ubuntu + Windows 双平台。四个示例各自**执行产物并断言行为**，不是只看退出码：
+    `string_encoding.py` 与 `keyword_arguments.py`（后者带 `--preserve-param-names`）
+    比对 stdout 与原始运行逐字相同；`ai_debugging/` 跑完整往返——混淆版崩溃、
+    断言 traceback 里**不含**原函数名 `order_total`，再用 `--unmap` 断言原名被还原；
+    `import_hook/` 断言自定义 loader 能加载混淆模块，且 `top_secret_algorithm`
+    等原始标识符**没有**出现在被加载的源码里。本地 12/12 通过、**无一 skip**。
+    `pyinstaller/` 与 `compiled_packaging/` 需要外部工具链，按计划仍留 advisory-only。
+  - **③ 测试 fixture 漏临时目录 —— 免发版，Python 与 TS 两侧都修**。
+    Python 侧：`test_license_embed.py` 不再用 `NamedTemporaryFile(delete=False)`
+    （HOME 已 monkeypatch 到 `tmp_path`，计数器随之落在每测试目录里）；
+    `test_license_verification.py` 删掉那个**从没人用过也从没人删过**的
+    `mkdtemp()`（模块级 autouse fixture 早已把许可缓存绑到 `tmp_path`）。
+    TS 侧新增 `test/suite/helpers/tempdir.ts`（`trackTempDir` +
+    `suiteTeardown(cleanupTrackedTempDirs)`），覆盖四个 suite 的 `mkdtemp*`。
+    **验收是量出来的**：跑完整 `/tmp` 目录前后快照 `diff` 为空，扩展 53 测试
+    跑完 `pyobfus-*` 计数仍为 0。顺带修了 integration 测试一个真实隐患——它原本
+    读**开发者本机真实** `~/.pyobfus` 状态，本机装了 Pro 就会让「community」
+    断言失败；现指向空临时 HOME，与 `AGENTS.md` 那条红线一致。
+  - **四个测试根全绿**：core 1336 passed/1 skipped、MCP 97、integration 12、
+    扩展 53；CI 同口径的 black/ruff/mypy 全过。
+- **2026-09-19 下载量复查（数据截止 09-18，含 09-16 的 0.5.27 发布日）**：Core
+  recent 口径日/周/月 `32 / 605 / 2,274`。09-14～09-18 逐日（`without_mirrors`）：
+  `41` → `99`(09-15) → `68`(09-16, 0.5.27 发布日) → `18`(09-17) → `32`(09-18)。
+  **TODO 里悬置的「09-15 的 99 是否基线抬升」已有答案：没有抬升**——09-16
+  发布日之后两个干净日 `18 / 32` 回落到 20–40 安静区间，99 判定为 0.5.26 的
+  发布长尾。另 09-16 发布日 `68` 明显低于历史尖峰（123/225/122），本轮不解读、
+  继续观察。MCP recent 日/周/月 `9 / 66 / 991`，仍在安静区间。GitHub
+  **9 stars**（较 09-10 的 7 +2）/ 2 forks / 0 open issue。发版吸流量策略的
+  收益继续按「非发布日基线」衡量：基线未见抬升。
 - **2026-09-16 下载量复查（数据截止 09-15，不含 09-16 的 0.5.27 发布日）**：Core
   `99 / 678 / 2,336`（日/周/月，`without_mirrors`）。09-09～09-15 七日逐日：
   `31`(09-09) → `123`(09-10, 0.5.23) → `37`(09-11) → `225`(09-12, 0.5.24/0.5.25)
