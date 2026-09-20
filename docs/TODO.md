@@ -128,8 +128,11 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 
 ## 待发内容（已在 main，未发版）
 
-发版本身是独立 gate。下面内容已经合进 `main` 或进入本轮 release-candidate 提交，
-但要发布才会到用户手里：
+发版本身是独立 gate。下面内容已经合进 `main`，但要发布才会到用户手里：
+
+- **Core `[Unreleased]`**：CycloneDX 1.7 声明对齐 + **trial `pyobfus-trial start
+  --email`**（客户端）。**Worker 端已部署上线并验证**（2026-09-20，版本 `9a0fb84a`），
+  硬约束「先服务端」已满足，客户端可随下次 Core 发版发出。
 
 - **`pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]`**：mcp SDK 2.x 兼容。**刻意没有随
   Core 0.5.27 一起发**——这是独立 MCP 增量，不应捆绑到 Core 发布；且每发一次 MCP 都要

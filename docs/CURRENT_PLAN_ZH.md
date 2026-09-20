@@ -127,6 +127,24 @@ provenance 冲突时退出码 1。⚠️ 环境陷阱：本地 venv 的 editable
     该条 test 的详情/日志看显式结果（08-24 对 `01a033e4` 就是这么坐实的），
     确认后才可把构建侧记为恢复。
 - **分发扩展调研已记录**：见 [`DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md`](DISTRIBUTION_EXPANSION_RESEARCH_2026-09-07.md)。结论是不提交 `free-for.dev`，后续顺序为 Open VSX、GitHub Action、`awesome-python`、安全类 awesome-list、AlternativeTo、Smithery、Product Hunt。**其中 Open VSX 已于本日完成**，队列下一个是 GitHub Action。
+- **2026-09-20 本轮：三透镜重排 + trial 决策与实现 + OSPS 收口 + P0 对标文档**（已 commit+push，共 7 提交）：
+  - **规划重排**：对标竞品（PyArmor 9.2.7 上 VMC/ECC）、国际最佳实践（CycloneDX 1.7
+    落 ECMA-424、SLSA v1.2、OSPS 2026-02-19）、本地已完成/未发版，把 provenance 簇
+    收拢为 **P0 可验证性主线**、明确**不追**保护强度。见 `TODO.md` 顶部。
+  - **Trial 策略（决策 A，`TRIAL_STRATEGY_DECISION_2026-09-20.md`）**：维持本地 5 天
+    不设额度上限、不改先收费；新增**服务端邮箱登记 trial** 做去重+获客。
+    **Worker `/api/trial/request` 已实现 + 部署上线**（版本 `9a0fb84a`，
+    `TRIAL_SIGNING_SECRET` 已设，端点五项 curl 验证通过，测试 KV 记录已清理）；
+    **客户端 `pyobfus-trial start --email` 已实现**（联网失败回退本地、显式 UA 绕
+    Cloudflare 1010、UTC Z 时间戳 3.9/3.10 兼容），攒在 `[Unreleased]` 待发版。
+  - **OSPS 补齐**：4 个维护者开关（私密漏洞上报 / secret scanning+push protection /
+    `protect-main` ruleset / Dependabot，均 gh api 核实）+ 4 份文档（GOVERNANCE /
+    THREAT_MODEL / dependabot.yml / CI 最小权限）。差距表
+    `OSPS_BASELINE_SELF_ASSESSMENT_2026-09-20.md`。开 Dependabot 即报 7 个 npm 传递
+    依赖告警（全在 vscode-extension 构建期，待处置）。
+  - **P0 对标文档**：`SUPPLY_CHAIN_ASSURANCE.md` 把 PEP 740/build report/provenance
+    映射到 SLSA v1.2（L2 达标、L3 部分不声称）与 CycloneDX 1.7。P0 剩 reason code（代码）。
+  - **仍等 gate**：发版（CycloneDX 1.7 + trial `--email` 攒着）；Dependabot 7 告警处置方式。
 - **2026-09-19 完成 TODO 前三项（队列因此前移）**：三项都已实测验收，已从
   `TODO.md` 移出。
   - **① CycloneDX 版本声明对齐 —— 选了「升 1.7」，因此要发版**。
