@@ -565,7 +565,7 @@ pyobfus/
 │   ├── transformers/   # AST 变换器
 │   └── cross_file/    # 跨文件混淆
 ├── pyobfus_pro/       # Pro Edition (商业许可)
-├── tests/             # 1336 passed + 1 skipped (2026-09-19 实测；+ pyobfus_mcp/tests 97 + integration_tests/ 12 + vscode-extension 53)
+├── tests/             # 1352 passed + 1 skipped (2026-09-20 实测，含 reason-code 测试；+ pyobfus_mcp/tests 97 + integration_tests/ 12 + vscode-extension 53)
 ├── examples/          # 示例代码
 ├── docs/              # 项目文档
 └── cloudflare-worker/ # 许可验证 Worker
