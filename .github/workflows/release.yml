@@ -64,7 +64,7 @@ jobs:
           ls -lh dist/
 
       - name: Publish to PyPI (with PEP 740 attestations)
-        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b  # release/v1 (pinned 2026-05-09 — refresh quarterly to pick up bug fixes)
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33  # release/v1 (pinned 2026-05-09 — refresh quarterly to pick up bug fixes)
         with:
           attestations: true
           print-hash: true
@@ -94,7 +94,7 @@ jobs:
           ls -lh dist/
 
       - name: Publish to PyPI (with PEP 740 attestations)
-        uses: pypa/gh-action-pypi-publish@cef221092ed1bacb1cc03d23a2d87d1d172e277b  # release/v1 (pinned 2026-05-09 — refresh quarterly to pick up bug fixes)
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33  # release/v1 (pinned 2026-05-09 — refresh quarterly to pick up bug fixes)
         with:
           attestations: true
           print-hash: true
