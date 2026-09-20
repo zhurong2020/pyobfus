@@ -14,14 +14,29 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### 🔴 2026-09-16 — 0.5.27 已发布（最新 · 冷启动先读这段，再往下看历史）
+### 🔴 2026-09-20 — 0.5.28 已发布（最新 · 冷启动先读这段，再往下看历史）
+
+Core `0.5.28` 已发布并全面验证（PyPI latest / 两个 PEP 740 provenance 200 / 全新装机
+功能核对 / 完整 CI 矩阵 + CodeQL 全绿 / GitHub Release / CITATION.cff）= **三项打包**：
+稳定 reason codes（plan/report 发 `selected.included`/`excluded.pattern`/`disabled_transforms`
++`reason_codes_version`）+ 可选 `pyobfus-trial start --email`（服务端登记去重 · **Worker
+已部署上线** Version `9a0fb84a`）+ CycloneDX 1.7 声明对齐。同期 **OSPS 四开关+四文档收口**
+（私密漏洞上报/secret scanning+push protection/`protect-main` ruleset/Dependabot）、
+**Dependabot 开启即报的 7 个 npm 告警已清零**（override，避开 `--force` 降级）。后续优先级
+见 `docs/CURRENT_PLAN_ZH.md` 与 `docs/TODO.md`。
+
+**当前状态一句话（2026-09-20）**：`0.5.28` 是最新公开版本；`CHANGELOG.md` 的 `[Unreleased]`
+现为空（MCP SDK 2.x 兼容仍攒在 `pyobfus_mcp/CHANGELOG.md` 待发）。节奏仍是**免发版先做、
+攒够再发**，发版是独立 gate 须用户明确批准。⚠️ 已装客户机器 Pro 激活仍需
+`pyobfus-license register <KEY> --no-verify`（0.5.26 的修复只救新安装）。
+
+### 🔴 2026-09-16 — 0.5.27 已发布（历史记录）
 
 Core `0.5.27` 已通过完整 Python 3.9–3.14 矩阵、Ubuntu/Windows 集成、CodeQL、
 OIDC PyPI 发布、PEP 740 provenance、GitHub Release 与公开 PyPI 全新环境安装验证。
 本版本修复跨文件局部绑定、eager 注解/默认值改写、控制流隐式 `None` 返回和 Windows
 CP1252 help 输出。后续开发优先级见 `docs/CURRENT_PLAN_ZH.md` 与 `docs/TODO.md`。
 
-**当前状态一句话（2026-09-19）**：`0.5.27` 仍是最新公开版本；`CHANGELOG.md` 的 `[Unreleased]` 里**攒着一个待发增量**（provenance 的 CycloneDX 声明升到 1.7，校验侧兼容 1.6）。按用户定的节奏**免发版的先做、攒够增量再发**，发版是独立 gate、须用户明确批准。`examples/` 第一批现已在 `integration` job 里真实执行（Ubuntu + Windows）。
 
 ### 🔴 2026-09-13 — 许可系统可靠性（历史记录）
 
@@ -67,7 +82,7 @@ UA（403 + `error code: 1010`），请求到不了 Worker，**所有付费客户
   server 拿不到 `2026-07-28` 协议，见 `docs/MCP_SDK_2X_SPIKE.md`）、新增只读
   `pyobfus-review` skill、`COMPARISON.md` 补浏览器端混淆服务小节。
   **下一步做什么看 [`docs/TODO.md`](docs/TODO.md)。**
-- Core **`0.5.27`**（2026-09-16 · 跨文件正确性与 Windows 执行）/ MCP **`0.3.12`** / VS Code **`0.4.3`** 为最新公开版本；VS Code
+- Core **`0.5.28`**（2026-09-20 · reason codes + trial `--email` + CycloneDX 1.7）/ MCP **`0.3.12`** / VS Code **`0.4.3`** 为最新公开版本；VS Code
   扩展同时在 **Microsoft Marketplace 与 Open VSX** 上架，两边同为 `0.4.3`（均已 curl 独立复核）。
 - **✅ `Core 0.5.24` 已于 2026-09-12 发布**（用户批准「按照流程发版」）= unified
   verifiable build report。`--build-report PATH` 在构建成功后原子写一份 v1 JSON
@@ -529,7 +544,7 @@ cardiac-manuscripts 仓库（不影响 pyobfus 仓库本身）。
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.9-3.14, AST, setuptools
-- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.27，2026-09-16 发布**；完整版本历史见 `CHANGELOG.md`)
+- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.28，2026-09-20 发布**；完整版本历史见 `CHANGELOG.md`)
 - **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.3，2026-09-10 发布**；Marketplace 与 Open VSX 两边同版本，均已 `curl` 独立复核；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`。**发版必须两个 registry 都发**：Marketplace 手工上传 + `ovsx publish`，runbook 见 `docs/OPEN_VSX_PUBLISH_PLAN.md`)
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.12，2026-09-07 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.18` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp`（**0.3.12** 2026-09-07 发布，2026-09-10 已核实 `active` / `isLatest=true`）
