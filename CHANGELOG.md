@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`pyobfus-trial start --email <address>` (optional) registers the trial with
+  the license server.** This enables one-trial-per-email deduplication and an
+  expiry reminder; omitting `--email` keeps the previous purely-local 5-day
+  trial with no network call. If the server is unreachable, an `--email`
+  request falls back to a local trial so offline evaluators are never blocked.
+  The trial remains a convenience control, not an enforcement boundary — moving
+  *registration* server-side only blocks the cheap "delete the local file and
+  re-trial" reset at the email layer. Requires the trial endpoint to be
+  deployed server-side. Design: `docs/TRIAL_STRATEGY_DECISION_2026-09-20.md`.
+
+
 ### Changed
 
 - **The provenance manifest's embedded CycloneDX section now declares

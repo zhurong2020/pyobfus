@@ -57,6 +57,10 @@ BUILD_MARKER_FORMAT = 1
 
 LICENSE_API_URL = "https://pyobfus-license-server.zhurong0525.workers.dev/api/verify"
 
+# Server-registered trial issuance (opt-in via `pyobfus-trial start --email`).
+# Same Worker as LICENSE_API_URL. Keep the host in sync with pyobfus_pro/license.py.
+TRIAL_API_URL = "https://pyobfus-license-server.zhurong0525.workers.dev/api/trial/request"
+
 # =============================================================================
 # DOCUMENTATION FILES TO UPDATE MANUALLY
 # =============================================================================

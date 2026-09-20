@@ -32,10 +32,15 @@ Design goals:
 import hashlib
 import json
 import platform
+import urllib.error
+import urllib.request
 import uuid
 from datetime import datetime, timedelta
+from importlib.metadata import PackageNotFoundError, version as _pkg_version
 from pathlib import Path
 from typing import Any, Dict, Optional
+
+from pyobfus.constants import TRIAL_API_URL
 
 # Trial configuration
 TRIAL_DIR = Path.home() / ".pyobfus"
@@ -68,16 +73,109 @@ def get_device_id() -> str:
     return hashlib.sha256(data.encode()).hexdigest()[:16]
 
 
-def start_trial() -> Dict[str, Any]:
+def _online_user_agent() -> str:
+    """Explicit UA. urllib's default ``Python-urllib/X.Y`` is refused at the
+    Cloudflare edge (403 / error code 1010) — the license endpoint hit exactly
+    this in 2026-09, so any request from this package must identify itself."""
+    try:
+        ver = _pkg_version("pyobfus")
+    except PackageNotFoundError:
+        ver = "0.0.0"
+    return f"pyobfus/{ver} (+https://github.com/zhurong2020/pyobfus)"
+
+
+def _parse_server_iso(value: str) -> datetime:
+    """Parse a server ISO-8601 timestamp into a *naive local* datetime.
+
+    The trial record stores naive local times (``datetime.now().isoformat()``)
+    and ``get_trial_status`` compares against ``datetime.now()``. The server
+    emits UTC with a trailing ``Z``, which ``datetime.fromisoformat`` cannot
+    parse on Python 3.9/3.10; a tz-aware value would also break the naive
+    comparison. Normalise both here so the stored record stays comparable.
+    """
+    text = value.strip()
+    if text.endswith("Z"):
+        text = text[:-1] + "+00:00"
+    parsed = datetime.fromisoformat(text)
+    if parsed.tzinfo is not None:
+        parsed = parsed.astimezone().replace(tzinfo=None)
+    return parsed
+
+
+def _request_online_trial(
+    email: str, device_id: str, timeout: float = 10.0
+) -> Optional[Dict[str, Any]]:
+    """POST an email + device id to the trial server.
+
+    Returns the parsed JSON dict on an HTTP response (any status the server
+    itself produced, including a 4xx it chose), or ``None`` when the server
+    could not be reached at all — the caller then falls back to a purely local
+    trial so offline evaluators are never blocked. This is lead capture and
+    per-email dedup, not enforcement (see the module docstring / issue #20-21).
+    """
+    payload = json.dumps({"email": email, "device_id": device_id}).encode("utf-8")
+    request = urllib.request.Request(
+        TRIAL_API_URL,
+        data=payload,
+        headers={"Content-Type": "application/json", "User-Agent": _online_user_agent()},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as resp:  # noqa: S310
+            data = json.loads(resp.read().decode("utf-8"))
+            return data if isinstance(data, dict) else None
+    except urllib.error.HTTPError as exc:
+        # The server answered with an error status; its body is still the
+        # machine-readable contract, so parse it rather than treating it as
+        # unreachable.
+        try:
+            data = json.loads(exc.read().decode("utf-8"))
+            return data if isinstance(data, dict) else None
+        except Exception:
+            return None
+    except (urllib.error.URLError, TimeoutError, OSError, ValueError):
+        return None
+
+
+def _write_trial_record(
+    device_id: str,
+    started: datetime,
+    expires: datetime,
+    token: Optional[str] = None,
+    email: Optional[str] = None,
+) -> None:
+    """Persist the local trial record (schema v2 adds optional server fields)."""
+    trial_data: Dict[str, Any] = {
+        "v": 2,
+        "device_id": device_id,
+        "started": started.isoformat(),
+        "expires": expires.isoformat(),
+    }
+    if token is not None:
+        trial_data["token"] = token
+    if email is not None:
+        trial_data["email"] = email
+    TRIAL_DIR.mkdir(parents=True, exist_ok=True)
+    with open(TRIAL_FILE, "w", encoding="utf-8") as f:
+        json.dump(trial_data, f, indent=2)
+
+
+def start_trial(email: Optional[str] = None) -> Dict[str, Any]:
     """
     Start a 5-day trial of Pro features.
 
+    Args:
+        email: Optional. When given, the trial is registered with the license
+            server (per-email deduplication + follow-up) and the local record
+            carries the returned token. Omitted, the trial is purely local and
+            behaves exactly as before — no network call is made. If the server
+            cannot be reached, an ``--email`` request falls back to a local
+            trial so offline evaluators are never blocked.
+
     Returns:
-        dict: Trial status with keys:
-            - success: bool
-            - message: str
-            - expires: str (ISO format date)
-            - days_remaining: int
+        dict: keys ``success`` (bool), ``message`` (str), ``expires`` (str),
+            ``days_remaining`` (int), and — for the email path — ``registered``
+            (bool: reached the server) and optionally ``note``.
 
     Never raises for an already-used trial; it returns ``success: False``
     with an explanatory message instead.
@@ -103,29 +201,60 @@ def start_trial() -> Dict[str, Any]:
                 "days_remaining": 0,
             }
 
-    # Start new trial
     device_id = get_device_id()
+
+    # Server-registered path (opt-in). Deduplication lives on the server; a
+    # network failure degrades gracefully to a local trial.
+    if email is not None:
+        online = _request_online_trial(email, device_id)
+        if online is not None and online.get("status") in ("issued", "already_issued"):
+            if not online.get("active", True):
+                # Server: this email already spent its trial.
+                return {
+                    "success": False,
+                    "message": online.get(
+                        "message",
+                        "This email has already used its trial. "
+                        "Purchase a license to continue using Pro features.",
+                    ),
+                    "expires": online.get("expires", ""),
+                    "days_remaining": 0,
+                    "registered": True,
+                }
+            started_dt = _parse_server_iso(online["started"])
+            expires_dt = _parse_server_iso(online["expires"])
+            _write_trial_record(
+                device_id,
+                started_dt,
+                expires_dt,
+                token=online.get("token"),
+                email=email,
+            )
+            remaining = max(0, (expires_dt - datetime.now()).days)
+            return {
+                "success": True,
+                "message": "Trial started and registered! You can now use Pro features.",
+                "expires": expires_dt.strftime("%Y-%m-%d %H:%M"),
+                "days_remaining": remaining,
+                "registered": True,
+            }
+        # Unreachable / unexpected response: fall through to a local trial.
+
+    # Local trial (no email, or the server could not be reached).
     start_time = datetime.now()
     expires = start_time + TRIAL_DURATION
+    _write_trial_record(device_id, start_time, expires)
 
-    trial_data = {
-        "v": 1,  # Schema version
-        "device_id": device_id,
-        "started": start_time.isoformat(),
-        "expires": expires.isoformat(),
-    }
-
-    # Save trial data
-    TRIAL_DIR.mkdir(parents=True, exist_ok=True)
-    with open(TRIAL_FILE, "w", encoding="utf-8") as f:
-        json.dump(trial_data, f, indent=2)
-
-    return {
+    result: Dict[str, Any] = {
         "success": True,
         "message": "Trial started successfully! You can now use Pro features.",
         "expires": expires.strftime("%Y-%m-%d %H:%M"),
         "days_remaining": TRIAL_DURATION.days,
     }
+    if email is not None:
+        result["registered"] = False
+        result["note"] = "Could not reach the trial server; started a local trial instead."
+    return result
 
 
 def get_trial_status() -> Optional[Dict[str, Any]]:

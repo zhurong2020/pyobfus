@@ -30,11 +30,18 @@ def cli() -> None:
 
 
 @cli.command()
-def start() -> None:
+@click.option(
+    "--email",
+    default=None,
+    help="Register the trial with an email (optional). Enables one-trial-per-email "
+    "dedup and lets us send an expiry reminder. Omit it for a purely local trial "
+    "with no network call. If the server is unreachable, a local trial starts anyway.",
+)
+def start(email: str) -> None:
     """
     Start a 5-day free trial of Pro features.
 
-    No registration or credit card required.
+    No credit card required. Email is optional.
 
     \b
     Trial includes:
@@ -45,18 +52,23 @@ def start() -> None:
     \b
     Example:
       pyobfus-trial start
+      pyobfus-trial start --email you@example.com
     """
     click.echo("\n" + "=" * 60)
     click.echo("  pyobfus Professional Edition - Free Trial")
     click.echo("=" * 60)
 
-    result = start_trial()
+    result = start_trial(email=email)
 
     if result["success"]:
         click.echo("")
         click.echo("  " + click.style("SUCCESS!", fg="green", bold=True))
         click.echo("")
         click.echo(f"  {result['message']}")
+        if result.get("note"):
+            click.echo("  " + click.style(result["note"], fg="yellow"))
+        elif result.get("registered"):
+            click.echo("  " + click.style("Registered with the license server.", fg="green"))
         click.echo("")
         click.echo("  TRIAL DETAILS")
         click.echo("  --------------")
