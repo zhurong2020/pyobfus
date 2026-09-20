@@ -144,7 +144,8 @@ provenance 冲突时退出码 1。⚠️ 环境陷阱：本地 venv 的 editable
     依赖告警（全在 vscode-extension 构建期）——**已全部解决**：非破坏性 `npm audit fix` + `serialize-javascript`/`diff` 两个 override（避开 `--force` 的 test-cli 降级），`npm audit`=0、53 测试全过、dev-tree only 不发扩展版（commit 2e603db）。
   - **P0 对标文档**：`SUPPLY_CHAIN_ASSURANCE.md` 把 PEP 740/build report/provenance
     映射到 SLSA v1.2（L2 达标、L3 部分不声称）与 CycloneDX 1.7。P0 剩 reason code（代码）。
-  - **仍等 gate**：发版（CycloneDX 1.7 + trial `--email` 攒着）；Dependabot 7 告警处置方式。
+  - **Dependabot 16 PR 清零（收尾）**：开 Dependabot 后自动开 16 个 version-update PR，逐个 review 合 8 个（含 checkout/upload-artifact v7）+ codeql-action 成对升 v4.38.0（一次提交）+ 关 6 个并加 `dependabot.yml` ignore 止噪（npm `@types/vscode`/dev-major、pip ruff minor/major）。review 挡下 4 个会打红 main 的真问题。16→0、main 全绿。
+  - **仍等 gate**：MCP SDK 2.x 攒着待发；分发上架队列（awesome-python 等，需维护者账号）；OSPS DCO（主动延后）与 L3 阈值政策。
 - **2026-09-19 完成 TODO 前三项（队列因此前移）**：三项都已实测验收，已从
   `TODO.md` 移出。
   - **① CycloneDX 版本声明对齐 —— 选了「升 1.7」，因此要发版**。
