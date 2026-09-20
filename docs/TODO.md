@@ -5,9 +5,11 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-09-19（原排在前三位的 CycloneDX 版本对齐、`examples/` 进 CI、测试
-fixture 漏临时目录已全部做完并移出本文件，队列前移；Core `0.5.27` 仍是当前公开版本，
-公开门面审计状态及运营复查见 `CURRENT_PLAN_ZH.md`）。
+最后更新：2026-09-20（对标竞品 + 国际最佳实践 + 本地已完成/未发版做了一次三透镜
+重排，见 `FEATURE_EXPANSION_RESEARCH_2026-09-12.md` 之上的本轮外部核查；新增
+**服务端邮箱登记 trial** 为 P1，依据见 `TRIAL_STRATEGY_DECISION_2026-09-20.md`；
+把 provenance / SARIF / build-report / CycloneDX 收拢为一条「可验证性主线」抬为 P0。
+Core `0.5.27` 仍是当前公开版本，运营复查见 `CURRENT_PLAN_ZH.md`）。
 
 ## 状态口径
 
@@ -40,31 +42,66 @@ fixture 漏临时目录）记在同一文件的「09-19」段。其中只有 Cyc
 `65 / 48 / 31` 是最近一次验证）。所以「发版吸流量」的收益要看**非发布日的基线**
 是否上移，而不是看发布当天的数字。下次复查见本文件「周期性」。
 
-## 待办（按建议顺序）
+## 待办（按建议顺序 · 2026-09-20 三透镜重排）
 
 判断标准：**只动 `docs/` 或外部渠道 = 免发版**（改动一进 main 就在 GitHub 与文档
-站生效）；**动 `pyobfus/` 或 `pyobfus_mcp/` 的代码 = 要发版才到用户手里**。
+站生效）；**动 `pyobfus/`、`pyobfus_mcp/` 的代码或 Worker = 要部署 / 要发版才到
+用户手里**。
 
-| # | 任务 | 要发版吗 | 谁来做 |
+**战略重估（本轮外部核查后）**：pyobfus 的护城河不是"保护强度"（PyArmor 9.2.7
+已上 VMC/ECC 虚拟机档，纯 AST 追不上），而是"供应链透明与可验证性"——SARIF /
+PEP 740 / build report / CycloneDX 1.7（已落 ECMA-424 2nd ed）/ OSPS Baseline /
+SLSA v1.2 这一簇开放标准正是 2026 采购与 DevSecOps 在问的东西。因此把散落的
+provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的保护强度，只在对比页
+诚实标注差距。
+
+| 优先级 | 任务 | 要发版吗 | 谁来做 |
 |---|---|---|---|
-| 1 | 稳定 reason code | **要发版**（改 `--check` / plan / build report 三处 JSON） | Claude |
-| 2 | OpenSSF OSPS Baseline 自评 | 免发版（产出差距表；个别项可能要改仓库设置） | Claude 出表，设置项需维护者 |
-| 3 | 对比可见度：拆分对比页 + 上架目录 | 免发版（拆页纯 docs；上架需对方站点提交） | 拆页 Claude；上架需维护者账号 |
+| **P0** | 可验证性主线：CycloneDX 1.7 增量 + build report/provenance 显式对标 SLSA v1.2 与 CycloneDX citations + 稳定 reason code，凑成一个"供应链透明"版本 | 对标文档免发版；reason code + 发版要批准 | Claude 实现，发版需批准 |
+| **P1** | **服务端邮箱登记 trial**（获客向，非 DRM） | Worker 要部署 + 客户端要发版 | Claude 实现，部署/发版需批准 |
+| **P1** | OSPS 补齐（自评差距表 ✅ 见 `OSPS_BASELINE_SELF_ASSESSMENT_2026-09-20.md`）：第一批 4 个 GitHub 开关 ⚙️ + 第二批 4 份文档 📝 | 免发版 | 开关需维护者；文档 Claude |
+| **P1** | 抗 AI 措辞改写（`docs/TODO.md` 遗留项，tech-deai）。~~pyarmor VMC/ECC 补记~~——核查后确认 `compare/pyarmor.md` **已诚实覆盖** 9.2.x VMC/ECC，无需改 | 免发版 | Claude |
+| **P2** | 分发上架队列（awesome-python → awesome-security → AlternativeTo） | 免发版（提交需维护者账号） | Claude 备文案，提交需维护者 |
 
-### 1. 稳定 reason code（两三天 · 动 JSON 契约）
+### P1 · 服务端邮箱登记 trial（尽快实现 · 获客向，非 DRM）
+
+决策与完整设计见 [`TRIAL_STRATEGY_DECISION_2026-09-20.md`](TRIAL_STRATEGY_DECISION_2026-09-20.md)。
+用户 2026-09-20 选定方案 A：**维持本地 5 天 trial、不设行数/文件数上限**（本地限制对
+可读源码的 Pro 是安全戏法且伤评估者），**不改"先收费"trial**（当前无有机增长信号，加
+购买摩擦反漏斗）；把 trial 挪到服务端并顺手做成获客渠道。
+
+- **免发版**：本决策文档、TODO 登记、Worker 端点设计评审（已完成本条）。
+- **要部署**：Worker 新增 `POST /api/trial/request`（email + device_id → 签名
+  trial token；KV 以 email 去重；复用 `/api/verify` 同源签名工具，不 DIY 加密；
+  速率限制；PII 不落明文日志）。**先于客户端部署**（硬约束，同 0.5.26 教训）。
+- **要发版**：客户端 `pyobfus-trial start --email <addr>` 换 token；离线/不带
+  `--email` 回退现有纯本地 5 天（不回归）。
+- 验收标准见决策文档 §5.4。诚实边界：服务端登记解决**去重 + 获客**，不宣称能挡住
+  能读 Pro 源码的人。
+
+### P0 · 稳定 reason code（两三天 · 动 JSON 契约）
 
 给每个 excluded file、preserved symbol、disabled transform 一个稳定的 reason
 code，替代现在的自由文本。涉及 `--check` / dry-run plan / build report 三处
 JSON，需要版本字段管理，**排在矩阵之后**，因为矩阵会暴露到底需要哪些 code（矩阵已完成，见 `SUPPORT_MATRIX.md`）。
 
-### 2. OpenSSF OSPS Baseline 自评（一天）
+### P1 · OSPS Baseline 补齐（自评 ✅ 2026-09-20 · 差距表已出）
 
-对照 [Baseline 2026-02-19](https://baseline.openssf.org/versions/2026-02-19.html)
-（Level 1 / Level 2，共 40 条，覆盖访问控制、构建发布、文档、治理、法务、质量、
-安全评估与漏洞处理）做一次差距清单。与已有的 OpenSSF Best Practices passing
-徽章互补，不重复。产出是差距表，不是一次性全部补齐。
+自评差距表见 [`OSPS_BASELINE_SELF_ASSESSMENT_2026-09-20.md`](OSPS_BASELINE_SELF_ASSESSMENT_2026-09-20.md)
+（62 条逐条实测）。L1 总体达标；真实缺口集中在治理/流程门禁。补齐分两批：
 
-### 3. 对比可见度 —— 拆页已完成，只剩上架
+**第一批 · 维护者一次性开关（⚙️需维护者，分钟级）**：
+1. 开 GitHub 私密漏洞上报（closes VM-03.01）。
+2. 开 secret scanning + push protection（BR-07.01 纵深）。
+3. `main` 建 ruleset（路线 A：禁 force-push/删除 + 要求状态检查 → AC-03.01/QA-03.01/QA-06.01）。
+4. 开 Dependabot security updates（VM-05.x）。
+
+**第二批 · Claude 起草（📝免发版）**：`GOVERNANCE.md`、`ci.yml`/`vscode-extension-ci.yml`
+加 `permissions: contents: read`、`.github/dependabot.yml`、`docs/THREAT_MODEL.md`。
+
+`QA-02.02` SBOM / `DO-03.x` 验证说明并入 P0 可验证性主线，不单开。
+
+### P1/P2 · 对比可见度 —— 拆页已完成，只剩上架（+ PyArmor 9.2.7 诚实性）
 
 **已完成 2026-09-13**：`COMPARISON.md` 由 490 行的单页拆成索引页 + `docs/compare/`
 下 7 个一页一对手的页面（PyArmor / Nuitka / Cython / PyLocket / Oxyry /
@@ -76,9 +113,15 @@ JSON，需要版本字段管理，**排在矩阵之后**，因为矩阵会暴露
 条因内容移入子目录而失效的相对链接。README 原有的 `#layered-deployment-strategy`
 锚点仍在索引页上，未断。
 
-**仍未做**：**AlternativeTo 上架**（见下方分发队列第 5 项）。那是**中立第三方**的
-「PyArmor 替代品」清单，搜这类词的人真的会落到那里，是我们能进的「对比矩阵」。
-**需维护者在对方站点提交**。
+**已核查确认无需改（2026-09-20）**：外部核查发现 PyArmor 最新为 **9.2.7（2026-08-14）**、
+新增 VMC/ECC 虚拟机档。回查 `docs/compare/pyarmor.md` §"Bytecode Protection Is Not
+Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyobfus 结构上没有的
+能力、并指用户去 PyArmor。**只是版本号写作"9.2.x"而非"9.2.7"，但 9.2.x 表述仍准确**，
+且页内 9.2.4 是绑定实测的 trial-limit 实验版本、不能改。故此项**已完成，非待办**。
+
+**仍未做（需维护者账号）**：**AlternativeTo 上架**（见下方分发队列第 5 项）。中立
+第三方的「PyArmor 替代品」清单，搜这类词的人真的会落到那里。**需维护者在对方站点
+提交**。
 
 不做：在对手页面下留言/要求收录、买对比位、为排名写夸大文案。
 
