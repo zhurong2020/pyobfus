@@ -145,7 +145,7 @@ provenance 冲突时退出码 1。⚠️ 环境陷阱：本地 venv 的 editable
   - **P0 对标文档**：`SUPPLY_CHAIN_ASSURANCE.md` 把 PEP 740/build report/provenance
     映射到 SLSA v1.2（L2 达标、L3 部分不声称）与 CycloneDX 1.7。P0 剩 reason code（代码）。
   - **Dependabot 16 PR 清零（收尾）**：开 Dependabot 后自动开 16 个 version-update PR，逐个 review 合 8 个（含 checkout/upload-artifact v7）+ codeql-action 成对升 v4.38.0（一次提交）+ 关 6 个并加 `dependabot.yml` ignore 止噪（npm `@types/vscode`/dev-major、pip ruff minor/major）。review 挡下 4 个会打红 main 的真问题。16→0、main 全绿。
-  - **Dependabot 第二波（收尾时出现，已知/预期，未处理）**：合第一批 Actions 后 Dependabot 重扫开了 6 个新 PR——#44 是**去掉 `@types/vscode` 后的干净 npm minor-patch 组**（配置生效的预期结果，应可绿合）；#45–#49 是**另 5 个 github-actions 主版本**（setup-python/codecov/deploy-pages 等，`dependabot.yml` 刻意保留 gh-actions 主版本可 review）。下次处理：#44 绿则合；#45–#49 逐个看 CI（部分在 pages.yml/release 未被 PR CI 覆盖）；若嫌噪可把 gh-actions 主版本也加进 ignore。
+  - **Dependabot 第二波已全部合并 + 建 auto-merge 治本**：合第一批后 Dependabot 重扫开了 6 个新 PR（#44 干净 npm 组 + #45–#49 五个 gh-actions 主版本 setup-python/codecov/pages 系列），**全绿全部合并**；#46/#47/#49 改 pages.yml（PR CI 不覆盖）合后 **main 的 Pages 工作流 success** 验证文档部署正常。**治本**：新增 `.github/workflows/dependabot-auto-merge.yml`（fetch-metadata v3.1.0 SHA-pin），patch/minor 更新 CI 绿后**自动合并**（repo `allow_auto_merge` 已开）、major 仍留人工 review。稳态：日常只会看到少数 major PR,其余自动。**16+6 全清零、0 open PR、main 全绿。**
   - **仍等 gate**：MCP SDK 2.x 攒着待发；分发上架队列（awesome-python 等，需维护者账号）；OSPS DCO（主动延后）与 L3 阈值政策。
 - **2026-09-19 完成 TODO 前三项（队列因此前移）**：三项都已实测验收，已从
   `TODO.md` 移出。
