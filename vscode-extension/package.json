@@ -1,6 +1,6 @@
 {
   "name": "pyobfus",
-  "displayName": "pyobfus — Python Code Obfuscator",
+  "displayName": "pyobfus \u2014 Python Code Obfuscator",
   "description": "Inline risk diagnostics + reverse-mapped stack traces for pyobfus, the open-source AST-based Python obfuscator. Open source, OpenSSF Best Practices verified, PEP 740 attested releases.",
   "version": "0.4.3",
   "publisher": "zhurong2020",
@@ -113,7 +113,12 @@
     },
     "yamlValidation": [
       {
-        "fileMatch": ["pyobfus.yaml", "pyobfus.yml", ".pyobfus.yaml", ".pyobfus.yml"],
+        "fileMatch": [
+          "pyobfus.yaml",
+          "pyobfus.yml",
+          ".pyobfus.yaml",
+          ".pyobfus.yml"
+        ],
         "url": "./schemas/pyobfus.schema.json"
       }
     ]
@@ -144,5 +149,9 @@
     "eslint": "^9.0.0",
     "mocha": "^11.0.0",
     "typescript": "^5.5.0"
+  },
+  "overrides": {
+    "serialize-javascript": "^7.0.5",
+    "diff": "^8.0.3"
   }
 }
