@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.28] - 2026-09-20
+
+
 ### Added
 
 - **Stable reason codes for build decisions.** `--dry-run --json` (the plan) and

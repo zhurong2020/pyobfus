@@ -20,14 +20,14 @@ A Python code obfuscator built with AST-based transformations. **Supports Python
 
 > **🔒 Pro Edition available** — 6 patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator, $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
 
-> **🔎 What's new in v0.5.27** — three correctness
-> fixes found by running Pro over a real multi-module scientific package.
-> Cross-file mangling now respects every form of function-local binding and
-> rewrites eager annotations/defaults using the renamed same-module or imported
-> class. Control-flow flattening now preserves Python's implicit `None` return
-> when only some branches return explicitly. Basic generated output is also
-> executed on Windows in CI, not merely transformed there. Install the released
-> package with `pip install -U pyobfus`.
+> **🔎 What's new in v0.5.28** — supply-chain transparency and evaluation.
+> `--dry-run --json` and `--build-report` now attach **stable, versioned reason
+> codes** to each build decision (plus a `disabled_transforms` list) so CI and
+> editors branch on a token instead of parsing prose. The optional
+> `pyobfus-trial start --email` registers a trial for one-per-email dedup and an
+> expiry reminder (omit it for the unchanged local 5-day trial). The provenance
+> manifest's CycloneDX section now declares the current `specVersion 1.7`
+> (ECMA-424 2nd ed.), still valid under 1.6. Install with `pip install -U pyobfus`.
 
 > 🔔 **Starring this repo doesn't notify you about new releases** — GitHub only
 > sends release notifications to people who explicitly **Watch** it. Click

@@ -57,7 +57,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 
 | 优先级 | 任务 | 要发版吗 | 谁来做 |
 |---|---|---|---|
-| **P0** | 可验证性主线：**对标文档 ✅**（`SUPPLY_CHAIN_ASSURANCE.md` 映射 SLSA v1.2 / CycloneDX 1.7 / PEP 740）。剩 **稳定 reason code**（代码，要发版）+ 发布 CycloneDX 1.7 增量 | 文档已免发版完成；reason code + 发版要批准 | Claude 实现，发版需批准 |
+| ~~P0~~ ✅ | 可验证性主线**完成**：对标文档 `SUPPLY_CHAIN_ASSURANCE.md` + 稳定 reason code（`reason_codes.py` v1，plan/report 发射，`REASON_CODES.md`）+ CycloneDX 1.7，全部**随 0.5.28 发布** | — | — |
 | **P1** | **服务端邮箱登记 trial**（获客向，非 DRM） | Worker 要部署 + 客户端要发版 | Claude 实现，部署/发版需批准 |
 | ~~P1~~ ✅ | OSPS 补齐**基本完成 2026-09-20**：4 开关（gh api 核实）+ 4 文档（f2cd713）全做完。残余 = `LE-01.01` DCO（主动延后）+ 若干 L3 | 免发版 | — |
 | **P1** | 抗 AI 措辞改写（`docs/TODO.md` 遗留项，tech-deai）。~~pyarmor VMC/ECC 补记~~——核查后确认 `compare/pyarmor.md` **已诚实覆盖** 9.2.x VMC/ECC，无需改 | 免发版 | Claude |
@@ -79,15 +79,15 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 - 验收标准见决策文档 §5.4。诚实边界：服务端登记解决**去重 + 获客**，不宣称能挡住
   能读 Pro 源码的人。
 
-### P0 · 稳定 reason code（两三天 · 动 JSON 契约）
+### ✅ 可验证性主线（2026-09-20 完成，随 0.5.28 发布）
 
-> 可验证性主线的**对标文档已完成**：`docs/SUPPLY_CHAIN_ASSURANCE.md` 把 PEP 740 /
-> build report / provenance manifest 显式映射到 SLSA v1.2 与 CycloneDX 1.7（诚实标注
-> L2 达标、L3 部分）。以下 reason code 是该主线**剩下的代码项**。
+- 对标文档 `SUPPLY_CHAIN_ASSURANCE.md`（SLSA v1.2 / CycloneDX 1.7 / PEP 740）。
+- 稳定 reason code：`pyobfus/core/reason_codes.py`（v1）+ plan/report 发射
+  `selected.included`/`excluded.pattern`/`disabled_transforms` + `reason_codes_version`；
+  契约 `docs/REASON_CODES.md`。`preserved.*` 为**保留词汇未发射**（analyzer 在收集期
+  剪枝、事后无法重建 per-symbol 原因，是刻意的 follow-up）。
+- CycloneDX 1.7 声明对齐。
 
-给每个 excluded file、preserved symbol、disabled transform 一个稳定的 reason
-code，替代现在的自由文本。涉及 `--check` / dry-run plan / build report 三处
-JSON，需要版本字段管理，**排在矩阵之后**，因为矩阵会暴露到底需要哪些 code（矩阵已完成，见 `SUPPORT_MATRIX.md`）。
 
 ### ✅ OSPS Baseline 补齐（2026-09-20 基本完成）
 
@@ -128,15 +128,12 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 
 ## 待发内容（已在 main，未发版）
 
-发版本身是独立 gate。下面内容已经合进 `main`，但要发布才会到用户手里：
+发版本身是独立 gate。
 
-- **Core `[Unreleased]`**：CycloneDX 1.7 声明对齐 + **trial `pyobfus-trial start
-  --email`**（客户端）。**Worker 端已部署上线并验证**（2026-09-20，版本 `9a0fb84a`），
-  硬约束「先服务端」已满足，客户端可随下次 Core 发版发出。
+- **Core `0.5.28` 已含**：reason code + trial `--email` + CycloneDX 1.7（本轮发布）。
+- **`pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]`**：mcp SDK 2.x 兼容。刻意不随 Core
+  发，攒够增量或有人明确要 2.x 时再发（每发一次 MCP 要手工改 Glama Build steps）。
 
-- **`pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]`**：mcp SDK 2.x 兼容。**刻意没有随
-  Core 0.5.27 一起发**——这是独立 MCP 增量，不应捆绑到 Core 发布；且每发一次 MCP 都要
-  手工改一次 Glama 的 Build steps。攒够增量或有人明确要 2.x 时再发。
 
 ## 本轮留下的小尾巴（都不急，按顺手程度做）
 
