@@ -1,6 +1,10 @@
 # Dependabot configuration (OSPS-VM-05.x direction).
 # Pairs with GitHub → Settings → Code security → "Dependabot security updates".
 # Weekly, low-noise: grouped minor/patch bumps, capped open PRs.
+#
+# Ignores below suppress low-value / known-incompatible *version-update* PRs
+# (2026-09-20). Security updates are NOT affected by these ignores — a real
+# advisory still opens a PR regardless.
 version: 2
 updates:
   # Python — the pyobfus / pyobfus-mcp packaging deps declared in pyproject.toml.
@@ -12,8 +16,15 @@ updates:
     groups:
       python-minor-patch:
         update-types: ["minor", "patch"]
+    ignore:
+      # ruff's minor bumps ship new default lint rules that fail CI's Lint job
+      # on existing code; adopt them deliberately, not automatically. Patch
+      # updates (bug fixes, same ruleset) still flow.
+      - dependency-name: "ruff"
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
 
-  # GitHub Actions — keep CI/release actions patched (also supports SHA-pinning hygiene).
+  # GitHub Actions — keep CI/release actions patched (also supports SHA-pinning
+  # hygiene). Major bumps here are security-relevant infra and remain reviewable.
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
@@ -23,7 +34,8 @@ updates:
       actions-minor-patch:
         update-types: ["minor", "patch"]
 
-  # VS Code extension (Node/npm).
+  # VS Code extension (Node/npm) — dev/build toolchain only, never shipped in
+  # the .vsix bundle. Security comes via minor/patch + npm overrides.
   - package-ecosystem: "npm"
     directory: "/vscode-extension"
     schedule:
@@ -32,3 +44,13 @@ updates:
     groups:
       npm-minor-patch:
         update-types: ["minor", "patch"]
+    ignore:
+      # @types/vscode must not exceed engines.vscode (vsce package refuses it);
+      # it is kept in sync with the declared VS Code baseline by hand, not by
+      # Dependabot.
+      - dependency-name: "@types/vscode"
+      # Dev-toolchain major bumps (typescript, vsce, test-electron, @types/node,
+      # …) are low-value churn and often break the build/typecheck; adopt them
+      # deliberately. Minor/patch still flow.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
