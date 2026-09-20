@@ -107,7 +107,7 @@ Status: 自评完成。**逐条状态就是当天实测**；标 `⚙️设置` �
 | VM-02.01 安全联系人 | 1 | ✅ | SECURITY.md 邮箱 + 通道 | — |
 | VM-03.01 私密漏洞上报通道 | 2 | ✅ | **private vulnerability reporting = enabled**（2026-09-20 gh api 核实）+ 邮箱通道 | — |
 | VM-04.01 公开已知漏洞数据 | 2 | 🟡 | 暂无漏洞需披露；CodeQL dismiss 有据可查 | 出现时走 GH advisory |
-| VM-05.x SCA 阈值/发布前处置/恶意依赖评估 | 3 | 🟢 | **Dependabot security updates = enabled** + `.github/dependabot.yml`（pip/actions/npm）；成文阈值政策待定 | 阈值政策 📝（L3，不急） |
+| VM-05.x SCA 阈值/发布前处置/恶意依赖评估 | 3 | 🟢 | **Dependabot enabled** + `dependabot.yml`；开启即报的 7 个 npm 告警**已全部清零**（fix + override，commit 2e603db）；成文阈值政策待定 | 阈值政策 📝（L3，不急） |
 | VM-06.x SAST 阈值/自动评估 | 3 | 🟡 | CodeQL 已跑（SAST），无成文阈值政策 | 记一条阈值政策 📝 |
 
 ## 流程门禁的取舍（AC-03.01 / QA-03.01 / QA-06.01 / LE-01.01）

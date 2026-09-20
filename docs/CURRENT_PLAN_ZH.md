@@ -141,7 +141,7 @@ provenance 冲突时退出码 1。⚠️ 环境陷阱：本地 venv 的 editable
     `protect-main` ruleset / Dependabot，均 gh api 核实）+ 4 份文档（GOVERNANCE /
     THREAT_MODEL / dependabot.yml / CI 最小权限）。差距表
     `OSPS_BASELINE_SELF_ASSESSMENT_2026-09-20.md`。开 Dependabot 即报 7 个 npm 传递
-    依赖告警（全在 vscode-extension 构建期，待处置）。
+    依赖告警（全在 vscode-extension 构建期）——**已全部解决**：非破坏性 `npm audit fix` + `serialize-javascript`/`diff` 两个 override（避开 `--force` 的 test-cli 降级），`npm audit`=0、53 测试全过、dev-tree only 不发扩展版（commit 2e603db）。
   - **P0 对标文档**：`SUPPLY_CHAIN_ASSURANCE.md` 把 PEP 740/build report/provenance
     映射到 SLSA v1.2（L2 达标、L3 部分不声称）与 CycloneDX 1.7。P0 剩 reason code（代码）。
   - **仍等 gate**：发版（CycloneDX 1.7 + trial `--email` 攒着）；Dependabot 7 告警处置方式。
