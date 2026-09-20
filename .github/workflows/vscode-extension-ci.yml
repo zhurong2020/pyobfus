@@ -16,6 +16,11 @@ on:
       - 'vscode-extension/**'
       - '.github/workflows/vscode-extension-ci.yml'
 
+# Least privilege: lint / typecheck / headless tests only read the checkout.
+# OSPS-AC-04.01.
+permissions:
+  contents: read
+
 defaults:
   run:
     working-directory: vscode-extension

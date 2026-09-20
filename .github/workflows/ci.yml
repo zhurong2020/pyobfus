@@ -6,6 +6,11 @@ on:
   pull_request:
     branches: [ main ]
 
+# Least privilege: these jobs only read the checkout. No job here publishes,
+# writes releases, or needs OIDC (that lives in release.yml). OSPS-AC-04.01.
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Test Python ${{ matrix.python-version }}

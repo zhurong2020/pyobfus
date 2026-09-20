@@ -79,6 +79,7 @@ nav:
     - Verifiable build report: VERIFIABLE_BUILD_REPORT.md
     - Provenance manifest: PROVENANCE_MANIFEST.md
     - SARIF code scanning: SARIF_CODE_SCANNING.md
+    - Threat model: THREAT_MODEL.md
   - Distribution:
     - Open VSX publishing: OPEN_VSX_PUBLISH_PLAN.md
 
