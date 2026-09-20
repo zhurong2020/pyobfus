@@ -32,6 +32,10 @@ export default {
         return await handleDeactivate(request, env, corsHeaders);
       }
 
+      if (url.pathname === '/api/trial/request' && request.method === 'POST') {
+        return await handleTrialRequest(request, env, corsHeaders);
+      }
+
       if (url.pathname === '/api/admin/reset-devices' && request.method === 'POST') {
         return await handleAdminResetDevices(request, env, corsHeaders);
       }
@@ -153,6 +157,132 @@ export function reconcileDevices(existing, deviceId, nowIso, maxDevices = MAX_DE
     devices: devices.filter((d) => !doomed.has(d.id)),
     evicted: [...doomed],
   };
+}
+
+/**
+ * Length of a server-issued trial, in days. Mirrors the client default in
+ * pyobfus/trial.py (TRIAL_DURATION). Keep the two in sync.
+ */
+export const TRIAL_DURATION_DAYS = 5;
+
+/**
+ * Cheap email shape check. Deliberately permissive: this gates obvious junk
+ * and keeps a KV key well-formed, it is not an identity proof. The trial is a
+ * growth/lead-capture control, not a security boundary — a determined user can
+ * supply any address, exactly as they can already edit the local trial file.
+ */
+export function isValidEmail(email) {
+  return typeof email === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && email.length <= 254;
+}
+
+/** Lower-case + trim, so Foo@Bar.com and foo@bar.com dedupe to one trial. */
+export function normalizeEmail(email) {
+  return String(email).trim().toLowerCase();
+}
+
+async function sha256Hex(text) {
+  const data = new TextEncoder().encode(text);
+  const digest = await crypto.subtle.digest('SHA-256', data);
+  return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function hmacSha256Hex(secret, message) {
+  const key = await crypto.subtle.importKey(
+    'raw', new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+  );
+  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(message));
+  return [...new Uint8Array(sig)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Issue (or re-issue) a server-registered 5-day trial.
+ * POST /api/trial/request  { email, device_id }
+ *
+ * What this endpoint IS: per-email deduplication (one trial per address, no
+ * silent renewal) plus lead capture for follow-up. What it is NOT: an
+ * enforcement boundary. Pro ships as readable source, so the local client
+ * remains patchable; this only moves the *registration* somewhere the user
+ * cannot silently multi-issue by deleting a local file. See
+ * docs/TRIAL_STRATEGY_DECISION_2026-09-20.md.
+ *
+ * Fails closed if TRIAL_SIGNING_SECRET is unset, so a misconfigured deploy
+ * never hands out unsigned tokens.
+ */
+async function handleTrialRequest(request, env, corsHeaders) {
+  const json = (obj, status = 200) => new Response(JSON.stringify(obj), {
+    status, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  });
+
+  if (!env.TRIAL_SIGNING_SECRET) {
+    return json({ status: 'error', code: 'not_configured',
+      error: 'Trial issuance is not configured on this server' }, 500);
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ status: 'error', code: 'bad_request', error: 'Malformed JSON body' }, 400);
+  }
+  const { email, device_id } = body || {};
+
+  if (!isValidEmail(email) || typeof device_id !== 'string' || device_id.length === 0) {
+    return json({ status: 'error', code: 'bad_request',
+      error: 'Provide a valid email and a device_id' }, 400);
+  }
+
+  const emailHash = await sha256Hex(normalizeEmail(email));
+  const key = `trial:${emailHash}`;
+
+  // Dedup: an email that already has a trial gets its existing record back,
+  // never a fresh 5 days. This is the whole point — it blocks the cheap
+  // "re-run with a different local file" reset at the identity layer.
+  const existing = await env.LICENSES.get(key, { type: 'json' });
+  if (existing) {
+    const active = new Date(existing.expires) > new Date();
+    return json({
+      status: 'already_issued',
+      email_known: true,
+      active,
+      started: existing.started,
+      expires: existing.expires,
+      token: existing.token,
+      message: active
+        ? 'A trial was already issued for this email; returning the existing one.'
+        : 'This email already used its trial. Purchase a license to continue.',
+    });
+  }
+
+  const now = new Date();
+  const expires = new Date(now.getTime() + TRIAL_DURATION_DAYS * 24 * 60 * 60 * 1000);
+  const startedIso = now.toISOString();
+  const expiresIso = expires.toISOString();
+  const token = await hmacSha256Hex(
+    env.TRIAL_SIGNING_SECRET, `${emailHash}:${device_id}:${expiresIso}`
+  );
+
+  const record = {
+    email: normalizeEmail(email), // plaintext for follow-up; same PII posture as license records
+    email_hash: emailHash,
+    first_device: device_id,
+    started: startedIso,
+    expires: expiresIso,
+    token,
+    v: 1,
+  };
+  await env.LICENSES.put(key, JSON.stringify(record));
+
+  return json({
+    status: 'issued',
+    email_known: false,
+    active: true,
+    started: startedIso,
+    expires: expiresIso,
+    days_remaining: TRIAL_DURATION_DAYS,
+    token,
+    message: 'Trial started. Pro features are enabled for 5 days.',
+  });
 }
 
 /**
