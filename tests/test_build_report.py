@@ -43,7 +43,7 @@ def test_build_report_unifies_plan_stats_verification_and_outputs(tmp_path: Path
     assert report["state"] == "completed"
     assert report["mode"] == "cross_file"
     assert report["selection"]["selected_count"] == 1
-    assert report["selection"]["excluded"][0]["reason"] == "exclude_pattern"
+    assert report["selection"]["excluded"][0]["reason"] == "excluded.pattern"
     assert report["transformations"]["files_processed"] == 1
     assert report["verification"]["syntax_valid"] is True
     assert report["verification"]["execution_performed"] is False

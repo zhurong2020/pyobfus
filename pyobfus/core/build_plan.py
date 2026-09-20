@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional
 from pyobfus.config import ObfuscationConfig
 from pyobfus.core.build_marker import marker_enabled, marker_state
 from pyobfus.core.provenance import config_hash
+from pyobfus.core import reason_codes
 from pyobfus.utils import filter_python_files, should_exclude_file
 
 BUILD_PLAN_VERSION = 1
@@ -50,7 +51,7 @@ def build_obfuscation_plan(
                 excluded.append(
                     {
                         "path": relative,
-                        "reason": "exclude_pattern",
+                        "reason": reason_codes.EXCLUDED_PATTERN,
                         "pattern": matches[0] if matches else "configured exclusion",
                     }
                 )
@@ -107,6 +108,7 @@ def build_obfuscation_plan(
 
     return {
         "version": BUILD_PLAN_VERSION,
+        "reason_codes_version": reason_codes.REASON_CODES_VERSION,
         "mode": mode,
         "effective_config": {
             "source": config_source,
@@ -124,6 +126,7 @@ def build_obfuscation_plan(
             "excluded_count": len(excluded),
         },
         "artifacts": artifacts,
+        "disabled_transforms": _disabled_transforms(config, mode),
         "output_marker": marker_state(
             mode=marker_mode,
             edition=config.level,
@@ -133,12 +136,54 @@ def build_obfuscation_plan(
     }
 
 
+# Mechanisms that operate on generated source and are skipped in cross-file
+# directory mode (see cli.py's build-fusion note). Kept in sync with that path.
+_FUSION_MECHANISMS = (
+    "selective_opacity",
+    "seal_code",
+    "vault",
+    "scrub_traceback",
+    "bind_device",
+)
+# Pro-only transforms that will not run when the effective level is community.
+_PRO_TRANSFORMS = (
+    "string_encryption",
+    "control_flow_flattening",
+    "dead_code_injection",
+    "import_obfuscation",
+    "anti_debug",
+)
+
+
+def _disabled_transforms(config: ObfuscationConfig, mode: str) -> List[Dict[str, str]]:
+    """Report requested transforms/mechanisms that will not run, with a coded reason.
+
+    Only requested-but-suppressed items are listed (a config flag is set but the
+    mode or level prevents it), so consumers see "you asked for X, it won't run
+    because Y" without noise from every off-by-default transform.
+    """
+    disabled: List[Dict[str, str]] = []
+    is_cross_file_dir = mode == "cross_file"
+    level = getattr(config, "level", "community")
+    for mech in _FUSION_MECHANISMS:
+        if not getattr(config, mech, False):
+            continue
+        if is_cross_file_dir:
+            disabled.append({"transform": mech, "reason": reason_codes.DISABLED_CROSS_FILE_MODE})
+        elif level != "pro":
+            disabled.append({"transform": mech, "reason": reason_codes.DISABLED_REQUIRES_PRO})
+    for transform in _PRO_TRANSFORMS:
+        if getattr(config, transform, False) and level != "pro":
+            disabled.append({"transform": transform, "reason": reason_codes.DISABLED_REQUIRES_PRO})
+    return disabled
+
+
 def _file_record(source_file: Path, root: Path, output_relative: str) -> Dict[str, str]:
     try:
         relative = source_file.relative_to(root).as_posix()
     except ValueError:
         relative = source_file.name
-    return {"path": relative, "output": output_relative, "reason": "included"}
+    return {"path": relative, "output": output_relative, "reason": reason_codes.SELECTED_INCLUDED}
 
 
 def _safe_path_label(path: Path, cwd: Path) -> str:

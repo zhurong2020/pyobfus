@@ -81,6 +81,7 @@ nav:
     - SARIF code scanning: SARIF_CODE_SCANNING.md
     - Threat model: THREAT_MODEL.md
     - Supply-chain assurance (SLSA / CycloneDX / PEP 740): SUPPLY_CHAIN_ASSURANCE.md
+    - Reason codes: REASON_CODES.md
   - Distribution:
     - Open VSX publishing: OPEN_VSX_PUBLISH_PLAN.md
 

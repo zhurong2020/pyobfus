@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Union
 
 from pyobfus import __version__ as PYOBFUS_VERSION
+from pyobfus.core import reason_codes
 
 BUILD_REPORT_FORMAT = "pyobfus-build-report"
 BUILD_REPORT_VERSION = 1
@@ -34,9 +35,11 @@ def build_report(
         "version": BUILD_REPORT_VERSION,
         "tool": {"name": "pyobfus", "version": PYOBFUS_VERSION},
         "state": "completed",
+        "reason_codes_version": reason_codes.REASON_CODES_VERSION,
         "mode": plan["mode"],
         "effective_config": _effective_config_facts(plan["effective_config"]),
         "selection": _selection_facts(plan["files"]),
+        "disabled_transforms": list(plan.get("disabled_transforms", [])),
         "transformations": {key: stats[key] for key in sorted(stats)},
         "cache": {
             "hit": cache_hit,

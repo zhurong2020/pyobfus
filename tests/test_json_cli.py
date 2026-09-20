@@ -64,7 +64,7 @@ def test_obfuscate_dry_run_json(tmp_path: Path) -> None:
     assert data["plan"]["version"] == 1
     assert data["plan"]["mode"] == "single_file"
     assert data["plan"]["files"]["selected"] == [
-        {"path": "a.py", "output": "out.py", "reason": "included"}
+        {"path": "a.py", "output": "out.py", "reason": "selected.included"}
     ]
     assert data["plan"]["artifacts"][0]["role"] == "ship"
     assert data["plan"]["apply_supported"] is False
@@ -103,7 +103,7 @@ def test_dry_run_plan_reports_config_excludes_and_artifact_roles(tmp_path: Path)
     assert plan["files"]["excluded_count"] == 1
     assert plan["files"]["excluded"][0] == {
         "path": "test_app.py",
-        "reason": "exclude_pattern",
+        "reason": "excluded.pattern",
         "pattern": "test_*.py",
     }
     assert plan["effective_config"]["source"] == "level-default"

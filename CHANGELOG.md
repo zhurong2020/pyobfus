@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Stable reason codes for build decisions.** `--dry-run --json` (the plan) and
+  `--build-report` now attach a versioned, catalogued reason code to each
+  decision instead of free text, so tooling can branch on a stable token. New
+  top-level `reason_codes_version` (currently 1) on both surfaces; file
+  selection reasons are now `selected.included` / `excluded.pattern`; a new
+  `disabled_transforms` list reports each requested-but-suppressed transform
+  with a coded reason (`disabled.cross_file_mode` / `disabled.requires_pro`).
+  The `preserved.*` symbol codes are defined and documented as reserved
+  vocabulary but not yet emitted. Catalog: `pyobfus/core/reason_codes.py`;
+  contract: [REASON_CODES.md](docs/REASON_CODES.md). Consumers must ignore
+  unknown codes. **Note:** the file-selection `reason` values changed from
+  `included` / `exclude_pattern` to the namespaced codes above.
+
 - **`pyobfus-trial start --email <address>` (optional) registers the trial with
   the license server.** This enables one-trial-per-email deduplication and an
   expiry reminder; omitting `--email` keeps the previous purely-local 5-day
