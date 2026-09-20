@@ -1,7 +1,6 @@
 """Tests for the server-registered (opt-in --email) trial path."""
 
 import json
-import sys
 import urllib.error
 from datetime import datetime, timedelta
 from pathlib import Path
