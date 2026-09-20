@@ -37,10 +37,13 @@ def test_start_trial_with_email_issued(monkeypatch):
     now = datetime.now()
     expires = now + timedelta(days=5)
     monkeypatch.setattr(
-        trial_module, "_request_online_trial",
+        trial_module,
+        "_request_online_trial",
         lambda email, device_id, timeout=10.0: {
-            "status": "issued", "active": True,
-            "started": _iso_z(now), "expires": _iso_z(expires),
+            "status": "issued",
+            "active": True,
+            "started": _iso_z(now),
+            "expires": _iso_z(expires),
             "token": "a" * 64,
         },
     )
@@ -56,9 +59,11 @@ def test_start_trial_with_email_issued(monkeypatch):
 
 def test_start_trial_email_already_used_is_refused_without_local_grant(monkeypatch):
     monkeypatch.setattr(
-        trial_module, "_request_online_trial",
+        trial_module,
+        "_request_online_trial",
         lambda email, device_id, timeout=10.0: {
-            "status": "already_issued", "active": False,
+            "status": "already_issued",
+            "active": False,
             "expires": "2020-01-01T00:00:00.000Z",
             "message": "This email has already used its trial.",
         },
@@ -73,7 +78,8 @@ def test_start_trial_email_already_used_is_refused_without_local_grant(monkeypat
 
 def test_start_trial_email_offline_falls_back_to_local(monkeypatch):
     monkeypatch.setattr(
-        trial_module, "_request_online_trial",
+        trial_module,
+        "_request_online_trial",
         lambda email, device_id, timeout=10.0: None,  # server unreachable
     )
     result = start_trial(email="offline@example.com")
@@ -88,6 +94,7 @@ def test_start_trial_email_offline_falls_back_to_local(monkeypatch):
 def test_no_email_makes_no_network_call(monkeypatch):
     def _boom(*a, **k):
         raise AssertionError("network must not be touched without --email")
+
     monkeypatch.setattr(trial_module, "_request_online_trial", _boom)
     result = start_trial()  # no email
     assert result["success"] is True
@@ -101,9 +108,14 @@ def test_request_online_trial_sets_explicit_user_agent(monkeypatch):
     captured = {}
 
     class _Resp:
-        def __enter__(self): return self
-        def __exit__(self, *a): return False
-        def read(self): return json.dumps({"status": "issued", "active": True}).encode()
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            return False
+
+        def read(self):
+            return json.dumps({"status": "issued", "active": True}).encode()
 
     def fake_urlopen(request, timeout=None):
         captured["ua"] = request.headers.get("User-agent")
@@ -123,5 +135,6 @@ def test_request_online_trial_sets_explicit_user_agent(monkeypatch):
 def test_request_online_trial_returns_none_on_network_error(monkeypatch):
     def fake_urlopen(request, timeout=None):
         raise urllib.error.URLError("unreachable")
+
     monkeypatch.setattr(trial_module.urllib.request, "urlopen", fake_urlopen)
     assert _request_online_trial("a@b.co", "dev-1") is None
