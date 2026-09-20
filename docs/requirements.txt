@@ -5,4 +5,4 @@
 # be requested explicitly. Pinned so a theme release cannot change the
 # published site without a commit here.
 mkdocs>=1.6.1,<2
-mkdocs-material>=9.7,<10
+mkdocs-material>=9.7.7,<10
