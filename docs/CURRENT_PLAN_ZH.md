@@ -1,6 +1,6 @@
 # pyobfus 当前计划
 
-更新时间：2026-09-19（当前公开版本：Core **`0.5.27`** / MCP **`0.3.12`** /
+更新时间：2026-09-20（当前公开版本：Core **`0.5.28`**（reason codes + trial `--email` + CycloneDX 1.7，OIDC+PEP740 已发布、PyPI latest、两个 provenance 200、全新装验证、GitHub Release 已建、完整 CI+CodeQL 绿）/ MCP **`0.3.12`** /
 VS Code **`0.4.3`**；**GitHub Action `pyobfus-action v1.0.1` 已上架 Marketplace**。本轮完成：**09-10 下载与渠道复查**——三个 0.5.22 发布后的
 干净日 `65 / 48 / 31` 单调回落进安静区间，**09-08 悬置的「基线是否抬升」问题
 已有答案：没有抬升**；MCP 09-07 的 235 已由 `16 / 23` 坐实为发版/重建自动化流量。
@@ -136,7 +136,7 @@ provenance 冲突时退出码 1。⚠️ 环境陷阱：本地 venv 的 editable
     **Worker `/api/trial/request` 已实现 + 部署上线**（版本 `9a0fb84a`，
     `TRIAL_SIGNING_SECRET` 已设，端点五项 curl 验证通过，测试 KV 记录已清理）；
     **客户端 `pyobfus-trial start --email` 已实现**（联网失败回退本地、显式 UA 绕
-    Cloudflare 1010、UTC Z 时间戳 3.9/3.10 兼容），攒在 `[Unreleased]` 待发版。
+    Cloudflare 1010、UTC Z 时间戳 3.9/3.10 兼容）。**已随 0.5.28 发布**。
   - **OSPS 补齐**：4 个维护者开关（私密漏洞上报 / secret scanning+push protection /
     `protect-main` ruleset / Dependabot，均 gh api 核实）+ 4 份文档（GOVERNANCE /
     THREAT_MODEL / dependabot.yml / CI 最小权限）。差距表
