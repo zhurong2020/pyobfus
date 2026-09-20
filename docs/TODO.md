@@ -57,7 +57,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 
 | 优先级 | 任务 | 要发版吗 | 谁来做 |
 |---|---|---|---|
-| **P0** | 可验证性主线：CycloneDX 1.7 增量 + build report/provenance 显式对标 SLSA v1.2 与 CycloneDX citations + 稳定 reason code，凑成一个"供应链透明"版本 | 对标文档免发版；reason code + 发版要批准 | Claude 实现，发版需批准 |
+| **P0** | 可验证性主线：**对标文档 ✅**（`SUPPLY_CHAIN_ASSURANCE.md` 映射 SLSA v1.2 / CycloneDX 1.7 / PEP 740）。剩 **稳定 reason code**（代码，要发版）+ 发布 CycloneDX 1.7 增量 | 文档已免发版完成；reason code + 发版要批准 | Claude 实现，发版需批准 |
 | **P1** | **服务端邮箱登记 trial**（获客向，非 DRM） | Worker 要部署 + 客户端要发版 | Claude 实现，部署/发版需批准 |
 | ~~P1~~ ✅ | OSPS 补齐**基本完成 2026-09-20**：4 开关（gh api 核实）+ 4 文档（f2cd713）全做完。残余 = `LE-01.01` DCO（主动延后）+ 若干 L3 | 免发版 | — |
 | **P1** | 抗 AI 措辞改写（`docs/TODO.md` 遗留项，tech-deai）。~~pyarmor VMC/ECC 补记~~——核查后确认 `compare/pyarmor.md` **已诚实覆盖** 9.2.x VMC/ECC，无需改 | 免发版 | Claude |
@@ -80,6 +80,10 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
   能读 Pro 源码的人。
 
 ### P0 · 稳定 reason code（两三天 · 动 JSON 契约）
+
+> 可验证性主线的**对标文档已完成**：`docs/SUPPLY_CHAIN_ASSURANCE.md` 把 PEP 740 /
+> build report / provenance manifest 显式映射到 SLSA v1.2 与 CycloneDX 1.7（诚实标注
+> L2 达标、L3 部分）。以下 reason code 是该主线**剩下的代码项**。
 
 给每个 excluded file、preserved symbol、disabled transform 一个稳定的 reason
 code，替代现在的自由文本。涉及 `--check` / dry-run plan / build report 三处
