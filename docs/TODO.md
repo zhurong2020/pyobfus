@@ -59,7 +59,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 |---|---|---|---|
 | **P0** | 可验证性主线：CycloneDX 1.7 增量 + build report/provenance 显式对标 SLSA v1.2 与 CycloneDX citations + 稳定 reason code，凑成一个"供应链透明"版本 | 对标文档免发版；reason code + 发版要批准 | Claude 实现，发版需批准 |
 | **P1** | **服务端邮箱登记 trial**（获客向，非 DRM） | Worker 要部署 + 客户端要发版 | Claude 实现，部署/发版需批准 |
-| **P1** | OSPS 补齐（自评差距表 ✅ 见 `OSPS_BASELINE_SELF_ASSESSMENT_2026-09-20.md`）：第一批 4 个 GitHub 开关 ⚙️ + 第二批 4 份文档 📝 | 免发版 | 开关需维护者；文档 Claude |
+| ~~P1~~ ✅ | OSPS 补齐**基本完成 2026-09-20**：4 开关（gh api 核实）+ 4 文档（f2cd713）全做完。残余 = `LE-01.01` DCO（主动延后）+ 若干 L3 | 免发版 | — |
 | **P1** | 抗 AI 措辞改写（`docs/TODO.md` 遗留项，tech-deai）。~~pyarmor VMC/ECC 补记~~——核查后确认 `compare/pyarmor.md` **已诚实覆盖** 9.2.x VMC/ECC，无需改 | 免发版 | Claude |
 | **P2** | 分发上架队列（awesome-python → awesome-security → AlternativeTo） | 免发版（提交需维护者账号） | Claude 备文案，提交需维护者 |
 
@@ -85,21 +85,18 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 code，替代现在的自由文本。涉及 `--check` / dry-run plan / build report 三处
 JSON，需要版本字段管理，**排在矩阵之后**，因为矩阵会暴露到底需要哪些 code（矩阵已完成，见 `SUPPORT_MATRIX.md`）。
 
-### P1 · OSPS Baseline 补齐（自评 ✅ 2026-09-20 · 差距表已出）
+### ✅ OSPS Baseline 补齐（2026-09-20 基本完成）
 
-自评差距表见 [`OSPS_BASELINE_SELF_ASSESSMENT_2026-09-20.md`](OSPS_BASELINE_SELF_ASSESSMENT_2026-09-20.md)
-（62 条逐条实测）。L1 总体达标；真实缺口集中在治理/流程门禁。补齐分两批：
+差距表 `OSPS_BASELINE_SELF_ASSESSMENT_2026-09-20.md`。**四个维护者开关 + 四份文档
+均已完成**（gh api 核实：私密漏洞上报 / secret scanning + push protection /
+`protect-main` ruleset / Dependabot 全 enabled；GOVERNANCE / THREAT_MODEL /
+dependabot.yml / CI 最小权限见 commit f2cd713）。
 
-**第一批 · 维护者一次性开关（⚙️需维护者，分钟级）**：
-1. 开 GitHub 私密漏洞上报（closes VM-03.01）。
-2. 开 secret scanning + push protection（BR-07.01 纵深）。
-3. `main` 建 ruleset（路线 A：禁 force-push/删除 + 要求状态检查 → AC-03.01/QA-03.01/QA-06.01）。
-4. 开 Dependabot security updates（VM-05.x）。
+**残余（不急，不列为当前主线待办）**：
+- `LE-01.01` DCO sign-off — 单维护者主动延后，等有外部协作者再上。
+- L3 阈值政策（SCA/SAST）、`QA-02.02` SBOM → 后者并入 **P0 可验证性主线**。
+- ⚠️ `.github/dependabot.yml` **需 push 到 origin 后 Dependabot 才生效**。
 
-**第二批 · Claude 起草（📝免发版）**：`GOVERNANCE.md`、`ci.yml`/`vscode-extension-ci.yml`
-加 `permissions: contents: read`、`.github/dependabot.yml`、`docs/THREAT_MODEL.md`。
-
-`QA-02.02` SBOM / `DO-03.x` 验证说明并入 P0 可验证性主线，不单开。
 
 ### P1/P2 · 对比可见度 —— 拆页已完成，只剩上架（+ PyArmor 9.2.7 诚实性）
 

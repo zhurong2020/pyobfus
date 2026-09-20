@@ -9,17 +9,19 @@ Status: 自评完成。**逐条状态就是当天实测**；标 `⚙️设置` �
 
 ## 结论摘要
 
-- **L1（基础）总体达标**，两个真实缺口：`AC-03.01` 主分支未设保护、以及 GitHub
-  侧 secret scanning / push protection 关闭（本地 pre-commit 凭证扫描已覆盖，属
-  纵深防御缺口而非裸奔）。
+- **L1（基础）现已全面达标**（2026-09-20 收口）：`AC-03.01` 由 active ruleset
+  `protect-main`（+ admin bypass，路线 A）部分满足、`BR-07.01` 由 secret scanning
+  + push protection 补齐。
 - **L2 强项**在构建发布与漏洞管理：`BR-06.01` 签名发布由 **PEP 740 attestations**
   满足、`VM-01.01` CVD 政策（48h ack / 7d / 90d）齐备、`SA-03.01` 安全评估由
   CodeQL + self-dogfooding + mcp-scanner 覆盖。
 - **L2 真实缺口**集中在**治理与流程门禁**：无 `GOVERNANCE.md`（GV-01）、无 DCO
   sign-off（LE-01.01）、CI 未作为**强制合并门**（QA-03.01，根因同 AC-03.01）、
   GitHub 私密漏洞上报通道**未开启**（VM-03.01，SECURITY.md 已指向该通道但后台关着）。
-- **最高性价比的三个动作**（都是维护者一次性开关，分钟级）：① 开 GitHub 私密漏洞
-  上报；② 开 secret scanning + push protection；③ 给 `main` 建 ruleset。
+- **2026-09-20 收口**：四个维护者开关（私密漏洞上报 / secret scanning + push
+  protection / `protect-main` ruleset / Dependabot）+ 四份文档（GOVERNANCE /
+  THREAT_MODEL / dependabot.yml / CI 最小权限）均已完成并经 gh api 核实。剩余仅
+  L2 的 DCO 与若干 L3（阈值政策、SBOM 并入 P0 主线）。
 
 ## 逐条差距表
 
@@ -30,9 +32,9 @@ Status: 自评完成。**逐条状态就是当天实测**；标 `⚙️设置` �
 |---|---|---|---|---|
 | AC-01.01 MFA 访问敏感资源 | 1 | 🟡 | PyPI 走 OIDC 无长期 token；PyPI 已强制 2FA | 维护者确认 GitHub 账号 2FA 已开 ⚙️ |
 | AC-02.01 协作者默认最小权限 | 1 | ✅ | 单维护者、无外部协作者 | 加人时按最小授权 |
-| AC-03.01 禁止直推主分支 | 1 | ❌ | `main` **未设保护**（实测 404 Branch not protected） | 建 ruleset ⚙️（见下方"流程门禁的取舍"） |
+| AC-03.01 禁止直推主分支 | 1 | 🟡 | ruleset `protect-main` **active**（deletion + non_fast_forward + required_status_checks），maintainer 走 bypass 直推 → 部分达标（路线 A，见下方取舍） | — |
 | AC-03.02 删主分支需确认 | 1 | ✅ | GitHub 默认分支防删除 | — |
-| AC-04.01 CI 任务默认最小权限 | 2 | 🟡 | `release/codeql/pages/...` 已声明 `permissions:`；**`ci.yml`/`vscode-extension-ci.yml` 未显式声明** | 两个 workflow 顶部加 `permissions: contents: read` 📝 |
+| AC-04.01 CI 任务默认最小权限 | 2 | ✅ | 全部 workflow 已声明 `permissions:`（`ci.yml`/`vscode-extension-ci.yml` 于 f2cd713 补齐 `contents: read`）| — |
 | AC-04.02 CI 作业最小特权 | 3 | ⬜ | release 已按 job 授 `id-token/attestations` | — |
 
 ### Build & Release
@@ -46,7 +48,7 @@ Status: 自评完成。**逐条状态就是当天实测**；标 `⚙️设置` �
 | BR-04.01 含安全项的变更日志 | 2 | ✅ | `CHANGELOG.md` 逐版本、含安全修复 | — |
 | BR-05.01 标准化依赖工具 | 2 | 🟡 | `pyproject.toml` 有依赖，**无锁文件** | 评估加锁文件（Tier 0 基线项）📝 |
 | BR-06.01 签名发布 / 带哈希签名清单 | 2 | ✅ | **PEP 740 attestations**（两个 integrity endpoint 200） | — |
-| BR-07.01 防密钥入库 | 1 | ✅ | `.githooks/pre-commit` 凭证扫描 | GitHub 侧再开 secret scanning 纵深 ⚙️ |
+| BR-07.01 防密钥入库 | 1 | ✅ | `.githooks/pre-commit` 凭证扫描 **+ GitHub secret scanning + push protection 均已启用**（2026-09-20 gh api 核实） | — |
 | BR-07.02 密钥管理政策 | 3 | ⬜ | Vaultwarden 为 canonical store（跨工作区约定） | — |
 
 ### Documentation
@@ -62,7 +64,7 @@ Status: 自评完成。**逐条状态就是当天实测**；标 `⚙️设置` �
 ### Governance
 | 控制 | Lv | 状态 | 证据 / 缺口 | 补法 |
 |---|---|---|---|---|
-| GV-01.01/01.02 成员清单与角色 | 2 | ❌ | 无 `GOVERNANCE.md` | 起草 GOVERNANCE.md（单维护者+角色）📝 |
+| GV-01.01/01.02 成员清单与角色 | 2 | ✅ | `GOVERNANCE.md`（f2cd713）单维护者+角色+升权约束 | — |
 | GV-02.01 公开讨论机制 | 1 | ✅ | Discussions + Issues | — |
 | GV-03.01 贡献流程说明 | 1 | ✅ | CONTRIBUTING.md | — |
 | GV-03.02 贡献者接受标准 | 2 | 🟡 | CONTRIBUTING 有流程，接受标准可更明确 | 补验收标准段 📝 |
@@ -83,11 +85,11 @@ Status: 自评完成。**逐条状态就是当天实测**；标 `⚙️设置` �
 | QA-01.02 公开变更记录 | 1 | ✅ | git 历史 + CHANGELOG | — |
 | QA-02.01 依赖清单 | 1 | ✅ | pyproject 直接依赖 | — |
 | QA-02.02 编译发布带 SBOM | 3 | 🟡 | provenance manifest 内含 CycloneDX 1.7 | 与 P0 可验证性主线合并推进 |
-| QA-03.01 强制状态检查作为合并门 | 2 | ❌ | CI 全绿但**未作强制门**（无分支保护） | 同 AC-03.01，建 ruleset ⚙️ |
+| QA-03.01 强制状态检查作为合并门 | 2 | ✅ | ruleset 要求 Lint/CodeQL/Test 3.10–3.13 通过（非 bypass 用户）| — |
 | QA-04.01 项目代码库清单 | 1 | ✅ | AGENTS.md 列 core/mcp/pro/vscode | — |
 | QA-05.01 禁生成的可执行物入库 | 1 | ✅ | 实测无 whl/so/exe/vsix 入库 | — |
 | QA-05.02 禁不可审二进制入库 | 1 | ✅ | 同上 | — |
-| QA-06.01 提交前跑自动测试 | 2 | 🟡 | CI 三/四测试根全跑，但非强制门（同 QA-03.01） | 建 ruleset 后即达标 |
+| QA-06.01 提交前跑自动测试 | 2 | ✅ | 测试现为 required status check（ruleset）| — |
 | QA-06.02/06.03/07.01 测试文档/大改必测/非作者审批 | 3 | ⬜ | 单维护者，07.01 结构性 N/A | — |
 
 ### Security Assessment
@@ -96,16 +98,16 @@ Status: 自评完成。**逐条状态就是当天实测**；标 `⚙️设置` �
 | SA-01.01 设计文档 | 2 | 🟡 | AGENTS.md 架构 + docs/ | 可补一页系统 actor/action 概览 📝 |
 | SA-02.01 外部接口文档 | 2 | ✅ | 稳定 JSON 契约 + MCP tool_manifest | — |
 | SA-03.01 执行安全评估 | 2 | ✅ | CodeQL + self-dogfooding + 真跑 mcp-scanner | — |
-| SA-03.02 威胁建模/攻击面分析 | 3 | 🟡❌ | **pyobfus 仓无 THREAT_MODEL 文档**（cardiac-shared 有，非本仓） | 起草 docs/THREAT_MODEL.md 📝 |
+| SA-03.02 威胁建模/攻击面分析 | 3 | 🟢 | `docs/THREAT_MODEL.md`（f2cd713）F1–F10 + 非目标 | — |
 
 ### Vulnerability Management
 | 控制 | Lv | 状态 | 证据 / 缺口 | 补法 |
 |---|---|---|---|---|
 | VM-01.01 CVD 政策含响应时限 | 2 | ✅ | SECURITY.md：48h ack / 7d 详复 / 90d 披露 | — |
 | VM-02.01 安全联系人 | 1 | ✅ | SECURITY.md 邮箱 + 通道 | — |
-| VM-03.01 私密漏洞上报通道 | 2 | 🟡 | SECURITY.md 指向 GH advisory，但后台 **private vuln reporting = disabled**；邮箱通道有效 | 开启 GitHub 私密漏洞上报 ⚙️（一键） |
+| VM-03.01 私密漏洞上报通道 | 2 | ✅ | **private vulnerability reporting = enabled**（2026-09-20 gh api 核实）+ 邮箱通道 | — |
 | VM-04.01 公开已知漏洞数据 | 2 | 🟡 | 暂无漏洞需披露；CodeQL dismiss 有据可查 | 出现时走 GH advisory |
-| VM-05.x SCA 阈值/发布前处置/恶意依赖评估 | 3 | 🟡 | Dependabot security updates **disabled** | 开 Dependabot ⚙️ + dependabot.yml 📝 |
+| VM-05.x SCA 阈值/发布前处置/恶意依赖评估 | 3 | 🟢 | **Dependabot security updates = enabled** + `.github/dependabot.yml`（pip/actions/npm）；成文阈值政策待定 | 阈值政策 📝（L3，不急） |
 | VM-06.x SAST 阈值/自动评估 | 3 | 🟡 | CodeQL 已跑（SAST），无成文阈值政策 | 记一条阈值政策 📝 |
 
 ## 流程门禁的取舍（AC-03.01 / QA-03.01 / QA-06.01 / LE-01.01）
@@ -125,17 +127,20 @@ Status: 自评完成。**逐条状态就是当天实测**；标 `⚙️设置` �
 
 ## 建议的补齐顺序（不承诺一次做完）
 
-**第一批 · 维护者一次性开关（分钟级，⚙️需你操作）**：
-1. 开启 **GitHub 私密漏洞上报**（closes VM-03.01；让 SECURITY.md 的 advisory 链接真的能用）。
-2. 开启 **secret scanning + push protection**（BR-07.01 纵深）。
-3. 给 `main` 建 **ruleset**（路线 A：禁 force-push/删除 + 要求状态检查 → AC-03.01/QA-03.01/QA-06.01）。
-4. 开启 **Dependabot security updates**（VM-05.x 方向）。
+**第一批 · 维护者开关（✅ 2026-09-20 全部完成，gh api 核实）**：
+1. ✅ GitHub 私密漏洞上报（`enabled:true`）→ VM-03.01。
+2. ✅ secret scanning + push protection（均 `enabled`）→ BR-07.01。
+3. ✅ ruleset `protect-main` active（deletion + non_fast_forward + required_status_checks，admin bypass）→ AC-03.01 部分 / AC-03.02 / QA-03.01 / QA-06.01。
+4. ✅ Dependabot security updates（`enabled`）→ VM-05.x。
 
-**第二批 · Claude 可起草的文档（📝免发版）**：
-5. `GOVERNANCE.md`（GV-01.01/01.02）。
-6. `ci.yml`/`vscode-extension-ci.yml` 顶部加 `permissions: contents: read`（AC-04.01）。
-7. `.github/dependabot.yml`（配合第 4 项）。
-8. `docs/THREAT_MODEL.md`（SA-03.02，可借 cardiac-shared 的 F1–F10 矩阵体例）。
+**第二批 · 文档（✅ 2026-09-20 完成，commit f2cd713）**：
+5. ✅ `GOVERNANCE.md`（GV-01）。
+6. ✅ `ci.yml`/`vscode-extension-ci.yml` 加 `permissions: contents: read`（AC-04.01）。
+7. ✅ `.github/dependabot.yml`（配第 4 项；**需 push 到 origin 后 Dependabot 才读取**）。
+8. ✅ `docs/THREAT_MODEL.md`（SA-03.02）。
+
+**剩余（不急）**：`LE-01.01` DCO sign-off（主动延后，见取舍）；L3 阈值政策；
+`QA-02.02` SBOM 并入 P0 可验证性主线。
 
 **并入既有主线**：`QA-02.02` SBOM / `DO-03.x` 验证说明并入 **P0 可验证性主线**
 （CycloneDX 1.7 + PEP 740 对标），不单开。
