@@ -1,6 +1,6 @@
 # pyobfus 当前计划
 
-更新时间：2026-09-20（当前公开版本：Core **`0.5.28`**（reason codes + trial `--email` + CycloneDX 1.7，OIDC+PEP740 已发布、PyPI latest、两个 provenance 200、全新装验证、GitHub Release 已建、完整 CI+CodeQL 绿）/ MCP **`0.3.12`** /
+更新时间：2026-09-22（**09-22 迁移后核查与收尾见下一段**；当前公开版本：Core **`0.5.28`**（reason codes + trial `--email` + CycloneDX 1.7，OIDC+PEP740 已发布、PyPI latest、两个 provenance 200、全新装验证、GitHub Release 已建、完整 CI+CodeQL 绿）/ MCP **`0.3.12`** /
 VS Code **`0.4.3`**；**GitHub Action `pyobfus-action v1.0.1` 已上架 Marketplace**。本轮完成：**09-10 下载与渠道复查**——三个 0.5.22 发布后的
 干净日 `65 / 48 / 31` 单调回落进安静区间，**09-08 悬置的「基线是否抬升」问题
 已有答案：没有抬升**；MCP 09-07 的 235 已由 `16 / 23` 坐实为发版/重建自动化流量。
@@ -13,6 +13,31 @@ Marketplace 与 Open VSX，同版本）；**`pyobfus-mcp` 0.3.11 → 0.3.12 当�
 （修 `serverInfo` 版本广播 + 修 0.3.11 引入的启动崩溃回归）；**Glama 两条线
 全部结清**——构建已恢复（连续两次 success），目录条目本就正常上架、
 **不需要重新提交**。）
+
+**09-22 迁移后核查与免发版收尾**（项目 09-21 由 OneDrive 同步目录物理迁入 `~/projects/pyobfus`）：
+① **环境全绿**——git 干净、`core.hooksPath` 与钩子可执行位在、`filemode=true`、fsck 无错；venv 在新路径
+重建（editable 元数据 0.5.28 / mcp 0.3.12）；三测试根 `1352 passed / 1 skipped`、`97`、`12`，ruff/mypy 干净，
+扩展 typecheck 过；Pylance v3 基线齐；`docs/internal/`、`.claude/`、`.wrangler` 等 git-ignore 资产在；wrangler
+4.136 经 npx 缓存可用且 WSL 侧 OAuth 有效；gh 已登录、CI/CodeQL 全绿、Dependabot 生效 0 告警；Zenodo concept
+DOI → record `22858892` = v0.5.28 与 `CITATION.cff` 一致；09-22 02:01 每日备份已收 `pyobfus-legal`（13M）与
+`docs/internal`（753K）。无 Windows 残留文件，8 个 CRLF 文件是索引里本来就有的。**旧 OneDrive 副本
+（pyobfus 7.9G、pyobfus-legal 13M）经 rsync 逐文件比对确认零遗漏后已删**；同目录下 `pyobfus-action` 与
+`pyobfus-backup-pre-filter-repo-20260503-2231` 两个旧副本也带 MOVED 标记、WSL 有副本，**未删，留维护者定**。
+② **免发版收尾**——(a) **抗 AI 措辞改写（P1）完成**：README 48 处散文 em-dash、20 条 bold-colon 功能列表，
+落地页 7 处、`docs/index.md` 2 处，改成带动词的句子或括号/冒号；命令、版本、链接、What's new 横幅、UI 标签
+（`Unlock Pro`）原样；`check_readme_links.py` 与 `mkdocs build --strict` 通过；H2 骨架刻意未动。(b) **Alipay
+「is being enabled」句已删**（维护者核实 Stripe 仍 Pending；等真 Enabled 再加回）。(c) CI black/ruff 范围
+扩到 `examples/ scripts/`，5 个文件格式化 + 1 个 ruff F541 修掉，examples 相关测试通过。(d) 迁移残留：
+`VSCODE_MARKETPLACE_PUBLISHER_SETUP.md` vsix 上传路径改为 `\\wsl.localhost\…` 占位写法，`AGENTS.md`
+`.venv` 说明改写，`~/scripts/wsl_daily_backup.sh` 两行指向已迁走文件的 backup_pair 移除。
+③ **外部状态**——**Claude plugin 08-02 的提交记录已消失**（Console「No submissions yet」），公开目录
+2,320 条无 `pyobfus` = 从未批准；官方流程已改为 Console 表单 `platform.claude.com/plugins/submit` →
+内部管线 → 每夜同步，**需维护者重新提交**（本地 validate 通过、从本仓库实装成功；文案
+`docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`）。**MCP Trust Checker 已实扫**（wheel 0.3.12：
+A · 94/100 · 0 威胁；publish 到其 Registry 需维护者 token）。**awesome-python 文案已备**
+（`docs/internal/AWESOME_PYTHON_PR_DRAFT_2026-09-22.md`，槽位 Distribution→Obfuscation 仅 pyarmor 一条，
+按 challenger 报，被拒概率高）。下载：Core 09-20 发布日 `120`、09-21 `18`，MCP `6 / 6`，基线未抬升。
+本轮**不改 `pyobfus/` 代码、不发版**；README 改动到 PyPI 要等下次发版。
 
 **09-15 开发、候选版与运营复查**：Y-8 已修——控制流扁平化遇到“一条路径显式 return、
 另一条路径自然落底”时，生成的共享 return slot 过去可能未初始化并抛

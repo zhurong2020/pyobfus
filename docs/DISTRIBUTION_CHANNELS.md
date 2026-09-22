@@ -631,11 +631,32 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 - Full evidence and the exact recheck sequence:
   [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-### Claude Plugin Marketplace 🟡 PENDING
+### Claude Plugin Marketplace 🔴 RESUBMIT NEEDED (2026-09-22)
+- 2026-09-22 maintainer check: Console now shows `Plugin submissions · No submissions yet`; the Aug 2 record is gone.
+  Public catalog `anthropics/claude-plugins-community/.claude-plugin/marketplace.json` (2,320 entries, fetched raw) has no
+  `pyobfus`, and `gh search code pyobfus --owner anthropics` is empty, so it was never approved.
+- Official docs (<https://code.claude.com/docs/en/plugins#submit-your-plugin-to-the-community-marketplace>) now route
+  individual authors to the Console form <https://platform.claude.com/plugins/submit>; approved plugins are pinned to a
+  commit SHA and synced nightly. The old submission most likely lapsed when the pipeline was rebuilt.
+- Verified locally the same day: `claude plugin validate .` passes; installing from this checkout as a local marketplace
+  succeeds (`pyobfus@pyobfus`, 2 skills, ~396 always-on tokens), then uninstalled.
+- Action: maintainer resubmits via the Console form. Copy (typo fixed) in `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`.
 - Console entry: `pyobfus`
 - 2026-08-24 maintainer recheck: still `Submitted and pending review`, submission date Aug 2.
 - 2026-09-07 maintainer recheck (console dump): unchanged — still `Submitted and pending review`, still dated Aug 2, now **36 days** in queue with no state transition and no request for changes. Nothing actionable; keep the passive-wait policy and re-check on the next periodic sweep.
 - Known copy issue: submitted description says `protected_project`; correct tool name is `protect_project`. Do not resubmit only for this typo; fix opportunistically if Anthropic exposes an edit/request-changes path.
+
+### MCP Trust Checker 🟢 SCANNED A (94/100) · registry publish pending maintainer token
+- Tool: `mcptrustchecker` 1.14.0 (npm, local-first deterministic scanner; <https://github.com/illia-haidar/mcptrustchecker>).
+- 2026-09-22 scan of the published wheel `pyobfus_mcp-0.3.12-py3-none-any.whl` (offline source scan):
+  threat score 100, client score **94/100, grade A**, gates fired: none, threat findings: none.
+  One capability observation: `MTC-SRC-002` shell/command execution in `tools.py` (the subprocess call into the
+  pyobfus CLI; informational, by design). Coverage note: no tools enumerated in source mode, so injection/toxic-flow
+  analysis had no runtime surface. The `--command` stdio mode refuses path-qualified interpreters, and with a bare
+  `python` resolved through PATH the sandboxed spawn ended in `Connection closed`; `uvx` (allowlisted) is not installed
+  on this machine, so the live-tool grade is still to be obtained.
+- Publishing to its public MCP Trust Registry is a separate `mcptrustchecker publish <package> --token <key>` step
+  that needs a maintainer-registered API key; scanning never auto-publishes. Do not change product behaviour for the badge.
 
 ### OpenSSF Best Practices passing badge 🟢 LIVE
 - URL: https://www.bestpractices.dev/projects/12788

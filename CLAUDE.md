@@ -14,7 +14,18 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### 🔴 2026-09-20 — 0.5.28 已发布（最新 · 冷启动先读这段，再往下看历史）
+### 🟢 2026-09-22 — 迁到 WSL 后的环境核查与免发版收尾（最新 · 冷启动先读这段）
+
+- 项目 09-21 从 OneDrive 迁入 `~/projects/pyobfus`，09-22 全面核查通过（git/hooks/venv/三测试根/lint/
+  wrangler/gh/Zenodo/每日备份均正常）；旧 OneDrive 副本 pyobfus、pyobfus-legal 已删（rsync 比对零遗漏后）。
+- 免发版收尾已做：抗 AI 措辞改写（README/落地页/docs 首页，P1 结）、Alipay「is being enabled」句已删
+  （Stripe 仍 Pending）、CI black/ruff 扩到 `examples/ scripts/`、迁移残留路径文案修正。
+- **待维护者动作**：① Claude plugin **重新提交**（Console 旧记录已消失、公开目录从未收录，走
+  `platform.claude.com/plugins/submit`）；② awesome-python PR；③ MCP Trust Registry publish 需其 API token。
+  文案在 `docs/internal/`；细节 `docs/TODO.md` + `docs/CURRENT_PLAN_ZH.md` 09-22 段。
+- 「当前状态一句话」不变：`0.5.28` 最新，本轮不改 `pyobfus/` 代码、不发版；README 改动到 PyPI 要等下次发版。
+
+### 🔴 2026-09-20 — 0.5.28 已发布（历史记录）
 
 Core `0.5.28` 已发布并全面验证（PyPI latest / 两个 PEP 740 provenance 200 / 全新装机
 功能核对 / 完整 CI 矩阵 + CodeQL 全绿 / GitHub Release / CITATION.cff）= **三项打包**：
@@ -642,5 +653,5 @@ vX.Y.Z"横幅），跟徽标是两回事。
 
 | 关联项目 | 所在 Workspace | 关系 |
 |----------|---------------|------|
-| `pyobfus-legal/` | cardiac-research.code-workspace（WSL 本地同级目录 `~/projects/pyobfus-legal/` · 2026-09-21 起为真实目录，不再是 OneDrive 软链接）| pyobfus 软著 + 专利申报材料的物理仓库（**不在 git repo 内** · 含 PII，不公开）。包含 `software_copyright/` (V0.4.0 软著已 2026-05-09 提交 CCPC) 和未来的 `patent/` (v0.5 专利申请目录)。物理路径：`/home/wuxia/projects/pyobfus-legal/`（旧 OneDrive 副本 `/mnt/c/onedrive/msft/OneDrive - MSFT/rong/3-job/program/pyobfus-legal/` 已过期勿再编辑），工作区入口：`~/projects/pyobfus-legal/`（symlink） |
+| `pyobfus-legal/` | cardiac-research.code-workspace（WSL 本地同级目录 `~/projects/pyobfus-legal/` · 2026-09-21 起为真实目录，不再是 OneDrive 软链接）| pyobfus 软著 + 专利申报材料的物理仓库（**不在 git repo 内** · 含 PII，不公开）。包含 `software_copyright/` (V0.4.0 软著已 2026-05-09 提交 CCPC) 和未来的 `patent/` (v0.5 专利申请目录)。物理路径：`~/projects/pyobfus-legal/`（旧 OneDrive 副本 `/mnt/c/onedrive/msft/OneDrive - MSFT/rong/3-job/program/pyobfus-legal/` 已过期勿再编辑），工作区入口：`~/projects/pyobfus-legal/`（symlink） |
 | `cac-plus-ip/` | cardiac-research.code-workspace（同 workspace 内）| **同申请人的并行 IP 工作流**。CAC Plus 医学 AI 项目的 3 件中国发明专利 + 2 件软著申请仓库。**与 pyobfus 内容无关、但工作流共享**：同一个 CCPC 账号 / 同一个 CPC 客户端 USB Key / 同一个 85% 个人申请减免资格 / 同一套 CNIPA 官方申请模板（位于 `cac-plus-ip/02_china_发明专利/_templates_CNIPA/`，pyobfus v0.5 专利申请直接复用，不重复下载）|

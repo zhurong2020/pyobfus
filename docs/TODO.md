@@ -5,7 +5,9 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-09-20（对标竞品 + 国际最佳实践 + 本地已完成/未发版做了一次三透镜
+最后更新：2026-09-22（迁移到 WSL 后的核查与收尾：抗 AI 措辞改写完成、Alipay 句已删、
+awesome-python 文案已备、Claude plugin 需重提、MCP Trust Checker 已实扫；详见
+`CURRENT_PLAN_ZH.md` 09-22 段。上一轮 2026-09-20：对标竞品 + 国际最佳实践 + 本地已完成/未发版做了一次三透镜
 重排，见 `FEATURE_EXPANSION_RESEARCH_2026-09-12.md` 之上的本轮外部核查；新增
 **服务端邮箱登记 trial** 为 P1，依据见 `TRIAL_STRATEGY_DECISION_2026-09-20.md`；
 把 provenance / SARIF / build-report / CycloneDX 收拢为一条「可验证性主线」抬为 P0。
@@ -60,8 +62,8 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 | ~~P0~~ ✅ | 可验证性主线**完成**：对标文档 `SUPPLY_CHAIN_ASSURANCE.md` + 稳定 reason code（`reason_codes.py` v1，plan/report 发射，`REASON_CODES.md`）+ CycloneDX 1.7，全部**随 0.5.28 发布** | — | — |
 | **P1** | **服务端邮箱登记 trial**（获客向，非 DRM） | Worker 要部署 + 客户端要发版 | Claude 实现，部署/发版需批准 |
 | ~~P1~~ ✅ | OSPS 补齐**基本完成 2026-09-20**：4 开关（gh api 核实）+ 4 文档（f2cd713）全做完。残余 = `LE-01.01` DCO（主动延后）+ 若干 L3 | 免发版 | — |
-| **P1** | 抗 AI 措辞改写（`docs/TODO.md` 遗留项，tech-deai）。~~pyarmor VMC/ECC 补记~~——核查后确认 `compare/pyarmor.md` **已诚实覆盖** 9.2.x VMC/ECC，无需改 | 免发版 | Claude |
-| **P2** | 分发上架队列（awesome-python → awesome-security → AlternativeTo） | 免发版（提交需维护者账号） | Claude 备文案，提交需维护者 |
+| ~~P1~~ ✅ | 抗 AI 措辞改写**完成 2026-09-22**（tech-deai）：README / `landing/index.html` / `docs/index.md` 散文里的 em-dash 全部清零（README 48 处）、20 条 bold-colon 功能列表改成带动词的句子；命令、路径、版本号、链接、What's new 横幅与 UI 标签（如 `Unlock Pro`）原样。H2 骨架未动（doc-hub 型 README，锚点被外部引用）。~~pyarmor VMC/ECC 补记~~——已确认无需改 | 免发版（README 到 PyPI 要等下次发版） | — |
+| **P2** | 分发上架队列：**awesome-python 文案已备（2026-09-22）**，见 `docs/internal/AWESOME_PYTHON_PR_DRAFT_2026-09-22.md` → awesome-security → AlternativeTo | 免发版（提交需维护者账号） | 文案已备，提交需维护者 |
 
 ### P1 · 服务端邮箱登记 trial（尽快实现 · 获客向，非 DRM）
 
@@ -156,7 +158,7 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 
 1. ~~Open VSX~~ ✅ 2026-09-07
 2. ~~独立 GitHub Action + Marketplace~~ ✅ 2026-09-10
-3. **`awesome-python`** ← 当前队头（**需维护者账号提 PR**；文案可由 Claude 先备好）
+3. **`awesome-python`** ← 当前队头。**文案已备（2026-09-22）**：`docs/internal/AWESOME_PYTHON_PR_DRAFT_2026-09-22.md`。目标槽位 `Distribution → Obfuscation`（现仅 pyarmor 一条，上限 5，**不需 displacement**，按 challenger 报）。**需维护者账号提 PR**。诚实预期：其 admission 主要看 PyPI 月下载（我们约 2k vs pyarmor 约 289k），被拒概率高，拒信不代表项目质量；**别同时提 pyobfus-mcp**（同作者多项目会按 self-promotion 直接关）
 4. `awesome-security` 或 `awesome-devsecops`（择一尝试）
 5. **AlternativeTo**（**需维护者在对方站点提交**；同时服务上面第 5 项的对比可见度）
 6. 为 stdio MCP 准备 MCPB，之后再评估 Smithery
@@ -195,14 +197,14 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
 
 ## 周期性
 
-- **Alipay 文案复查**：Stripe 上 Alipay 自 2026-09-04 起一直是 `Pending approval`
-  （Cartes Bancaires 同时挂起，更像账号级审核排队而非 Alipay 单独被卡；微信支付已
-  Enabled，中国买家主路径已通）。README 与落地页现写「Alipay (支付宝) is being
-  enabled」——**若到 2026-09-27 仍是 Pending，把这句删掉**，等真 Enabled 再加回来。
-  我们在对外文案上守「说得准」这条线，这里不该例外。可向 Stripe 支持直接问审核在等什么。
+- **Alipay 文案**：Stripe 上 Alipay 自 2026-09-04 起 `Pending approval`，2026-09-22 维护者
+  核实仍是。README / 落地页 / `docs/index.md` 里「Alipay (支付宝) is being enabled」一句
+  **已于 09-22 删除**（没等到 09-27 期限，因为它本来就说不准）。微信支付已 Enabled，
+  中国买家主路径未受影响。**等 Stripe 真 Enabled 再加回来**；可向 Stripe 支持直接问审核在等什么。
 
-- **下载量复查**：**2026-09-19 已查**，数据覆盖至 09-18（见
-  `CURRENT_PLAN_ZH.md` 09-19 条目）。结论：09-16 的 0.5.27 发布日为 `68`（低于
+- **下载量复查**：**2026-09-22 已查**，数据覆盖至 09-21：Core 09-20（0.5.28 发布日）`120`、
+  09-21 `18`；MCP `6 / 6`。发布日尖峰、次日即回安静区间，**基线未抬升**。此前 2026-09-19
+  那次覆盖至 09-18（见 `CURRENT_PLAN_ZH.md` 09-19 条目）。结论：09-16 的 0.5.27 发布日为 `68`（低于
   历史尖峰），其后两个干净日 `18 / 32` 回落 20–40 安静区间——**09-15 的 `99`
   判定为 0.5.26 长尾，基线未抬升**，该悬置问题已关闭。下次复查照旧看非发布日
   基线是否上移；注意发布日与验收流量不能当自然增长。
@@ -254,8 +256,13 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
 
 ## 外部等待（不阻塞本地开发）
 
-- Claude Plugin Marketplace：2026-08-02 提交，至今 `Submitted and pending
-  review`。策略不变：被动等待，不为文案笔误重新提交。
+- **Claude Plugin Marketplace —— 需重新提交（维护者动作）**。2026-09-22 维护者看到 Console
+  「Plugin submissions · No submissions yet」，08-02 的记录已消失；同日核实公开目录
+  `claude-plugins-community/.claude-plugin/marketplace.json`（2,320 条）无 `pyobfus` → 从未被批准。
+  官方文档现写明流程是 **Console 表单 <https://platform.claude.com/plugins/submit>** → 内部管线
+  （跑 `claude plugin validate` + 安全扫描）→ 每夜同步目录；旧记录大概率随管线重建作废，
+  「被动等待」已无对象。本地 `validate` 通过、从本仓库以 marketplace 方式实装成功（2 skills）。
+  表单文案见 `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`（已修 `protected_project` 笔误）。
 - Open VSX namespace 归属验证：可选，`not verified` 是「未申请」不是「被拒」。
 - **Canopii [`canopii-cli#6`](https://github.com/canopii-dev/canopii-cli/issues/6)
   —— ⏰ follow-up 已到期**。2026-09-19 实测：仍 `OPEN`、**0 条回复**、最后更新
@@ -264,8 +271,13 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
   现在登记在此。follow-up 只发一次，不反复催。上游重扫后按四项验收（latest ≥ v0.3.10 /
   识别 8 tools / 不再把 `pyobfus_pro/`、`examples/`、VS Code/Worker 计入 MCP 包
   evidence / PEP 740 provenance 是否被识别），**不是只看总分**。
-- **MCP Trust Checker 登记**：尚未执行，无外部依赖，想做随时可做。同上，此前也只在
-  `CURRENT_PLAN_ZH.md` 里。
+- **MCP Trust Checker**：**2026-09-22 已实扫**——`npx mcptrustchecker@1.14 scan` 对已发布 wheel
+  `pyobfus_mcp-0.3.12`：**Trust grade A · 94/100 · 0 威胁发现**；唯一一条是能力观察
+  `MTC-SRC-002`（`tools.py` 里的 shell/command execution，即调用 pyobfus CLI，设计内，
+  信息性不扣信任分）。stdio 实跑扫描被其沙箱拒（`Connection closed`），覆盖面为源码级。
+  **登记（publish 到其公开 MCP Trust Registry）需要该站 API token，得维护者注册后跑
+  `npx mcptrustchecker publish <package> --token <key>`**；不为徽章改产品逻辑。结果记在
+  `DISTRIBUTION_CHANNELS.md`。
 
 ## 明确不做
 
