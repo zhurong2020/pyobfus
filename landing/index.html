@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>pyobfus — obfuscate Python before you ship it</title>
+<title>pyobfus: obfuscate Python before you ship it</title>
 <meta name="description" content="AST-based Python obfuscator. Ships portable .py files, and reverse-maps production stack traces back to your original names so you can still debug what you shipped. Apache-2.0 core, $45 one-time Pro.">
 <link rel="icon" href="logo.jpeg">
-<meta property="og:title" content="pyobfus — obfuscate Python before you ship it">
+<meta property="og:title" content="pyobfus: obfuscate Python before you ship it">
 <meta property="og:description" content="Ships portable .py files, and reverse-maps production stack traces back to your original names.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://zhurong2020.github.io/pyobfus/">
@@ -70,7 +70,7 @@
   <p class="lede">Obfuscate Python before you ship it, and still be able to debug
   what you shipped.</p>
   <div class="cta">
-    <a class="btn btn-primary" href="#purchase-professional-edition">Professional Edition — $45</a>
+    <a class="btn btn-primary" href="#purchase-professional-edition">Professional Edition ($45)</a>
     <a class="btn btn-secondary" href="https://pyobfus.readthedocs.io/">Read the docs</a>
     <a class="btn btn-secondary" href="https://github.com/zhurong2020/pyobfus">GitHub</a>
   </div>
@@ -98,8 +98,8 @@
     </div>
     <div class="card">
       <h3>Checks before you ship, not after</h3>
-      <p><code>--check</code> flags what obfuscation tends to break — <code>eval</code>,
-      dynamic attribute access, framework reflection — and exports SARIF for
+      <p><code>--check</code> flags what obfuscation tends to break (<code>eval</code>,
+      dynamic attribute access, framework reflection) and exports SARIF for
       GitHub Code Scanning. <code>--dry-run --json</code> shows exactly what a
       build would do before it does it.</p>
     </div>
@@ -122,7 +122,7 @@ pyobfus --unmap trace.txt --mapping mapping.json</code></pre>
   <p class="sub">The free edition is a complete tool, not a demo.</p>
   <div class="grid">
     <div class="card">
-      <h3>Community — free, Apache-2.0</h3>
+      <h3>Community: free, Apache-2.0</h3>
       <ul>
         <li>Name obfuscation across a whole project, imports included</li>
         <li>Reverse stack-trace mapping (<code>--unmap</code>)</li>
@@ -134,7 +134,7 @@ pyobfus --unmap trace.txt --mapping mapping.json</code></pre>
       </ul>
     </div>
     <div class="card">
-      <h3>Professional — $45 one-time</h3>
+      <h3>Professional: $45 one-time</h3>
       <ul>
         <li>AES-256 string encryption</li>
         <li>Control-flow flattening</li>
@@ -154,8 +154,7 @@ pyobfus --unmap trace.txt --mapping mapping.json</code></pre>
   <div class="card">
     <p class="price">$45 <small>USD, one time</small></p>
     <p class="note">Card, Apple Pay, or WeChat Pay (微信支付) for buyers in China.
-    Stripe shows the methods available in your region at checkout. Alipay (支付宝)
-    is being enabled.</p>
+    Stripe shows the methods available in your region at checkout.</p>
     <div class="cta" style="justify-content:flex-start;margin:22px 0 6px">
       <a class="btn btn-primary" href="https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400">Buy now</a>
       <a class="btn btn-secondary" href="https://pyobfus.readthedocs.io/en/latest/LICENSE_ACTIVATION_GUIDE/">Activation guide</a>
@@ -187,8 +186,8 @@ pyobfus-license register PYOB-XXXX-XXXX-XXXX-XXXX</code></pre>
   <div class="honest">
     <strong>What obfuscation is not.</strong> It raises the cost of reading your
     code; it is not encryption and it does not make reverse engineering
-    impossible. Anything that must stay secret — keys, licensing decisions, the
-    algorithm itself — belongs behind a server boundary. Our
+    impossible. Anything that must stay secret (keys, licensing decisions, the
+    algorithm itself) belongs behind a server boundary. Our
     <a href="https://pyobfus.readthedocs.io/en/latest/COMPARISON/">comparison pages</a>
     say the same thing about the alternatives, including where they beat us.
   </div>
