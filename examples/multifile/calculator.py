@@ -39,11 +39,7 @@ class Calculator:
 
     def _record_operation(self, operation, a, b, result):
         """Record operation in history."""
-        self.history.append({
-            "operation": operation,
-            "operands": (a, b),
-            "result": result
-        })
+        self.history.append({"operation": operation, "operands": (a, b), "result": result})
 
     def get_history(self):
         """Get calculation history."""

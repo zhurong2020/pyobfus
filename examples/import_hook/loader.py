@@ -34,9 +34,7 @@ class ExampleFinder(importlib.abc.MetaPathFinder):
         candidate = self.base_dir / f"{fullname}.py"
         if candidate.exists():
             loader = ExampleLoader(candidate)
-            return importlib.machinery.ModuleSpec(
-                fullname, loader, origin=str(candidate)
-            )
+            return importlib.machinery.ModuleSpec(fullname, loader, origin=str(candidate))
         return None
 
 

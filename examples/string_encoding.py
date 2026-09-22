@@ -185,9 +185,7 @@ def main():
     print("Example 4: Product Information")
     print("-" * 70)
     product_info = format_product_info(
-        "Wireless Mouse",
-        "Ergonomic wireless mouse with 3 buttons",
-        29.99
+        "Wireless Mouse", "Ergonomic wireless mouse with 3 buttons", 29.99
     )
     print(product_info)
 

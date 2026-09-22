@@ -167,7 +167,7 @@ def main():
         timeout=60,
         retry_count=5,
     )
-    print(f"API Configuration:")
+    print("API Configuration:")
     print(f"  Endpoint: {config['endpoint']}")
     print(f"  Timeout: {config['timeout']}s")
     print(f"  Retries: {config['retry_count']}")

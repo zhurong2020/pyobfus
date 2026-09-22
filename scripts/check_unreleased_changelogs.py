@@ -52,7 +52,7 @@ def unreleased_content(text: str) -> str:
     m = UNRELEASED_RE.search(text)
     if not m:
         return ""
-    rest = text[m.end():]
+    rest = text[m.end() :]
     next_m = NEXT_HEADER_RE.search(rest)
     section = rest[: next_m.start()] if next_m else rest
     return section.strip()
@@ -80,7 +80,9 @@ def main() -> int:
         print("No pending [Unreleased] content in any tracked CHANGELOG.md. Clean.")
         return 0
 
-    print(f"{len(pending)} of {len(CHANGELOG_PATHS)} CHANGELOGs have pending [Unreleased] content:\n")
+    print(
+        f"{len(pending)} of {len(CHANGELOG_PATHS)} CHANGELOGs have pending [Unreleased] content:\n"
+    )
     for path, content in pending:
         rel = path.relative_to(REPO_ROOT)
         line_count = len(content.splitlines())

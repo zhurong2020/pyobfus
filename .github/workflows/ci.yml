@@ -67,11 +67,11 @@ jobs:
 
     - name: Check code formatting with black
       run: |
-        black --check pyobfus/ pyobfus_pro/ pyobfus_mcp/pyobfus_mcp/ tests/ integration_tests/ benchmarks/llm_resistance/
+        black --check pyobfus/ pyobfus_pro/ pyobfus_mcp/pyobfus_mcp/ tests/ integration_tests/ benchmarks/llm_resistance/ examples/ scripts/
 
     - name: Lint with ruff
       run: |
-        ruff check pyobfus/ pyobfus_pro/ pyobfus_mcp/pyobfus_mcp/ tests/ integration_tests/ benchmarks/llm_resistance/
+        ruff check pyobfus/ pyobfus_pro/ pyobfus_mcp/pyobfus_mcp/ tests/ integration_tests/ benchmarks/llm_resistance/ examples/ scripts/
 
     - name: Type check with mypy
       run: |
