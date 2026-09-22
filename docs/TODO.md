@@ -38,6 +38,10 @@ Core `0.5.27` 仍是当前公开版本，运营复查见 `CURRENT_PLAN_ZH.md`）
       `pyobfus-backup-pre-filter-repo-20260503-2231/`，都带 `MOVED_TO_WSL_20260921.md`、WSL 均有副本
       （`~/projects/` 同名目录）。09-22 只删了 pyobfus 与 pyobfus-legal 两个批过的；这两个不在清单里，未动。
       删前照旧 rsync 比对；该租户 OneDrive 只读、云端删除会同步删本地，反向也一样，别在里面再编辑。
+- [ ] **删掉 `spike/mcp-sdk-2x` 分支**（2026-09-22 跨仓扫描发现）：领先 `main` **0 个提交**，
+      即内容已全在 `main` 里，本地与远端都还留着一个 2026-09-12 的空壳分支。
+      `git branch -d spike/mcp-sdk-2x && git push origin --delete spike/mcp-sdk-2x`。
+      无风险（`-d` 而非 `-D`，未合并就会自己拒绝）；留着只是让分支列表多一条噪音。
 - [ ] **Y-1 Pro 运行时分发缺口定优先级**（见「真实交付场景暴露的 Pro 缺口」表）。
 
 ## 本轮已完成的去处
