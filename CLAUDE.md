@@ -20,9 +20,10 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   wrangler/gh/Zenodo/每日备份均正常）；旧 OneDrive 副本 pyobfus、pyobfus-legal 已删（rsync 比对零遗漏后）。
 - 免发版收尾已做：抗 AI 措辞改写（README/落地页/docs 首页，P1 结）、Alipay「is being enabled」句已删
   （Stripe 仍 Pending）、CI black/ruff 扩到 `examples/ scripts/`、迁移残留路径文案修正。
-- **待维护者动作**：① Claude plugin **重新提交**（Console 旧记录已消失、公开目录从未收录，走
-  `platform.claude.com/plugins/submit`）；② awesome-python PR；③ MCP Trust Registry publish 需其 API token。
-  文案在 `docs/internal/`；细节 `docs/TODO.md` + `docs/CURRENT_PLAN_ZH.md` 09-22 段。
+- **待维护者动作总表在 `docs/TODO.md` 顶部**：① Claude plugin **重新提交**（Console 旧记录已消失、公开目录
+  从未收录，走 `platform.claude.com/plugins/submit`）；② awesome-python PR；③ MCP Trust Registry publish 需其
+  API token；④ OneDrive 里 `pyobfus-action` / `pyobfus-backup-pre-filter-repo-*` 两个旧副本是否删（未批未动）；
+  ⑤ Y-1 优先级。文案在 `docs/internal/`；细节 `docs/CURRENT_PLAN_ZH.md` 09-22 段。本轮提交已 push，CI 全绿。
 - 「当前状态一句话」不变：`0.5.28` 最新，本轮不改 `pyobfus/` 代码、不发版；README 改动到 PyPI 要等下次发版。
 
 ### 🔴 2026-09-20 — 0.5.28 已发布（历史记录）

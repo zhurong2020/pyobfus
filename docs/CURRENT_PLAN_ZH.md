@@ -37,7 +37,9 @@ DOI → record `22858892` = v0.5.28 与 `CITATION.cff` 一致；09-22 02:01 每�
 A · 94/100 · 0 威胁；publish 到其 Registry 需维护者 token）。**awesome-python 文案已备**
 （`docs/internal/AWESOME_PYTHON_PR_DRAFT_2026-09-22.md`，槽位 Distribution→Obfuscation 仅 pyarmor 一条，
 按 challenger 报，被拒概率高）。下载：Core 09-20 发布日 `120`、09-21 `18`，MCP `6 / 6`，基线未抬升。
-本轮**不改 `pyobfus/` 代码、不发版**；README 改动到 PyPI 要等下次发版。
+本轮**不改 `pyobfus/` 代码、不发版**；README 改动到 PyPI 要等下次发版。收尾：5 个提交已 push，CI / CodeQL / Pages
+在 `4dfaf29` 全绿；**维护者动作总表在 `TODO.md` 顶部**（plugin 重提 / awesome-python PR / Trust Registry
+publish / OneDrive 残留两副本 / Y-1 优先级）。
 
 **09-15 开发、候选版与运营复查**：Y-8 已修——控制流扁平化遇到“一条路径显式 return、
 另一条路径自然落底”时，生成的共享 return slot 过去可能未初始化并抛
