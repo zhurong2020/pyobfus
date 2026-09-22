@@ -27,10 +27,11 @@ from the Apache-2.0 core.
 
 ## Setup
 
-Use the repository-local **`venv/`** on WSL/Linux. Do **not** use `.venv/`:
-that directory is a Windows-side legacy environment and WSL cannot reliably run
-its executables. Either activate `venv/` first, or call tools through
-`venv/bin/...` directly.
+Use the repository-local **`venv/`** on WSL/Linux. If a `.venv/` directory
+shows up, it is a Windows-side legacy environment (the checkout moved from a
+Windows-synced folder into WSL on 2026-09-21 and did not carry it over); WSL
+cannot reliably run its executables, so don't use it. Either activate `venv/`
+first, or call tools through `venv/bin/...` directly.
 
 ```bash
 python -m venv venv && source venv/bin/activate

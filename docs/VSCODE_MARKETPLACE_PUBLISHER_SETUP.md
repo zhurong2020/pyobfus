@@ -145,9 +145,10 @@ built — don't just describe the steps and let them assemble the URL**
 1. Clickable management page:
    <https://marketplace.visualstudio.com/manage/publishers/zhurong2020>
 2. Sign-in reminder: `wuxiami@hotmail.com`.
-3. The `.vsix` **Windows** path (the upload happens in a Windows browser, so a
-   WSL `/mnt/c/...` path is not directly usable):
-   `C:\onedrive\msft\OneDrive - MSFT\rong\3-job\program\pyobfus\vscode-extension\pyobfus-<version>.vsix`
+3. The `.vsix` path **as the Windows browser sees it**. The checkout lives inside
+   WSL (since 2026-09-21), so give the UNC form, not a `/home/...` path:
+   `\\wsl.localhost\<distro>\home\<user>\projects\pyobfus\vscode-extension\pyobfus-<version>.vsix`
+   (paste it into the file picker's address bar; Explorer resolves it directly).
 
 After the upload, verify the public listing independently rather than relying
 on the page display:
