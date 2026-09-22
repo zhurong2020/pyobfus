@@ -24,6 +24,22 @@ Core `0.5.27` 仍是当前公开版本，运营复查见 `CURRENT_PLAN_ZH.md`）
   下游是否选择混淆自己的代码由其分发边界决定；公开第三方依赖不因被打包而自动成为
   pyobfus 的处理目标。
 
+## 维护者动作清单（2026-09-22 收尾 · Claude 做不了、只等你）
+
+按顺手程度排，每项的细节都在本文件后面对应小节或所指文件里，这里只是一处能勾掉的总表。
+
+- [ ] **Claude plugin 重新提交**：<https://platform.claude.com/plugins/submit>，文案与字段
+      `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`（旧记录已消失、公开目录从未收录，见「外部等待」）。
+- [ ] **awesome-python PR**：一 PR 一项目，别同时提 pyobfus-mcp；文案
+      `docs/internal/AWESOME_PYTHON_PR_DRAFT_2026-09-22.md`（见「分发 / 上架队列」第 3 项）。
+- [ ] **MCP Trust Registry publish**：在其站点注册拿 API token 后
+      `npx mcptrustchecker publish <package> --token <key>`（wheel 已扫 A · 94/100，见「外部等待」）。
+- [ ] **OneDrive 残留两个旧副本是否删**：`…/3-job/program/` 下 `pyobfus-action/` 与
+      `pyobfus-backup-pre-filter-repo-20260503-2231/`，都带 `MOVED_TO_WSL_20260921.md`、WSL 均有副本
+      （`~/projects/` 同名目录）。09-22 只删了 pyobfus 与 pyobfus-legal 两个批过的；这两个不在清单里，未动。
+      删前照旧 rsync 比对；该租户 OneDrive 只读、云端删除会同步删本地，反向也一样，别在里面再编辑。
+- [ ] **Y-1 Pro 运行时分发缺口定优先级**（见「真实交付场景暴露的 Pro 缺口」表）。
+
 ## 本轮已完成的去处
 
 不在这里留历史层。2026-09-12 完成的六项（0.5.25 的三项修复、mcp 2.x 兼容与
