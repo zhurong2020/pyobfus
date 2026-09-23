@@ -5,7 +5,8 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-09-23（删除已完全合入 `main` 的本地及远端 `spike/mcp-sdk-2x` 空壳分支；
+最后更新：2026-09-24（`pyobfus-runtime` 0.1.0 已通过 OIDC/PEP 740 发布并完成 PyPI 验收；
+删除已完全合入 `main` 的本地及远端 `spike/mcp-sdk-2x` 空壳分支；
 修正本文件把已随 0.5.28 发布的邮箱 trial 误列为待实现、仍称 0.5.27 为当前版本的状态漂移。
 上一轮 2026-09-22：迁移到 WSL 后的核查与收尾，抗 AI 措辞改写完成、Alipay 句已删、
 awesome-python PR #3352 已提交并等待评审、Claude plugin 需重提、MCP Trust Checker 已实扫；详见
