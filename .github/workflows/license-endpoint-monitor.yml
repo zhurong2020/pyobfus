@@ -24,6 +24,7 @@ on:
     paths:
       - 'pyobfus_pro/license.py'
       - 'pyobfus_pro/fingerprint.py'
+      - 'pyobfus_runtime/**'
       - 'cloudflare-worker/src/index.js'
       - 'scripts/monitor_license_endpoint.py'
       - '.github/workflows/license-endpoint-monitor.yml'
@@ -48,6 +49,10 @@ jobs:
     - name: Install pyobfus
       run: |
         python -m pip install --upgrade pip
+        # Core does not depend on the unpublished runtime until the runtime
+        # release gate is complete; install the local WSL-owned candidate so
+        # the real Pro licence-client import path remains monitored meanwhile.
+        pip install -e ./pyobfus_runtime
         pip install -e .
 
     - name: Probe the licence endpoint
