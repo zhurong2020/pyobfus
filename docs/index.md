@@ -8,23 +8,23 @@ title: pyobfus - Modern Python Code Obfuscator
 </div>
 
 <div style="text-align: center; margin-bottom: 2em;">
-  <h1 style="font-size: 2.5em; margin-bottom: 0.2em; color: #2c3e50;">pyobfus</h1>
-  <p style="font-size: 1.3em; color: #34495e; margin-top: 0;">Modern Python Code Obfuscator</p>
+  <h1 style="font-size: 2.5em; margin-bottom: 0.2em; color: var(--md-default-fg-color);">pyobfus</h1>
+  <p style="font-size: 1.3em; color: var(--md-default-fg-color); margin-top: 0;">Modern Python Code Obfuscator</p>
   <p style="margin: 0.5em 0;">
     <a href="https://pypi.org/project/pyobfus/"><img src="https://img.shields.io/pypi/v/pyobfus.svg" alt="PyPI version"></a>
     <a href="https://pypi.org/project/pyobfus/"><img src="https://img.shields.io/pypi/dm/pyobfus.svg" alt="PyPI downloads"></a>
     <a href="https://pyobfus.readthedocs.io/en/latest/"><img src="https://readthedocs.org/projects/pyobfus/badge/?version=latest" alt="Documentation Status"></a>
   </p>
-  <p style="font-size: 1em; color: #7f8c8d; max-width: 600px; margin: 1em auto;">An open-source PyArmor alternative for teams that need to obfuscate before shipping without giving up production debugging. pyobfus emits portable Python through AST transformations and can reverse-map protected stack traces back to original identifiers for developers and AI coding assistants. <strong>Supports Python 3.9 through 3.14.</strong></p>
+  <p style="font-size: 1em; color: var(--md-default-fg-color--light); max-width: 600px; margin: 1em auto;">An open-source PyArmor alternative for teams that need to obfuscate before shipping without giving up production debugging. pyobfus emits portable Python through AST transformations and can reverse-map protected stack traces back to original identifiers for developers and AI coding assistants. <strong>Supports Python 3.9 through 3.14.</strong></p>
 </div>
 
 ## Features
 
 <div style="display: grid; gap: 1.5em; margin: 1.5em 0;">
 
-<div style="background: #f8f9fa; padding: 1.5em; border-radius: 8px; border-left: 4px solid #27ae60;">
+<div style="background: var(--md-code-bg-color); padding: 1.5em; border-radius: 8px; border-left: 4px solid #27ae60;">
   <h3 style="margin-top: 0; color: #27ae60;">🆓 Community Edition (Free)</h3>
-  <ul style="color: #555; line-height: 1.8; margin-bottom: 0;">
+  <ul style="color: var(--md-default-fg-color); line-height: 1.8; margin-bottom: 0;">
     <li><strong>Name Obfuscation</strong>: Rename variables, functions, and classes to I0, I1, I2...</li>
     <li><strong>Comment Removal</strong>: Strip comments and docstrings</li>
     <li><strong>String Encoding</strong>: Base64 encoding for string literals</li>
@@ -67,7 +67,7 @@ title: pyobfus - Modern Python Code Obfuscator
 
 </div>
 
-<p style="text-align: center; font-size: 0.9em; color: #7f8c8d; margin-top: 1em;"><a href="#purchase-professional-edition" style="color: #3498db; text-decoration: none;">📄 More purchase details ↓</a></p>
+<p style="text-align: center; font-size: 0.9em; color: var(--md-default-fg-color--light); margin-top: 1em;"><a href="#purchase-professional-edition" style="color: #3498db; text-decoration: none;">📄 More purchase details ↓</a></p>
 
 ## Installation
 
@@ -154,13 +154,13 @@ def I0(I1, I2):
 
 ## Purchase Professional Edition
 
-<div style="background: #f8f9fa; padding: 2em; border-radius: 8px; border-left: 4px solid #667eea; margin: 1.5em 0;">
-  <h3 style="margin-top: 0; color: #2c3e50;">💎 Professional Edition - $45 USD</h3>
-  <p style="color: #7f8c8d; font-size: 0.95em;">One-time payment • Lifetime access</p>
-  <p style="color: #555; font-size: 0.9em; margin-top: 0.4em;">💳 Pay by card, Apple Pay, or <strong>WeChat Pay (微信支付)</strong> for buyers in China. Stripe shows the methods available for your region at checkout.</p>
+<div style="background: var(--md-code-bg-color); padding: 2em; border-radius: 8px; border-left: 4px solid #667eea; margin: 1.5em 0;">
+  <h3 style="margin-top: 0; color: var(--md-default-fg-color);">💎 Professional Edition - $45 USD</h3>
+  <p style="color: var(--md-default-fg-color--light); font-size: 0.95em;">One-time payment • Lifetime access</p>
+  <p style="color: var(--md-default-fg-color); font-size: 0.9em; margin-top: 0.4em;">💳 Pay by card, Apple Pay, or <strong>WeChat Pay (微信支付)</strong> for buyers in China. Stripe shows the methods available for your region at checkout.</p>
 
-  <h4 style="color: #34495e; margin-top: 1.5em;">What's Included:</h4>
-  <ul style="color: #555; line-height: 1.8;">
+  <h4 style="color: var(--md-default-fg-color); margin-top: 1.5em;">What's Included:</h4>
+  <ul style="color: var(--md-default-fg-color); line-height: 1.8;">
     <li>✅ <strong>Control Flow Flattening</strong> - State machine transformation</li>
     <li>✅ <strong>Dead Code Injection</strong> - Increase code complexity</li>
     <li>✅ <strong>AES-256 String Encryption</strong></li>
@@ -174,7 +174,7 @@ def I0(I1, I2):
 
   <div style="text-align: center; margin: 1.5em 0;">
     <a href="https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 40px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 17px; box-shadow: 0 3px 6px rgba(102, 126, 234, 0.3); transition: all 0.3s;">🚀 Buy Now - $45 USD</a>
-    <p style="margin-top: 1em; color: #7f8c8d; font-size: 0.9em;">⚡ Instant delivery • 🔒 Secure checkout • 💯 30-day money-back guarantee</p>
+    <p style="margin-top: 1em; color: var(--md-default-fg-color--light); font-size: 0.9em;">⚡ Instant delivery • 🔒 Secure checkout • 💯 30-day money-back guarantee</p>
   </div>
 </div>
 

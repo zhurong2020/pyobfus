@@ -32,6 +32,15 @@ runtime 再分发许可证，并在 PyPI 配置第三个 Trusted Publisher。顺
 challenger PR [`vinta/awesome-python#3352`](https://github.com/vinta/awesome-python/pull/3352)；
 PR 明示维护者身份与约 2k/月相对 pyarmor 约 290k/月的采用差距。当前只等待评审，不同时
 投第二个 awesome-list、不争辩或重复提交。
+09-23 后续复查确认 PR 仍 open、无评论且对方 CI 通过；本仓库 `fd620d2` 的 CI 与 CodeQL
+也全绿。OneDrive 两个迁移旧副本已完成删除前 checksum rsync：排除版本库、缓存及迁移
+标记后，两组与 `~/projects/` 同名目录均零差异，现只等维护者明确批准删除。pypistats
+`without_mirrors` 数据已到 09-22：Core 在 0.5.28 发布日 `120` 后为 `18 / 21`，MCP 同期
+`6 / 6 / 9`，仍无自然基线抬升。文档首页的浅色硬编码卡片/文字已改用 Material 主题变量，
+避免暗色模式下 Community 与购买区块对比度失真。
+0.5.28 的 Zenodo 链路也已补验：concept DOI `10.5281/zenodo.20846053` 当前 302 到
+record `22858892`，其公开 API 明确返回 version `v0.5.28` 与 publication date
+`2026-09-20`；无需轮换 webhook，继续按每次发版后验证。
 
 更新时间：2026-09-22（**09-22 迁移后核查与收尾见下一段**；当前公开版本：Core **`0.5.28`**（reason codes + trial `--email` + CycloneDX 1.7，OIDC+PEP740 已发布、PyPI latest、两个 provenance 200、全新装验证、GitHub Release 已建、完整 CI+CodeQL 绿）/ MCP **`0.3.12`** /
 VS Code **`0.4.3`**；**GitHub Action `pyobfus-action v1.0.1` 已上架 Marketplace**。本轮完成：**09-10 下载与渠道复查**——三个 0.5.22 发布后的
