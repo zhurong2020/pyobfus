@@ -7,7 +7,7 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-**Last updated**: 2026-09-16. Download/channel snapshot: pypistats
+**Last updated**: 2026-09-24. Download/channel snapshot: pypistats
 `without_mirrors` data now runs through 09-15. Core recorded `99` on 09-15,
 above the historical 20–40 quiet band; 09-13/09-14 (`122`/`41`) bracket the
 0.5.26 release and verification. MCP recorded `5 / 9` on 09-13/09-14 and remains
@@ -17,7 +17,7 @@ The two registry download counters are not additive user counts. The prior
 baseline conclusion remains unchanged: three clean post-0.5.22 days
 (`65 / 48 / 31`) decay back into the quiet band, so the 09-08 open question is
 answered — no baseline uplift. Current public versions are pyobfus
-**`0.5.27`** (released 09-16), pyobfus-mcp `0.3.12`, and VS Code/Open VSX
+**`0.5.28`** (released 09-20), pyobfus-mcp `0.3.12`, and VS Code/Open VSX
 **`0.4.3`** (both released 09-10 and independently re-checked on both
 registries). Open VSX is
 live; Glama is listed, searchable and healthy, with two consecutive successful
@@ -35,7 +35,7 @@ do not interpret the next release-day spike as an organic baseline change.
 
 ### PyPI — `pyobfus`
 - URL: https://pypi.org/project/pyobfus/
-- Current version: **0.5.27** (released 2026-09-16) · ships with PEP 740 attestations via OIDC trusted publishing
+- Current version: **0.5.28** (released 2026-09-20) · ships with PEP 740 attestations via OIDC trusted publishing
 - Current headline: licensing reliability — Pro activation had been failing for every customer since roughly 2026-07-08 because a CDN rejected Python's default network signature; alongside that, an OS update no longer takes a registered licence away, revocation now takes effect, the server retires the least recently used device instead of refusing a fourth, and `pyobfus-license deactivate` lets a customer release a machine themselves.
 - Prior headline (0.5.24): `--build-report` writes one versioned, privacy-safe fact model of a completed build — selection/config, transform and cache counters, verification evidence, output digests, artifact roles, marker state, and provenance linkage. Digests are evidence, not signatures; an unrequested syntax check is never reported as passed.
 - Prior headline (0.5.23): generated Community output carries a versioned, transparent build marker; generated output no longer embeds the input file's absolute path. Marker policy is configurable and recorded in dry-run/provenance facts.
@@ -92,6 +92,13 @@ do not interpret the next release-day spike as an organic baseline change.
   wait for 2–3 clean days from 09-17 before judging organic uplift. This does
   not yet establish a baseline change.
 - Tracker: `gh api repos/zhurong2020/pyobfus` + PePy
+
+### PyPI — `pyobfus-runtime` 🟢 LIVE
+- URL: https://pypi.org/project/pyobfus-runtime/
+- Current version: **0.1.0** (published 2026-09-24) · OIDC trusted publishing with PEP 740 attestations
+- The wheel and sdist use the custom `LicenseRef-pyobfus-Runtime-1.0` licence.
+  A clean PyPI installation was verified with `pyobfus_pro` absent.
+- Release evidence: [workflow 35931605485](https://github.com/zhurong2020/pyobfus/actions/runs/35931605485)
 
 ### PyPI — `pyobfus-mcp`
 - URL: https://pypi.org/project/pyobfus-mcp/
@@ -249,7 +256,7 @@ do not interpret the next release-day spike as an organic baseline change.
   prior is not evidence of an actual review. Continue tracking installs and
   real reviews, not raw update/download count alone.
 - Wiki: disabled · Discussions: enabled · Issues: open
-- Releases: latest Core `v0.5.27`, MCP `mcp-v0.3.12`, and VS Code
+- Releases: latest Core `v0.5.28`, runtime `runtime-v0.1.0`, MCP `mcp-v0.3.12`, and VS Code
   `vscode-v0.4.3`; MCP releases attach wheel+sdist.
 
 ### Open VSX — `zhurong2020.pyobfus` 🟢 LIVE

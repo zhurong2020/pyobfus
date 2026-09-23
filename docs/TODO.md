@@ -44,12 +44,6 @@ Core `0.5.28` 是当前公开版本，运营复查见 `CURRENT_PLAN_ZH.md`）。
       代理不执行该云同步删除；删完只需回报以便勾掉。此后 Core/MCP/runtime/Action 的本地
       开发、测试、构建与发版准备全部只在 `~/projects/` 的 WSL 工作副本进行，
       OneDrive 仅作迁移残留或备份，不在其中编辑或执行。
-- [ ] **发布 Y-1 Pro 可再分发运行时**：优先级已定为当前产品 P0，设计见
-      `Y1_RUNTIME_DISTRIBUTION_DESIGN.md`。代码、兼容别名、marker 清理、独立 wheel 与 CI/release
-      workflow 已形成候选；再分发许可证已按批准意见修改，项目级 PyPI Pending Trusted
-      Publisher 也已配置；修改后的 sdist/wheel、全新环境、四测试根和静态/文档检查均通过。
-      发布前只剩维护者明确批准推送 `runtime-v0.1.0` 标签。
-      必须先发布独立 runtime，再给 builder 声明依赖并发布。
 
 ## 本轮已完成的去处
 
@@ -188,7 +182,6 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
 
 | # | 缺口 | 证据 | 方向 |
 |---|---|---|---|
-| **Y-1** 🔴 **P0** | **Pro 运行时无法合法随输出分发**，影响所有使用运行时功能的客户 | 2026-09-14 的真实交付实验已复现；2026-09-23 进一步审计确认影响 L3、vault、seal、scrub、设备绑定、到期/次数限制、runtime-policy 与 embedded data | **方案已定**：独立可再分发 `pyobfus-runtime`（命名空间 `pyobfus_runtime`）作为唯一实现，Pro 留 0.5.x 兼容转发层，清理已消费的 marker import；设计、顺序和验收见 `Y1_RUNTIME_DISTRIBUTION_DESIGN.md` |
 | Y-2 | `--expire-hard` 没有到期前提醒，不能不重新构建就延期 | `build_fusion._inject_expire_check` 在模块顶部直接抛 `LicenseExpired` | `--expire-warn-days N` 或提醒回调 |
 | Y-3 | 设备绑定只认 pyobfus 自己的 `current_machine_id()` | 自带授权体系（JWT 加自有机器码）的应用，无法在不逐机器构建的前提下把 L3 密钥绑定到自己的授权上 | 运行时"密钥提供者"钩子，应用验签后提供密钥材料 |
 | ~~Y-4~~ ✅ | ~~Windows 上运行混淆输出没有 CI 验证~~ **已补基础合同** | `integration` job 扩为 Ubuntu + Windows；单文件和跨文件示例均执行混淆产物并与原输出比较 | 覆盖基础 Community 交付；torch/MONAI、Python embedded、L3 runtime 等重型真实下游组合仍需 Y-1 专项验证 |

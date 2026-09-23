@@ -15,6 +15,10 @@ PyPI's own documentation is explicit about the security boundary: attestations
 bind a distribution file to the identity and digest that produced it. They do
 not prove that the code is bug-free, vulnerability-free, or trustworthy.
 
+The first standalone runtime release is `pyobfus-runtime` 0.1.0. Its release
+workflow uses the same OIDC/PEP 740 path as Core and MCP, but its provenance
+must be checked against the runtime project and filename rather than `pyobfus`.
+
 ## Quick Endpoint Check
 
 Use this to confirm that PyPI has provenance JSON for a published artifact:
@@ -24,6 +28,15 @@ curl -fsS \
   -H 'Accept: application/vnd.pypi.integrity.v1+json' \
   https://pypi.org/integrity/pyobfus/0.5.27/pyobfus-0.5.27-py3-none-any.whl/provenance \
   >/tmp/pyobfus-provenance.json
+```
+
+For the runtime release:
+
+```bash
+curl -fsS \
+  -H 'Accept: application/vnd.pypi.integrity.v1+json' \
+  https://pypi.org/integrity/pyobfus-runtime/0.1.0/pyobfus_runtime-0.1.0-py3-none-any.whl/provenance \
+  >/tmp/pyobfus-runtime-provenance.json
 ```
 
 Exit code `0` plus `Content-Type: application/vnd.pypi.integrity.v1+json` means

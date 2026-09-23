@@ -1,6 +1,6 @@
 # Support matrix
 
-What is actually verified, by what, as of 2026-09-23 (`pyobfus` 0.5.28 /
+What is actually verified, by what, as of 2026-09-24 (`pyobfus` 0.5.28 /
 `pyobfus-mcp` 0.3.12 / VS Code extension 0.4.3).
 
 Three labels, used strictly:
@@ -20,7 +20,7 @@ confident anyone feels about it.
 | Surface | Linux | macOS | Windows | Evidence |
 |---|---|---|---|---|
 | Core obfuscator, 3.9–3.14 | tested | tested | tested | `ci.yml` job `test`, 3 OS × 6 versions |
-| `pyobfus-runtime`, 3.9–3.14 | tested | tested | tested | Local boundary suite 2/2 and clean-wheel install passed; CI run [`35864537940`](https://github.com/zhurong2020/pyobfus/actions/runs/35864537940) installed and tested it across 3 OS × 6 versions, and its `runtime-wheel` job inspected and executed the standalone wheel |
+| `pyobfus-runtime`, 3.9–3.14 | tested | tested | tested | PyPI `0.1.0` clean install passed; local boundary suite 2/2; CI run [`35931303008`](https://github.com/zhurong2020/pyobfus/actions/runs/35931303008) and release run [`35931605485`](https://github.com/zhurong2020/pyobfus/actions/runs/35931605485) built, inspected, and published the standalone wheel |
 | End-to-end CLI (obfuscate, execute output) | tested (3.11) | advisory-only | tested (3.11) | `ci.yml` job `integration` runs `integration_tests/` on Ubuntu and Windows; single-file and cross-file outputs are executed and compared with the originals |
 | `pyobfus-mcp` server | tested (3.11, 3.13) | advisory-only | advisory-only | `ci.yml` jobs `mcp-tests` (3.11), `mcp-sdk-latest` and `mcp-sdk-2x` (3.13) |
 | VS Code extension | tested (Node 22, Python 3.12) | advisory-only | advisory-only | `vscode-extension-ci.yml`, headless xvfb |
@@ -62,7 +62,7 @@ generated output; `--verify-syntax` compiles it, which is weaker than running.
 | Import hook — SOURCEdefender `.pye` encrypted files | advisory-only | [`IMPORT_HOOK_COOKBOOK.md`](IMPORT_HOOK_COOKBOOK.md); the stdlib path above is what CI covers |
 | Model serving | advisory-only | [`MODEL_SERVING_COOKBOOK.md`](MODEL_SERVING_COOKBOOK.md) |
 | Reverse stack-trace mapping workflow | tested | `tests/test_unmap_cli.py`, plus `integration_tests/test_examples.py` — the `examples/ai_debugging/` round trip (obfuscated crash → `--unmap` restores originals) runs on every push |
-| Pro artifact on a target without `pyobfus_pro` | tested | Standalone runtime wheel installed in clean local and CI environments; `pyobfus_pro` was not importable, the runtime API executed, and wheel inspection found no Pro, transformer, licence-client, or CLI files. CI evidence: run [`35864537940`](https://github.com/zhurong2020/pyobfus/actions/runs/35864537940), `runtime-wheel` job. |
+| Pro artifact on a target without `pyobfus_pro` | tested | Standalone runtime wheel installed in clean local and CI environments; `pyobfus_pro` was not importable, the runtime API executed, and wheel inspection found no Pro, transformer, licence-client, or CLI files. CI evidence: run [`35931303008`](https://github.com/zhurong2020/pyobfus/actions/runs/35931303008), `runtime-wheel` job. |
 
 First-batch examples executed by the `integration` job (Ubuntu and Windows),
 each obfuscated, run, and compared against the original behavior:

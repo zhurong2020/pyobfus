@@ -31,7 +31,7 @@ uvx pyobfus-mcp
 
 ## Core commands
 
-- Current Core release: `0.5.27` fixes cross-file
+- Current Core release: `0.5.28` fixes cross-file
   local-scope shadowing, eager annotation/default rewriting after class
   renaming, and control-flow fallthrough paths that previously read an
   uninitialized return slot. Windows CI now executes generated output.

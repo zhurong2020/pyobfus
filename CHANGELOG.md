@@ -16,10 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   builder on the target machine. The runtime contains no transformer, CLI,
   payment, or licence-verification code and needs no licence key to execute an
   artifact. Legacy `pyobfus_pro.runtime` imports remain module aliases for the
-  0.5.x compatibility line. Release sequencing is strict: publish the runtime
-  first, then release the builder that emits its namespace. Its custom
-  redistribution licence permits packaging-only transformations while keeping
-  functional modification and build-time obfuscation-service use prohibited.
+  0.5.x compatibility line. `pyobfus-runtime` 0.1.0 is now published through
+  OIDC/PEP 740; the next builder release may declare its compatible runtime
+  requirement. Its custom redistribution licence permits packaging-only
+  transformations while keeping functional modification and build-time
+  obfuscation-service use prohibited.
 
 ### Fixed
 

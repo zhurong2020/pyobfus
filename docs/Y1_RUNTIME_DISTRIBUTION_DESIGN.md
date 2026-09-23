@@ -1,6 +1,6 @@
 # Redistributable Pro runtime design
 
-Status: release candidate; publication gates remain (2026-09-23)
+Status: published `pyobfus-runtime` 0.1.0 (2026-09-24)
 
 Local evidence: standalone boundary tests 2/2; focused runtime/fusion tests
 189/189; compatibility regression tests 76/76; standalone wheel built and
@@ -12,11 +12,13 @@ and the affected 76-test slice then passed. Final local validation passed: Core
 1354/1 skipped, MCP 97, integration 12, runtime 2; Black, Ruff, mypy, MkDocs,
 README links, workflow YAML, Twine, and a fresh dual-wheel install all passed.
 Remote CI is green. The redistribution licence review and the project-specific
-PyPI Pending Trusted Publisher setup are complete. The licence-adjusted sdist
+PyPI Trusted Publisher setup are complete. The licence-adjusted sdist
 and wheel pass Twine, metadata/licence inspection, content-boundary inspection,
 and a clean-environment install where `pyobfus_pro` is absent. The four local
-test roots and all required static/documentation checks also pass. Only explicit
-publication approval remains.
+test roots and all required static/documentation checks also pass. Release
+workflow [`35931605485`](https://github.com/zhurong2020/pyobfus/actions/runs/35931605485)
+published both artifacts through PyPI Trusted Publishing with PEP 740
+attestations; PyPI metadata and a fresh PyPI install were verified on 2026-09-24.
 
 ## Problem
 
@@ -78,11 +80,10 @@ artifacts; trial use does not grant production redistribution; separate
 sublicensing and misrepresentation as open source remain prohibited. This is a
 product/legal recommendation, not jurisdiction-specific legal advice.
 
-PyPI has a project-specific Pending Trusted Publisher for `pyobfus-runtime`,
-owned by `zhurong2020/pyobfus` and bound to `.github/workflows/release.yml`.
-Its environment is intentionally blank because the current runtime publication
-job does not declare a GitHub environment. The pending publisher becomes the
-ordinary project publisher when the first release creates the project.
+PyPI now has the ordinary project-level Trusted Publisher for `pyobfus-runtime`,
+created from the pending publisher owned by `zhurong2020/pyobfus` and bound to
+`.github/workflows/release.yml`. Its environment remains blank because the
+publication job does not declare a GitHub environment.
 
 ## Source and compatibility layout
 
@@ -144,8 +145,8 @@ dependency because Community-only output does not need it.
 6. README, support matrix, Pro licence, runtime licence, changelogs, and SBOM
    output describe the delivery requirement consistently.
 7. Runtime publication and the Pro/Core release that begins emitting the new
-   namespace are separate release/deployment gates and require maintainer
-   approval.
+   namespace are separate release/deployment gates; runtime publication is
+   complete, while the builder dependency/release gate remains.
 
 ## Rollout order
 
