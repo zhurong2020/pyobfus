@@ -166,7 +166,7 @@ jobs:
     - name: Install only the runtime wheel and test its boundary
       run: |
         pip install pytest pyobfus_runtime/dist/*.whl
-        pytest pyobfus_runtime/tests/ -v --no-cov
+        pytest pyobfus_runtime/tests/ -v
 
   benchmark-smoke:
     # Offline, deterministic validation of the P2-18 corpus -> obfuscate ->
