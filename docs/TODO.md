@@ -8,7 +8,7 @@
 最后更新：2026-09-23（删除已完全合入 `main` 的本地及远端 `spike/mcp-sdk-2x` 空壳分支；
 修正本文件把已随 0.5.28 发布的邮箱 trial 误列为待实现、仍称 0.5.27 为当前版本的状态漂移。
 上一轮 2026-09-22：迁移到 WSL 后的核查与收尾，抗 AI 措辞改写完成、Alipay 句已删、
-awesome-python 文案已备、Claude plugin 需重提、MCP Trust Checker 已实扫；详见
+awesome-python PR #3352 已提交并等待评审、Claude plugin 需重提、MCP Trust Checker 已实扫；详见
 `CURRENT_PLAN_ZH.md` 09-22 段。上一轮 2026-09-20：对标竞品 + 国际最佳实践 + 本地已完成/未发版做了一次三透镜
 重排，见 `FEATURE_EXPANSION_RESEARCH_2026-09-12.md` 之上的本轮外部核查；新增
 **服务端邮箱登记 trial** 为 P1（现已完成并随 0.5.28 发布），依据见
@@ -33,8 +33,6 @@ Core `0.5.28` 是当前公开版本，运营复查见 `CURRENT_PLAN_ZH.md`）。
 
 - [ ] **Claude plugin 重新提交**：<https://platform.claude.com/plugins/submit>，文案与字段
       `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`（旧记录已消失、公开目录从未收录，见「外部等待」）。
-- [ ] **awesome-python PR**：一 PR 一项目，别同时提 pyobfus-mcp；文案
-      `docs/internal/AWESOME_PYTHON_PR_DRAFT_2026-09-22.md`（见「分发 / 上架队列」第 3 项）。
 - [ ] **MCP Trust Registry publish**：在其站点注册拿 API token 后
       `npx mcptrustchecker publish <package> --token <key>`（wheel 已扫 A · 94/100，见「外部等待」）。
 - [ ] **OneDrive 残留两个旧副本是否删**：`…/3-job/program/` 下 `pyobfus-action/` 与
@@ -84,7 +82,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 | ~~P0~~ ✅ | 可验证性主线**完成**：对标文档 `SUPPLY_CHAIN_ASSURANCE.md` + 稳定 reason code（`reason_codes.py` v1，plan/report 发射，`REASON_CODES.md`）+ CycloneDX 1.7，全部**随 0.5.28 发布** | — | — |
 | ~~P1~~ ✅ | OSPS 补齐**基本完成 2026-09-20**：4 开关（gh api 核实）+ 4 文档（f2cd713）全做完。残余 = `LE-01.01` DCO（主动延后）+ 若干 L3 | 免发版 | — |
 | ~~P1~~ ✅ | 抗 AI 措辞改写**完成 2026-09-22**（tech-deai）：README / `landing/index.html` / `docs/index.md` 散文里的 em-dash 全部清零（README 48 处）、20 条 bold-colon 功能列表改成带动词的句子；命令、路径、版本号、链接、What's new 横幅与 UI 标签（如 `Unlock Pro`）原样。H2 骨架未动（doc-hub 型 README，锚点被外部引用）。~~pyarmor VMC/ECC 补记~~——已确认无需改 | 免发版（README 到 PyPI 要等下次发版） | — |
-| **P2** | 分发上架队列：**awesome-python 文案已备（2026-09-22）**，见 `docs/internal/AWESOME_PYTHON_PR_DRAFT_2026-09-22.md` → awesome-security → AlternativeTo | 免发版（提交需维护者账号） | 文案已备，提交需维护者 |
+| **P2** | 分发上架队列：awesome-python PR #3352 已提交、等待评审；不要同时投第二个 awesome-list → 结果出来后再评估 awesome-security → AlternativeTo | 免发版 | 外部等待 |
 
 ### ✅ 可验证性主线（2026-09-20 完成，随 0.5.28 发布）
 
@@ -163,8 +161,12 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 
 1. ~~Open VSX~~ ✅ 2026-09-07
 2. ~~独立 GitHub Action + Marketplace~~ ✅ 2026-09-10
-3. **`awesome-python`** ← 当前队头。**文案已备（2026-09-22）**：`docs/internal/AWESOME_PYTHON_PR_DRAFT_2026-09-22.md`。目标槽位 `Distribution → Obfuscation`（现仅 pyarmor 一条，上限 5，**不需 displacement**，按 challenger 报）。**需维护者账号提 PR**。诚实预期：其 admission 主要看 PyPI 月下载（我们约 2k vs pyarmor 约 289k），被拒概率高，拒信不代表项目质量；**别同时提 pyobfus-mcp**（同作者多项目会按 self-promotion 直接关）
-4. `awesome-security` 或 `awesome-devsecops`（择一尝试）
+3. **`awesome-python`**：✅ 2026-09-23 已提交
+   [`vinta/awesome-python#3352`](https://github.com/vinta/awesome-python/pull/3352)，严格一行、按
+   challenger 报并披露维护者身份；当前等待评审。其 admission 主要看 PyPI 月下载（我们约
+   2k vs pyarmor 约 289k），被拒概率高；拒信不代表项目质量，不争辩、不重开。**等待结果前
+   不同时投第二个 awesome-list，也不提 pyobfus-mcp**。
+4. `awesome-security` 或 `awesome-devsecops`（awesome-python 有结果后择一尝试）
 5. **AlternativeTo**（**需维护者在对方站点提交**；同时服务上面第 5 项的对比可见度）
 6. 为 stdio MCP 准备 MCPB，之后再评估 Smithery
 7. Product Hunt——**等有真实用户信号再做**，不提前

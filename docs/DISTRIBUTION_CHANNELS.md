@@ -668,6 +668,15 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 
 ## 🟡 Pending action
 
+### awesome-python — PR pending
+
+2026-09-23 已向 `Distribution → Obfuscation` 提交 challenger 条目：
+[`vinta/awesome-python#3352`](https://github.com/vinta/awesome-python/pull/3352)。提交前复核了
+最新 `CONTRIBUTING.md`、槽位（仅 pyarmor 一项，上限未满）以及全仓历史 PR/issue，无
+`pyobfus` 重复记录。PR 只有一行，披露维护者身份，并诚实说明约 2k/月与 pyarmor 约
+290k/月的采用量差距。当前等待维护者裁决；不争辩、不重开，结果出来前不同时投第二个
+awesome-list。
+
 ### `awesome-mcp-servers` community lists — 2 LIVE / 1 dead-end (refreshed 2026-06-08)
 - 🟢 **`wong2/awesome-mcp-servers` LIVE** via mcpservers.org (the list has retired direct PRs; submissions go through the form-driven `mcpservers.org/submit` channel). Listing: <https://mcpservers.org/servers/zhurong2020/pyobfus>. Approval landed same-day (2026-05-08) vs the 7-day SLA.
 - 🟢 **`punkpeye/awesome-mcp-servers` PR #5777 MERGED 2026-06-06** (opened 2026-05-03 · merged by punkpeye/Frank Fiegel after ~34 days at 86K★-repo human cadence). pyobfus-mcp now listed under Developer Tools. All bot gates were green throughout (`has-emoji`/`has-glama`/`valid-name`).

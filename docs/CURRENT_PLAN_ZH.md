@@ -20,9 +20,18 @@ wheel 禁含 Pro/transformer/license-client/CLI 文件均实测通过；Ruff 与
 已预备 `runtime-v*` OIDC job。最终本地验收：Core 1354 passed / 1 skipped、MCP 97、
 integration 12、runtime 2；Black、Ruff、mypy、MkDocs strict、README links、workflow YAML
 均通过；runtime sdist/wheel 通过 Twine，Core wheel + runtime wheel 全新安装成功且模块身份
-兼容，Core wheel 不夹带 runtime。**尚未发布**：发布前仍需远端 CI、审核自定义
+兼容，Core wheel 不夹带 runtime。远端 CI run
+[`35864537940`](https://github.com/zhurong2020/pyobfus/actions/runs/35864537940) 已全绿，覆盖
+3 OS × 6 Python、独立 runtime wheel 边界、benchmark 及 Linux/Windows integration；CodeQL run
+[`35864537985`](https://github.com/zhurong2020/pyobfus/actions/runs/35864537985) 亦通过。
+**尚未发布**：发布前仍需审核自定义
 runtime 再分发许可证，并在 PyPI 配置第三个 Trusted Publisher。顺序硬约束仍是 runtime
 先发，随后 builder 才能声明依赖并发版。
+
+分发侧已复核 awesome-python 最新规则、当前槽位及历史 PR/issue，无重复后提交单行
+challenger PR [`vinta/awesome-python#3352`](https://github.com/vinta/awesome-python/pull/3352)；
+PR 明示维护者身份与约 2k/月相对 pyarmor 约 290k/月的采用差距。当前只等待评审，不同时
+投第二个 awesome-list、不争辩或重复提交。
 
 更新时间：2026-09-22（**09-22 迁移后核查与收尾见下一段**；当前公开版本：Core **`0.5.28`**（reason codes + trial `--email` + CycloneDX 1.7，OIDC+PEP740 已发布、PyPI latest、两个 provenance 200、全新装验证、GitHub Release 已建、完整 CI+CodeQL 绿）/ MCP **`0.3.12`** /
 VS Code **`0.4.3`**；**GitHub Action `pyobfus-action v1.0.1` 已上架 Marketplace**。本轮完成：**09-10 下载与渠道复查**——三个 0.5.22 发布后的
@@ -58,11 +67,11 @@ DOI → record `22858892` = v0.5.28 与 `CITATION.cff` 一致；09-22 02:01 每�
 2,320 条无 `pyobfus` = 从未批准；官方流程已改为 Console 表单 `platform.claude.com/plugins/submit` →
 内部管线 → 每夜同步，**需维护者重新提交**（本地 validate 通过、从本仓库实装成功；文案
 `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`）。**MCP Trust Checker 已实扫**（wheel 0.3.12：
-A · 94/100 · 0 威胁；publish 到其 Registry 需维护者 token）。**awesome-python 文案已备**
-（`docs/internal/AWESOME_PYTHON_PR_DRAFT_2026-09-22.md`，槽位 Distribution→Obfuscation 仅 pyarmor 一条，
-按 challenger 报，被拒概率高）。下载：Core 09-20 发布日 `120`、09-21 `18`，MCP `6 / 6`，基线未抬升。
+A · 94/100 · 0 威胁；publish 到其 Registry 需维护者 token）。**awesome-python 已于 09-23 提交
+PR #3352**（槽位 Distribution→Obfuscation 仅 pyarmor 一条，按 challenger 报并披露维护者身份；
+当前只等待，不同时投第二个 awesome-list）。下载：Core 09-20 发布日 `120`、09-21 `18`，MCP `6 / 6`，基线未抬升。
 本轮**不改 `pyobfus/` 代码、不发版**；README 改动到 PyPI 要等下次发版。收尾：5 个提交已 push，CI / CodeQL / Pages
-在 `4dfaf29` 全绿；**维护者动作总表在 `TODO.md` 顶部**（plugin 重提 / awesome-python PR / Trust Registry
+在 `4dfaf29` 全绿；**维护者动作总表在 `TODO.md` 顶部**（plugin 重提 / Trust Registry
 publish / OneDrive 残留两副本 / Y-1 优先级）。
 
 **09-15 开发、候选版与运营复查**：Y-8 已修——控制流扁平化遇到“一条路径显式 return、
