@@ -34,7 +34,8 @@ Core `0.5.28` 是当前公开版本，运营复查见 `CURRENT_PLAN_ZH.md`）。
 - [ ] **Claude plugin 重新提交**：<https://platform.claude.com/plugins/submit>，文案与字段
       `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`（旧记录已消失、公开目录从未收录，见「外部等待」）。
 - [ ] **MCP Trust Registry publish**：在其站点注册拿 API token 后
-      `npx mcptrustchecker publish <package> --token <key>`（wheel 已扫 A · 94/100，见「外部等待」）。
+      `MCPTRUSTCHECKER_TOKEN=… npx --yes mcptrustchecker@1.14.0 publish pyobfus-mcp --registry pypi --online --category developer-tools`
+      （wheel 已扫 A · 94/100，09-23 已用 CLI help 核对参数；不要把 token 写进 shell history、仓库或聊天）。
 - [ ] **OneDrive 残留两个旧副本是否删**：`…/3-job/program/` 下 `pyobfus-action/` 与
       `pyobfus-backup-pre-filter-repo-20260503-2231/`，都带 `MOVED_TO_WSL_20260921.md`、WSL 均有副本
       （`~/projects/` 同名目录）。09-22 只删了 pyobfus 与 pyobfus-legal 两个批过的；这两个不在清单里，未动。
@@ -166,7 +167,9 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
    2k vs pyarmor 约 289k），被拒概率高；拒信不代表项目质量，不争辩、不重开。**等待结果前
    不同时投第二个 awesome-list，也不提 pyobfus-mcp**。
 4. `awesome-security` 或 `awesome-devsecops`（awesome-python 有结果后择一尝试）
-5. **AlternativeTo**（**需维护者在对方站点提交**；同时服务上面第 5 项的对比可见度）
+5. **AlternativeTo**（**需维护者验证邮箱后在对方站点提交**；字段草稿已记入
+   `DISTRIBUTION_CHANNELS.md`。免费队列官方口径至少数月，$5 priority review 是可选付费 gate，
+   默认不买；同时服务上面第 5 项的对比可见度）
 6. 为 stdio MCP 准备 MCPB，之后再评估 Smithery
 7. Product Hunt——**等有真实用户信号再做**，不提前
 
@@ -283,7 +286,9 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
   `MTC-SRC-002`（`tools.py` 里的 shell/command execution，即调用 pyobfus CLI，设计内，
   信息性不扣信任分）。stdio 实跑扫描被其沙箱拒（`Connection closed`），覆盖面为源码级。
   **登记（publish 到其公开 MCP Trust Registry）需要该站 API token，得维护者注册后跑
-  `npx mcptrustchecker publish <package> --token <key>`**；不为徽章改产品逻辑。结果记在
+  `MCPTRUSTCHECKER_TOKEN=… npx --yes mcptrustchecker@1.14.0 publish pyobfus-mcp --registry pypi --online --category developer-tools`**；
+  09-23 已用该固定版本的 CLI help 核对 package、registry、online、category 与 token 参数。
+  不为徽章改产品逻辑，也不要把 token 写进 shell history、仓库或聊天。结果记在
   `DISTRIBUTION_CHANNELS.md`。
 
 ## 明确不做

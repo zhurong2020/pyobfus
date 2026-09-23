@@ -43,6 +43,11 @@ PR 明示维护者身份与约 2k/月相对 pyarmor 约 290k/月的采用差距�
 0.5.28 的 Zenodo 链路也已补验：concept DOI `10.5281/zenodo.20846053` 当前 302 到
 record `22858892`，其公开 API 明确返回 version `v0.5.28` 与 publication date
 `2026-09-20`；无需轮换 webhook，继续按每次发版后验证。
+维护者动作材料也进一步收口：MCP Trust Checker 1.14.0 的 `publish --help` 已实跑，确定
+PyPI 包的准确登记命令与 `developer-tools` 分类；token 改走临时环境变量，禁止进入 history/
+仓库/聊天。AlternativeTo 最新官方 FAQ 已复核，表单字段、诚实的 Freemium/Apache-2.0 +
+商业 Pro 口径、PyArmor 单一替代关系和 logo 路径将写入 `DISTRIBUTION_CHANNELS.md`；免费队列
+至少数月，$5 加急属于单独付费 gate，默认不买，且继续等待 awesome-python 结果后再提交。
 
 更新时间：2026-09-22（**09-22 迁移后核查与收尾见下一段**；当前公开版本：Core **`0.5.28`**（reason codes + trial `--email` + CycloneDX 1.7，OIDC+PEP740 已发布、PyPI latest、两个 provenance 200、全新装验证、GitHub Release 已建、完整 CI+CodeQL 绿）/ MCP **`0.3.12`** /
 VS Code **`0.4.3`**；**GitHub Action `pyobfus-action v1.0.1` 已上架 Marketplace**。本轮完成：**09-10 下载与渠道复查**——三个 0.5.22 发布后的

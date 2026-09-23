@@ -656,7 +656,10 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   `python` resolved through PATH the sandboxed spawn ended in `Connection closed`; `uvx` (allowlisted) is not installed
   on this machine, so the live-tool grade is still to be obtained.
 - Publishing to its public MCP Trust Registry is a separate `mcptrustchecker publish <package> --token <key>` step
-  that needs a maintainer-registered API key; scanning never auto-publishes. Do not change product behaviour for the badge.
+  that needs a maintainer-registered API key; scanning never auto-publishes. The exact command verified from
+  version 1.14.0's CLI help is `MCPTRUSTCHECKER_TOKEN=… npx --yes mcptrustchecker@1.14.0 publish pyobfus-mcp
+  --registry pypi --online --category developer-tools`. Keep the token out of shell history, the repository,
+  and chat. Do not change product behaviour for the badge.
 
 ### OpenSSF Best Practices passing badge 🟢 LIVE
 - URL: https://www.bestpractices.dev/projects/12788
@@ -676,6 +679,30 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 `pyobfus` 重复记录。PR 只有一行，披露维护者身份，并诚实说明约 2k/月与 pyarmor 约
 290k/月的采用量差距。当前等待维护者裁决；不争辩、不重开，结果出来前不同时投第二个
 awesome-list。
+
+### AlternativeTo — account submission prepared, intentionally queued
+
+Do not submit until the awesome-python PR has a result; this avoids simultaneous directory pushes.
+AlternativeTo requires a signed-in account with a verified email. Its current FAQ says free submissions
+normally wait at least several months; the optional $5 priority review targets 1–2 business days but does
+not buy approval. Use the free queue unless the maintainer separately approves spending.
+
+- Name: `pyobfus`
+- Official website: `https://pyobfus.readthedocs.io/`
+- Source: `https://github.com/zhurong2020/pyobfus`
+- Platforms: Linux, macOS, Windows
+- License: Free with limited functionality / Freemium; mark the core as Open Source (Apache-2.0) and
+  state clearly that optional Pro transformations are commercial
+- Suggested description: `pyobfus is an AST-based Python code obfuscator that emits portable Python and
+  can reverse-map protected stack traces. It includes framework-aware presets, machine-readable JSON and
+  SARIF, verifiable build reports, and a free Apache-2.0 core; optional Pro transformations are commercial.`
+- Tags: Python, code obfuscation, developer tools, application security
+- First alternative relationship: PyArmor only. Add broader compiler tools only if the form's taxonomy
+  requires them; do not inflate relevance.
+- Asset: `docs/assets/logo.jpeg`; do not fabricate reviews, votes, adoption, or screenshots
+
+After submission, record the private submission status/date here. A pending page visible only to the
+submitter is normal according to the service FAQ.
 
 ### `awesome-mcp-servers` community lists — 2 LIVE / 1 dead-end (refreshed 2026-06-08)
 - 🟢 **`wong2/awesome-mcp-servers` LIVE** via mcpservers.org (the list has retired direct PRs; submissions go through the form-driven `mcpservers.org/submit` channel). Listing: <https://mcpservers.org/servers/zhurong2020/pyobfus>. Approval landed same-day (2026-05-08) vs the 7-day SLA.
