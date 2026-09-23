@@ -165,7 +165,7 @@ jobs:
 
     - name: Install only the runtime wheel and test its boundary
       run: |
-        pip install pyobfus_runtime/dist/*.whl
+        pip install pytest pyobfus_runtime/dist/*.whl
         pytest pyobfus_runtime/tests/ -v --no-cov
 
   benchmark-smoke:
@@ -187,6 +187,7 @@ jobs:
     - name: Install package
       run: |
         python -m pip install --upgrade pip
+        pip install -e ./pyobfus_runtime
         pip install -e ".[dev]"
 
     - name: Run offline benchmark smoke suite
