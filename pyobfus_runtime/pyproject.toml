@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyobfus-runtime"
+version = "0.1.0"
+description = "Redistributable runtime support for artifacts produced by pyobfus Pro."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "LicenseRef-pyobfus-Runtime-1.0"
+license-files = ["LICENSE"]
+authors = [{name = "Rong Zhu"}]
+dependencies = ["cryptography>=42.0"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+
+[project.urls]
+Homepage = "https://github.com/zhurong2020/pyobfus"
+Documentation = "https://pyobfus.readthedocs.io/"
+Repository = "https://github.com/zhurong2020/pyobfus"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["pyobfus_runtime*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

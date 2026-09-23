@@ -34,11 +34,13 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
+        pip install -e ./pyobfus_runtime
         pip install -e ".[dev]"
 
     - name: Run tests
       run: |
         pytest tests/ -v --cov=pyobfus --cov-report=xml --cov-report=term
+        pytest pyobfus_runtime/tests/ -v --no-cov
 
     - name: Upload coverage to Codecov
       if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
@@ -63,21 +65,22 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
+        pip install -e ./pyobfus_runtime
         pip install -e ".[dev]"
 
     - name: Check code formatting with black
       run: |
-        black --check pyobfus/ pyobfus_pro/ pyobfus_mcp/pyobfus_mcp/ tests/ integration_tests/ benchmarks/llm_resistance/ examples/ scripts/
+        black --check pyobfus/ pyobfus_pro/ pyobfus_runtime/pyobfus_runtime/ pyobfus_runtime/tests/ pyobfus_mcp/pyobfus_mcp/ tests/ integration_tests/ benchmarks/llm_resistance/ examples/ scripts/
 
     - name: Lint with ruff
       run: |
-        ruff check pyobfus/ pyobfus_pro/ pyobfus_mcp/pyobfus_mcp/ tests/ integration_tests/ benchmarks/llm_resistance/ examples/ scripts/
+        ruff check pyobfus/ pyobfus_pro/ pyobfus_runtime/pyobfus_runtime/ pyobfus_runtime/tests/ pyobfus_mcp/pyobfus_mcp/ tests/ integration_tests/ benchmarks/llm_resistance/ examples/ scripts/
 
     - name: Type check with mypy
       run: |
         # Check every shipped source package explicitly. Tests remain covered by
         # runtime pytest and lint; they are not part of the public typed surface.
-        mypy pyobfus/ pyobfus_pro/ pyobfus_mcp/pyobfus_mcp/
+        mypy pyobfus/ pyobfus_pro/ pyobfus_runtime/pyobfus_runtime/ pyobfus_mcp/pyobfus_mcp/
 
     - name: Validate discovery metadata
       run: |
@@ -134,11 +137,36 @@ jobs:
     - name: Install package
       run: |
         python -m pip install --upgrade pip
+        pip install -e ./pyobfus_runtime
         pip install -e ".[dev]"
 
     - name: Run end-to-end test suite
       run: |
         pytest integration_tests/ -v --no-cov
+
+  runtime-wheel:
+    name: Redistributable runtime wheel boundary
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
+
+    - name: Set up Python
+      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5 (pinned 2026-05-09)
+      with:
+        python-version: '3.12'
+        cache: 'pip'
+
+    - name: Build and inspect the standalone wheel
+      run: |
+        python -m pip install --upgrade pip build
+        python -m build --wheel pyobfus_runtime
+        python -c "import glob, zipfile; wheel=glob.glob('pyobfus_runtime/dist/*.whl')[0]; names=zipfile.ZipFile(wheel).namelist(); forbidden=('pyobfus_pro', 'transformers/', 'license.py', 'cli.py'); assert not any(any(item in name for item in forbidden) for name in names), names"
+
+    - name: Install only the runtime wheel and test its boundary
+      run: |
+        pip install pyobfus_runtime/dist/*.whl
+        pytest pyobfus_runtime/tests/ -v --no-cov
 
   benchmark-smoke:
     # Offline, deterministic validation of the P2-18 corpus -> obfuscate ->

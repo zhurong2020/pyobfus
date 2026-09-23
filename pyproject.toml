@@ -111,9 +111,10 @@ pyobfus-unscrub = "pyobfus_pro.unscrub:main"
 where = ["."]
 include = ["pyobfus*"]
 # Exclude sibling packages that are distributed separately (e.g. pyobfus_mcp)
-exclude = ["tests*", "docs*", "examples*", "pyobfus_mcp*"]
+exclude = ["tests*", "docs*", "examples*", "pyobfus_mcp*", "pyobfus_runtime*"]
 
 [tool.pytest.ini_options]
+pythonpath = [".", "pyobfus_runtime"]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]

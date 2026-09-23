@@ -5,13 +5,16 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-09-22（迁移到 WSL 后的核查与收尾：抗 AI 措辞改写完成、Alipay 句已删、
+最后更新：2026-09-23（删除已完全合入 `main` 的本地及远端 `spike/mcp-sdk-2x` 空壳分支；
+修正本文件把已随 0.5.28 发布的邮箱 trial 误列为待实现、仍称 0.5.27 为当前版本的状态漂移。
+上一轮 2026-09-22：迁移到 WSL 后的核查与收尾，抗 AI 措辞改写完成、Alipay 句已删、
 awesome-python 文案已备、Claude plugin 需重提、MCP Trust Checker 已实扫；详见
 `CURRENT_PLAN_ZH.md` 09-22 段。上一轮 2026-09-20：对标竞品 + 国际最佳实践 + 本地已完成/未发版做了一次三透镜
 重排，见 `FEATURE_EXPANSION_RESEARCH_2026-09-12.md` 之上的本轮外部核查；新增
-**服务端邮箱登记 trial** 为 P1，依据见 `TRIAL_STRATEGY_DECISION_2026-09-20.md`；
+**服务端邮箱登记 trial** 为 P1（现已完成并随 0.5.28 发布），依据见
+`TRIAL_STRATEGY_DECISION_2026-09-20.md`；
 把 provenance / SARIF / build-report / CycloneDX 收拢为一条「可验证性主线」抬为 P0。
-Core `0.5.27` 仍是当前公开版本，运营复查见 `CURRENT_PLAN_ZH.md`）。
+Core `0.5.28` 是当前公开版本，运营复查见 `CURRENT_PLAN_ZH.md`）。
 
 ## 状态口径
 
@@ -38,11 +41,10 @@ Core `0.5.27` 仍是当前公开版本，运营复查见 `CURRENT_PLAN_ZH.md`）
       `pyobfus-backup-pre-filter-repo-20260503-2231/`，都带 `MOVED_TO_WSL_20260921.md`、WSL 均有副本
       （`~/projects/` 同名目录）。09-22 只删了 pyobfus 与 pyobfus-legal 两个批过的；这两个不在清单里，未动。
       删前照旧 rsync 比对；该租户 OneDrive 只读、云端删除会同步删本地，反向也一样，别在里面再编辑。
-- [ ] **删掉 `spike/mcp-sdk-2x` 分支**（2026-09-22 跨仓扫描发现）：领先 `main` **0 个提交**，
-      即内容已全在 `main` 里，本地与远端都还留着一个 2026-09-12 的空壳分支。
-      `git branch -d spike/mcp-sdk-2x && git push origin --delete spike/mcp-sdk-2x`。
-      无风险（`-d` 而非 `-D`，未合并就会自己拒绝）；留着只是让分支列表多一条噪音。
-- [ ] **Y-1 Pro 运行时分发缺口定优先级**（见「真实交付场景暴露的 Pro 缺口」表）。
+- [ ] **实现 Y-1 Pro 可再分发运行时**：优先级已定为当前产品 P0，设计见
+      `Y1_RUNTIME_DISTRIBUTION_DESIGN.md`。代码、兼容别名、marker 清理、独立 wheel 与 CI/release
+      workflow 已形成候选；发布前剩完整验证、再分发许可证审核、PyPI Trusted Publisher。
+      必须先发布独立 runtime，再给 builder 声明依赖并发布。
 
 ## 本轮已完成的去处
 
@@ -80,26 +82,9 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 | 优先级 | 任务 | 要发版吗 | 谁来做 |
 |---|---|---|---|
 | ~~P0~~ ✅ | 可验证性主线**完成**：对标文档 `SUPPLY_CHAIN_ASSURANCE.md` + 稳定 reason code（`reason_codes.py` v1，plan/report 发射，`REASON_CODES.md`）+ CycloneDX 1.7，全部**随 0.5.28 发布** | — | — |
-| **P1** | **服务端邮箱登记 trial**（获客向，非 DRM） | Worker 要部署 + 客户端要发版 | Claude 实现，部署/发版需批准 |
 | ~~P1~~ ✅ | OSPS 补齐**基本完成 2026-09-20**：4 开关（gh api 核实）+ 4 文档（f2cd713）全做完。残余 = `LE-01.01` DCO（主动延后）+ 若干 L3 | 免发版 | — |
 | ~~P1~~ ✅ | 抗 AI 措辞改写**完成 2026-09-22**（tech-deai）：README / `landing/index.html` / `docs/index.md` 散文里的 em-dash 全部清零（README 48 处）、20 条 bold-colon 功能列表改成带动词的句子；命令、路径、版本号、链接、What's new 横幅与 UI 标签（如 `Unlock Pro`）原样。H2 骨架未动（doc-hub 型 README，锚点被外部引用）。~~pyarmor VMC/ECC 补记~~——已确认无需改 | 免发版（README 到 PyPI 要等下次发版） | — |
 | **P2** | 分发上架队列：**awesome-python 文案已备（2026-09-22）**，见 `docs/internal/AWESOME_PYTHON_PR_DRAFT_2026-09-22.md` → awesome-security → AlternativeTo | 免发版（提交需维护者账号） | 文案已备，提交需维护者 |
-
-### P1 · 服务端邮箱登记 trial（尽快实现 · 获客向，非 DRM）
-
-决策与完整设计见 [`TRIAL_STRATEGY_DECISION_2026-09-20.md`](TRIAL_STRATEGY_DECISION_2026-09-20.md)。
-用户 2026-09-20 选定方案 A：**维持本地 5 天 trial、不设行数/文件数上限**（本地限制对
-可读源码的 Pro 是安全戏法且伤评估者），**不改"先收费"trial**（当前无有机增长信号，加
-购买摩擦反漏斗）；把 trial 挪到服务端并顺手做成获客渠道。
-
-- **免发版**：本决策文档、TODO 登记、Worker 端点设计评审（已完成本条）。
-- **要部署**：Worker 新增 `POST /api/trial/request`（email + device_id → 签名
-  trial token；KV 以 email 去重；复用 `/api/verify` 同源签名工具，不 DIY 加密；
-  速率限制；PII 不落明文日志）。**先于客户端部署**（硬约束，同 0.5.26 教训）。
-- **要发版**：客户端 `pyobfus-trial start --email <addr>` 换 token；离线/不带
-  `--email` 回退现有纯本地 5 天（不回归）。
-- 验收标准见决策文档 §5.4。诚实边界：服务端登记解决**去重 + 获客**，不宣称能挡住
-  能读 Pro 源码的人。
 
 ### ✅ 可验证性主线（2026-09-20 完成，随 0.5.28 发布）
 
@@ -195,7 +180,7 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
 
 | # | 缺口 | 证据 | 方向 |
 |---|---|---|---|
-| **Y-1** 🔴 | **Pro 运行时无法合法随输出分发**，影响所有使用 L3 opacity / `--scrub-traceback` / `--expire-hard` 的客户 | 2026-09-14 实验：L3 输出保留 `from pyobfus_pro import opacity, Layer` 和 `from pyobfus_pro.runtime import _l3_dispatch`，scrub 与 expire 同样注入 `pyobfus_pro` import；在没有 pyobfus_pro 的解释器上运行报 `ModuleNotFoundError`。而 `pyobfus_pro/LICENSE` §2a 禁止分发，没有运行时例外条款。标记 import 还会连带加载整个 `pyobfus_pro/__init__` | ① 独立的最小 `pyobfus-runtime` 包（运行时不需要许可证 key）；② 许可证加运行时再分发例外；③ 后处理时剥掉标记 import；④ 在 README 和 SUPPORT_MATRIX 写明交付要求 |
+| **Y-1** 🔴 **P0** | **Pro 运行时无法合法随输出分发**，影响所有使用运行时功能的客户 | 2026-09-14 的真实交付实验已复现；2026-09-23 进一步审计确认影响 L3、vault、seal、scrub、设备绑定、到期/次数限制、runtime-policy 与 embedded data | **方案已定**：独立可再分发 `pyobfus-runtime`（命名空间 `pyobfus_runtime`）作为唯一实现，Pro 留 0.5.x 兼容转发层，清理已消费的 marker import；设计、顺序和验收见 `Y1_RUNTIME_DISTRIBUTION_DESIGN.md` |
 | Y-2 | `--expire-hard` 没有到期前提醒，不能不重新构建就延期 | `build_fusion._inject_expire_check` 在模块顶部直接抛 `LicenseExpired` | `--expire-warn-days N` 或提醒回调 |
 | Y-3 | 设备绑定只认 pyobfus 自己的 `current_machine_id()` | 自带授权体系（JWT 加自有机器码）的应用，无法在不逐机器构建的前提下把 L3 密钥绑定到自己的授权上 | 运行时"密钥提供者"钩子，应用验签后提供密钥材料 |
 | ~~Y-4~~ ✅ | ~~Windows 上运行混淆输出没有 CI 验证~~ **已补基础合同** | `integration` job 扩为 Ubuntu + Windows；单文件和跨文件示例均执行混淆产物并与原输出比较 | 覆盖基础 Community 交付；torch/MONAI、Python embedded、L3 runtime 等重型真实下游组合仍需 Y-1 专项验证 |
@@ -285,10 +270,9 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
   表单文案见 `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`（已修 `protected_project` 笔误）。
 - Open VSX namespace 归属验证：可选，`not verified` 是「未申请」不是「被拒」。
 - **Canopii [`canopii-cli#6`](https://github.com/canopii-dev/canopii-cli/issues/6)
-  —— ⏰ follow-up 已到期**。2026-09-19 实测：仍 `OPEN`、**0 条回复**、最后更新
-  停在 2026-09-02，距今 17 天，已越过既定的「14 天无回复只做一次简短 follow-up」。
-  **这条此前只写在 `CURRENT_PLAN_ZH.md` 深处、没有进本文件**，所以到期了也没人看见——
-  现在登记在此。follow-up 只发一次，不反复催。上游重扫后按四项验收（latest ≥ v0.3.10 /
+  —— 单次 follow-up 已发，等待上游**。2026-09-23 确认 issue 仍 `OPEN`、0 条上游回复后，
+  已按约定发出唯一一次简短 follow-up（明确当前版本 0.3.12 与四项验收）；**不再反复催**。
+  上游重扫后按四项验收（latest ≥ v0.3.10 /
   识别 8 tools / 不再把 `pyobfus_pro/`、`examples/`、VS Code/Worker 计入 MCP 包
   evidence / PEP 740 provenance 是否被识别），**不是只看总分**。
 - **MCP Trust Checker**：**2026-09-22 已实扫**——`npx mcptrustchecker@1.14 scan` 对已发布 wheel

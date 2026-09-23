@@ -34,7 +34,7 @@ from cryptography.hazmat.primitives import serialization
 
 from pyobfus_pro.runtime.scrub import generate_keypair
 
-_RUNTIME_MODULE = "pyobfus_pro.runtime"
+_RUNTIME_MODULE = "pyobfus_runtime"
 _INSTALL_FUNC = "install_scrub_excepthook"
 _PUBLIC_KEY_CONSTANT = "_PYOBFUS_SCRUB_PUBLIC_KEY"
 _DEFAULT_PREFIX = "PYOBFUS-ERR"

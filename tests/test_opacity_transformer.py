@@ -219,7 +219,7 @@ class TestL3Emission:
                 return x * 7
         """)
         out, _ = transform_module(src)
-        assert "from pyobfus_pro.runtime import _l3_dispatch" in out
+        assert "from pyobfus_runtime import _l3_dispatch" in out
 
     def test_l3_extends_existing_runtime_import(self):
         src = _src("""

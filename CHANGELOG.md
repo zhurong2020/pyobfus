@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **A separately distributable `pyobfus-runtime` package for Pro artifacts.**
+  Generated L3, vault, seal, traceback-scrub, device/expiry/run-count policy,
+  runtime-platform-policy, and embedded-data code now imports the minimal
+  `pyobfus_runtime` namespace instead of requiring the complete proprietary
+  builder on the target machine. The runtime contains no transformer, CLI,
+  payment, or licence-verification code and needs no licence key to execute an
+  artifact. Legacy `pyobfus_pro.runtime` imports remain module aliases for the
+  0.5.x compatibility line. Release sequencing is strict: publish the runtime
+  first, then release the builder that emits its namespace.
+
+### Fixed
+
+- **Pro marker imports no longer leak into generated deliverables.** Once
+  `opacity`, `Layer`, `seal_code`, or `vault_secrets` markers are consumed,
+  their build-only `pyobfus_pro` imports are removed while unrelated imports
+  are retained. This closes the legal and technical delivery gap where a
+  protected artifact required redistribution of the complete Pro package.
+
 ## [0.5.28] - 2026-09-20
 
 

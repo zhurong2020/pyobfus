@@ -1,5 +1,29 @@
 # pyobfus 当前计划
 
+**2026-09-23 续作进度**：已确认 `spike/mcp-sdk-2x` 领先 `main` 0 个提交且为其祖先，
+随后用安全删除移除本地分支并删除 `origin/spike/mcp-sdk-2x`。同时修正 `TODO.md` 的两处
+状态漂移：公开 Core 已是 `0.5.28`，服务端邮箱 trial 也已部署、实现并随 0.5.28 发布，
+不再作为待实现项。Canopii `canopii-cli#6` 在 0 条上游回复、等待三周后已发出约定的
+唯一一次 follow-up，明确 0.3.12 与四项验收标准，此后只等待、不重复催。当前正在审计
+Y-1 Pro 运行时合法分发边界：已确认影响面包含 L3、vault、seal、scrub、设备绑定、
+到期/次数限制、runtime-policy 与 embedded data，不能靠复制三处 import 草率解决。
+方案已定为独立可再分发的 `pyobfus-runtime`（`pyobfus_runtime` 命名空间）作为单一实现，
+Pro 在整个 0.5.x 保留旧 import 的兼容转发层；先发布 runtime，后发布会生成新 import 的
+builder，避免生成物引用尚不存在的包。合同与验收见 `Y1_RUNTIME_DISTRIBUTION_DESIGN.md`。
+实现已推进到候选状态：7 个 runtime 实现模块迁到独立发行目录，旧 Pro 路径为同一模块
+对象的兼容别名；新生成物 import 已切换且会清理消费完的 marker import；独立边界测试
+2/2、聚焦 runtime/fusion 测试 189/189、兼容修复后的回归 76/76 通过。完整 Core 首轮为
+1351 passed / 1 skipped / 1 failed，唯一失败是兼容别名的 monkeypatch 身份语义，已修并由
+上述 76 项复验通过。独立 wheel 构建、全新临时环境安装、无 `pyobfus_pro` 可导入运行、
+wheel 禁含 Pro/transformer/license-client/CLI 文件均实测通过；Ruff 与 mypy（95 源文件）
+通过。CI 已加入 3 OS × 6 Python 的 runtime 安装/测试及独立 wheel 边界 job；release workflow
+已预备 `runtime-v*` OIDC job。最终本地验收：Core 1354 passed / 1 skipped、MCP 97、
+integration 12、runtime 2；Black、Ruff、mypy、MkDocs strict、README links、workflow YAML
+均通过；runtime sdist/wheel 通过 Twine，Core wheel + runtime wheel 全新安装成功且模块身份
+兼容，Core wheel 不夹带 runtime。**尚未发布**：发布前仍需远端 CI、审核自定义
+runtime 再分发许可证，并在 PyPI 配置第三个 Trusted Publisher。顺序硬约束仍是 runtime
+先发，随后 builder 才能声明依赖并发版。
+
 更新时间：2026-09-22（**09-22 迁移后核查与收尾见下一段**；当前公开版本：Core **`0.5.28`**（reason codes + trial `--email` + CycloneDX 1.7，OIDC+PEP740 已发布、PyPI latest、两个 provenance 200、全新装验证、GitHub Release 已建、完整 CI+CodeQL 绿）/ MCP **`0.3.12`** /
 VS Code **`0.4.3`**；**GitHub Action `pyobfus-action v1.0.1` 已上架 Marketplace**。本轮完成：**09-10 下载与渠道复查**——三个 0.5.22 发布后的
 干净日 `65 / 48 / 31` 单调回落进安静区间，**09-08 悬置的「基线是否抬升」问题

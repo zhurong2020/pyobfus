@@ -45,6 +45,7 @@ git config core.hooksPath .githooks   # once per clone — enables the pre-commi
 venv/bin/pytest tests/                 # core suite (run this and the two below separately)
 venv/bin/pytest pyobfus_mcp/tests/     # MCP server suite
 venv/bin/pytest integration_tests/     # end-to-end CLI
+venv/bin/pytest pyobfus_runtime/tests/  # redistributable runtime boundary
 venv/bin/black pyobfus/                # format
 venv/bin/ruff check pyobfus/           # lint
 venv/bin/mypy pyobfus/                 # type check

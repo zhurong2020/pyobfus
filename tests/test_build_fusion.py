@@ -185,6 +185,8 @@ class TestFusionStructural:
         ):
             assert marker in text, marker
         assert "sk-secret-xyz" not in text
+        assert "pyobfus_pro" not in text
+        assert "from pyobfus_runtime import" in text
         assert _compiles(out)
 
 
@@ -212,6 +214,9 @@ class TestFusionRuntime:
                 ],
             )
         assert res.exit_code == 0, res.output
+        text = out.read_text()
+        assert "pyobfus_pro" not in text
+        assert "from pyobfus_runtime import" in text
         saved = sys.excepthook
         try:
             spec = importlib.util.spec_from_file_location("fused_mod", str(out))
@@ -222,6 +227,27 @@ class TestFusionRuntime:
         # compute(5)=5*2+7=17 (L3-encrypted, reads global MULT); guard(10)=9
         assert m.run() == 26
         assert m.CFG.get("API_KEY") == "sk-secret-xyz"
+
+
+class TestConsumedMarkerCleanup:
+    def test_mixed_from_import_retains_unrelated_pro_name(self):
+        from pyobfus_pro.build_fusion import _strip_consumed_pro_markers
+
+        source = "from pyobfus_pro import opacity, Layer, unrelated\nprint(unrelated)\n"
+        out = _strip_consumed_pro_markers(source, {"opacity", "Layer"})
+        assert "from pyobfus_pro import unrelated" in out
+        assert "opacity" not in out
+        assert "Layer" not in out
+
+    def test_plain_pro_import_is_removed_only_when_unused(self):
+        from pyobfus_pro.build_fusion import _strip_consumed_pro_markers
+
+        unused = _strip_consumed_pro_markers("import pyobfus_pro\nvalue = 1\n", {"opacity"})
+        used = _strip_consumed_pro_markers(
+            "import pyobfus_pro\nvalue = pyobfus_pro.other_api\n", {"opacity"}
+        )
+        assert "pyobfus_pro" not in unused
+        assert "import pyobfus_pro" in used
 
 
 @requires_pro

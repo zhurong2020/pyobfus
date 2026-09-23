@@ -54,7 +54,7 @@ from pyobfus_pro.opacity.layers import LAYER_SPECS, Layer
 from pyobfus_pro.opacity.patterns import Resolver
 from pyobfus_pro.runtime.opacity import _encrypt_code
 
-_RUNTIME_MODULE = "pyobfus_pro.runtime"
+_RUNTIME_MODULE = "pyobfus_runtime"
 _RUNTIME_DISPATCH = "_l3_dispatch"
 _LAYER_KEY_NAME = "_LAYER_KEY"
 _CIPHER_PREFIX = "_CIPHER_"

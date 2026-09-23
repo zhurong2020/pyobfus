@@ -88,7 +88,7 @@ class TestEmissionShape:
             SECRETS = vault_secrets({"K": "v"})
         """)
         out, _ = transform_module(src)
-        assert "from pyobfus_pro.runtime import Vault" in out
+        assert "from pyobfus_runtime import Vault" in out
 
     def test_vault_class_import_extended_when_partial(self):
         src = _src("""
@@ -243,7 +243,7 @@ class TestMultipleVaults:
         assert "_VAULT_KEY_BETA = " in out
         assert "_VAULT_BLOB_BETA = " in out
         # Vault class imported once
-        assert out.count("from pyobfus_pro.runtime import Vault") <= 1
+        assert out.count("from pyobfus_runtime import Vault") <= 1
         assert schemas == {"ALPHA": ["K1"], "BETA": ["K2"]}
 
     def test_multiple_vaults_round_trip_independently(self):

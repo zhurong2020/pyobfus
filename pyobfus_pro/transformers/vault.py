@@ -64,7 +64,7 @@ import secrets
 
 from pyobfus_pro.runtime.vault import Vault
 
-_RUNTIME_MODULE = "pyobfus_pro.runtime"
+_RUNTIME_MODULE = "pyobfus_runtime"
 _RUNTIME_VAULT_CLASS = "Vault"
 _MARKER_NAME = "vault_secrets"
 _VAULT_KEY_PREFIX = "_VAULT_KEY_"

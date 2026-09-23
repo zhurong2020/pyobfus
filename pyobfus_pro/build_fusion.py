@@ -159,7 +159,7 @@ def _substitute_layer_key_binding(source: str, salt: bytes) -> str:
     )
 
     imp = ast.ImportFrom(
-        module="pyobfus_pro",
+        module="pyobfus_runtime",
         names=[
             ast.alias(name="bind_device_key", asname="_pyobfus_bind_device_key"),
             ast.alias(name="current_machine_id", asname="_pyobfus_machine_id"),
@@ -284,7 +284,7 @@ def _ensure_bind_device_import(tree: ast.Module) -> None:
     if {"_pyobfus_bind_device_key", "_pyobfus_machine_id"} <= have:
         return
     imp = ast.ImportFrom(
-        module="pyobfus_pro",
+        module="pyobfus_runtime",
         names=[
             ast.alias(name="bind_device_key", asname="_pyobfus_bind_device_key"),
             ast.alias(name="current_machine_id", asname="_pyobfus_machine_id"),
@@ -498,7 +498,51 @@ def apply_post_passes(
     if embed_data_path:
         source = _inject_embedded_data(source, embed_data_path)
 
-    return source
+    consumed_markers = set()
+    if getattr(config, "selective_opacity", False) or getattr(config, "opacity_config", None):
+        consumed_markers.update({"opacity", "Layer"})
+    if getattr(config, "seal_code", False):
+        consumed_markers.add("seal_code")
+    if getattr(config, "vault", False):
+        consumed_markers.add("vault_secrets")
+    return _strip_consumed_pro_markers(source, consumed_markers)
+
+
+def _strip_consumed_pro_markers(source: str, marker_names: set[str]) -> str:
+    """Remove build-only Pro marker imports after their transforms ran.
+
+    Generated artifacts must depend only on ``pyobfus_runtime``. Mixed
+    ``from pyobfus_pro import ...`` statements retain unrelated names. A plain
+    ``import pyobfus_pro`` is removed only when no surviving expression uses
+    that binding after marker decorators/calls were consumed.
+    """
+    if not marker_names or "pyobfus_pro" not in source:
+        return source
+    tree = ast.parse(source)
+    body: list[ast.stmt] = []
+    for stmt in tree.body:
+        if isinstance(stmt, ast.ImportFrom) and stmt.module == "pyobfus_pro":
+            stmt.names = [alias for alias in stmt.names if alias.name not in marker_names]
+            if not stmt.names:
+                continue
+        body.append(stmt)
+    tree.body = body
+
+    pro_name_used = any(
+        isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load) and node.id == "pyobfus_pro"
+        for node in ast.walk(tree)
+    )
+    if not pro_name_used:
+        tree.body = [
+            stmt
+            for stmt in tree.body
+            if not (
+                isinstance(stmt, ast.Import)
+                and any(alias.name == "pyobfus_pro" for alias in stmt.names)
+            )
+        ]
+    ast.fix_missing_locations(tree)
+    return ast.unparse(tree)
 
 
 def _inject_expire_check(source: str, expire_iso: str) -> str:
@@ -512,7 +556,7 @@ def _inject_expire_check(source: str, expire_iso: str) -> str:
         return source
     header = (
         f"{marker}\n"
-        "from pyobfus_pro import expire_check as _pyobfus_expire_check\n"
+        "from pyobfus_runtime import expire_check as _pyobfus_expire_check\n"
         f"_pyobfus_expire_check({expire_iso!r})\n"
     )
     # Place after a leading shebang / encoding cookie / module docstring block
@@ -537,7 +581,7 @@ def _inject_period_check(source: str, module_qualname: str, max_runs: int) -> st
     artifact_id = hashlib.sha256((module_qualname or "module").encode("utf-8")).hexdigest()[:16]
     header = (
         f"{marker}\n"
-        "from pyobfus_pro import period_check as _pyobfus_period_check, "
+        "from pyobfus_runtime import period_check as _pyobfus_period_check, "
         "default_counter_path as _pyobfus_counter_path\n"
         f"_pyobfus_period_check(_pyobfus_counter_path({artifact_id!r}), {int(max_runs)})\n"
     )
@@ -575,7 +619,7 @@ def _inject_runtime_policy_check(
 
     header = (
         f"{marker}\n"
-        "from pyobfus_pro import requires_runtime as _pyobfus_requires_runtime\n"
+        "from pyobfus_runtime import requires_runtime as _pyobfus_requires_runtime\n"
         f"_pyobfus_requires_runtime({', '.join(kwargs)})\n"
     )
     return header + source
@@ -607,7 +651,7 @@ def _inject_embedded_data(source: str, data_path: str) -> str:
         f"{marker}\n"
         f"_EMBED_DATA_KEY = {key!r}\n"
         f"_EMBED_DATA_BLOB = {blob_b85!r}\n"
-        "from pyobfus_pro import get_embedded_data as _pyobfus_get_embedded_data\n"
+        "from pyobfus_runtime import get_embedded_data as _pyobfus_get_embedded_data\n"
         "\n"
         "\n"
         "def get_embedded_data():\n"

@@ -50,7 +50,7 @@ from collections.abc import Iterable
 from pyobfus_pro.opacity.layers import Layer
 from pyobfus_pro.runtime.seal import _compute_seal, _compute_seal_bytes
 
-_RUNTIME_MODULE = "pyobfus_pro.runtime"
+_RUNTIME_MODULE = "pyobfus_runtime"
 _RUNTIME_VERIFIER = "_verify_seal"
 _SEAL_CONSTANT_PREFIX = "_SEAL_"
 _CIPHER_CONSTANT_PREFIX = "_CIPHER_"

@@ -65,7 +65,7 @@ class TestDecoratorRewrite:
                 return x * 2
         """)
         out = transform_module(src)
-        assert "from pyobfus_pro.runtime import _verify_seal" in out
+        assert "from pyobfus_runtime import _verify_seal" in out
 
     def test_runtime_import_extended_when_partial(self):
         src = _src("""

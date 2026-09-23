@@ -207,6 +207,13 @@ the bound device.
 - **`--scrub-traceback`.** Production traceback encryption (RSA-2048 + AES-256-GCM); reverse error IDs with the new `pyobfus-unscrub` CLI.
 - **Runtime String Vault.** Encrypted KV namespace for runtime secrets with lazy per-entry decryption.
 
+Starting with the next release, generated artifacts that use these runtime-backed
+features depend on the separately redistributable `pyobfus-runtime` package,
+not the complete Pro builder. Build machines still require a valid Pro licence;
+target machines need no licence key. The runtime must be published before the
+builder release that begins emitting its import namespace. Existing 0.5.x
+artifacts keep working through compatibility aliases.
+
 > Requires Python ≥ 3.9 as of v0.5.0 (3.8 dropped, EOL 2024-10).
 
 See the [selective opacity configuration guide](https://github.com/zhurong2020/pyobfus/blob/main/docs/OPACITY_CONFIG.md)
