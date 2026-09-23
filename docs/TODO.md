@@ -36,12 +36,14 @@ Core `0.5.28` 是当前公开版本，运营复查见 `CURRENT_PLAN_ZH.md`）。
 - [ ] **MCP Trust Registry publish**：在其站点注册拿 API token 后
       `MCPTRUSTCHECKER_TOKEN=… npx --yes mcptrustchecker@1.14.0 publish pyobfus-mcp --registry pypi --online --category developer-tools`
       （wheel 已扫 A · 94/100，09-23 已用 CLI help 核对参数；不要把 token 写进 shell history、仓库或聊天）。
-- [ ] **OneDrive 残留两个旧副本是否删**：`…/3-job/program/` 下 `pyobfus-action/` 与
+- [ ] **维护者手动删除 OneDrive 两个旧副本**：`…/3-job/program/` 下 `pyobfus-action/` 与
       `pyobfus-backup-pre-filter-repo-20260503-2231/`，都带 `MOVED_TO_WSL_20260921.md`、WSL 均有副本
       （`~/projects/` 同名目录）。09-22 只删了 pyobfus 与 pyobfus-legal 两个批过的；这两个不在清单里，未动。
       **09-23 已完成删除前核验**：排除 `.git`、`.mypy_cache`、`.ruff_cache` 与迁移标记后，
-      对两组执行 checksum `rsync -rcni --delete` 均为零输出。现只差维护者明确批准删除；
-      该租户 OneDrive 只读、云端删除会同步删本地，反向也一样，别在里面再编辑。
+      对两组执行 checksum `rsync -rcni --delete` 均为零输出。维护者已决定自行删除，AI
+      代理不执行该云同步删除；删完只需回报以便勾掉。此后 Core/MCP/runtime/Action 的本地
+      开发、测试、构建与发版准备全部只在 `~/projects/` 的 WSL 工作副本进行，
+      OneDrive 仅作迁移残留或备份，不在其中编辑或执行。
 - [ ] **实现 Y-1 Pro 可再分发运行时**：优先级已定为当前产品 P0，设计见
       `Y1_RUNTIME_DISTRIBUTION_DESIGN.md`。代码、兼容别名、marker 清理、独立 wheel 与 CI/release
       workflow 已形成候选；发布前剩完整验证、再分发许可证审核、PyPI Trusted Publisher。

@@ -16,11 +16,14 @@ file; Cursor / Windsurf / Aider / Codex read `AGENTS.md` natively.
 pyobfus is an **AST-based Python code obfuscator** — framework-aware presets,
 reverse stack-trace mapping for AI-assisted debugging, and a machine-readable
 JSON CLI. A transparent, open-source alternative to PyArmor. The repo ships
-**two packages**:
+**three Python distributions**:
 
 - `pyobfus/` — the obfuscator (CLI + library). Published as `pyobfus`.
 - `pyobfus_mcp/` — an MCP server exposing the tools to AI agents. Published as
   `pyobfus-mcp`.
+- `pyobfus_runtime/` — the minimal redistributable runtime used by generated
+  Pro artifacts. Published separately as `pyobfus-runtime`; it is not part of
+  the Apache-2.0 core.
 
 Plus `pyobfus_pro/` (commercial, license-gated features) kept source-separated
 from the Apache-2.0 core.
@@ -32,6 +35,13 @@ shows up, it is a Windows-side legacy environment (the checkout moved from a
 Windows-synced folder into WSL on 2026-09-21 and did not carry it over); WSL
 cannot reliably run its executables, so don't use it. Either activate `venv/`
 first, or call tools through `venv/bin/...` directly.
+
+**Operational boundary:** perform all local development, testing, builds,
+release preparation, and maintainer commands for pyobfus Core, MCP, runtime,
+and `pyobfus-action` from their WSL checkouts under `~/projects/`.
+OneDrive copies are migration remnants or backups only: do not edit, execute,
+build, commit, tag, or publish from them. Hosted GitHub Actions CI/release jobs
+remain the expected remote exception to this local WSL-only rule.
 
 ```bash
 python -m venv venv && source venv/bin/activate

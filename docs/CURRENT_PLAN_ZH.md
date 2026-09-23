@@ -48,6 +48,13 @@ PyPI 包的准确登记命令与 `developer-tools` 分类；token 改走临时�
 仓库/聊天。AlternativeTo 最新官方 FAQ 已复核，表单字段、诚实的 Freemium/Apache-2.0 +
 商业 Pro 口径、PyArmor 单一替代关系和 logo 路径将写入 `DISTRIBUTION_CHANNELS.md`；免费队列
 至少数月，$5 加急属于单独付费 gate，默认不买，且继续等待 awesome-python 结果后再提交。
+维护者进一步明确：两个 OneDrive 迁移副本由本人手工删除，AI 不执行云同步删除；以后
+Core/MCP/runtime/Action 的所有本地开发、测试、构建和发版准备均从
+`~/projects/` 下的 WSL 工作副本进行，OneDrive 只作迁移残留或备份。许可证审查
+结论写入 `Y1_RUNTIME_DISTRIBUTION_DESIGN.md`：保留 PEP 639 `LicenseRef` 自定义商业再分发
+许可，不改成开源；批准前补“允许纯打包变换但禁止功能修改”，并把模糊的“竞品”限制改成
+禁止将 runtime 用于提供构建期混淆/保护产品或服务。PyPI 方面必须新建第三个、项目级的
+`pyobfus-runtime` Pending Trusted Publisher；既有 Core/MCP Publisher 不会自动覆盖它。
 
 更新时间：2026-09-22（**09-22 迁移后核查与收尾见下一段**；当前公开版本：Core **`0.5.28`**（reason codes + trial `--email` + CycloneDX 1.7，OIDC+PEP740 已发布、PyPI latest、两个 provenance 200、全新装验证、GitHub Release 已建、完整 CI+CodeQL 绿）/ MCP **`0.3.12`** /
 VS Code **`0.4.3`**；**GitHub Action `pyobfus-action v1.0.1` 已上架 Marketplace**。本轮完成：**09-10 下载与渠道复查**——三个 0.5.22 发布后的

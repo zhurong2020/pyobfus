@@ -45,6 +45,34 @@ to redistribute unmodified runtime wheels or bundle their unmodified contents
 with artifacts produced by pyobfus. It must not depend on an implied exception
 to the existing `pyobfus_pro/LICENSE` restriction.
 
+### Licence review recommendation (2026-09-23)
+
+Keep a custom proprietary redistribution licence; do not apply Apache-2.0,
+MIT, or another open-source licence to the runtime. That preserves the product
+boundary: Core is open, Pro creates protected artifacts, and the minimum code
+needed to execute those artifacts may travel with them. The package metadata's
+`LicenseRef-pyobfus-Runtime-1.0` is the correct PEP 639 mechanism for this
+custom licence, and the full licence file is included in both distribution
+archives.
+
+Before approval, make two narrow wording changes to the current draft:
+
+1. Permit non-substantive packaging transformations needed to deliver an
+   artifact, such as archiving, wheel vendoring, byte-compilation, or bundling
+   into an executable, while continuing to prohibit functional modification.
+   Otherwise an honest PyInstaller, embedded-Python, or similar delivery may
+   accidentally fall outside the word "unmodified".
+2. Replace the broad phrase "create or enable a competing obfuscation product"
+   with a concrete restriction against using the runtime to provide a
+   build-time obfuscation/protection product or service. Ordinary customers
+   should not have to interpret what counts as a competitor.
+
+Retain the other boundaries: a valid Pro holder may redistribute it only with
+artifacts produced by Pro; recipients may use it only to run those artifacts;
+trial use does not grant production redistribution; separate sublicensing and
+misrepresentation as open source remain prohibited. This is a product/legal
+recommendation, not jurisdiction-specific legal advice.
+
 ## Source and compatibility layout
 
 The standalone runtime is the single implementation. `pyobfus_pro` retains
