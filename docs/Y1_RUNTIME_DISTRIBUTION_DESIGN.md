@@ -11,7 +11,12 @@ identity regression (1351 passed, 1 skipped, 1 failed); the alias was corrected
 and the affected 76-test slice then passed. Final local validation passed: Core
 1354/1 skipped, MCP 97, integration 12, runtime 2; Black, Ruff, mypy, MkDocs,
 README links, workflow YAML, Twine, and a fresh dual-wheel install all passed.
-Remote CI, licence review, Trusted Publisher setup, and publication remain.
+Remote CI is green. The redistribution licence review and the project-specific
+PyPI Pending Trusted Publisher setup are complete. The licence-adjusted sdist
+and wheel pass Twine, metadata/licence inspection, content-boundary inspection,
+and a clean-environment install where `pyobfus_pro` is absent. The four local
+test roots and all required static/documentation checks also pass. Only explicit
+publication approval remains.
 
 ## Problem
 
@@ -45,7 +50,7 @@ to redistribute unmodified runtime wheels or bundle their unmodified contents
 with artifacts produced by pyobfus. It must not depend on an implied exception
 to the existing `pyobfus_pro/LICENSE` restriction.
 
-### Licence review recommendation (2026-09-23)
+### Licence decision (approved 2026-09-23)
 
 Keep a custom proprietary redistribution licence; do not apply Apache-2.0,
 MIT, or another open-source licence to the runtime. That preserves the product
@@ -55,7 +60,7 @@ needed to execute those artifacts may travel with them. The package metadata's
 custom licence, and the full licence file is included in both distribution
 archives.
 
-Before approval, make two narrow wording changes to the current draft:
+The approved licence makes two narrow wording changes to the original draft:
 
 1. Permit non-substantive packaging transformations needed to deliver an
    artifact, such as archiving, wheel vendoring, byte-compilation, or bundling
@@ -67,11 +72,17 @@ Before approval, make two narrow wording changes to the current draft:
    build-time obfuscation/protection product or service. Ordinary customers
    should not have to interpret what counts as a competitor.
 
-Retain the other boundaries: a valid Pro holder may redistribute it only with
-artifacts produced by Pro; recipients may use it only to run those artifacts;
-trial use does not grant production redistribution; separate sublicensing and
-misrepresentation as open source remain prohibited. This is a product/legal
-recommendation, not jurisdiction-specific legal advice.
+It retains the other boundaries: a valid Pro holder may redistribute it only
+with artifacts produced by Pro; recipients may use it only to run those
+artifacts; trial use does not grant production redistribution; separate
+sublicensing and misrepresentation as open source remain prohibited. This is a
+product/legal recommendation, not jurisdiction-specific legal advice.
+
+PyPI has a project-specific Pending Trusted Publisher for `pyobfus-runtime`,
+owned by `zhurong2020/pyobfus` and bound to `.github/workflows/release.yml`.
+Its environment is intentionally blank because the current runtime publication
+job does not declare a GitHub environment. The pending publisher becomes the
+ordinary project publisher when the first release creates the project.
 
 ## Source and compatibility layout
 

@@ -44,9 +44,11 @@ Core `0.5.28` 是当前公开版本，运营复查见 `CURRENT_PLAN_ZH.md`）。
       代理不执行该云同步删除；删完只需回报以便勾掉。此后 Core/MCP/runtime/Action 的本地
       开发、测试、构建与发版准备全部只在 `~/projects/` 的 WSL 工作副本进行，
       OneDrive 仅作迁移残留或备份，不在其中编辑或执行。
-- [ ] **实现 Y-1 Pro 可再分发运行时**：优先级已定为当前产品 P0，设计见
+- [ ] **发布 Y-1 Pro 可再分发运行时**：优先级已定为当前产品 P0，设计见
       `Y1_RUNTIME_DISTRIBUTION_DESIGN.md`。代码、兼容别名、marker 清理、独立 wheel 与 CI/release
-      workflow 已形成候选；发布前剩完整验证、再分发许可证审核、PyPI Trusted Publisher。
+      workflow 已形成候选；再分发许可证已按批准意见修改，项目级 PyPI Pending Trusted
+      Publisher 也已配置；修改后的 sdist/wheel、全新环境、四测试根和静态/文档检查均通过。
+      发布前只剩维护者明确批准推送 `runtime-v0.1.0` 标签。
       必须先发布独立 runtime，再给 builder 声明依赖并发布。
 
 ## 本轮已完成的去处

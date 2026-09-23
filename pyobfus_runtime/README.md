@@ -14,3 +14,9 @@ python -m pip install pyobfus-runtime
 Creating protected artifacts still requires a valid pyobfus Pro licence.
 Until the first runtime release is published, install the wheel built from this
 directory; do not release a builder that emits `pyobfus_runtime` imports first.
+
+A valid pyobfus Pro licence permits redistribution of this runtime with an
+artifact produced by Pro. Packaging-only transformations such as vendoring,
+byte-compilation, or application bundling are permitted when runtime behaviour
+and the included licence notice remain unchanged. See `LICENSE` for the full
+terms.

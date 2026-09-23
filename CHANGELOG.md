@@ -17,7 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   payment, or licence-verification code and needs no licence key to execute an
   artifact. Legacy `pyobfus_pro.runtime` imports remain module aliases for the
   0.5.x compatibility line. Release sequencing is strict: publish the runtime
-  first, then release the builder that emits its namespace.
+  first, then release the builder that emits its namespace. Its custom
+  redistribution licence permits packaging-only transformations while keeping
+  functional modification and build-time obfuscation-service use prohibited.
 
 ### Fixed
 

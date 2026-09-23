@@ -5,15 +5,22 @@ Copyright (c) 2025-2026 Rong Zhu. All rights reserved.
 Permission is granted to install and use this runtime solely to execute
 artifacts produced by a legitimately licensed copy or trial of pyobfus Pro.
 
-A holder of a valid pyobfus Pro licence may redistribute unmodified copies of
-this runtime, including its wheel or its unmodified files bundled with an
-artifact produced by pyobfus Pro. Recipients may use that copy solely to run
-such artifacts.
+A holder of a valid pyobfus Pro licence may redistribute copies of this
+runtime, including its wheel or its files bundled with an artifact produced by
+pyobfus Pro. The runtime must remain functionally unmodified, and this licence
+notice must remain included. Recipients may use that copy solely to run such
+artifacts.
 
-You may not modify this runtime, use it to create or enable a competing
-obfuscation product, sublicense it separately, or represent it as open-source
-software. The pyobfus Pro build-time software and its source code are not
-covered by this redistribution permission.
+Non-substantive transformations required solely for packaging or delivery,
+including archiving, compression, byte-compilation, wheel vendoring, and
+executable or application bundling, are permitted provided they do not alter
+runtime behaviour or remove this licence notice.
+
+You may not otherwise modify this runtime, use it as a component of or to
+provide a build-time code-obfuscation or code-protection product or service,
+sublicense it separately, or represent it as open-source software. The
+pyobfus Pro build-time software and its source code are not covered by this
+redistribution permission.
 
 This software is provided "AS IS", without warranty of any kind. In no event
 shall the copyright holder be liable for damages arising from its use.

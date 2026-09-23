@@ -24,9 +24,13 @@ integration 12、runtime 2；Black、Ruff、mypy、MkDocs strict、README links�
 [`35864537940`](https://github.com/zhurong2020/pyobfus/actions/runs/35864537940) 已全绿，覆盖
 3 OS × 6 Python、独立 runtime wheel 边界、benchmark 及 Linux/Windows integration；CodeQL run
 [`35864537985`](https://github.com/zhurong2020/pyobfus/actions/runs/35864537985) 亦通过。
-**尚未发布**：发布前仍需审核自定义
-runtime 再分发许可证，并在 PyPI 配置第三个 Trusted Publisher。顺序硬约束仍是 runtime
-先发，随后 builder 才能声明依赖并发版。
+**尚未发布**：自定义 runtime 再分发许可证已按审查建议获批并修改，PyPI 也已配置第三个、
+项目级的 `pyobfus-runtime` Pending Trusted Publisher（仓库 `zhurong2020/pyobfus`、workflow
+`release.yml`、environment 留空，与当前 workflow 一致）。许可证修改后的 sdist/wheel 已通过
+Twine、元数据/许可证/内容边界检查，
+并在全新环境确认 0.1.0 可导入且 `pyobfus_pro` 不存在；Core 1354/1 skipped、MCP 97、
+integration 12、runtime 2 及 Black/Ruff/mypy/MkDocs strict 均通过。现只剩维护者明确批准推送
+`runtime-v0.1.0` 标签。顺序硬约束仍是 runtime 先发，随后 builder 才能声明依赖并发版。
 
 分发侧已复核 awesome-python 最新规则、当前槽位及历史 PR/issue，无重复后提交单行
 challenger PR [`vinta/awesome-python#3352`](https://github.com/vinta/awesome-python/pull/3352)；
@@ -52,9 +56,9 @@ PyPI 包的准确登记命令与 `developer-tools` 分类；token 改走临时�
 Core/MCP/runtime/Action 的所有本地开发、测试、构建和发版准备均从
 `~/projects/` 下的 WSL 工作副本进行，OneDrive 只作迁移残留或备份。许可证审查
 结论写入 `Y1_RUNTIME_DISTRIBUTION_DESIGN.md`：保留 PEP 639 `LicenseRef` 自定义商业再分发
-许可，不改成开源；批准前补“允许纯打包变换但禁止功能修改”，并把模糊的“竞品”限制改成
-禁止将 runtime 用于提供构建期混淆/保护产品或服务。PyPI 方面必须新建第三个、项目级的
-`pyobfus-runtime` Pending Trusted Publisher；既有 Core/MCP Publisher 不会自动覆盖它。
+许可，不改成开源；现已补入“允许纯打包变换但禁止功能修改”，并把模糊的“竞品”限制改成
+禁止将 runtime 用于提供构建期混淆/保护产品或服务。第三个、项目级的
+`pyobfus-runtime` Pending Trusted Publisher 已建立；既有 Core/MCP Publisher 不会自动覆盖它。
 
 更新时间：2026-09-22（**09-22 迁移后核查与收尾见下一段**；当前公开版本：Core **`0.5.28`**（reason codes + trial `--email` + CycloneDX 1.7，OIDC+PEP740 已发布、PyPI latest、两个 provenance 200、全新装验证、GitHub Release 已建、完整 CI+CodeQL 绿）/ MCP **`0.3.12`** /
 VS Code **`0.4.3`**；**GitHub Action `pyobfus-action v1.0.1` 已上架 Marketplace**。本轮完成：**09-10 下载与渠道复查**——三个 0.5.22 发布后的
