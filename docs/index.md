@@ -45,7 +45,7 @@ title: pyobfus - Modern Python Code Obfuscator
   </ul>
 </div>
 
-<div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 1.5em; border-radius: 8px; color: white;">
+<div style="background: linear-gradient(135deg, #1a2a5e 0%, #087f93 100%); padding: 1.5em; border-radius: 8px; color: white;">
   <h3 style="margin-top: 0; color: white;">💎 Professional Edition - $45 USD</h3>
   <ul style="list-style: none; padding-left: 0; margin: 0.5em 0;">
     <li style="margin: 0.5em 0;">✨ <strong>All Community Features</strong> +</li>
@@ -61,13 +61,13 @@ title: pyobfus - Modern Python Code Obfuscator
     <li style="margin: 0.5em 0;">📧 <strong>Priority Email Support</strong></li>
   </ul>
   <div style="text-align: center; margin-top: 1.5em;">
-    <a href="https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400" style="display: inline-block; background: white; color: #667eea; padding: 12px 32px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">Buy Now - $45 USD →</a>
+    <a href="https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400" style="display: inline-block; background: white; color: #1a2a5e; padding: 12px 32px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">Buy Now - $45 USD →</a>
   </div>
 </div>
 
 </div>
 
-<p style="text-align: center; font-size: 0.9em; color: var(--md-default-fg-color--light); margin-top: 1em;"><a href="#purchase-professional-edition" style="color: #3498db; text-decoration: none;">📄 More purchase details ↓</a></p>
+<p style="text-align: center; font-size: 0.9em; color: var(--md-default-fg-color--light); margin-top: 1em;"><a href="#purchase-professional-edition" style="color: #1668c7; text-decoration: none;">📄 More purchase details ↓</a></p>
 
 ## Installation
 
@@ -154,7 +154,7 @@ def I0(I1, I2):
 
 ## Purchase Professional Edition
 
-<div style="background: var(--md-code-bg-color); padding: 2em; border-radius: 8px; border-left: 4px solid #667eea; margin: 1.5em 0;">
+<div style="background: var(--md-code-bg-color); padding: 2em; border-radius: 8px; border-left: 4px solid #22c7e8; margin: 1.5em 0;">
   <h3 style="margin-top: 0; color: var(--md-default-fg-color);">💎 Professional Edition - $45 USD</h3>
   <p style="color: var(--md-default-fg-color--light); font-size: 0.95em;">One-time payment • Lifetime access</p>
   <p style="color: var(--md-default-fg-color); font-size: 0.9em; margin-top: 0.4em;">💳 Pay by card, Apple Pay, or <strong>WeChat Pay (微信支付)</strong> for buyers in China. Stripe shows the methods available for your region at checkout.</p>
@@ -173,7 +173,7 @@ def I0(I1, I2):
   </ul>
 
   <div style="text-align: center; margin: 1.5em 0;">
-    <a href="https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 14px 40px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 17px; box-shadow: 0 3px 6px rgba(102, 126, 234, 0.3); transition: all 0.3s;">🚀 Buy Now - $45 USD</a>
+    <a href="https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400" style="display: inline-block; background: linear-gradient(135deg, #1a2a5e 0%, #087f93 100%); color: white; padding: 14px 40px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 17px; box-shadow: 0 3px 6px rgba(26, 42, 94, 0.3); transition: all 0.3s;">🚀 Buy Now - $45 USD</a>
     <p style="margin-top: 1em; color: var(--md-default-fg-color--light); font-size: 0.9em;">⚡ Instant delivery • 🔒 Secure checkout • 💯 30-day money-back guarantee</p>
   </div>
 </div>

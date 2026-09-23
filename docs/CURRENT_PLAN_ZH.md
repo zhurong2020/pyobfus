@@ -38,6 +38,8 @@ PR 明示维护者身份与约 2k/月相对 pyarmor 约 290k/月的采用差距�
 `without_mirrors` 数据已到 09-22：Core 在 0.5.28 发布日 `120` 后为 `18 / 21`，MCP 同期
 `6 / 6 / 9`，仍无自然基线抬升。文档首页的浅色硬编码卡片/文字已改用 Material 主题变量，
 避免暗色模式下 Community 与购买区块对比度失真。
+旧 Jekyll 时代的紫色渐变也已替换为与 logo、`landing/index.html` 一致的 navy/cyan 色系，
+关闭该视觉小尾巴。
 0.5.28 的 Zenodo 链路也已补验：concept DOI `10.5281/zenodo.20846053` 当前 302 到
 record `22858892`，其公开 API 明确返回 version `v0.5.28` 与 publication date
 `2026-09-20`；无需轮换 webhook，继续按每次发版后验证。
