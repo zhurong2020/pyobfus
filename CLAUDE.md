@@ -14,7 +14,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### 🟢 2026-09-22 — 迁到 WSL 后的环境核查与免发版收尾（最新 · 冷启动先读这段）
+### 🟢 2026-09-24 — runtime 0.1.0 发布与文档同步（最新 · 冷启动先读这段）
 
 - 项目 09-21 从 OneDrive 迁入 `~/projects/pyobfus`，09-22 全面核查通过（git/hooks/venv/三测试根/lint/
   wrangler/gh/Zenodo/每日备份均正常）；旧 OneDrive 副本 pyobfus、pyobfus-legal 已删（rsync 比对零遗漏后）。
@@ -24,7 +24,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   从未收录，走 `platform.claude.com/plugins/submit`）；② awesome-python PR；③ MCP Trust Registry publish 需其
   API token；④ OneDrive 里 `pyobfus-action` / `pyobfus-backup-pre-filter-repo-*` 两个旧副本是否删（未批未动）；
   ⑤ Y-1 优先级。文案在 `docs/internal/`；细节 `docs/CURRENT_PLAN_ZH.md` 09-22 段。本轮提交已 push，CI 全绿。
-- 「当前状态一句话」不变：`0.5.28` 最新，本轮不改 `pyobfus/` 代码、不发版；README 改动到 PyPI 要等下次发版。
+- `pyobfus-runtime 0.1.0` 已于 09-24 通过 OIDC/PEP 740 发布并完成 PyPI、provenance、
+  全新环境安装验收；当前下一道 gate 是 builder 声明兼容 runtime 依赖后再决定 Core 发版。
+- 「当前状态一句话」：`0.5.28` 是最新 Core，`pyobfus-runtime 0.1.0` 已公开；本轮不再重复发 runtime。
 
 ### 🔴 2026-09-20 — 0.5.28 已发布（历史记录）
 
