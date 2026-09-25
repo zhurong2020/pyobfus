@@ -5,11 +5,12 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-09-24（`pyobfus-runtime` 0.1.0 已通过 OIDC/PEP 740 发布并完成 PyPI 验收；
+最后更新：2026-09-24（awesome-python PR #3352 当日被维护者关闭，理由是采用量，见「分发 / 上架队列」；
+`pyobfus-runtime` 0.1.0 已通过 OIDC/PEP 740 发布并完成 PyPI 验收；
 删除已完全合入 `main` 的本地及远端 `spike/mcp-sdk-2x` 空壳分支；
 修正本文件把已随 0.5.28 发布的邮箱 trial 误列为待实现、仍称 0.5.27 为当前版本的状态漂移。
 上一轮 2026-09-22：迁移到 WSL 后的核查与收尾，抗 AI 措辞改写完成、Alipay 句已删、
-awesome-python PR #3352 已提交并等待评审、Claude plugin 需重提、MCP Trust Checker 已实扫；详见
+awesome-python PR #3352 已提交（09-24 被拒）、Claude plugin 需重提、MCP Trust Checker 已实扫；详见
 `CURRENT_PLAN_ZH.md` 09-22 段。上一轮 2026-09-20：对标竞品 + 国际最佳实践 + 本地已完成/未发版做了一次三透镜
 重排，见 `FEATURE_EXPANSION_RESEARCH_2026-09-12.md` 之上的本轮外部核查；新增
 **服务端邮箱登记 trial** 为 P1（现已完成并随 0.5.28 发布），依据见
@@ -84,7 +85,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 | ~~P0~~ ✅ | 可验证性主线**完成**：对标文档 `SUPPLY_CHAIN_ASSURANCE.md` + 稳定 reason code（`reason_codes.py` v1，plan/report 发射，`REASON_CODES.md`）+ CycloneDX 1.7，全部**随 0.5.28 发布** | — | — |
 | ~~P1~~ ✅ | OSPS 补齐**基本完成 2026-09-20**：4 开关（gh api 核实）+ 4 文档（f2cd713）全做完。残余 = `LE-01.01` DCO（主动延后）+ 若干 L3 | 免发版 | — |
 | ~~P1~~ ✅ | 抗 AI 措辞改写**完成 2026-09-22**（tech-deai）：README / `landing/index.html` / `docs/index.md` 散文里的 em-dash 全部清零（README 48 处）、20 条 bold-colon 功能列表改成带动词的句子；命令、路径、版本号、链接、What's new 横幅与 UI 标签（如 `Unlock Pro`）原样。H2 骨架未动（doc-hub 型 README，锚点被外部引用）。~~pyarmor VMC/ECC 补记~~——已确认无需改 | 免发版（README 到 PyPI 要等下次发版） | — |
-| **P2** | 分发上架队列：awesome-python PR #3352 已提交、等待评审；不要同时投第二个 awesome-list → 结果出来后再评估 awesome-security → AlternativeTo | 免发版 | 外部等待 |
+| **P2** | 分发上架队列：awesome-python PR #3352 **2026-09-24 被拒**（理由=采用量，对方留了「adoption grows」再议的门；不争辩、不重开）；awesome-security / awesome-devsecops 门槛同为下载量，**跳过**；队列下一项 **AlternativeTo**（需维护者账号） | 免发版 | 维护者 |
 
 ### ✅ 可验证性主线（2026-09-20 完成，随 0.5.28 发布）
 
@@ -160,12 +161,15 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 
 1. ~~Open VSX~~ ✅ 2026-09-07
 2. ~~独立 GitHub Action + Marketplace~~ ✅ 2026-09-10
-3. **`awesome-python`**：✅ 2026-09-23 已提交
-   [`vinta/awesome-python#3352`](https://github.com/vinta/awesome-python/pull/3352)，严格一行、按
-   challenger 报并披露维护者身份；当前等待评审。其 admission 主要看 PyPI 月下载（我们约
-   2k vs pyarmor 约 289k），被拒概率高；拒信不代表项目质量，不争辩、不重开。**等待结果前
-   不同时投第二个 awesome-list，也不提 pyobfus-mcp**。
-4. `awesome-security` 或 `awesome-devsecops`（awesome-python 有结果后择一尝试）
+3. ~~`awesome-python`~~ ❌ **2026-09-24 被拒（未合并）**：09-23 提交
+   [`vinta/awesome-python#3352`](https://github.com/vinta/awesome-python/pull/3352)（严格一行、按
+   challenger 报并披露维护者身份），次日由维护者 JinyangWang27 关闭，原话
+   「A Challenger slot needs adoption-trajectory evidence, and pyobfus is at ~6k downloads/month versus ~313k for pyarmor. Happy to revisit as adoption grows.」
+   对方的约 6k 是含镜像口径（pypistats 近 30 天 with_mirrors 6538 / without_mirrors 2172），与
+   我们自报的约 2k 不矛盾。结论与预判一致：拒的是采用量不是质量。按既定规则**不争辩、不重开**；
+   **重提条件**=非发布日下载基线明显抬升后再议，届时引用这条评论。
+4. ~~`awesome-security` 或 `awesome-devsecops`~~ **跳过**：admission 门槛同样是下载量，现在投大概率
+   同一结果；等第 3 项的重提条件满足后再一并评估
 5. **AlternativeTo**（**需维护者验证邮箱后在对方站点提交**；字段草稿已记入
    `DISTRIBUTION_CHANNELS.md`。免费队列官方口径至少数月，$5 priority review 是可选付费 gate，
    默认不买；同时服务上面第 5 项的对比可见度）

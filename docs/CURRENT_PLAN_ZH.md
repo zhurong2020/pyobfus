@@ -36,9 +36,13 @@ integration 12、runtime 2 及 Black/Ruff/mypy/MkDocs strict 均通过。已于 
 
 分发侧已复核 awesome-python 最新规则、当前槽位及历史 PR/issue，无重复后提交单行
 challenger PR [`vinta/awesome-python#3352`](https://github.com/vinta/awesome-python/pull/3352)；
-PR 明示维护者身份与约 2k/月相对 pyarmor 约 290k/月的采用差距。当前只等待评审，不同时
-投第二个 awesome-list、不争辩或重复提交。
-09-23 后续复查确认 PR 仍 open、无评论且对方 CI 通过；本仓库 `fd620d2` 的 CI 与 CodeQL
+PR 明示维护者身份与约 2k/月相对 pyarmor 约 290k/月的采用差距。
+09-23 复查 PR 仍 open、无评论且对方 CI 通过；**09-24 12:10 UTC 被维护者 JinyangWang27 关闭**，原话
+「A Challenger slot needs adoption-trajectory evidence, and pyobfus is at ~6k downloads/month versus ~313k for pyarmor. Happy to revisit as adoption grows.」
+对方 6k 是含镜像口径（pypistats 近 30 天 with_mirrors 6538 / without_mirrors 2172），与我们
+自报的 2k 不矛盾，拒的是采用量不是质量。按既定规则不争辩、不重开；对方留了「adoption grows」
+再议的门，重提条件是非发布日基线明显抬升。安全类 awesome-list 门槛同为下载量，跳过；分发队列
+直接推进到 AlternativeTo（需维护者账号）。本仓库 `fd620d2` 的 CI 与 CodeQL
 也全绿。OneDrive 两个迁移旧副本已完成删除前 checksum rsync：排除版本库、缓存及迁移
 标记后，两组与 `~/projects/` 同名目录均零差异，现只等维护者明确批准删除。pypistats
 `without_mirrors` 数据已到 09-22：Core 在 0.5.28 发布日 `120` 后为 `18 / 21`，MCP 同期
@@ -53,7 +57,8 @@ record `22858892`，其公开 API 明确返回 version `v0.5.28` 与 publication
 PyPI 包的准确登记命令与 `developer-tools` 分类；token 改走临时环境变量，禁止进入 history/
 仓库/聊天。AlternativeTo 最新官方 FAQ 已复核，表单字段、诚实的 Freemium/Apache-2.0 +
 商业 Pro 口径、PyArmor 单一替代关系和 logo 路径将写入 `DISTRIBUTION_CHANNELS.md`；免费队列
-至少数月，$5 加急属于单独付费 gate，默认不买，且继续等待 awesome-python 结果后再提交。
+至少数月，$5 加急属于单独付费 gate，默认不买；awesome-python 已于 09-24 出结果（被拒），
+「等它结果再投」的条件已解除，AlternativeTo 现只等维护者账号提交。
 维护者进一步明确：两个 OneDrive 迁移副本由本人手工删除，AI 不执行云同步删除；以后
 Core/MCP/runtime/Action 的所有本地开发、测试、构建和发版准备均从
 `~/projects/` 下的 WSL 工作副本进行，OneDrive 只作迁移残留或备份。许可证审查
@@ -99,7 +104,7 @@ DOI → record `22858892` = v0.5.28 与 `CITATION.cff` 一致；09-22 02:01 每�
 `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`）。**MCP Trust Checker 已实扫**（wheel 0.3.12：
 A · 94/100 · 0 威胁；publish 到其 Registry 需维护者 token）。**awesome-python 已于 09-23 提交
 PR #3352**（槽位 Distribution→Obfuscation 仅 pyarmor 一条，按 challenger 报并披露维护者身份；
-当前只等待，不同时投第二个 awesome-list）。下载：Core 09-20 发布日 `120`、09-21 `18`，MCP `6 / 6`，基线未抬升。
+当前只等待，不同时投第二个 awesome-list；**09-24 被拒，见文首 09-24 段**）。下载：Core 09-20 发布日 `120`、09-21 `18`，MCP `6 / 6`，基线未抬升。
 本轮**不改 `pyobfus/` 代码、不发版**；README 改动到 PyPI 要等下次发版。收尾：5 个提交已 push，CI / CodeQL / Pages
 在 `4dfaf29` 全绿；**维护者动作总表在 `TODO.md` 顶部**（plugin 重提 / Trust Registry
 publish / OneDrive 残留两副本 / Y-1 优先级）。
@@ -236,7 +241,7 @@ provenance 冲突时退出码 1。⚠️ 环境陷阱：本地 venv 的 editable
     映射到 SLSA v1.2（L2 达标、L3 部分不声称）与 CycloneDX 1.7。P0 剩 reason code（代码）。
   - **Dependabot 16 PR 清零（收尾）**：开 Dependabot 后自动开 16 个 version-update PR，逐个 review 合 8 个（含 checkout/upload-artifact v7）+ codeql-action 成对升 v4.38.0（一次提交）+ 关 6 个并加 `dependabot.yml` ignore 止噪（npm `@types/vscode`/dev-major、pip ruff minor/major）。review 挡下 4 个会打红 main 的真问题。16→0、main 全绿。
   - **Dependabot 第二波已全部合并 + 建 auto-merge 治本**：合第一批后 Dependabot 重扫开了 6 个新 PR（#44 干净 npm 组 + #45–#49 五个 gh-actions 主版本 setup-python/codecov/pages 系列），**全绿全部合并**；#46/#47/#49 改 pages.yml（PR CI 不覆盖）合后 **main 的 Pages 工作流 success** 验证文档部署正常。**治本**：新增 `.github/workflows/dependabot-auto-merge.yml`（fetch-metadata v3.1.0 SHA-pin），patch/minor 更新 CI 绿后**自动合并**（repo `allow_auto_merge` 已开）、major 仍留人工 review。稳态：日常只会看到少数 major PR,其余自动。**16+6 全清零、0 open PR、main 全绿。**
-  - **仍等 gate**：MCP SDK 2.x 攒着待发；分发上架队列（awesome-python 等，需维护者账号）；OSPS DCO（主动延后）与 L3 阈值政策。
+  - **仍等 gate**：MCP SDK 2.x 攒着待发；分发上架队列（awesome-python 09-24 已拒，下一项 AlternativeTo，需维护者账号）；OSPS DCO（主动延后）与 L3 阈值政策。
 - **2026-09-19 完成 TODO 前三项（队列因此前移）**：三项都已实测验收，已从
   `TODO.md` 移出。
   - **① CycloneDX 版本声明对齐 —— 选了「升 1.7」，因此要发版**。

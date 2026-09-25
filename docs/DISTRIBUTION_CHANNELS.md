@@ -678,18 +678,28 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 
 ## 🟡 Pending action
 
-### awesome-python — PR pending
+### awesome-python — PR closed 2026-09-24, not merged
 
 2026-09-23 已向 `Distribution → Obfuscation` 提交 challenger 条目：
 [`vinta/awesome-python#3352`](https://github.com/vinta/awesome-python/pull/3352)。提交前复核了
 最新 `CONTRIBUTING.md`、槽位（仅 pyarmor 一项，上限未满）以及全仓历史 PR/issue，无
 `pyobfus` 重复记录。PR 只有一行，披露维护者身份，并诚实说明约 2k/月与 pyarmor 约
-290k/月的采用量差距。当前等待维护者裁决；不争辩、不重开，结果出来前不同时投第二个
-awesome-list。
+290k/月的采用量差距。
 
-### AlternativeTo — account submission prepared, intentionally queued
+**结果**：2026-09-24 12:10 UTC 由维护者 JinyangWang27 关闭（未合并），评论原话：
 
-Do not submit until the awesome-python PR has a result; this avoids simultaneous directory pushes.
+> A Challenger slot needs adoption-trajectory evidence, and pyobfus is at ~6k
+> downloads/month versus ~313k for pyarmor. Happy to revisit as adoption grows.
+
+对方引用的约 6k 是含镜像口径（pypistats 近 30 天 `with_mirrors` 6538 / `without_mirrors`
+2172），与我们自报的约 2k 不矛盾。拒的是采用量，不是质量，与提交前的预判一致。处置：
+**不争辩、不重开**；重提条件是非发布日下载基线明显抬升，届时在新 PR 里引用这条评论。
+`awesome-security` / `awesome-devsecops` 的门槛同样是下载量，暂不投。
+
+### AlternativeTo — account submission prepared, gate cleared 2026-09-24
+
+The awesome-python PR was closed on 2026-09-24, so the "wait for its result" gate no longer applies;
+submission now waits only on the maintainer signing in with a verified email.
 AlternativeTo requires a signed-in account with a verified email. Its current FAQ says free submissions
 normally wait at least several months; the optional $5 priority review targets 1–2 business days but does
 not buy approval. Use the free queue unless the maintainer separately approves spending.
