@@ -105,6 +105,7 @@ class ObfuscationConfig:
     )
     bind_device: bool = False  # P2-8: runtime device-key substitution for L3 (v0.5.3)
     bind_device_id: Optional[str] = None  # P2-8: target machine-id (None = build machine)
+    bind_key_env: Optional[str] = None  # Y-3: bind L3 key to app-provided material via env NAME
     requires_os: Optional[str] = None  # P2-16: comma-separated OS allowlist (platform.system())
     requires_python_min: Optional[str] = None  # P2-16: minimum Python version "X.Y"
     requires_arch: Optional[str] = (

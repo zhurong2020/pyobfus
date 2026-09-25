@@ -83,6 +83,11 @@ _FIELD_DESCRIPTIONS: Dict[str, str] = {
     "machine's fingerprint at runtime (Pro).",
     "bind_device_id": "Target machine-id for bind_device; omit to use "
     "the build machine's own fingerprint (Pro).",
+    "bind_key_env": "Bind the Selective Opacity L3 key to application-supplied "
+    "key material read from a base64 environment variable of this name at "
+    "build and runtime; the runtime also accepts a provider registered via "
+    "pyobfus_runtime.set_key_provider. Requires an L3 layer; not compatible "
+    "with vault or bind_device (Pro).",
     "requires_os": "Comma-separated allowed OS names (platform.system() "
     "values) -- import refuses to run elsewhere (Pro).",
     "requires_python_min": 'Minimum required Python version, e.g. "3.10" ' "(Pro).",
@@ -127,6 +132,7 @@ _PRO_ONLY_FIELDS = {
     "opacity_config",
     "bind_device",
     "bind_device_id",
+    "bind_key_env",
     "requires_os",
     "requires_python_min",
     "requires_arch",

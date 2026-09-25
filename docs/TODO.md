@@ -196,7 +196,7 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
 | # | 缺口 | 证据 | 方向 |
 |---|---|---|---|
 | ~~Y-2~~ ✅ | ~~`--expire-hard` 没有到期前提醒~~ **已实现 2026-09-24**（held 在 `[Unreleased]`，待发版）| runtime `expire_check` 加向后兼容 `warn_days`，窗口内发 `LicenseExpiryWarning`（`UserWarning` 子类，宿主可经 `warnings`/`logging.captureWarnings` 接管）| `--expire-warn-days N`（须配 `--expire-hard`）；16 测试含端到端「warns but still loads」 |
-| Y-3 | 设备绑定只认 pyobfus 自己的 `current_machine_id()` | 自带授权体系（JWT 加自有机器码）的应用，无法在不逐机器构建的前提下把 L3 密钥绑定到自己的授权上 | 运行时"密钥提供者"钩子，应用验签后提供密钥材料 |
+| ~~Y-3~~ ✅ | ~~设备绑定只认 pyobfus 自己的 `current_machine_id()`~~ **已实现 v1 2026-09-25**（held 在 `[Unreleased]`，待发版）| `--bind-key-env NAME`：L3 密钥改由应用提供（`pyobfus_runtime.set_key_provider` 回调 或 base64 env 回退），一次构建跑任意授权机器；v1 只覆盖 L3，配 `--vault` 报错、与 `--bind-device` 互斥。契约 `docs/Y3_KEY_PROVIDER_DESIGN.md` | 19 测试（10 运行时 + 9 构建/校验/端到端含正确/错误 key/provider 通道）；vault 覆盖为后续 |
 | ~~Y-4~~ ✅ | ~~Windows 上运行混淆输出没有 CI 验证~~ **已补基础合同** | `integration` job 扩为 Ubuntu + Windows；单文件和跨文件示例均执行混淆产物并与原输出比较 | 覆盖基础 Community 交付；torch/MONAI、Python embedded、L3 runtime 等重型真实下游组合仍需 Y-1 专项验证 |
 | ~~Y-6~~ ✅ | ~~name-mangling 打断运行时注解~~ **已修** | 函数签名表达式此前被跳过，或在参数局部作用域压栈后才遍历，导致同模块/导入类改名后 eager annotation 仍引用旧名 | 注解和默认值现在按 Python 语义在函数局部作用域压栈前改写；端到端测试覆盖同模块、跨模块、默认值及参数名遮蔽导入类型 |
 | ~~Y-7~~ ✅ | ~~cross-file mangler 作用域 bug~~ **已修** (`069a820`) | 函数局部变量复用被重命名的模块级名字时 Load 引用被误改 → `NameError: name 'Ixx'`。`LocalNameTransformer` 现按 Python 作用域收集函数体内全部绑定名（含 lambda/推导式作用域）| 已修 + 2 回归测试 |

@@ -213,6 +213,13 @@
           ],
           "description": "Target machine-id for bind_device; omit to use the build machine's own fingerprint (Pro). Requires level: pro."
         },
+        "bind_key_env": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Bind the Selective Opacity L3 key to application-supplied key material read from a base64 environment variable of this name at build and runtime; the runtime also accepts a provider registered via pyobfus_runtime.set_key_provider. Requires an L3 layer; not compatible with vault or bind_device (Pro). Requires level: pro."
+        },
         "requires_os": {
           "type": [
             "string",

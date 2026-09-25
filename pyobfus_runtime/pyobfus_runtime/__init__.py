@@ -11,6 +11,8 @@ from .binding import (
     default_counter_path,
     expire_check,
     period_check,
+    provided_key,
+    set_key_provider,
 )
 from .embedded_data import EmbeddedDataError, encrypt_data_file, get_embedded_data
 from .opacity import OpacityRuntimeError, _encrypt_code, _l3_dispatch
@@ -53,6 +55,8 @@ __all__ = [
     "get_embedded_data",
     "install_scrub_excepthook",
     "period_check",
+    "provided_key",
+    "set_key_provider",
     "requires_runtime",
     "scrub_traceback_text",
     "unscrub_error_id",

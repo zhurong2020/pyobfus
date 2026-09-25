@@ -52,6 +52,7 @@ from __future__ import annotations
 import ast
 import base64
 import hashlib
+import os
 import secrets
 from pathlib import Path
 from typing import Optional, Tuple
@@ -77,6 +78,7 @@ def fusion_enabled(config) -> bool:
         or getattr(config, "period_max_runs", None)
         or getattr(config, "opacity_config", None)
         or getattr(config, "bind_device", False)
+        or getattr(config, "bind_key_env", None)
         or getattr(config, "requires_os", None)
         or getattr(config, "requires_python_min", None)
         or getattr(config, "requires_arch", None)
@@ -120,6 +122,80 @@ def _device_key_and_salt(config) -> tuple[Optional[bytes], Optional[bytes]]:
     salt = secrets.token_bytes(_BUILD_SALT_SIZE)
     target_id = getattr(config, "bind_device_id", None) or current_machine_id()
     return bind_device_key(target_id, salt), salt
+
+
+_BIND_KEY_LEN = 32  # AES-256
+
+
+def _provider_key_from_env(config) -> Optional[bytes]:
+    """The build-time L3 key for ``--bind-key-env NAME``, or ``None``.
+
+    Reads a base64-encoded 32-byte key from environment variable ``NAME`` at
+    build time. The build encrypts the L3 ciphertext with it, and the runtime
+    reproduces the same key through :func:`pyobfus_runtime.provided_key` (a
+    registered provider or the same env var). Supplying the key by environment
+    keeps it out of argv and shell history. Fails loudly if unset or not
+    exactly 32 bytes -- a silent fallback would ship an unbound artifact.
+    """
+    env_name = getattr(config, "bind_key_env", None)
+    if not env_name:
+        return None
+    raw = os.environ.get(env_name)
+    if raw is None:
+        raise ValueError(
+            f"--bind-key-env {env_name}: environment variable {env_name!r} is "
+            f"unset at build time; set it to the base64-encoded 32-byte key"
+        )
+    try:
+        key = base64.b64decode(raw, validate=True)
+    except (ValueError, TypeError) as exc:
+        raise ValueError(
+            f"--bind-key-env {env_name}: value must be base64-encoded key " f"material: {exc}"
+        ) from exc
+    if len(key) != _BIND_KEY_LEN:
+        raise ValueError(
+            f"--bind-key-env {env_name}: key must decode to {_BIND_KEY_LEN} "
+            f"bytes, got {len(key)}"
+        )
+    return key
+
+
+def _substitute_layer_key_provider(source: str, env_name: str) -> str:
+    """Rewrite the opacity pass's ``_LAYER_KEY = b"..."`` into a runtime call
+    to :func:`pyobfus_runtime.provided_key`, so the raw key never ships.
+
+    Replaces the baked constant with
+    ``_LAYER_KEY = provided_key("<env_name>")`` and inserts the import
+    immediately before it. No-op if the module has no ``_LAYER_KEY``. Only the
+    environment-variable *name* is baked into the artifact.
+    """
+    tree = ast.parse(source)
+    idx = None
+    for i, node in enumerate(tree.body):
+        if (
+            isinstance(node, ast.Assign)
+            and len(node.targets) == 1
+            and isinstance(node.targets[0], ast.Name)
+            and node.targets[0].id == "_LAYER_KEY"
+        ):
+            idx = i
+            break
+    if idx is None:
+        return source
+
+    tree.body[idx].value = ast.Call(  # type: ignore[attr-defined]
+        func=ast.Name(id="_pyobfus_provided_key", ctx=ast.Load()),
+        args=[ast.Constant(value=env_name)],
+        keywords=[],
+    )
+    imp = ast.ImportFrom(
+        module="pyobfus_runtime",
+        names=[ast.alias(name="provided_key", asname="_pyobfus_provided_key")],
+        level=0,
+    )
+    tree.body[idx:idx] = [imp]
+    ast.fix_missing_locations(tree)
+    return ast.unparse(tree)
 
 
 def _substitute_layer_key_binding(source: str, salt: bytes) -> str:
@@ -443,6 +519,8 @@ def apply_post_passes(
     # runtime re-derivation, so the raw key never ships and decryption only
     # succeeds on the matching device (P2-8).
     device_key, device_salt = _device_key_and_salt(config)
+    provider_key = _provider_key_from_env(config)
+    provider_env = getattr(config, "bind_key_env", None)
 
     assignments = None
     if getattr(config, "selective_opacity", False) or getattr(config, "opacity_config", None):
@@ -450,9 +528,13 @@ def apply_post_passes(
         # opacity-config PRE-pass injected (by pre-mangle qualname) are consumed
         # here. Passing config=None keeps this pass purely decorator-based; the
         # TOML rules already did their work pre-mangle.
-        effective_key = (
-            device_key if device_key is not None else _layer_key(config, module_qualname)
-        )
+        effective_key: Optional[bytes]
+        if device_key is not None:
+            effective_key = device_key
+        elif provider_key is not None:
+            effective_key = provider_key
+        else:
+            effective_key = _layer_key(config, module_qualname)
         source, assignments = _t_opacity.transform_module(
             source,
             None,
@@ -461,6 +543,8 @@ def apply_post_passes(
         )
         if device_key is not None and device_salt is not None:
             source = _substitute_layer_key_binding(source, device_salt)
+        elif provider_key is not None and provider_env:
+            source = _substitute_layer_key_provider(source, provider_env)
 
     if getattr(config, "seal_code", False):
         source = _t_seal.transform_module(

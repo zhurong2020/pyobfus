@@ -38,13 +38,14 @@ Patent-gated. See PATENT_NOTES.md and docs/P2-8_DESIGN.md.
 
 from __future__ import annotations
 
+import base64
 import datetime as _datetime
 import hashlib
 import os
 import platform
 import shutil
 import warnings
-from typing import cast
+from typing import Callable, Optional, cast
 import tempfile
 from pathlib import Path
 
@@ -87,6 +88,75 @@ class LicenseExpiryWarning(UserWarning):
     ``warnings.simplefilter`` entry, etc.). The artifact keeps running;
     only :class:`LicenseExpired` stops it.
     """
+
+
+# ---------------------------------------------------------------------------
+# Application-supplied key provider (Y-3)
+# ---------------------------------------------------------------------------
+
+_KEY_PROVIDER: Optional[Callable[[], bytes]] = None
+
+
+def set_key_provider(provider: Optional[Callable[[], bytes]]) -> None:
+    """Register (or clear) a process-wide key provider for --bind-key-env output.
+
+    An artifact built with ``--bind-key-env NAME`` calls :func:`provided_key`
+    at import to obtain its L3 key. Registering a provider here lets the host
+    application supply that key from its own authorization system: verify a
+    JWT, fetch the per-machine key from its server, and return the 32 raw
+    bytes. ``provider`` is a zero-argument callable returning ``bytes``; pass
+    ``None`` to clear a previously registered provider.
+
+    Must be called before importing the protected module. When no provider is
+    registered, :func:`provided_key` falls back to an environment variable.
+    """
+    global _KEY_PROVIDER
+    if provider is not None and not callable(provider):
+        raise LicenseBindingError("key provider must be callable or None")
+    _KEY_PROVIDER = provider
+
+
+def provided_key(env_name: str, *, expected_len: int = 32) -> bytes:
+    """Resolve the application-supplied key for a ``--bind-key-env`` artifact.
+
+    Resolution order:
+
+    1. the callable registered via :func:`set_key_provider`, if any;
+    2. otherwise environment variable ``env_name``, base64-decoded.
+
+    The result must be exactly ``expected_len`` bytes (32 for AES-256). This
+    is the frozen v1 call shape emitted into generated artifacts; the L3
+    ciphertext decrypts iff the returned key matches the build key.
+
+    Raises:
+        LicenseBindingError: when neither channel yields a valid key of the
+            expected length (unregistered and unset, undecodable base64, or
+            wrong length). Failing here aborts import with a clear message
+            rather than producing an opaque AES-GCM decryption failure later.
+    """
+    if _KEY_PROVIDER is not None:
+        key = _KEY_PROVIDER()
+        source = "registered key provider"
+    else:
+        raw = os.environ.get(env_name)
+        if raw is None:
+            raise LicenseBindingError(
+                f"no key provider registered and environment variable {env_name!r} "
+                f"is unset; call pyobfus_runtime.set_key_provider(...) before import "
+                f"or set {env_name} to the base64 key"
+            )
+        try:
+            key = base64.b64decode(raw, validate=True)
+        except (ValueError, TypeError) as exc:
+            raise LicenseBindingError(
+                f"environment variable {env_name!r} must be base64-encoded key " f"material: {exc}"
+            ) from exc
+        source = f"environment variable {env_name!r}"
+    if not isinstance(key, (bytes, bytearray)):
+        raise LicenseBindingError(f"{source} must return bytes, got {type(key).__name__}")
+    if len(key) != expected_len:
+        raise LicenseBindingError(f"{source} must return {expected_len} bytes, got {len(key)}")
+    return bytes(key)
 
 
 # ---------------------------------------------------------------------------

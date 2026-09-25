@@ -7,6 +7,7 @@ name-mangling and runs correctly — the combined pipeline the 2026-06-18 probe
 proved out (vault PRE-pass, opacity/seal/scrub POST-pass).
 """
 
+import base64
 import datetime
 import importlib.util
 import sys
@@ -696,3 +697,179 @@ class TestExpireWarnDays:
         assert any(isinstance(w.message, LicenseExpiryWarning) for w in caught), [
             str(w.message) for w in caught
         ]
+
+
+_L3_KEY = b"z" * 32
+_L3_KEY_B64 = base64.b64encode(_L3_KEY).decode()
+_WRONG_KEY_B64 = base64.b64encode(b"w" * 32).decode()
+_KEY_ENV = "PYOBFUS_TEST_L3_KEY"
+
+
+@requires_pro
+class TestBindKeyEnv:
+    """Y-3: --bind-key-env binds the L3 key to application-supplied material."""
+
+    def _src(self, tmp_path):
+        f = tmp_path / "mod.py"
+        f.write_text(
+            "from pyobfus_pro import opacity, Layer\n"
+            "MULT = 4\n\n"
+            "@opacity(Layer.ENCRYPTED)\n"
+            "def compute(x):\n"
+            "    return x * MULT + 2\n\n"
+            "def run():\n"
+            "    return compute(6)\n"
+        )
+        return f
+
+    def _keep_run_cfg(self, tmp_path):
+        cfg = tmp_path / "pyobfus.yaml"
+        cfg.write_text("obfuscation:\n  exclude_names: [run]\n")
+        return cfg
+
+    def _build(self, runner, src, out, cfg, *extra):
+        with patch("pyobfus.cli.is_trial_active", return_value=True):
+            return runner.invoke(
+                main,
+                [
+                    str(src),
+                    "-o",
+                    str(out),
+                    "--level",
+                    "pro",
+                    "--config",
+                    str(cfg),
+                    "--selective-opacity",
+                    *extra,
+                ],
+            )
+
+    def _clear_provider(self):
+        from pyobfus_runtime import set_key_provider
+
+        set_key_provider(None)
+
+    # -- validation --------------------------------------------------------
+
+    def test_requires_an_l3_layer(self, runner, marked_file, tmp_path):
+        out = tmp_path / "o.py"
+        res = _invoke(runner, marked_file, out, "--bind-key-env", _KEY_ENV)
+        assert res.exit_code == 1
+        assert "requires an L3 layer" in res.output
+
+    def test_rejected_with_vault(self, runner, marked_file, tmp_path):
+        out = tmp_path / "o.py"
+        res = _invoke(
+            runner, marked_file, out, "--selective-opacity", "--vault", "--bind-key-env", _KEY_ENV
+        )
+        assert res.exit_code == 1
+        assert "Runtime String Vault" in res.output
+
+    def test_rejected_with_bind_device(self, runner, marked_file, tmp_path):
+        out = tmp_path / "o.py"
+        res = _invoke(
+            runner,
+            marked_file,
+            out,
+            "--selective-opacity",
+            "--bind-device",
+            "--bind-key-env",
+            _KEY_ENV,
+        )
+        assert res.exit_code == 1
+        assert "cannot be combined with --bind-device" in res.output
+
+    # -- build-time key source --------------------------------------------
+
+    def test_build_fails_when_env_unset(self, runner, tmp_path, monkeypatch):
+        monkeypatch.delenv(_KEY_ENV, raising=False)
+        src = self._src(tmp_path)
+        out = tmp_path / "o.py"
+        res = self._build(
+            runner, src, out, self._keep_run_cfg(tmp_path), "--bind-key-env", _KEY_ENV
+        )
+        assert res.exit_code != 0
+        assert "unset at build time" in res.output or "unset" in str(res.exception)
+
+    def test_build_fails_on_wrong_key_length(self, runner, tmp_path, monkeypatch):
+        monkeypatch.setenv(_KEY_ENV, base64.b64encode(b"short").decode())
+        src = self._src(tmp_path)
+        out = tmp_path / "o.py"
+        res = self._build(
+            runner, src, out, self._keep_run_cfg(tmp_path), "--bind-key-env", _KEY_ENV
+        )
+        assert res.exit_code != 0
+
+    # -- emitted shape -----------------------------------------------------
+
+    def test_emits_provided_key_and_no_raw_key(self, runner, tmp_path, monkeypatch):
+        monkeypatch.setenv(_KEY_ENV, _L3_KEY_B64)
+        src = self._src(tmp_path)
+        out = tmp_path / "o.py"
+        res = self._build(
+            runner, src, out, self._keep_run_cfg(tmp_path), "--bind-key-env", _KEY_ENV
+        )
+        assert res.exit_code == 0, res.output
+        text = out.read_text()
+        assert "_pyobfus_provided_key(" in text
+        assert _KEY_ENV in text
+        assert "_LAYER_KEY = b'" not in text and '_LAYER_KEY = b"' not in text
+        # only the env-var name ships, never the key bytes
+        assert _L3_KEY_B64 not in text
+        assert _compiles(out)
+
+    # -- end to end --------------------------------------------------------
+
+    def test_env_channel_correct_key_decrypts(self, runner, tmp_path, monkeypatch):
+        monkeypatch.setenv(_KEY_ENV, _L3_KEY_B64)
+        src = self._src(tmp_path)
+        out = tmp_path / "o.py"
+        res = self._build(
+            runner, src, out, self._keep_run_cfg(tmp_path), "--bind-key-env", _KEY_ENV
+        )
+        assert res.exit_code == 0, res.output
+        self._clear_provider()
+        try:
+            m = _load_module(out, "bke_env_match")
+            assert m.run() == 26  # compute(6) = 6*4+2
+        finally:
+            self._clear_provider()
+
+    def test_wrong_key_fails_to_decrypt(self, runner, tmp_path, monkeypatch):
+        monkeypatch.setenv(_KEY_ENV, _L3_KEY_B64)
+        src = self._src(tmp_path)
+        out = tmp_path / "o.py"
+        res = self._build(
+            runner, src, out, self._keep_run_cfg(tmp_path), "--bind-key-env", _KEY_ENV
+        )
+        assert res.exit_code == 0, res.output
+        # Runtime supplies a different key than the build key.
+        monkeypatch.setenv(_KEY_ENV, _WRONG_KEY_B64)
+        self._clear_provider()
+        from pyobfus_pro import OpacityRuntimeError
+
+        try:
+            m = _load_module(out, "bke_env_mismatch")
+            with pytest.raises(OpacityRuntimeError):
+                m.run()
+        finally:
+            self._clear_provider()
+
+    def test_registered_provider_channel_decrypts(self, runner, tmp_path, monkeypatch):
+        monkeypatch.setenv(_KEY_ENV, _L3_KEY_B64)
+        src = self._src(tmp_path)
+        out = tmp_path / "o.py"
+        res = self._build(
+            runner, src, out, self._keep_run_cfg(tmp_path), "--bind-key-env", _KEY_ENV
+        )
+        assert res.exit_code == 0, res.output
+        # Remove the env channel; the registered provider must carry the key.
+        monkeypatch.delenv(_KEY_ENV, raising=False)
+        from pyobfus_runtime import set_key_provider
+
+        set_key_provider(lambda: _L3_KEY)
+        try:
+            m = _load_module(out, "bke_provider_match")
+            assert m.run() == 26
+        finally:
+            set_key_provider(None)

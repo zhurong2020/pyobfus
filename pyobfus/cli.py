@@ -287,6 +287,14 @@ def _echo_pro_import_hint() -> None:
     "machine (Pro, v0.5.3; implies --bind-device)",
 )
 @click.option(
+    "--bind-key-env",
+    type=str,
+    default=None,
+    help="Bind the L3 key to app-supplied material read from base64 env var "
+    "NAME (build + runtime); pairs with pyobfus_runtime.set_key_provider "
+    "(Pro; requires an L3 layer; not for --vault; excludes --bind-device)",
+)
+@click.option(
     "--requires-os",
     type=str,
     help="Comma-separated OS allowlist (e.g. 'Linux,Darwin'); module-top "
@@ -505,6 +513,7 @@ def main(
     opacity_config: Optional[str],
     bind_device: bool,
     bind_device_id: Optional[str],
+    bind_key_env: Optional[str],
     requires_os: Optional[str],
     requires_python_min: Optional[str],
     requires_arch: Optional[str],
@@ -558,6 +567,30 @@ def main(
             sys.exit(1)
         if not expire_hard:
             click.echo("Error: --expire-warn-days requires --expire-hard.", err=True)
+            sys.exit(1)
+
+    # --bind-key-env binds the L3 key to application-supplied material.
+    if bind_key_env is not None:
+        if bind_device or bind_device_id:
+            click.echo(
+                "Error: --bind-key-env cannot be combined with --bind-device / "
+                "--bind-device-id; they bind the same L3 key to different sources.",
+                err=True,
+            )
+            sys.exit(1)
+        if not (selective_opacity or opacity_config):
+            click.echo(
+                "Error: --bind-key-env requires an L3 layer "
+                "(--selective-opacity or --opacity-config).",
+                err=True,
+            )
+            sys.exit(1)
+        if vault_flag:
+            click.echo(
+                "Error: --bind-key-env does not yet cover Runtime String Vault "
+                "keys; omit --vault or use --bind-device.",
+                err=True,
+            )
             sys.exit(1)
 
     # Handle --check: pre-flight risk scan (no output files)
@@ -842,6 +875,7 @@ def main(
             or opacity_config
             or bind_device
             or bind_device_id
+            or bind_key_env
             or requires_os
             or requires_python_min
             or requires_arch
@@ -963,6 +997,10 @@ def main(
                 if verbose:
                     _target = f"device {bind_device_id}" if bind_device_id else "build machine"
                     click.echo(f"Enabled: Device binding ({_target}, P2-8)")
+            if bind_key_env:
+                config.bind_key_env = bind_key_env
+                if verbose:
+                    click.echo(f"Enabled: App key-provider binding (env {bind_key_env}, Y-3)")
             if requires_os:
                 config.requires_os = requires_os
                 if verbose:

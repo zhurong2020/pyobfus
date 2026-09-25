@@ -197,7 +197,11 @@ as opt-in `pyobfus` build flags (single-file / `--no-cross-file` mode):
 (pattern-driven L3 encryption by original qualname), and `--bind-device` /
 `--bind-device-id <id>` (device-locked L3 encryption). `--expire-warn-days
 <N>` adds an advisory pre-expiry warning to `--expire-hard` that lets the
-artifact keep running while alerting the host. **v0.5.4** extends
+artifact keep running while alerting the host. `--bind-key-env <NAME>` binds
+the L3 key to key material your application supplies (a
+`pyobfus_runtime.set_key_provider` callback or a base64 env var) instead of
+the machine fingerprint, so one artifact runs wherever your own
+authorization system releases the key. **v0.5.4** extends
 `--bind-device` to Runtime String Vault keys too. Previously only the
 Selective Opacity L3 layer was device-locked, so vault secrets decrypted on
 any machine; now each vault key is independently re-derived at runtime from

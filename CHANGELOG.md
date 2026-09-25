@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **`--bind-key-env NAME` (Pro): bind the Selective Opacity L3 key to
+  application-supplied key material instead of the machine fingerprint.**
+  The build reads a base64 32-byte key from environment variable `NAME` and
+  encrypts the L3 ciphertext with it; the generated artifact re-derives the
+  key at import through the new `pyobfus_runtime.provided_key("NAME")`, which
+  takes it from a provider registered via `pyobfus_runtime.set_key_provider`
+  (verify your own auth, fetch a per-machine key from your server, return the
+  bytes) or, failing that, from the same environment variable. The same
+  artifact then runs on any machine the application authorizes, with no
+  per-machine build, and the raw key never ships — only the variable name
+  does. Requires an L3 layer; not combinable with `--vault` (rejected) or
+  `--bind-device`. Contract: `docs/Y3_KEY_PROVIDER_DESIGN.md`.
 - **`--expire-warn-days N` (Pro): a pre-expiry warning that does not stop
   the artifact.** Used with `--expire-hard`, it makes the generated module
   emit a `LicenseExpiryWarning` (a `UserWarning` subclass in
