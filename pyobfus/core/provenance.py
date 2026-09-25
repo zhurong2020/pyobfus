@@ -25,6 +25,12 @@ from typing import Any, Dict, Iterable, List, Optional, Union
 
 from pyobfus import __version__ as PYOBFUS_VERSION
 from pyobfus.config import ObfuscationConfig
+from pyobfus.constants import (
+    RUNTIME_DISTRIBUTION,
+    RUNTIME_IMPORT_NAME,
+    RUNTIME_REQUIREMENT,
+    RUNTIME_REQUIREMENT_SPECIFIER,
+)
 from pyobfus.core.build_marker import marker_enabled, marker_state
 
 PROVENANCE_FORMAT_VERSION = 1
@@ -55,6 +61,33 @@ def config_hash(config: ObfuscationConfig) -> str:
     payload = _normalize(config)
     encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
     return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+
+def runtime_requirement_for(config: ObfuscationConfig) -> Optional[Dict[str, str]]:
+    """Describe the runtime package an artifact built with ``config`` needs.
+
+    Returns None for output that runs on a plain interpreter. Output that went
+    through the Pro fusion passes imports ``pyobfus_runtime`` and needs the
+    separately published ``pyobfus-runtime`` package beside it. The predicate
+    mirrors the CLI's own gate for running those passes (``level == "pro"``
+    and a fusion flag set), so the manifest never claims a requirement the
+    build did not create. Core must not import Pro eagerly, hence the lazy
+    import; when Pro is absent no fusion pass can have run.
+    """
+    if getattr(config, "level", "community") != "pro":
+        return None
+    try:
+        from pyobfus_pro.build_fusion import fusion_enabled  # type: ignore[import]
+    except ImportError:
+        return None
+    if not fusion_enabled(config):
+        return None
+    return {
+        "package": RUNTIME_DISTRIBUTION,
+        "import_name": RUNTIME_IMPORT_NAME,
+        "specifier": RUNTIME_REQUIREMENT_SPECIFIER,
+        "requirement": RUNTIME_REQUIREMENT,
+    }
 
 
 def build_provenance_manifest(
@@ -132,6 +165,15 @@ def build_provenance_manifest(
 
     created_at = datetime.now(timezone.utc).isoformat()
     config_digest = config_hash(config)
+    runtime_requirement = runtime_requirement_for(config)
+    component_properties: List[Dict[str, str]] = [
+        {"name": "pyobfus:config-sha256", "value": config_digest},
+        {"name": "pyobfus:mode", "value": mode},
+    ]
+    if runtime_requirement is not None:
+        component_properties.append(
+            {"name": "pyobfus:runtime-requirement", "value": runtime_requirement["requirement"]}
+        )
     payload: Dict[str, Any] = {
         "version": PROVENANCE_FORMAT_VERSION,
         "pyobfus_version": PYOBFUS_VERSION,
@@ -157,6 +199,11 @@ def build_provenance_manifest(
             edition=config.level,
             emitted=marker_enabled(getattr(config, "community_marker", "auto")),
         ),
+        # Additive since 0.5.29. Names the redistributable runtime package a
+        # Pro artifact must be delivered with, or null when the output runs on
+        # a plain interpreter. Mirrored as a CycloneDX property on the output
+        # component so SBOM tooling sees the same delivery requirement.
+        "runtime_requirement": runtime_requirement,
         "files": file_records,
         "cyclonedx": {
             "bomFormat": "CycloneDX",
@@ -177,10 +224,7 @@ def build_provenance_manifest(
                     "type": "application",
                     "name": "pyobfus-obfuscated-output",
                     "version": "1",
-                    "properties": [
-                        {"name": "pyobfus:config-sha256", "value": config_digest},
-                        {"name": "pyobfus:mode", "value": mode},
-                    ],
+                    "properties": component_properties,
                 },
             },
             "components": components,
@@ -328,6 +372,17 @@ def validate_provenance_manifest(manifest: Dict[str, Any]) -> Dict[str, Any]:
         source_control.get("git_commit"), str
     ):
         errors.append("source_control.git_commit must be a string or null.")
+
+    runtime_requirement = manifest.get("runtime_requirement")
+    if runtime_requirement is not None:
+        if not isinstance(runtime_requirement, dict):
+            errors.append("runtime_requirement must be null or an object.")
+        else:
+            for key in ("package", "import_name", "specifier", "requirement"):
+                if not isinstance(runtime_requirement.get(key), str) or not runtime_requirement.get(
+                    key
+                ):
+                    errors.append(f"runtime_requirement.{key} must be a non-empty string.")
 
     _validate_cyclonedx_section(manifest.get("cyclonedx"), errors, warnings)
 

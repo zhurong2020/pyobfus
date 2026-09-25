@@ -17,13 +17,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   payment, or licence-verification code and needs no licence key to execute an
   artifact. Legacy `pyobfus_pro.runtime` imports remain module aliases for the
   0.5.x compatibility line. `pyobfus-runtime` 0.1.0 is now published through
-  OIDC/PEP 740; the next builder release may declare its compatible runtime
-  requirement. Its custom redistribution licence permits packaging-only
+  OIDC/PEP 740, and `pyobfus` declares `pyobfus-runtime>=0.1,<1` as a
+  dependency: the `pyobfus_pro` package shipped in this wheel re-exports the
+  runtime and cannot import without it, so a build machine must always have
+  it. Its custom redistribution licence permits packaging-only
   transformations while keeping functional modification and build-time
   obfuscation-service use prohibited.
 
+- **Provenance manifests name the runtime a Pro artifact must ship with.**
+  `--provenance-manifest` output gains an additive `runtime_requirement`
+  object (`package`, `import_name`, `specifier`, `requirement`) and a matching
+  `pyobfus:runtime-requirement` property on the CycloneDX output component
+  whenever the build ran a fusion pass. It is `null` for output that runs on a
+  plain interpreter, and manifests written before the field existed still
+  validate.
+
 ### Fixed
 
+- **A broken Pro import is explained instead of looking like a missing
+  licence.** `pyobfus_pro` ships inside the `pyobfus` wheel, so when it fails
+  to import (typically because `pyobfus-runtime` was left out by
+  `pip install --no-deps`) the Pro gates now say so and print the install
+  command, rather than telling a licensed customer to start a trial.
 - **Pro marker imports no longer leak into generated deliverables.** Once
   `opacity`, `Layer`, `seal_code`, or `vault_secrets` markers are consumed,
   their build-only `pyobfus_pro` imports are removed while unrelated imports

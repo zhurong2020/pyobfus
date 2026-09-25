@@ -18,6 +18,9 @@ from pyobfus.config import ObfuscationConfig
 from pyobfus.constants import (
     GITHUB_REPO,
     PRO_PRICE_USD,
+    RUNTIME_DISTRIBUTION,
+    RUNTIME_IMPORT_NAME,
+    RUNTIME_REQUIREMENT,
     STRIPE_PAYMENT_LINK,
     TRACE_MARKER_PREFIX,
 )
@@ -34,20 +37,51 @@ from pyobfus.transformers.name_mangler import NameMangler
 from pyobfus.utils import filter_python_files
 from pyobfus.trial import is_trial_active, get_trial_expiry_message
 
-# Check if Pro edition is available
+# Check if Pro edition is available. pyobfus_pro ships inside this very wheel,
+# so an ImportError here is a broken environment rather than a missing
+# edition; keep the exception so the Pro gates below can say why instead of
+# letting a licensed install look like Community.
+PRO_IMPORT_ERROR: Optional[ImportError] = None
 try:
     import pyobfus_pro  # type: ignore[import]
 
     PRO_AVAILABLE = True
-except ImportError:
+except ImportError as _pro_import_exc:
     pyobfus_pro = None  # type: ignore[assignment]
     PRO_AVAILABLE = False
+    PRO_IMPORT_ERROR = _pro_import_exc
 
 # v0.5.1 build-fusion helper (orchestrates the patent-targeted Pro source passes)
 try:
     from pyobfus_pro import build_fusion as _build_fusion  # type: ignore[import]
 except ImportError:
     _build_fusion = None  # type: ignore[assignment]
+
+
+def _pro_import_hint() -> Optional[str]:
+    """Explain why the bundled Pro edition failed to import, or None.
+
+    The one cause worth naming is a missing ``pyobfus_runtime``: pyobfus
+    declares it as a dependency, so it is only absent after ``--no-deps`` or a
+    hand-edited environment, and a Pro customer hitting this wall would
+    otherwise be told they merely lack a licence.
+    """
+    if PRO_AVAILABLE or PRO_IMPORT_ERROR is None:
+        return None
+    missing = getattr(PRO_IMPORT_ERROR, "name", None) or ""
+    if missing.split(".")[0] == RUNTIME_IMPORT_NAME:
+        return (
+            "Note: the Pro edition is installed but could not be imported because the "
+            f"'{RUNTIME_DISTRIBUTION}' package is missing. It is a declared dependency of "
+            f'pyobfus; run: pip install "{RUNTIME_REQUIREMENT}"'
+        )
+    return f"Note: the Pro edition is installed but could not be imported: {PRO_IMPORT_ERROR}"
+
+
+def _echo_pro_import_hint() -> None:
+    hint = _pro_import_hint()
+    if hint:
+        click.echo(f"\n{hint}", err=True)
 
 
 @click.command()
@@ -643,6 +677,7 @@ def main(
                         f"Error: The '{preset}' preset requires Pro edition or active trial.",
                         err=True,
                     )
+                    _echo_pro_import_hint()
                     click.echo("\nStart a free 5-day trial:", err=True)
                     click.echo("  pyobfus-trial start", err=True)
                     click.echo(
@@ -734,6 +769,7 @@ def main(
                         "Error: Pro edition features require a license or active trial.",
                         err=True,
                     )
+                    _echo_pro_import_hint()
                     click.echo(
                         "\nStart a free 5-day trial (no registration required):",
                         err=True,
@@ -814,6 +850,7 @@ def main(
                     "Error: Pro features require a license or active trial.",
                     err=True,
                 )
+                _echo_pro_import_hint()
                 click.echo(
                     "\nStart a free 5-day trial (no registration required):",
                     err=True,

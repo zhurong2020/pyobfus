@@ -51,6 +51,12 @@ dependencies = [
     "click>=8.0",
     "pyyaml>=5.4",
     "cryptography>=42.0",  # AES-256-GCM / RSA-OAEP / PBKDF2 for Pro features + license management
+    # Artifacts built by the Pro fusion passes import pyobfus_runtime, and the
+    # pyobfus_pro package shipped in this same wheel re-exports it. Without this
+    # line a licensed Pro install could not import pyobfus_pro and would silently
+    # run as Community. Keep in sync with pyobfus.constants.RUNTIME_REQUIREMENT
+    # (docs/Y1_RUNTIME_DISTRIBUTION_DESIGN.md, "Versioning").
+    "pyobfus-runtime>=0.1,<1",
     'tomli>=2.0; python_version<"3.11"',  # opacity-config TOML parser (tomllib is stdlib on 3.11+)
 ]
 

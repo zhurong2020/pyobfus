@@ -74,3 +74,18 @@ TRIAL_API_URL = "https://pyobfus-license-server.zhurong0525.workers.dev/api/tria
 #     "MONEY_BACK_DAYS/TRIAL_DAYS constants -- TS can't import this module directly)",
 # ]
 # =============================================================================
+
+# =============================================================================
+# REDISTRIBUTABLE PRO RUNTIME
+# =============================================================================
+# Artifacts produced by the Pro fusion passes import ``pyobfus_runtime``, a
+# separately published, redistributable package. pyproject.toml declares the
+# exact requirement below so a build machine always has it (the pyobfus_pro
+# package shipped in this wheel re-exports it and cannot import without it);
+# a target machine installs only the runtime beside the artifact.
+# Keep these values and the pyproject.toml dependency line in sync --
+# tests/test_runtime_requirement.py asserts it.
+RUNTIME_DISTRIBUTION = "pyobfus-runtime"
+RUNTIME_IMPORT_NAME = "pyobfus_runtime"
+RUNTIME_REQUIREMENT_SPECIFIER = ">=0.1,<1"
+RUNTIME_REQUIREMENT = RUNTIME_DISTRIBUTION + RUNTIME_REQUIREMENT_SPECIFIER
