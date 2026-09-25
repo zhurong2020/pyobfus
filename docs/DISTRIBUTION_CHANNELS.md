@@ -650,8 +650,12 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   empty view.
 - **Action taken (2026-09-24): escalation email sent** by the maintainer to `support@anthropic.com` (the form error
   offered no dedicated contact), stating the form error text, both workspaces empty, earlier submission ~2026-08-02,
-  account `zhurong0525@gmail.com`, and requesting the stale lock be released. **Now waiting on the directory team;
-  do not retry the form until the lock is released.**
+  account `zhurong0525@gmail.com`, and requesting the stale lock be released.
+- **2026-09-25: Fin AI (Intercom) auto-replied** that it only knows Claude Code *worktree* locks, not plugin-directory
+  submission locks, and that a **human agent** must investigate and release the lock; it offered to connect one. The
+  maintainer **replied "yes"** and restated the request. **Now waiting on a human directory-team agent to release the
+  lock; do not retry the form until it is released.** When it is, resubmit with the fields in
+  `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`.
 - 2026-09-22 maintainer check: Console showed `Plugin submissions · No submissions yet` (now understood as the
   hidden-record symptom above, not a released record).
   Public catalog `anthropics/claude-plugins-community/.claude-plugin/marketplace.json` (2,320 entries, fetched raw) has no

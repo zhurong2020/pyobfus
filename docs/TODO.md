@@ -37,9 +37,10 @@ Core `0.5.28` 是当前公开版本，运营复查见 `CURRENT_PLAN_ZH.md`）。
       「Another submission already holds this repository and path」，但两个工作区 submissions 页都 `No submissions yet`。
       2026-08-02 旧提交没消失，而是留了个自己撤不掉的**孤儿仓库锁**。**别再反复点提交表单**（同一个锁挡）；
       走 contact the directory team 请求释放锁,说明:表单报错原文 + 两工作区皆空 + 旧提交约 2026-08-02 +
-      账号 `zhurong0525@gmail.com`。**2026-09-24 升级邮件已由维护者手动发出**(收件人
-      `support@anthropic.com`,报错未提供专用联系入口)——**现等 directory team 回复释放锁,再重提**;
-      收到回执/工单号后记回。字段/描述文案见 `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`。
+      账号 `zhurong0525@gmail.com`。**2026-09-24 升级邮件已发**(`support@anthropic.com`);**2026-09-25 Fin AI
+      自动回信称只懂 Claude Code worktree 锁、需真人释放提交锁并主动提出转人工,维护者已回「yes」转人工**。
+      **现等真人 agent 释放锁再重提**(锁没释放前别再点表单)。字段/描述见
+      `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`。
 - [ ] **MCP Trust Registry publish**：在其站点注册拿 API token 后
       `MCPTRUSTCHECKER_TOKEN=… npx --yes mcptrustchecker@1.14.0 publish pyobfus-mcp --registry pypi --online --category developer-tools`
       （wheel 已扫 A · 94/100，09-23 已用 CLI help 核对参数；不要把 token 写进 shell history、仓库或聊天）。
