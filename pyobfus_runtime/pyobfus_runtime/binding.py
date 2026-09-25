@@ -43,6 +43,7 @@ import hashlib
 import os
 import platform
 import shutil
+import warnings
 from typing import cast
 import tempfile
 from pathlib import Path
@@ -72,6 +73,19 @@ class LicenseExpired(RuntimeError):
     abort module import cleanly. Surfaces in the application's normal
     exception path so customers see a meaningful error rather than a
     cryptic decryption failure.
+    """
+
+
+class LicenseExpiryWarning(UserWarning):
+    """Warned (not raised) when an artifact is within its pre-expiry window.
+
+    Emitted by :func:`expire_check` when ``warn_days`` is set and the
+    expiry date is near but not yet passed. It is a :class:`UserWarning`
+    subclass so the host application decides how to surface it: shown on
+    stderr by default, or captured/filtered/routed to logging via the
+    standard :mod:`warnings` machinery (``logging.captureWarnings``, a
+    ``warnings.simplefilter`` entry, etc.). The artifact keeps running;
+    only :class:`LicenseExpired` stops it.
     """
 
 
@@ -237,7 +251,12 @@ def bind_device_key(
 # ---------------------------------------------------------------------------
 
 
-def expire_check(expire_iso: str, *, now: _datetime.date | None = None) -> None:
+def expire_check(
+    expire_iso: str,
+    *,
+    now: _datetime.date | None = None,
+    warn_days: int | None = None,
+) -> None:
     """Raise :class:`LicenseExpired` if the current date is past ``expire_iso``.
 
     Args:
@@ -245,6 +264,10 @@ def expire_check(expire_iso: str, *, now: _datetime.date | None = None) -> None:
             Parsed via :meth:`datetime.date.fromisoformat`.
         now: Override for the "current date" — testing aid; production
             calls leave this ``None`` and use :meth:`datetime.date.today`.
+        warn_days: When set, emit a :class:`LicenseExpiryWarning` (not an
+            error) if the artifact is within this many days of expiry and
+            not yet expired. ``None`` (default) emits no warning. The
+            artifact keeps running either way; the warning is advisory.
 
     The check is *date-only* (not datetime); a user on UTC+8 and a user
     on UTC-8 see the same expiry behavior on the boundary day. For
@@ -269,6 +292,18 @@ def expire_check(expire_iso: str, *, now: _datetime.date | None = None) -> None:
     today = now if now is not None else _datetime.date.today()
     if not isinstance(today, _datetime.date):
         raise LicenseBindingError(f"now must be a datetime.date, got {type(today).__name__}")
+
+    if warn_days is not None:
+        if not isinstance(warn_days, int) or isinstance(warn_days, bool) or warn_days < 0:
+            raise LicenseBindingError(f"warn_days must be a non-negative int, got {warn_days!r}")
+        days_left = (expire_date - today).days
+        if 0 <= days_left <= warn_days:
+            warnings.warn(
+                f"license expires on {expire_date.isoformat()} "
+                f"({days_left} day(s) from {today.isoformat()})",
+                LicenseExpiryWarning,
+                stacklevel=2,
+            )
 
     if today > expire_date:
         raise LicenseExpired(

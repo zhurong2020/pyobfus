@@ -7,8 +7,10 @@ name-mangling and runs correctly — the combined pipeline the 2026-06-18 probe
 proved out (vault PRE-pass, opacity/seal/scrub POST-pass).
 """
 
+import datetime
 import importlib.util
 import sys
+import warnings
 
 import pytest
 from click.testing import CliRunner
@@ -639,3 +641,58 @@ class TestFusionGating:
             res = runner.invoke(main, [str(marked_file), "-o", str(out), "--vault"])
         assert res.exit_code == 1
         assert "Pro features require a license or active trial" in res.output
+
+
+class TestExpireWarnDays:
+    """Y-2: --expire-warn-days emits warn_days into the injected expire check."""
+
+    def test_warn_days_injected_into_expire_call(self, runner, marked_file, tmp_path):
+        out = tmp_path / "o.py"
+        res = _invoke(
+            runner, marked_file, out, "--expire-hard", "2099-01-01", "--expire-warn-days", "30"
+        )
+        assert res.exit_code == 0, res.output
+        text = out.read_text()
+        assert "_pyobfus_expire_check('2099-01-01', warn_days=30)" in text
+        assert _compiles(out)
+
+    def test_expire_hard_alone_has_no_warn_days(self, runner, marked_file, tmp_path):
+        out = tmp_path / "o.py"
+        res = _invoke(runner, marked_file, out, "--expire-hard", "2099-01-01")
+        assert res.exit_code == 0, res.output
+        text = out.read_text()
+        assert "_pyobfus_expire_check('2099-01-01')" in text
+        assert "warn_days" not in text
+
+    def test_warn_days_requires_expire_hard(self, runner, marked_file, tmp_path):
+        out = tmp_path / "o.py"
+        res = _invoke(runner, marked_file, out, "--expire-warn-days", "30")
+        assert res.exit_code == 1
+        assert "requires --expire-hard" in res.output
+
+    def test_negative_warn_days_rejected(self, runner, marked_file, tmp_path):
+        out = tmp_path / "o.py"
+        res = _invoke(
+            runner, marked_file, out, "--expire-hard", "2099-01-01", "--expire-warn-days", "-3"
+        )
+        assert res.exit_code == 1
+        assert "--expire-warn-days must be >= 0" in res.output
+
+    def test_obfuscated_module_warns_but_still_loads(self, runner, marked_file, tmp_path):
+        # End-to-end: a build whose expiry is a few days out should exec, emit
+        # the runtime warning, and keep working (compute() still callable).
+        near = (datetime.date.today() + datetime.timedelta(days=5)).isoformat()
+        out = tmp_path / "o.py"
+        res = _invoke(runner, marked_file, out, "--expire-hard", near, "--expire-warn-days", "30")
+        assert res.exit_code == 0, res.output
+        from pyobfus_runtime import LicenseExpiryWarning
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            # exec succeeding is itself the proof the expiry guard did not
+            # raise: a hard-expired build would raise LicenseExpired here.
+            m = _load_module(out, "expire_warn_e2e")
+        assert m is not None
+        assert any(isinstance(w.message, LicenseExpiryWarning) for w in caught), [
+            str(w.message) for w in caught
+        ]

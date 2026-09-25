@@ -74,6 +74,9 @@ _FIELD_DESCRIPTIONS: Dict[str, str] = {
     "AES-256-GCM hybrid); reverse with pyobfus-unscrub (Pro).",
     "fingerprint": "Per-buyer deterministic forensic watermark key (buyer " "id) (Pro).",
     "expire_hard": "Module-top hard expiration check (ISO date) baked " "into the build (Pro).",
+    "expire_warn_days": "Warn (not fail) within N days of expire_hard; "
+    "the artifact keeps running and emits a LicenseExpiryWarning. Requires "
+    "expire_hard (Pro).",
     "period_max_runs": "Module-top run-counter limit baked into the " "build (Pro).",
     "opacity_config": "Path to an opacity.toml pattern-driven " "layer-assignment file (Pro).",
     "bind_device": "Derive Selective Opacity + Vault keys from the bound "
@@ -119,6 +122,7 @@ _PRO_ONLY_FIELDS = {
     "scrub_traceback",
     "fingerprint",
     "expire_hard",
+    "expire_warn_days",
     "period_max_runs",
     "opacity_config",
     "bind_device",

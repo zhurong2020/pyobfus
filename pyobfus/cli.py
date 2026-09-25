@@ -255,6 +255,12 @@ def _echo_pro_import_hint() -> None:
     help="Module-top crypto-bound expiry check, ISO date (Pro, v0.5.1; distinct from --expire)",
 )
 @click.option(
+    "--expire-warn-days",
+    type=int,
+    default=None,
+    help="Warn (not fail) within N days of --expire-hard; requires --expire-hard (Pro)",
+)
+@click.option(
     "--period",
     type=int,
     default=0,
@@ -494,6 +500,7 @@ def main(
     scrub_traceback: bool,
     fingerprint: Optional[str],
     expire_hard: Optional[str],
+    expire_warn_days: Optional[int],
     period: int,
     opacity_config: Optional[str],
     bind_device: bool,
@@ -543,6 +550,15 @@ def main(
     if sarif_path is not None and not check_mode:
         click.echo("Error: --sarif is only valid with --check.", err=True)
         sys.exit(1)
+
+    # --expire-warn-days is advisory-only and needs a date to count down to.
+    if expire_warn_days is not None:
+        if expire_warn_days < 0:
+            click.echo("Error: --expire-warn-days must be >= 0.", err=True)
+            sys.exit(1)
+        if not expire_hard:
+            click.echo("Error: --expire-warn-days requires --expire-hard.", err=True)
+            sys.exit(1)
 
     # Handle --check: pre-flight risk scan (no output files)
     if check_mode:
@@ -927,6 +943,10 @@ def main(
                 config.expire_hard = expire_hard
                 if verbose:
                     click.echo(f"Enabled: Hard expiry check ({expire_hard})")
+            if expire_warn_days is not None:
+                config.expire_warn_days = expire_warn_days
+                if verbose:
+                    click.echo(f"Enabled: Pre-expiry warning ({expire_warn_days} day(s) before)")
             if period > 0:
                 config.period_max_runs = period
                 if verbose:

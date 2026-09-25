@@ -195,7 +195,9 @@ as opt-in `pyobfus` build flags (single-file / `--no-cross-file` mode):
 `--fingerprint <buyer-id>`, `--expire-hard <date>`. **v0.5.3** adds
 `--period <N>` (run-counter limit), `--opacity-config <opacity.toml>`
 (pattern-driven L3 encryption by original qualname), and `--bind-device` /
-`--bind-device-id <id>` (device-locked L3 encryption). **v0.5.4** extends
+`--bind-device-id <id>` (device-locked L3 encryption). `--expire-warn-days
+<N>` adds an advisory pre-expiry warning to `--expire-hard` that lets the
+artifact keep running while alerting the host. **v0.5.4** extends
 `--bind-device` to Runtime String Vault keys too. Previously only the
 Selective Opacity L3 layer was device-locked, so vault secrets decrypted on
 any machine; now each vault key is independently re-derived at runtime from

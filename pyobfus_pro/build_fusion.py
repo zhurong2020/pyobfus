@@ -477,7 +477,7 @@ def apply_post_passes(
 
     expire = getattr(config, "expire_hard", None)
     if expire:
-        source = _inject_expire_check(source, expire)
+        source = _inject_expire_check(source, expire, getattr(config, "expire_warn_days", None))
 
     period = getattr(config, "period_max_runs", None)
     if period:
@@ -545,19 +545,27 @@ def _strip_consumed_pro_markers(source: str, marker_names: set[str]) -> str:
     return ast.unparse(tree)
 
 
-def _inject_expire_check(source: str, expire_iso: str) -> str:
+def _inject_expire_check(source: str, expire_iso: str, warn_days: Optional[int] = None) -> str:
     """Inject a module-top ``expire_check("<iso>")`` (P2-8 expiry subset).
 
     Refuses to import past the date; raises ``LicenseExpired`` from
-    ``pyobfus_pro.license_binding``. Idempotent on a marker comment.
+    ``pyobfus_runtime``. When ``warn_days`` is set, the emitted call also
+    passes ``warn_days=N`` so the runtime emits a ``LicenseExpiryWarning``
+    within N days of expiry without stopping the artifact. Idempotent on a
+    marker comment.
     """
     marker = "# pyobfus:expire"
     if marker in source:
         return source
+    call = (
+        f"_pyobfus_expire_check({expire_iso!r}, warn_days={int(warn_days)})"
+        if warn_days is not None
+        else f"_pyobfus_expire_check({expire_iso!r})"
+    )
     header = (
         f"{marker}\n"
         "from pyobfus_runtime import expire_check as _pyobfus_expire_check\n"
-        f"_pyobfus_expire_check({expire_iso!r})\n"
+        f"{call}\n"
     )
     # Place after a leading shebang / encoding cookie / module docstring block
     # is unnecessary here: expire must run at import, and a plain module-top

@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`--expire-warn-days N` (Pro): a pre-expiry warning that does not stop
+  the artifact.** Used with `--expire-hard`, it makes the generated module
+  emit a `LicenseExpiryWarning` (a `UserWarning` subclass in
+  `pyobfus-runtime`) when it runs within N days of the expiry date, while
+  still running. The host application decides how to surface it through the
+  standard `warnings` machinery (shown on stderr by default, or captured via
+  `logging.captureWarnings` / a `warnings` filter). It requires
+  `--expire-hard`; the runtime `expire_check` gains a backward-compatible
+  keyword-only `warn_days`, so artifacts built before this release are
+  unaffected.
+
 ## [0.5.29] - 2026-09-24
 
 ### Added

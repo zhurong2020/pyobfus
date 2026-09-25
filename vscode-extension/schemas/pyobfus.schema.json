@@ -180,6 +180,13 @@
           ],
           "description": "Module-top hard expiration check (ISO date) baked into the build (Pro). Requires level: pro."
         },
+        "expire_warn_days": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "description": "Warn (not fail) within N days of expire_hard; the artifact keeps running and emits a LicenseExpiryWarning. Requires expire_hard (Pro). Requires level: pro."
+        },
         "period_max_runs": {
           "type": [
             "integer",

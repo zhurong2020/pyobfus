@@ -5,6 +5,7 @@ from importlib.metadata import PackageNotFoundError, version
 from .binding import (
     LicenseBindingError,
     LicenseExpired,
+    LicenseExpiryWarning,
     bind_device_key,
     current_machine_id,
     default_counter_path,
@@ -34,6 +35,7 @@ __all__ = [
     "IntegrityError",
     "LicenseBindingError",
     "LicenseExpired",
+    "LicenseExpiryWarning",
     "OpacityRuntimeError",
     "RuntimePolicyError",
     "ScrubError",

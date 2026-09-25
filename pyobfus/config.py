@@ -98,6 +98,7 @@ class ObfuscationConfig:
     scrub_traceback: bool = False  # P2-10: encrypt production tracebacks
     fingerprint: Optional[str] = None  # P2-7: per-buyer deterministic L3 key (buyer id)
     expire_hard: Optional[str] = None  # P2-8 (subset): module-top expire_check(ISO date)
+    expire_warn_days: Optional[int] = None  # Y-2: warn (not fail) within N days of expire_hard
     period_max_runs: Optional[int] = None  # P2-8 (subset): module-top run-counter limit (v0.5.3)
     opacity_config: Optional[str] = (
         None  # P2-1: opacity.toml path -> pattern-driven layers (v0.5.3)
