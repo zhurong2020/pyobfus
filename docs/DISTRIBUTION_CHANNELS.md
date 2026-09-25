@@ -638,13 +638,26 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 - Full evidence and the exact recheck sequence:
   [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-### Claude Plugin Marketplace 🔴 RESUBMIT NEEDED (2026-09-22)
-- 2026-09-22 maintainer check: Console now shows `Plugin submissions · No submissions yet`; the Aug 2 record is gone.
+### Claude Plugin Marketplace 🔴 BLOCKED — stale repository lock (2026-09-24)
+- **2026-09-24 resubmission attempt: the Console form rejects it with "Another submission already holds this
+  repository and path" for `github.com/zhurong2020/pyobfus` (repository root).** Yet the maintainer's
+  `platform.claude.com/plugins/submissions` shows `No submissions yet` in *both* workspaces on the account
+  (Default and Claude Code). So the Aug 2 submission did **not** vanish as 2026-09-22 assumed — it left a stale
+  repository+path lock that no longer appears in any submissions view the owner can reach, and self-withdraw is
+  therefore impossible.
+- **Correction to the 2026-09-22 note below:** "No submissions yet" meant the record was hidden, not released;
+  do not read an empty submissions page as "never submitted / safe to submit fresh". The lock survives the
+  empty view.
+- **Action (maintainer): escalate to the directory team** to release the stale lock, then resubmit. Message drafted
+  in the session log; key facts to include: form error text, both workspaces empty, earlier submission ~2026-08-02,
+  account `zhurong0525@gmail.com`. Do not keep retrying the form — it will keep hitting the same lock.
+- 2026-09-22 maintainer check: Console showed `Plugin submissions · No submissions yet` (now understood as the
+  hidden-record symptom above, not a released record).
   Public catalog `anthropics/claude-plugins-community/.claude-plugin/marketplace.json` (2,320 entries, fetched raw) has no
-  `pyobfus`, and `gh search code pyobfus --owner anthropics` is empty, so it was never approved.
+  `pyobfus`, and `gh search code pyobfus --owner anthropics` is empty, so it was never approved into the public catalog.
 - Official docs (<https://code.claude.com/docs/en/plugins#submit-your-plugin-to-the-community-marketplace>) now route
   individual authors to the Console form <https://platform.claude.com/plugins/submit>; approved plugins are pinned to a
-  commit SHA and synced nightly. The old submission most likely lapsed when the pipeline was rebuilt.
+  commit SHA and synced nightly.
 - Verified locally the same day: `claude plugin validate .` passes; installing from this checkout as a local marketplace
   succeeds (`pyobfus@pyobfus`, 2 skills, ~396 always-on tokens), then uninstalled.
 - Action: maintainer resubmits via the Console form. Copy (typo fixed) in `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`.

@@ -33,8 +33,11 @@ Core `0.5.28` 是当前公开版本，运营复查见 `CURRENT_PLAN_ZH.md`）。
 
 按顺手程度排，每项的细节都在本文件后面对应小节或所指文件里，这里只是一处能勾掉的总表。
 
-- [ ] **Claude plugin 重新提交**：<https://platform.claude.com/plugins/submit>，文案与字段
-      `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`（旧记录已消失、公开目录从未收录，见「外部等待」）。
+- [ ] **Claude plugin — 联系 directory team 解锁后再重提**（2026-09-24 更正）：Console 重提被拒
+      「Another submission already holds this repository and path」，但两个工作区 submissions 页都 `No submissions yet`。
+      2026-08-02 旧提交没消失，而是留了个自己撤不掉的**孤儿仓库锁**。**别再反复点提交表单**（同一个锁挡）；
+      走 contact the directory team 请求释放锁,说明:表单报错原文 + 两工作区皆空 + 旧提交约 2026-08-02 +
+      账号 `zhurong0525@gmail.com`。字段/描述文案仍见 `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`。
 - [ ] **MCP Trust Registry publish**：在其站点注册拿 API token 后
       `MCPTRUSTCHECKER_TOKEN=… npx --yes mcptrustchecker@1.14.0 publish pyobfus-mcp --registry pypi --online --category developer-tools`
       （wheel 已扫 A · 94/100，09-23 已用 CLI help 核对参数；不要把 token 写进 shell history、仓库或聊天）。
