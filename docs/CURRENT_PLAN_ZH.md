@@ -1,5 +1,20 @@
 # pyobfus 当前计划
 
+**2026-09-25 续作进度**：`0.5.29` 已发布并完全收尾——runtime import 切换 + builder 声明
+`pyobfus-runtime>=0.1,<1` + provenance `runtime_requirement` + Pro 导入失败提示；PyPI latest、
+两个 PEP 740 endpoint、全新环境安装带入 runtime、GitHub Release 均核实；Zenodo webhook 在 Release
+时投递（GitHub 侧 202 已接受）但约 2.5 小时才归档为 record `22949529`，`CITATION.cff` 已更新为
+0.5.29 / 2026-09-25（doi 保留 concept DOI）。随后按用户「先做后攒够再发」编码两批并 held 在
+`[Unreleased]`：**Y-2 `--expire-warn-days`**（到期前告警不停机，16 测试）与 **Y-3 `--bind-key-env`**
+（L3 密钥改由应用提供，一次构建跑任意授权机器；v1 仅 L3，配 `--vault` 报错、与 `--bind-device` 互斥；
+19 测试 + `docs/Y3_KEY_PROVIDER_DESIGN.md`）；真实下游 Pro 缺口 Y-1/Y-2/Y-3 至此全清零。再落
+**self-dogfooding 四 lane**（`dogfood/canary/` + `scripts/dogfood/run.py` + 非阻塞 `Dogfood` workflow，
+观察模式、非必需检查，首次 CI success）。外部：awesome-python PR #3352 被拒（采用量，含镜像口径）→
+文档更正、安全类 list 跳过；Vercel 卸载 + giscus 核实保留；`pyobfus-pro-dev` 私有仓归档；Claude plugin
+孤儿仓库锁已转人工（Fin AI → 回 yes → 等真人释放锁，锁没释放别点表单）。用户 09-25 决定**等 1–2 天
+再发版**（建议合为 `0.5.30` Pro 小版本，dogfooding 不单独发；发版是独立 gate 须明确批准）。逐轮教训
+见 memory `pyobfus-session-closeout-2026-09-25`。
+
 **2026-09-24 续作进度**：已确认 `spike/mcp-sdk-2x` 领先 `main` 0 个提交且为其祖先，
 随后用安全删除移除本地分支并删除 `origin/spike/mcp-sdk-2x`。同时修正 `TODO.md` 的两处
 状态漂移：公开 Core 已是 `0.5.28`，服务端邮箱 trial 也已部署、实现并随 0.5.28 发布，
