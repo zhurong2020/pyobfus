@@ -33,6 +33,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - **09-25 下午 P0（用户列，当日完成）**：trial 服务端上线 5 天登记 0；KV 每日备份脚本此前不认
   `trial:*` 记录（第一条会让许可备份静默停止）→ 已按类型校验 + 自检 + 挪进日备份随 systemd 补跑，
   09-24/25 漏导已补。脚本在 `~/scripts/`（仓库外）。详见 `docs/CURRENT_PLAN_ZH.md` 09-25 下午段。
+- **节奏改了（09-25 用户定 · 0.5.30 发版后生效，先测一轮）**：静默 4 周（10-25 前不发 Core）→ 每月一版
+  → 只做有触发的事 → 每周一巡检；全文 `docs/TODO.md`「节奏」段。**查进度固定动作：进度 + 下载量
+  （`python scripts/download_snapshot.py`）+ Gmail（`/pyobfus-inbox`），三样一起给**，缺一样不算查过。
 - 「当前状态一句话」：`0.5.29` 是最新 Core；`[Unreleased]` 有 Y-2+Y-3 待发。逐轮细节见
   `docs/CURRENT_PLAN_ZH.md` 09-25 段 + memory `pyobfus_session_closeout_2026-09-25`。
 

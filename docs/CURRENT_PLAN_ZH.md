@@ -34,6 +34,16 @@ wrangler 是 Windows 二进制跑不起来，合成记录自检已覆盖校验�
 随日备份进 OneDrive），memory `reference_pyobfus_kv_backup` 同步更正「日备份不在 user systemd timer」
 这条过期判断。
 
+**同日节奏决定（用户同意，0.5.30 后生效）**：三周实测（9 月 10 次 Core 发版、最长间隔 4 天；
+发布日 120–225、非发布日中位数 31、地板未动）否掉了 09-12 的「持续发版吸流量」；改为 0.5.30 后
+静默 4 周 → 每月一个小版本 → 只做有触发的事 → 每周一巡检，10-25 复盘，全文 `TODO.md`「节奏」段。
+配套落了 `scripts/download_snapshot.py`（pypistats 三包无镜像日序列 + git tag 标发布日 + 安静日中位数
++ Marketplace / Open VSX / Action 归因，无凭证）。**用户新规则**：以后每次查进度，一并给下载量与
+Gmail 相关邮件。首跑读数（数据到 09-24）：Core 安静日中位数 30d=31；MCP 7d 安静日 4–9；runtime 09-23/24
+为 76/36，高于 Core 本身，因为每个装 wheel 的 CI job 都从 PyPI 解析它（09-22..24 三天约 60 次
+workflow run），这个包的下载数不代表用户；Marketplace 9 installs（09-12 为 7）；Open VSX 574；
+引用 pyobfus-action 的可见仓库 0。
+
 **2026-09-24 续作进度**：已确认 `spike/mcp-sdk-2x` 领先 `main` 0 个提交且为其祖先，
 随后用安全删除移除本地分支并删除 `origin/spike/mcp-sdk-2x`。同时修正 `TODO.md` 的两处
 状态漂移：公开 Core 已是 `0.5.28`，服务端邮箱 trial 也已部署、实现并随 0.5.28 发布，
