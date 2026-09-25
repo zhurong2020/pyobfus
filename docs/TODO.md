@@ -251,15 +251,15 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
 - **giscus — 保留**，用于旧博客的评论（基于 GitHub Discussions）。pyobfus 仓库内无
   任何引用。
 
-仍待办：
+已收口（2026-09-24，维护者在 <https://github.com/settings/installations> 操作）：
 
-- [ ] **确认 Vercel 是否还需要装着**。若这两个仓库都不由它部署，卸载最干净；留着也
-  **不要批那个权限升级**。当前已授予的权限集无法用 `gh` 枚举（需 GitHub App 自身的
-  token），只能在 <https://github.com/settings/installations> 页面看。
-- [ ] **确认 giscus 的仓库范围只含博客仓库**，不含 pyobfus。同上，需页面查看。
-- [ ] **不要导入 Vercel 提示的那个 "docs" 项目**。它检测到的是 `docs/_config.yml`，
-  该文件已于 2026-09-13 随落地页拆分删除；导入会让同一份 `docs/` 长出第三个公开
-  站点，正是刚消掉的重复内容问题。
+- [x] **Vercel — 已卸载**。它不部署 pyobfus 的任何面（文档在 RTD、落地页在 Pages、
+  `pyobfus-action` 是 Action 仓），对本仓库只有 `contents: write` 风险没有用途，直接卸载。
+- [x] **giscus — 已核实干净，保留**。权限仅 Read metadata + Read/write discussions（**无 code/
+  contents 写权限**，碰不到 `release.yml`/PyPI）；Repository access 为 Only select，精确 1 个
+  `zhurong2020/workshop`（博客仓），不含 pyobfus / pyobfus-action。
+- 备忘（Vercel 已卸载后此项变为 moot，保留提醒）：**不要导入那个 "docs" 项目**——它认的是已删的
+  `docs/_config.yml`，导入会多长一个重复文档站。
 
 ## Zenodo webhook token —— 决定「只验证不轮换」
 
