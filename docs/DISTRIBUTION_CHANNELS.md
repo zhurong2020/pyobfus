@@ -648,9 +648,10 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 - **Correction to the 2026-09-22 note below:** "No submissions yet" meant the record was hidden, not released;
   do not read an empty submissions page as "never submitted / safe to submit fresh". The lock survives the
   empty view.
-- **Action (maintainer): escalate to the directory team** to release the stale lock, then resubmit. Message drafted
-  in the session log; key facts to include: form error text, both workspaces empty, earlier submission ~2026-08-02,
-  account `zhurong0525@gmail.com`. Do not keep retrying the form — it will keep hitting the same lock.
+- **Action taken (2026-09-24): escalation email sent** by the maintainer to `support@anthropic.com` (the form error
+  offered no dedicated contact), stating the form error text, both workspaces empty, earlier submission ~2026-08-02,
+  account `zhurong0525@gmail.com`, and requesting the stale lock be released. **Now waiting on the directory team;
+  do not retry the form until the lock is released.**
 - 2026-09-22 maintainer check: Console showed `Plugin submissions · No submissions yet` (now understood as the
   hidden-record symptom above, not a released record).
   Public catalog `anthropics/claude-plugins-community/.claude-plugin/marketplace.json` (2,320 entries, fetched raw) has no
