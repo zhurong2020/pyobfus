@@ -33,6 +33,11 @@ The top-level manifest keeps pyobfus's native provenance contract:
   inside a Git repository; otherwise `null`.
 - `mapping.path` and `mapping.sha256`: mapping file location and digest when
   `--save-mapping` is used.
+- `runtime_requirement`: additive since 0.5.29. Names the redistributable
+  runtime package a Pro artifact must be delivered with (`package`,
+  `import_name`, `specifier`, `requirement`), or `null` when the output runs on
+  a plain interpreter. It is set only when the build ran a Pro fusion pass,
+  the same gate the CLI uses to run those passes.
 - `files[]`: per-file source/output paths, relative path, input SHA-256, and
   output SHA-256 when the file is present.
 - `integrity`: a canonical JSON self-consistency digest for the manifest.
@@ -45,7 +50,9 @@ The manifest also embeds a `cyclonedx` object:
 - `specVersion: "1.7"` (see below for 1.6 compatibility)
 - `metadata.tools.components[]`: the pyobfus tool component.
 - `metadata.component`: the obfuscated output artifact, including pyobfus
-  properties for config hash and mode.
+  properties for config hash and mode and, when `runtime_requirement` is set,
+  a `pyobfus:runtime-requirement` property carrying the same requirement
+  string.
 - `components[]`: file components for source inputs, obfuscated outputs, and
   the debug mapping file when present.
 - `dependencies[]`: relationships from each obfuscated output file to its

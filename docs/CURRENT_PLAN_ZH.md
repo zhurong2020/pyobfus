@@ -33,6 +33,20 @@ integration 12、runtime 2 及 Black/Ruff/mypy/MkDocs strict 均通过。已于 
 `runtime-v0.1.0`，Release workflow [`35931605485`](https://github.com/zhurong2020/pyobfus/actions/runs/35931605485)
 通过 OIDC/PEP 740 发布；PyPI wheel/sdist、LicenseRef 元数据和全新 PyPI 安装均已验收。
 下一道独立 gate 是让 builder 声明兼容的 runtime 依赖，再决定 Core 发版。
+**该 gate 已于 09-24 晚完成**：先实测确认了风险——`pyobfus_pro/__init__.py` 硬导入 runtime、
+`pyobfus/cli.py` 用 `except ImportError` 把 Pro 导入失败静默当成 Community，所以不声明依赖的话
+下一版 wheel 装到没有 runtime 的机器上会让持证客户静默降级。用户在「硬依赖」与「可选 extra」间
+选定**硬依赖**（Core 与 Pro 同一个 wheel、`pip install --upgrade pyobfus` 路径不能断；代价只是一个
+仅依赖 cryptography 的小包）。落地：`pyproject.toml` 声明 `pyobfus-runtime>=0.1,<1`，单一来源
+`pyobfus.constants.RUNTIME_REQUIREMENT`；provenance manifest 增 additive 字段
+`runtime_requirement`（仅当 level=pro 且 fusion flag 触发，与 CLI 跑 fusion 的门槛完全一致）及
+CycloneDX 输出组件属性 `pyobfus:runtime-requirement`，校验器兼容旧清单；CLI 三处 Pro 门槛在
+`pyobfus_pro` 导入失败时说明缺 runtime 并给安装命令，不再当作无许可。19 个新测试
+`tests/test_runtime_requirement.py`（pyproject 与常量一致 / 声明范围容纳仓库内 runtime 版本 /
+Core wheel 不夹带 runtime / manifest 字段与校验 / CLI 提示）。验收：四测试根 1373+1skip / 97 / 12 / 2，
+CI 范围 black+ruff+mypy 全过，mkdocs strict 过，本地 wheel METADATA 核实
+`Requires-Dist: pyobfus-runtime<1,>=0.1` 且 0 个 runtime 文件；设计文档「Versioning」段改为记录
+此决定与理由。**现在只剩 Core 0.5.29 发版 gate，须用户单独批准。**
 
 分发侧已复核 awesome-python 最新规则、当前槽位及历史 PR/issue，无重复后提交单行
 challenger PR [`vinta/awesome-python#3352`](https://github.com/vinta/awesome-python/pull/3352)；

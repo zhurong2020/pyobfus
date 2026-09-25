@@ -1,6 +1,7 @@
 # Redistributable Pro runtime design
 
-Status: published `pyobfus-runtime` 0.1.0 (2026-09-24)
+Status: published `pyobfus-runtime` 0.1.0 (2026-09-24); the builder dependency
+is declared on `main` (2026-09-24) and only the Core release gate remains
 
 Local evidence: standalone boundary tests 2/2; focused runtime/fusion tests
 189/189; compatibility regression tests 76/76; standalone wheel built and
@@ -125,9 +126,18 @@ Start the runtime at `0.1.0`. Generated source depends on a stable v1 call
 shape rather than checking an exact package version. Breaking call changes
 require a runtime major version and a deliberate generated-code migration.
 
-The Pro distribution depends on a compatible runtime range while it contains
-the legacy re-export shims. The Core distribution must not acquire a runtime
-dependency because Community-only output does not need it.
+The `pyobfus` distribution declares `pyobfus-runtime>=0.1,<1` (decision
+2026-09-24). This design originally wanted Core to stay free of a runtime
+dependency because Community output does not need one, but Core and Pro ship
+in the same wheel and `pyobfus_pro` re-exports the runtime, so without the
+dependency a licensed install fails to import Pro and the CLI silently runs as
+Community. A hard dependency was preferred over an optional `pyobfus[pro]`
+extra so that the documented `pip install --upgrade pyobfus` path keeps working
+for existing customers; the cost to Community users is one small package whose
+only dependency, `cryptography`, Core already requires. The requirement string
+lives in `pyobfus.constants.RUNTIME_REQUIREMENT`, is mirrored into provenance
+manifests as `runtime_requirement`, and is checked against `pyproject.toml` and
+the shipped runtime version by `tests/test_runtime_requirement.py`.
 
 ## Acceptance criteria
 
@@ -146,7 +156,8 @@ dependency because Community-only output does not need it.
    output describe the delivery requirement consistently.
 7. Runtime publication and the Pro/Core release that begins emitting the new
    namespace are separate release/deployment gates; runtime publication is
-   complete, while the builder dependency/release gate remains.
+   complete and the builder dependency is declared, so only the Core release
+   gate remains.
 
 ## Rollout order
 

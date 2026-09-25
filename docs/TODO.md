@@ -138,7 +138,10 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 
 发版本身是独立 gate。
 
-- **Core `0.5.28` 已含**：reason code + trial `--email` + CycloneDX 1.7（本轮发布）。
+- **Core `[Unreleased]`（截至 09-24 晚）**：`pyobfus-runtime` 拆包（生成物改 import
+  `pyobfus_runtime`、消费完的 marker import 清理）+ **builder 声明 `pyobfus-runtime>=0.1,<1`
+  依赖** + provenance `runtime_requirement` 字段 + Pro 导入失败提示。**发版为 0.5.29 须用户
+  批准**；发版清单照 `CLAUDE.md`「发布流程」（README 横幅同提交、CITATION.cff 事后核 Zenodo）。
 - **`pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]`**：mcp SDK 2.x 兼容。刻意不随 Core
   发，攒够增量或有人明确要 2.x 时再发（每发一次 MCP 要手工改 Glama Build steps）。
 

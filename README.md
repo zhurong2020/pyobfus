@@ -211,8 +211,11 @@ Generated artifacts that use these runtime-backed features depend on the
 separately redistributable `pyobfus-runtime` package, not the complete Pro
 builder. Install `pyobfus-runtime>=0.1,<1` beside the protected artifact. Build
 machines still require a valid Pro licence; target machines need no licence
-key. The runtime was published as `0.1.0` before the builder release that emits
-its import namespace. Existing 0.5.x artifacts keep working through
+key. `pyobfus` itself now declares that same requirement, so a build machine
+gets the runtime with `pip install --upgrade pyobfus`, and a
+`--provenance-manifest` records it as `runtime_requirement` whenever a build
+needs it. The runtime was published as `0.1.0` before the builder release that
+emits its import namespace. Existing 0.5.x artifacts keep working through
 compatibility aliases.
 
 > Requires Python ≥ 3.9 as of v0.5.0 (3.8 dropped, EOL 2024-10).
