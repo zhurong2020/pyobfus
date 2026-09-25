@@ -20,14 +20,15 @@ A Python code obfuscator built with AST-based transformations. **Supports Python
 
 > **🔒 Pro Edition available.** Six patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator. $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
 
-> **🔎 What's new in v0.5.28:** supply-chain transparency and evaluation.
-> `--dry-run --json` and `--build-report` now attach **stable, versioned reason
-> codes** to each build decision (plus a `disabled_transforms` list) so CI and
-> editors branch on a token instead of parsing prose. The optional
-> `pyobfus-trial start --email` registers a trial for one-per-email dedup and an
-> expiry reminder (omit it for the unchanged local 5-day trial). The provenance
-> manifest's CycloneDX section now declares the current `specVersion 1.7`
-> (ECMA-424 2nd ed.), still valid under 1.6. Install with `pip install -U pyobfus`.
+> **🔎 What's new in v0.5.29:** Pro artifacts now ship with a redistributable
+> runtime. Output built with the Pro fusion passes imports the small, separately
+> published `pyobfus-runtime` package instead of the complete `pyobfus_pro`
+> builder, so a protected artifact can be delivered legally and run on a clean
+> target with no licence key. `pyobfus` declares `pyobfus-runtime>=0.1,<1`, so
+> `pip install -U pyobfus` brings it along; `--provenance-manifest` records the
+> requirement as `runtime_requirement`; consumed Pro marker imports are stripped
+> from deliverables; and a Pro edition that fails to import now says why
+> instead of looking unlicensed. Existing 0.5.x artifacts keep working.
 
 > 🔔 **Starring this repo doesn't notify you about new releases.** GitHub only
 > sends release notifications to people who explicitly **Watch** it. Click

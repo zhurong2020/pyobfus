@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.29] - 2026-09-24
+
 ### Added
 
 - **A separately distributable `pyobfus-runtime` package for Pro artifacts.**
