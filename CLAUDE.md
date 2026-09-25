@@ -14,7 +14,26 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### 🟢 2026-09-24 — runtime 0.1.0 发布与文档同步（最新 · 冷启动先读这段）
+### 🟢 2026-09-25 — 0.5.29 发布 + Y-2/Y-3 编码(held) + dogfooding 落地（最新 · 冷启动先读这段）
+
+- **`0.5.29` 已发布并全渠道收尾**（runtime import 切换 + builder 声明 `pyobfus-runtime>=0.1,<1` 依赖
+  + provenance `runtime_requirement` + Pro 导入失败提示；PyPI/PEP 740/全新装/Release/Zenodo record `22949529`
+  /`CITATION.cff` 均核实）。Zenodo webhook 送达(202)但约 2.5h 才归档——延迟不是失败。
+- **`[Unreleased]` 攒着两个可发 Pro 增量**：**Y-2 `--expire-warn-days`**（到期前告警不停机）+
+  **Y-3 `--bind-key-env`**（L3 密钥改由应用提供，一次构建跑任意授权机器；v1 仅 L3，配 `--vault` 报错、
+  与 `--bind-device` 互斥；`docs/Y3_KEY_PROVIDER_DESIGN.md`）。真实下游 Pro 缺口 Y-1/2/3 全清零。
+  **用户 09-25 决定等 1–2 天发 `0.5.30`**（dogfooding 不单独发；发版是独立 gate 须明确批准）。
+- **self-dogfooding 四 lane 已落地为观察模式**：`dogfood/canary/` + `scripts/dogfood/run.py` +
+  非阻塞 `Dogfood` workflow（**刻意不是必需检查**）；升 PR gate 是单独 reviewed 步骤。
+- **Claude plugin：孤儿仓库锁已转人工**（08-02 旧提交锁未释放、两工作区 submissions 皆空、自己撤不掉；
+  已发 `support@anthropic.com` → Fin AI 需真人 → 回 yes 转人工）。**等真人释放锁再到
+  `platform.claude.com/plugins/submit` 重提；锁没释放别点表单**。字段 `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`。
+- 其余维护者动作不变（MCP Trust Registry publish 需 token / AlternativeTo 提交 / OneDrive 删两旧副本）；
+  awesome-python PR #3352 被拒（采用量·含镜像口径）、Vercel 卸载、giscus 保留、`pyobfus-pro-dev` 归档。
+- 「当前状态一句话」：`0.5.29` 是最新 Core；`[Unreleased]` 有 Y-2+Y-3 待发。逐轮细节见
+  `docs/CURRENT_PLAN_ZH.md` 09-25 段 + memory `pyobfus_session_closeout_2026-09-25`。
+
+### 🔴 2026-09-24 — runtime 0.1.0 发布与文档同步（历史记录）
 
 - 项目 09-21 从 OneDrive 迁入 `~/projects/pyobfus`，09-22 全面核查通过（git/hooks/venv/三测试根/lint/
   wrangler/gh/Zenodo/每日备份均正常）；旧 OneDrive 副本 pyobfus、pyobfus-legal 已删（rsync 比对零遗漏后）。
@@ -26,7 +45,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   ⑤ Y-1 优先级。文案在 `docs/internal/`；细节 `docs/CURRENT_PLAN_ZH.md` 09-22 段。本轮提交已 push，CI 全绿。
 - `pyobfus-runtime 0.1.0` 已于 09-24 通过 OIDC/PEP 740 发布并完成 PyPI、provenance、
   全新环境安装验收；当前下一道 gate 是 builder 声明兼容 runtime 依赖后再决定 Core 发版。
-- 「当前状态一句话」：`0.5.28` 是最新 Core，`pyobfus-runtime 0.1.0` 已公开；本轮不再重复发 runtime。
+- 「当前状态一句话（09-24 当时）」：`0.5.28` 是最新 Core，`pyobfus-runtime 0.1.0` 已公开（09-25 已被 0.5.29 取代）。
 
 ### 🔴 2026-09-20 — 0.5.28 已发布（历史记录）
 
@@ -558,7 +577,7 @@ cardiac-manuscripts 仓库（不影响 pyobfus 仓库本身）。
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.9-3.14, AST, setuptools
-- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.28，2026-09-20 发布**；完整版本历史见 `CHANGELOG.md`)
+- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.5.29，2026-09-25 发布**；完整版本历史见 `CHANGELOG.md`)
 - **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.3，2026-09-10 发布**；Marketplace 与 Open VSX 两边同版本，均已 `curl` 独立复核；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`。**发版必须两个 registry 都发**：Marketplace 手工上传 + `ovsx publish`，runbook 见 `docs/OPEN_VSX_PUBLISH_PLAN.md`)
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.12，2026-09-07 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.18` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp`（**0.3.12** 2026-09-07 发布，2026-09-10 已核实 `active` / `isLatest=true`）

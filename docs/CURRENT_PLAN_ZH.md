@@ -13,7 +13,7 @@
 文档更正、安全类 list 跳过；Vercel 卸载 + giscus 核实保留；`pyobfus-pro-dev` 私有仓归档；Claude plugin
 孤儿仓库锁已转人工（Fin AI → 回 yes → 等真人释放锁，锁没释放别点表单）。用户 09-25 决定**等 1–2 天
 再发版**（建议合为 `0.5.30` Pro 小版本，dogfooding 不单独发；发版是独立 gate 须明确批准）。逐轮教训
-见 memory `pyobfus-session-closeout-2026-09-25`。
+见 memory `pyobfus_session_closeout_2026-09-25`。
 
 **2026-09-24 续作进度**：已确认 `spike/mcp-sdk-2x` 领先 `main` 0 个提交且为其祖先，
 随后用安全删除移除本地分支并删除 `origin/spike/mcp-sdk-2x`。同时修正 `TODO.md` 的两处
