@@ -1,7 +1,12 @@
 # Self-Dogfooding and Bootstrap Best Practices
 
-Status: research complete 2026-09-02; adoption plan proposed, no CI or release
-mutation authorized by this document.
+Status: research complete 2026-09-02. Lanes A–D landed 2026-09-25 in
+**observation mode** — a driver at `scripts/dogfood/run.py`, a canary fixture
+at `dogfood/canary/`, and a non-blocking `Dogfood` workflow
+(`.github/workflows/dogfood.yml`) that is deliberately not a required status
+check. The lanes gather evidence and fail only on a genuine regression; they
+do not gate merges. Promotion to a PR gate (Phase A3) remains a separate,
+reviewed step. This document authorizes no release, tag, or publish.
 
 ## Executive decision
 
@@ -283,8 +288,12 @@ Rules:
 
 1. **0.5.21:** keep product scope as SARIF generation. Use pyobfus itself as a
    documented manual/audit-only upload smoke, with no baseline-state claim.
-2. **Post-0.5.21 maintenance increment:** add the stable/current canary and
-   artifact-only self-SARIF CI job. No failure gate yet.
+2. **Post-0.5.21 maintenance increment — landed 2026-09-25:** the canary
+   (`dogfood/canary/`), the four-lane driver (`scripts/dogfood/run.py`) and the
+   artifact-only `Dogfood` workflow are in place. Lane A uploads self-check
+   JSON + SARIF as artifacts (not to code scanning yet); Lanes B/D run on
+   relevant PRs and pushes; Lane C (wheel build + fresh-venv install) runs on
+   demand and weekly. No failure gate; not a required check.
 3. **After two clean observation windows:** publish a reviewed suppression
    design and turn parse errors + new unsuppressed high findings into a PR gate.
 4. **0.5.22 marker work:** add path/time/environment variance tests and remove

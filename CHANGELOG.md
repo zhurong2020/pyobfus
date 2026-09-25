@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Self-dogfooding lanes (development infrastructure, not shipped in the
+  wheel).** A canary fixture (`dogfood/canary/`), a four-lane driver
+  (`scripts/dogfood/run.py`) and a non-blocking `Dogfood` workflow exercise
+  pyobfus against its own source and a controlled canary: self-`--check`
+  (Lane A), obfuscate-and-run outcome comparison with provenance validation
+  (Lane B), release-candidate wheel build + fresh-venv install verification
+  (Lane C), and a reproducibility probe under varied environment (Lane D).
+  Observation mode: evidence only, not a required check. See
+  `docs/SELF_DOGFOODING_BEST_PRACTICES.md`.
 - **`--bind-key-env NAME` (Pro): bind the Selective Opacity L3 key to
   application-supplied key material instead of the machine fingerprint.**
   The build reads a base64 32-byte key from environment variable `NAME` and

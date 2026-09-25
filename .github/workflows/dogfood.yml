@@ -1,0 +1,123 @@
+name: Dogfood
+
+# Self-dogfooding lanes from docs/SELF_DOGFOODING_BEST_PRACTICES.md, in
+# observation mode: they gather evidence and fail only on a genuine regression
+# (a crash, a parse error, output that no longer runs, a leaked path). This
+# workflow is deliberately NOT one of the required status checks on main, so a
+# red run notifies without blocking a merge. Promotion to a gate is a separate,
+# reviewed step per the doc's staged-adoption plan.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekly, Monday 03:00 UTC — a quiet cadence for evidence, not per-PR noise.
+    - cron: '0 3 * * 1'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'pyobfus/**'
+      - 'pyobfus_pro/**'
+      - 'pyobfus_runtime/**'
+      - 'scripts/dogfood/**'
+      - 'dogfood/**'
+      - '.github/workflows/dogfood.yml'
+  push:
+    branches: [ main ]
+    paths:
+      - 'pyobfus/**'
+      - 'pyobfus_pro/**'
+      - 'pyobfus_runtime/**'
+      - 'scripts/dogfood/**'
+      - 'dogfood/**'
+      - '.github/workflows/dogfood.yml'
+
+# Least privilege: every job only reads the checkout. No publish, no OIDC, no
+# code-scanning upload (Lane A keeps SARIF as an artifact in this phase).
+permissions:
+  contents: read
+
+concurrency:
+  group: dogfood-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  self-analysis:
+    name: Lane A — self-analysis (observation)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5 (pinned 2026-05-09)
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - name: Install pyobfus (editable) + runtime
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install -e ./pyobfus_runtime
+      - name: Run Lane A
+        run: python scripts/dogfood/run.py lane-a --out dogfood_out
+      - name: Upload Lane A evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: dogfood-lane-a
+          path: dogfood_out/lane_a
+          retention-days: 14
+
+  canary:
+    name: Lanes B + D — canary + reproducibility (observation)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5 (pinned 2026-05-09)
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - name: Install pyobfus (editable) + runtime
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .
+          pip install -e ./pyobfus_runtime
+      - name: Run Lane B (checkout entry)
+        run: python scripts/dogfood/run.py lane-b --out dogfood_out
+      - name: Run Lane D (reproducibility probe)
+        run: python scripts/dogfood/run.py lane-d --out dogfood_out
+      - name: Upload canary evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: dogfood-canary
+          path: |
+            dogfood_out/lane_b
+            dogfood_out/lane_d
+          retention-days: 14
+
+  rc-artifact:
+    name: Lane C — release-candidate wheel verification
+    # Heavier (builds a wheel + fresh venv install); run on demand and weekly,
+    # not on every PR.
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5 (pinned 2026-05-09)
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+      - name: Install build tooling
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+      - name: Run Lane C
+        run: python scripts/dogfood/run.py lane-c --out dogfood_out
+      - name: Upload Lane C evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: dogfood-lane-c
+          path: dogfood_out/lane_c
+          retention-days: 14

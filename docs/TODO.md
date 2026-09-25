@@ -207,7 +207,7 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
 
 | 项 | 来源 | 解冻条件 |
 |---|---|---|
-| self-dogfooding 四条 lane 落地 | `SELF_DOGFOODING_BEST_PRACTICES.md` | 研究完成未执行；无外部压力，机会性做 |
+| ~~self-dogfooding 四条 lane 落地~~ ✅ 2026-09-25 | `SELF_DOGFOODING_BEST_PRACTICES.md` | 已落地为观察模式：`scripts/dogfood/run.py` + `dogfood/canary/` + 非阻塞 `Dogfood` workflow（不是必需检查）。Phase A3 升为 PR gate 仍是单独 reviewed 步骤 |
 | MCP Resources / Prompts 原语拆分 | `MCP_PRIMITIVES_DESIGN.md` | 等真实 MCP 用户反馈 |
 | 放开 `mcp<2.0.0` 上限 | `MCP_SDK_2X_SPIKE.md` §5 | `mcp-sdk-2x` job 连绿数周 / 有人明确要 2.x / 1.x 停止维护，三者任一 |
 | `--output-pyc` 可行性 spike | `CURRENT_PLAN_ZH.md` P3-1 | 只做 spike，不承诺产品化 |
