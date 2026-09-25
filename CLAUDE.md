@@ -30,6 +30,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   `platform.claude.com/plugins/submit` 重提；锁没释放别点表单**。字段 `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`。
 - 其余维护者动作不变（MCP Trust Registry publish 需 token / AlternativeTo 提交 / OneDrive 删两旧副本）；
   awesome-python PR #3352 被拒（采用量·含镜像口径）、Vercel 卸载、giscus 保留、`pyobfus-pro-dev` 归档。
+- **09-25 下午 P0（用户列，当日完成）**：trial 服务端上线 5 天登记 0；KV 每日备份脚本此前不认
+  `trial:*` 记录（第一条会让许可备份静默停止）→ 已按类型校验 + 自检 + 挪进日备份随 systemd 补跑，
+  09-24/25 漏导已补。脚本在 `~/scripts/`（仓库外）。详见 `docs/CURRENT_PLAN_ZH.md` 09-25 下午段。
 - 「当前状态一句话」：`0.5.29` 是最新 Core；`[Unreleased]` 有 Y-2+Y-3 待发。逐轮细节见
   `docs/CURRENT_PLAN_ZH.md` 09-25 段 + memory `pyobfus_session_closeout_2026-09-25`。
 

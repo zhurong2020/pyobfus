@@ -15,6 +15,25 @@
 再发版**（建议合为 `0.5.30` Pro 小版本，dogfooding 不单独发；发版是独立 gate 须明确批准）。逐轮教训
 见 memory `pyobfus_session_closeout_2026-09-25`。
 
+**2026-09-25 下午续作（trial 现状核查 + KV 备份 P0）**：应用户「之前修订的 trial 现在怎样」核查
+09-20 方案 A 的落地状态：Worker `/api/trial/request` 在线（空请求 400 校验提示）、客户端
+`pyobfus-trial start --email` 自 0.5.28 起可用（0.5.29 本机核实）、**KV 里 trial 登记数 0**（上线
+5 天，5 个 key 仍全是许可记录），与下载基线未抬升一致。核查顺带发现两项，用户当即**列为 P0**，
+当日全部完成：(1) `~/scripts/pyobfus_kv_export.sh` 只认 license 记录（逐条断言 license_key ==
+key），第一条 `trial:*` 记录进来会让整轮导出拒绝落盘、付费许可备份静默停止——与
+`TRIAL_STRATEGY_DECISION` §5.1「明文 email 须进 KV 每日备份口径」正好相反；已改为按 key 类型校验
+（license / trial / 未知类型只查可解析并 WARN）、`:`→`__` Windows 安全文件名（日备份落 OneDrive）、
+curl `--fail` 不把 API 错误体当记录、`--selftest` 14 项合成记录自检全过；(2) KV 导出 09-24/25 两晚
+没跑：crontab 01:30 Asia/Shanghai 在 WSL 不在线时不补跑（机器今天 03:02 CDT 才启动），而日备份是
+user systemd `wsl-backup.timer` `Persistent=true` 开机补跑（03:04 已补）。已把导出挪到
+`wsl_daily_backup.sh` 开头「第 0 步」（OneDrive 检查之前、失败不阻断），退掉 crontab 条目（原条目留
+注释备查，`CRON_TZ=Asia/Shanghai` 行保留防后续追加踩时区坑），当场补跑导出：5 份、与 09-22 逐字节
+一致。`check_backup.sh` 加「3b. KV 导出」一节，`~/.pyobfus-backups/README.md` 记记录类型、文件名映射
+与 trial 感知的恢复命令。**刻意没做**：往生产 KV 写测试 trial 记录做端到端（只读 token 删不掉、本机
+wrangler 是 Windows 二进制跑不起来，合成记录自检已覆盖校验分支）。脚本都在 `~/scripts/`（仓库外，
+随日备份进 OneDrive），memory `reference_pyobfus_kv_backup` 同步更正「日备份不在 user systemd timer」
+这条过期判断。
+
 **2026-09-24 续作进度**：已确认 `spike/mcp-sdk-2x` 领先 `main` 0 个提交且为其祖先，
 随后用安全删除移除本地分支并删除 `origin/spike/mcp-sdk-2x`。同时修正 `TODO.md` 的两处
 状态漂移：公开 Core 已是 `0.5.28`，服务端邮箱 trial 也已部署、实现并随 0.5.28 发布，

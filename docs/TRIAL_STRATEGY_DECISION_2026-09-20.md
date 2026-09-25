@@ -108,3 +108,15 @@ trust boundary 注释）。
 - 本地 LOC / 文件数上限（安全戏法）。
 - "先收费 / 先要卡"的 trial（反漏斗，当前规模不做）。
 - 声称服务端 trial 能挡住能读 Pro 源码的人（诚实边界）。
+
+## 7. 上线后状态（2026-09-25 核查）
+
+- Worker `/api/trial/request` 在线（空请求返回 400 校验提示）；客户端 `pyobfus-trial start --email`
+  自 0.5.28（2026-09-20）起可用。
+- KV 里 trial 登记数 **0**：上线 5 天，全部 5 个 key 仍是许可记录。与下载基线未抬升一致，
+  是流量问题不是功能问题。
+- §5.1 红线的「进 KV 每日备份口径」当时**没有真正落地**：`~/scripts/pyobfus_kv_export.sh`
+  只认 license 记录，第一条 trial 记录会让整轮导出拒绝落盘、许可备份静默停止。2026-09-25
+  已修（按 key 类型校验 + Windows 安全文件名 + `--selftest`），并把调度挪进日备份以随
+  systemd `Persistent` 补跑。记录里的明文 email 沿用 license 记录的 PII 口径，随日备份进
+  OneDrive；恢复命令见 `~/.pyobfus-backups/README.md`。
