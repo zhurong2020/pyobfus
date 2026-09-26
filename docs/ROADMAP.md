@@ -372,7 +372,7 @@ as important trust/discovery data.
   official `2025-12-11` schema, now carries GitHub repository stable ID
   `1093960892`, and keeps `fileSha256` omitted deliberately because PyPI's
   wheel/sdist multi-artifact model makes a single optional hash ambiguous._
-- [ ] **P2-29: Framework/runtime packaging compatibility checks** — add more
+- [x] **P2-29: Framework/runtime packaging compatibility checks** (shipped in 0.5.15, 2026-08-20, as the `compatibility_advisory` check category; see `CURRENT_PLAN_ZH.md`; box ticked 2026-09-25) — add more
   pre-flight guidance for combinations users actually ship: PyInstaller
   already has a cookbook; next candidates are import-hook/encrypted-file
   ecosystems, compiled packaging, and model-serving layouts. Prefer
