@@ -20,15 +20,12 @@ A Python code obfuscator built with AST-based transformations. **Supports Python
 
 > **🔒 Pro Edition available.** Six patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator. $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
 
-> **🔎 What's new in v0.5.29:** Pro artifacts now ship with a redistributable
-> runtime. Output built with the Pro fusion passes imports the small, separately
-> published `pyobfus-runtime` package instead of the complete `pyobfus_pro`
-> builder, so a protected artifact can be delivered legally and run on a clean
-> target with no licence key. `pyobfus` declares `pyobfus-runtime>=0.1,<1`, so
-> `pip install -U pyobfus` brings it along; `--provenance-manifest` records the
-> requirement as `runtime_requirement`; consumed Pro marker imports are stripped
-> from deliverables; and a Pro edition that fails to import now says why
-> instead of looking unlicensed. Existing 0.5.x artifacts keep working.
+> **🔎 What's new in v0.5.30:** Pro builds can now warn before a hard expiry
+> without stopping the artifact (`--expire-warn-days N`), and Selective Opacity
+> L3 keys can come from an application-controlled provider or base64 environment
+> variable (`--bind-key-env NAME`). That lets one protected artifact run on any
+> machine your application authorizes, without embedding the raw key or rebuilding
+> separately for every device. See `pyobfus --help` for the compatibility rules.
 
 > 🔔 **Starring this repo doesn't notify you about new releases.** GitHub only
 > sends release notifications to people who explicitly **Watch** it. Click

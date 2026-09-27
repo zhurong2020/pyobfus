@@ -31,9 +31,10 @@ uvx pyobfus-mcp
 
 ## Core commands
 
-- Current Core release: `0.5.29` ships Pro artifacts on the redistributable
-  `pyobfus-runtime` package (declared as a dependency, recorded in provenance
-  manifests as `runtime_requirement`, consumed Pro marker imports stripped).
+- Current Core release: `0.5.30` adds Pro pre-expiry warnings via
+  `--expire-warn-days N` and application-supplied Selective Opacity L3 keys via
+  `--bind-key-env NAME` (provider callback or base64 environment fallback).
+  Pro artifacts continue to use the redistributable `pyobfus-runtime` package.
   0.5.27 fixed cross-file
   local-scope shadowing, eager annotation/default rewriting after class
   renaming, and control-flow fallthrough paths that previously read an
