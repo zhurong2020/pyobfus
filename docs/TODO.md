@@ -5,7 +5,7 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-09-25（trial 现状核查 + KV 备份 P0 当日完成，见待办表首行；上一轮 09-24：awesome-python PR #3352 当日被维护者关闭，理由是采用量，见「分发 / 上架队列」；
+最后更新：2026-09-26（Claude plugin 孤儿锁已按 Rudy 要求补齐账号核查、workspace ID 与两张截图并在原线程回复，现等后端处理；上一轮 09-25：trial 现状核查 + KV 备份 P0 当日完成；09-24：awesome-python PR #3352 当日被维护者关闭，理由是采用量，见「分发 / 上架队列」；
 `pyobfus-runtime` 0.1.0 已通过 OIDC/PEP 740 发布并完成 PyPI 验收；
 删除已完全合入 `main` 的本地及远端 `spike/mcp-sdk-2x` 空壳分支；
 修正本文件把已随 0.5.28 发布的邮箱 trial 误列为待实现、仍称 0.5.27 为当前版本的状态漂移。
@@ -16,7 +16,7 @@ awesome-python PR #3352 已提交（09-24 被拒）、Claude plugin 需重提、
 **服务端邮箱登记 trial** 为 P1（现已完成并随 0.5.28 发布），依据见
 `TRIAL_STRATEGY_DECISION_2026-09-20.md`；
 把 provenance / SARIF / build-report / CycloneDX 收拢为一条「可验证性主线」抬为 P0。
-Core `0.5.28` 是当前公开版本，运营复查见 `CURRENT_PLAN_ZH.md`）。
+Core `0.5.29` 是当前公开版本，运营复查见 `CURRENT_PLAN_ZH.md`）。
 
 ## 状态口径
 
@@ -33,13 +33,15 @@ Core `0.5.28` 是当前公开版本，运营复查见 `CURRENT_PLAN_ZH.md`）。
 
 按顺手程度排，每项的细节都在本文件后面对应小节或所指文件里，这里只是一处能勾掉的总表。
 
-- [ ] **Claude plugin — 联系 directory team 解锁后再重提**（2026-09-24 更正）：Console 重提被拒
+- [ ] **Claude plugin — 已补齐证据回复真人支持，等待后端解除锁**（2026-09-26 更新）：Console 重提被拒
       「Another submission already holds this repository and path」，但两个工作区 submissions 页都 `No submissions yet`。
       2026-08-02 旧提交没消失，而是留了个自己撤不掉的**孤儿仓库锁**。**别再反复点提交表单**（同一个锁挡）；
       走 contact the directory team 请求释放锁,说明:表单报错原文 + 两工作区皆空 + 旧提交约 2026-08-02 +
       账号 `zhurong0525@gmail.com`。**2026-09-24 升级邮件已发**(`support@anthropic.com`);**2026-09-25 Fin AI
       自动回信称只懂 Claude Code worktree 锁、需真人释放提交锁并主动提出转人工,维护者已回「yes」转人工**。
-      **现等真人 agent 释放锁再重提**(锁没释放前别再点表单)。字段/描述见
+      09-25 真人支持 Rudy 回信要求核对原提交账号；维护者已查三个常用邮箱均无确认邮件，随后以同一仓库根路径
+      复现锁报错，并于 09-26 在原线程附上「No submissions yet」与 repository/path lock 两张截图，提供
+      Claude Code workspace ID，请求后端定位/释放。**现等支持回复，锁没释放前别再点表单或换路径绕过**。字段/描述与证据见
       `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`。
 - [ ] **MCP Trust Registry publish**：在其站点注册拿 API token 后
       `MCPTRUSTCHECKER_TOKEN=… npx --yes mcptrustchecker@1.14.0 publish pyobfus-mcp --registry pypi --online --category developer-tools`
@@ -174,10 +176,10 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 
 发版本身是独立 gate。
 
-- **Core `[Unreleased]`（截至 09-24 晚）**：`pyobfus-runtime` 拆包（生成物改 import
-  `pyobfus_runtime`、消费完的 marker import 清理）+ **builder 声明 `pyobfus-runtime>=0.1,<1`
-  依赖** + provenance `runtime_requirement` 字段 + Pro 导入失败提示。**发版为 0.5.29 须用户
-  批准**；发版清单照 `CLAUDE.md`「发布流程」（README 横幅同提交、CITATION.cff 事后核 Zenodo）。
+- **Core `[Unreleased]`（截至 09-26）**：Y-2 `--expire-warn-days` + Y-3
+  `--bind-key-env`；self-dogfooding 属开发基建、不单独作为发版理由。计划合为 `0.5.30`，
+  **发版仍须用户明确批准**；清单照 `CLAUDE.md`「发布流程」（README 横幅同提交、
+  `CITATION.cff` 事后核 Zenodo）。
 - **`pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]`**：mcp SDK 2.x 兼容。刻意不随 Core
   发，攒够增量或有人明确要 2.x 时再发（每发一次 MCP 要手工改 Glama Build steps）。
 

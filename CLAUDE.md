@@ -14,7 +14,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### 🟢 2026-09-25 — 0.5.29 发布 + Y-2/Y-3 编码(held) + dogfooding 落地（最新 · 冷启动先读这段）
+### 🟢 2026-09-26 — 0.5.29 后续 + plugin 孤儿锁证据升级（最新 · 冷启动先读这段）
 
 - **`0.5.29` 已发布并全渠道收尾**（runtime import 切换 + builder 声明 `pyobfus-runtime>=0.1,<1` 依赖
   + provenance `runtime_requirement` + Pro 导入失败提示；PyPI/PEP 740/全新装/Release/Zenodo record `22949529`
@@ -25,9 +25,12 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   **用户 09-25 决定等 1–2 天发 `0.5.30`**（dogfooding 不单独发；发版是独立 gate 须明确批准）。
 - **self-dogfooding 四 lane 已落地为观察模式**：`dogfood/canary/` + `scripts/dogfood/run.py` +
   非阻塞 `Dogfood` workflow（**刻意不是必需检查**）；升 PR gate 是单独 reviewed 步骤。
-- **Claude plugin：孤儿仓库锁已转人工**（08-02 旧提交锁未释放、两工作区 submissions 皆空、自己撤不掉；
-  已发 `support@anthropic.com` → Fin AI 需真人 → 回 yes 转人工）。**等真人释放锁再到
-  `platform.claude.com/plugins/submit` 重提；锁没释放别点表单**。字段 `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`。
+- **Claude plugin：孤儿仓库锁已补齐证据升级给真人支持 Rudy**。维护者查
+  `wuxiami@hotmail.com` / `zhurong0525@gmail.com` / `zhurong0525@icloud.com` 均无 08-02
+  确认邮件；同一公开仓库根路径稳定复现锁报错。09-26 已在 Rudy 原线程附「No submissions yet」与
+  repository/path lock 两张截图、三个候选邮箱及 Claude Code workspace ID，请求后端定位/释放。
+  **现在等支持回复；锁没释放前别再点表单或换路径绕过**。证据与字段见
+  `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`。
 - 其余维护者动作不变（MCP Trust Registry publish 需 token / AlternativeTo 提交 / OneDrive 删两旧副本）；
   awesome-python PR #3352 被拒（采用量·含镜像口径）、Vercel 卸载、giscus 保留、`pyobfus-pro-dev` 归档。
 - **09-25 下午 P0（用户列，当日完成）**：trial 服务端上线 5 天登记 0；KV 每日备份脚本此前不认

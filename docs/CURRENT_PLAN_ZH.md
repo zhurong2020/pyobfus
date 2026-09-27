@@ -11,7 +11,8 @@
 **self-dogfooding 四 lane**（`dogfood/canary/` + `scripts/dogfood/run.py` + 非阻塞 `Dogfood` workflow，
 观察模式、非必需检查，首次 CI success）。外部：awesome-python PR #3352 被拒（采用量，含镜像口径）→
 文档更正、安全类 list 跳过；Vercel 卸载 + giscus 核实保留；`pyobfus-pro-dev` 私有仓归档；Claude plugin
-孤儿仓库锁已转人工（Fin AI → 回 yes → 等真人释放锁，锁没释放别点表单）。用户 09-25 决定**等 1–2 天
+孤儿仓库锁已转人工；09-25 真人支持 Rudy 要求核对原提交账号，维护者查三个常用邮箱均无确认邮件，09-26 已用
+同一仓库根路径复现报错并在原线程附两张证据截图、workspace ID，请求后端定位/释放（锁没释放别再点表单）。用户 09-25 决定**等 1–2 天
 再发版**（建议合为 `0.5.30` Pro 小版本，dogfooding 不单独发；发版是独立 gate 须明确批准）。逐轮教训
 见 memory `pyobfus_session_closeout_2026-09-25`。
 
