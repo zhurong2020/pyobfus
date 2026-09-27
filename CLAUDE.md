@@ -16,6 +16,10 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ### 🟢 2026-09-26/27 — Core 0.5.30 已发布 + plugin 孤儿锁待支持（最新 · 冷启动先读这段）
 
+- **Affiliate 只完成设计，未上线**：邀请制 3–5 人、无 cookie、签名 Stripe reference、20% / 30 天
+  / 月结 / $50；公开设计 `docs/AFFILIATE_PROGRAM_DESIGN.md`，条款草案明确未生效。实现前先补 Worker
+  event/session 双幂等、paid/async、refund/dispute、隐私日志、测试、KV 备份、Privacy/最终条款与财税确认；
+  **文档完成不等于授权实现/部署**，且不需要 Core 发版。
 - **`0.5.29` 已发布并全渠道收尾**（runtime import 切换 + builder 声明 `pyobfus-runtime>=0.1,<1` 依赖
   + provenance `runtime_requirement` + Pro 导入失败提示；PyPI/PEP 740/全新装/Release/Zenodo record `22949529`
   /`CITATION.cff` 均核实）。Zenodo webhook 送达(202)但约 2.5h 才归档——延迟不是失败。

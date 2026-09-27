@@ -119,11 +119,22 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 
 | 优先级 | 任务 | 要发版吗 | 谁来做 |
 |---|---|---|---|
+| **P1 · gate** | **Affiliate 邀请制 pilot**：方案与未生效条款草案已完成；当前不开放、不实现。若维护者明确批准上线，必须依次完成 Stripe event + Checkout Session 双幂等、paid/async fulfillment、退款/拒付回冲、隐私安全日志、commission 状态机与测试、KV 备份/恢复识别新记录、Privacy Policy + 最终条款 + 会计税务确认；只先邀 3–5 人，20% / 30 天 / 月结 / $50 门槛，无 cookie。验收与停止条件见 `AFFILIATE_PROGRAM_DESIGN.md` | **不发 Core**；需 Worker 部署和 Stripe 配置 | AI 实现 + 维护者批准/财税确认 |
 | ~~P0~~ ✅ | 可验证性主线**完成**：对标文档 `SUPPLY_CHAIN_ASSURANCE.md` + 稳定 reason code（`reason_codes.py` v1，plan/report 发射，`REASON_CODES.md`）+ CycloneDX 1.7，全部**随 0.5.28 发布** | — | — |
 | ~~P1~~ ✅ | OSPS 补齐**基本完成 2026-09-20**：4 开关（gh api 核实）+ 4 文档（f2cd713）全做完。残余 = `LE-01.01` DCO（主动延后）+ 若干 L3 | 免发版 | — |
 | ~~P1~~ ✅ | 抗 AI 措辞改写**完成 2026-09-22**（tech-deai）：README / `landing/index.html` / `docs/index.md` 散文里的 em-dash 全部清零（README 48 处）、20 条 bold-colon 功能列表改成带动词的句子；命令、路径、版本号、链接、What's new 横幅与 UI 标签（如 `Unlock Pro`）原样。H2 骨架未动（doc-hub 型 README，锚点被外部引用）。~~pyarmor VMC/ECC 补记~~——已确认无需改 | 免发版（README 到 PyPI 要等下次发版） | — |
 | ~~P0~~ ✅ | **KV 每日备份适配 trial 记录 + 补跑机制**（用户 2026-09-25 列为 P0，当日完成）：`~/scripts/pyobfus_kv_export.sh` 此前只认 license 记录，第一条 `trial:*` 登记会让整轮导出拒绝落盘、许可备份静默停止（上线 5 天 KV 尚无 trial 记录，未实际发生）。已改为按 key 类型校验（`PYOB-*` 查 license_key / `trial:*` 查 email_hash+v / 未知类型只查可解析并 WARN）+ `:`→`__` Windows 安全文件名 + `--selftest` 14 项；调度从 crontab 01:30 挪进 `wsl_daily_backup.sh` 开头（systemd `Persistent` 开机补跑，cron 不补跑致 09-24/25 漏导，已补、与 09-22 逐字节一致）；`check_backup.sh` 加 KV 一节。脚本都在 `~/scripts/`（仓库外，随日备份进 OneDrive），仓内只记状态 | 免发版（仓库外脚本） | — |
 | **P2** | 分发上架队列：awesome-python PR #3352 **2026-09-24 被拒**（理由=采用量，对方留了「adoption grows」再议的门；不争辩、不重开）；awesome-security / awesome-devsecops 门槛同为下载量，**跳过**；队列下一项 **AlternativeTo**（需维护者账号） | 免发版 | 维护者 |
+
+### P1 gate · Affiliate pilot（方案完成，未授权实现/部署）
+
+- 方案源：[`AFFILIATE_PROGRAM_DESIGN.md`](AFFILIATE_PROGRAM_DESIGN.md)；条款草案明确
+  `DRAFT — NOT IN EFFECT`，不能当报名页或付款承诺。
+- 当前 Worker 的 `checkout.session.completed` 会直接随机发 licence，尚无 event/session 双幂等、
+  paid/async 分流、refund/dispute 回冲；affiliate 上线前必须先修，避免重复 licence + 重复佣金。
+- v1 不放 cookie、不建 portal、不上 Stripe Connect/第三方 SaaS；只有真实活跃 affiliate 和人工
+  工作量达到设计文档门槛后才升级。三个月无可归因成交就停止，不继续自动化。
+- 这项属于商业分发的明确用户触发，但不打破 10-25 前 Core 静默期；Worker 生产部署仍须单独批准。
 
 ### ✅ 可验证性主线（2026-09-20 完成，随 0.5.28 发布）
 

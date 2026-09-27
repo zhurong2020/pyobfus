@@ -1,5 +1,14 @@
 # pyobfus 当前计划
 
+**2026-09-26 affiliate 方案已固化（未上线）**：用户提出 Pro 联盟推广后，已完成公开设计
+[`AFFILIATE_PROGRAM_DESIGN.md`](AFFILIATE_PROGRAM_DESIGN.md) 与明确标注未生效的条款草案
+`docs/legal/AFFILIATE_PROGRAM_TERMS_DRAFT.md`。决定为邀请制 3–5 人、无 cookie、签名
+`client_reference_id`、20% 佣金、30 天退款锁定、每月人工审核、最低 $50；affiliate 只属于
+Stripe/Worker/内部账本，不进入 Core/Pro runtime/license 文件。**当前没有 affiliate、没有佣金、
+没有公开报名**。若后续明确批准上线，先修现有 Worker 的 event/session 双幂等、paid/async 状态、
+退款/拒付回冲和日志 PII，再补测试、KV 备份类型、隐私政策/最终条款与会计税务确认；这些是硬 gate，
+不因方案文档完成而自动授权实现或部署。
+
 **2026-09-26/27 `0.5.30` 已发布**：用户明确要求立即发版后，Y-2
 `--expire-warn-days` 与 Y-3 `--bind-key-env` 已从 `[Unreleased]` 收入 `0.5.30`。
 发布提交 `79b83a1` 的本地四测试根为 Core `1389 passed / 1 skipped`、MCP `97`、
