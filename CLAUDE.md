@@ -16,6 +16,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ### 🟢 2026-09-26/27 — Core 0.5.30 已发布 + plugin 孤儿锁待支持（最新 · 冷启动先读这段）
 
+- **内容引流改为定期发（2026-09-27 定）**：10-11 前只写不发，10-13 那周起 DEV 双周一篇、arong.eu.org + 知乎月度、
+  微博不发 pyobfus；Show HN 已用完。**未发稿件放 gitignored 的 `docs/internal/content-*/`，不进 `_drafts/`**。
+  排期与退出条件见 `docs/TODO.md`「内容节奏」。
 - **Affiliate 只完成设计，未上线**：邀请制 3–5 人、无 cookie、签名 Stripe reference、20% / 30 天
   / 月结 / $50；公开设计 `docs/AFFILIATE_PROGRAM_DESIGN.md`，条款草案明确未生效。实现前先补 Worker
   event/session 双幂等、paid/async、refund/dispute、隐私日志、测试、KV 备份、Privacy/最终条款与财税确认；

@@ -1,5 +1,15 @@
 # pyobfus 当前计划
 
+**2026-09-27 进度核查 + 内容节奏定案**：按「查进度 = 进度 + 下载量 + Gmail」核查：仓库干净、CI 全绿、
+0 open issue/PR；Core 近 7 天安静日中位数 `21`、近 30 天 `30`（未抬升），MCP `6/7`，Marketplace `9 installs`；
+Gmail 无人在等我们（plugin 孤儿锁线程最后一封是我们 09-27 的回复，等 Rudy；09-26 的 "Rate your conversation"
+疑为自动关单，09-30 前无回复则原线程跟进）。GitHub 14 天来源里 dev.to / X / 微博 / Reddit / HN **一次未出现**，
+流量来自搜索与 chatgpt.com；Show HN（08-01）最终 1 分、零外部评论，已用完不重发。据此定**内容节奏**：
+09-28→10-11 只写不发（保住静默期基线），10-13 那周起 DEV 双周一篇工程故事，arong.eu.org 与**知乎**（09-27 选定，
+先记录）跟月度版本，r/Python 跟月度版本，微博不发 pyobfus。第 1 篇（Cloudflare 拦 `Python-urllib` UA 事故复盘）
+草稿在 gitignored 的 `docs/internal/content-2026-10/`，**未发稿件不进 `_drafts/`**（公开仓库一推就可见）。
+排期、选题、度量与退出条件见 [`TODO.md`](TODO.md)「内容节奏」。
+
 **2026-09-26 affiliate 方案已固化（未上线）**：用户提出 Pro 联盟推广后，已完成公开设计
 [`AFFILIATE_PROGRAM_DESIGN.md`](AFFILIATE_PROGRAM_DESIGN.md) 与明确标注未生效的条款草案
 `docs/legal/AFFILIATE_PROGRAM_TERMS_DRAFT.md`。决定为邀请制 3–5 人、无 cookie、签名
