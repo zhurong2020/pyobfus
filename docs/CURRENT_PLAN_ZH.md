@@ -1,5 +1,14 @@
 # pyobfus 当前计划
 
+**2026-09-26 下载快照（查询于 09-27 03:09 UTC，数据截至 09-26）**：Core 0.5.29
+发布日 09-25 为 `132`，次日已回落到 `27`；近 7 天安静日中位数 `21`（3 天），近 30 天
+安静日中位数 `30`（9 天），仍未高于 9 月既有约 `31` 的基线。MCP 09-26 单日 `22`，但
+近 7/30 天安静日中位数仍为 `6/7`，单日跳点不足以判定增长；后续看是否持续。runtime
+09-23..26 为 `76/36/75/21`，继续主要受本仓库 CI 解析依赖影响，不作为用户数。VS Code
+Marketplace `9 installs`（未增）、Open VSX `582 downloads`（较首跑 574 +8，含镜像/爬虫）、
+GitHub Action 可见引用仍 `0`。结论：0.5.29 仍是发布日尖峰后回落，**自然采用基线没有抬升**；
+保持既定 `0.5.30` 后静默观察方案。
+
 **2026-09-25 续作进度**：`0.5.29` 已发布并完全收尾——runtime import 切换 + builder 声明
 `pyobfus-runtime>=0.1,<1` + provenance `runtime_requirement` + Pro 导入失败提示；PyPI latest、
 两个 PEP 740 endpoint、全新环境安装带入 runtime、GitHub Release 均核实；Zenodo webhook 在 Release
