@@ -14,15 +14,17 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### 🟢 2026-09-26 — 0.5.29 后续 + plugin 孤儿锁证据升级（最新 · 冷启动先读这段）
+### 🟢 2026-09-26/27 — Core 0.5.30 已发布 + plugin 孤儿锁待支持（最新 · 冷启动先读这段）
 
 - **`0.5.29` 已发布并全渠道收尾**（runtime import 切换 + builder 声明 `pyobfus-runtime>=0.1,<1` 依赖
   + provenance `runtime_requirement` + Pro 导入失败提示；PyPI/PEP 740/全新装/Release/Zenodo record `22949529`
   /`CITATION.cff` 均核实）。Zenodo webhook 送达(202)但约 2.5h 才归档——延迟不是失败。
-- **`[Unreleased]` 攒着两个可发 Pro 增量**：**Y-2 `--expire-warn-days`**（到期前告警不停机）+
+- **Core `0.5.30` 已发布**：**Y-2 `--expire-warn-days`**（到期前告警不停机）+
   **Y-3 `--bind-key-env`**（L3 密钥改由应用提供，一次构建跑任意授权机器；v1 仅 L3，配 `--vault` 报错、
   与 `--bind-device` 互斥；`docs/Y3_KEY_PROVIDER_DESIGN.md`）。真实下游 Pro 缺口 Y-1/2/3 全清零。
-  **用户 09-25 决定等 1–2 天发 `0.5.30`**（dogfooding 不单独发；发版是独立 gate 须明确批准）。
+  用户 09-26 明确要求立即发版；本地四测试根、quality 与 Lane C 候选 wheel 全绿，远端 CI 27/27 +
+  CodeQL 全绿，tag 经 OIDC/PEP 740 发布，PyPI 全新安装和 GitHub Release 已核实；Zenodo record
+  `22986080` 与 `CITATION.cff` 也已同步。自本版起进入 10-25 前静默观察期。
 - **self-dogfooding 四 lane 已落地为观察模式**：`dogfood/canary/` + `scripts/dogfood/run.py` +
   非阻塞 `Dogfood` workflow（**刻意不是必需检查**）；升 PR gate 是单独 reviewed 步骤。
 - **Claude plugin：孤儿仓库锁已补齐证据升级给真人支持 Rudy**。维护者查
@@ -39,7 +41,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - **节奏改了（09-25 用户定 · 0.5.30 发版后生效，先测一轮）**：静默 4 周（10-25 前不发 Core）→ 每月一版
   → 只做有触发的事 → 每周一巡检；全文 `docs/TODO.md`「节奏」段。**查进度固定动作：进度 + 下载量
   （`python scripts/download_snapshot.py`）+ Gmail（`/pyobfus-inbox`），三样一起给**，缺一样不算查过。
-- 「当前状态一句话」：`0.5.29` 是最新 Core；`[Unreleased]` 有 Y-2+Y-3 待发。逐轮细节见
+- 「当前状态一句话」：`0.5.30` 是最新 Core；Core `[Unreleased]` 为空，10-25 前静默观察。逐轮细节见
   `docs/CURRENT_PLAN_ZH.md` 09-25 段 + memory `pyobfus_session_closeout_2026-09-25`。
 
 ### 🔴 2026-09-24 — runtime 0.1.0 发布与文档同步（历史记录）

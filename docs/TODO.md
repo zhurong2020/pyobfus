@@ -16,7 +16,7 @@ awesome-python PR #3352 已提交（09-24 被拒）、Claude plugin 需重提、
 **服务端邮箱登记 trial** 为 P1（现已完成并随 0.5.28 发布），依据见
 `TRIAL_STRATEGY_DECISION_2026-09-20.md`；
 把 provenance / SARIF / build-report / CycloneDX 收拢为一条「可验证性主线」抬为 P0。
-Core `0.5.29` 是当前公开版本，运营复查见 `CURRENT_PLAN_ZH.md`）。
+Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运营复查见 `CURRENT_PLAN_ZH.md`）。
 
 ## 状态口径
 
@@ -74,7 +74,7 @@ awesome-python 要的 adoption trajectory 也因此拿不出来。09-25 用户�
 0.5.30 发出后开始，10-25 复盘。
 
 **发版**
-1. `0.5.30`（Y-2 + Y-3）按原计划 09-26/27 发，是这一波功能驱动发版的收尾。
+1. `0.5.30`（Y-2 + Y-3）已于 09-26/27 发布，是这一波功能驱动发版的收尾。
 2. 之后**静默 4 周，10-25 前不发 Core**。例外只有三种：影响用户的 bug、安全修复、
    付费客户或真实下游明确要的东西。目的是拿到第一份干净的基线读数，按周看安静日。
 3. 静默期后**每月一个小版本**，落在每月第一周，装那个月 `[Unreleased]` 攒下的东西；
@@ -172,14 +172,13 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 
 不做：在对手页面下留言/要求收录、买对比位、为排名写夸大文案。
 
-## 待发内容（已在 main，未发版）
+## 待发内容
 
 发版本身是独立 gate。
 
-- **Core `[Unreleased]`（截至 09-26）**：Y-2 `--expire-warn-days` + Y-3
-  `--bind-key-env`；self-dogfooding 属开发基建、不单独作为发版理由。计划合为 `0.5.30`，
-  **发版仍须用户明确批准**；清单照 `CLAUDE.md`「发布流程」（README 横幅同提交、
-  `CITATION.cff` 事后核 Zenodo）。
+- **Core `[Unreleased]` 当前为空**：Y-2 `--expire-warn-days` + Y-3
+  `--bind-key-env` 已随 `0.5.30` 发布；self-dogfooding 属开发基建、不单独作为发版理由。
+  10-25 前进入静默观察期，只有既定三类例外才提前发 Core。
 - **`pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]`**：mcp SDK 2.x 兼容。刻意不随 Core
   发，攒够增量或有人明确要 2.x 时再发（每发一次 MCP 要手工改 Glama Build steps）。
 

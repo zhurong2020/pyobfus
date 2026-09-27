@@ -1,5 +1,18 @@
 # pyobfus 当前计划
 
+**2026-09-26/27 `0.5.30` 已发布**：用户明确要求立即发版后，Y-2
+`--expire-warn-days` 与 Y-3 `--bind-key-env` 已从 `[Unreleased]` 收入 `0.5.30`。
+发布提交 `79b83a1` 的本地四测试根为 Core `1389 passed / 1 skipped`、MCP `97`、
+integration `12`、runtime `24`，Black/Ruff/mypy 与 release-candidate Lane C（构建、
+Twine、wheel 内容、全新 venv 安装、canary、provenance/build report、路径/PII）均通过；
+远端 CI 27/27 与 CodeQL 全绿。tag `v0.5.30` 经 OIDC workflow
+[`36291151552`](https://github.com/zhurong2020/pyobfus/actions/runs/36291151552)
+发布，PyPI latest、wheel/sdist 两个 PEP 740 endpoint、公开全新安装（含 runtime 0.1.0
+与两个新 CLI 参数）及 [GitHub Release](https://github.com/zhurong2020/pyobfus/releases/tag/v0.5.30)
+均已核实。Zenodo concept DOI 已指向新 record `22986080`（version `v0.5.30`、publication
+date `2026-09-27`），`CITATION.cff` 已据实同步。**自本版起进入 10-25 前 Core 静默观察期**；
+例外仅限影响用户的 bug、安全修复或付费客户/真实下游明确需求。
+
 **2026-09-26 下载快照（查询于 09-27 03:09 UTC，数据截至 09-26）**：Core 0.5.29
 发布日 09-25 为 `132`，次日已回落到 `27`；近 7 天安静日中位数 `21`（3 天），近 30 天
 安静日中位数 `30`（9 天），仍未高于 9 月既有约 `31` 的基线。MCP 09-26 单日 `22`，但
@@ -16,13 +29,13 @@ GitHub Action 可见引用仍 `0`。结论：0.5.29 仍是发布日尖峰后回�
 0.5.29 / 2026-09-25（doi 保留 concept DOI）。随后按用户「先做后攒够再发」编码两批并 held 在
 `[Unreleased]`：**Y-2 `--expire-warn-days`**（到期前告警不停机，16 测试）与 **Y-3 `--bind-key-env`**
 （L3 密钥改由应用提供，一次构建跑任意授权机器；v1 仅 L3，配 `--vault` 报错、与 `--bind-device` 互斥；
-19 测试 + `docs/Y3_KEY_PROVIDER_DESIGN.md`）；真实下游 Pro 缺口 Y-1/Y-2/Y-3 至此全清零。再落
+19 测试 + `docs/Y3_KEY_PROVIDER_DESIGN.md`）；两项已于 0.5.30 发布，真实下游 Pro 缺口 Y-1/Y-2/Y-3 至此全清零。再落
 **self-dogfooding 四 lane**（`dogfood/canary/` + `scripts/dogfood/run.py` + 非阻塞 `Dogfood` workflow，
 观察模式、非必需检查，首次 CI success）。外部：awesome-python PR #3352 被拒（采用量，含镜像口径）→
 文档更正、安全类 list 跳过；Vercel 卸载 + giscus 核实保留；`pyobfus-pro-dev` 私有仓归档；Claude plugin
 孤儿仓库锁已转人工；09-25 真人支持 Rudy 要求核对原提交账号，维护者查三个常用邮箱均无确认邮件，09-26 已用
 同一仓库根路径复现报错并在原线程附两张证据截图、workspace ID，请求后端定位/释放（锁没释放别再点表单）。用户 09-25 决定**等 1–2 天
-再发版**（建议合为 `0.5.30` Pro 小版本，dogfooding 不单独发；发版是独立 gate 须明确批准）。逐轮教训
+再发版**（此 gate 已于 09-26 获明确批准并发布为 `0.5.30`；dogfooding 不单独作为发版理由）。逐轮教训
 见 memory `pyobfus_session_closeout_2026-09-25`。
 
 **2026-09-25 下午续作（trial 现状核查 + KV 备份 P0）**：应用户「之前修订的 trial 现在怎样」核查
