@@ -21,6 +21,11 @@ This directory contains all legal and compliance documents for pyobfus Professio
   - User rights and data protection
   - International data transfers
 
+- **[AFFILIATE_PROGRAM_TERMS_DRAFT.md](AFFILIATE_PROGRAM_TERMS_DRAFT.md)** -
+  proposed affiliate pilot terms
+  - Draft only; not in effect and not a public enrolment offer
+  - Must receive accounting/legal review and an effective date before launch
+
 ## For Customers
 
 All purchases of pyobfus Professional Edition are subject to these legal terms. By completing a purchase, you acknowledge that you have read and agree to these terms.

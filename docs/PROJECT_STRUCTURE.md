@@ -91,6 +91,7 @@ pyobfus/
 └── docs/                 # Documentation
     ├── index.md          # GitHub Pages homepage
     ├── CURRENT_PLAN_ZH.md # Current project plan and priorities (Chinese content)
+    ├── AFFILIATE_PROGRAM_DESIGN.md # Planned commerce-only affiliate pilot
     ├── ROADMAP.md        # Archived development roadmap
     ├── COMPARISON.md     # Tool comparison (vs PyArmor, etc.)
     ├── PROJECT_STRUCTURE.md    # This file

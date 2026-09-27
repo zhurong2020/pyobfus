@@ -236,6 +236,7 @@ By purchasing pyobfus Professional Edition, you agree to our:
 - [Terms of Service & EULA](https://github.com/zhurong2020/pyobfus/blob/main/docs/legal/TERMS_OF_SERVICE.md)
 - [Refund Policy](https://github.com/zhurong2020/pyobfus/blob/main/docs/legal/REFUND_POLICY.md) - 30-day money-back guarantee
 - [Privacy Policy](https://github.com/zhurong2020/pyobfus/blob/main/docs/legal/PRIVACY_POLICY.md) - GDPR compliant
+- [Affiliate pilot design](AFFILIATE_PROGRAM_DESIGN.md) - approved design; not launched
 
 ---
 

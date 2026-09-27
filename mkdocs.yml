@@ -84,6 +84,7 @@ nav:
     - Reason codes: REASON_CODES.md
   - Distribution:
     - Open VSX publishing: OPEN_VSX_PUBLISH_PLAN.md
+    - Affiliate pilot design (not launched): AFFILIATE_PROGRAM_DESIGN.md
 
 markdown_extensions:
   - admonition
