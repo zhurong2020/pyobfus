@@ -118,6 +118,20 @@ No credential is stored in this repository.
   under "Baseline before publication". Maintainer stays available to reply to
   incoming comments; no vote solicitation, no simultaneous cross-posting of
   the same text.
+- **Final outcome (recorded 2026-09-27, +57 days, from the maintainer's
+  `/threads` page)**: 1 point, and the only comment is the maintainer's own
+  explanation. No outside replies ever arrived, and the item never reached the
+  front page. The +24 h / +7 d / +30 d measurements above were never taken;
+  this line replaces them. Account `znhskzj` has 2 karma.
+- The Show HN is **spent**. Do not repost it. HN allows a repost only when a
+  story got no attention, and the FAQ frames that as rare and roughly a year
+  apart; asking moderators for the second-chance pool is possible but not worth
+  pursuing. Any future HN use is at most one ordinary link submission of a
+  strong engineering post, written and discussed entirely by the maintainer
+  (see `docs/TODO.md`, "内容节奏").
+- The reply to benbalter's answer on the earlier MCP thread (drafted
+  2026-07-23, blocked by the HN login 429) was never posted. Optional; it is
+  now 66 days stale.
 
 ### CN long-form (arong.eu.org) — 2026-08-01
 

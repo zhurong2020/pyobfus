@@ -5,7 +5,7 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-09-26（Claude plugin 孤儿锁已按 Rudy 要求补齐账号核查、workspace ID 与两张截图并在原线程回复，现等后端处理；上一轮 09-25：trial 现状核查 + KV 备份 P0 当日完成；09-24：awesome-python PR #3352 当日被维护者关闭，理由是采用量，见「分发 / 上架队列」；
+最后更新：2026-09-27（新增「内容节奏」段：只写不发到 10-11、10-13 那周起 DEV 双周一篇，知乎选定为中文开发者渠道先记录，第 1 篇草稿已写；Show HN 最终结果补记；上一轮 09-26：Claude plugin 孤儿锁已按 Rudy 要求补齐账号核查、workspace ID 与两张截图并在原线程回复，现等后端处理；上一轮 09-25：trial 现状核查 + KV 备份 P0 当日完成；09-24：awesome-python PR #3352 当日被维护者关闭，理由是采用量，见「分发 / 上架队列」；
 `pyobfus-runtime` 0.1.0 已通过 OIDC/PEP 740 发布并完成 PyPI 验收；
 删除已完全合入 `main` 的本地及远端 `spike/mcp-sdk-2x` 空壳分支；
 修正本文件把已随 0.5.28 发布的邮箱 trial 误列为待实现、仍称 0.5.27 为当前版本的状态漂移。
@@ -193,6 +193,74 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 - **`pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]`**：mcp SDK 2.x 兼容。刻意不随 Core
   发，攒够增量或有人明确要 2.x 时再发（每发一次 MCP 要手工改 Glama Build steps）。
 
+
+## 内容节奏（2026-09-27 用户定 · 只写不发到 10-11，10-13 那周起发）
+
+**依据**：09-13→09-26 的 GitHub 流量来源是 github.com 32 / pypi.org 19 / Bing 15 /
+Google 14 / DuckDuckGo 9 / chatgpt.com 9，14 天 301 次浏览（169 独立访客）。dev.to、X、
+微博、Reddit、HN **一次都没出现**。7–8 月的发布波次（dev.to 两篇阅读 52/42、Show HN 1 分
+零外部评论、r/Python showcase）是一次性的，已结束。所以方向改成**能被搜索与 AI 问答
+收录的问题型工程文章**，按固定节奏发，每篇都有真实素材、可归因。
+
+**为什么 10-11 前不发**：10-25 前是 Core 静默观察期，目的是拿到第一份不受发版干扰的
+下载基线；前两周连内容也不发，保住这份读数。
+
+**渠道分工**
+
+| 渠道 | 角色 | 频率 | 谁发 |
+|---|---|---|---|
+| DEV（英文） | 主力，工程故事 | 每两周一篇 | 维护者（Claude 起草 + tech-deai + 文末 AI 辅助说明） |
+| arong.eu.org（中文） | 中文首发（WordPress 首发原则），自动推 Discord | 每月一篇，跟月度版本 | 维护者跑 findata `publish.py` |
+| **知乎**（中文开发者渠道，**2026-09-27 选定，先记录不开动**） | 把 WP 月度文人工粘贴并改写成知乎体，注明原文链接 | 跟 WP 月度文 | 维护者 |
+| Reddit r/Python | 当月 showcase 帖里发一条更新 | 有月度版本的月份 | 维护者 |
+| X | 每篇 DEV 顺手一条链接帖 | 跟 DEV | 维护者 |
+| HN | 最多一次，只投最强的事故复盘，普通链接帖 | 一次 | 维护者本人写标题与全部评论 |
+| 微博 | **不发 pyobfus**（受众是投资与医学读者） | — | — |
+
+V2EX 仍卡在账号激活（要邀请码）；Stack Overflow 按 2026-04-22 的决定到 Q4 再评估。
+
+**选题池**（真实素材，按搜索意图排；Stripe webhook 那段默认不写，待维护者定）
+
+1. Cloudflare 拦 `Python-urllib` UA（403 / error code 1010），全体付费客户两个月激活不了
+   —— **草稿已写**，放在 gitignored 的 `docs/internal/content-2026-10/01-urllib-user-agent-postmortem.md`
+   （`published: false`；维护者 09-27 定：发稿前不进公开仓库）
+2. SARIF 上传前别再 `|| true`（带出 `pyobfus-action`）
+3. PyInstaller / Nuitka 打包前先混淆（已有 cookbook）
+4. 2026 年 PyArmor 替代品的诚实对比（`docs/compare/` 已有搜索流量）
+5. Claude / Codex 能不能还原混淆过的 Python（08-01 基准，写明只有 5 个样本）
+6. 一个月 10 次发版、下载基线没动（**等 10-25 复盘数据**）
+
+**排期**
+
+| 时间 | 事项 |
+|---|---|
+| 09-28 → 10-11 | 只写不发：维护者审第 1 篇、Claude 起草第 2 篇；DEV 个人资料链 GitHub；X 简介加一句 pyobfus maintainer |
+| 10-13 那周（周二/三美东上午） | DEV 发第 1 篇 + X 一条；1–3 天后看反响，决定是否由维护者本人投一次 HN |
+| 10-25 | 节奏复盘，同时看第 1 篇的来源数据 |
+| 10-27 那周 | DEV 发第 2 篇 + X |
+| 11-02 → 11-06 | 月度版本（`[Unreleased]` 非空才发）+ r/Python showcase + WP 中文第 4 篇（1+2 合并）+ 知乎（若届时开动） |
+| 11-10 / 11-24 | DEV 第 4、6 篇 |
+| 12 月 | 第 3、5 篇 + 12 月 WP 月度篇 |
+
+**草稿存放规则（09-27 定）**
+
+- 未发布的文章一律放 `docs/internal/content-*/`（已 gitignore），**不进 `_drafts/`**：本仓库公开，
+  草稿一进 `main`，随下一次 push 就公开了。
+- `docs/internal/` **已在** `~/scripts/wsl_daily_backup.sh` 第 9 条里（09-21 加，`pyobfus_local_only/docs_internal/`，
+  09-27 日志 OK 845K）。⚠️ 但 09-27 核查发现该脚本的落点 `C:\Users\wuxia\OneDrive\Documents\wsl-backup`
+  已不是任何 OneDrive 账号的同步目录（个人账号现同步 `C:\onedrive\wuxiami\OneDrive`），Google Drive 上也只有
+  `backups/arong-vps/`：**此前 WSL 每日备份只有本机 C 盘一份**。同日已修：日备份末尾 rclone 镜像到
+  `gdrive:backups/wsl/`（详见全局 memory `reference_wsl_local_backup`），`check_backup.sh` 第 5 节可查。
+- 发布后可选把定稿连同真实 URL、发布日期、+24h/+7d/+30d 数据写回公开记录（参照
+  `_drafts/launch-v0.5.4/README.md` 的 Publication record 写法），草稿原文仍可留在 internal。
+
+**度量与退出**
+
+- 每周一巡检加一项：GitHub 流量来源（`gh api repos/zhurong2020/pyobfus/traffic/popular/referrers`）
+  + 每篇 DEV 阅读数。**待做**：把来源这一项并进 `scripts/download_snapshot.py`（免发版）。
+- 算有效：发文后 14 天内来源里出现 dev.to / reddit ≥ 10 独立访客，或 star、安静日中位数上移。
+- 退出：前 4 篇 DEV 每篇阅读都不到 100 且来源里从未出现 dev.to → 停止定期发，改成有好故事
+  才写；X 满 3 条没有来源 → 停；HN 投后 24 小时零外部评论 → HN 这条线收掉。
 
 ## 本轮留下的小尾巴（都不急，按顺手程度做）
 - **落地页只有一页**（`landing/index.html`）。目前够用：它要回答的只有"这是什么、
