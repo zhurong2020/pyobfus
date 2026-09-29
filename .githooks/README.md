@@ -78,3 +78,25 @@ PYOBFUS_ALLOW_SECRET=1 git commit ...
 
 If a blocked credential was ever real, **rotate it**. Removing it from the
 file is not a rotation.
+
+### `pre-push`
+
+Added 2026-09-29. Runs `scripts/check.sh` (black, ruff, mypy, discovery
+metadata, README links, `mkdocs build --strict`; about 10 seconds) before a
+push leaves the machine. CI's lint and docs jobs call the same script, so a
+push that passes this hook passes those two jobs.
+
+Why: the documented local commands had drifted to a subset of CI
+(`black pyobfus/` against ten paths in CI; no docs build at all). On
+2026-09-20 one unformatted file under `tests/` turned main red for nine
+consecutive pushes, and every open pull request with it; on 2026-09-29 a
+broken docs link failed `mkdocs --strict`. Both would have stopped here.
+
+Tests are not run by this hook: the four pytest roots and the Python/OS
+matrix stay in CI and in the commands listed in `AGENTS.md`.
+
+**Bypass once**, for a push that genuinely cannot pass locally:
+
+```bash
+PYOBFUS_SKIP_PREPUSH=1 git push ...
+```

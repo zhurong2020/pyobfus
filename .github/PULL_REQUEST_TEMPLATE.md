@@ -28,7 +28,7 @@ Please describe the tests you ran to verify your changes:
 
 ## Checklist
 
-- [ ] My code follows the project's style guidelines (`black`, `ruff`, `mypy`)
+- [ ] `scripts/check.sh` passes (black, ruff, mypy, docs build — the same checks CI runs)
 - [ ] I have performed a self-review of my own code
 - [ ] I have commented my code, particularly in hard-to-understand areas
 - [ ] I have made corresponding changes to the documentation

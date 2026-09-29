@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# pre-push: run the static checks CI runs, before they can turn main red.
+#
+# Runs scripts/check.sh (black, ruff, mypy, metadata, README links,
+# mkdocs --strict; about 10 seconds). Tests are not run here; see AGENTS.md.
+#
+# Setup (one-time per clone, shared with pre-commit):
+#     git config core.hooksPath .githooks
+#
+# Bypass for a push that genuinely cannot pass locally (say so in the commit):
+#     PYOBFUS_SKIP_PREPUSH=1 git push ...
+
+set -euo pipefail
+
+if [[ "${PYOBFUS_SKIP_PREPUSH:-}" == "1" ]]; then
+    echo "pre-push: PYOBFUS_SKIP_PREPUSH=1, skipping scripts/check.sh" >&2
+    exit 0
+fi
+
+repo_root="$(git rev-parse --show-toplevel)"
+
+if ! "$repo_root/scripts/check.sh" all; then
+    echo >&2
+    echo "pre-push: scripts/check.sh failed; the same check would fail in CI." >&2
+    echo "Fix it, or bypass with PYOBFUS_SKIP_PREPUSH=1 git push" >&2
+    exit 1
+fi

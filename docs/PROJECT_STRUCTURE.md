@@ -226,19 +226,10 @@ pytest -v
 ### Code Quality
 
 ```bash
-# Format code
-black pyobfus/ tests/
+# Formatting, lint, type check and docs build -- CI runs this same script
+scripts/check.sh
 
-# Type checking
-mypy pyobfus/
-
-# Linting
-ruff check pyobfus/ tests/
-
-# Run all checks (same as CI)
-black pyobfus/ tests/
-mypy pyobfus/
-ruff check pyobfus/ tests/
+# Tests (CI also runs the MCP, integration and runtime roots; see AGENTS.md)
 pytest --cov=pyobfus
 ```
 

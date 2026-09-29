@@ -46,20 +46,25 @@ remain the expected remote exception to this local WSL-only rule.
 ```bash
 python -m venv venv && source venv/bin/activate
 pip install -e ".[dev]"
-git config core.hooksPath .githooks   # once per clone — enables the pre-commit guard (PII + credentials)
+git config core.hooksPath .githooks   # once per clone — pre-commit (PII + credentials) and pre-push (scripts/check.sh)
 ```
 
 ## Build / test / lint — run before every commit
 
 ```bash
-venv/bin/pytest tests/                 # core suite (run this and the two below separately)
+scripts/check.sh                       # black, ruff, mypy, README links, mkdocs --strict (~10 s)
+venv/bin/pytest tests/                 # core suite (run each test root separately)
 venv/bin/pytest pyobfus_mcp/tests/     # MCP server suite
 venv/bin/pytest integration_tests/     # end-to-end CLI
 venv/bin/pytest pyobfus_runtime/tests/  # redistributable runtime boundary
-venv/bin/black pyobfus/                # format
-venv/bin/ruff check pyobfus/           # lint
-venv/bin/mypy pyobfus/                 # type check
 ```
+
+`scripts/check.sh` is the only list of lint/type/docs paths: CI's lint and
+docs jobs call the same script, and the `pre-push` hook runs it before every
+push. Do not replace it with a shorter hand-typed command such as
+`black pyobfus/`; CI checks ten paths, and a file that only CI looked at
+turned main red for nine pushes on 2026-09-20. To fix formatting, run
+`venv/bin/black` on the paths the script reports.
 
 Note: the core and MCP test roots are collected as **separate** pytest
 invocations (CI runs them as separate jobs) — don't point one `pytest` at both

@@ -112,12 +112,8 @@ git checkout -b feature/your-feature-name
 # Run tests
 pytest tests/ -v --cov=pyobfus
 
-# Check code style
-black pyobfus/
-ruff check pyobfus/
-
-# Type checking (optional but recommended)
-mypy pyobfus/
+# Formatting, lint, type check and docs build -- the same checks CI runs
+scripts/check.sh
 
 # Commit changes
 git add .

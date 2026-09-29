@@ -123,7 +123,7 @@ python -m venv venv
 source venv/bin/activate
 pip install -e ".[dev]"
 
-# 一次性激活仓库内的 PII 防护 pre-commit 钩子（每个 clone 各自做一次）
+# 一次性激活仓库内钩子（每个 clone 各自做一次）：pre-commit 拦 PII/凭证，pre-push 跑 scripts/check.sh
 git config core.hooksPath .githooks
 ```
 
@@ -141,9 +141,8 @@ pytest integration_tests/ -v
 
 ### 代码规范
 
-- 格式化: `black pyobfus/`
-- 类型检查: `mypy pyobfus/`
-- Lint: `ruff check pyobfus/`
+- 格式 / lint / 类型 / 文档站：一律跑 `scripts/check.sh`（与 CI 同一份路径清单，pre-push 钩子也跑它）。
+  **不要手打 `black pyobfus/` 之类的缩短命令**——CI 查 10 个路径，09-20 就因只有 CI 查的 `tests/` 文件连红 9 次推送。
 
 ### 发布流程
 

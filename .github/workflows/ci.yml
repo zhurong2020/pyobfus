@@ -68,23 +68,11 @@ jobs:
         pip install -e ./pyobfus_runtime
         pip install -e ".[dev]"
 
-    - name: Check code formatting with black
-      run: |
-        black --check pyobfus/ pyobfus_pro/ pyobfus_runtime/pyobfus_runtime/ pyobfus_runtime/tests/ pyobfus_mcp/pyobfus_mcp/ tests/ integration_tests/ benchmarks/llm_resistance/ examples/ scripts/
-
-    - name: Lint with ruff
-      run: |
-        ruff check pyobfus/ pyobfus_pro/ pyobfus_runtime/pyobfus_runtime/ pyobfus_runtime/tests/ pyobfus_mcp/pyobfus_mcp/ tests/ integration_tests/ benchmarks/llm_resistance/ examples/ scripts/
-
-    - name: Type check with mypy
-      run: |
-        # Check every shipped source package explicitly. Tests remain covered by
-        # runtime pytest and lint; they are not part of the public typed surface.
-        mypy pyobfus/ pyobfus_pro/ pyobfus_runtime/pyobfus_runtime/ pyobfus_mcp/pyobfus_mcp/
-
-    - name: Validate discovery metadata
-      run: |
-        python -m json.tool docs/.well-known/ai-catalog.json > /dev/null
+    # black, ruff, mypy and the discovery-metadata check. The paths live only
+    # in scripts/check.sh, which contributors and the pre-push hook run too, so
+    # the local and CI lists cannot drift apart again.
+    - name: Black, ruff, mypy, metadata (scripts/check.sh lint)
+      run: scripts/check.sh lint
 
   mcp-tests:
     # The MCP package has its own pytest root (AGENTS.md documents three roots).
@@ -281,18 +269,11 @@ jobs:
       with:
         python-version: '3.12'
 
-    # README.md is the package long_description. PyPI resolves relative links
-    # against the project page, so they 404 there while looking perfect on
-    # GitHub -- which is the view maintainers check. 46 shipped that way.
-    - name: Check README links survive PyPI rendering
-      run: python scripts/check_readme_links.py
-
     - name: Install docs dependencies
       run: pip install -r docs/requirements.txt
 
-    # --strict turns link warnings into failures. Without it the published site
-    # carried links to ../README.md and ../CHANGELOG.md that resolved to
-    # nothing, because those files live at the repository root and not in the
-    # docs tree. Nothing noticed, because nothing was checking.
-    - name: Build the documentation site
-      run: mkdocs build --strict
+    # README links must survive PyPI rendering (46 once shipped as 404s), and
+    # mkdocs --strict turns link warnings into failures. Both live in
+    # scripts/check.sh so a local run checks exactly what CI checks.
+    - name: README links + mkdocs --strict (scripts/check.sh docs)
+      run: scripts/check.sh docs
