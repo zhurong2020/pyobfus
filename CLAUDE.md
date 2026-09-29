@@ -22,6 +22,8 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - **AI/Agent 内容（09-28 定）**：`llms.txt`/`AGENTS.md`/MCP 这层已完整，**不另做 AI 专用页**；缺口用文章补
   （选题第 7 篇「混淆后让 AI 助手继续调试」排 11-24）。落地页已有 `SoftwareApplication` JSON-LD，改价须同步其 offers。
   每周一巡检跑 `python scripts/download_snapshot.py`（已含 GitHub 流量来源）；09-28 巡检记录在 `CURRENT_PLAN_ZH.md` 顶部。
+- **IP 后续（09-28 登记，待拍板未执行）**：提前公布 / 专利标识 + 专有许可补专利条款（随 11 月月度版本）/ 出海建议否、
+  2027-03 复核（优先权窗口 2027-05-22）。仓库侧见 `docs/TODO.md`「IP 相关」，法务侧 `~/projects/pyobfus-legal/IP商业化迁移_TODO.md`。
 - **Affiliate 只完成设计，未上线**：邀请制 3–5 人、无 cookie、签名 Stripe reference、20% / 30 天
   / 月结 / $50；公开设计 `docs/AFFILIATE_PROGRAM_DESIGN.md`，条款草案明确未生效。实现前先补 Worker
   event/session 双幂等、paid/async、refund/dispute、隐私日志、测试、KV 备份、Privacy/最终条款与财税确认；
