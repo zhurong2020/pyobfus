@@ -8,6 +8,10 @@
 **trial 登记仍 0**（上线 8 天）。Gmail：无人在等我们；plugin 孤儿锁线程 **Rudy 09-28 回信已升级内部、有消息再跟进**，
 09-27 定的「09-30 前无回复则跟进」取消。免发版小改：GitHub 流量来源并进 `scripts/download_snapshot.py`；第 2 篇内容
 草稿（SARIF `|| true`）已写入 gitignored `docs/internal/content-2026-10/`。基线判断等 10-05 攒满一整周安静日再读。
+同日续：确认 AI/Agent 这一层（`llms.txt` 已到 0.5.30、`AGENTS.md`、skills、MCP 各渠道、08-31 SEO Wave A/B/C）
+已完整且在起作用（chatgpt.com 是唯一带来访客的内容型来源），**不另做一套 AI 专用页面**；缺的是专门讲 AI 可调试性的
+文章 → 选题池加第 7 篇、排进 11-24。落地页补 `SoftwareApplication` JSON-LD（两档 offer $0 / $45，刻意不写版本号
+防漂移），随 Pages workflow 生效、免发版。
 
 **2026-09-27 进度核查 + 内容节奏定案**：按「查进度 = 进度 + 下载量 + Gmail」核查：仓库干净、CI 全绿、
 0 open issue/PR；Core 近 7 天安静日中位数 `21`、近 30 天 `30`（未抬升），MCP `6/7`，Marketplace `9 installs`；
