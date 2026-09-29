@@ -1,5 +1,12 @@
 # pyobfus 当前计划
 
+**2026-09-29 仓库维护（免发版，已 push，CI 全绿）**：① `CLAUDE.md` 从 92 KB 精简到约 18 KB，09-24 以前的逐次发版记录原样移到
+`docs/CLAUDE_MD_HISTORY.md`（已从文档站排除，维护者用）。② 本地与 CI 检查统一：新增 `scripts/check.sh`（black/ruff 10 个路径、
+mypy 4 个包、元数据、README 链接、`mkdocs --strict`），CI 的 lint/docs 任务直接调用它；新增 `.githooks/pre-push` 推送前跑它
+（约 7 s，旁路 `PYOBFUS_SKIP_PREPUSH=1`）；`AGENTS.md`/`CONTRIBUTING.md`/`PROJECT_STRUCTURE.md`/PR 模板改为指向脚本。起因：
+约定里只写 `black pyobfus/`，09-20 一个 `tests/` 下的格式问题让 main 连红 9 次、PR 全红；09-29 移动归档导致文档链接失效。
+**不影响静默期与 `[Unreleased]`**（仅开发工具，未进 CHANGELOG）。提交 `ff39ff8`→`ab9368e`→`3f3804e`。
+
 **2026-09-28 周一巡检（静默期第 1 周）**：仓库干净、CI / CodeQL / Dogfood / License Endpoint Monitor 全绿，
 0 open issue/PR，Dependabot 自动合并 #50/#51。下载（不含镜像，数据截至 09-28）：Core 近 7 天安静日中位数 `21`
 （仅 3 个安静日）、近 30 天 `30`，09-28 为 0.5.30 后首个干净安静日 `26`；MCP `4/7`（续降，量太小先观察）；runtime
