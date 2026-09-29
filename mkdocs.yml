@@ -11,6 +11,8 @@ exclude_docs: |
   # being published. Excluding the directory makes a local build match what
   # actually ships, instead of relying on the ignore rule to do two jobs.
   internal/
+  # Agent-facing history moved out of CLAUDE.md; maintainer-only.
+  CLAUDE_MD_HISTORY.md
 
 repo_name: zhurong2020/pyobfus
 repo_url: https://github.com/zhurong2020/pyobfus

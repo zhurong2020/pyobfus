@@ -59,8 +59,8 @@ UA（403 + `error code: 1010`），请求到不了 Worker，**所有付费客户
 一页一对手、文档站改 Material）与**第三方授权审计**（判断标准=**对本仓库的写权限即
 等于 PyPI 发布权**，因为 `release.yml` 由推送标签触发走 OIDC）。
 
-**这三条线的完整记述在 [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md) 的 09-13
-段，待办与「明确不做」在 [`docs/TODO.md`](docs/TODO.md)。本文件不复制细节。**
+**这三条线的完整记述在 [`docs/CURRENT_PLAN_ZH.md`](CURRENT_PLAN_ZH.md) 的 09-13
+段，待办与「明确不做」在 [`docs/TODO.md`](TODO.md)。本文件不复制细节。**
 
 ⚠️ 两条会咬人的事实：**`[project.urls]` 与 README 链接修复要发版才会到 PyPI**
 （项目 URL 打包时固化）；**`pyobfus-license deactivate` 需要 Worker 已部署**，
@@ -86,7 +86,7 @@ UA（403 + `error code: 1010`），请求到不了 Worker，**所有付费客户
   `mcp-sdk-2x` CI job 合并进 main（**依赖上限未动**；探路结论：升 2.x 对 stdio
   server 拿不到 `2026-07-28` 协议，见 `docs/MCP_SDK_2X_SPIKE.md`）、新增只读
   `pyobfus-review` skill、`COMPARISON.md` 补浏览器端混淆服务小节。
-  **下一步做什么看 [`docs/TODO.md`](docs/TODO.md)。**
+  **下一步做什么看 [`docs/TODO.md`](TODO.md)。**
 - Core **`0.5.28`**（2026-09-20 · reason codes + trial `--email` + CycloneDX 1.7）/ MCP **`0.3.12`** / VS Code **`0.4.3`** 为最新公开版本；VS Code
   扩展同时在 **Microsoft Marketplace 与 Open VSX** 上架，两边同为 `0.4.3`（均已 curl 独立复核）。
 - **✅ `Core 0.5.24` 已于 2026-09-12 发布**（用户批准「按照流程发版」）= unified
@@ -100,7 +100,7 @@ UA（403 + `error code: 1010`），请求到不了 Worker，**所有付费客户
   字符串、license/buyer/device 值。tag `v0.5.24` 经 OIDC + PEP 740 发 PyPI
   （`latest=0.5.24`，两个 provenance endpoint 均 200），全新 venv 装已发布 wheel
   实跑确认报告写 0.5.24 且无绝对路径，GitHub Release 已建，CI 全矩阵 + CodeQL 全绿。
-  契约见 [`docs/VERIFIABLE_BUILD_REPORT.md`](docs/VERIFIABLE_BUILD_REPORT.md)。
+  契约见 [`docs/VERIFIABLE_BUILD_REPORT.md`](VERIFIABLE_BUILD_REPORT.md)。
   ⚠️ **发版前踩到的环境陷阱**：本地 venv 的 editable 元数据停在 0.5.19（dist-info
   未随版本号更新），导致本地实跑生成的 marker/report 都写 0.5.19，看起来像发布缺陷。
   **不是**——PyPI 安装读自己的元数据。凡是要核验「输出里的版本号」，先
@@ -136,7 +136,7 @@ UA（403 + `error code: 1010`），请求到不了 Worker，**所有付费客户
   HTTP 200。两个易误读的字段：上传后**立即**查询返回 404 只是索引传播延迟（同日
   自愈，别据此判失败）；API 的 `verified: false` 是 namespace 归属验证标记、与
   发布成败无关。发布记录 + 再发布 runbook：
-  [`docs/OPEN_VSX_PUBLISH_PLAN.md`](docs/OPEN_VSX_PUBLISH_PLAN.md)。发布 token 存
+  [`docs/OPEN_VSX_PUBLISH_PLAN.md`](OPEN_VSX_PUBLISH_PLAN.md)。发布 token 存
   Vaultwarden 条目 `Open VSX Access Token (pyobfus)`（唯一副本，**不进仓库/CI**，
   维护者定期轮换）。
 - **🟢 Glama（2026-09-07 全线结清，无待办）**：① **构建已恢复**——连续两次
@@ -199,14 +199,14 @@ UA（403 + `error code: 1010`），请求到不了 Worker，**所有付费客户
   + `--level` 改 tri-state）。发布后 main CI 曾因一处脆弱测试断言在单个 Py3.14
   job 红一次（numeric-obfuscation 目录模式用子串 `= 42` 检查被随机 XOR 分量前缀
   误中），已改为 AST 断言（commit `1e62674`）后转绿；发布 wheel 不受影响，未重发。
-  验收见 [`docs/V0.5.21_RELEASE_PLAN.md`](docs/V0.5.21_RELEASE_PLAN.md)。
+  验收见 [`docs/V0.5.21_RELEASE_PLAN.md`](V0.5.21_RELEASE_PLAN.md)。
   Community build marker 仍是已设计但 gated 的 P2，未随 0.5.21 发布。
 - 本轮还重写了废弃的 `docs/INTEGRATION_TESTING.md`、修了两处文档死链、补录三个
   已发布 Community flag（`--numeric-obfuscation`/`--strip-ai-artifacts`/
   `--incremental`）到 README/llms/index。逐轮明细见 `docs/CURRENT_PLAN_ZH.md`。
 - self-dogfooding 采用 audit/manual → N-1/N canary → wheel verification 的分阶段
   路线；不把公开 Core/Pro wheel 自混淆。规范见
-  [`docs/SELF_DOGFOODING_BEST_PRACTICES.md`](docs/SELF_DOGFOODING_BEST_PRACTICES.md)。
+  [`docs/SELF_DOGFOODING_BEST_PRACTICES.md`](SELF_DOGFOODING_BEST_PRACTICES.md)。
 - Canopii 已显示 publisher/maintainer verified；合理的 VS Code/Worker 安全加固
   已完成并推送，monorepo scope、v0.3.10 stale scan 与 8 tools 未提取已报
   [canopii-cli#6](https://github.com/canopii-dev/canopii-cli/issues/6)。后续只按
@@ -264,7 +264,7 @@ UA（403 + `error code: 1010`），请求到不了 Worker，**所有付费客户
 - 08-24 发布后的首轮完整数据已复查：发布日下载为 Core 137 / MCP 99，
   08-25 随即回落为 27 / 8；GitHub issue、PR、Discussion 均无新增，维持
   “发布/自动化噪音，尚无有机增长”判断。证据已追加到
-  [`docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md`](docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md)。
+  [`docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md`](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md)。
 - 一位真实 Pro 客户确认使用进展良好，并要求为既有 Payment Link 购买开票。
   付款已成功关联，Dashboard 为 Paid / US$0.00 remaining。2026-09-01 Stripe
   Support 最终确认：`send invoice` 的 invoice PDF 按设计保留原始应付金额与
@@ -275,14 +275,14 @@ UA（403 + `error code: 1010`），请求到不了 Worker，**所有付费客户
   需求。当前状态以 `docs/CURRENT_PLAN_ZH.md` 为准；具体客户/支付信息只留在
   Git 忽略的 `docs/internal/` 运营记录，绝不进入公开提交。
 - 下一轮功能方向已完成代码审计与官方资料调研，最新一版见
-  [`docs/FEATURE_EXPANSION_RESEARCH_2026-09-02.md`](docs/FEATURE_EXPANSION_RESEARCH_2026-09-02.md)
+  [`docs/FEATURE_EXPANSION_RESEARCH_2026-09-02.md`](FEATURE_EXPANSION_RESEARCH_2026-09-02.md)
   （刷新并取代 2026-08-26 版）。
   配置感知 `--check`（0.5.18）、`--dry-run --json` versioned plan 与
   `--verify-syntax`（均 0.5.19，见本节首条）都已发布。暂不做任意
   `--verify-command`、zip/tar delivery bundle、mapping 内建加密或团队 license
   后端。
 - **✅ 长尾词 / AI 搜索优化 rollout 已完成（2026-09-01）** —— 竞品扫描 + 15 个 surface 的关键词计划见
-  [`docs/SEO_AND_COMPETITOR_SCAN_2026-08-31.md`](docs/SEO_AND_COMPETITOR_SCAN_2026-08-31.md)，
+  [`docs/SEO_AND_COMPETITOR_SCAN_2026-08-31.md`](SEO_AND_COMPETITOR_SCAN_2026-08-31.md)，
   Wave A/B/C 均已落地，Wave C 随 Core 0.5.20 / MCP 0.3.10 发布。
   相关外部状态已于 2026-09-02 全部收口；下一功能方向仍须用户 gate。
 - 2026-08-30 至 09-02 的发布与收尾均已 push：0.5.19 功能版、两轮 docs
@@ -313,7 +313,7 @@ UA（403 + `error code: 1010`），请求到不了 Worker，**所有付费客户
   Canopii 的 39/F 来自扫描 sibling Pro runtime 的 `marshal.loads` 语法命中，
   MCP 输入无可达路径；该历史待办现已推进为 upstream #6，见顶部当前焦点。
 - 冷启动的完整数字、证据边界与 2-3 天后复查清单见
-  [`docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md`](docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md)。
+  [`docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md`](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md)。
   当前开发/产品优先级仍只看 `docs/CURRENT_PLAN_ZH.md`。
 
 ### ✅ 2026-08-21 — 周期性复查（下载量 + Glama + Claude plugin），全部无变化
