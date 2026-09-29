@@ -4,12 +4,14 @@
 Prints, for each PyPI package, the last N days of *non-mirror* daily downloads
 with release days marked (from git tags), plus the non-release-day median so a
 release-day spike is never read as growth.  Then the VS Code Marketplace,
-Open VSX and GitHub Action attribution counters.
+Open VSX and GitHub Action attribution counters, and the repo's 14-day
+traffic referrers.
 
 Usage:  python scripts/download_snapshot.py [--days 14] [--no-gh]
 
 Stdout is plain ASCII on purpose (Windows consoles).  No credentials needed;
-the optional GitHub code search uses the ``gh`` CLI's own login.
+the optional GitHub code search and traffic lookup use the ``gh`` CLI's own
+login (traffic requires push access, so it reports n/a for anyone else).
 """
 
 from __future__ import annotations
@@ -156,6 +158,33 @@ def action_section() -> None:
     print("   GitHub code search only indexes visible repos; measures visibility, not adoption")
 
 
+def gh_api(path: str):
+    out = subprocess.run(
+        ["gh", "api", path], capture_output=True, text=True, timeout=60, check=True
+    ).stdout
+    return json.loads(out)
+
+
+def traffic_section() -> None:
+    """GitHub repo traffic: 14-day views and referrers.  Needs push access
+    (the ``gh`` login of a maintainer); the data is a rolling 14-day window."""
+    try:
+        views = gh_api("repos/zhurong2020/pyobfus/traffic/views")
+        refs = gh_api("repos/zhurong2020/pyobfus/traffic/popular/referrers")
+    except Exception as e:  # noqa: BLE001 - reporting only
+        print(f"== GitHub traffic: n/a ({str(e)[:80]})")
+        return
+    print(
+        f"== GitHub traffic (rolling 14 days): views={views.get('count')} "
+        f"unique={views.get('uniques')}"
+    )
+    print(
+        "   referrers (views/unique): "
+        + (", ".join(f"{r['referrer']} {r['count']}/{r['uniques']}" for r in refs) or "none")
+    )
+    print("   content channels count once they appear here (e.g. dev.to, reddit.com)")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--days", type=int, default=14)
@@ -180,6 +209,7 @@ def main() -> int:
             print(f"== {fn.__name__}: fetch failed ({e})")
     if not a.no_gh:
         action_section()
+        traffic_section()
     print(
         "Read the quiet-day median, not the totals: releases spike the same day and fall back in 2-3 days."
     )

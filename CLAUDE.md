@@ -34,7 +34,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   `22986080` 与 `CITATION.cff` 也已同步。自本版起进入 10-25 前静默观察期。
 - **self-dogfooding 四 lane 已落地为观察模式**：`dogfood/canary/` + `scripts/dogfood/run.py` +
   非阻塞 `Dogfood` workflow（**刻意不是必需检查**）；升 PR gate 是单独 reviewed 步骤。
-- **Claude plugin：孤儿仓库锁已补齐证据升级给真人支持 Rudy**。维护者查
+- **Claude plugin：孤儿仓库锁已由真人支持 Rudy 于 09-28 升级到 Anthropic 内部**，等其跟进（球在对方）。维护者查
   `wuxiami@hotmail.com` / `zhurong0525@gmail.com` / `zhurong0525@icloud.com` 均无 08-02
   确认邮件；同一公开仓库根路径稳定复现锁报错。09-26 已在 Rudy 原线程附「No submissions yet」与
   repository/path lock 两张截图、三个候选邮箱及 Claude Code workspace ID，请求后端定位/释放。

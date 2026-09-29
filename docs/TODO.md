@@ -5,7 +5,7 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-09-27（新增「内容节奏」段：只写不发到 10-11、10-13 那周起 DEV 双周一篇，知乎选定为中文开发者渠道先记录，第 1 篇草稿已写；Show HN 最终结果补记；上一轮 09-26：Claude plugin 孤儿锁已按 Rudy 要求补齐账号核查、workspace ID 与两张截图并在原线程回复，现等后端处理；上一轮 09-25：trial 现状核查 + KV 备份 P0 当日完成；09-24：awesome-python PR #3352 当日被维护者关闭，理由是采用量，见「分发 / 上架队列」；
+最后更新：2026-09-28（周一巡检：plugin 锁由 Rudy 09-28 升级到 Anthropic 内部、等其跟进；GitHub 流量来源已并进 `download_snapshot.py`；第 2 篇草稿已写。上一轮 09-27：新增「内容节奏」段：只写不发到 10-11、10-13 那周起 DEV 双周一篇，知乎选定为中文开发者渠道先记录，第 1 篇草稿已写；Show HN 最终结果补记；上一轮 09-26：Claude plugin 孤儿锁已按 Rudy 要求补齐账号核查、workspace ID 与两张截图并在原线程回复，现等后端处理；上一轮 09-25：trial 现状核查 + KV 备份 P0 当日完成；09-24：awesome-python PR #3352 当日被维护者关闭，理由是采用量，见「分发 / 上架队列」；
 `pyobfus-runtime` 0.1.0 已通过 OIDC/PEP 740 发布并完成 PyPI 验收；
 删除已完全合入 `main` 的本地及远端 `spike/mcp-sdk-2x` 空壳分支；
 修正本文件把已随 0.5.28 发布的邮箱 trial 误列为待实现、仍称 0.5.27 为当前版本的状态漂移。
@@ -33,7 +33,7 @@ Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运�
 
 按顺手程度排，每项的细节都在本文件后面对应小节或所指文件里，这里只是一处能勾掉的总表。
 
-- [ ] **Claude plugin — 已补齐证据回复真人支持，等待后端解除锁**（2026-09-26 更新）：Console 重提被拒
+- [ ] **Claude plugin — 已由真人支持升级到内部，等待后端解除锁**（2026-09-28 更新）：Console 重提被拒
       「Another submission already holds this repository and path」，但两个工作区 submissions 页都 `No submissions yet`。
       2026-08-02 旧提交没消失，而是留了个自己撤不掉的**孤儿仓库锁**。**别再反复点提交表单**（同一个锁挡）；
       走 contact the directory team 请求释放锁,说明:表单报错原文 + 两工作区皆空 + 旧提交约 2026-08-02 +
@@ -41,7 +41,7 @@ Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运�
       自动回信称只懂 Claude Code worktree 锁、需真人释放提交锁并主动提出转人工,维护者已回「yes」转人工**。
       09-25 真人支持 Rudy 回信要求核对原提交账号；维护者已查三个常用邮箱均无确认邮件，随后以同一仓库根路径
       复现锁报错，并于 09-26 在原线程附上「No submissions yet」与 repository/path lock 两张截图，提供
-      Claude Code workspace ID，请求后端定位/释放。**现等支持回复，锁没释放前别再点表单或换路径绕过**。字段/描述与证据见
+      Claude Code workspace ID，请求后端定位/释放。**09-28 Rudy 回信「已升级内部，有消息再跟进」——球在对方，不必再催；锁没释放前别再点表单或换路径绕过**。字段/描述与证据见
       `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`。
 - [ ] **MCP Trust Registry publish**：在其站点注册拿 API token 后
       `MCPTRUSTCHECKER_TOKEN=… npx --yes mcptrustchecker@1.14.0 publish pyobfus-mcp --registry pypi --online --category developer-tools`
@@ -224,7 +224,8 @@ V2EX 仍卡在账号激活（要邀请码）；Stack Overflow 按 2026-04-22 的
 1. Cloudflare 拦 `Python-urllib` UA（403 / error code 1010），全体付费客户两个月激活不了
    —— **草稿已写**，放在 gitignored 的 `docs/internal/content-2026-10/01-urllib-user-agent-postmortem.md`
    （`published: false`；维护者 09-27 定：发稿前不进公开仓库）
-2. SARIF 上传前别再 `|| true`（带出 `pyobfus-action`）
+2. SARIF 上传前别再 `|| true`（带出 `pyobfus-action`）—— **草稿已写 09-28**，
+   `docs/internal/content-2026-10/02-sarif-or-true.md`（`published: false`，待维护者审）
 3. PyInstaller / Nuitka 打包前先混淆（已有 cookbook）
 4. 2026 年 PyArmor 替代品的诚实对比（`docs/compare/` 已有搜索流量）
 5. Claude / Codex 能不能还原混淆过的 Python（08-01 基准，写明只有 5 个样本）
@@ -257,7 +258,7 @@ V2EX 仍卡在账号激活（要邀请码）；Stack Overflow 按 2026-04-22 的
 **度量与退出**
 
 - 每周一巡检加一项：GitHub 流量来源（`gh api repos/zhurong2020/pyobfus/traffic/popular/referrers`）
-  + 每篇 DEV 阅读数。**待做**：把来源这一项并进 `scripts/download_snapshot.py`（免发版）。
+  + 每篇 DEV 阅读数。来源与 14 天浏览量已并进 `scripts/download_snapshot.py`（09-28，免发版），巡检跑一条命令即可。
 - 算有效：发文后 14 天内来源里出现 dev.to / reddit ≥ 10 独立访客，或 star、安静日中位数上移。
 - 退出：前 4 篇 DEV 每篇阅读都不到 100 且来源里从未出现 dev.to → 停止定期发，改成有好故事
   才写；X 满 3 条没有来源 → 停；HN 投后 24 小时零外部评论 → HN 这条线收掉。

@@ -1,5 +1,14 @@
 # pyobfus 当前计划
 
+**2026-09-28 周一巡检（静默期第 1 周）**：仓库干净、CI / CodeQL / Dogfood / License Endpoint Monitor 全绿，
+0 open issue/PR，Dependabot 自动合并 #50/#51。下载（不含镜像，数据截至 09-28）：Core 近 7 天安静日中位数 `21`
+（仅 3 个安静日）、近 30 天 `30`，09-28 为 0.5.30 后首个干净安静日 `26`；MCP `4/7`（续降，量太小先观察）；runtime
+继续以本仓库 CI 为主；Marketplace `11 installs`、Open VSX `598`、Action 可见引用 `0`。GitHub 14 天浏览 `301`/独立 `169`，
+来源仍是 github.com / pypi.org / 搜索引擎 / chatgpt.com，内容渠道未出现。KV：license 5 条（最新 09-12，**无新购买**），
+**trial 登记仍 0**（上线 8 天）。Gmail：无人在等我们；plugin 孤儿锁线程 **Rudy 09-28 回信已升级内部、有消息再跟进**，
+09-27 定的「09-30 前无回复则跟进」取消。免发版小改：GitHub 流量来源并进 `scripts/download_snapshot.py`；第 2 篇内容
+草稿（SARIF `|| true`）已写入 gitignored `docs/internal/content-2026-10/`。基线判断等 10-05 攒满一整周安静日再读。
+
 **2026-09-27 进度核查 + 内容节奏定案**：按「查进度 = 进度 + 下载量 + Gmail」核查：仓库干净、CI 全绿、
 0 open issue/PR；Core 近 7 天安静日中位数 `21`、近 30 天 `30`（未抬升），MCP `6/7`，Marketplace `9 installs`；
 Gmail 无人在等我们（plugin 孤儿锁线程最后一封是我们 09-27 的回复，等 Rudy；09-26 的 "Rate your conversation"
