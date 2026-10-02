@@ -7,13 +7,17 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-**Last updated**: 2026-09-30 (queried 2026-10-01 00:30 UTC; PyPI data through
-09-29). Core's 7-day and 30-day non-release-day medians are both `30`, still
-next to the September baseline of `31`; there is no evidence of organic
-baseline uplift. MCP's corresponding medians are `4 / 6`. Marketplace reports
-`12 installs`; Open VSX reports `602 downloads`, but that cumulative fetch
+**Last updated**: 2026-10-02 (queried 10:57 UTC; PyPI data through 10-01).
+Core's 7-day non-release-day median is `40`, but it covers only three quiet
+days; its 30-day median remains `30`, next to the September baseline of `31`,
+so there is not yet evidence of organic baseline uplift. MCP's corresponding
+medians are `4 / 7`. Marketplace reports `12 installs`; Open VSX reports
+`612 downloads`, but that cumulative fetch
 counter includes mirrors and automated clients and is not additive with
 Marketplace installs. GitHub Action attribution remains `0` visible repos.
+GitHub's rolling 14-day traffic is `244 views / 122 unique visitors`; referrers
+remain search engines, GitHub, PyPI, and chatgpt.com, with no DEV or Reddit
+referrer yet.
 Current public versions are pyobfus **`0.5.30`** (released 09-26/27),
 pyobfus-mcp `0.3.12`, pyobfus-runtime `0.1.0`, and VS Code/Open VSX **`0.4.3`**.
 Open VSX is live; Glama is listed, searchable and healthy, with all 8 tools.
