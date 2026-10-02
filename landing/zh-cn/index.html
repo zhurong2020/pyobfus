@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>pyobfus 中文入口：交付前保护 Python，交付后仍可调试</title>
-<meta name="description" content="pyobfus 中文入口。本地 AST Python 混淆、生产 traceback 反向映射、免费不限文件和代码行数。">
+<meta name="description" content="pyobfus 中文入口。本地 Python 代码混淆、生产错误堆栈名称还原、免费不限文件和代码行数。">
 <link rel="icon" href="../logo.jpeg">
 <link rel="canonical" href="https://zhurong2020.github.io/pyobfus/zh-cn/">
 <link rel="alternate" hreflang="en" href="https://zhurong2020.github.io/pyobfus/">
@@ -13,7 +13,7 @@
 <style>
   :root{--navy:#1a2a5e;--cyan:#22c7e8;--ink:#1c2130;--muted:#5d6b84;--line:#dfe5ee;--bg:#f7f9fc;--card:#fff;--code:#0f1729}
   @media(prefers-color-scheme:dark){:root{--ink:#e8edf6;--muted:#9aa8bf;--line:#28324a;--bg:#0d1320;--card:#141c2d}}
-  *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.75 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif}.bar{height:5px;background:linear-gradient(90deg,var(--navy),var(--cyan))}.wrap{max-width:900px;margin:auto;padding:0 24px}a{color:#1668c7}header{padding:54px 0 42px;text-align:center}header img{width:96px;border-radius:14px}h1{font-size:clamp(34px,6vw,52px);margin:16px 0 6px}.lede{font-size:20px;color:var(--muted);max-width:650px;margin:auto}.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:28px 0}.btn{padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600}.primary{background:var(--navy);color:#fff}.secondary{border:1px solid var(--line);color:inherit}.note{font-size:14px;color:var(--muted)}section{padding:56px 0 44px;border-top:1px solid var(--line)}h2{margin:0 0 12px}.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}.card h3{margin-top:0}.pro-list{columns:2;column-gap:36px;padding-left:22px}.pro-list li{break-inside:avoid;margin:7px 0}.section-actions{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:24px}pre{background:var(--code);color:#e6edf7;padding:17px;border-radius:10px;overflow:auto}footer{padding:30px 0 45px;border-top:1px solid var(--line);color:var(--muted)}@media(max-width:600px){section{padding-top:48px}.pro-list{columns:1}}
+  *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.75 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans SC",sans-serif}.bar{height:5px;background:linear-gradient(90deg,var(--navy),var(--cyan))}.wrap{max-width:900px;margin:auto;padding:0 24px}a{color:#1668c7}header.wrap{padding:54px 24px 42px;text-align:center}header img{width:96px;border-radius:14px}h1{font-size:clamp(34px,6vw,52px);margin:16px 0 6px}.lede{font-size:20px;color:var(--muted);max-width:650px;margin:auto}.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:28px 0}.btn{padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:600}.primary{background:var(--navy);color:#fff}.secondary{border:1px solid var(--line);color:inherit}.note{font-size:14px;color:var(--muted)}section.wrap{padding:56px 24px 48px;border-top:1px solid var(--line)}h2{margin:0 0 12px}.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px}.card h3{margin-top:0}.pro-list{columns:2;column-gap:36px;padding-left:22px}.pro-list li{break-inside:avoid;margin:7px 0}.section-actions{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:24px}pre{background:var(--code);color:#e6edf7;padding:17px;border-radius:10px;overflow:auto}footer.wrap{padding:42px 24px 52px;border-top:1px solid var(--line);color:var(--muted)}@media(max-width:600px){section.wrap{padding-top:48px}.pro-list{columns:1}}
 </style>
 </head>
 <body>
@@ -28,25 +28,25 @@
     <a class="btn secondary" href="#professional">了解 Professional</a>
     <a class="btn secondary" href="https://github.com/zhurong2020/pyobfus/blob/main/README.zh-CN.md">中文说明</a>
   </div>
-  <p class="note">Community 采用 Apache-2.0，不限制文件数和代码行数，也不需要试用。</p>
+  <p class="note">社区版采用 Apache-2.0 开源许可证，不限制文件数和代码行数，也不需要试用。</p>
 </header>
 
 <section class="wrap">
   <h2>为什么选择 pyobfus</h2>
   <div class="grid">
-    <div class="card"><h3>本地处理</h3><p>源码留在本机；Community 输出普通、跨平台的 Python 文件。</p></div>
-    <div class="card"><h3>混淆后仍可调试</h3><p>私有保存 mapping，可将生产 traceback 中的标识符恢复后交给开发者或 AI Agent 分析。</p></div>
-    <div class="card"><h3>过程可验证</h3><p>构建前扫描和预览，构建后保留语法验证、provenance 与可复现报告。</p></div>
+    <div class="card"><h3>本地处理</h3><p>源码留在本机；社区版输出普通、跨平台的 Python 文件。</p></div>
+    <div class="card"><h3>混淆后仍可调试</h3><p>私有保存名称映射文件，可还原生产错误堆栈中的标识符，再交给开发者或 AI 编程助手分析。</p></div>
+    <div class="card"><h3>过程可验证</h3><p>构建前扫描和预览，构建后保留语法验证、构建来源记录与可复现报告。</p></div>
   </div>
 </section>
 
 <section class="wrap" id="professional">
   <h2>何时选择 Professional</h2>
-  <p>Community 已覆盖可靠混淆、检查、验证和调试的完整本地工作流。需要保护商业交付物时，
+  <p>社区版已覆盖可靠混淆、检查、验证和调试的完整本地工作流。需要保护商业交付物时，
     Professional 在同一工作流上增加四类价值：</p>
   <ul class="pro-list">
     <li><strong>更强保护：</strong>提高静态分析和动态调试成本。</li>
-    <li><strong>更多受保护资产：</strong>覆盖字符串、嵌入数据和 traceback 等内容。</li>
+    <li><strong>更多受保护资产：</strong>覆盖字符串、嵌入数据和错误堆栈等内容。</li>
     <li><strong>分发控制：</strong>按设备、期限、次数、平台或应用密钥控制运行。</li>
     <li><strong>责任追踪：</strong>通过取证水印和买方专属构建追踪泄漏来源。</li>
   </ul>
@@ -63,23 +63,23 @@
   <pre><code>pip install pyobfus
 pyobfus --check src/
 pyobfus src/ -o dist/ --save-mapping mapping.json --verify-syntax</code></pre>
-  <p>输入/输出示例只维护一份，请查看英文 README 的
-    <a href="https://github.com/zhurong2020/pyobfus#minimal-example">Minimal example</a>。
+  <p>输入/输出示例只维护一份，请查看英文项目说明中的
+    <a href="https://github.com/zhurong2020/pyobfus#minimal-example">最小示例</a>。
   </p>
 </section>
 
 <section class="wrap">
   <h2>继续阅读</h2>
   <div class="grid">
-    <div class="card"><h3>中文概览</h3><p>功能边界、Agent/编辑器/CI 接入与安全说明。</p><a href="https://github.com/zhurong2020/pyobfus/blob/main/README.zh-CN.md">打开中文 README →</a></div>
-    <div class="card"><h3>完整技术文档</h3><p>配置、验证、打包、威胁模型和竞品比较以英文 RTD 为权威来源。</p><a href="https://pyobfus.readthedocs.io/">打开 Read the Docs →</a></div>
+    <div class="card"><h3>中文概览</h3><p>功能边界、AI 编程助手、编辑器、持续集成与安全说明。</p><a href="https://github.com/zhurong2020/pyobfus/blob/main/README.zh-CN.md">打开中文项目说明 →</a></div>
+    <div class="card"><h3>完整技术文档</h3><p>英文技术文档内容最完整；如阅读困难，可以使用浏览器内置的网页翻译功能。</p><a href="https://pyobfus.readthedocs.io/">打开完整技术文档 →</a></div>
     <div class="card"><h3>购买与试用</h3><p>先用中文了解升级价值，再进入统一维护的购买步骤。</p><a href="#professional">中文查看详情 →</a></div>
   </div>
 </section>
 
 <footer class="wrap">
-  <p>本页是稳定中文入口，不复制完整手册；价格、功能和安全边界分别由英文产品页、版本政策和 RTD 维护。</p>
-  <a href="../llms.txt">For AI agents</a> ·
+  <p>本页是稳定的中文入口，不复制完整手册；价格、功能和安全边界以英文产品页、版本划分原则和完整技术文档为准。阅读英文内容有困难时，可以使用浏览器内置的网页翻译功能。</p>
+  <a href="../llms.txt">AI 编程助手指南</a> ·
   <a href="https://github.com/zhurong2020/pyobfus">GitHub</a>
 </footer>
 </body>
