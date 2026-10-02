@@ -64,6 +64,25 @@ Resolution commits are recorded in the repositories themselves. The legal
 workspace is intentionally not a Git repository; its two routing/status files
 were updated in place and remain covered by the workspace backup policy.
 
+## Session closeout sync status
+
+Checked again at the end of the 2026-10-02 documentation session:
+
+- `pyobfus` is clean and synchronized with `origin/main` through `6b8872b`.
+- `pyobfus-action` commit `ad33bb7` and `workspace-meta` commit `9636fd8` are
+  pushed; both working trees are clean and synchronized.
+- `pyobfus-pro-dev` commit `e0d9e21` remains local because GitHub rejects pushes
+  to the intentionally archived/read-only repository (HTTP 403). Do not
+  temporarily unarchive it merely to publish a historical status edit. The
+  untracked local `venv-3.10/` is a development environment and was left alone.
+- `home` commit `812e5a3` contains the pyobfus routing update but sits above four
+  unrelated personal finance/household/legal commits. This session did not push
+  that stack, avoiding incidental publication outside the pyobfus task scope;
+  the home-repository maintainer can decide its normal backup/push timing.
+
+These two local-only cases do not change the public product architecture or
+release state and must not be treated as a reason to publish a pyobfus package.
+
 ## Maintenance rule
 
 A change to package boundaries, repository ownership, release independence, or

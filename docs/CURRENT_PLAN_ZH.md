@@ -48,7 +48,9 @@ builder/runtime/MCP/VS Code/Action 拓扑，README、威胁模型、支持矩阵
 `AGENTS.md`、架构兼容与 runtime 交付边界；私有 Pro 开发仓改为历史只读并保留原始证据；
 `workspace-meta` 新增产品线仓库映射，`home` 与 `pyobfus-legal` 同步当前职责/Phase 5 已完成状态。
 完整发现、处置与以后同步触发规则见 `CROSS_REPO_DOC_SYNC_AUDIT_2026-10-02.md`。均为文档维护，
-不触发发版。
+不触发发版。session 收尾时已补推 `pyobfus-action` 的 `ad33bb7` 与 `workspace-meta` 的 `9636fd8`；
+`pyobfus-pro-dev` 因仓库已归档只读而无法推送 `e0d9e21`，保留本地且不为此解除归档；`home` 的
+`812e5a3` 前叠有四个无关个人记录提交，本轮为避免越界未推，等待该仓正常维护时处理。
 
 **2026-10-02 临时下载快照**（查询于 10-02 10:57 UTC，PyPI 数据截至 10-01）：Core 近 7 天
 安静日中位数 `40`（仅 3 个安静日，样本仍不足），近 30 天中位数 `30`，因此暂不判定基线高于
