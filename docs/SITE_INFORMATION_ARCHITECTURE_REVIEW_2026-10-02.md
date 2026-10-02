@@ -75,3 +75,20 @@ git log -5 --oneline
 
 从第一个未勾选项继续；不要重做已完成阶段，不要改变现有 URL，不要自行扩展为内容营销
 或在线源码上传项目。
+
+## E. README / 中文 / Agent 入口收口 — ✅ 完成
+
+- [x] 英文 README 从 916 行百科全书收敛为项目入口，保留外部引用锚点
+- [x] 详细配置、架构、限制、对比与开发内容统一链接到现有专页
+- [x] 新增精简 `README.zh-CN.md` 并双向链接，不做完整镜像
+- [x] 精简 root / RTD 的 `llms.txt`；Pages 部署时从同一源复制
+- [x] Pages 页脚增加公开可见的 Agent 入口，不做隐藏或 UA 分流内容
+- [ ] GitHub About 改指产品 Pages；推送后核对 Pages / RTD workflow（外部执行）
+- [x] 本地全部检查通过；不打 tag、不发版
+
+Agent 决策依据：`llms.txt` 仍是开放提案而非强制标准，用作简短导航而非第三份 README
+（https://llmstxt.org/）；`AGENTS.md` 按开放格式只承载编码、测试与仓库约定
+（https://agents.md/）；OpenAI 将搜索 `OAI-SearchBot`、训练 `GPTBot` 与用户触发的
+`ChatGPT-User` 分开（https://platform.openai.com/docs/bots）。本项目在 `github.io/pyobfus/`
+子路径下不能可靠控制域根 robots，因此不伪装已实现 crawler 策略；也不使用隐藏文本或
+User-Agent 分流，避免不可审计内容、事实漂移和 cloaking 风险。

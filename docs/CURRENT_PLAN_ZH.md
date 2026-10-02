@@ -6,7 +6,11 @@
 RTD=任务型技术文档。完整发现、阶段状态、验收条件与冷启动恢复方法见
 `SITE_INFORMATION_ARCHITECTURE_REVIEW_2026-10-02.md`。Pages 已改为免费采用优先、五任务路径和
 四类 Pro 价值；RTD 首页已从重复销售/功能清单改为任务门户；价格、试用、runtime、版本边界和
-Python 支持口径已跨入口核对并通过统一检查。不 push、不发版。
+Python 支持口径已跨入口核对并通过统一检查。前两阶段当时未 push，也未发版。
+续作：英文 README 从 916 行收敛为 189 行入口，详细内容转到既有 RTD 专页；新增 88 行
+中文入口而非完整镜像；Agent guide 从 202 行精简为 74 行，root/RTD 由检查锁定一致，Pages
+部署时从同一源复制并在页脚公开链接。所有 Agent 内容对人可见，不使用隐藏 HTML 或 UA 分流。
+待本批提交后更新 GitHub About 为产品 Pages 并 push，随后只核对文档/Pages workflow，不发版。
 
 **2026-10-02 Community / Pro 长期边界调研与收口（免发版）**：调研确认当前技术边界总体清晰，
 没有证据表明免费版正在替代 Pro 购买；现有数据更符合采用与试用漏斗仍小，而非 Community 过度慷慨。

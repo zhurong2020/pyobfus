@@ -1,10 +1,10 @@
 # pyobfus: the Python obfuscator
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/zhurong2020/pyobfus/main/docs/assets/logo.jpeg" alt="pyobfus Logo" width="200">
-</p>
+<p align="center"><img src="https://raw.githubusercontent.com/zhurong2020/pyobfus/main/docs/assets/logo.jpeg" alt="pyobfus Logo" width="180"></p>
 
-**pyobfus** (pronounced as "Python obfuscator") is a modern, AST-based **python-obfuscator / code-obfuscator** for developers who need to **obfuscate before shipping** while keeping failures diagnosable. Framework-aware presets, reverse stack-trace mapping, and a machine-readable JSON CLI let [Claude Code](https://claude.com/claude-code), [Cursor](https://cursor.com/), [GitHub Copilot](https://github.com/features/copilot), [Codex](https://openai.com/codex/), [CodeBuddy](https://www.codebuddy.ai/), and any MCP-compatible AI agent help **debug obfuscated stack traces**. A transparent, open-source alternative to PyArmor.
+<p align="center"><strong>Obfuscate Python before you ship it—and still debug what you shipped.</strong></p>
+
+<p align="center"><a href="https://github.com/zhurong2020/pyobfus/blob/main/README.zh-CN.md">简体中文</a> · <a href="https://zhurong2020.github.io/pyobfus/">Product</a> · <a href="https://pyobfus.readthedocs.io/">Documentation</a> · <a href="https://pypi.org/project/pyobfus/">PyPI</a></p>
 
 [![PyPI version](https://img.shields.io/pypi/v/pyobfus.svg)](https://pypi.org/project/pyobfus/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/pyobfus.svg)](https://pypi.org/project/pyobfus/)
@@ -13,904 +13,177 @@
 [![Python](https://img.shields.io/badge/python-3.9--3.14-blue.svg)](https://www.python.org/downloads/)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/12788/badge)](https://www.bestpractices.dev/projects/12788)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20846053.svg)](https://doi.org/10.5281/zenodo.20846053)
-[![pyobfus MCP server](https://glama.ai/mcp/servers/zhurong2020/pyobfus/badges/score.svg)](https://glama.ai/mcp/servers/zhurong2020/pyobfus)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-A Python code obfuscator built with AST-based transformations. **Supports Python 3.9 through 3.14**. Provides reliable name mangling, string encoding, control-flow flattening, AES-256 string encryption, and, unique to pyobfus, a reverse-mapping workflow that lets you (or your AI coding assistant) debug obfuscated stack traces without giving up the protection.
-
-> **🔒 Pro Edition available.** Six patent-targeted protection mechanisms (Selective Opacity, forensic watermarking, Runtime String Vault, and more) layered on top of the free AST obfuscator. $45 one-time, no subscription. See [Pro Edition](#-pro-edition) below.
-
-> **🔎 What's new in v0.5.30:** Pro builds can now warn before a hard expiry
-> without stopping the artifact (`--expire-warn-days N`), and Selective Opacity
-> L3 keys can come from an application-controlled provider or base64 environment
-> variable (`--bind-key-env NAME`). That lets one protected artifact run on any
-> machine your application authorizes, without embedding the raw key or rebuilding
-> separately for every device. See `pyobfus --help` for the compatibility rules.
-
-> 🔔 **Starring this repo doesn't notify you about new releases.** GitHub only
-> sends release notifications to people who explicitly **Watch** it. Click
-> **Watch → Custom → Releases** (top of this page) to get a heads-up the
-> moment a new version ships, without the noise of every commit/issue.
+pyobfus is a local-first, AST-based Python obfuscator for Python 3.9–3.14. It
+handles complete projects, keeps generated output portable, and can reverse-map
+protected production tracebacks for developers and AI coding agents. Community
+is Apache-2.0, has no file or line limits, and requires no trial.
 
 ## Why pyobfus
 
 | Advantage | What it means in practice |
 |---|---|
-| **A complete Community edition—not a size-limited demo** | Obfuscate real projects with no file/line cap and no trial clock. Optional `max_files` / `max_total_loc` settings are your CI safety rails, not an upgrade gate. See the [edition-boundary policy](https://github.com/zhurong2020/pyobfus/blob/main/docs/EDITION_BOUNDARY_POLICY.md). |
-| **Protection that remains diagnosable** | Keep the private mapping, reverse production tracebacks, and let humans or coding agents work from restored identifiers without handing customers the original source. |
-| **Evidence before and after a build** | Preview selection and artifacts, scan compatibility risks, verify generated syntax, and retain reproducible build reports and provenance instead of treating obfuscation as an opaque one-way command. |
-| **Portable, local-first delivery** | Transform source locally into ordinary cross-platform Python—no source upload, native compiler, or per-platform build matrix. Public dependency-name checks can be disabled with `--offline`. |
-| **Explicit security claims** | Threat-model limits, advisory-only compatibility, trial controls, and non-cryptographic deterrents are labeled as such; tested claims are separated from assumptions in the [support matrix](https://github.com/zhurong2020/pyobfus/blob/main/docs/SUPPORT_MATRIX.md). |
-
-## 🔌 Companion MCP server: [`pyobfus-mcp`](https://github.com/zhurong2020/pyobfus/tree/main/pyobfus_mcp)
-
-This repository ships **two installable packages**:
-
-| Package | What it is | Install |
-|---|---|---|
-| [`pyobfus`](https://pypi.org/project/pyobfus/) | The Python obfuscator (CLI + library). | `pip install pyobfus` |
-| [`pyobfus-mcp`](https://pypi.org/project/pyobfus-mcp/) | A **Model Context Protocol (MCP) server** that exposes pyobfus's tools to AI coding agents. | `uvx pyobfus-mcp` (zero-install) or `pip install pyobfus-mcp` |
-
-The MCP server lives in [`pyobfus_mcp/`](https://github.com/zhurong2020/pyobfus/tree/main/pyobfus_mcp) and is built on the official [Model Context Protocol Python SDK](https://github.com/modelcontextprotocol/python-sdk) (FastMCP). It registers eight MCP tools so **Claude Desktop, Claude Code, Cursor, Windsurf, Zed, and Codex** can call pyobfus directly from agent conversations, no shelling out:
-
-| MCP tool | Implementation | Purpose |
-|---|---|---|
-| `protect_project` | [`pyobfus_mcp/tools.py`](https://github.com/zhurong2020/pyobfus/blob/main/pyobfus_mcp/pyobfus_mcp/tools.py) | **One-call, self-verifying pipeline**: scan → preset → obfuscate → byte-compile + import-smoke-test the output → return `verified: true/false`. The agent reports a green check instead of hoping the transform didn't break anything |
-| `check_obfuscation_risks` | [`pyobfus_mcp/tools.py`](https://github.com/zhurong2020/pyobfus/blob/main/pyobfus_mcp/pyobfus_mcp/tools.py) | Pre-flight risk scan; pass `verify_dependencies_online=true` to check declared package names against public PyPI. |
-| `generate_pyobfus_config` | [`pyobfus_mcp/tools.py`](https://github.com/zhurong2020/pyobfus/blob/main/pyobfus_mcp/pyobfus_mcp/tools.py) | Auto-detect framework → write a working `pyobfus.yaml` |
-| `unmap_stack_trace` | [`pyobfus_mcp/tools.py`](https://github.com/zhurong2020/pyobfus/blob/main/pyobfus_mcp/pyobfus_mcp/tools.py) | Reverse obfuscated identifiers in a production stack trace |
-| `list_presets` | [`pyobfus_mcp/tools.py`](https://github.com/zhurong2020/pyobfus/blob/main/pyobfus_mcp/pyobfus_mcp/tools.py) | Enumerate community / framework / Pro presets |
-| `explain_preset` | [`pyobfus_mcp/tools.py`](https://github.com/zhurong2020/pyobfus/blob/main/pyobfus_mcp/pyobfus_mcp/tools.py) | Describe what a named preset changes |
-| `recommend_tier` | [`pyobfus_mcp/tools.py`](https://github.com/zhurong2020/pyobfus/blob/main/pyobfus_mcp/pyobfus_mcp/tools.py) | Analyze a project and recommend community vs Pro tier, with reasoning |
-| `start_pro_trial` | [`pyobfus_mcp/tools.py`](https://github.com/zhurong2020/pyobfus/blob/main/pyobfus_mcp/pyobfus_mcp/tools.py) | Return structured guidance for starting the 5-day Pro trial |
-
-The server is registered in the **official [MCP Registry](https://registry.modelcontextprotocol.io/)** under `io.github.zhurong2020/pyobfus-mcp`. The transport is stdio. See [`pyobfus_mcp/README.md`](https://github.com/zhurong2020/pyobfus/blob/main/pyobfus_mcp/README.md) for per-client configuration snippets.
-
-### 🧩 Claude Code skill / plugin
-
-This repo is also a **Claude Code plugin marketplace**, shipping two skills split by whether they change anything:
-
-| Skill | What it does | Writes? |
-|---|---|---|
-| `pyobfus-protect` | The full "protect Python before shipping: obfuscate **and** verify it still runs" workflow (MCP-first, CLI fallback) | Yes, produces a build |
-| `pyobfus-review` | Answers the question that comes first: is this project safe to obfuscate, what would break, and which artifacts would a build emit. Config-aware `--check` plus `--dry-run`, nothing else | No, read-only |
-
-Both follow the [agentskills.io](https://agentskills.io) `SKILL.md` format, so they also work in GitHub Copilot agent mode, Cursor and Codex CLI, which read skills from `.github/skills/` in your own repository.
-
-```
-/plugin marketplace add zhurong2020/pyobfus
-/plugin install pyobfus@pyobfus
-```
-
-See [`skills/`](https://github.com/zhurong2020/pyobfus/tree/main/skills) for both skills and install details. (This is distinct from [`templates/ai-integration/`](https://github.com/zhurong2020/pyobfus/tree/main/templates/ai-integration), which are copy-in rule files for *your* project.)
-
-### 🧑‍💻 VS Code extension
-
-pyobfus is also on the [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus) and [Open VSX](https://open-vsx.org/extension/zhurong2020/pyobfus) (publisher `zhurong2020`, same version on both; Open VSX covers VSCodium, Gitpod, Eclipse Theia and code-server). It is the **first** obfuscation-focused extension in this category, since no competitor (PyArmor, Nuitka, Sourcedefender) has one. Inline obfuscation-risk diagnostics (`pyobfus --check` findings rendered via VS Code's native `DiagnosticCollection` API: squiggles + Problems panel, no separate linter to configure), a "Reverse Stack Trace" command, a status bar item showing your current tier with a one-click menu (Check Workspace / Generate Config / Start Trial / Unlock Pro), a "Generate pyobfus.yaml" command, and right-click "Obfuscate with pyobfus" from the Explorer or editor. Source and design rationale in [`vscode-extension/`](https://github.com/zhurong2020/pyobfus/tree/main/vscode-extension) and [`docs/VSCODE_EXTENSION_PLAN.md`](https://github.com/zhurong2020/pyobfus/blob/main/docs/VSCODE_EXTENSION_PLAN.md).
-
-### 🤖 AI-native features
-
-- **`pyobfus --check src/`** runs a config-aware pre-flight risk scan. It detects `eval`/`exec`, dynamic attribute access, framework reflection points, and declared dependencies that do not exist on public PyPI before you obfuscate. It honors the same explicit/discovered config and presets as a build; findings from excluded files are reported separately without affecting the primary result. Use `--no-config` for the legacy unfiltered scan and `--offline` to skip PyPI lookups. JSON includes `effective_config`, `excluded_findings`, and an `ai_hint` telling your AI assistant what to run next. Add `--sarif pyobfus.sarif` to also emit a SARIF 2.1.0 report for GitHub Code Scanning (see [`docs/SARIF_CODE_SCANNING.md`](https://github.com/zhurong2020/pyobfus/blob/main/docs/SARIF_CODE_SCANNING.md)).
-- **`uses: zhurong2020/pyobfus-action@v1`** runs the pre-flight scan or an obfuscated build in GitHub Actions, with SARIF wired to Code Scanning and a findings table in the job summary. It separates findings from tool errors, so `fail-on: never` lets a SARIF upload run first without the `|| true` workaround swallowing a mistyped path. Repo: [zhurong2020/pyobfus-action](https://github.com/zhurong2020/pyobfus-action) · [Marketplace](https://github.com/marketplace/actions/pyobfus-scan-and-build).
-- **`pyobfus --init src/`** is zero-config onboarding: it scans the project, detects FastAPI/Django/Pydantic/Click/SQLAlchemy, and writes a ready-to-use `pyobfus.yaml`.
-- **`pyobfus --unmap --trace error.log --mapping mapping.json`** reverses obfuscated identifiers in a production stack trace so you can debug (or hand the trace to an AI assistant) without reversing the obfuscation itself.
-- **`pyobfus … --save-mapping mapping.json --trace-marker`** stamps each obfuscated file with a `# pyobfus:obfuscated` header (id + mapping filename + the exact `--unmap` command) so an AI agent that lands in an obfuscated file from a traceback immediately knows it's pyobfus output and how to reverse the names.
-- **`pyobfus … --no-community-marker`** switches off the versioned `# pyobfus:generated` marker that generated files normally open with. The marker names the tool version, edition, and the project-relative source path, so anyone (or any agent) opening the file knows it is generated output rather than something to edit. It never contains an absolute path, buyer id, licence key or hash. It is transparent attribution (a plain comment you can delete), not a licence check or an anti-piracy measure, and suppressing it is a free-tier feature, not a paid one. Distinct from `--trace-marker`, which is about reversing tracebacks.
-- **`pyobfus … --provenance-manifest provenance.json`** writes a local JSON manifest (input/output hashes, config hash, pyobfus version, git commit when available, mapping digest, CycloneDX-compatible component relationships, and a self-consistency integrity digest, not a cryptographic signature) for offline build provenance. See [`docs/PROVENANCE_MANIFEST.md`](https://github.com/zhurong2020/pyobfus/blob/main/docs/PROVENANCE_MANIFEST.md).
-- **`pyobfus --verify-provenance-manifest provenance.json --json`** validates the manifest structure, CycloneDX-compatible relationships, and local integrity digest before archiving or shipping it.
-- **`pyobfus … --dry-run --json`** previews a versioned `plan` object before anything is written: the effective configuration, which files are selected or excluded (and why), and the artifacts a build would produce, each tagged `ship` / `retain-internal` / `optional`. Relative labels only (no source, secrets, or absolute paths); it is a preview, not a saved apply file.
-- **`pyobfus … --verify-syntax`** is an opt-in post-build check: it compiles every generated `.py` in memory (no import, no execution, no `__pycache__`) and reports `syntax_valid` in JSON. A failure blocks delivery; it makes no runtime-correctness claim.
-- **`pyobfus … --build-report build-report.json`** writes one deterministic, privacy-safe fact model after a successful build: selection/config, transformation and cache counters, verification evidence, output hashes, artifact roles, marker state, and provenance linkage. See [`docs/VERIFIABLE_BUILD_REPORT.md`](https://github.com/zhurong2020/pyobfus/blob/main/docs/VERIFIABLE_BUILD_REPORT.md).
-- **Packages that re-export.** An `__init__.py` that re-exports (`from .core import run`, with `run` in `__all__`) keeps the name its definition was given, so the generated package stays importable and `from pkg import *` still works. Names re-exported from third-party packages are left alone. (v0.5.25)
-- **Reproducible builds** (v0.5.25). The same input and configuration produce the same output bytes, so whoever receives a build can re-run it and compare against the digests in `--build-report` rather than trusting them. Scope is deliberate: `--numeric-obfuscation` and AES string encryption draw fresh randomness per build and are expected to differ.
-- **Release provenance.** pyobfus and pyobfus-mcp are published through PyPI Trusted Publishing with PEP 740 attestations; see [`docs/RELEASE_PROVENANCE_VERIFICATION.md`](https://github.com/zhurong2020/pyobfus/blob/main/docs/RELEASE_PROVENANCE_VERIFICATION.md) for verification commands and the current snapshot.
-- **Framework-aware presets.** `--preset fastapi | django | flask | pydantic | click | sqlalchemy | ml` with built-in exclusions for dispatch methods, decorators, ORM fields, migrations, model-serving wrappers, and dependency-injection parameters.
-- **Support matrix.** What is actually verified and by what, in three honest labels (tested / verified once / advisory-only). Cells that cannot point at a CI job or a dated record are marked advisory-only rather than assumed. See [`docs/SUPPORT_MATRIX.md`](https://github.com/zhurong2020/pyobfus/blob/main/docs/SUPPORT_MATRIX.md).
-- **Compatibility cookbooks.** Pair pyobfus with real delivery pipelines: import-hook / encrypted-file (SOURCEdefender `.pye`), compiled packaging (Nuitka / Cython), and ML model-serving. `pyobfus --check` also emits `compatibility_advisory` findings for these. See [`docs/IMPORT_HOOK_COOKBOOK.md`](https://github.com/zhurong2020/pyobfus/blob/main/docs/IMPORT_HOOK_COOKBOOK.md), [`docs/COMPILED_PACKAGING_COOKBOOK.md`](https://github.com/zhurong2020/pyobfus/blob/main/docs/COMPILED_PACKAGING_COOKBOOK.md), and [`docs/MODEL_SERVING_COOKBOOK.md`](https://github.com/zhurong2020/pyobfus/blob/main/docs/MODEL_SERVING_COOKBOOK.md). For a hardened Python 3.14+ deployment that uses anti-debug protection, `--check` also flags PEP 768 remote-debug exposure (which must be disabled at interpreter startup, not by the obfuscator); see [`docs/REMOTE_DEBUG_HARDENING.md`](https://github.com/zhurong2020/pyobfus/blob/main/docs/REMOTE_DEBUG_HARDENING.md).
-- **Global `--json`.** Every CLI mode (`obfuscate`, `--check`, `--unmap`, `--init`) emits the same structured schema with an `ai_hint` field, ready for Claude Code, Cursor, Windsurf, and MCP servers to consume.
-
-## Features
-
-### ✅ Free Edition
-
-The following features are **fully implemented and available** in the current version:
-
-- Cross-file obfuscation keeps renamed symbols consistent across every file in a project:
-  - Automatic import statement rewriting
-  - `__all__` list updates with obfuscated names
-  - Global symbol table with collision detection
-  - Two-phase obfuscation pipeline (Scan → Transform)
-  - Preview mode with `--dry-run` flag
-
-- Name mangling renames variables, functions, classes, and class attributes to index-based names (I0, I1, I2...).
-- Comment removal strips comments and docstrings.
-- String encoding wraps string literals in Base64 and injects the decoder for you.
-- Numeric / constant obfuscation (`--numeric-obfuscation`) replaces integer and float literals with value-preserving opaque expressions (int → XOR/add/sub identities, float → `float.fromhex`) so the original constants no longer appear in the shipped source
-- AI provenance stripping (`--strip-ai-artifacts`) removes AI-generation markers (e.g. `Generated by Claude`, `Co-Authored-By: Claude`) from docstrings and attribution dunders, so AI-assisted code doesn't ship with "this was AI-generated" fingerprints
-- Incremental builds (`--incremental`) skip a directory rebuild when every input file and the config are unchanged since the last successful build (cache at `<output>/.pyobfus-cache/`), useful in CI pipelines that cache artifacts
-- Parameter preservation (`--preserve-param-names`) keeps function parameter names so keyword arguments still work.
-- Whole projects can be obfuscated in one run, with import relationships preserved.
-- File filtering excludes files by glob pattern (test files, config files, etc.).
-- A YAML configuration file makes builds repeatable.
-- Selective obfuscation preserves specific names (builtins, magic methods, custom exclusions).
-- Presets: `--preset safe | balanced | aggressive` for quick obfuscation-strength tradeoffs, plus framework-aware ones (`--preset fastapi | django | flask | pydantic | click | sqlalchemy | ml`) with built-in exclusions for dispatch methods, decorators, ORM fields, migrations, and dependency-injection parameters. `--list-presets` shows them all.
-- Pre-flight risk scanning (`--check`) detects `eval`/`exec`, dynamic attribute access, and framework reflection points before you obfuscate; add `--sarif PATH` to export findings as SARIF 2.1.0 for GitHub Code Scanning
-- Reverse stack-trace mapping (`--unmap`) reverses obfuscated identifiers in a production stack trace, so you (or an AI coding assistant) can debug without un-obfuscating the shipped code
-- Build provenance (`--provenance-manifest`, v0.5.5+) writes a local JSON manifest of an obfuscation run (input/output file hashes, config hash, pyobfus version, git commit when available, mapping digest, and CycloneDX-compatible component relationships) for offline build provenance. No network calls.
-- Provenance validation (`--verify-provenance-manifest`) checks manifest shape, CycloneDX-compatible relationships, and the local integrity digest; JSON output is available for CI/agent use
-- Structured dry-run plan (`--dry-run --json`, v0.5.19+) emits a versioned `plan` object: effective config, selected/excluded files with reasons, and artifacts tagged `ship` / `retain-internal` / `optional`. Relative labels only, preview-only (not applyable).
-- Syntax-only output verification (`--verify-syntax`, v0.5.19+) compiles generated Python in memory after a build (no import, no execution, no `__pycache__`) and reports `syntax_valid` in JSON. A failure blocks delivery; it makes no runtime-correctness claim.
-- Verifiable build report (`--build-report`, v0.5.24+) records deterministic, privacy-safe JSON facts linking the dry-run selection/config model to actual transform counters, verification evidence, output hashes, artifact roles, marker state, and provenance
-- Release attestations: a PyPI Integrity API / PEP 740 runbook for verifying pyobfus and pyobfus-mcp release artifacts.
-
-### 🔒 Pro Edition
-
-**Community helps you reliably obfuscate, inspect, verify, and debug. Pro helps
-you protect commercial IP, constrain artifact execution, and trace leaks.** The
-durable classification rules for current and future features are documented in
-the [Community / Pro boundary policy](https://github.com/zhurong2020/pyobfus/blob/main/docs/EDITION_BOUNDARY_POLICY.md).
-
-Pro's value falls into four groups:
-
-| Value | What it provides | Examples |
-|---|---|---|
-| Protection strength | Raises reverse-engineering cost | AES encryption, control-flow flattening, anti-debugging, opacity, sealing |
-| Protected assets | Protects data beyond identifiers | import strings, embedded data, string vaults, tracebacks |
-| Distribution control | Constrains artifact execution | device/expiry/run limits, platform policy, supplied keys |
-| Accountability | Links a build or leak to its recipient | forensic watermarking, buyer-specific builds and seals |
-
-The following advanced features are available with a Pro license:
-
-- **String Encryption**
-  - AES-256 encryption for strings
-  - Runtime decryption with injected decoder
-  - Automatic key generation
-
-- **Anti-Debugging**
-  - Debugger detection checks injected into functions
-  - Four detection methods (v0.5.11): `sys.gettrace()` (Python-level tracers/debuggers), TracerPid via `/proc/self/status` (native debuggers on Linux: gdb, strace), WinAPI `IsDebuggerPresent()` (native debuggers on Windows), and a timing-skew check (catches single-stepping regardless of platform)
-  - Default OFF to protect AI-debuggability; opt-in via `--anti-debug`
-  - Heuristic, not a security boundary; documented in the [CHANGELOG](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md)
-
-- **Control Flow Flattening**
-  - State machine transformation for if/else/elif
-  - For/while loop flattening
-  - Nested structure support
-  - CLI: `--control-flow`
-
-- **Dead Code Injection**
-  - Insertion of unreachable code paths
-  - Four strategies: after-return, false branches, opaque predicates, decoy functions
-  - CLI: `--dead-code`
-
-- **License Embedding**
-  - Embed expiration dates: `--expire 2025-12-31`
-  - Machine binding: `--bind-machine`
-  - Run count limits: `--max-runs 100`
-  - Offline verification - no external dependencies
-
-- **Runtime Policy** (v0.5.9)
-  - Refuse to import outside a build-time platform allowlist, a pure-Python generalization of PyArmor BCC's platform restrictions
-  - OS allowlist: `--requires-os Linux,Darwin`
-  - Minimum Python version: `--requires-python-min 3.10`
-  - CPU architecture allowlist: `--requires-arch x86_64,arm64`
-  - Any combination composes; each check is independent
-
-- **Embedded Encrypted Data** (v0.5.10)
-  - AES-256-GCM encrypt a resource file at build time and embed it base85-encoded in the output. This closes the Nuitka Commercial "Protect Data Files" / PyArmor `--bind-data` gap
-  - CLI: `--embed-data path/to/resource.bin`
-  - Generates a `get_embedded_data()` accessor that decrypts on call, not at import
-
-- **Configuration Presets**
-  - `--preset trial` - 30-day time-limited version
-  - `--preset commercial` - Maximum protection with machine binding
-  - `--preset library` - For pip-distributable libraries
-  - `--preset maximum` - Highest security with all protections
-  - `--list-presets` - View all presets
-
-#### Patent-targeted mechanisms (CN 202610712171X, introduced v0.5.0)
-
-Six mechanisms, available both as the `pyobfus_pro` API and, as of **v0.5.1**,
-as opt-in `pyobfus` build flags (single-file / `--no-cross-file` mode):
-`--selective-opacity`, `--seal-code`, `--vault`, `--scrub-traceback`,
-`--fingerprint <buyer-id>`, `--expire-hard <date>`. **v0.5.3** adds
-`--period <N>` (run-counter limit), `--opacity-config <opacity.toml>`
-(pattern-driven L3 encryption by original qualname), and `--bind-device` /
-`--bind-device-id <id>` (device-locked L3 encryption). `--expire-warn-days
-<N>` adds an advisory pre-expiry warning to `--expire-hard` that lets the
-artifact keep running while alerting the host. `--bind-key-env <NAME>` binds
-the L3 key to key material your application supplies (a
-`pyobfus_runtime.set_key_provider` callback or a base64 env var) instead of
-the machine fingerprint, so one artifact runs wherever your own
-authorization system releases the key. **v0.5.4** extends
-`--bind-device` to Runtime String Vault keys too. Previously only the
-Selective Opacity L3 layer was device-locked, so vault secrets decrypted on
-any machine; now each vault key is independently re-derived at runtime from
-the bound device.
-
-- **Selective Opacity.** Per-symbol protection layers (transparent / ai-readable / obfuscated / AES-256-GCM encrypted with lazy `__code__` materialization).
-- **Forensic watermarking.** Per-buyer deterministic key derivation for piracy traceback.
-- **License binding combo.** Device / expiry / run-count binding woven into the AES-GCM decryption path (no separate patchable license check).
-- **`@seal_code`.** Build-time bytecode integrity hash; runtime in-memory-patch detection.
-- **`--scrub-traceback`.** Production traceback encryption (RSA-2048 + AES-256-GCM); reverse error IDs with the new `pyobfus-unscrub` CLI.
-- **Runtime String Vault.** Encrypted KV namespace for runtime secrets with lazy per-entry decryption.
-
-Generated artifacts that use these runtime-backed features depend on the
-separately redistributable `pyobfus-runtime` package, not the complete Pro
-builder. Install `pyobfus-runtime>=0.1,<1` beside the protected artifact. Build
-machines still require a valid Pro licence; target machines need no licence
-key. `pyobfus` itself now declares that same requirement, so a build machine
-gets the runtime with `pip install --upgrade pyobfus`, and a
-`--provenance-manifest` records it as `runtime_requirement` whenever a build
-needs it. The runtime was published as `0.1.0` before the builder release that
-emits its import namespace. Existing 0.5.x artifacts keep working through
-compatibility aliases.
-
-> Requires Python ≥ 3.9 as of v0.5.0 (3.8 dropped, EOL 2024-10).
-
-See the [selective opacity configuration guide](https://github.com/zhurong2020/pyobfus/blob/main/docs/OPACITY_CONFIG.md)
-for the complete `opacity.toml` format, matching rules, precedence, and current
-CLI limitations.
-
-See [CURRENT_PLAN_ZH.md](https://github.com/zhurong2020/pyobfus/blob/main/docs/CURRENT_PLAN_ZH.md) for the current project plan and priorities.
-
-## Try Pro Features FREE
-
-**Try all Pro features for 5 days - no registration or credit card required!**
-
-```bash
-# Start your free trial
-pyobfus-trial start
-
-# Check trial status
-pyobfus-trial status
-
-# Use Pro features during trial
-pyobfus input.py -o output.py --level pro
-```
-
-**What's included in the trial:**
-- Control flow flattening (`--control-flow`)
-- AES-256 string encryption (`--string-encryption`)
-- Anti-debugging protection (`--anti-debug`)
-- Dead code injection (`--dead-code`)
-- License embedding (`--expire`, `--bind-machine`, `--max-runs`)
-- Configuration presets (`--preset trial/commercial/library/maximum`)
-
-After your trial, purchase a license to continue using Pro features.
-
-> **The trial runs on the honor system.** It stores its state in an unsigned
-> file in your home directory, and `pyobfus/trial.py` is readable Apache-2.0
-> source, so it is a convenience control, not a security boundary, and we
-> document it as such rather than claiming protection it cannot deliver. See
-> [SECURITY.md](https://github.com/zhurong2020/pyobfus/blob/main/SECURITY.md#trust-boundary-the-pro-trial-is-not-a-security-boundary).
-
-## Purchase Professional Edition
-
-**Pro Edition Features**:
-- 🔀 Control Flow Flattening
-- 🧩 Dead Code Injection
-- 🔐 AES-256 String Encryption
-- 📦 Import Obfuscation - runtime `importlib` imports with encrypted import strings
-- 🛡️ Anti-Debugging Checks
-- 📅 License Embedding - Expiration, machine binding, run limits
-- ⚡ Configuration Presets - One-command setup
-- 🔄 Lifetime Updates
-- 💻 Up to 3 devices per license
-- 📧 Priority Email Support
-
-**Price**: $45.00 USD (one-time payment)
-
-**Payment methods**: credit/debit card, Apple Pay, and **WeChat Pay (微信支付)** for buyers in China, plus the other options Stripe shows for your region at checkout.
-
-### How to Purchase
-
-**Visit our purchase page**: **[zhurong2020.github.io/pyobfus](https://zhurong2020.github.io/pyobfus/#purchase-professional-edition)** for detailed information and secure checkout.
-
-**Quick purchase**: **[🚀 Buy Now](https://buy.stripe.com/00w4gr8ta9F78Fj8oI9k400)** - Direct checkout link (Instant delivery • 30-day money-back guarantee)
-
-**3-Step Purchase Process**:
-
-1. **Complete Secure Checkout** (Stripe)
-   - Click the buy link above or visit the purchase page
-   - Enter your email (for license delivery)
-   - Complete payment securely via Stripe
-
-2. **Receive License Key**
-   - License key delivered to your email within minutes
-   - Format: `PYOB-XXXX-XXXX-XXXX-XXXX`
-   - **Check Spam/Junk folder** if not in inbox
-
-3. **Activate License**
-   ```bash
-   pip install --upgrade pyobfus
-   pyobfus-license register PYOB-XXXX-XXXX-XXXX-XXXX
-   pyobfus-license status
-   ```
-
-4. **Start Using Pro Features**
-   ```bash
-   # Quick start with presets
-   pyobfus src/ -o dist/ --preset commercial   # Maximum protection
-   pyobfus src/ -o dist/ --preset trial        # 30-day trial version
-   pyobfus src/ -o dist/ --preset library      # For pip distribution
-
-   # Individual features
-   pyobfus input.py -o output.py --string-encryption
-   pyobfus input.py -o output.py --import-obfuscation
-   pyobfus input.py -o output.py --anti-debug
-   pyobfus input.py -o output.py --control-flow
-   pyobfus input.py -o output.py --dead-code
-
-   # License restrictions
-   pyobfus src/ -o dist/ --expire 2025-12-31 --bind-machine --max-runs 100
-
-   # All Pro features
-   pyobfus input.py -o output.py --string-encryption --import-obfuscation --anti-debug --control-flow --dead-code
-   ```
-
-**Support**: For license activation, billing, or account questions, email zhurong0525@gmail.com with your license key. For bug reports or usage questions, please [open a GitHub issue](https://github.com/zhurong2020/pyobfus/issues) or [start a discussion](https://github.com/zhurong2020/pyobfus/discussions), so the answer is there for the next person who hits the same thing.
-
-### Legal & Policies
-
-By purchasing pyobfus Professional Edition, you agree to our:
-- **[Terms of Service & EULA](https://github.com/zhurong2020/pyobfus/blob/main/docs/legal/TERMS_OF_SERVICE.md)** - License agreement and usage terms
-- **[Refund Policy](https://github.com/zhurong2020/pyobfus/blob/main/docs/legal/REFUND_POLICY.md)** - 30-day money-back guarantee, no questions asked
-- **[Privacy Policy](https://github.com/zhurong2020/pyobfus/blob/main/docs/legal/PRIVACY_POLICY.md)** - GDPR compliant, we protect your data
-
-## Quick Start
-
-### Installation
-
-**From PyPI** (recommended):
+| **Complete Community edition** | Obfuscate real projects without a file/line cap or trial clock. Optional limits are your CI safety rails, not an upgrade gate. |
+| **Diagnosable protection** | Keep the private mapping and restore identifiers in production tracebacks without giving customers the original source. |
+| **Evidence, not a black box** | Scan, preview, verify syntax, retain provenance and compare reproducible build reports. |
+| **Portable and local-first** | Source stays local; Community emits ordinary cross-platform Python without a native build matrix. |
+| **Explicit security claims** | Tested, verified-once and advisory-only claims are separated; deterrents are not presented as irreversible security. |
+
+## Quick start
 
 ```bash
 pip install pyobfus
-```
 
-**From source** (for development):
-
-```bash
-git clone https://github.com/zhurong2020/pyobfus.git
-cd pyobfus
-pip install -e .
-```
-
-### Basic Usage
-
-```bash
-# Obfuscate a single file
-pyobfus input.py -o output.py
-
-# Obfuscate a directory (cross-file mode - default in v0.2.0+)
-pyobfus src/ -o dist/
-
-# Preview obfuscation without writing files (v0.2.0+)
-pyobfus src/ -o dist/ --dry-run
-
-# Machine-readable plan: effective config, included/excluded files, artifacts
+# Check compatibility, preview, then build
+pyobfus --check src/
 pyobfus src/ -o dist/ --dry-run --json
+pyobfus src/ -o dist/ --save-mapping mapping.json --verify-syntax
 
-# Write output, then compile every generated .py in memory (no import/execution)
-pyobfus src/ -o dist/ --verify-syntax --json
-
-# Legacy single-file mode (v0.2.0+)
-pyobfus src/ -o dist/ --no-cross-file
-
-# With configuration file
-pyobfus src/ -o dist/ --config pyobfus.yaml
-
-# Preserve parameter names for keyword arguments (v0.1.6+)
-pyobfus src/ -o dist/ --preserve-param-names
-
-# Verbose output with progress indicators (v0.2.0+)
-pyobfus src/ -o dist/ --verbose
+# Restore names when a production traceback arrives
+pyobfus --unmap --trace error.log --mapping mapping.json
 ```
 
-### Example
+For framework presets, configuration discovery, packaging and verification,
+start at the [task-oriented documentation](https://pyobfus.readthedocs.io/).
 
-**Before obfuscation**:
+## Features at a glance
 
-```python
-def calculate_risk(age, score):
-    """Calculate risk factor."""
-    risk_factor = 0.1
-    if score > 100:
-        risk_factor = 0.5
-    return age * risk_factor
+Community includes project-wide name mangling and import rewriting, string and
+numeric transforms, framework-aware presets, config-aware pre-flight scanning,
+SARIF, structured dry-run, reverse traceback mapping, syntax verification,
+provenance, reproducible output and verifiable build reports.
 
-patient_age = 55
-patient_score = 150
-risk = calculate_risk(patient_age, patient_score)
-print(f"Risk score: {risk}")
+Professional adds four kinds of commercial value:
+
+- **Protection strength:** AES encryption, control-flow flattening, dead-code
+  injection, anti-debugging, Selective Opacity and sealing.
+- **Protected assets:** import strings, embedded data, Runtime String Vault and
+  protected tracebacks.
+- **Distribution control:** device, expiry, run-count, platform and
+  application-supplied-key policies.
+- **Accountability:** forensic watermarking and buyer-specific builds.
+
+The durable classification rule is documented in the
+[Community / Pro boundary policy](https://github.com/zhurong2020/pyobfus/blob/main/docs/EDITION_BOUNDARY_POLICY.md).
+
+## 🔌 Companion MCP server: `pyobfus-mcp`
+
+Install the MCP server with no API key and no source upload:
+
+```bash
+uvx pyobfus-mcp
+# or: pip install pyobfus-mcp
 ```
 
-**After obfuscation**:
+It exposes structured tools for scanning, configuration, protection,
+verification, preset explanation, tier recommendations and traceback mapping.
+See the [MCP package guide](https://github.com/zhurong2020/pyobfus/tree/main/pyobfus_mcp)
+and its registration in the
+[official MCP Registry](https://registry.modelcontextprotocol.io/).
 
-```python
-def I0(I1, I2):
-    I3 = 0.1
-    if I2 > 100:
-        I3 = 0.5
-    return I1 * I3
-I4 = 55
-I5 = 150
-I6 = I0(I4, I5)
-print(f'Risk score: {I6}')
-```
+### Agent and editor integrations
 
-*Note: Variable names (I0, I1, etc.) may vary slightly depending on code structure, but functionality is preserved.*
+- `pyobfus-review` and `pyobfus-protect` skills separate read-only review from
+  build-producing work. See [skills](https://github.com/zhurong2020/pyobfus/tree/main/skills).
+- The [VS Code extension](https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus)
+  provides inline risk diagnostics and traceback reversal; it is also on
+  [Open VSX](https://open-vsx.org/extension/zhurong2020/pyobfus).
+- [`zhurong2020/pyobfus-action@v1`](https://github.com/marketplace/actions/pyobfus-scan-and-build)
+  runs scans or verified builds in GitHub Actions with SARIF support.
+- The stable JSON CLI includes reason codes and an `ai_hint` next action.
+- Agent-readable project facts are published in
+  [`llms.txt`](https://github.com/zhurong2020/pyobfus/blob/main/llms.txt), while
+  contributor instructions live in
+  [`AGENTS.md`](https://github.com/zhurong2020/pyobfus/blob/main/AGENTS.md).
+
+All Agent guidance is public and human-auditable. pyobfus does not serve hidden
+instructions or different facts based on User-Agent.
 
 ## Configuration
 
-### Quick Start with Templates
-
-Generate a configuration template for your project type:
+Generate a starting configuration or use a named preset:
 
 ```bash
-# For Django projects
-pyobfus --init-config django
-
-# For Flask projects
-pyobfus --init-config flask
-
-# For Python libraries
-pyobfus --init-config library
-
-# For general projects
-pyobfus --init-config general
+pyobfus --init src/
+pyobfus src/ -o dist/ --preset django
+pyobfus --list-presets
 ```
 
-This creates a `pyobfus.yaml` file with sensible defaults for your project type.
+Community presets include `safe`, `balanced`, `aggressive`, `fastapi`, `django`,
+`flask`, `pydantic`, `click`, `sqlalchemy` and `ml`. See the
+[documentation home](https://pyobfus.readthedocs.io/) and
+[`pyobfus --help`](https://github.com/zhurong2020/pyobfus/blob/main/pyobfus/cli.py)
+for current options. Optional `max_files` and `max_total_loc` values are
+user-selected safety limits at every tier.
 
-### Validate Configuration
+## How do I debug an obfuscated crash with an AI assistant?
 
-Check your configuration file for errors before use:
+Build with `--save-mapping mapping.json`, keep that file private, then run:
 
 ```bash
-pyobfus --validate-config pyobfus.yaml
+pyobfus --unmap --trace error.log --mapping mapping.json
 ```
 
-The validator checks for:
-- YAML syntax errors
-- Invalid configuration options
-- Common typos (e.g., `exclude_pattern` -> `exclude_patterns`)
-- Pro features used with community level
+The restored identifiers can be read by you or an AI assistant without giving
+the customer your mapping or original source. `--trace-marker` can also stamp
+generated files with the exact recovery command.
 
-### Auto-Discovery
+## Purchase Professional Edition
 
-When you run `pyobfus` without `-c`, it automatically searches for:
-1. `pyobfus.yaml`
-2. `pyobfus.yml`
-3. `.pyobfus.yaml`
-4. `.pyobfus.yml`
-
-### Manual Configuration
-
-Create `pyobfus.yaml`:
-
-```yaml
-obfuscation:
-  level: community
-  exclude_patterns:
-    - "test_*.py"
-    - "**/tests/**"
-    - "__init__.py"
-  exclude_names:
-    - "logger"
-    - "config"
-    - "main"
-  remove_docstrings: true
-  remove_comments: true
-```
-
-### exclude_names Behavior
-
-The `exclude_names` option preserves specified names from being renamed during obfuscation:
-
-```yaml
-obfuscation:
-  exclude_names:
-    - MyPublicClass      # Name preserved, but strings inside are still encoded
-    - exported_function  # Name preserved for external callers
-```
-
-**Important**: `exclude_names` only affects **name obfuscation**, not **string encoding**:
-
-```python
-# Original
-SECRET_KEY = "admin-password-123"
-
-# With exclude_names: [SECRET_KEY] and string_encoding: true
-SECRET_KEY = _decode_str('YWRtaW4tcGFzc3dvcmQtMTIz')
-# ✅ Name 'SECRET_KEY' is preserved
-# ✅ String content is still encoded (Base64)
-```
-
-**Use cases**:
-- Preserve names for public APIs that external code imports
-- Keep class/function names for debugging while still protecting string content
-- Maintain compatibility with external frameworks expecting specific names
-
-### File Filtering
-
-Exclude patterns support glob syntax:
-
-- `test_*.py` - Exclude files starting with "test_"
-- `**/tests/**` - Exclude all files in "tests" directories
-- `**/__init__.py` - Exclude all `__init__.py` files
-- `setup.py` - Exclude specific files
-
-See `pyobfus.yaml.example` for more configuration examples.
-
-## Architecture
-
-At the source-transformation layer, pyobfus uses Python's `ast` module:
-
-1. **Parser**: Parse Python source to AST
-2. **Analyzer**: Build symbol table with scope analysis
-3. **Transformers**: Apply obfuscation techniques (name mangling, string encoding, etc.)
-4. **Generator**: Generate obfuscated Python code
-
-This approach ensures:
-- Syntactically correct output
-- Proper handling of Python scoping rules
-- Support for modern Python features (f-strings, walrus operator, etc.)
-
-At the system level, the project has independent build, runtime and interface
-surfaces:
-
-- `pyobfus` contains the Apache-2.0 Core plus the source-separated,
-  proprietary Pro builder. Build machines run this distribution.
-- `pyobfus-runtime` is the minimal, independently published target dependency
-  for runtime-backed Pro artifacts. Target machines do not need the Pro
-  builder or a build licence.
-- `pyobfus-mcp` and the VS Code extension are independently versioned
-  interfaces over the CLI and its stable JSON contracts.
-- [`pyobfus-action`](https://github.com/zhurong2020/pyobfus-action) is an
-  independently versioned composite Action in a separate repository. It
-  invokes the builder; it does not make generated output self-contained or
-  replace the runtime dependency.
-
-See [Project Structure](https://github.com/zhurong2020/pyobfus/blob/main/docs/PROJECT_STRUCTURE.md)
-for the complete repository/distribution map and ownership rules.
-
-## Development
-
-### Setup
+Professional Edition is **$45 USD, one time**—not a subscription. A five-day
+trial requires no registration or card:
 
 ```bash
-git clone https://github.com/zhurong2020/pyobfus.git
-cd pyobfus
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -e ".[dev]"
+pyobfus-trial start
 ```
 
-### Testing
-
-```bash
-# Run unit tests
-pytest tests/ -v
-
-# With coverage
-pytest tests/ -v --cov=pyobfus --cov-report=html
-
-# Run integration tests
-pytest integration_tests/ -v
-```
-
-**Integration Testing Framework** (v0.1.6+): Test pyobfus on real-world code without uploading to PyPI. See [`INTEGRATION_TESTING.md`](https://github.com/zhurong2020/pyobfus/blob/main/docs/INTEGRATION_TESTING.md) for details.
-
-### Code Quality
-
-```bash
-# Format code
-black pyobfus/
-
-# Type checking
-mypy pyobfus/
-
-# Linting
-ruff check pyobfus/
-```
-
-## Use Cases
-
-### Protecting Proprietary Algorithms
-
-Obfuscate sensitive business logic before distributing Python applications.
-
-### Educational Purposes
-
-Demonstrate code protection concepts and obfuscation techniques.
-
-### Intellectual Property Protection
-
-Add an additional layer of protection for commercial Python software.
-
-## Limitations
-
-### Current Limitations
-
-- **Keyword Arguments** (✅ Resolved in v0.1.6): By default, parameter names are obfuscated, which breaks keyword arguments. **Solution**: Use the `--preserve-param-names` flag to preserve parameter names while still obfuscating function bodies.
-
-  Example:
-  ```python
-  # Before obfuscation
-  def process(data_path, output_dir):
-      temp_file = data_path + ".tmp"
-      return temp_file
-
-  result = process(data_path='./data', output_dir='./output')  # ✅ Works
-
-  # After obfuscation (default behavior)
-  def I0(I1, I2):
-      I3 = I1 + ".tmp"
-      return I3
-
-  result = process(data_path='./data', output_dir='./output')  # ❌ TypeError!
-
-  # After obfuscation (with --preserve-param-names)
-  def I0(data_path, output_dir):
-      I3 = data_path + ".tmp"
-      return I3
-
-  result = I0(data_path='./data', output_dir='./output')  # ✅ Works!
-  ```
-
-  **When to use `--preserve-param-names`**:
-  - Public API functions/libraries where keyword arguments are used by clients
-  - Functions with many parameters where keyword arguments improve readability
-  - Code that relies heavily on keyword-only arguments (`def func(*, kwonly)`)
-
-  **Trade-off**: Parameter names reveal some information about the function's interface, but function bodies and local variables are still fully obfuscated.
-
-- Cross-file imports: resolved in v0.2.0 with full cross-file obfuscation support.
-- `eval()` and `exec()` over obfuscated code may need adjustments.
-- Obfuscated code is harder to debug (by design; `--unmap` exists for exactly that reason).
-- Some techniques cost runtime performance; the FAQ below has the numbers.
-
-### Recommendations
-
-- **Test obfuscated code thoroughly** before deployment
-- Keep original source in version control
-- Use configuration files for reproducible builds
-- For public APIs, use `--preserve-param-names` to maintain keyword argument compatibility
-- Consider combining with other protection methods (compilation, etc.)
-
-## Technical Details
-
-- Python 3.9, 3.10, 3.11, 3.12, 3.13, 3.14, including free-threaded 3.14 builds (`python3.14t`, [verified](https://github.com/zhurong2020/pyobfus/blob/main/docs/PYTHON314_FREETHREADING.md): full test suite + a real seal/scrub-traceback obfuscate→execute→decrypt round trip)
-- Index-based naming scheme (I0, I1, I2...).
-- Modular transformer pipeline with two-phase cross-file obfuscation.
-- 1,000+ tests, 90% coverage, multi-OS CI (Python 3.9-3.14 × Ubuntu / macOS / Windows).
-
-## Frequently Asked Questions
-
-### Is pyobfus Right for Me?
-
-**Use pyobfus if you:**
-- Need to protect proprietary algorithms before distributing Python applications
-- Want a tool that "just works" without DLL conflicts or native dependencies
-- Prefer transparent pricing without hidden trial limitations
-- Support open-source software with optional paid features
-
-### How do I obfuscate Python code?
-
-```bash
-# Install
-pip install pyobfus
-
-# Obfuscate a single file
-pyobfus script.py -o script_obf.py
-
-# Obfuscate an entire project
-pyobfus src/ -o dist/
-
-# Preview without writing files
-pyobfus src/ -o dist/ --dry-run
-
-# Preview a structured, non-applicable protection plan for an AI/CI consumer
-pyobfus src/ -o dist/ --dry-run --json
-```
-
-`--verify-syntax` is an opt-in post-build check: it compiles generated Python
-source in memory, creates no `__pycache__`, and reports `syntax_valid` in JSON.
-It does not import or execute the project and is not a runtime compatibility
-guarantee.
-
-### How do I obfuscate Python before selling or delivering it?
-
-Run `pyobfus --check` first, build into a separate output directory, and keep
-the optional `mapping.json` outside the customer artifact. Ship the transformed
-tree, then run your normal tests or packaging step against that exact output.
-The [PyInstaller](https://github.com/zhurong2020/pyobfus/blob/main/docs/PYINSTALLER_COOKBOOK.md),
-[compiled-packaging](https://github.com/zhurong2020/pyobfus/blob/main/docs/COMPILED_PACKAGING_COOKBOOK.md), and
-[import-hook](https://github.com/zhurong2020/pyobfus/blob/main/docs/IMPORT_HOOK_COOKBOOK.md) cookbooks cover common delivery
-formats.
-
-### How do I debug an obfuscated crash with an AI assistant?
-
-Build with `--save-mapping mapping.json`. When a production traceback arrives,
-run `pyobfus --unmap --trace error.log --mapping mapping.json`; the restored
-identifiers can then be read by you, Claude Code, Cursor, Copilot, or another AI
-assistant without giving the customer your private mapping file.
-
-### Is there an MCP server for Python obfuscation?
-
-Yes. `uvx pyobfus-mcp` exposes eight local tools for risk scanning, config
-generation, project protection, verification, preset guidance, and traceback
-mapping. Source paths are validated locally and pyobfus does not upload project
-code or require an API key.
-
-### Will my code still work after obfuscation?
-
-pyobfus is designed to preserve program behavior for supported Python syntax and
-framework patterns, and its compatibility matrix is covered by automated tests.
-Obfuscation is still a source transformation: run your own test suite and verify
-the built artifact, especially when the project relies on dynamic imports,
-reflection, or generated code.
-
-### Does obfuscated code run slower?
-
-Minimal impact:
-- Name mangling: zero runtime cost (just renamed identifiers)
-- String encoding (Base64): ~0.1ms per string at startup
-- String encryption (AES-256, Pro): ~0.5ms per string at startup
-
-### Can I obfuscate Django/Flask projects?
-
-Yes! Use our built-in templates:
-
-```bash
-# Django
-pyobfus --init-config django
-
-# Flask
-pyobfus --init-config flask
-
-# Then run obfuscation
-pyobfus src/ -o dist/ -c pyobfus.yaml
-```
-
-### What Python versions are supported?
-
-pyobfus supports **Python 3.9 through 3.14**. Build and test the obfuscated
-artifact with the Python version used in production; cross-interpreter
-portability can depend on syntax, dependencies, and enabled transformations.
-
-### PyArmor vs pyobfus: Which should I choose?
-
-| Feature | pyobfus | PyArmor |
-|---------|---------|---------|
-| **Price** | $45 (Pro, one-time) | $89 (Pro, one-time) |
-| **Free tier project size** | No file or line limits | Trial caps out around 935-940 lines/file (measured 2026-05-09) |
-| **Open source** | Yes (Core: Apache 2.0, Pro: Proprietary) | No |
-| **Native dependencies** | None (pure Python output) | Requires runtime library |
-| **Python 3.9-3.14 support** | Yes | Yes |
-
-**Choose pyobfus if:** You want transparent pricing, open-source trust, and simpler deployment without native dependencies.
-
-See the [comparison overview](https://github.com/zhurong2020/pyobfus/blob/main/docs/COMPARISON.md), or go straight to the one you came for: [PyArmor](https://github.com/zhurong2020/pyobfus/blob/main/docs/compare/pyarmor.md), [Nuitka](https://github.com/zhurong2020/pyobfus/blob/main/docs/compare/nuitka.md), [Cython](https://github.com/zhurong2020/pyobfus/blob/main/docs/compare/cython.md), [PyLocket](https://github.com/zhurong2020/pyobfus/blob/main/docs/compare/pylocket.md), [Oxyry](https://github.com/zhurong2020/pyobfus/blob/main/docs/compare/oxyry.md), [browser-based obfuscators](https://github.com/zhurong2020/pyobfus/blob/main/docs/compare/browser-based.md).
-
-### Can I use pyobfus alongside PyArmor or Nuitka?
-
-Yes, and for many projects this is the most cost-effective approach. Use pyobfus as your always-on default layer (every module gets AST mangling + mapping for AI-debug compatibility), then stack PyArmor Pro's bytecode encryption or Nuitka's native compilation on the small set of modules that genuinely need stronger protection. The comparison now also covers why bytecode encryption should be treated as a stronger speed bump, not as irreversible cryptographic protection for client-side Python. See [Layered Deployment Strategy in COMPARISON.md](https://github.com/zhurong2020/pyobfus/blob/main/docs/COMPARISON.md#layered-deployment-strategy) for the full reasoning.
-
-### Can I ship a single-file executable, like with Nuitka?
-
-Yes, at a fraction of Nuitka Commercial's cost: obfuscate first, then bundle the obfuscated output with the free [PyInstaller](https://pyinstaller.org/). The two tools solve different problems (name mangling vs. bundling a Python interpreter into one file) and compose cleanly; see the [PyInstaller Cookbook](https://github.com/zhurong2020/pyobfus/blob/main/docs/PYINSTALLER_COOKBOOK.md) for a full worked example, including verification that the original identifier names never reach the compiled binary and that `pyobfus --unmap` still reverses a traceback captured from the bundled exe.
-
-### What if obfuscation breaks my code?
-
-1. **Use `--dry-run`** to preview changes before writing files
-2. **Use `--preserve-param-names`** if you rely on keyword arguments
-3. **Add exclusions** in `pyobfus.yaml` for names that must stay unchanged
-4. **Report issues** on [GitHub](https://github.com/zhurong2020/pyobfus/issues) - we fix bugs quickly!
-
-### Can obfuscated code be reversed?
-
-Name mangling removes the original identifiers from the emitted source and
-raises the cost of analysis, but it is not cryptographically irreversible: a
-determined analyst may infer names and behavior from context. Keep the optional
-mapping file private when you need reliable reverse mapping. For stronger
-protection, use Pro features:
-- **AES-256 encryption** for strings
-- **Anti-debugging** checks to prevent analysis
-
-### Security Note: String Encryption Limitations
-
-**Important**: String encryption (AES-256) is designed as a **deterrent against casual reverse engineering**, not as cryptographic security.
-
-Because obfuscated code must decrypt strings at runtime, the encryption key is necessarily embedded in the output. A determined attacker with access to the obfuscated code can:
-1. Locate the embedded key
-2. Extract and decrypt all strings
-
-**This is a fundamental limitation of ALL client-side obfuscators** (including PyArmor, Nuitka, etc.) - true cryptographic security would require server-side decryption, which is impractical for most use cases.
-
-**What string encryption DOES provide:**
-- ✅ Prevents casual `strings` or `grep` searches from revealing sensitive text
-- ✅ Increases effort required for reverse engineering
-- ✅ Deters non-technical users from extracting information
-- ✅ Adds a layer of protection combined with other techniques
-
-**What string encryption does NOT provide:**
-- ❌ Protection against determined reverse engineers
-- ❌ Cryptographic security for secrets (use environment variables or secret management instead)
-- ❌ DRM-level protection
-
-**Recommendation**: For sensitive credentials (API keys, passwords), use environment variables or external secret management systems rather than embedding them in code.
-
-### How is pyobfus different from Cython/Nuitka?
-
-| Tool | Approach | Output |
-|------|----------|--------|
-| **pyobfus** | AST transformation | `.py` files (pure Python) |
-| **Cython** | Compile to C | `.so`/`.pyd` (platform-specific) |
-| **Nuitka** | Compile to executable | Binary (platform-specific) |
-
-**Choose pyobfus if:** You need cross-platform `.py` files without compilation overhead.
-
-## Documentation
-
-### For Users
-- **[Installation & Quick Start](#installation)** - Get started in minutes
-- **[Configuration Guide](#configuration)** - YAML configuration and file filtering
-- **[Examples](https://github.com/zhurong2020/pyobfus/tree/main/examples)** - Working code examples demonstrating features
-- **[Use Cases](#use-cases)** - Real-world application scenarios
-
-### For Developers
-- **[Project Structure](https://github.com/zhurong2020/pyobfus/blob/main/docs/PROJECT_STRUCTURE.md)** - Codebase architecture and development workflow
-- **[Contributing Guide](https://github.com/zhurong2020/pyobfus/blob/main/CONTRIBUTING.md)** - How to contribute code and documentation
-- **[Current Plan](https://github.com/zhurong2020/pyobfus/blob/main/docs/CURRENT_PLAN_ZH.md)** - Current project status and priorities
-- **[Changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md)** - Version history and release notes
-
-### Community & Support
-- **[GitHub Issues](https://github.com/zhurong2020/pyobfus/issues)** - Bug reports and feature requests
-- **[GitHub Discussions](https://github.com/zhurong2020/pyobfus/discussions)** - Questions, ideas, and community help
-- **[Security Policy](https://github.com/zhurong2020/pyobfus/blob/main/SECURITY.md)** - How to report security vulnerabilities
-
-### Legal & License
-- **Dual License Model** (see [`LICENSE-NOTICE.md`](https://github.com/zhurong2020/pyobfus/blob/main/LICENSE-NOTICE.md)):
-  - **pyobfus** (Core): [Apache 2.0](https://github.com/zhurong2020/pyobfus/blob/main/LICENSE) - Free and open source
-  - **pyobfus_pro** (Pro): [Proprietary](https://github.com/zhurong2020/pyobfus/blob/main/pyobfus_pro/LICENSE) - Requires paid license
-- **[Affiliate pilot design](https://github.com/zhurong2020/pyobfus/blob/main/docs/AFFILIATE_PROGRAM_DESIGN.md)** - Approved design only; the programme is not launched and has no public enrolment
-
-## Support the Project
-
-If you find pyobfus helpful, consider supporting its development:
-
-[Buy Me A Coffee](https://www.buymeacoffee.com/zhurong052Q)
-
-<a href="https://www.buymeacoffee.com/zhurong052Q" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
-
-Your support helps maintain and improve pyobfus. Thank you!
-
-## Citation
-
-If you use pyobfus in academic work or want to reference it, please cite the archived release. The concept DOI below always resolves to the latest version:
-
-**APA**
-
-> Zhu, R. (2026). *pyobfus: An AST-based Python obfuscator with reverse stack-trace mapping for AI-assisted development*. Zenodo. https://doi.org/10.5281/zenodo.20846053
-
-**BibTeX**
-
-```bibtex
-@software{zhu_pyobfus,
-  author    = {Zhu, Rong},
-  title     = {pyobfus: An AST-based Python obfuscator with reverse stack-trace mapping for AI-assisted development},
-  year      = {2026},
-  publisher = {Zenodo},
-  doi       = {10.5281/zenodo.20846053},
-  url       = {https://doi.org/10.5281/zenodo.20846053}
-}
-```
-
-Machine-readable metadata is in [`CITATION.cff`](https://github.com/zhurong2020/pyobfus/blob/main/CITATION.cff) (GitHub's "Cite this repository" widget reads it).
-
-## Acknowledgments
-
-- Inspired by [Opy](https://github.com/QQuick/Opy)'s AST-based approach
-- Clean room implementation - no code copying
+The trial is an honor-system convenience control, not a security boundary.
+Visit the [product and purchase page](https://zhurong2020.github.io/pyobfus/#purchase-professional-edition)
+for current payment methods, refund terms and purchase steps. After purchase,
+use the [license activation guide](https://pyobfus.readthedocs.io/en/latest/LICENSE_ACTIVATION_GUIDE/).
+
+Runtime-backed Pro artifacts depend on the separately redistributable,
+pure-Python `pyobfus-runtime` package. Target machines do not need the complete
+proprietary builder or a licence key.
+
+## Security and limitations
+
+Obfuscation raises the cost of inspection; it does not make client-side Python
+irreversible. Runtime-decrypted material can be observed by a determined
+attacker. Keep credentials and authorization decisions behind environment,
+secret-manager or server boundaries.
+
+- [Threat model](https://pyobfus.readthedocs.io/en/latest/THREAT_MODEL/)
+- [Support matrix](https://pyobfus.readthedocs.io/en/latest/SUPPORT_MATRIX/)
+- [Release provenance](https://github.com/zhurong2020/pyobfus/blob/main/docs/RELEASE_PROVENANCE_VERIFICATION.md)
+- [Security policy](https://github.com/zhurong2020/pyobfus/blob/main/SECURITY.md)
+
+## Comparison and deployment guides
+
+- [Comparison overview](https://pyobfus.readthedocs.io/en/latest/COMPARISON/)
+- [vs PyArmor](https://pyobfus.readthedocs.io/en/latest/compare/pyarmor/)
+- [vs Nuitka](https://pyobfus.readthedocs.io/en/latest/compare/nuitka/)
+- [PyInstaller cookbook](https://pyobfus.readthedocs.io/en/latest/PYINSTALLER_COOKBOOK/)
+- [Compiled-packaging cookbook](https://github.com/zhurong2020/pyobfus/blob/main/docs/COMPILED_PACKAGING_COOKBOOK.md)
+- [Integration testing](https://pyobfus.readthedocs.io/en/latest/INTEGRATION_TESTING/)
+
+## Architecture and development
+
+The product line separates the Apache-2.0 Core, proprietary Pro builder,
+redistributable runtime, MCP package, editor extension and GitHub Action. See:
+
+- [Project structure](https://pyobfus.readthedocs.io/en/latest/PROJECT_STRUCTURE/)
+- [Contributing guide](https://github.com/zhurong2020/pyobfus/blob/main/CONTRIBUTING.md)
+- [Developer instructions](https://github.com/zhurong2020/pyobfus/blob/main/AGENTS.md)
+- [Changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md)
+
+## Community and citation
+
+Use [GitHub Issues](https://github.com/zhurong2020/pyobfus/issues) for bugs and
+[Discussions](https://github.com/zhurong2020/pyobfus/discussions) for questions
+and ideas. Citation metadata is in
+[`CITATION.cff`](https://github.com/zhurong2020/pyobfus/blob/main/CITATION.cff),
+with archival DOI [10.5281/zenodo.20846053](https://doi.org/10.5281/zenodo.20846053).
+
+Core is Apache-2.0; Professional implementation is proprietary. See
+[`LICENSE-NOTICE.md`](https://github.com/zhurong2020/pyobfus/blob/main/LICENSE-NOTICE.md).

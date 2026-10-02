@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   its detailed feature inventory. GitHub Pages now follows the same hierarchy:
   free adoption first, task-oriented Protect/Check/Verify/Debug/Automate paths,
   and Pro value grouped by commercial outcome rather than a flag inventory.
+  The repository README is now a concise project gateway with a maintained
+  Simplified Chinese entry page; detailed manuals remain in Read the Docs.
+  A shorter, public `llms.txt` is shared by the repository, RTD and Pages so
+  Agents receive auditable guidance rather than hidden User-Agent content.
 
 ### Fixed
 

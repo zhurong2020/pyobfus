@@ -71,6 +71,9 @@ run_lint() {
 }
 
 run_docs() {
+    step "Agent guide twins match"
+    cmp --silent llms.txt docs/llms.txt
+
     # README.md is the package long_description. PyPI resolves relative links
     # against the project page, so they 404 there while looking fine on GitHub.
     step "README links survive PyPI rendering"
