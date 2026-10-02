@@ -36,6 +36,11 @@ Please describe the tests you ran to verify your changes:
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] New and existing unit tests pass locally with my changes
 - [ ] Any dependent changes have been merged and published
+- [ ] If this adds a capability or changes an edition boundary, I applied
+      `docs/EDITION_BOUNDARY_POLICY.md` and recorded the user, buyer, problem,
+      evidence, and Community/Pro decision
+- [ ] Edition-facing README/comparison/config/help/tests/changelog stay aligned;
+      Community correctness and existing workflows are not artificially limited
 
 ## Additional Context
 

@@ -178,8 +178,23 @@ patent/release context.
 ## Where to look next
 
 - **Architecture / repository ownership**: [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md).
+- **Community / Pro product boundary**: [`docs/EDITION_BOUNDARY_POLICY.md`](docs/EDITION_BOUNDARY_POLICY.md).
 - **Current plan / daily source of truth**: [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md).
 - **What to pick up next**: [`docs/TODO.md`](docs/TODO.md), ordered, with acceptance criteria.
 - **Historical detail**: [`docs/POST_V0.4_TODO.md`](docs/POST_V0.4_TODO.md) and [`docs/ROADMAP.md`](docs/ROADMAP.md) are archived context, not the primary cold-start entry.
 - **Contributing**: [`CONTRIBUTING.md`](CONTRIBUTING.md).
 - **Security policy**: [`SECURITY.md`](SECURITY.md).
+
+## Edition-boundary rules
+
+- Never paywall correctness, security fixes, compatibility, or the basic local
+  ability to inspect, verify, and debug output.
+- Put features in Pro when their primary value is stronger protection, broader
+  protected assets, runtime/distribution control, buyer accountability, or a
+  managed organization service.
+- Do not remove an existing Community capability solely to increase conversion.
+- For a mixed feature, prefer a Community local primitive plus a Pro managed or
+  organizational layer.
+- Every new capability or tier change must apply
+  `docs/EDITION_BOUNDARY_POLICY.md`, record the user/buyer/problem/evidence in
+  the PR, and update the edition-facing docs, config/help, tests, and changelog.

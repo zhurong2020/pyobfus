@@ -135,6 +135,11 @@ The following features are **fully implemented and available** in the current ve
 
 ### 🔒 Pro Edition
 
+**Community helps you reliably obfuscate, inspect, verify, and debug. Pro helps
+you protect commercial IP, constrain artifact execution, and trace leaks.** The
+durable classification rules for current and future features are documented in
+the [Community / Pro boundary policy](https://github.com/zhurong2020/pyobfus/blob/main/docs/EDITION_BOUNDARY_POLICY.md).
+
 The following advanced features are available with a Pro license:
 
 - **String Encryption**

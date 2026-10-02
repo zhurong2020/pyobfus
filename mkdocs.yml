@@ -60,6 +60,7 @@ nav:
     - How to cite: CITATION.md
     - License activation: LICENSE_ACTIVATION_GUIDE.md
     - Project structure: PROJECT_STRUCTURE.md
+    - Community / Pro boundary: EDITION_BOUNDARY_POLICY.md
   - Compare:
     - Overview: COMPARISON.md
     - vs PyArmor: compare/pyarmor.md
