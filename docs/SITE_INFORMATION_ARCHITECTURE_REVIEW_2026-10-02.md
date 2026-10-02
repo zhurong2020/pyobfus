@@ -41,16 +41,16 @@ pyobfus 不照搬在线上传源码、大量薄内容页或宽泛安全宣传。
 - [x] 冻结职责、借鉴边界及验收原则
 - [x] 写入 `CURRENT_PLAN_ZH.md` / `TODO.md`
 
-### B. GitHub Pages 适度重构 — ⏳ 下一步
+### B. GitHub Pages 适度重构 — ✅ 完成
 
-- [ ] Hero 主 CTA 改为免费安装，Pro 试用为次级入口
-- [ ] 增加五条任务路径，不新增薄页面
-- [ ] 用五项差异化优势替代重复功能表达
-- [ ] Pro 按保护强度/受保护资产/分发控制/责任追踪组织
-- [ ] 修正 runtime 交付事实，保留购买、证据与诚实边界
-- [ ] 本地结构/链接检查通过
+- [x] Hero 主 CTA 改为免费安装，Pro 试用为次级入口
+- [x] 增加五条任务路径，不新增薄页面
+- [x] 用五项差异化优势替代重复功能表达
+- [x] Pro 按保护强度/受保护资产/分发控制/责任追踪组织
+- [x] 修正 runtime 交付事实，保留购买、证据与诚实边界
+- [x] 本地 HTML 解析与差异检查通过
 
-### C. Read the Docs 首页任务化 — ⏸ 等 B 完成
+### C. Read the Docs 首页任务化 — ⏳ 下一步
 
 - [ ] 顶部改为 Getting started / Protect / Check / Verify / Debug / Integrate
 - [ ] Community/Pro 只留摘要与边界政策入口

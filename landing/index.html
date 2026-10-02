@@ -112,7 +112,8 @@
   <p class="lede">Obfuscate Python before you ship it, and still be able to debug
   what you shipped.</p>
   <div class="cta">
-    <a class="btn btn-primary" href="#purchase-professional-edition">Professional Edition ($45)</a>
+    <a class="btn btn-primary" href="#start">Install Community</a>
+    <a class="btn btn-secondary" href="#purchase-professional-edition">Try Professional</a>
     <a class="btn btn-secondary" href="https://pyobfus.readthedocs.io/">Read the docs</a>
     <a class="btn btn-secondary" href="https://github.com/zhurong2020/pyobfus">GitHub</a>
   </div>
@@ -121,11 +122,17 @@
 </header>
 
 <section class="wrap">
-  <h2>The problem it actually solves</h2>
-  <p class="sub">Protecting source is easy. Supporting it afterwards is the hard part.</p>
+  <h2>Why pyobfus</h2>
+  <p class="sub">Protection is useful only when the resulting software can still be shipped, checked and supported.</p>
   <div class="grid">
     <div class="card">
-      <h3>A traceback you can still read</h3>
+      <h3>A complete free edition</h3>
+      <p>Community handles real multi-file projects with no file or line cap and
+      no trial clock. Optional project limits are your CI safety rails, not an
+      upgrade gate.</p>
+    </div>
+    <div class="card">
+      <h3>Protection that stays diagnosable</h3>
       <p>Obfuscation normally makes production reports useless: a customer sends
       you a stack trace full of <code>I0</code> and <code>I7</code>. pyobfus keeps
       a mapping, so <code>--unmap</code> turns that trace back into your original
@@ -133,22 +140,27 @@
       obfuscated build.</p>
     </div>
     <div class="card">
-      <h3>Output that runs everywhere</h3>
-      <p>The result is ordinary <code>.py</code> files. No native runtime to
-      install, no per-platform build, nothing extra to ship. One build works on
-      every platform your Python already works on.</p>
+      <h3>Evidence before and after a build</h3>
+      <p>Preview selection and artifacts, scan compatibility risks, verify
+      generated syntax, and retain reproducible build reports and provenance
+      instead of trusting an opaque one-way command.</p>
     </div>
     <div class="card">
-      <h3>Checks before you ship, not after</h3>
-      <p><code>--check</code> flags what obfuscation tends to break (<code>eval</code>,
-      dynamic attribute access, framework reflection) and exports SARIF for
-      GitHub Code Scanning. <code>--dry-run --json</code> shows exactly what a
-      build would do before it does it.</p>
+      <h3>Portable, local-first delivery</h3>
+      <p>Your source stays local and Community emits ordinary cross-platform
+      <code>.py</code>. Runtime-backed Pro artifacts ship the separate pure-Python
+      <code>pyobfus-runtime</code>, never the proprietary builder or a native build matrix.</p>
+    </div>
+    <div class="card">
+      <h3>Claims you can inspect</h3>
+      <p>Threat-model limits, advisory-only compatibility and non-cryptographic
+      deterrents are labelled honestly. Tested claims link to evidence rather
+      than being presented as guarantees.</p>
     </div>
   </div>
 </section>
 
-<section class="wrap">
+<section class="wrap" id="start">
   <h2>Start in two commands</h2>
   <p class="sub">Nothing to sign up for.</p>
   <pre><code><span class="c"># Free, no limits on files or lines</span>
@@ -157,6 +169,18 @@ pyobfus src/ -o dist/ --save-mapping mapping.json
 
 <span class="c"># Later, when a customer sends you an obfuscated traceback</span>
 pyobfus --unmap trace.txt --mapping mapping.json</code></pre>
+</section>
+
+<section class="wrap">
+  <h2>Choose your workflow</h2>
+  <p class="sub">Start with the task you need to complete; the detailed reference stays in the docs.</p>
+  <div class="grid">
+    <div class="card"><h3>Protect</h3><p>Obfuscate a file or a complete project with framework-aware presets.</p><a href="https://pyobfus.readthedocs.io/en/latest/#quick-start">Quick start →</a></div>
+    <div class="card"><h3>Check</h3><p>Find reflection, dynamic-code and dependency risks before transforming code.</p><a href="https://pyobfus.readthedocs.io/en/latest/SARIF_CODE_SCANNING/">Scan and SARIF →</a></div>
+    <div class="card"><h3>Verify</h3><p>Keep syntax evidence, hashes, provenance and a deterministic build report.</p><a href="https://pyobfus.readthedocs.io/en/latest/VERIFIABLE_BUILD_REPORT/">Verify a build →</a></div>
+    <div class="card"><h3>Debug</h3><p>Restore original identifiers in a shipped traceback while keeping the mapping private.</p><a href="https://github.com/zhurong2020/pyobfus#how-do-i-debug-an-obfuscated-crash-with-an-ai-assistant">Debug a traceback →</a></div>
+    <div class="card"><h3>Automate</h3><p>Use the JSON CLI, GitHub Action, MCP server, skills or VS Code extension.</p><a href="https://github.com/zhurong2020/pyobfus#-companion-mcp-server-pyobfus-mcp">Integrations →</a></div>
+  </div>
 </section>
 
 <section class="wrap">
@@ -178,11 +202,10 @@ pyobfus --unmap trace.txt --mapping mapping.json</code></pre>
     <div class="card">
       <h3>Professional: $45 one-time</h3>
       <ul>
-        <li>AES-256 string encryption</li>
-        <li>Control-flow flattening</li>
-        <li>Dead-code injection</li>
-        <li>Anti-debugging checks</li>
-        <li>License embedding: expiry, machine binding, run limits</li>
+        <li><strong>Protection strength:</strong> encryption, flattening, anti-debugging, opacity and sealing</li>
+        <li><strong>Protected assets:</strong> import strings, embedded data, vault secrets and tracebacks</li>
+        <li><strong>Distribution control:</strong> device, expiry, run, platform and supplied-key policies</li>
+        <li><strong>Accountability:</strong> forensic watermarking and buyer-specific builds</li>
         <li>Lifetime updates, up to 3 devices</li>
         <li>Email support</li>
       </ul>

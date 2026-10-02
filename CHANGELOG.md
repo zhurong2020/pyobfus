@@ -17,7 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   surfaces in sync. The README now surfaces the resulting product advantages—
   unlimited Community projects, diagnosable protection, verifiable builds,
   local portable delivery, and explicit security claims—without duplicating
-  its detailed feature inventory.
+  its detailed feature inventory. GitHub Pages now follows the same hierarchy:
+  free adoption first, task-oriented Protect/Check/Verify/Debug/Automate paths,
+  and Pro value grouped by commercial outcome rather than a flag inventory.
 
 ### Fixed
 
