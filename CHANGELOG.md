@@ -14,7 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   verification, and debugging; Pro is grouped by protection strength,
   protected assets, distribution control, and accountability. New features and
   tier changes must apply `docs/EDITION_BOUNDARY_POLICY.md` and keep all public
-  surfaces in sync.
+  surfaces in sync. The README now surfaces the resulting product advantages—
+  unlimited Community projects, diagnosable protection, verifiable builds,
+  local portable delivery, and explicit security claims—without duplicating
+  its detailed feature inventory.
 
 ### Fixed
 

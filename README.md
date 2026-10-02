@@ -32,6 +32,16 @@ A Python code obfuscator built with AST-based transformations. **Supports Python
 > **Watch → Custom → Releases** (top of this page) to get a heads-up the
 > moment a new version ships, without the noise of every commit/issue.
 
+## Why pyobfus
+
+| Advantage | What it means in practice |
+|---|---|
+| **A complete Community edition—not a size-limited demo** | Obfuscate real projects with no file/line cap and no trial clock. Optional `max_files` / `max_total_loc` settings are your CI safety rails, not an upgrade gate. See the [edition-boundary policy](https://github.com/zhurong2020/pyobfus/blob/main/docs/EDITION_BOUNDARY_POLICY.md). |
+| **Protection that remains diagnosable** | Keep the private mapping, reverse production tracebacks, and let humans or coding agents work from restored identifiers without handing customers the original source. |
+| **Evidence before and after a build** | Preview selection and artifacts, scan compatibility risks, verify generated syntax, and retain reproducible build reports and provenance instead of treating obfuscation as an opaque one-way command. |
+| **Portable, local-first delivery** | Transform source locally into ordinary cross-platform Python—no source upload, native compiler, or per-platform build matrix. Public dependency-name checks can be disabled with `--offline`. |
+| **Explicit security claims** | Threat-model limits, advisory-only compatibility, trial controls, and non-cryptographic deterrents are labeled as such; tested claims are separated from assumptions in the [support matrix](https://github.com/zhurong2020/pyobfus/blob/main/docs/SUPPORT_MATRIX.md). |
+
 ## 🔌 Companion MCP server: [`pyobfus-mcp`](https://github.com/zhurong2020/pyobfus/tree/main/pyobfus_mcp)
 
 This repository ships **two installable packages**:
@@ -274,8 +284,6 @@ After your trial, purchase a license to continue using Pro features.
 > source, so it is a convenience control, not a security boundary, and we
 > document it as such rather than claiming protection it cannot deliver. See
 > [SECURITY.md](https://github.com/zhurong2020/pyobfus/blob/main/SECURITY.md#trust-boundary-the-pro-trial-is-not-a-security-boundary).
-> Note that the **Community Edition has no file or line limits and needs no
-> trial at all**; the trial gates only the Pro mechanisms.
 
 ## Purchase Professional Edition
 
