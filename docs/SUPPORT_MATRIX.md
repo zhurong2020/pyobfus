@@ -1,7 +1,8 @@
 # Support matrix
 
-What is actually verified, by what, as of 2026-09-24 (`pyobfus` 0.5.28 /
-`pyobfus-mcp` 0.3.12 / VS Code extension 0.4.3).
+What is actually verified, by what, as of 2026-10-02 (`pyobfus` 0.5.30 /
+`pyobfus-mcp` 0.3.12 / `pyobfus-runtime` 0.1.0 / VS Code extension 0.4.3 /
+`pyobfus-action` 1.0.1).
 
 Three labels, used strictly:
 
@@ -24,6 +25,7 @@ confident anyone feels about it.
 | End-to-end CLI (obfuscate, execute output) | tested (3.11) | advisory-only | tested (3.11) | `ci.yml` job `integration` runs `integration_tests/` on Ubuntu and Windows; single-file and cross-file outputs are executed and compared with the originals |
 | `pyobfus-mcp` server | tested (3.11, 3.13) | advisory-only | advisory-only | `ci.yml` jobs `mcp-tests` (3.11), `mcp-sdk-latest` and `mcp-sdk-2x` (3.13) |
 | VS Code extension | tested (Node 22, Python 3.12) | advisory-only | advisory-only | `vscode-extension-ci.yml`, headless xvfb |
+| `pyobfus-action` composite wrapper | tested | tested | tested | External `zhurong2020/pyobfus-action` CI runs the local action against real clean/risky fixtures on all three hosted-runner OS families; Action release 1.0.1 |
 | Free-threaded 3.14 (`--disable-gil`) | verified once, 2026-08-20 | advisory-only | advisory-only | Manual run of the full core suite plus an end-to-end smoke on a downloaded free-threaded build; not in CI. See [`PYTHON314_FREETHREADING.md`](PYTHON314_FREETHREADING.md) |
 
 Reading this honestly: the **transformation** is broadly tested, and basic
@@ -63,6 +65,8 @@ generated output; `--verify-syntax` compiles it, which is weaker than running.
 | Model serving | advisory-only | [`MODEL_SERVING_COOKBOOK.md`](MODEL_SERVING_COOKBOOK.md) |
 | Reverse stack-trace mapping workflow | tested | `tests/test_unmap_cli.py`, plus `integration_tests/test_examples.py` — the `examples/ai_debugging/` round trip (obfuscated crash → `--unmap` restores originals) runs on every push |
 | Pro artifact on a target without `pyobfus_pro` | tested | Standalone runtime wheel installed in clean local and CI environments; `pyobfus_pro` was not importable, the runtime API executed, and wheel inspection found no Pro, transformer, licence-client, or CLI files. CI evidence: run [`35931303008`](https://github.com/zhurong2020/pyobfus/actions/runs/35931303008), `runtime-wheel` job. |
+| Action `check` mode → SARIF/JSON/step outputs | tested | External Action CI runs clean and risky fixtures, both finding gates, and a nonexistent-path tool error; the public repo also documents the contract in [`SARIF_CODE_SCANNING.md`](SARIF_CODE_SCANNING.md). |
+| Action `build` mode → generated output | tested for wrapper behavior; deployment remains caller-owned | External Action CI exercises build mode and syntax verification. The Action does not vendor dependencies into the output: runtime-backed Pro artifacts still require the compatible `pyobfus-runtime` package in the target environment. |
 
 First-batch examples executed by the `integration` job (Ubuntu and Windows),
 each obfuscated, run, and compared against the original behavior:
@@ -80,6 +84,8 @@ executes them.
 | `mcp` SDK 1.x | `>=1.27,<2.0` (shipped) | tested | `ci.yml` job `mcp-sdk-latest`, resolves to newest 1.x |
 | `mcp` SDK 2.x | not shipped; cap holds it back | tested anyway | `ci.yml` job `mcp-sdk-2x` installs over the cap and runs the whole MCP suite. See [`MCP_SDK_2X_SPIKE.md`](MCP_SDK_2X_SPIKE.md) |
 | `pyobfus` floor for the MCP server | `>=0.5.18` | tested | MCP suite installs the local Core checkout |
+| `pyobfus-runtime` for the builder/artifacts | `>=0.1,<1` | tested | Declared by Core metadata; runtime boundary suite and clean-wheel install verify the current 0.x contract |
+| `pyobfus-action` → `pyobfus` | latest by default; exact `pyobfus-version` supported | tested | External Action CI covers default install and version pinning. Action and Core versions are independent; pin for reproducible CI. |
 
 ## How to change a cell
 

@@ -1,9 +1,11 @@
 # Cross-repository documentation sync audit — 2026-10-02
 
 Scope: the public `pyobfus` repository, the public `pyobfus-action` repository,
-and the private historical `pyobfus-pro-dev` repository. This audit was opened
-after the Pro build/runtime split and the creation of the standalone GitHub
-Action repository.
+the private historical `pyobfus-pro-dev` repository, and cross-project routing
+records in `workspace-meta`, `home`, and `pyobfus-legal`. Backups and dated
+archives were inventoried but are not synchronization targets. This audit was
+opened after the Pro build/runtime split and the creation of the standalone
+GitHub Action repository.
 
 ## Current architecture
 
@@ -45,16 +47,22 @@ runtime-backed Pro artifacts.
 
 ## Resolution plan
 
-- [ ] Mark `pyobfus-pro-dev` as historical/read-only and add completion notes
+- [x] Mark `pyobfus-pro-dev` as historical/read-only and add completion notes
       to stale design status headers without rewriting the original record.
-- [ ] Replace `PROJECT_STRUCTURE.md` with the current multi-distribution and
+- [x] Replace `PROJECT_STRUCTURE.md` with the current multi-distribution and
       cross-repository topology; expand the README architecture section.
-- [ ] Add `pyobfus-runtime` to the threat model and refresh the support matrix,
+- [x] Add `pyobfus-runtime` to the threat model and refresh the support matrix,
       including Action CI and delivery-boundary evidence.
-- [ ] Add an Action maintainer guide and document runtime deployment and
+- [x] Add an Action maintainer guide and document runtime deployment and
       version-compatibility rules in `pyobfus-action`.
-- [ ] Run each repository's applicable checks and commit changes separately;
+- [x] Add a workspace-level repository map, link it from `workspace-meta` and
+      `home`, and update `pyobfus-legal`'s current Phase 5/repository status.
+- [x] Run each repository's applicable checks and commit changes separately;
       do not publish or release as part of documentation synchronization.
+
+Resolution commits are recorded in the repositories themselves. The legal
+workspace is intentionally not a Git repository; its two routing/status files
+were updated in place and remain covered by the workspace backup policy.
 
 ## Maintenance rule
 

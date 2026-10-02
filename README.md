@@ -523,7 +523,7 @@ See `pyobfus.yaml.example` for more configuration examples.
 
 ## Architecture
 
-pyobfus uses Python's `ast` module for syntax-aware transformations:
+At the source-transformation layer, pyobfus uses Python's `ast` module:
 
 1. **Parser**: Parse Python source to AST
 2. **Analyzer**: Build symbol table with scope analysis
@@ -534,6 +534,24 @@ This approach ensures:
 - Syntactically correct output
 - Proper handling of Python scoping rules
 - Support for modern Python features (f-strings, walrus operator, etc.)
+
+At the system level, the project has independent build, runtime and interface
+surfaces:
+
+- `pyobfus` contains the Apache-2.0 Core plus the source-separated,
+  proprietary Pro builder. Build machines run this distribution.
+- `pyobfus-runtime` is the minimal, independently published target dependency
+  for runtime-backed Pro artifacts. Target machines do not need the Pro
+  builder or a build licence.
+- `pyobfus-mcp` and the VS Code extension are independently versioned
+  interfaces over the CLI and its stable JSON contracts.
+- [`pyobfus-action`](https://github.com/zhurong2020/pyobfus-action) is an
+  independently versioned composite Action in a separate repository. It
+  invokes the builder; it does not make generated output self-contained or
+  replace the runtime dependency.
+
+See [Project Structure](https://github.com/zhurong2020/pyobfus/blob/main/docs/PROJECT_STRUCTURE.md)
+for the complete repository/distribution map and ownership rules.
 
 ## Development
 

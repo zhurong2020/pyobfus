@@ -12,9 +12,11 @@ and the not-yet-launched [`AFFILIATE_PROGRAM_DESIGN.md`](AFFILIATE_PROGRAM_DESIG
 
 ## Assets
 
-1. **Integrity of published artifacts** — the `pyobfus` / `pyobfus-mcp` wheels,
-   the VS Code extension (Marketplace + Open VSX), and the `pyobfus-action`.
-   Users must get what the maintainer built.
+1. **Integrity of published artifacts** — the `pyobfus`, `pyobfus-mcp`, and
+   independently built `pyobfus-runtime` wheels; the VS Code extension
+   (Marketplace + Open VSX); and the separately versioned `pyobfus-action`.
+   Users must get what the maintainer built, and a runtime-backed artifact must
+   resolve the intended compatible runtime rather than a substituted package.
 2. **Project secrets** — no long-lived PyPI token (OIDC), the Stripe webhook
    secret, the trial signing secret, Open VSX / publisher tokens, KV contents.
 3. **License / trial records** — the Cloudflare KV store (paying customers +
@@ -41,9 +43,11 @@ and the not-yet-launched [`AFFILIATE_PROGRAM_DESIGN.md`](AFFILIATE_PROGRAM_DESIG
 
 Boundaries: (a) the local machine ↔ the license Worker (network); (b) the AI
 agent ↔ the MCP server (process input); (c) the public repo/CI ↔ release
-publishing (OIDC); (d) untrusted PR code ↔ privileged CI credentials; and,
-only after an affiliate pilot launches, (e) referral input ↔ Stripe Checkout ↔
-the commission ledger.
+publishing (OIDC); (d) the Pro builder ↔ the separately distributed target
+runtime; (e) the external Action wrapper ↔ the installed pyobfus version and
+the consumer's workflow permissions; (f) untrusted PR code ↔ privileged CI
+credentials; and, only after an affiliate pilot launches, (g) referral input ↔
+Stripe Checkout ↔ the commission ledger.
 
 ## Assumptions (read these first)
 
@@ -60,7 +64,7 @@ the commission ledger.
 
 | ID | Threat | Mitigation | Status |
 |----|--------|------------|--------|
-| F1 | Tampered published artifact (wheel / extension / action) served to users | GitHub OIDC Trusted Publishing (no long-lived token), PEP 740 attestations, verifiable build report with output SHA-256, CodeQL on every push | **Mitigated** |
+| F1 | Tampered published artifact (builder/MCP/runtime wheel, extension, or action) served to users | GitHub OIDC Trusted Publishing (no long-lived token), PEP 740 attestations for PyPI artifacts, verifiable build report with output SHA-256, SHA-pinned third-party Actions, CodeQL on every push | **Mitigated** |
 | F2 | Malicious or typosquatted dependency enters the build | Minimal declared deps, CodeQL, Dependabot security updates, SHA-pinned Actions (hardening ongoing) | **Partial** |
 | F3 | Secret committed to the public repo | Pre-commit credential scan (`.githooks`, prints `file:line` only), GitHub secret scanning + push protection, OIDC removes the PyPI token entirely | **Mitigated + hardening** |
 | F4 | License / trial bypass by a non-paying user | Server-side license verification; server-registered trial with per-email dedup and fail-closed issuance. **Explicitly NOT claimed tamper-proof** — see Assumptions | **Accepted residual risk (documented)** |
@@ -74,6 +78,8 @@ the commission ledger.
 | F12 | Forged/self-attributed referral, cookie stuffing or misleading endorsement earns commission | Launch gate: signed allowlisted reference, cookie-free v1, manual hold/review, self-referral and traffic-abuse policy, clear disclosure terms | **Planned — affiliate launch blocked** |
 | F13 | Refund/dispute leaves an affiliate paid or a refunded licence active | Launch gate: auditable partial/full reversals linked to Session/PaymentIntent and the licence refund policy | **Planned — affiliate launch blocked** |
 | F14 | Affiliate or buyer PII leaks through logs, reports or public repo | Launch gate: data minimization, hashed/redacted logs, aggregate affiliate reports, private tax/payout records, privacy-policy update | **Planned — affiliate launch blocked** |
+| F15 | Builder/runtime version or contents drift: a generated Pro artifact imports unavailable or substituted runtime code | Builder declares `pyobfus-runtime>=0.1,<1`; provenance records `runtime_requirement`; runtime wheel has an independent boundary suite and is inspected to exclude builder, transformer, CLI, and licence-client files; deployment docs require installing the runtime beside the artifact | **Mitigated within the 0.x compatibility line** |
+| F16 | A mutable Action tag or unpinned builder changes CI behavior unexpectedly | Action documents moving `v1` versus immutable tags; `pyobfus-version` can pin the builder; Action source is a readable composite action and its own CI pins third-party actions | **Documented + tested** |
 
 ## Out of scope / non-goals
 
@@ -90,6 +96,6 @@ the commission ledger.
 
 ## Review cadence
 
-Revisit on any material change to the license Worker, the MCP surface, the
-release pipeline, or the distribution model. Findings from CodeQL, self-scan,
+Revisit on any material change to the license Worker, the MCP or Action
+surface, builder/runtime boundary, release pipeline, or the distribution model. Findings from CodeQL, self-scan,
 and third-party scanners (e.g. `mcp-scanner`) feed back into this table.

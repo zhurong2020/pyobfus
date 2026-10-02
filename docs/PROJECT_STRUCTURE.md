@@ -1,319 +1,133 @@
-# Project Structure
+# Project structure
 
-This document describes the organization of the pyobfus codebase.
+This document is the durable map of pyobfus's source, distribution, and
+cross-repository boundaries. Current priorities belong in
+[`CURRENT_PLAN_ZH.md`](CURRENT_PLAN_ZH.md); historical implementation detail
+belongs in dated design documents.
 
-## Directory Layout
+## System topology
 
+```text
+                         developer / CI
+                               |
+              +----------------+----------------+
+              |                                 |
+      pyobfus CLI/library                 pyobfus-action
+      (public repo, PyPI)               (separate public repo)
+              |                                 |
+       +------+---------+                 invokes pyobfus
+       |                |
+  Apache-2.0 Core   Pro builder
+                        |
+                 generated artifact
+                        |
+                 pyobfus-runtime
+            (separate PyPI distribution)
+
+  pyobfus-mcp and the VS Code extension are separate user interfaces over
+  the same CLI/contracts; neither owns the transformation implementation.
 ```
+
+The builder and target runtime are deliberately different products. Build
+machines use `pyobfus` and, for Pro features, a valid licence. Runtime-backed
+generated artifacts import the minimal `pyobfus-runtime` distribution on the
+target; they do not require the Pro builder or a build licence there.
+
+The GitHub Action lives in `zhurong2020/pyobfus-action`, not this repository.
+GitHub Marketplace requires `action.yml` at the repository root, `uses:`
+fetches that repository, and the Action's moving `v1` tag must not collide with
+Core release tags. It installs or invokes pyobfus; it does not bundle a copy of
+the runtime into generated output.
+
+## Repository and distribution map
+
+| Path / repository | Responsibility | Release identity |
+|---|---|---|
+| `pyobfus/` | Apache-2.0 CLI, library, AST engine, config, scan and reporting contracts | PyPI `pyobfus` (contains source-separated Pro builder too) |
+| `pyobfus_pro/` | Proprietary, licence-gated build-time transforms and orchestration | Versioned with the `pyobfus` builder; never part of the Apache-2.0 core |
+| `pyobfus_runtime/` | Minimal proprietary runtime imported by generated Pro artifacts | PyPI `pyobfus-runtime`, independently built and published |
+| `pyobfus_mcp/` | MCP server exposing eight agent tools | PyPI `pyobfus-mcp`, independent version |
+| `vscode-extension/` | VS Code UI and real CLI-contract integration | VS Code Marketplace + Open VSX, independent version |
+| `skills/` | Review/protection skills plus plugin metadata | Repository-distributed agent integration assets |
+| `cloudflare-worker/` | Licence/trial verification and Stripe fulfillment | Independently deployed Worker; not shipped in Python wheels |
+| `landing/` | Commercial landing page | GitHub Pages |
+| `zhurong2020/pyobfus-action` | Composite CI wrapper for scan/build, SARIF, JSON and step outputs | GitHub Marketplace, moving `v1` plus immutable tags |
+| private `pyobfus-pro-dev` | Original patent-gated v0.5 invention/development record | Historical/read-only; never publish or use as current source |
+
+## Source layout
+
+```text
 pyobfus/
-├── .github/              # GitHub configuration
-│   └── workflows/        # CI/CD pipelines
-│       └── ci.yml        # Test and code quality checks
-│
-├── pyobfus/              # Main package (Community Edition)
-│   ├── __init__.py       # Package version and exports
-│   ├── cli.py            # Command-line interface
-│   ├── config.py         # Configuration management
-│   ├── config_templates.py  # Configuration templates (django, flask, etc.)
-│   ├── config_validator.py  # Configuration validation with typo detection
-│   ├── constants.py      # Centralized URLs and configuration
-│   ├── exceptions.py     # Custom exception classes
-│   ├── trial.py          # Trial system for Pro features
-│   ├── trial_cli.py      # Trial CLI commands
-│   ├── utils.py          # Utility functions
-│   │
-│   ├── core/             # Core obfuscation engine
-│   │   ├── parser.py     # AST parsing
-│   │   ├── analyzer.py   # Symbol table and scope analysis
-│   │   ├── transformer.py# Base transformer class
-│   │   └── generator.py  # Code generation with f-string handling
-│   │
-│   ├── transformers/     # Obfuscation transformers
-│   │   ├── name_mangler.py    # Variable/function name obfuscation
-│   │   ├── string_encoder.py  # Base64 string encoding
-│   │   └── ...           # Additional transformers
-│   │
-│   └── plugins/          # Plugin system
-│       ├── base.py       # Plugin base classes
-│       └── ...           # Plugin implementations
-│
-├── pyobfus_pro/          # Pro Edition (proprietary)
-│   ├── __init__.py       # Pro package initialization
-│   ├── cli.py            # License management CLI (pyobfus-license)
-│   ├── license.py        # License verification system
-│   ├── fingerprint.py    # Device fingerprinting
-│   ├── string_aes.py     # AES-256 string encryption
-│   └── anti_debug.py     # Anti-debugging protection
-│
-├── cloudflare-worker/    # License server (Cloudflare Workers)
-│   ├── src/index.js      # Worker code (license verification + Stripe webhook)
-│   ├── wrangler.toml     # Worker configuration
-│   └── README.md         # Worker management guide
-│
-├── tests/                # Core test suite (1,000+ tests, 90% coverage)
-│   ├── test_core/        # Tests for core modules
-│   ├── test_transformers/# Tests for transformers
-│   ├── integration/      # Integration tests
-│   ├── fixtures/         # Test fixtures
-│   ├── test_license_verification.py  # License system tests
-│   ├── test_fingerprint.py     # Device fingerprint tests
-│   ├── test_string_aes.py      # AES encryption tests
-│   ├── test_anti_debug.py      # Anti-debugging tests
-│   ├── test_generator.py       # Code generator tests
-│   ├── test_config_features.py # Config template/validation tests
-│   └── test_trial.py           # Trial system tests
-│
-├── integration_tests/    # External project testing
-│   ├── test_external_projects.py  # pytest suite
-│   ├── interactive_testing.ipynb  # Jupyter notebook
-│   ├── README.md         # Detailed instructions
-│   └── QUICK_REFERENCE.md # Quick command reference
-│
-├── examples/             # Example files
-│   ├── simple.py         # Basic obfuscation example
-│   ├── string_encoding.py      # String encoding demo
-│   ├── keyword_arguments.py    # Parameter preservation demo
-│   └── multifile/        # Multi-file project example
-│
-├── scripts/              # Utility scripts
-│   ├── test_ml_research.py     # CLI testing tool
-│   ├── setup_stripe_webhook.py # Stripe webhook configuration
-│   └── test_license_server.py  # License server integration tests
-│
-├── pyproject.toml        # Project configuration and dependencies
-├── README.md             # Project documentation
-├── CHANGELOG.md          # Version history
-├── CONTRIBUTING.md       # Contribution guidelines
-├── SECURITY.md           # Security policy
-├── LICENSE               # Dual license (Apache 2.0 for core, Proprietary for Pro)
-├── .gitignore            # Git ignore patterns
-├── .editorconfig         # Editor configuration
-└── docs/                 # Documentation
-    ├── index.md          # GitHub Pages homepage
-    ├── CURRENT_PLAN_ZH.md # Current project plan and priorities (Chinese content)
-    ├── AFFILIATE_PROGRAM_DESIGN.md # Planned commerce-only affiliate pilot
-    ├── ROADMAP.md        # Archived development roadmap
-    ├── COMPARISON.md     # Tool comparison (vs PyArmor, etc.)
-    ├── PROJECT_STRUCTURE.md    # This file
-    ├── LICENSE_ACTIVATION_GUIDE.md  # Pro license activation
-    ├── INTEGRATION_TESTING.md  # Integration testing guide
-    ├── internal/         # Internal docs (git-ignored)
-    └── legal/            # Legal documents
-        ├── TERMS_OF_SERVICE.md
-        ├── REFUND_POLICY.md
-        └── PRIVACY_POLICY.md
-
+├── pyobfus/                 # Core package
+│   ├── cli.py               # CLI and stable JSON entry points
+│   ├── config.py            # Effective configuration
+│   ├── core/                # parser, analyzer, orchestration, reports
+│   ├── transformers/        # Core AST transforms
+│   └── plugins/             # Core plugin interfaces
+├── pyobfus_pro/             # Proprietary build-time implementation
+├── pyobfus_runtime/         # Standalone target-runtime project
+├── pyobfus_mcp/             # Standalone MCP distribution and tests
+├── vscode-extension/        # Standalone Node/VS Code package and tests
+├── cloudflare-worker/       # Licence/commerce service
+├── skills/                  # Agent skills and marketplace metadata
+├── templates/               # Copy-in agent rules and baselines
+├── dogfood/                 # Maintained self-dogfooding canary
+├── examples/                # User-facing examples
+├── integration_tests/       # End-to-end CLI/example tests
+├── tests/                   # Core and Pro-builder tests
+├── scripts/                 # Shared checks, release and dogfood tooling
+├── docs/                    # Product, architecture and operational docs
+├── landing/                 # Static product site
+└── .github/workflows/       # CI, release, security and docs automation
 ```
 
-## Module Descriptions
+## Ownership and dependency rules
 
-### Core Modules
+- Core must not import proprietary implementation modules. The CLI may route
+  explicitly requested Pro behavior into `pyobfus_pro`; implementation stays
+  source-separated.
+- Runtime modules must remain usable without `pyobfus_pro`, the CLI,
+  transformers, licence client, or build-time state.
+- `pyobfus` declares `pyobfus-runtime>=0.1,<1` so builder installations can
+  test and describe the target requirement. Generated artifacts still need
+  that dependency installed in their deployment environment.
+- MCP, VS Code, and Action consume public CLI/JSON contracts. A consumer-side
+  workaround must not silently redefine those contracts; fix the owning layer
+  and add contract tests instead.
+- Each independently released surface keeps its own changelog and version.
+  A Core release never implies an Action, MCP, runtime, or extension release.
 
-**`pyobfus/cli.py`**
-- Command-line interface using Click framework
-- Handles argument parsing and command execution
-- Entry point for the `pyobfus` command
+## Test boundaries
 
-**`pyobfus/config.py`**
-- Configuration data classes
-- YAML file loading and validation
-- Default configuration settings
-
-**`pyobfus/exceptions.py`**
-- Custom exception hierarchy
-- Error types for parsing, analysis, and transformation
-
-### Core Engine
-
-**`pyobfus/core/parser.py`**
-- Wraps Python's `ast` module
-- Handles syntax errors and Python version compatibility
-- Provides AST parsing functionality
-
-**`pyobfus/core/analyzer.py`**
-- Symbol table construction
-- Scope analysis (module, class, function)
-- Determines which names can be obfuscated
-
-**`pyobfus/core/transformer.py`**
-- Base class for all transformers
-- AST visitor pattern implementation
-- Transformer pipeline management
-
-**`pyobfus/core/generator.py`**
-- Code generation from AST
-- Uses `ast.unparse()` for Python 3.9+
-- Ensures syntactically correct output
-
-### Transformers
-
-**`pyobfus/transformers/name_mangler.py`**
-- Renames variables, functions, classes
-- Uses index-based naming (I0, I1, I2...)
-- Respects scope rules and exclusion lists
-- Supports cross-file consistent naming (v0.2.0+)
-
-**`pyobfus/transformers/string_encoder.py`**
-- Base64 encoding for string literals
-- Automatic decoder function injection
-- F-string expression preservation
-
-Additional transformers can be added following the same pattern.
-
-### Pro Edition Modules
-
-**`pyobfus_pro/license.py`**
-- License verification against Cloudflare Worker API
-- Local caching with HMAC-SHA256 signing
-- Device fingerprint validation
-- 3-day cache duration with offline fallback
-
-**`pyobfus_pro/fingerprint.py`**
-- Device fingerprinting (MAC + hostname + OS)
-- Cross-platform support (Windows, macOS, Linux)
-- Tamper-resistant design
-
-**`pyobfus_pro/string_aes.py`**
-- AES-256 string encryption
-- Runtime decryption infrastructure
-- Automatic key management
-
-**`pyobfus_pro/anti_debug.py`**
-- Anti-debugging checks injection
-- Debugger detection techniques
-- Runtime protection
-
-### Plugins
-
-**`pyobfus/plugins/base.py`**
-- Plugin interface definition
-- Plugin discovery and loading
-- Extension point for custom transformers
-
-## Development Workflow
-
-### Setting Up Development Environment
+Run the roots separately because CI treats them as separate contracts:
 
 ```bash
-# Clone repository
-git clone https://github.com/zhurong2020/pyobfus.git
-cd pyobfus
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Install in editable mode with dev dependencies
-pip install -e ".[dev]"
-```
-
-### Running Tests
-
-```bash
-# Run all tests
-pytest
-
-# Run with coverage
-pytest --cov=pyobfus --cov-report=html
-
-# Run specific test file
-pytest tests/test_core/test_parser.py
-
-# Run with verbose output
-pytest -v
-```
-
-### Code Quality
-
-```bash
-# Formatting, lint, type check and docs build -- CI runs this same script
 scripts/check.sh
-
-# Tests (CI also runs the MCP, integration and runtime roots; see AGENTS.md)
-pytest --cov=pyobfus
+venv/bin/pytest tests/
+venv/bin/pytest pyobfus_mcp/tests/
+venv/bin/pytest integration_tests/
+venv/bin/pytest pyobfus_runtime/tests/
 ```
 
-## Adding New Features
+The VS Code package has its own Node toolchain; see `AGENTS.md` for the exact
+commands and interpreter requirement. The external Action repository runs its
+composite action against real fixtures on Ubuntu, macOS, and Windows; follow
+that repository's `AGENTS.md` and `CONTRIBUTING.md` for its checks.
 
-### Adding a New Transformer
+## Where changes belong
 
-1. Create a new file in `pyobfus/transformers/`
-2. Inherit from `BaseTransformer`
-3. Implement the `transform()` method
-4. Add visitor methods for specific AST nodes
-5. Register in `pyobfus/transformers/__init__.py`
-6. Add tests in `tests/test_transformers/`
-7. Update documentation
+| Change | Owning location |
+|---|---|
+| Parser, transform, config, scan, JSON or SARIF behavior | `pyobfus/` + `tests/` |
+| Pro build mechanism | `pyobfus_pro/` + core routing tests |
+| Code imported by a generated target artifact | `pyobfus_runtime/` + boundary tests |
+| MCP tool surface | `pyobfus_mcp/` |
+| Editor UX | `vscode-extension/` |
+| CI wrapper inputs, outputs, summary or failure semantics | external `pyobfus-action` repo |
+| Licence/trial/Stripe server behavior | `cloudflare-worker/` |
 
-Example:
-
-```python
-# pyobfus/transformers/my_transformer.py
-from pyobfus.core.transformer import BaseTransformer
-
-class MyTransformer(BaseTransformer):
-    def transform(self, tree):
-        # Your transformation logic
-        return self.visit(tree)
-
-    def visit_FunctionDef(self, node):
-        # Transform function definitions
-        self.generic_visit(node)
-        return node
-```
-
-### Adding Tests
-
-1. Create test file following naming convention `test_*.py`
-2. Use pytest fixtures for common setup
-3. Test both success and failure cases
-4. Ensure test coverage > 80%
-5. Run tests locally before submitting PR
-
-## Configuration Files
-
-**`pyproject.toml`**
-- Project metadata and dependencies
-- Tool configurations (black, mypy, ruff, pytest)
-- Build system settings
-
-**`.editorconfig`**
-- Editor settings for consistent code style
-- Indentation, line endings, encoding
-
-**`.gitignore`**
-- Files to exclude from version control
-- Generated files, virtual environments, etc.
-
-## Release Process
-
-**Version is defined in ONE place**: `pyproject.toml`
-
-1. Update version in `pyproject.toml` (single source of truth)
-2. Update `CHANGELOG.md` with release notes
-3. Run full test suite: `pytest tests/ -v`
-4. Create git tag: `git tag vX.Y.Z`
-5. Push tag: `git push origin vX.Y.Z`
-6. Build distribution: `python -m build`
-7. Upload to PyPI: `python -m twine upload dist/*`
-
-Note: `pyobfus.__version__` is automatically read from package metadata via `importlib.metadata`.
-
-## Troubleshooting
-
-### Common Issues
-
-**Import errors**: Ensure package is installed in editable mode: `pip install -e .`
-
-**Test failures**: Check Python version compatibility and dependencies
-
-**Type checking errors**: Update type hints or adjust mypy configuration
-
-**Coverage too low**: Add tests for uncovered code paths
-
-## Additional Resources
-
-- [Python AST Documentation](https://docs.python.org/3/library/ast.html)
-- [Green Tree Snakes (AST Tutorial)](https://greentreesnakes.readthedocs.io/)
-- [pytest Documentation](https://docs.pytest.org/)
-- [Click Documentation](https://click.palletsprojects.com/)
+When a package or repository boundary changes, update the owning README and
+changelog, this document, [`SUPPORT_MATRIX.md`](SUPPORT_MATRIX.md), and
+[`THREAT_MODEL.md`](THREAT_MODEL.md) when their claims are affected. The
+cross-repository audit and maintenance rule are recorded in
+[`CROSS_REPO_DOC_SYNC_AUDIT_2026-10-02.md`](CROSS_REPO_DOC_SYNC_AUDIT_2026-10-02.md).

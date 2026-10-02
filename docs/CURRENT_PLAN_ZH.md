@@ -1,5 +1,13 @@
 # pyobfus 当前计划
 
+**2026-10-02 跨仓架构文档同步**：完成 `pyobfus` / `pyobfus-action` /
+`pyobfus-pro-dev` 及工作区级记录审计。主仓 `PROJECT_STRUCTURE.md` 已改为当前 Core/Pro
+builder/runtime/MCP/VS Code/Action 拓扑，README、威胁模型、支持矩阵同步；Action 仓补
+`AGENTS.md`、架构兼容与 runtime 交付边界；私有 Pro 开发仓改为历史只读并保留原始证据；
+`workspace-meta` 新增产品线仓库映射，`home` 与 `pyobfus-legal` 同步当前职责/Phase 5 已完成状态。
+完整发现、处置与以后同步触发规则见 `CROSS_REPO_DOC_SYNC_AUDIT_2026-10-02.md`。均为文档维护，
+不触发发版。
+
 **2026-10-02 临时下载快照**（查询于 10-02 10:57 UTC，PyPI 数据截至 10-01）：Core 近 7 天
 安静日中位数 `40`（仅 3 个安静日，样本仍不足），近 30 天中位数 `30`，因此暂不判定基线高于
 9 月的 `31`；MCP 为 `4/7`。Marketplace `12 installs`，Open VSX `612 downloads`，Action
