@@ -10,6 +10,10 @@
 <meta property="og:description" content="Ships portable .py files, and reverse-maps production stack traces back to your original names.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://zhurong2020.github.io/pyobfus/">
+<link rel="canonical" href="https://zhurong2020.github.io/pyobfus/">
+<link rel="alternate" hreflang="en" href="https://zhurong2020.github.io/pyobfus/">
+<link rel="alternate" hreflang="zh-Hans" href="https://zhurong2020.github.io/pyobfus/zh-cn/">
+<link rel="alternate" hreflang="x-default" href="https://zhurong2020.github.io/pyobfus/">
 <!-- Structured data for search engines and AI answer engines. Facts only;
      keep offers in step with the pricing section below. No version number on
      purpose: it would drift between releases. -->
@@ -107,6 +111,7 @@
 <div class="bar"></div>
 
 <header class="wrap">
+  <p class="note"><strong>English</strong> · <a href="zh-cn/" lang="zh-CN">简体中文</a></p>
   <img src="logo.jpeg" alt="pyobfus" width="208" height="208">
   <h1>pyobfus</h1>
   <p class="lede">Obfuscate Python before you ship it, and still be able to debug
@@ -175,7 +180,7 @@ pyobfus --unmap trace.txt --mapping mapping.json</code></pre>
   <h2>Choose your workflow</h2>
   <p class="sub">Start with the task you need to complete; the detailed reference stays in the docs.</p>
   <div class="grid">
-    <div class="card"><h3>Protect</h3><p>Obfuscate a file or a complete project with framework-aware presets.</p><a href="https://pyobfus.readthedocs.io/en/latest/#quick-start">Quick start →</a></div>
+    <div class="card"><h3>Protect</h3><p>Obfuscate a file or a complete project with framework-aware presets.</p><a href="https://github.com/zhurong2020/pyobfus#minimal-example">See the canonical example →</a></div>
     <div class="card"><h3>Check</h3><p>Find reflection, dynamic-code and dependency risks before transforming code.</p><a href="https://pyobfus.readthedocs.io/en/latest/SARIF_CODE_SCANNING/">Scan and SARIF →</a></div>
     <div class="card"><h3>Verify</h3><p>Keep syntax evidence, hashes, provenance and a deterministic build report.</p><a href="https://pyobfus.readthedocs.io/en/latest/VERIFIABLE_BUILD_REPORT/">Verify a build →</a></div>
     <div class="card"><h3>Debug</h3><p>Restore original identifiers in a shipped traceback while keeping the mapping private.</p><a href="https://github.com/zhurong2020/pyobfus#how-do-i-debug-an-obfuscated-crash-with-an-ai-assistant">Debug a traceback →</a></div>

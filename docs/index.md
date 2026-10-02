@@ -12,11 +12,14 @@ title: pyobfus documentation
 pyobfus is a local-first, AST-based Python obfuscator for Python 3.9–3.14.
 Community is Apache-2.0, has no file or line limits, and requires no trial.
 
+[简体中文概览](https://github.com/zhurong2020/pyobfus/blob/main/README.zh-CN.md)
+
 ## Start here
 
 | Task | Go to |
 |---|---|
 | Install and protect a project | [Quick start](#quick-start) |
+| See a minimal before/after transformation | [Canonical README example](https://github.com/zhurong2020/pyobfus#minimal-example) |
 | Find risks before changing code | [`--check` and SARIF](SARIF_CODE_SCANNING.md) |
 | Preview exactly what a build will select | [Structured dry-run and build evidence](VERIFIABLE_BUILD_REPORT.md) |
 | Verify and retain build evidence | [Verifiable build report](VERIFIABLE_BUILD_REPORT.md) and [provenance manifest](PROVENANCE_MANIFEST.md) |

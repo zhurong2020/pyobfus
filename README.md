@@ -46,6 +46,32 @@ pyobfus --unmap --trace error.log --mapping mapping.json
 For framework presets, configuration discovery, packaging and verification,
 start at the [task-oriented documentation](https://pyobfus.readthedocs.io/).
 
+## Minimal example
+
+Input:
+
+```python
+def greet(name):
+    message = f"Hello, {name}!"
+    return message
+
+print(greet("world"))
+```
+
+Run `pyobfus input.py -o output.py`. Representative Community output:
+
+```python
+def I0(I1):
+    I2 = f"Hello, {I1}!"
+    return I2
+
+print(I0("world"))
+```
+
+Both print `Hello, world!`. Generated identifiers can differ with input and
+configuration; verify the exact output with your own tests. Keep a mapping when
+you need to restore names from a shipped traceback.
+
 ## Features at a glance
 
 Community includes project-wide name mangling and import rewriting, string and

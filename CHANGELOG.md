@@ -24,6 +24,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Simplified Chinese entry page; detailed manuals remain in Read the Docs.
   A shorter, public `llms.txt` is shared by the repository, RTD and Pages so
   Agents receive auditable guidance rather than hidden User-Agent content.
+  A stable Chinese Pages entry now routes readers to the single Chinese
+  overview and the canonical English example; RTD links to those same sources
+  instead of maintaining translated or example copies.
 
 ### Fixed
 

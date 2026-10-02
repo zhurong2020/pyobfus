@@ -1,7 +1,7 @@
 # pyobfus：面向交付的 Python 代码混淆器
 
 [English](https://github.com/zhurong2020/pyobfus/blob/main/README.md) ·
-[产品页面](https://zhurong2020.github.io/pyobfus/) ·
+[中文产品入口](https://zhurong2020.github.io/pyobfus/zh-cn/) ·
 [完整文档](https://pyobfus.readthedocs.io/) ·
 [PyPI](https://pypi.org/project/pyobfus/)
 
@@ -34,6 +34,8 @@ pyobfus --unmap --trace error.log --mapping mapping.json
 
 框架预设包括 FastAPI、Django、Flask、Pydantic、Click、SQLAlchemy 和 ML。
 完整配置、打包与验证流程请从[任务型文档首页](https://pyobfus.readthedocs.io/)进入。
+最小输入/输出示例只在英文 README 维护，见
+[Minimal example](https://github.com/zhurong2020/pyobfus#minimal-example)，避免多份示例漂移。
 
 ## Community 与 Professional
 

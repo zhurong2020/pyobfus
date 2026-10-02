@@ -48,10 +48,24 @@ jobs:
     - name: Check the purchase anchor the README points at still exists
       run: grep -q 'id="purchase-professional-edition"' landing/index.html
 
+    # English is canonical for product facts. The Chinese page is deliberately
+    # a small navigation shell, but both stable URLs and language links must
+    # remain deployable together.
+    - name: Check the bilingual entry points remain connected
+      run: |
+        test -f landing/zh-cn/index.html
+        grep -q 'hreflang="zh-Hans"' landing/index.html
+        grep -q 'hreflang="en"' landing/zh-cn/index.html
+        grep -q 'README.zh-CN.md' landing/zh-cn/index.html
+        grep -q 'pyobfus#minimal-example' landing/zh-cn/index.html
+
     # llms.txt has one source of truth. RTD ships the checked-in twin while
     # Pages receives the same bytes at deploy time.
     - name: Add the public Agent guide to the Pages artifact
-      run: cp llms.txt landing/llms.txt
+      run: |
+        test -s llms.txt
+        cmp --silent llms.txt docs/llms.txt
+        cp llms.txt landing/llms.txt
 
     - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d  # v6.0.0
     - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9  # v5.0.0

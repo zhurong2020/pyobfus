@@ -12,6 +12,12 @@ Python 支持口径已跨入口核对并通过统一检查。前两阶段当时�
 部署时从同一源复制并在页脚公开链接。所有 Agent 内容对人可见，不使用隐藏 HTML 或 UA 分流。
 提交 `b41fccc` 已 push；GitHub About 已改指产品 Pages。Pages、RTD、公开 `llms.txt`、CI、
 CodeQL 与 Dogfood 均在线验收通过；没有 tag、PyPI 或 GitHub Release，不构成发版。
+后续中文与示例采用最小维护面：`README.md` 是英文/PyPI 摘要及最小示例唯一事实源，
+`README.zh-CN.md` 是唯一中文概览，RTD 只外链二者；Pages 新增稳定 `/zh-cn/` 轻量导航入口，
+但不复制完整手册或示例。中英文 Pages 以显式语言切换、canonical 和 `hreflang` 互联，不做
+浏览器语言自动跳转；只有中文真实使用信号足以承担长期维护时，才考虑 RTD translation project。
+Pages workflow 会校验双语入口、示例链接及 Agent guide，防止部署时漂移。README 仍是 PyPI
+long description，因此这些 README 优化只会随下一次正常版本发布到 PyPI，不能单独触发发版。
 
 **2026-10-02 Community / Pro 长期边界调研与收口（免发版）**：调研确认当前技术边界总体清晰，
 没有证据表明免费版正在替代 Pro 购买；现有数据更符合采用与试用漏斗仍小，而非 Community 过度慷慨。

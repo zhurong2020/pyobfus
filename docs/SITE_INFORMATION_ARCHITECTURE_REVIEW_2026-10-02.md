@@ -92,3 +92,27 @@ Agent 决策依据：`llms.txt` 仍是开放提案而非强制标准，用作简
 `ChatGPT-User` 分开（https://platform.openai.com/docs/bots）。本项目在 `github.io/pyobfus/`
 子路径下不能可靠控制域根 robots，因此不伪装已实现 crawler 策略；也不使用隐藏文本或
 User-Agent 分流，避免不可审计内容、事实漂移和 cloaking 风险。
+
+## F. 中文与示例的最小维护面 — ⏳ 等待线上验收
+
+原提议中的 `docs/OVERVIEW_ZH_CN.md` 与 `docs/QUICK_EXAMPLE.md` 不再创建，避免中文事实源和
+示例各自变成额外副本。永久规则：
+
+| 内容 | 唯一权威源 | 其它入口 |
+|---|---|---|
+| 英文产品/安装摘要与最小示例 | `README.md`（同时成为下次 PyPI long description） | RTD/Pages 只链接锚点 |
+| 中文说明 | `README.zh-CN.md` | RTD 直接外链；中文 Pages 只做轻量导航壳 |
+| 任务型完整文档 | RTD `docs/` 专页 | README/Pages 只链接 |
+| Agent 产品指南 | root `llms.txt` | RTD twin 强制比较；Pages 部署时复制 |
+| 价格与购买 | `landing/index.html` | README/RTD 只摘要并链接 |
+
+约束：不自动按浏览器语言跳转；中英文 Pages 使用稳定 URL、显式语言切换和 `hreflang`；
+翻译只覆盖稳定入口，不翻译完整手册。只有中文真实使用信号足以承担持续维护时，才建立 RTD
+正式 translation project。
+
+- [x] README 增加唯一的短 before/after 示例及稳定锚点
+- [x] RTD 首页/导航链接中文 README 与 canonical example，不新增翻译页
+- [x] 新增最小 `landing/zh-cn/index.html`，不复制功能百科
+- [x] 英文/中文 Pages 加语言切换、canonical 与 `hreflang`
+- [x] Pages workflow 校验两种语言入口、购买锚点与 Agent guide
+- [ ] 统一检查、线上部署和人工视觉检查入口

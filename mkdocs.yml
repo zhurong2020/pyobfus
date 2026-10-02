@@ -57,6 +57,7 @@ plugins:
 nav:
   - Home: index.md
   - Getting started:
+    - 简体中文概览: https://github.com/zhurong2020/pyobfus/blob/main/README.zh-CN.md
     - How to cite: CITATION.md
     - License activation: LICENSE_ACTIVATION_GUIDE.md
     - Project structure: PROJECT_STRUCTURE.md
