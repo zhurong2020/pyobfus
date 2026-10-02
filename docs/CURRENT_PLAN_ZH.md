@@ -10,7 +10,8 @@ Python 支持口径已跨入口核对并通过统一检查。前两阶段当时�
 续作：英文 README 从 916 行收敛为 189 行入口，详细内容转到既有 RTD 专页；新增 88 行
 中文入口而非完整镜像；Agent guide 从 202 行精简为 74 行，root/RTD 由检查锁定一致，Pages
 部署时从同一源复制并在页脚公开链接。所有 Agent 内容对人可见，不使用隐藏 HTML 或 UA 分流。
-待本批提交后更新 GitHub About 为产品 Pages 并 push，随后只核对文档/Pages workflow，不发版。
+提交 `b41fccc` 已 push；GitHub About 已改指产品 Pages。Pages、RTD、公开 `llms.txt`、CI、
+CodeQL 与 Dogfood 均在线验收通过；没有 tag、PyPI 或 GitHub Release，不构成发版。
 
 **2026-10-02 Community / Pro 长期边界调研与收口（免发版）**：调研确认当前技术边界总体清晰，
 没有证据表明免费版正在替代 Pro 购买；现有数据更符合采用与试用漏斗仍小，而非 Community 过度慷慨。

@@ -83,7 +83,7 @@ git log -5 --oneline
 - [x] 新增精简 `README.zh-CN.md` 并双向链接，不做完整镜像
 - [x] 精简 root / RTD 的 `llms.txt`；Pages 部署时从同一源复制
 - [x] Pages 页脚增加公开可见的 Agent 入口，不做隐藏或 UA 分流内容
-- [ ] GitHub About 改指产品 Pages；推送后核对 Pages / RTD workflow（外部执行）
+- [x] GitHub About 已改指产品 Pages；Pages / RTD / CI / CodeQL / Dogfood 均在线验收通过
 - [x] 本地全部检查通过；不打 tag、不发版
 
 Agent 决策依据：`llms.txt` 仍是开放提案而非强制标准，用作简短导航而非第三份 README
