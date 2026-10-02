@@ -1,5 +1,13 @@
 # pyobfus 当前计划
 
+**2026-10-02 中文产品页与竞品披露续作（执行中、未授权发版）**：前序中英文入口、最小维护面、
+Professional 中文说明和 CSS 间距修复均已部署。当前待完成：重新判断页脚纯文本 Agent guide
+链接；用克制、可证实的文字解释 AI 工具降低软件实现与复刻门槛后为何仍需源码保护；统一中文
+Community / Professional 命名；为 PyArmor 等公开对比补齐对比日期、版本/资料基线、保守风险和
+免责说明；最后评估本日大量文档变化应通过 Pages/RTD 即时发布，还是等待下一次正常 PyPI 版本。
+详细逐项状态见 `SITE_INFORMATION_ARCHITECTURE_REVIEW_2026-10-02.md` §G。恢复时从首个未勾选项
+继续；本记录不授权 tag、GitHub Release 或 PyPI 发布。
+
 **2026-10-02 网站信息架构调研与改造（已完成、免发版）**：已对照 `pyobfuscate.com` 的首页、
 比较与内容组织，结论是借鉴“一页一个意图”、任务入口和稳定 CTA，不复制在线上传源码、
 大量薄 SEO 页面或宽泛安全宣传。永久分工定为 README=快速判断/安装，GitHub Pages=产品决策，
