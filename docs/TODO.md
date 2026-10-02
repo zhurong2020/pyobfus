@@ -468,8 +468,3 @@ MCP 的 stateless / streamable-HTTP 传输**，因此也拿不到 `2026-07-28` �
 ⚠️ **没有一并关闭的是另一件事**：为上海旎嵘科技注册商标做**品牌防护**（防别人在 PyPI
 或各类市场用同名发包）本身是否值得，**本轮未做决定**，不要把它当成也被否掉了。若将来
 要做，先在中国注册第 9 类（计算机软件）成本很低，拿到后再评估是否加美国。
-# P0 · 网站信息架构适度重构（执行中，免发版）
-
-唯一执行台账：[`SITE_INFORMATION_ARCHITECTURE_REVIEW_2026-10-02.md`](SITE_INFORMATION_ARCHITECTURE_REVIEW_2026-10-02.md)。
-按 B GitHub Pages → C RTD 首页 → D 一致性验收推进；README 的 “Why pyobfus” 已完成，不重复
-扩写。保持既有 URL，不扩展在线源码上传或薄 SEO 页面，不自行 push/发版。

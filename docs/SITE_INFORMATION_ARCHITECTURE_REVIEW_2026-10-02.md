@@ -1,6 +1,6 @@
 # pyobfus 网站信息架构调研与改造台账（2026-10-02）
 
-**状态：执行中；免发版；不得因文档完成自动发布。**
+**状态：全部完成；免发版；不得因文档完成自动发布。**
 
 ## 背景与结论
 
@@ -50,19 +50,19 @@ pyobfus 不照搬在线上传源码、大量薄内容页或宽泛安全宣传。
 - [x] 修正 runtime 交付事实，保留购买、证据与诚实边界
 - [x] 本地 HTML 解析与差异检查通过
 
-### C. Read the Docs 首页任务化 — ⏳ 下一步
+### C. Read the Docs 首页任务化 — ✅ 完成
 
-- [ ] 顶部改为 Getting started / Protect / Check / Verify / Debug / Integrate
-- [ ] Community/Pro 只留摘要与边界政策入口
-- [ ] 删除首页重复的第二套详细购买/功能清单，链接到 Pages 与 activation guide
-- [ ] `mkdocs build --strict` 通过
+- [x] 顶部改为 Getting started / Protect / Check / Verify / Debug / Integrate
+- [x] Community/Pro 只留摘要与边界政策入口
+- [x] 删除首页重复的第二套详细购买/功能清单，链接到 Pages 与 activation guide
+- [x] `mkdocs build --strict` 通过
 
-### D. 跨入口一致性验收 — ⏸ 等 C 完成
+### D. 跨入口一致性验收 — ✅ 完成
 
-- [ ] 核对价格、试用、runtime、版本边界、支持版本与 CTA
-- [ ] `scripts/check.sh` 通过
-- [ ] 更新本台账、`CURRENT_PLAN_ZH.md`、`TODO.md` 和 `[Unreleased]`
-- [ ] 单独提交；不 push、不发版，除非维护者明确授权
+- [x] 核对价格、试用、runtime、版本边界、支持版本与 CTA
+- [x] `scripts/check.sh` 通过
+- [x] 更新本台账、`CURRENT_PLAN_ZH.md`、`TODO.md` 和 `[Unreleased]`
+- [x] 单独提交；不 push、不发版，除非维护者明确授权
 
 ## 冷启动恢复方法
 
