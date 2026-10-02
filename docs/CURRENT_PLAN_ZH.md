@@ -1,5 +1,16 @@
 # pyobfus 当前计划
 
+**2026-09-30 进度核查 + 下载数据留存收口**（查询于 10-01 00:30 UTC，PyPI 数据截至 09-29）：
+核查时仓库干净且与 `origin/main` 同步，0 open issue/PR；最近 CI、CodeQL、License Endpoint Monitor 全绿。
+Core 近 7/30 天安静日中位数均为 `30`，仍贴近 9 月基线 `31`，没有自然采用抬升证据；MCP 为 `4/6`，
+Marketplace `12 installs`，Open VSX `602 downloads`，Action 可见引用 `0`。GitHub 14 天浏览 `300`/独立
+`174`，来源仍以搜索、GitHub、PyPI、chatgpt.com 为主，内容渠道未出现。Gmail 无客户许可/购买问题等待回复；
+plugin 孤儿锁线程最后一封仍是 Rudy 09-28 的「已升级内部、有消息再跟进」，当前等对方。下载数据留存改为
+**只记决策摘要，不保存每次完整 stdout 或另建 CSV/JSON**：静默期周检保留 Core/MCP 安静日中位数、
+Marketplace installs、trial、GitHub 流量/来源和结论；10-25 复盘后改为月度摘要，发版、投放或异常峰值再加
+临时检查点。`scripts/download_snapshot.py` 保留为统一、可复跑的统计口径；runtime 逐日数、Open VSX 累计抓取数
+等低信号明细不重复沉淀。
+
 **2026-09-29 仓库维护（免发版，已 push，CI 全绿）**：① `CLAUDE.md` 从 92 KB 精简到约 18 KB，09-24 以前的逐次发版记录原样移到
 `docs/CLAUDE_MD_HISTORY.md`（已从文档站排除，维护者用）。② 本地与 CI 检查统一：新增 `scripts/check.sh`（black/ruff 10 个路径、
 mypy 4 个包、元数据、README 链接、`mkdocs --strict`），CI 的 lint/docs 任务直接调用它；新增 `.githooks/pre-push` 推送前跑它
@@ -191,7 +202,7 @@ Core/MCP/runtime/Action 的所有本地开发、测试、构建和发版准备�
 `pyobfus-runtime` Trusted Publisher 已建立并在首次发布后转为正式项目 Publisher；既有
 Core/MCP Publisher 不会自动覆盖它。
 
-更新时间：2026-09-22（**09-22 迁移后核查与收尾见下一段**；当前公开版本：Core **`0.5.28`**（reason codes + trial `--email` + CycloneDX 1.7，OIDC+PEP740 已发布、PyPI latest、两个 provenance 200、全新装验证、GitHub Release 已建、完整 CI+CodeQL 绿）/ MCP **`0.3.12`** /
+更新时间：2026-09-22（**09-22 迁移后核查与收尾见下一段**；当时公开版本：Core **`0.5.28`**（reason codes + trial `--email` + CycloneDX 1.7，OIDC+PEP740 已发布、PyPI latest、两个 provenance 200、全新装验证、GitHub Release 已建、完整 CI+CodeQL 绿）/ MCP **`0.3.12`** /
 VS Code **`0.4.3`**；**GitHub Action `pyobfus-action v1.0.1` 已上架 Marketplace**。本轮完成：**09-10 下载与渠道复查**——三个 0.5.22 发布后的
 干净日 `65 / 48 / 31` 单调回落进安静区间，**09-08 悬置的「基线是否抬升」问题
 已有答案：没有抬升**；MCP 09-07 的 235 已由 `16 / 23` 坐实为发版/重建自动化流量。

@@ -14,14 +14,15 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### 🟢 2026-09-26/27 — Core 0.5.30 已发布 + plugin 孤儿锁待支持（最新 · 冷启动先读这段）
+### 🟢 2026-09-30 — Core 0.5.30 静默观察 + plugin 孤儿锁待支持（最新 · 冷启动先读这段）
 
 - **内容引流改为定期发（2026-09-27 定）**：10-11 前只写不发，10-13 那周起 DEV 双周一篇、arong.eu.org + 知乎月度、
   微博不发 pyobfus；Show HN 已用完。**未发稿件放 gitignored 的 `docs/internal/content-*/`，不进 `_drafts/`**。
   排期与退出条件见 `docs/TODO.md`「内容节奏」。第 1、2 篇草稿已写待维护者审（第 2 篇头注释列了发稿前必须核的三条事实）。
 - **AI/Agent 内容（09-28 定）**：`llms.txt`/`AGENTS.md`/MCP 这层已完整，**不另做 AI 专用页**；缺口用文章补
   （选题第 7 篇「混淆后让 AI 助手继续调试」排 11-24）。落地页已有 `SoftwareApplication` JSON-LD，改价须同步其 offers。
-  每周一巡检跑 `python scripts/download_snapshot.py`（已含 GitHub 流量来源）；09-28 巡检记录在 `CURRENT_PLAN_ZH.md` 顶部。
+  每周一巡检跑 `python scripts/download_snapshot.py`（已含 GitHub 流量来源）；09-30 巡检记录在 `CURRENT_PLAN_ZH.md` 顶部。
+  只留决策摘要、不存完整 stdout 或另建 CSV/JSON；10-25 复盘后改为月度留存，细则见 `docs/TODO.md`「节奏」。
 - **IP 后续（09-28 登记，待拍板未执行）**：提前公布 / 专利标识 + 专有许可补专利条款（随 11 月月度版本）/ 出海建议否、
   2027-03 复核（优先权窗口 2027-05-22）。仓库侧见 `docs/TODO.md`「IP 相关」，法务侧 `~/projects/pyobfus-legal/IP商业化迁移_TODO.md`。
 - **Affiliate 只完成设计，未上线**：邀请制 3–5 人、无 cookie、签名 Stripe reference、20% / 30 天
@@ -108,7 +109,7 @@ pyobfus/
 │   ├── transformers/   # AST 变换器
 │   └── cross_file/    # 跨文件混淆
 ├── pyobfus_pro/       # Pro Edition (商业许可)
-├── tests/             # 1352 passed + 1 skipped (2026-09-20 实测，含 reason-code 测试；+ pyobfus_mcp/tests 97 + integration_tests/ 12 + vscode-extension 53)
+├── tests/             # Core 测试；各测试根须按 AGENTS.md 分开运行，最新验收见 CURRENT_PLAN_ZH.md
 ├── examples/          # 示例代码
 ├── docs/              # 项目文档
 └── cloudflare-worker/ # 许可验证 Worker

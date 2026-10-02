@@ -5,7 +5,7 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-09-28（新增「IP 相关」段：专利标识、专有许可专利条款、发版清单 Apache 边界检查，待拍板；选题池加第 7 篇「混淆后让 AI 助手继续帮你调试」并排进 11-24；落地页加 JSON-LD 结构化数据；周一巡检：plugin 锁由 Rudy 09-28 升级到 Anthropic 内部、等其跟进；GitHub 流量来源已并进 `download_snapshot.py`；第 2 篇草稿已写。上一轮 09-27：新增「内容节奏」段：只写不发到 10-11、10-13 那周起 DEV 双周一篇，知乎选定为中文开发者渠道先记录，第 1 篇草稿已写；Show HN 最终结果补记；上一轮 09-26：Claude plugin 孤儿锁已按 Rudy 要求补齐账号核查、workspace ID 与两张截图并在原线程回复，现等后端处理；上一轮 09-25：trial 现状核查 + KV 备份 P0 当日完成；09-24：awesome-python PR #3352 当日被维护者关闭，理由是采用量，见「分发 / 上架队列」；
+最后更新：2026-09-30（下载数据留存收口：只保留决策摘要，10-25 复盘后改为月度留存；所有暂不发版的后续改进继续按本文件的触发条件与节奏跟踪。上一轮 09-28：新增「IP 相关」段：专利标识、专有许可专利条款、发版清单 Apache 边界检查，待拍板；选题池加第 7 篇「混淆后让 AI 助手继续帮你调试」并排进 11-24；落地页加 JSON-LD 结构化数据；周一巡检：plugin 锁由 Rudy 09-28 升级到 Anthropic 内部、等其跟进；GitHub 流量来源已并进 `download_snapshot.py`；第 2 篇草稿已写。上一轮 09-27：新增「内容节奏」段：只写不发到 10-11、10-13 那周起 DEV 双周一篇，知乎选定为中文开发者渠道先记录，第 1 篇草稿已写；Show HN 最终结果补记；上一轮 09-26：Claude plugin 孤儿锁已按 Rudy 要求补齐账号核查、workspace ID 与两张截图并在原线程回复，现等后端处理；上一轮 09-25：trial 现状核查 + KV 备份 P0 当日完成；09-24：awesome-python PR #3352 当日被维护者关闭，理由是采用量，见「分发 / 上架队列」；
 `pyobfus-runtime` 0.1.0 已通过 OIDC/PEP 740 发布并完成 PyPI 验收；
 删除已完全合入 `main` 的本地及远端 `spike/mcp-sdk-2x` 空壳分支；
 修正本文件把已随 0.5.28 发布的邮箱 trial 误列为待实现、仍称 0.5.27 为当前版本的状态漂移。
@@ -88,7 +88,11 @@ awesome-python 要的 adoption trajectory 也因此拿不出来。09-25 用户�
 2. **每周一固定巡检，不写代码**：`python scripts/download_snapshot.py`（三个 PyPI 包安静日
    中位数 + Marketplace installs + Open VSX + Action 归因）、trial 登记数（`check_backup.sh`
    3b 节）、客户来信（`/pyobfus-inbox`）、plugin 解锁邮件、Stripe Alipay、CI 与 Dependabot
-   大版本、Dogfood workflow 结果、KV 备份新鲜度。结果在 `CURRENT_PLAN_ZH.md` 记一行。
+   大版本、Dogfood workflow 结果、KV 备份新鲜度。结果在 `CURRENT_PLAN_ZH.md` 记一行决策摘要；
+   不保存完整 stdout，也不另建 CSV/JSON 快照。静默期保留 Core/MCP 安静日中位数、Marketplace
+   installs、trial、GitHub 流量/来源与结论；runtime 逐日数、Open VSX 累计抓取数和长期不变的
+   Action `0` 只在异常或变化时写。10-25 复盘后改为每月留一份摘要，发版、内容投放或异常峰值
+   才增加临时检查点。`scripts/download_snapshot.py` 继续作为统一、可复跑的统计口径。
 3. **每月月底四件事复盘**（下载趋势 / 问题排查 / 竞品重扫 / 已有设计复盘，08-08 定），
    结论决定下月第一周发不发版、发什么。
 4. dogfood 观察满 4 周且无 flaky 失败，再决定是否升 PR gate。
