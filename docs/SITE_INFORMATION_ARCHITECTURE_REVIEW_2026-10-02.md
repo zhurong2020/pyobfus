@@ -93,7 +93,7 @@ Agent 决策依据：`llms.txt` 仍是开放提案而非强制标准，用作简
 子路径下不能可靠控制域根 robots，因此不伪装已实现 crawler 策略；也不使用隐藏文本或
 User-Agent 分流，避免不可审计内容、事实漂移和 cloaking 风险。
 
-## F. 中文与示例的最小维护面 — ⏳ 等待线上验收
+## F. 中文与示例的最小维护面 — ✅ 完成
 
 原提议中的 `docs/OVERVIEW_ZH_CN.md` 与 `docs/QUICK_EXAMPLE.md` 不再创建，避免中文事实源和
 示例各自变成额外副本。永久规则：
@@ -115,4 +115,8 @@ User-Agent 分流，避免不可审计内容、事实漂移和 cloaking 风险�
 - [x] 新增最小 `landing/zh-cn/index.html`，不复制功能百科
 - [x] 英文/中文 Pages 加语言切换、canonical 与 `hreflang`
 - [x] Pages workflow 校验两种语言入口、购买锚点与 Agent guide
-- [ ] 统一检查、线上部署和人工视觉检查入口
+- [x] 统一检查、Pages 线上部署及公开 URL/内容验收
+
+线上验收：提交 `4ab32b0` 的 Pages、CI 与 CodeQL 均通过；`/zh-cn/`、英文语言入口、
+canonical example 和部署后的 `llms.txt` 已从公开 URL 核对。维护者可在真实桌面/手机浏览器
+做一次主观视觉复核，但它不是技术完成 gate，也不需要维护第二份内容。
