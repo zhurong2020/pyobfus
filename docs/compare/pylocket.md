@@ -11,7 +11,7 @@ as "a full platform" rather than an encryption utility.
 
 | Feature | pyobfus | PyLocket |
 |---------|---------|----------|
-| **Price (Pro)** | **$45** (one-time) | Flat subscription + $4/activated license |
+| **Commercial model** | **$45** (one-time Pro) | Subscription plus activated-licence pricing; verify current vendor terms |
 | **Python versions** | **3.9 - 3.14** | 3.12 - 3.14 only |
 | **Protection unit** | AST transformation on whole modules | Per-function bytecode encryption |
 | **Key management** | Local Pro license / Runtime String Vault | Device-bound keys issued at activation, never embedded in the shipped app |
@@ -65,4 +65,4 @@ below for how the two tradeoffs coexist rather than compete head-on.
 
 Part of the [pyobfus tool comparison](../COMPARISON.md), which also carries
 the feature matrix, pricing, and the reasoning behind layering more than one
-tool.
+tool. Its dated scope and disclaimer apply here as well.

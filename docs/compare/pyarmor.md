@@ -1,39 +1,57 @@
 # pyobfus vs PyArmor
 
-PyArmor is the most established commercial Python obfuscator, and the tool most
-people weigh pyobfus against. Both protect source before it ships; they differ
+PyArmor is a long-running commercial Python obfuscator and a common alternative
+considered alongside pyobfus. Both protect source before it ships; they differ
 in what they do to your build, your runtime, and your ability to debug what
 comes back from production.
 
+> **Baseline — reviewed 2026-10-02.** PyArmor facts use the official 9.2.7
+> documentation, PyPI metadata and public purchase page. The free-tier line
+> threshold is a separate reproducible test of PyArmor 9.2.4 performed on
+> 2026-05-09; it has **not** been re-measured on 9.2.7 and is labelled
+> accordingly. Features and restrictions vary by licence, platform and build
+> mode. Prices and terms can change, so verify the linked official sources and
+> test your own project. PyArmor is a trademark of its owner; this independent
+> comparison is not endorsed by PyArmor and is not a warranty, security
+> guarantee or legal advice.
+
 | Feature | pyobfus | PyArmor |
 |---------|---------|---------|
-| **Price (Pro)** | **$45** (one-time) | $89 (one-time; [official cart](https://jondy.github.io/paypal/index.html), verified 2026-09-01) |
-| **Price savings** | **50% cheaper** | - |
-| **Free tier** | Unlimited (Community features) | ~935-940 lines/file before `ERROR out of license` (PyArmor 9.2.4, verified 2026-05-09) |
-| **Pro trial** | **5 days free** (full features) | Same opaque trial limits as free; no documented threshold |
-| **Open source** | Yes (Core: Apache 2.0, Pro: Proprietary) | No |
-| **Auditable code** | Yes | No |
-| **Native dependencies** | None | Requires `pytransform` runtime |
+| **Price (Pro)** | **$45** (one-time) | $89 (one-time; [official purchase page](https://jondy.github.io/paypal/index.html), checked 2026-10-02) |
+| **Price difference at snapshot** | **$44 lower** | Baseline |
+| **Free tier** | No file/line cap on Community features | Official docs say it cannot obfuscate “big scripts”; our 9.2.4 test passed 935 lines and failed 940 lines |
+| **Pro feature trial** | **5 days free** | Free trial does not unlock licensed features; official docs do not state a numeric big-script threshold |
+| **Source availability** | Core: Apache-2.0; Pro builder: proprietary | Proprietary product |
+| **Inspectable implementation** | Community implementation is public | Public documentation and packaged interface; implementation is not published as open source |
+| **Runtime dependency** | Community output is pure Python; some Pro modes use the separately redistributable pure-Python runtime | Generated output uses a platform-specific PyArmor runtime package |
 | **Output format** | Pure `.py` files | `.py` + native libraries |
-| **Cross-platform output** | Yes (single output works everywhere) | Requires per-platform build |
+| **Cross-platform output** | Community output is portable; Pro runtime policies may intentionally restrict it | Runtime packages and advanced modes depend on target platforms; verify the selected mode |
 | **Python 3.9-3.14** | Yes | Yes |
 | **String encryption** | AES-256 (Pro) | AES (Pro) |
 | **Anti-debugging** | Yes (Pro) | Yes (Pro) |
 | **Control flow flattening** | Yes (Pro v0.3.0+) | Yes (Pro) |
 | **Import obfuscation** | Yes (Pro, runtime importlib + encrypted import strings) | Yes (Pro) |
-| **Function-body virtualization** | No (AST-level only) | Yes — VMC/ECC modes (PyArmor 9.2.x, 2026) |
+| **Function-body virtualization** | No (AST-level only) | Yes — VMC/ECC modes (PyArmor 9.2.7 docs, checked 2026-10-02) |
 | **License binding** | Per-device (3 devices) | Per-device |
 | **Future Python support** | Community-driven | "Can't guarantee" (per docs) |
 
-## PyArmor Pain Points (from user feedback)
+## Constraints and trade-offs
 
-Based on GitHub issues and community feedback, common PyArmor frustrations include:
+These items have different evidence strengths; each should be read only within
+the stated source or tested version:
 
-1. **Opaque trial limit (~935-940 lines/file)**: Errors out at this threshold with the message `ERROR out of license` — no threshold number, no upgrade hint, no documentation. Verified empirically on PyArmor 9.2.4 in clean venv on 2026-05-09 (935 lines passes, 940 fails; line count not byte count — 900 lines at 67 KB still passes). Full reproducible methodology: [`PYARMOR_TRIAL_LIMIT_EXPERIMENT.md`](../PYARMOR_TRIAL_LIMIT_EXPERIMENT.md).
-2. **PyInstaller conflicts**: DLL version mismatches, slow startup times
-3. **Environment issues**: Doesn't work in MSYS, no warning given
-4. **Future compatibility**: License may not work with future PyArmor versions
-5. **Complex deployment**: Requires distributing native `pytransform` libraries
+1. **Free-version big-script restriction**: official 9.2.7 docs disclose that
+   the free version cannot obfuscate “big scripts” but do not give a numeric
+   threshold. In our clean-venv **9.2.4** experiment on 2026-05-09, 935 lines
+   passed and 940 failed with `ERROR out of license`; this may differ in later
+   releases. See the full reproducible
+   [methodology](../PYARMOR_TRIAL_LIMIT_EXPERIMENT.md).
+2. **Platform/runtime planning**: PyArmor's native runtime and some advanced
+   modes require target-specific build decisions. This can provide stronger
+   protection, but should be tested across every shipping platform.
+3. **Future-version licence compatibility**: PyArmor's official licence page
+   says non-CI licences keep working with the purchased version but may not
+   work with future PyArmor versions.
 
 ## Bytecode Protection Is Not Magic
 
@@ -46,8 +64,8 @@ disassembly and experimental source without executing the protected program:
 The tool's own README is careful about limits: disassembly can be accurate while
 decompiled source may be incomplete or incorrect.
 
-**A stronger PyArmor tier exists above plain RFT/bytecode encryption.** As of
-PyArmor 9.2.x (2026), `pyarmor build --vmc`/`--ecc` replace an entire function
+**A stronger PyArmor tier exists above plain RFT/bytecode encryption.** In the
+PyArmor 9.2.7 documentation checked on 2026-10-02, `pyarmor build --vmc`/`--ecc` replace an entire function
 body — not just names — with either PyArmor's own VM bytecode (VMC mode: no C
 compiler needed at build time; PyArmor's own docs describe the result as
 reversible) or compiled C machine code (ECC mode: requires a C compiler at
@@ -86,7 +104,8 @@ they ship.
 - You need **pure Python output** without native dependencies
 - You value **open-source** and code auditability
 - You're building **cross-platform** applications
-- You want **50% cost savings** over PyArmor Pro
+- The documented pyobfus workflow better matches your portability and
+  reverse-mapping needs, and the current $45 price fits your budget
 
 ## When to Choose PyArmor
 
@@ -123,4 +142,4 @@ they ship.
 
 Part of the [pyobfus tool comparison](../COMPARISON.md), which also carries
 the feature matrix, pricing, and the reasoning behind layering more than one
-tool.
+tool. Its dated scope and disclaimer apply here as well.

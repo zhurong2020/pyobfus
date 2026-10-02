@@ -40,4 +40,6 @@ either way.
 
 Part of the [pyobfus tool comparison](../COMPARISON.md), which also carries
 the feature matrix, pricing, and the reasoning behind layering more than one
-tool.
+tool. Its dated scope and disclaimer apply here as well. Each service has its
+own retention and privacy terms; “browser-based” alone does not establish what
+the operator stores or processes.

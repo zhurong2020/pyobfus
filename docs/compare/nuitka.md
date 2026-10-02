@@ -1,27 +1,27 @@
 # pyobfus vs Nuitka
 
 Nuitka compiles Python into a native binary. Like Cython it protects source by
-leaving the source behind entirely, and like Cython that costs you portability
-and readable tracebacks.
+leaving ordinary source behind. The trade-off is a compiled, platform-specific
+distribution workflow rather than source-to-source transformation.
 
 | Feature | pyobfus | Nuitka |
 |---------|---------|--------|
 | **Output** | `.py` files | Standalone binary |
 | **Distribution** | Requires Python installed | Self-contained |
-| **Build time** | Instant | Minutes to hours |
-| **File size** | Original size | Large (includes Python) |
-| **Commercial price** | $45 | ~$270/year |
-| **License model** | One-time | Annual subscription |
-| **Traceback protection** | RSA-2048-OAEP + AES-256-GCM hybrid, reversible via `pyobfus-unscrub` | Symmetric encryption only ([per Nuitka's own docs](https://nuitka.net/doc/commercial/traceback-encryption.html), asymmetric "planned" as of 2026-08) |
+| **Build time** | No native compilation | Native compilation; measure on your project |
+| **File size** | Transformed source | Standalone distributions include runtime dependencies |
+| **Commercial offering** | $45 one-time Pro | Separate vendor offering; check current quote and terms |
+| **Traceback protection** | RSA-2048-OAEP + AES-256-GCM hybrid, reversible via `pyobfus-unscrub` | Vendor-documented traceback encryption; verify the current edition and key-management design |
 
 ## Traceback Protection: Hybrid vs Symmetric-Only
 
 Both tools ship a feature for the same real problem — a production traceback
 can leak internal file/function/variable names to whoever sees it. Nuitka
-Commercial's "Traceback Encryption" (part of its ~$270/year tier) encrypts
-tracebacks so only the vendor can decode them, but as of this writing its own
-documentation states the encryption is symmetric only, with asymmetric
-support still on the roadmap. pyobfus's `--scrub-traceback` (Pro) already
+Commercial's "Traceback Encryption" encrypts traceback information. In the
+[vendor documentation](https://nuitka.net/doc/commercial/traceback-encryption.html)
+reviewed in 2026-08, the documented design used symmetric encryption and said
+asymmetric support was planned; verify the current design before relying on
+that snapshot. pyobfus's `--scrub-traceback` (Pro)
 uses a hybrid RSA-2048-OAEP + AES-256-GCM scheme — the production side never
 holds a key capable of decrypting what it just encrypted, only the
 private-key holder can, via the separate `pyobfus-unscrub` CLI. Symmetric
@@ -33,7 +33,7 @@ one-way trapdoor.
 ## When to Choose pyobfus
 
 - You're distributing **Python libraries** (not executables)
-- You want **one-time payment** vs subscription
+- You prefer pyobfus's published one-time price to Nuitka's commercial terms
 - You need **fast builds** (no compilation)
 - **File size** matters
 
@@ -41,9 +41,9 @@ one-way trapdoor.
 
 - You need **standalone executables**
 - Users shouldn't need Python installed
-- You want **maximum binary protection**
+- You specifically want a native compiled distribution
 
-> **Want a standalone executable without Nuitka's price or compile times?**
+> **Want a standalone executable without using Nuitka?**
 > pyobfus pairs with the free, MIT-licensed [PyInstaller](https://pyinstaller.org/)
 > to ship a single-file binary with mangled identifiers — obfuscate first,
 > then bundle. See the [PyInstaller Cookbook](../PYINSTALLER_COOKBOOK.md) for a
@@ -54,4 +54,4 @@ one-way trapdoor.
 
 Part of the [pyobfus tool comparison](../COMPARISON.md), which also carries
 the feature matrix, pricing, and the reasoning behind layering more than one
-tool.
+tool. Its dated scope and disclaimer apply here as well.

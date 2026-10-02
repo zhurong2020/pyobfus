@@ -41,6 +41,9 @@ Please describe the tests you ran to verify your changes:
       evidence, and Community/Pro decision
 - [ ] Edition-facing README/comparison/config/help/tests/changelog stay aligned;
       Community correctness and existing workflows are not artificially limited
+- [ ] Competitor claims identify their review date, version/tier/platform and
+      evidence source; prices and other changeable facts were rechecked, and
+      `docs/COMPARISON.md`'s scope/disclaimer still applies
 
 ## Additional Context
 

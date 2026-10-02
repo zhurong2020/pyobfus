@@ -26,7 +26,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Agents receive auditable guidance rather than hidden User-Agent content.
   A stable Chinese Pages entry now routes readers to the single Chinese
   overview and the canonical English example; RTD links to those same sources
-  instead of maintaining translated or example copies.
+  instead of maintaining translated or example copies. Product-page copy now
+  explains source protection in the AI era without claiming irreversibility,
+  and labels the public Agent guide as plain text. Competitor comparisons now
+  carry a dated evidence baseline, narrower version/tier scope, current source
+  links and a conservative independent-comparison disclaimer.
 
 ### Fixed
 

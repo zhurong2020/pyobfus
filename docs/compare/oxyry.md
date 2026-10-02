@@ -48,4 +48,5 @@ Oxyry is an online Python obfuscation service.
 
 Part of the [pyobfus tool comparison](../COMPARISON.md), which also carries
 the feature matrix, pricing, and the reasoning behind layering more than one
-tool.
+tool. Its dated scope and disclaimer apply here as well; browser-service
+capabilities and supported Python versions should be rechecked before use.

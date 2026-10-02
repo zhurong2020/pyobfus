@@ -157,6 +157,13 @@ cloudflare-worker/  # Pro license verification Worker
   `file:line` only, never the value. If a blocked credential was ever real,
   **rotate it**; deleting it from the file is not a rotation. Details:
   `.githooks/README.md`.
+- **Competitor comparisons are dated evidence, not evergreen claims.** State
+  the review date, exact version/tier/platform and whether evidence is official
+  documentation, public metadata or our own reproducible test. Do not
+  generalize one tested configuration, use unsupported superlatives, or turn a
+  historical price into a current claim. Link the central scope/disclaimer in
+  `docs/COMPARISON.md`, acknowledge genuine competitor strengths, and recheck
+  changeable facts before publishing.
 
 ## 🟢 Patent gate — CLEARED 2026-06-17 (v0.5 Pro mechanisms now releasable)
 

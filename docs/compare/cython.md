@@ -12,8 +12,8 @@ Cython compiles Python to C code, providing both performance benefits and obfusc
 | **Cross-platform** | Yes (single output) | No (compile per platform) |
 | **Build complexity** | None | Requires C compiler |
 | **Development workflow** | Unchanged | Compilation step required |
-| **Performance** | Python speed | Near-C speed |
-| **Reversibility** | Names irreversible | Binary harder to reverse |
+| **Performance** | Python execution model | Can accelerate suitable typed or extension code; benchmark your workload |
+| **Debug recovery** | Private identifier reverse mapping | No equivalent pyobfus mapping workflow documented |
 
 ## When to Choose pyobfus
 
@@ -32,4 +32,4 @@ Cython compiles Python to C code, providing both performance benefits and obfusc
 
 Part of the [pyobfus tool comparison](../COMPARISON.md), which also carries
 the feature matrix, pricing, and the reasoning behind layering more than one
-tool.
+tool. Its dated scope and disclaimer apply here as well.
