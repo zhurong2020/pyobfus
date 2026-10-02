@@ -131,7 +131,7 @@ Professional 判断区，解释四类商业价值、一次性价格和试用条�
 中文可见文案同时去掉未解释的 `RTD`、`mapping`、`traceback`、`provenance`、`CI` 等缩写或术语，
 改用中文含义；完整英文技术文档入口明确提示可使用浏览器内置网页翻译，不建立第二套手册。
 
-## G. 中文定位、Agent 入口与对比声明 — ⏳ 执行中
+## G. 中文定位、Agent 入口与对比声明 — ✅ 完成
 
 本节是 2026-10-02 本轮续作的冷启动检查点。恢复时从第一个未勾选项继续；不得因文档调整
 自动打 tag、发布 GitHub Release 或上传 PyPI。
@@ -140,7 +140,7 @@ Professional 判断区，解释四类商业价值、一次性价格和试用条�
 - [x] 将首页价值主张补足为“AI 时代为何需要源码保护”，但避免恐惧营销和绝对安全承诺
 - [x] 统一中文页 Community / Professional 的易懂命名，检查所有相关 CTA 和正文
 - [x] 审计所有公开竞品对比的日期、版本、证据基线、风险与免责说明
-- [ ] 运行统一检查，部署并核验中英文 Pages / RTD
+- [x] 运行统一检查，部署并核验中英文 Pages / RTD
 - [x] 评估今日文档变更是否需要发版，记录最佳发布方式；未经维护者再次确认不发版
 
 执行决定：保留 `llms.txt` 的公开入口以便发现和人工审计，但中英文页都明确标注为“纯文本”，
@@ -161,3 +161,7 @@ Professional 判断区，解释四类商业价值、一次性价格和试用条�
 复盘后的正常补丁版本一并发布。若维护者因真实受影响用户要求提前发版，应走完整 patch 流程：
 版本号与 changelog → 四测试根及 release-candidate 验证 → 签名 tag → OIDC/PEP 740 PyPI 发布 →
 公开安装、provenance、GitHub Release 和 Pages/RTD 复核；本轮不自行执行。
+
+线上验收：提交 `8b0245e` 的 Pages、CodeQL 和完整 CI 均通过；中英文产品页公开 URL 已核对
+新 hero、Pro 收费版命名及纯文本 Agent 标签；RTD 已核对总览的 2026-10-02 scope/disclaimer 与
+PyArmor 专页的 9.2.7/9.2.4 分层基线。本轮没有 tag、GitHub Release 或 PyPI 上传。
