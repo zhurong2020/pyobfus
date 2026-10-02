@@ -52,8 +52,6 @@ class ConfigurationError(PyObfusError):
 class LimitExceededError(PyObfusError):
     """
     Raised when an explicitly configured project limit is exceeded.
-
-    Provides clear upgrade path to Pro edition.
     """
 
     def __init__(self, limit_type: str, current: int, max_allowed: int):
@@ -61,9 +59,8 @@ class LimitExceededError(PyObfusError):
         self.current = current
         self.max_allowed = max_allowed
         super().__init__(
-            f"Community Edition limit exceeded: {limit_type}\n"
+            f"Configured project limit exceeded: {limit_type}\n"
             f"  Current: {current}\n"
             f"  Limit: {max_allowed}\n\n"
-            f"Upgrade to pyobfus Pro for unlimited {limit_type}:\n"
-            f"  https://github.com/zhurong2020/pyobfus#pricing"
+            "Raise or remove the corresponding max_files/max_total_loc setting."
         )

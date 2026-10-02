@@ -184,6 +184,14 @@ class TestListPresets:
 class TestPresetLimits:
     """Tests for preset limits and restrictions."""
 
+    def test_community_edition_has_no_product_limits(self):
+        """Community's convenience constructor matches the unlimited policy."""
+        config = ObfuscationConfig.community_edition()
+
+        assert config.level == "community"
+        assert config.max_files is None
+        assert config.max_total_loc is None
+
     def test_pro_presets_have_unlimited_files(self):
         """Test that Pro presets have unlimited files."""
         pro_presets = ["trial", "commercial", "library", "maximum"]
@@ -193,13 +201,15 @@ class TestPresetLimits:
             assert config.max_files is None, f"{preset_name} should have unlimited files"
             assert config.max_total_loc is None, f"{preset_name} should have unlimited LOC"
 
-    def test_community_presets_have_default_limits(self):
-        """Test that Community presets use default limits."""
+    def test_community_presets_are_unlimited(self):
+        """Test that Community presets do not impose product limits."""
         community_presets = ["safe", "balanced", "aggressive"]
 
         for preset_name in community_presets:
             config = ObfuscationConfig.get_preset(preset_name)
             assert config.level == "community", f"{preset_name} should be community level"
+            assert config.max_files is None, f"{preset_name} should have unlimited files"
+            assert config.max_total_loc is None, f"{preset_name} should have unlimited LOC"
 
 
 class TestPresetExcludeNames:

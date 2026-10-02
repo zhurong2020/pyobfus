@@ -143,6 +143,7 @@ def I0(I1, I2):
 - [Provenance Manifest](PROVENANCE_MANIFEST.md) - Obfuscated-output manifest fields and integrity notes
 - [Release Provenance](RELEASE_PROVENANCE_VERIFICATION.md) - PyPI Integrity API and attestation verification runbook
 - [Current Plan](https://github.com/zhurong2020/pyobfus/blob/main/docs/CURRENT_PLAN_ZH.md) - Current project status and priorities
+- [Community / Pro Boundary](EDITION_BOUNDARY_POLICY.md) - Durable rules for deciding which edition owns a feature
 - [Changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md) - Version history
 - [Security Policy](https://github.com/zhurong2020/pyobfus/blob/main/SECURITY.md) - Report vulnerabilities
 

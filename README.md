@@ -140,6 +140,15 @@ you protect commercial IP, constrain artifact execution, and trace leaks.** The
 durable classification rules for current and future features are documented in
 the [Community / Pro boundary policy](https://github.com/zhurong2020/pyobfus/blob/main/docs/EDITION_BOUNDARY_POLICY.md).
 
+Pro's value falls into four groups:
+
+| Value | What it provides | Examples |
+|---|---|---|
+| Protection strength | Raises reverse-engineering cost | AES encryption, control-flow flattening, anti-debugging, opacity, sealing |
+| Protected assets | Protects data beyond identifiers | import strings, embedded data, string vaults, tracebacks |
+| Distribution control | Constrains artifact execution | device/expiry/run limits, platform policy, supplied keys |
+| Accountability | Links a build or leak to its recipient | forensic watermarking, buyer-specific builds and seals |
+
 The following advanced features are available with a Pro license:
 
 - **String Encryption**

@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Community / Pro packaging now follows a durable buyer-value policy.**
+  Community remains a complete workflow for reliable obfuscation, inspection,
+  verification, and debugging; Pro is grouped by protection strength,
+  protected assets, distribution control, and accountability. New features and
+  tier changes must apply `docs/EDITION_BOUNDARY_POLICY.md` and keep all public
+  surfaces in sync.
+
+### Fixed
+
+- **Community's convenience configuration no longer carries obsolete hidden
+  limits.** `ObfuscationConfig.community_edition()` now agrees with the CLI,
+  presets, schema, and documentation: there is no product-imposed file or line
+  limit. `max_files` and `max_total_loc` remain available as optional,
+  user-selected safety rails.
+- **The comparison table no longer says configuration presets are Pro-only.**
+  It now distinguishes free Community/framework presets from Pro commercial
+  distribution presets.
+
 ## [0.5.30] - 2026-09-26
 
 ### Added

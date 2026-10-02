@@ -1,5 +1,18 @@
 # pyobfus 当前计划
 
+**2026-10-02 Community / Pro 长期边界调研与收口（免发版）**：调研确认当前技术边界总体清晰，
+没有证据表明免费版正在替代 Pro 购买；现有数据更符合采用与试用漏斗仍小，而非 Community 过度慷慨。
+新增 `EDITION_BOUNDARY_POLICY.md` 作为长期产品/工程约定：Community 保证可靠混淆、检查、验证与调试的
+完整本地工作流；Pro 按保护强度、受保护资产、分发控制、责任追踪四类商业价值收费，并可承载团队级
+托管/治理服务。政策已接入 `AGENTS.md`、PR 模板、README 和文档站，要求以后每项新功能记录用户、买方、
+问题、证据和分层判断，且不得把正确性、兼容性、安全修复或基础验证收费，也不得只为转化率回收既有
+免费能力。同步修复两处口径漂移：对比表明确 Community/框架 presets 免费、商业分发 presets 属于 Pro；
+`community_edition()` 移除遗留的 5 文件/1000 行默认限制并补回归测试。所有变更留在 `[Unreleased]`，
+不触发 10-25 前静默期发版。维护者复核后明确确认不保留该限制、也不改成 2000 行：文件拆分即可绕过，
+它限制基础工作流而非商业保护价值，并会倒退性限制长期已无限制的默认 cross-file/preset 用户；与 PyArmor
+对标应学习“为更强保护和组织价值收费”的原则，而非复制其 big-script 试用门槛。完整、可复用的决策依据
+已写入 `EDITION_BOUNDARY_POLICY.md`「Why project size is not a paywall」。
+
 **2026-10-02 跨仓架构文档同步**：完成 `pyobfus` / `pyobfus-action` /
 `pyobfus-pro-dev` 及工作区级记录审计。主仓 `PROJECT_STRUCTURE.md` 已改为当前 Core/Pro
 builder/runtime/MCP/VS Code/Action 拓扑，README、威胁模型、支持矩阵同步；Action 仓补

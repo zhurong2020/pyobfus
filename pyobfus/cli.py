@@ -1319,14 +1319,14 @@ def main(
             _emit_error_json(
                 "LimitExceededError",
                 str(e),
-                "Community Edition is capped at 5 files / 1000 LOC. "
-                "Start a free 5-day trial: pyobfus-trial start",
-                "pyobfus-trial start",
+                "A user-configured project safety limit was exceeded. "
+                "Raise or remove max_files/max_total_loc in the configuration.",
+                "pyobfus --init-config general",
                 exit_code=1,
             )
         else:
             click.echo(f"\nError: {e}", err=True)
-            click.echo("\nConsider upgrading to pyobfus Pro for unlimited obfuscation.")
+            click.echo("\nRaise or remove max_files/max_total_loc in the configuration.")
         sys.exit(1)
     except PyObfusError as e:
         sys.stdout = _saved_stdout
@@ -1577,7 +1577,7 @@ def _obfuscate_directory(
     if verbose and config.exclude_patterns:
         click.echo(f"Excluding patterns: {', '.join(config.exclude_patterns)}")
 
-    # Check Community Edition file limit
+    # Enforce optional user-configured project limits.
     if config.max_files and len(python_files) > config.max_files:
         raise LimitExceededError("file_count", len(python_files), config.max_files)
 

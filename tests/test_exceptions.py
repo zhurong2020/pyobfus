@@ -57,7 +57,8 @@ class TestLimitExceededError:
         assert "lines_of_code" in msg
         assert "2000" in msg
         assert "1000" in msg
-        assert "Pro" in msg
+        assert "max_files/max_total_loc" in msg
+        assert "Pro" not in msg
 
 
 class TestOtherErrors:

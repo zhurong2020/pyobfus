@@ -29,6 +29,32 @@ following categories stay free:
 Community has no product-imposed file or line limit. The optional `max_files`
 and `max_total_loc` settings are user-selected safety rails at every tier.
 
+### Why project size is not a paywall
+
+This is an explicit product decision, not an accidental omission. The original
+Community design considered a five-file / 1,000-line limit, partly in response
+to PyArmor's free-trial restriction on “big scripts.” pyobfus does not retain
+that limit or replace it with another arbitrary threshold such as 2,000 lines:
+
+- file and line limits gate completion of the basic workflow rather than a
+  commercial protection outcome;
+- splitting a file trivially bypasses the limit, so it is a weak and confusing
+  conversion mechanism;
+- large single-file utilities, generated code, and data scripts are penalized
+  even when they have no commercial protection requirement;
+- the default cross-file path and named Community presets have historically
+  operated without those limits, so enforcing them now would remove an
+  established Community capability;
+- the 2026-10-02 evidence showed a small adoption/trial funnel, not free-tier
+  substitution for Pro. Adding adoption friction would address the wrong
+  problem.
+
+PyArmor remains a useful market reference, but pyobfus follows the underlying
+commercial principle—charge for stronger protection and organizational value—
+rather than copying its trial-size constraint. A future change to this decision
+requires direct cannibalization evidence and the explicit boundary-change
+process below; a round-number threshold by itself is not evidence.
+
 We do not put correctness, compatibility, vulnerability fixes, or the ability
 to evaluate output honestly behind a paywall. We also do not remove an existing
 Community capability solely to manufacture conversion pressure.

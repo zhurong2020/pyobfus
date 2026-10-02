@@ -141,17 +141,34 @@ class TestDirectoryObfuscation:
         assert result.exit_code == 0
         assert (output / "main.py").exists()
 
-    def test_community_file_limit(self, runner, tmp_path):
-        """Test Community Edition file limit."""
+    def test_community_has_no_default_file_limit(self, runner, tmp_path):
+        """Community processes projects larger than the obsolete five-file cap."""
         src = tmp_path / "src"
         src.mkdir()
-        # Create 6 files (exceeds community limit of 5)
         for i in range(6):
             (src / f"mod_{i}.py").write_text(f"def f{i}(): pass\n")
         output = tmp_path / "dist"
         result = runner.invoke(main, [str(src), "-o", str(output), "--no-cross-file"])
+        assert result.exit_code == 0
+        assert len(list(output.glob("*.py"))) == 6
+
+    def test_explicit_project_file_limit_is_enforced(self, runner, tmp_path):
+        """Optional limits remain usable as user-selected safety rails."""
+        src = tmp_path / "src"
+        src.mkdir()
+        for i in range(2):
+            (src / f"mod_{i}.py").write_text(f"def f{i}(): pass\n")
+        cfg = tmp_path / "config.yaml"
+        cfg.write_text("obfuscation:\n  level: community\n  max_files: 1\n")
+
+        result = runner.invoke(
+            main,
+            [str(src), "-o", str(tmp_path / "dist"), "-c", str(cfg), "--no-cross-file"],
+        )
+
         assert result.exit_code == 1
-        assert "limit" in result.output.lower() or "Community" in result.output
+        assert "Configured project limit exceeded" in result.output
+        assert "upgrade" not in result.output.lower()
 
 
 class TestInitConfig:

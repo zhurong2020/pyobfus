@@ -54,7 +54,8 @@ is often to layer two tools rather than pick one.
 | Dead code injection | No | **Yes** | No | No |
 | Import obfuscation | No | **Yes** | Yes | No |
 | License embedding | No | **Yes** | Yes | No |
-| Configuration presets | No | **Yes** | No | No |
+| Community/framework presets | Yes | Yes | No | No |
+| Commercial distribution presets | No | **Yes** | No | No |
 
 ### Developer Experience
 

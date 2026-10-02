@@ -178,11 +178,11 @@ class ObfuscationConfig:
 
     @classmethod
     def community_edition(cls) -> "ObfuscationConfig":
-        """Get default Community Edition configuration with limits."""
+        """Get the unlimited default Community Edition configuration."""
         return cls(
             level="community",
-            max_files=5,  # Community: max 5 files
-            max_total_loc=1000,  # Community: max 1000 LOC total
+            max_files=None,
+            max_total_loc=None,
         )
 
     @classmethod
