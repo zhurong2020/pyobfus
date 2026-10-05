@@ -5,7 +5,7 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-09-30（下载数据留存收口：只保留决策摘要，10-25 复盘后改为月度留存；所有暂不发版的后续改进继续按本文件的触发条件与节奏跟踪。上一轮 09-28：新增「IP 相关」段：专利标识、专有许可专利条款、发版清单 Apache 边界检查，待拍板；选题池加第 7 篇「混淆后让 AI 助手继续帮你调试」并排进 11-24；落地页加 JSON-LD 结构化数据；周一巡检：plugin 锁由 Rudy 09-28 升级到 Anthropic 内部、等其跟进；GitHub 流量来源已并进 `download_snapshot.py`；第 2 篇草稿已写。上一轮 09-27：新增「内容节奏」段：只写不发到 10-11、10-13 那周起 DEV 双周一篇，知乎选定为中文开发者渠道先记录，第 1 篇草稿已写；Show HN 最终结果补记；上一轮 09-26：Claude plugin 孤儿锁已按 Rudy 要求补齐账号核查、workspace ID 与两张截图并在原线程回复，现等后端处理；上一轮 09-25：trial 现状核查 + KV 备份 P0 当日完成；09-24：awesome-python PR #3352 当日被维护者关闭，理由是采用量，见「分发 / 上架队列」；
+最后更新：2026-10-05（Stripe/许可线：两笔新购核对、结账页文案与激活说明更新、Worker 只对已付款发号并部署、webhook 加 async 订阅；新增维护者清单 5 项见下。上一轮 2026-09-30：下载数据留存收口：只保留决策摘要，10-25 复盘后改为月度留存；所有暂不发版的后续改进继续按本文件的触发条件与节奏跟踪。上一轮 09-28：新增「IP 相关」段：专利标识、专有许可专利条款、发版清单 Apache 边界检查，待拍板；选题池加第 7 篇「混淆后让 AI 助手继续帮你调试」并排进 11-24；落地页加 JSON-LD 结构化数据；周一巡检：plugin 锁由 Rudy 09-28 升级到 Anthropic 内部、等其跟进；GitHub 流量来源已并进 `download_snapshot.py`；第 2 篇草稿已写。上一轮 09-27：新增「内容节奏」段：只写不发到 10-11、10-13 那周起 DEV 双周一篇，知乎选定为中文开发者渠道先记录，第 1 篇草稿已写；Show HN 最终结果补记；上一轮 09-26：Claude plugin 孤儿锁已按 Rudy 要求补齐账号核查、workspace ID 与两张截图并在原线程回复，现等后端处理；上一轮 09-25：trial 现状核查 + KV 备份 P0 当日完成；09-24：awesome-python PR #3352 当日被维护者关闭，理由是采用量，见「分发 / 上架队列」；
 `pyobfus-runtime` 0.1.0 已通过 OIDC/PEP 740 发布并完成 PyPI 验收；
 删除已完全合入 `main` 的本地及远端 `spike/mcp-sdk-2x` 空壳分支；
 修正本文件把已随 0.5.28 发布的邮箱 trial 误列为待实现、仍称 0.5.27 为当前版本的状态漂移。
@@ -46,20 +46,23 @@ Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运�
 - [ ] **MCP Trust Registry publish**：在其站点注册拿 API token 后
       `MCPTRUSTCHECKER_TOKEN=… npx --yes mcptrustchecker@1.14.0 publish pyobfus-mcp --registry pypi --online --category developer-tools`
       （wheel 已扫 A · 94/100，09-23 已用 CLI help 核对参数；不要把 token 写进 shell history、仓库或聊天）。
-- [ ] **结账与客户可见文案更新 + 开票设置**（2026-10-05 登记，Dashboard 实看；不需要 Core 发版）。
-      买家从付款到激活依次看到的四处文字都停留在 2025-11 ~ 2026-06 的口径，
-      统一按 `EDITION_BOUNDARY_POLICY.md` 的四类 Pro 价值与 0.5.26 起的许可行为改写：
-      1. ~~Stripe 产品描述与 metadata `features`~~：**10-05 已改**为四类 Pro 价值口径（原值存于私有 memory）。
-      2. ~~付款后确认页 `docs/LICENSE_ACTIVATION_GUIDE.md`~~：**10-05 已按实际行为重写**（`deactivate` 释放名额、
-         `remove` 不释放、超过 3 台自动让出最久未用的设备、断网时 Pro 继续可用、旧版 `Access denied` → 升级或
-         `--no-verify`）。推送即生效。
-      3. ~~许可邮件~~：**10-05 已随 Worker 部署**（新功能口径、`deactivate`、丢失可回信补发、`reply_to` 指向维护者邮箱）。
-      4. **Payment Link**（`plink_1SSnVd1BxxEBSJisxqFMUKeA`）：`Post-payment invoice: No`。该链接由 API 创建，
-         **Dashboard 无法编辑**，开 `customer_creation=always`（免费，根治访客结账无 Customer）或
-         `invoice_creation`（可能另收 Invoicing 费）只能走 API，需先建只含 Payment Links 写权限的 restricted key。
-         开票需求目前很少（10 个月 1 次），不急。
+- [ ] **下一笔真实 Pro 购买后核验新发号流程**（2026-10-05 登记，事件触发，由 AI 代理做）。Worker 10-05 起
+      只对已付款发号、序列号由 session 派生，这条路径未用真付款跑过。下次 Stripe 有成功付款时：只读 KV 确认
+      新记录的 `stripe_session_id` 与付款一致、key 格式 `PYOB-XXXX-XXXX-XXXX-XXXX`、只有一条；Stripe
+      Workbench → Event destinations 该次投递为 200；问买家或看 Gmail 确认许可邮件送达。任何一项不符先停下排查，
+      不要在 Dashboard 手工重放事件（Stripe 本身会按退避自动重投）。
+- [ ] **两位 10 月新客户跟进邮件等回信**（2026-10-05 发出，身份记在私有 memory）。一位从未联网激活，回信若
+      仍报错按 `LICENSE_ACTIVATION_GUIDE.md` 排障；另一位是欢迎信，无回复即结案。随每周一巡检看 Gmail 一并查。
+- [ ] **Payment Link 开票设置**（2026-10-05 登记，维护者 + API，不急）。链接 `plink_1SSnVd1BxxEBSJisxqFMUKeA`
+      由 API 创建，Dashboard 不能编辑。开 `customer_creation=always`（免费，根治访客结账没有 Customer、事后
+      开票对不上）或 `invoice_creation`（每笔自动发票，可能另收 Invoicing 费，开前看说明）只能走 API；需先在
+      Dashboard 建只含 Payment Links 写权限的 restricted key 并存进 Vaultwarden。开票需求 10 个月 1 次，
+      等下一次真有人要发票时再做也可以。
 - [ ] **Worker 测试接入 CI**（2026-10-05 登记，可选）：`cloudflare-worker/test/` 5 个文件 34 项目前只能本地
       `node --test test/<file>.js` 逐个跑，CI 不跑；改 Worker 的 PR 因此没有自动回归。
+- [ ] **开启任何延迟到账付款方式前的检查**（规则，长期有效）：Worker 与 webhook 订阅已支持
+      `checkout.session.async_payment_succeeded`，但开 ACH / SEPA / 银行转账等之前先确认 endpoint 仍订阅该事件，
+      开后的第一笔按上面「核验新发号流程」走一遍。Stripe 付款方式是账户级配置，会按它动态展示。
 - [ ] **维护者手动删除 OneDrive 两个旧副本**：`…/3-job/program/` 下 `pyobfus-action/` 与
       `pyobfus-backup-pre-filter-repo-20260503-2231/`，都带 `MOVED_TO_WSL_20260921.md`、WSL 均有副本
       （`~/projects/` 同名目录）。09-22 只删了 pyobfus 与 pyobfus-legal 两个批过的；这两个不在清单里，未动。

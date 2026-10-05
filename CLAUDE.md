@@ -72,6 +72,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - **许可系统顺序硬约束：先部署 Worker，再发客户端**（`pyobfus-license deactivate` 等新路由）。
   已装客户机器 Pro 激活仍需 `pyobfus-license register <KEY> --no-verify`（0.5.26 修复只救新安装）。
 - **发布后查完整 CI 矩阵**，不只 Release/CodeQL workflow。
+- **Stripe / 许可 Worker（10-05）**：Worker 只对 `payment_status=paid` 发号、序列号由 HMAC(webhook secret, session id) 派生——
+  **别 Roll webhook signing secret**（验签全挂、派生也会变）；Payment Link 是 API 创建，Dashboard 不能编辑；
+  Dashboard 首页「Blocked」先点开看时间线再判断是否流失客户。详见 `docs/TODO.md` 维护者清单。
 - **拿不到访问权 ≠ 东西不存在**：API 返回 401/`not_found` 不能当「未收录」证据，用公开搜索页核实。
 - 发版是独立 gate，须用户明确批准；当前节奏见上文「节奏」一条与 `docs/TODO.md`。
 
