@@ -53,22 +53,17 @@ Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运�
       2. ~~付款后确认页 `docs/LICENSE_ACTIVATION_GUIDE.md`~~：**10-05 已按实际行为重写**（`deactivate` 释放名额、
          `remove` 不释放、超过 3 台自动让出最久未用的设备、断网时 Pro 继续可用、旧版 `Access denied` → 升级或
          `--no-verify`）。推送即生效。
-      3. **许可邮件**：已在仓库改好（新功能口径、`deactivate`、丢失可回信补发、`reply_to` 指向维护者邮箱），
-         随下面 Worker 一起部署。
+      3. ~~许可邮件~~：**10-05 已随 Worker 部署**（新功能口径、`deactivate`、丢失可回信补发、`reply_to` 指向维护者邮箱）。
       4. **Payment Link**（`plink_1SSnVd1BxxEBSJisxqFMUKeA`）：`Post-payment invoice: No`。该链接由 API 创建，
          **Dashboard 无法编辑**，开 `customer_creation=always`（免费，根治访客结账无 Customer）或
          `invoice_creation`（可能另收 Invoicing 费）只能走 API，需先建只含 Payment Links 写权限的 restricted key。
          开票需求目前很少（10 个月 1 次），不急。
-- [ ] **Worker：确认已付款才发序列号 —— 代码已完成，待批准部署**（2026-10-05；生产变更，不需要 Core 发版）。
-      仓库已改：只在 `payment_status == 'paid'` 时发号，并处理 `checkout.session.async_payment_succeeded`；
-      序列号改由 HMAC(webhook secret, session id) 派生（替换 `Math.random()`），重投的同一事件不再重复发号/发信，
-      派生撞上他人记录时返回 500 而不覆盖；许可邮件同步更新。`test/license_webhook.test.js` 9 项 + 既有 25 项全过，
-      `wrangler deploy --dry-run` 打包通过。**部署前后各一步**：部署用
-      `CLOUDFLARE_API_TOKEN`/`CLOUDFLARE_ACCOUNT_ID` + `npx wrangler deploy`；部署后在 Stripe Dashboard →
-      Developers → Webhooks → 本 endpoint 的事件订阅里加上 `checkout.session.async_payment_succeeded`
-      （只有开启延迟到账方式时才会用到，开之前必须先加）。账户级付款方式 10-05 实看已启用 9 种
-      （Cards、Apple Pay、Amazon Pay、Cash App Pay、Link、WeChat Pay、Bancontact、EPS、Klarna，均即时确认）；
-      Alipay 待审批，延迟到账方式均未开。另：Worker 测试未接入 CI（本地 `node --test test/<file>.js` 逐个跑）。
+- [ ] **Stripe webhook 事件订阅加 `checkout.session.async_payment_succeeded`**（维护者在 Dashboard 做）。
+      Worker 已于 2026-10-05 部署（version `16c89eeb-8a50-421a-944a-bdff5dbebcaa`，提交 `dfd8870`）：只对已付款发号、
+      处理延迟到账成功、按 session 派生序列号防重复，许可邮件同步更新；冒烟测试 health 200 / 假 key 404 /
+      无签名 webhook 400 / Endpoint Monitor 通过 / KV 记录数不变。Developers → Webhooks → 许可服务器 endpoint →
+      Add events。眼下启用的 9 种付款方式均即时确认用不到它，但**开任何延迟到账方式之前必须先加**。
+      另：Worker 测试未接入 CI（本地 `node --test test/<file>.js` 逐个跑）。
 - [ ] **维护者手动删除 OneDrive 两个旧副本**：`…/3-job/program/` 下 `pyobfus-action/` 与
       `pyobfus-backup-pre-filter-repo-20260503-2231/`，都带 `MOVED_TO_WSL_20260921.md`、WSL 均有副本
       （`~/projects/` 同名目录）。09-22 只删了 pyobfus 与 pyobfus-legal 两个批过的；这两个不在清单里，未动。
