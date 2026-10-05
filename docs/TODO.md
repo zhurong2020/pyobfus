@@ -46,6 +46,9 @@ Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运�
 - [ ] **MCP Trust Registry publish**：在其站点注册拿 API token 后
       `MCPTRUSTCHECKER_TOKEN=… npx --yes mcptrustchecker@1.14.0 publish pyobfus-mcp --registry pypi --online --category developer-tools`
       （wheel 已扫 A · 94/100，09-23 已用 CLI help 核对参数；不要把 token 写进 shell history、仓库或聊天）。
+- [ ] **Stripe Payment Link 打开「创建客户」**（2026-10-05 登记）：现在走访客结账，KV 里 `stripe_customer_id`
+      全为空，客户要发票时 Stripe 要求 invoice 与付款是同一 Customer，访客结账没有可匹配对象（08 月开票折腾的根源）。
+      Dashboard → Payment Links → 该链接 → 勾选创建客户；只影响以后的购买，不需要 Worker 或 Core 改动。
 - [ ] **维护者手动删除 OneDrive 两个旧副本**：`…/3-job/program/` 下 `pyobfus-action/` 与
       `pyobfus-backup-pre-filter-repo-20260503-2231/`，都带 `MOVED_TO_WSL_20260921.md`、WSL 均有副本
       （`~/projects/` 同名目录）。09-22 只删了 pyobfus 与 pyobfus-legal 两个批过的；这两个不在清单里，未动。
