@@ -46,9 +46,29 @@ Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运�
 - [ ] **MCP Trust Registry publish**：在其站点注册拿 API token 后
       `MCPTRUSTCHECKER_TOKEN=… npx --yes mcptrustchecker@1.14.0 publish pyobfus-mcp --registry pypi --online --category developer-tools`
       （wheel 已扫 A · 94/100，09-23 已用 CLI help 核对参数；不要把 token 写进 shell history、仓库或聊天）。
-- [ ] **Stripe Payment Link 打开「创建客户」**（2026-10-05 登记）：现在走访客结账，KV 里 `stripe_customer_id`
-      全为空，客户要发票时 Stripe 要求 invoice 与付款是同一 Customer，访客结账没有可匹配对象（08 月开票折腾的根源）。
-      Dashboard → Payment Links → 该链接 → 勾选创建客户；只影响以后的购买，不需要 Worker 或 Core 改动。
+- [ ] **结账与客户可见文案更新 + 开票设置**（2026-10-05 登记，Dashboard 实看；不需要 Core 发版）。
+      买家从付款到激活依次看到的四处文字都停留在 2025-11 ~ 2026-06 的口径，
+      统一按 `EDITION_BOUNDARY_POLICY.md` 的四类 Pro 价值与 0.5.26 起的许可行为改写：
+      1. **Stripe 产品描述**（结账页可见，产品 `prod_TPapFKf2Dwrvwx`）：仍是「AES-256 encryption and
+         anti-debugging features」；metadata `features` 同口径（买家不可见，顺手同步）。「Lifetime Updates」
+         与 Terms of Service 一致，可保留。产品税务类别已设为 Downloadable Software - business use。
+      2. **付款后确认页** = `docs/LICENSE_ACTIVATION_GUIDE.md`（最后修改 06-18，早于 0.5.26）：
+         换机器仍教 `pyobfus-license remove`（只删本地缓存、**不释放名额**），满 3 台仍写「联系支持重置」，
+         应改为 `pyobfus-license deactivate`；排障一节缺「请求在到达服务器前被拦 → 升级或
+         `register <KEY> --no-verify`」这一条。改仓库文件即可，随 main 部署。
+      3. **许可邮件**（Worker `sendLicenseEmail`）：功能列表同第 1 条旧口径，未提 `deactivate`；
+         改后需部署 Worker（生产变更，单独批准）。
+      4. **Payment Link**（`plink_1SSnVd1BxxEBSJisxqFMUKeA`）：详情页 `Post-payment invoice: No`。
+         打开它让每笔付款自动生成发票（08 月 kvikram 手工补开发票折腾的根源，可能另收 Invoicing 费，
+         以开关页说明为准）；详情页未见「创建客户」开关，若编辑页也没有则以 post-payment invoice 代替。
+- [ ] **Worker：确认已付款才发序列号**（2026-10-05 登记，生产变更需批准，不需要 Core 发版）。
+      `handleStripeWebhook` 收到 `checkout.session.completed` 即发号，不查 `payment_status`、不处理
+      `checkout.session.async_payment_succeeded`、同一 session 重投会重复发号。账户级付款方式配置
+      （Settings → Payments → Payment methods）10-05 实看已启用 9 种：Cards、Apple Pay、Amazon Pay、
+      Cash App Pay、Link、WeChat Pay、Bancontact、EPS、Klarna，**均为即时确认**；Alipay、Cartes Bancaires
+      待审批；ACH / SEPA / Bacs / Bank Transfers / OXXO / Multibanco 等延迟到账方式均未开。Stripe 会按
+      该配置动态展示付款方式，**修好之前不要开启任何延迟到账方式**。与 affiliate 上线 gate 的 paid/async、
+      幂等两项是同一处修改。
 - [ ] **维护者手动删除 OneDrive 两个旧副本**：`…/3-job/program/` 下 `pyobfus-action/` 与
       `pyobfus-backup-pre-filter-repo-20260503-2231/`，都带 `MOVED_TO_WSL_20260921.md`、WSL 均有副本
       （`~/projects/` 同名目录）。09-22 只删了 pyobfus 与 pyobfus-legal 两个批过的；这两个不在清单里，未动。
