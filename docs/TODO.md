@@ -58,12 +58,8 @@ Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运�
          **Dashboard 无法编辑**，开 `customer_creation=always`（免费，根治访客结账无 Customer）或
          `invoice_creation`（可能另收 Invoicing 费）只能走 API，需先建只含 Payment Links 写权限的 restricted key。
          开票需求目前很少（10 个月 1 次），不急。
-- [ ] **Stripe webhook 事件订阅加 `checkout.session.async_payment_succeeded`**（维护者在 Dashboard 做）。
-      Worker 已于 2026-10-05 部署（version `16c89eeb-8a50-421a-944a-bdff5dbebcaa`，提交 `dfd8870`）：只对已付款发号、
-      处理延迟到账成功、按 session 派生序列号防重复，许可邮件同步更新；冒烟测试 health 200 / 假 key 404 /
-      无签名 webhook 400 / Endpoint Monitor 通过 / KV 记录数不变。Developers → Webhooks → 许可服务器 endpoint →
-      Add events。眼下启用的 9 种付款方式均即时确认用不到它，但**开任何延迟到账方式之前必须先加**。
-      另：Worker 测试未接入 CI（本地 `node --test test/<file>.js` 逐个跑）。
+- [ ] **Worker 测试接入 CI**（2026-10-05 登记，可选）：`cloudflare-worker/test/` 5 个文件 34 项目前只能本地
+      `node --test test/<file>.js` 逐个跑，CI 不跑；改 Worker 的 PR 因此没有自动回归。
 - [ ] **维护者手动删除 OneDrive 两个旧副本**：`…/3-job/program/` 下 `pyobfus-action/` 与
       `pyobfus-backup-pre-filter-repo-20260503-2231/`，都带 `MOVED_TO_WSL_20260921.md`、WSL 均有副本
       （`~/projects/` 同名目录）。09-22 只删了 pyobfus 与 pyobfus-legal 两个批过的；这两个不在清单里，未动。
