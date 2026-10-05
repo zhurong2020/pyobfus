@@ -83,6 +83,12 @@ export default {
  */
 export const MAX_DEVICES = 3;
 
+/** Stripe events that may carry a completed, paid purchase. */
+export const LICENCE_EVENTS = new Set([
+  'checkout.session.completed',
+  'checkout.session.async_payment_succeeded',
+]);
+
 /**
  * Decide the device list for a verification.
  *
@@ -402,14 +408,44 @@ async function handleStripeWebhook(request, env, corsHeaders) {
     });
   }
 
-  // Handle payment success
-  if (event.type === 'checkout.session.completed') {
+  // Issue a licence only for money that has actually arrived. Card, wallet and
+  // redirect methods arrive as checkout.session.completed with payment_status
+  // 'paid'. A delayed method (bank debit, transfer, voucher) arrives first as
+  // completed + 'unpaid' and later as async_payment_succeeded; issuing on the
+  // first event would hand out a key for a payment that may still fail.
+  if (LICENCE_EVENTS.has(event.type)) {
     const session = event.data.object;
 
-    // Generate license key
-    const licenseKey = generateLicenseKey();
+    if (session.payment_status !== 'paid') {
+      console.log('Checkout session not paid yet, no licence issued:', session.id, session.payment_status);
+      return new Response(JSON.stringify({ received: true, issued: false }), {
+        status: 200,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
 
-    // Store license in KV
+    // The key is derived from the session id, so a redelivered event (Stripe
+    // retries on any non-2xx or timeout) finds the record it already wrote
+    // instead of minting a second key and sending a second email.
+    const licenseKey = await deriveLicenseKey(session.id, env.STRIPE_WEBHOOK_SECRET);
+    const existing = await env.LICENSES.get(licenseKey, { type: 'json' });
+    if (existing) {
+      if (existing.stripe_session_id === session.id) {
+        console.log('Licence already issued for session, skipping:', session.id);
+        return new Response(JSON.stringify({ received: true, issued: false, duplicate: true }), {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+      // 64-bit collision with an unrelated licence. Never overwrite a customer
+      // record; fail so Stripe retries and the error is visible in its logs.
+      console.error('Derived licence key collides with another record:', session.id);
+      return new Response(JSON.stringify({ error: 'Licence key collision' }), {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     const licenseData = {
       license_key: licenseKey,
       email: session.customer_details?.email || session.customer_email,
@@ -423,7 +459,6 @@ async function handleStripeWebhook(request, env, corsHeaders) {
 
     await env.LICENSES.put(licenseKey, JSON.stringify(licenseData));
 
-    // Send email to customer with license key
     const emailSent = await sendLicenseEmail(
       env.RESEND_API_KEY,
       licenseData.email,
@@ -580,20 +615,35 @@ async function handleAdminResetDevices(request, env, corsHeaders) {
  * Generate a unique license key
  * Format: PYOB-XXXX-XXXX-XXXX-XXXX (hex characters only)
  */
-function generateLicenseKey() {
-  const chars = '0123456789ABCDEF';  // HEX only - required by CLI validation
-  const segments = 4;
-  const segmentLength = 4;
-
-  let key = 'PYOB';
-  for (let i = 0; i < segments; i++) {
-    key += '-';
-    for (let j = 0; j < segmentLength; j++) {
-      key += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
+/**
+ * Derive the licence key for a Checkout Session.
+ *
+ * HMAC-SHA256 over the session id, keyed with the webhook secret and a
+ * domain-separation prefix, so the key is stable across webhook redeliveries
+ * (idempotency) yet unpredictable to anyone without the secret. Replaces a
+ * Math.random() generator, which was neither. Format is unchanged:
+ * PYOB- followed by four groups of four upper-case hex digits, as the CLI
+ * validates.
+ */
+export async function deriveLicenseKey(sessionId, secret) {
+  if (!sessionId || !secret) {
+    throw new Error('deriveLicenseKey needs a session id and a secret');
   }
-
-  return key;
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(`pyobfus-license-key-v1:${secret}`),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+  const mac = new Uint8Array(
+    await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(sessionId))
+  );
+  const hex = Array.from(mac.slice(0, 8))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('')
+    .toUpperCase();
+  return `PYOB-${hex.slice(0, 4)}-${hex.slice(4, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}`;
 }
 
 /**
@@ -603,18 +653,12 @@ function generateLicenseKey() {
  * @param {string} licenseKey - Generated license key
  * @returns {boolean} - True if email sent successfully
  */
-async function sendLicenseEmail(apiKey, toEmail, licenseKey) {
-  if (!apiKey) {
-    console.error('Resend API key not configured');
-    return false;
-  }
-
-  if (!toEmail) {
-    console.error('No recipient email address');
-    return false;
-  }
-
-  const emailBody = `Hello,
+/**
+ * Plain-text body of the licence email. Kept in step with
+ * docs/LICENSE_ACTIVATION_GUIDE.md, which is also the post-payment page.
+ */
+export function buildLicenseEmailBody(licenseKey) {
+  return `Hello,
 
 Thank you for purchasing pyobfus Professional Edition!
 
@@ -626,39 +670,57 @@ ${licenseKey}
 
 ════════════════════════════════════════════
 
-IMPORTANT: Please save this email! Your license key cannot be recovered without it.
+Please keep this email. If you lose the key, reply from this address and we will resend it.
 
 To activate your license:
 
-1. Install/upgrade pyobfus:
+1. Install or upgrade pyobfus (0.5.26 or later):
    pip install --upgrade pyobfus
 
 2. Register your license:
    pyobfus-license register ${licenseKey}
 
-3. Verify activation:
+3. Check it:
    pyobfus-license status
 
 4. Start using Pro features:
    pyobfus input.py -o output.py --level pro
 
 Your license includes:
-- AES-256 String Encryption
-- Anti-Debugging Checks
-- Lifetime Updates (never expires)
-- Up to 3 devices
+- Stronger protection: AES string encryption, control-flow flattening, anti-debugging
+- Runtime string vault, device binding and expiry controls, buyer watermarking
+- All future Pro updates; the license never expires
+- Up to 3 devices at a time. Moving to a new machine? Run "pyobfus-license deactivate"
+  on the old one to free its slot.
 
-Documentation: https://github.com/zhurong2020/pyobfus
-Full Activation Guide: https://github.com/zhurong2020/pyobfus/blob/main/docs/LICENSE_ACTIVATION_GUIDE.md
-Support: zhurong0525@gmail.com
+Activation guide and troubleshooting:
+https://github.com/zhurong2020/pyobfus/blob/main/docs/LICENSE_ACTIVATION_GUIDE.md
+
+License or billing questions (including invoices): reply to this email or write to zhurong0525@gmail.com
+Bugs and feature requests: https://github.com/zhurong2020/pyobfus/issues
 
 Thank you for supporting pyobfus!
 
 Best regards,
-The pyobfus Team
+Rong Zhu
+pyobfus
 
 ---
-Note: If you found this email in your spam/junk folder, please mark it as "Not Spam" to ensure you receive future updates.`;
+If you found this email in your spam/junk folder, please mark it as "Not Spam".`;
+}
+
+async function sendLicenseEmail(apiKey, toEmail, licenseKey) {
+  if (!apiKey) {
+    console.error('Resend API key not configured');
+    return false;
+  }
+
+  if (!toEmail) {
+    console.error('No recipient email address');
+    return false;
+  }
+
+  const emailBody = buildLicenseEmailBody(licenseKey);
 
   try {
     const response = await fetch('https://api.resend.com/emails', {
@@ -669,6 +731,7 @@ Note: If you found this email in your spam/junk folder, please mark it as "Not S
       },
       body: JSON.stringify({
         from: 'pyobfus <license@arong.eu.org>',
+        reply_to: 'zhurong0525@gmail.com',  // the email invites replies; send them to the monitored inbox
         to: [toEmail],
         subject: 'Your pyobfus Professional License Key',
         text: emailBody

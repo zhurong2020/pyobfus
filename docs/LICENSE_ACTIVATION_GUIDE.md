@@ -4,262 +4,171 @@ This guide explains how to activate and manage your pyobfus Professional Edition
 
 ## Prerequisites
 
-- Python 3.9 or higher installed
-- pyobfus package installed: `pip install pyobfus`
-- Valid license key (received via email after purchase)
+- Python 3.9 or higher
+- pyobfus installed: `pip install --upgrade pyobfus` (0.5.26 or later recommended; see
+  [Troubleshooting](#license-verification-failed-access-denied-or-request-blocked) if you are on an older version)
+- Your license key (`PYOB-XXXX-XXXX-XXXX-XXXX`), sent by email right after purchase
 
-> **Important**: Your license key email may be in your **Spam/Junk folder**. Please check there if you don't see it in your inbox within a few minutes of purchase.
+> **Important**: The license key email comes from `license@arong.eu.org` and may land in your **Spam/Junk folder**. Check there if it has not arrived within a few minutes of purchase.
 
 ## Try Before You Buy
 
-Not sure if Pro features are right for you? Try them free for 5 days:
+Not sure Pro is right for you? Try it free for 5 days. No credit card is required and the email is optional:
 
 ```bash
-# Start a free trial (no credit card required)
-pyobfus-trial start --email your@email.com
-
-# Test Pro features during trial
+pyobfus-trial start                        # or: pyobfus-trial start --email you@example.com
 pyobfus input.py -o output.py --string-encryption --anti-debug
-
-# Check trial status
 pyobfus-trial status
 ```
-
-The trial includes all Pro features. After 5 days, purchase a license to continue using them.
 
 ## Quick Activation
 
 ```bash
-# 1. Install/upgrade pyobfus
+# 1. Install or upgrade pyobfus
 pip install --upgrade pyobfus
 
-# 2. Register your license
+# 2. Register your license (verifies it online and registers this machine)
 pyobfus-license register PYOB-XXXX-XXXX-XXXX-XXXX
 
-# 3. Verify activation
+# 3. Check it
 pyobfus-license status
 ```
 
-## Detailed Steps
-
-### Step 1: Install pyobfus
-
-If you haven't already installed pyobfus:
+A successful registration prints `✓ License verified successfully!`. After that, Pro features are
+available, for example:
 
 ```bash
-pip install pyobfus
+pyobfus input.py -o output.py --level pro
+pyobfus input.py -o output.py --string-encryption --anti-debug --control-flow
 ```
 
-Or upgrade to the latest version:
-
-```bash
-pip install --upgrade pyobfus
-```
-
-### Step 2: Register License Key
-
-Use the `pyobfus-license` command to register your license:
-
-```bash
-pyobfus-license register PYOB-XXXX-XXXX-XXXX-XXXX
-```
-
-Replace `PYOB-XXXX-XXXX-XXXX-XXXX` with your actual license key.
-
-**Expected output**:
-```
-[INFO] Registering license: PYOB-XXXX-XXXX-XXXX-XXXX
-[SUCCESS] License registered successfully
-[INFO] License cached locally for offline use
-```
-
-### Step 3: Verify Activation
-
-Check your license status:
-
-```bash
-pyobfus-license status
-```
-
-**Expected output**:
-```
-License Status:
-  License Key: PYOB-XXXX-XXXX-XXXX-XXXX
-  Status: Active
-  Email: your-email@example.com
-  Device: 1/3 devices used
-  Features:
-    - AES-256 String Encryption: Enabled
-    - Anti-Debugging: Enabled
-  Cache: Valid (expires in 2 days, 23 hours)
-```
-
-### Step 4: Start Using Pro Features
-
-Once activated, use Pro features with command-line flags:
-
-```bash
-# AES-256 string encryption
-pyobfus input.py -o output.py --string-encryption
-
-# Anti-debugging checks
-pyobfus input.py -o output.py --anti-debug
-
-# Both features combined
-pyobfus input.py -o output.py --string-encryption --anti-debug --preserve-param-names
-```
+Run `pyobfus --help` for the full list of Pro options (string encryption, control-flow flattening,
+dead-code injection, anti-debugging, runtime string vault, expiry and device binding, and more).
 
 ## Managing Your License
 
-### Check Status
-
-View detailed license information:
+### Check status
 
 ```bash
-pyobfus-license status
+pyobfus-license status            # local information: key, type, expiry, last verification, this device
+pyobfus-license status --verify   # also re-check the license online
+pyobfus-license status --json     # machine-readable output
 ```
 
-Add `--verify` flag to force online verification:
+### Devices
 
-```bash
-pyobfus-license status --verify
-```
+Each license can be active on **up to 3 devices** at a time. Registering a fourth device does not fail:
+the device you have not used for the longest time is released automatically to make room.
 
-### Remove License
+### Move to another machine
 
-To deactivate the license on current device:
+1. **On the old machine**, release its device slot (needs internet):
 
-```bash
-pyobfus-license remove
-```
-
-**Note**: This only removes the local cache. Your license remains valid and can be reactivated on this or another device.
-
-### Transfer to Another Device
-
-Each license works on up to 3 devices. To transfer:
-
-1. **On old device** (optional):
    ```bash
-   pyobfus-license remove
+   pyobfus-license deactivate
    ```
 
-2. **On new device**:
+   This frees the slot on the license server and removes the local license from that machine.
+
+2. **On the new machine**:
+
    ```bash
-   pip install pyobfus
+   pip install --upgrade pyobfus
    pyobfus-license register PYOB-XXXX-XXXX-XXXX-XXXX
    ```
 
-If you've reached the 3-device limit, contact support to reset device bindings.
+If the old machine is gone or no longer works, skip step 1. Once you register more than 3 devices, the
+least recently used one is released automatically.
 
-## Offline Usage
+> `pyobfus-license remove` only deletes the license stored on this machine. It does **not** free the
+> device slot on the server. Use `deactivate` when you want the slot back.
 
-Your license is cached locally for **3 days** after activation. During this period, you can use Pro features offline.
+## Offline Use
 
-**To refresh cache** (requires internet):
-```bash
-pyobfus-license status --verify
-```
+After a successful online verification the license is stored locally (`~/.pyobfus/license.json`, or
+`%USERPROFILE%\.pyobfus\license.json` on Windows) and pyobfus does not need to contact the server
+again for 3 days.
 
-**Cache location**:
-- Linux/Mac: `~/.pyobfus/license.json`
-- Windows: `%USERPROFILE%\.pyobfus\license.json`
+After that, pyobfus tries to re-verify online. **If the server cannot be reached, Pro keeps working from
+the stored license.** It stops only if the server actively reports that the license has been revoked
+or has expired.
 
 ## Troubleshooting
 
-### "License not found" Error
+### "License verification failed ... Access denied" or "request blocked"
 
-**Problem**: License key not recognized
+Versions of pyobfus **before 0.5.26** cannot reach the license server: a network filter in front of
+the server rejects their requests, which older versions report as `Access denied`. Your key is fine.
 
-**Solutions**:
-1. Check your email for the correct license key
-2. Ensure no typos (use copy-paste)
-3. Verify internet connection
-4. Contact support if key is definitely correct
+- **Recommended**: upgrade, then register again:
 
-### "Device limit reached" Error
+  ```bash
+  pip install --upgrade pyobfus
+  pyobfus-license register PYOB-XXXX-XXXX-XXXX-XXXX
+  ```
 
-**Problem**: License already used on 3 devices
+- **If you cannot upgrade right now**, register without the online check:
 
-**Solutions**:
-1. Remove license from unused devices using `pyobfus-license remove`
-2. Contact support to reset device bindings: zhurong0525@gmail.com
-3. Include your license key in the email
+  ```bash
+  pyobfus-license register PYOB-XXXX-XXXX-XXXX-XXXX --no-verify
+  ```
 
-### "License verification failed" Error
+  This unlocks Pro on this machine immediately and keeps working, but the machine is not recorded on
+  the server.
 
-**Problem**: Cannot connect to license server
+### "License not found" or "Invalid license key"
 
-**Solutions**:
-1. Check internet connection
-2. Try again in a few minutes (server may be temporarily unavailable)
-3. Use offline mode (if cache is still valid)
-4. Contact support if problem persists
+1. Copy and paste the key from the purchase email instead of typing it.
+2. Make sure the key starts with `PYOB-`.
+3. If the key is definitely correct, contact support (below).
 
-### Cache Issues
+### "Could not reach the license server"
 
-**Problem**: License shows as expired despite being valid
+Check your internet connection or proxy and try again later. With an already stored license, Pro keeps
+working in the meantime (see [Offline Use](#offline-use)). With `deactivate`, nothing is changed
+locally, so you can simply retry.
 
-**Solutions**:
-1. Force online verification:
-   ```bash
-   pyobfus-license status --verify
-   ```
+### "License is revoked" or "License has expired"
 
-2. Remove and re-register:
-   ```bash
-   pyobfus-license remove
-   pyobfus-license register PYOB-XXXX-XXXX-XXXX-XXXX
-   ```
+The server reports that this license is no longer valid. Contact support with your license key.
 
 ## Support
 
-If you encounter any issues:
+For license or billing questions (lost key, invoice, activation problems), email
+**zhurong0525@gmail.com** with the subject "License Activation Issue" and include:
 
-**Email**: zhurong0525@gmail.com
-**Subject**: "License Activation Issue"
-**Include**:
-- Your license key
-- Error message (if any)
-- Python version: `python --version`
-- pyobfus version: `pip show pyobfus`
-- Operating system
+- your license key, or the email address used for purchase
+- the exact error message
+- `pyobfus --version`, `python --version`, and your operating system
 
-We typically respond within 24 hours.
+For bugs and feature requests, please use
+[GitHub Issues](https://github.com/zhurong2020/pyobfus/issues).
 
 ## FAQ
 
 ### How many devices can I use?
 
-Each license works on up to **3 devices** simultaneously.
+Up to **3 devices** at a time. Use `pyobfus-license deactivate` to release one yourself; otherwise the
+least recently used device is released when you register a fourth.
 
 ### Do I need internet to use Pro features?
 
-- **Initial activation**: Yes
-- **Regular use**: No (cache valid for 3 days)
-- **Verification refresh**: Yes (every 3 days or on-demand)
-
-### What happens if my cache expires?
-
-Pro features will stop working until you verify online again using `pyobfus-license status --verify`.
-
-### Can I share my license?
-
-No. Each license is for individual use. Sharing violates the license agreement and may result in license revocation.
+Only to register a machine and, occasionally, to re-verify. If the server cannot be reached, Pro keeps
+working from the stored license.
 
 ### Is the license lifetime?
 
-Yes. Once purchased, your license never expires. You get all updates to Pro features for free.
+Yes. The license does not expire, and future Pro updates are included at no extra cost.
 
 ### What if I lose my license key?
 
-Contact support at zhurong0525@gmail.com with:
-- Email address used for purchase
-- Approximate purchase date
-- Payment confirmation (if available)
+Email support from the address you used for the purchase (or include it, plus the approximate purchase
+date). We will resend the key to that address.
 
-We'll resend your license key to the registered email.
+### Can I share my license?
+
+No. Each license is for the purchaser's own use. See the Terms of Service.
 
 ---
 
-**Last Updated**: 2025-12-27
+**Last Updated**: 2026-10-05

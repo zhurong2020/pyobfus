@@ -49,26 +49,26 @@ Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运�
 - [ ] **结账与客户可见文案更新 + 开票设置**（2026-10-05 登记，Dashboard 实看；不需要 Core 发版）。
       买家从付款到激活依次看到的四处文字都停留在 2025-11 ~ 2026-06 的口径，
       统一按 `EDITION_BOUNDARY_POLICY.md` 的四类 Pro 价值与 0.5.26 起的许可行为改写：
-      1. **Stripe 产品描述**（结账页可见，产品 `prod_TPapFKf2Dwrvwx`）：仍是「AES-256 encryption and
-         anti-debugging features」；metadata `features` 同口径（买家不可见，顺手同步）。「Lifetime Updates」
-         与 Terms of Service 一致，可保留。产品税务类别已设为 Downloadable Software - business use。
-      2. **付款后确认页** = `docs/LICENSE_ACTIVATION_GUIDE.md`（最后修改 06-18，早于 0.5.26）：
-         换机器仍教 `pyobfus-license remove`（只删本地缓存、**不释放名额**），满 3 台仍写「联系支持重置」，
-         应改为 `pyobfus-license deactivate`；排障一节缺「请求在到达服务器前被拦 → 升级或
-         `register <KEY> --no-verify`」这一条。改仓库文件即可，随 main 部署。
-      3. **许可邮件**（Worker `sendLicenseEmail`）：功能列表同第 1 条旧口径，未提 `deactivate`；
-         改后需部署 Worker（生产变更，单独批准）。
-      4. **Payment Link**（`plink_1SSnVd1BxxEBSJisxqFMUKeA`）：详情页 `Post-payment invoice: No`。
-         打开它让每笔付款自动生成发票（08 月 kvikram 手工补开发票折腾的根源，可能另收 Invoicing 费，
-         以开关页说明为准）；详情页未见「创建客户」开关，若编辑页也没有则以 post-payment invoice 代替。
-- [ ] **Worker：确认已付款才发序列号**（2026-10-05 登记，生产变更需批准，不需要 Core 发版）。
-      `handleStripeWebhook` 收到 `checkout.session.completed` 即发号，不查 `payment_status`、不处理
-      `checkout.session.async_payment_succeeded`、同一 session 重投会重复发号。账户级付款方式配置
-      （Settings → Payments → Payment methods）10-05 实看已启用 9 种：Cards、Apple Pay、Amazon Pay、
-      Cash App Pay、Link、WeChat Pay、Bancontact、EPS、Klarna，**均为即时确认**；Alipay、Cartes Bancaires
-      待审批；ACH / SEPA / Bacs / Bank Transfers / OXXO / Multibanco 等延迟到账方式均未开。Stripe 会按
-      该配置动态展示付款方式，**修好之前不要开启任何延迟到账方式**。与 affiliate 上线 gate 的 paid/async、
-      幂等两项是同一处修改。
+      1. ~~Stripe 产品描述与 metadata `features`~~：**10-05 已改**为四类 Pro 价值口径（原值存于私有 memory）。
+      2. ~~付款后确认页 `docs/LICENSE_ACTIVATION_GUIDE.md`~~：**10-05 已按实际行为重写**（`deactivate` 释放名额、
+         `remove` 不释放、超过 3 台自动让出最久未用的设备、断网时 Pro 继续可用、旧版 `Access denied` → 升级或
+         `--no-verify`）。推送即生效。
+      3. **许可邮件**：已在仓库改好（新功能口径、`deactivate`、丢失可回信补发、`reply_to` 指向维护者邮箱），
+         随下面 Worker 一起部署。
+      4. **Payment Link**（`plink_1SSnVd1BxxEBSJisxqFMUKeA`）：`Post-payment invoice: No`。该链接由 API 创建，
+         **Dashboard 无法编辑**，开 `customer_creation=always`（免费，根治访客结账无 Customer）或
+         `invoice_creation`（可能另收 Invoicing 费）只能走 API，需先建只含 Payment Links 写权限的 restricted key。
+         开票需求目前很少（10 个月 1 次），不急。
+- [ ] **Worker：确认已付款才发序列号 —— 代码已完成，待批准部署**（2026-10-05；生产变更，不需要 Core 发版）。
+      仓库已改：只在 `payment_status == 'paid'` 时发号，并处理 `checkout.session.async_payment_succeeded`；
+      序列号改由 HMAC(webhook secret, session id) 派生（替换 `Math.random()`），重投的同一事件不再重复发号/发信，
+      派生撞上他人记录时返回 500 而不覆盖；许可邮件同步更新。`test/license_webhook.test.js` 9 项 + 既有 25 项全过，
+      `wrangler deploy --dry-run` 打包通过。**部署前后各一步**：部署用
+      `CLOUDFLARE_API_TOKEN`/`CLOUDFLARE_ACCOUNT_ID` + `npx wrangler deploy`；部署后在 Stripe Dashboard →
+      Developers → Webhooks → 本 endpoint 的事件订阅里加上 `checkout.session.async_payment_succeeded`
+      （只有开启延迟到账方式时才会用到，开之前必须先加）。账户级付款方式 10-05 实看已启用 9 种
+      （Cards、Apple Pay、Amazon Pay、Cash App Pay、Link、WeChat Pay、Bancontact、EPS、Klarna，均即时确认）；
+      Alipay 待审批，延迟到账方式均未开。另：Worker 测试未接入 CI（本地 `node --test test/<file>.js` 逐个跑）。
 - [ ] **维护者手动删除 OneDrive 两个旧副本**：`…/3-job/program/` 下 `pyobfus-action/` 与
       `pyobfus-backup-pre-filter-repo-20260503-2231/`，都带 `MOVED_TO_WSL_20260921.md`、WSL 均有副本
       （`~/projects/` 同名目录）。09-22 只删了 pyobfus 与 pyobfus-legal 两个批过的；这两个不在清单里，未动。
