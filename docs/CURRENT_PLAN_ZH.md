@@ -1,5 +1,13 @@
 # pyobfus 当前计划
 
+**2026-10-06 周一巡检（静默期第 2 周满，查询于 10-06 13:55 UTC，PyPI 数据截至 10-05）**：仓库与 `origin/main`
+同步，0 open issue/PR，CI / CodeQL / License Endpoint Monitor 全绿。Core 近 7 天安静日中位数 `40`（7 个安静日满一周，
+10-04=26、10-05=40），近 30 天 `31`：首次在完整一周上高于 9 月基线 31，仍只记为苗头，10-25 用 4 周数据判定。MCP 近 7 天
+中位数 `4`（10-04 起回落到 4，10-01–03 的 21–26 按一次性处理，不再追查）。Marketplace `12 installs`，Open VSX `626`，
+Action 引用 `0`；GitHub 14 天浏览 `224`/独立 `113`，来源仍为 Google/GitHub/PyPI，内容渠道未出现。Gmail 无客户等待回复
+（09-12 报障客户与 10-01 新客户最后一封均为我方 10-05 来信；plugin 孤儿锁仍停在 Rudy 09-28「已升级内部」）。
+结论：无需动作，不触发发版。
+
 **2026-10-05 补充（Pro 新购核对 + 下载量补读）**：Stripe 新增两笔 Pro 付款，KV 实读确认均有许可记录（webhook 正常）：10-01 那位 4 分钟内联网激活成功（新格式设备记录，即 0.5.26 修复后首个一次成功的新客户）；09-12 那位（即报出边缘拦截故障的客户）至今未联网激活，当时给的 `--no-verify` 不经服务器、KV 无从判断。10-05 已各发一封邮件（补兑「修复发布会通知」的承诺 / 欢迎信）。KV 无 trial 登记。补读 10-04 下载：Core 当日 26，近 7 天安静日中位数 `44`（6 个安静日），仍只算苗头；MCP 10-04 回落到 4，10-01–03 的放量暂按一次性处理。同日维护者在 Stripe Dashboard 完成税务设置（Tax Basic，只追踪门槛、未开启收税；产品类别Downloadable Software - business use）；首页「Blocked US$45」核实为 09-30 一次盗刷试卡（25 秒换 4 张卡、风险全 Highest，Radar 拦截，未扣款），近 4 周无真实买家流失；10-05 一笔 WeChat Pay 未完成付款，未发号属正常。随后完成：Stripe 产品描述/metadata 改为四类 Pro 价值口径；付款后确认页 `LICENSE_ACTIVATION_GUIDE.md` 按实际许可行为重写；Worker 改为只对已付款发号、处理延迟到账成功、按 session 派生序列号防重复（替换 `Math.random()`），许可邮件同步，经批准于 10-05 部署（`dfd8870`，冒烟与 Endpoint Monitor 通过）。维护者随后在 Stripe webhook endpoint（`we_1SSkvI…`）加订阅 `checkout.session.async_payment_succeeded`，现监听 2 个事件，本周投递 1 次 0 失败。余项见 `TODO.md`：Payment Link 开票设置（API 创建，需 restricted key）、Worker 测试接入 CI。客户身份只记在私有 memory，不进本仓库。
 
 **2026-10-04 进度核查（静默期第 2 周，查询于 10-05 00:23 UTC，PyPI 数据截至 10-03）**：仓库与
