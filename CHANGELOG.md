@@ -24,7 +24,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `modules` retains its module-level original-to-obfuscated contract. If lexical
   planning fails (including compile-time errors such as a late `global`
   declaration), only that file skips local renaming, with a warning and
-  `local_files_skipped` / `local_functions_skipped` counts. Frame-based reflection
+  `local_files_skipped` / `local_functions_skipped` counts; the `--json`
+  `ai_hint` says how many files kept their local names. Frame-based reflection
   (`inspect.currentframe().f_locals`, `sys._getframe().f_locals`) is not detected;
   disable local renaming for code that reads locals by their original spelling.
 

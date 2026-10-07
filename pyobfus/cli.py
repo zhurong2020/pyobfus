@@ -2083,6 +2083,13 @@ def _emit_obfuscate_success_json(
             "Obfuscation complete. Add '--save-mapping mapping.json' next time "
             "to enable 'pyobfus --unmap' for debugging obfuscated stack traces."
         )
+    skipped_files = stats.get("local_files_skipped", 0)
+    if skipped_files:
+        # A successful build can still leave whole files with readable locals.
+        ai_hint += (
+            f" {skipped_files} file(s) kept their function-local names because lexical "
+            "planning failed; see stats.warnings."
+        )
 
     payload: Dict[str, Any] = {
         "version": 1,
