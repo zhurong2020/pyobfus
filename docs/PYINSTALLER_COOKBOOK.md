@@ -79,5 +79,5 @@ generated source is hidden. Output must match the original; an invalid tier
 must raise and its bundled traceback must reverse through `--unmap --json`.
 The mapping remains outside the shipped directory. Local execution passed on
 2026-10-08; the [first hosted run](https://github.com/zhurong2020/pyobfus/actions/runs/37690761303) also passed. The workflow runs weekly on main
-and on relevant fixture/workflow PRs. Other platforms, third-party dependencies
+and on PRs that change the obfuscator, the fixtures or the workflow. Other platforms, third-party dependencies
 and larger projects remain outside this example's evidence.

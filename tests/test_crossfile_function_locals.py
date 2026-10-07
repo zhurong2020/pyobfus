@@ -558,6 +558,7 @@ def test_planning_failure_skips_one_file_and_resets_warning(tmp_path, monkeypatc
     assert "Skipped function-local renaming for app.py" in cli.stderr
     assert payload["stats"]["local_files_skipped"] == 1
     assert "app.py" in payload["stats"]["warnings"][0]
+    assert "1 file(s) kept their function-local names" in payload["ai_hint"]
     monkeypatch.setattr(orchestrator, "plan_locals", real_plan)
     result = ob.obfuscate(src, tmp_path / "retry")
     assert result.success

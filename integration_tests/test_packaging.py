@@ -7,6 +7,7 @@ missing toolchains; packaging-lane.yml installs the pinned stack.
 
 import importlib.util
 import json
+import marshal
 import os
 from pathlib import Path
 import subprocess
@@ -69,6 +70,14 @@ def _mapped(mapping, name):
     ]
     assert len(matches) == 1, (name, matches)
     return matches[0]
+
+
+def _code_names(code):
+    names = {code.co_name, *code.co_names, *code.co_varnames}
+    for const in code.co_consts:
+        if hasattr(const, "co_code"):
+            names |= _code_names(const)
+    return names
 
 
 def _unmap_cli(trace, work):
@@ -191,6 +200,13 @@ def test_pyinstaller_onefile_behavior_and_reverse_traceback(tmp_path):
     executable = tmp_path / "dist" / "pricing"
     assert executable.is_file()
     assert not list(executable.parent.rglob("*.json"))
+    # Inspect the bundle itself: no mapping entry, and the frozen entry script
+    # carries obfuscated identifiers rather than the original function name.
+    from PyInstaller.archive.readers import CArchiveReader
+
+    archive = CArchiveReader(str(executable))
+    assert not [entry for entry in archive.toc if "mapping" in entry.lower()]
+    assert "apply_discount" not in _code_names(marshal.loads(archive.extract("app")))
     # The frozen artifact must run after its obfuscated source is removed.
     (output / "app.py").rename(output / "app.py.hidden")
     for tier in ("free", "pro", "enterprise"):
