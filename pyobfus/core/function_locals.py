@@ -432,6 +432,8 @@ def plan_locals(
 def apply_local_plan(tree: ast.Module, plan: LocalPlan) -> ast.Module:
     """Apply the frozen plan to the original parsed tree."""
     for node in ast.walk(tree):
+        if getattr(node, "_pyobfus_class_binding", False):
+            continue
         line, col = getattr(node, "lineno", -1), getattr(node, "col_offset", -1)
         if isinstance(node, ast.Name) and (line, col) in plan.protected_references:
             # Legacy module/import passes must not rename skipped lexical locals.

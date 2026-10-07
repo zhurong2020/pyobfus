@@ -29,6 +29,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`inspect.currentframe().f_locals`, `sys._getframe().f_locals`) is not detected;
   disable local renaming for code that reads locals by their original spelling.
 
+### Fixed
+
+- Directory builds in 0.5.32 and earlier could rewrite class-body references
+  to already bound methods or attributes as same-named module functions or
+  imports, breaking patterns such as `calendar.py`'s
+  `firstweekday = property(getfirstweekday, setfirstweekday)`. Cross-file
+  builds now preserve class bindings in execution order, while still renaming
+  earlier global references and globals in methods, lambdas and comprehension
+  bodies. Conditional class bindings use a conservative may-bind policy;
+  see the support matrix for its limits. Class-local imports retain their
+  attribute names and class/function `__all__` lists are no longer rewritten
+  as module exports. Applies with `crossfile_local_names` enabled or disabled.
+
 ## [0.5.32] - 2026-10-07
 
 ### Fixed

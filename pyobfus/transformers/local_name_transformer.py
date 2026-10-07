@@ -209,7 +209,9 @@ class LocalNameTransformer(ast.NodeTransformer):
         Returns:
             Modified or original Name node
         """
-        if getattr(node, "_pyobfus_local_binding", False):
+        if getattr(node, "_pyobfus_local_binding", False) or getattr(
+            node, "_pyobfus_class_binding", False
+        ):
             return node
 
         # Only rename in Load context (usage, not definition)
@@ -342,8 +344,17 @@ class LocalNameTransformer(ast.NodeTransformer):
         targets: Set[str] = set()
         for generator in node.generators:
             _target_names(generator.target, targets)
+        node.generators[0].iter = self.visit(node.generators[0].iter)
         self._local_scopes.append(targets)
-        self.generic_visit(node)
+        for i, generator in enumerate(node.generators):
+            if i:
+                generator.iter = self.visit(generator.iter)
+            generator.ifs = [self.visit(condition) for condition in generator.ifs]
+        if isinstance(node, ast.DictComp):
+            node.key = self.visit(node.key)
+            node.value = self.visit(node.value)
+        else:
+            node.elt = self.visit(node.elt)
         self._local_scopes.pop()
         return node
 
