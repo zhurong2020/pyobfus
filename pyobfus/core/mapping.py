@@ -103,6 +103,12 @@ class ObfuscationMapping:
             for original, obfuscated in exports.items():
                 if obfuscated not in m.global_map:
                     m.global_map[obfuscated] = (module, original)
+        for module, locals_map in getattr(global_table, "local_mappings", {}).items():
+            for obfuscated, original in locals_map.items():
+                m.global_map[obfuscated] = (module, original)
+                # Scope-qualified keys retain repeated local names without
+                # changing the v1 mapping schema or reverse lookup.
+                m.modules.setdefault(module, {})[f"{original}@{obfuscated}"] = obfuscated
         return m
 
     @classmethod

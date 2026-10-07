@@ -53,6 +53,7 @@ Pro is USD 45 once, not a subscription. The five-day trial needs no card: `pyobf
 
 - Run `--check` before building and `--dry-run --json` before writes.
 - Use framework presets for reflection-heavy projects.
+- Upcoming release: directory builds rename function locals by default; parameters stay unchanged. Disable with `--no-crossfile-local-names` or YAML `crossfile_local_names: false`; reflective functions are skipped.
 - Do not expose source, mappings, licence keys or absolute paths.
 - Online dependency verification sends public package names to public PyPI; use `--offline` for private indexes or offline work.
 - Runtime-backed Pro output ships `pyobfus-runtime>=0.1,<1`, not the proprietary builder or a licence key.

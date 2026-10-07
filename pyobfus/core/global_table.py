@@ -50,6 +50,8 @@ class GlobalSymbolTable:
         # Module exports: module_name -> {original_name -> obfuscated_name}
         # Example: {"calculator": {"Calculator": "I0", "add": "I1"}}
         self.module_exports: Dict[str, Dict[str, str]] = {}
+        # Local reverse mappings are separate from importable exports.
+        self.local_mappings: Dict[str, Dict[str, str]] = {}
 
         # Import statements: file_path -> [ImportInfo, ...]
         # Track what each file imports for validation

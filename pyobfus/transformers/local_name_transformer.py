@@ -209,6 +209,9 @@ class LocalNameTransformer(ast.NodeTransformer):
         Returns:
             Modified or original Name node
         """
+        if getattr(node, "_pyobfus_local_binding", False):
+            return node
+
         # Only rename in Load context (usage, not definition)
         if not isinstance(node.ctx, ast.Load):
             return node

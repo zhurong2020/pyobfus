@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Community cross-file builds rename function-local bindings with deterministic,
+  build-wide unique names, closure-aware references, and private reverse mappings.
+  Parameters, methods, attributes, lambda/comprehension bindings and class bodies
+  remain preserved. Reflection-sensitive functions and their enclosing scopes
+  are skipped and counted; unaliased dotted imports and generic type parameter
+  files are also conservatively skipped. Names required by string/future
+  annotations and private class name mangling are preserved. Enabled by default in all presets;
+  disable with `--no-crossfile-local-names` or YAML `crossfile_local_names: false`.
+
+### Fixed
+
+- Keep explicit global declarations consistent with module mappings when the new
+  cross-file local-name pass is enabled, including globals inside closures.
+
 ## [0.5.32] - 2026-10-07
 
 ### Fixed
