@@ -5,7 +5,7 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-10-05（Stripe/许可线：两笔新购核对、结账页文案与激活说明更新、Worker 只对已付款发号并部署、webhook 加 async 订阅；新增维护者清单 5 项见下。上一轮 2026-09-30：下载数据留存收口：只保留决策摘要，10-25 复盘后改为月度留存；所有暂不发版的后续改进继续按本文件的触发条件与节奏跟踪。上一轮 09-28：新增「IP 相关」段：专利标识、专有许可专利条款、发版清单 Apache 边界检查，待拍板；选题池加第 7 篇「混淆后让 AI 助手继续帮你调试」并排进 11-24；落地页加 JSON-LD 结构化数据；周一巡检：plugin 锁由 Rudy 09-28 升级到 Anthropic 内部、等其跟进；GitHub 流量来源已并进 `download_snapshot.py`；第 2 篇草稿已写。上一轮 09-27：新增「内容节奏」段：只写不发到 10-11、10-13 那周起 DEV 双周一篇，知乎选定为中文开发者渠道先记录，第 1 篇草稿已写；Show HN 最终结果补记；上一轮 09-26：Claude plugin 孤儿锁已按 Rudy 要求补齐账号核查、workspace ID 与两张截图并在原线程回复，现等后端处理；上一轮 09-25：trial 现状核查 + KV 备份 P0 当日完成；09-24：awesome-python PR #3352 当日被维护者关闭，理由是采用量，见「分发 / 上架队列」；
+最后更新：2026-10-07（新增「GEO / 外部采用」段：本周先纠错 cookbook 与绝对措辞、在 10-13 首篇 DEV 前采集搜索与 AI 基线、用 0.5.30 跑通调试示例；之后做调试与商业交付两张任务页、sitemap、真实应用与打包实测；benchmark 与论文留到 60–90 天复盘。上一轮 2026-10-05：Stripe/许可线：两笔新购核对、结账页文案与激活说明更新、Worker 只对已付款发号并部署、webhook 加 async 订阅；新增维护者清单 5 项见下。上一轮 2026-09-30：下载数据留存收口：只保留决策摘要，10-25 复盘后改为月度留存；所有暂不发版的后续改进继续按本文件的触发条件与节奏跟踪。上一轮 09-28：新增「IP 相关」段：专利标识、专有许可专利条款、发版清单 Apache 边界检查，待拍板；选题池加第 7 篇「混淆后让 AI 助手继续帮你调试」并排进 11-24；落地页加 JSON-LD 结构化数据；周一巡检：plugin 锁由 Rudy 09-28 升级到 Anthropic 内部、等其跟进；GitHub 流量来源已并进 `download_snapshot.py`；第 2 篇草稿已写。上一轮 09-27：新增「内容节奏」段：只写不发到 10-11、10-13 那周起 DEV 双周一篇，知乎选定为中文开发者渠道先记录，第 1 篇草稿已写；Show HN 最终结果补记；上一轮 09-26：Claude plugin 孤儿锁已按 Rudy 要求补齐账号核查、workspace ID 与两张截图并在原线程回复，现等后端处理；上一轮 09-25：trial 现状核查 + KV 备份 P0 当日完成；09-24：awesome-python PR #3352 当日被维护者关闭，理由是采用量，见「分发 / 上架队列」；
 `pyobfus-runtime` 0.1.0 已通过 OIDC/PEP 740 发布并完成 PyPI 验收；
 删除已完全合入 `main` 的本地及远端 `spike/mcp-sdk-2x` 空壳分支；
 修正本文件把已随 0.5.28 发布的邮箱 trial 误列为待实现、仍称 0.5.27 为当前版本的状态漂移。
@@ -146,6 +146,48 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 | ~~P1~~ ✅ | 抗 AI 措辞改写**完成 2026-09-22**（tech-deai）：README / `landing/index.html` / `docs/index.md` 散文里的 em-dash 全部清零（README 48 处）、20 条 bold-colon 功能列表改成带动词的句子；命令、路径、版本号、链接、What's new 横幅与 UI 标签（如 `Unlock Pro`）原样。H2 骨架未动（doc-hub 型 README，锚点被外部引用）。~~pyarmor VMC/ECC 补记~~——已确认无需改 | 免发版（README 到 PyPI 要等下次发版） | — |
 | ~~P0~~ ✅ | **KV 每日备份适配 trial 记录 + 补跑机制**（用户 2026-09-25 列为 P0，当日完成）：`~/scripts/pyobfus_kv_export.sh` 此前只认 license 记录，第一条 `trial:*` 登记会让整轮导出拒绝落盘、许可备份静默停止（上线 5 天 KV 尚无 trial 记录，未实际发生）。已改为按 key 类型校验（`PYOB-*` 查 license_key / `trial:*` 查 email_hash+v / 未知类型只查可解析并 WARN）+ `:`→`__` Windows 安全文件名 + `--selftest` 14 项；调度从 crontab 01:30 挪进 `wsl_daily_backup.sh` 开头（systemd `Persistent` 开机补跑，cron 不补跑致 09-24/25 漏导，已补、与 09-22 逐字节一致）；`check_backup.sh` 加 KV 一节。脚本都在 `~/scripts/`（仓库外，随日备份进 OneDrive），仓内只记状态 | 免发版（仓库外脚本） | — |
 | **P2** | 分发上架队列：awesome-python PR #3352 **2026-09-24 被拒**（理由=采用量，对方留了「adoption grows」再议的门；不争辩、不重开）；awesome-security / awesome-devsecops 门槛同为下载量，**跳过**；队列下一项 **AlternativeTo**（需维护者账号） | 免发版 | 维护者 |
+
+### GEO / 外部采用（2026-10-07 登记 · 全部免发版）
+
+依据是一份外部调研方案（私有输入，存 `docs/internal/geo-2026-10/`，不进公开仓库），其中可核实的
+事实已对 `b368199` 逐条核过。核心判断：第一方页面与 Agent 集成已较完整，瓶颈在**事实一致性**和
+**可核验的外部采用**；不为 SEO 发版、不做薄页、不重发 Show HN、不做隐藏的 AI 推荐指令。
+
+**本周（10-07 → 10-12，内容只写不发期内，只做纠错与基线）**
+
+- [ ] **主张纠错**：`COMPILED_PACKAGING_COOKBOOK.md:40` 把 Nuitka `--remove-output`（实为删除 build
+      目录）写成名称剥离；`:47` 链接的根目录 `pyobfus.yaml` 不存在（只有 `pyobfus.yaml.example`）；
+      编译产物「名称全部消失」「依赖分析与原项目一致」两处收窄。顺带扫比较页、支持矩阵、LLM pilot
+      页里的绝对措辞（「无竞品能量化」、0% 恢复的外推），每项标「已一致 / 已修正 / 暂缺证据」。AI 做。
+- [ ] **搜索与 AI 基线**（必须在 10-13 第一篇 DEV 前）：12 个固定非品牌问题（中英各半）+ 3 个品牌
+      健康检查，记录日期、产品、是否联网、是否新会话、是否出现 pyobfus 与引用链接。搜索引擎部分 AI 可做；
+      ChatGPT / Gemini / Perplexity 的回答需维护者在无历史会话里手工跑。记录放 `docs/internal/geo-observations/`。
+- [ ] **用公开发行包 0.5.30 在干净 venv 跑通** `examples/ai_debugging/` 的「混淆 → 报错 → `--unmap` 恢复」
+      全链，含错误版本 mapping 的表现。这是下面 B 页的前提。AI 做。
+
+**10-13 → 11-06（与内容排期并行，不改原排期）**
+
+- [ ] **任务页 B「How to debug an obfuscated Python traceback」**（`docs/guides/`）：差异化定位已有搜索信号，
+      复用 ai_debugging 示例；同时作为第 7 篇文章的落地页。先于 A。
+- [ ] **任务页 A「Protect Python code before selling software」**：先问交付形态（.py / 库 / exe / API），
+      再给决策路径；pyobfus 只在「交付 Python 源码 + 要保留诊断能力」时作首选，exe 场景指向 Nuitka 组合，
+      绝对保密指向服务器端。
+- [ ] **Pages 加 sitemap**（10-07 实测 `zhurong2020.github.io/pyobfus/sitemap.xml` 为 404）；核对 RTD sitemap
+      与 canonical。Search Console 验证需维护者账号。
+- [ ] **真实框架应用 lane**：一个无依赖多文件 CLI + 一个 FastAPI/Pydantic v2 小应用，原版与输出版跑同一套
+      业务测试；通过后只升级被测单元格。低频 CI lane，标明实际频率。
+- [ ] **一个打包组合实测**（pyobfus → Nuitka，一种平台一种配置），通过后 cookbook 才去掉 advisory-only。
+- [ ] **案例与反馈入口**：Discussions 一条置顶 + 案例模板；不以好评/star 换协助，AI 不主动联系陌生人。
+
+**60–90 天后再定（P2，看复盘）**
+
+- 多工具交付 benchmark（先在 `benchmarks/distribution/` 验证方法，作者自建须披露，不称独立评测）。
+- 扩展 LLM 抗分析实验，及可能的期刊论文；以上两项都依赖上面的真实应用与打包数据。
+- 页面 C（pyobfus + Nuitka）在打包实测后改写 cookbook；D（PyArmor 比较）10-02 已做过一轮，有新证据再动；
+  E（AI 写的应用交付）与 A 重复就并入 A。
+
+验收口径：完成标准是「用户能按页面跑通、公开主张与测试一致、外部采用可核验」，**不以 star 数或 AI 首推率
+作为工程验收**。月度复查 12 个问题，与 `download_snapshot.py` 一起看。
 
 ### P1 gate · Affiliate pilot（方案完成，未授权实现/部署）
 
