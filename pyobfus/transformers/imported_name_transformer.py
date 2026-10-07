@@ -178,8 +178,9 @@ class ImportedNameTransformer(ast.NodeTransformer):
         """
         # Decorators, defaults and annotations are evaluated in the enclosing
         # scope, before parameter names begin shadowing imports.
-        for decorator in node.decorator_list:
-            self.visit(decorator)
+        # Assign the results back: visit_Name returns a new node, so a bare
+        # decorator name would otherwise keep its original spelling.
+        node.decorator_list = [self.visit(d) for d in node.decorator_list]
         self._visit_function_signature(node)
 
         # Push new scope
@@ -195,8 +196,9 @@ class ImportedNameTransformer(ast.NodeTransformer):
 
     def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> ast.AsyncFunctionDef:
         """Visit async function definition."""
-        for decorator in node.decorator_list:
-            self.visit(decorator)
+        # Assign the results back: visit_Name returns a new node, so a bare
+        # decorator name would otherwise keep its original spelling.
+        node.decorator_list = [self.visit(d) for d in node.decorator_list]
         self._visit_function_signature(node)
 
         self._scope_stack.append(self._parameter_names(node))

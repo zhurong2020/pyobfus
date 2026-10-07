@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Directory builds no longer break same-module decorators, base classes,
+  metaclasses and lambdas.** In the default cross-file mode, a module-level
+  name used as a decorator (`@logged`), a base class (`class Child(Base)`), a
+  `metaclass=` keyword, a lambda default or a bare lambda body kept its
+  original spelling while its definition was renamed, so the obfuscated
+  module raised `NameError` on import. Imported names used as function
+  decorators had the same problem. The cross-file transformers visited these
+  expressions but discarded the renamed node; the results are now assigned
+  back. Reproduced on 0.5.10 through 0.5.31. If you shipped a directory build,
+  rebuild and rerun your tests.
+
 ## [0.5.31] - 2026-10-07
 
 ### Changed
