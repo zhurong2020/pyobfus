@@ -230,9 +230,10 @@ def test_unmap_warns_when_trace_has_names_missing_from_mapping(tmp_path: Path) -
         main, ["--unmap", "--trace", str(trace_file), "--mapping", str(mapping_path)]
     )
     assert result.exit_code == 0
-    assert "in foo" in result.stdout
-    assert "Warning: 2 obfuscated name(s)" in result.stderr
-    assert "I5, I7" in result.stderr
+    # result.output: click < 8.2 (Python 3.9) cannot capture stderr separately.
+    assert "in foo" in result.output
+    assert "Warning: 2 obfuscated name(s)" in result.output
+    assert "I5, I7" in result.output
 
     as_json = CliRunner().invoke(
         main,
