@@ -31,7 +31,7 @@ When a crash is captured from the *serving* process, its frames reference
 obfuscated names. Reverse them with:
 
 ```bash
-pyobfus --unmap traceback.txt --mapping serve.map.json
+pyobfus --unmap --trace traceback.txt --mapping serve.map.json
 ```
 
 The output maps each obfuscated symbol back to its original, readable name.

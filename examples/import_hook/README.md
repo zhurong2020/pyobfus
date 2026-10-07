@@ -45,7 +45,7 @@ If the loaded module crashes, its frames reference obfuscated names. Reverse
 them with the saved mapping:
 
 ```bash
-pyobfus --unmap traceback.txt --mapping app.map.json
+pyobfus --unmap --trace traceback.txt --mapping app.map.json
 ```
 
 ## SOURCEdefender (.pye) variant

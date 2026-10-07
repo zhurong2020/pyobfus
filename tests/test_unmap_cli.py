@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import io
 import json
 from pathlib import Path
 
+import pytest
 from click.testing import CliRunner
 
-from pyobfus.cli import main
+from pyobfus.cli import _handle_unmap, main
 
 
 def test_save_mapping_and_unmap_roundtrip(tmp_path: Path) -> None:
@@ -162,3 +164,57 @@ def test_save_mapping_in_directory_mode(tmp_path: Path) -> None:
     module_keys = list(data["modules"].keys())
     # module names can be "a" and "b" or similar
     assert len(module_keys) >= 1
+
+
+def _write_minimal_mapping(tmp_path: Path) -> Path:
+    mapping_path = tmp_path / "mapping.json"
+    mapping_path.write_text(
+        json.dumps(
+            {
+                "version": 1,
+                "modules": {"m": {"foo": "I0"}},
+                "global": {"I0": {"module": "m", "original": "foo"}},
+            }
+        ),
+        encoding="utf-8",
+    )
+    return mapping_path
+
+
+def test_unmap_accepts_positional_trace_path(tmp_path: Path) -> None:
+    """`pyobfus --unmap trace.txt --mapping m.json` reads the positional file."""
+    mapping_path = _write_minimal_mapping(tmp_path)
+    trace_file = tmp_path / "trace.txt"
+    trace_file.write_text('  File "m.py", line 3, in I0\n', encoding="utf-8")
+
+    result = CliRunner().invoke(main, ["--unmap", str(trace_file), "--mapping", str(mapping_path)])
+    assert result.exit_code == 0, result.output
+    assert "in foo" in result.output
+
+
+def test_unmap_rejects_positional_and_trace_together(tmp_path: Path) -> None:
+    mapping_path = _write_minimal_mapping(tmp_path)
+    trace_file = tmp_path / "trace.txt"
+    trace_file.write_text("in I0\n", encoding="utf-8")
+
+    result = CliRunner().invoke(
+        main,
+        ["--unmap", str(trace_file), "--trace", str(trace_file), "--mapping", str(mapping_path)],
+    )
+    assert result.exit_code == 2
+    assert "not both" in result.output
+
+
+def test_unmap_without_trace_on_terminal_does_not_wait(tmp_path: Path, monkeypatch, capsys) -> None:
+    """With no trace and an interactive stdin, fail fast instead of blocking."""
+    mapping_path = _write_minimal_mapping(tmp_path)
+
+    class _Tty(io.StringIO):
+        def isatty(self) -> bool:
+            return True
+
+    monkeypatch.setattr("sys.stdin", _Tty(""))
+    with pytest.raises(SystemExit) as exc:
+        _handle_unmap(trace_path=None, mapping_path=str(mapping_path))
+    assert exc.value.code == 2
+    assert "needs a trace" in capsys.readouterr().err

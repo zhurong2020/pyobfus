@@ -612,8 +612,16 @@ def main(
 
     # Handle --unmap: reverse obfuscated names in a stack trace
     if unmap_mode:
+        # `pyobfus --unmap trace.txt --mapping m.json` is the form people
+        # naturally type; treat the positional path as the trace file.
+        if input_path and trace_path:
+            click.echo(
+                "Error: give the trace either as a positional path or with --trace, not both.",
+                err=True,
+            )
+            sys.exit(2)
         _handle_unmap(
-            trace_path=trace_path,
+            trace_path=trace_path or input_path,
             mapping_path=mapping_path,
             json_output=json_output,
         )
@@ -2289,6 +2297,13 @@ def _handle_unmap(
         sys.exit(2)
 
     if trace_path in (None, "-"):
+        if trace_path is None and sys.stdin.isatty():
+            # Nothing piped in: reading stdin would just wait silently.
+            click.echo("Error: --unmap needs a trace: --trace FILE, a path, or stdin.", err=True)
+            click.echo(
+                "Example: pyobfus --unmap --trace error.log --mapping mapping.json", err=True
+            )
+            sys.exit(2)
         trace_text = sys.stdin.read()
     else:
         trace_file = Path(trace_path)  # type: ignore[arg-type]

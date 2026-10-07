@@ -42,6 +42,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **The comparison table no longer says configuration presets are Pro-only.**
   It now distinguishes free Community/framework presets from Pro commercial
   distribution presets.
+- **`pyobfus --unmap trace.txt --mapping map.json` now works.** The positional
+  path is read as the trace, as several docs pages and the product page
+  already showed; previously it was ignored and the command read stdin, which
+  either failed with "no trace input" or waited silently in a terminal. Giving
+  both a positional path and `--trace` is an error, and `--unmap` with no trace
+  on an interactive terminal now exits with a usage hint instead of blocking.
+  The affected docs now use the explicit `--trace` form, which works on every
+  released version.
 
 ## [0.5.30] - 2026-09-26
 
