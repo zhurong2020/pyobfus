@@ -106,6 +106,11 @@ What the output looked like is the part to read carefully:
 - In 0.5.30, directory builds also kept function, method and class
   docstrings. 0.5.31 removes them as configured; on older versions, check your
   output for docstrings that describe your logic.
+- Directory builds made with 0.5.10 to 0.5.31 could fail on import with
+  `NameError` when a module used its own decorator, base class, metaclass or
+  a lambda referring to a module name. 0.5.32 fixes this; if you shipped such
+  a build, rebuild and rerun your tests. Step 3 above is what catches this
+  kind of problem.
 - String literals are kept as written unless you turn on string encoding
   (`string_encoding: true` in a config file; Pro adds AES-256 string
   encryption). Never rely on either to hide secrets.
