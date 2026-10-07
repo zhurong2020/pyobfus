@@ -1,5 +1,14 @@
 # pyobfus 当前计划
 
+**2026-10-07 Core 0.5.31 已发布（维护者当日批准，提前结束静默期）**：理由是静默期例外里的「影响用户的 bug」——
+目录构建自 cross-file 默认化以来从不删 docstring。同版带出 `--unmap` 位置参数与 mapping 不匹配告警、Community
+`community_edition()` 规模限制修正。MCP 不随发（`unmap_stack_trace` 提示留 `[Unreleased]`），P0 目录构建局部变量
+改名留给后续版本。验收：本地四测试根 + FastAPI lane + VS Code 53 项、`twine check`、候选 wheel 干净环境实测；
+发布提交 CI/CodeQL 全绿；tag `v0.5.31` 经 OIDC 发布，wheel/sdist PEP 740 provenance 200；PyPI 全新安装复测
+docstring 与告警；GitHub Release 已建；Zenodo record `23210576`（v0.5.31）发布后数分钟即归档，`CITATION.cff` 已同步。
+**基线口径**：09-27→10-06 为唯一干净窗口（近 7 天安静日中位数 40），10-25 复盘按此给初步结论；10-07 起为发版尖峰，
+10-13 起叠加内容投放，二者日期分开记录。
+
 **2026-10-07 GEO / 外部采用计划第一轮（免发版；Core 改动留 `[Unreleased]`）**：维护者交来一份外部 GEO 调研方案
 （私有，`docs/internal/geo-2026-10/`），逐条核实后执行。完成：① 主张纠错——编译 cookbook 的 `--remove-output`
 误释与死链修正，并用 PyPI 0.5.30 + Cython 3.3.0 + Nuitka 4.2.2 实测（先混淆则二进制里无原名；字符串字面量照留；

@@ -155,9 +155,8 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 单文件那样的改名深度**，而这正是多数商业交付用户的场景。
 
 - 已做（免发版部分）：README、产品页、支持矩阵「What gets renamed」表、卖前指南都已写明实际范围，不再泛称
-  「project-wide name mangling」。同一轮修了一个相关 bug：目录构建此前**从不删 docstring**（已修，在
-  `[Unreleased]`）。
-- 待定方案（改 Core 行为，需批准，随月度版本发）：第一步在 cross-file 模式下**改函数局部变量**（只在函数作用域内，
+  「project-wide name mangling」。同一轮修了一个相关 bug：目录构建此前**从不删 docstring**（已修，随 0.5.31 发布）。
+- 待定方案（改 Core 行为，需批准；维护者 10-07 定为「后续版本」）：第一步在 cross-file 模式下**改函数局部变量**（只在函数作用域内，
   跨文件无影响，最安全，收益最大）；第二步参数（与 `--preserve-param-names` 及调用方关键字参数联动，需跨文件
   调用点分析）；方法名与属性需要类型信息，暂不做。验收：`integration_tests/` 多文件与 FastAPI lane 仍逐字一致。
 - 这条按 GEO 计划 §16「真实转换问题优先于推广」处理，排在下面所有推广项之前。
@@ -245,8 +244,8 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 
 发版本身是独立 gate。
 
-- **Core `[Unreleased]`**：Community 默认规模限制修正（10-02）；10-07 加 `--unmap` 接受位置参数、
-  `--unmap` 对不匹配的 mapping 告警、目录构建删除 docstring。都不属于静默期三类例外，随 11 月第一周月度版本发。
+- **Core `[Unreleased]` 为空**：上述修复已随 `0.5.31`（10-07，维护者批准提前发版）发布。下一版带 P0
+  目录构建局部变量改名，按月度节奏。
 - **`pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]`**：mcp SDK 2.x 兼容。刻意不随 Core
   发，攒够增量或有人明确要 2.x 时再发（每发一次 MCP 要手工改 Glama Build steps）。
 
