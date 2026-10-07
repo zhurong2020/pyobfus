@@ -3,6 +3,9 @@ contact_links:
   - name: 💬 GitHub Discussions
     url: https://github.com/zhurong2020/pyobfus/discussions
     about: Ask questions and discuss ideas with the community
+  - name: 🧪 Share how you used pyobfus
+    url: https://github.com/zhurong2020/pyobfus/discussions/new?category=show-and-tell
+    about: What you protected, how you checked it, what broke
   - name: 📖 Documentation
     url: https://github.com/zhurong2020/pyobfus#readme
     about: Read the documentation for usage guides and examples

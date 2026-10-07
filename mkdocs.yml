@@ -62,6 +62,7 @@ nav:
     - License activation: LICENSE_ACTIVATION_GUIDE.md
     - Project structure: PROJECT_STRUCTURE.md
     - Community / Pro boundary: EDITION_BOUNDARY_POLICY.md
+    - Share a usage report: case-studies/README.md
   - Guides:
     - Protect Python before selling: guides/protect-python-before-selling.md
     - Debug an obfuscated traceback: guides/debug-obfuscated-python.md

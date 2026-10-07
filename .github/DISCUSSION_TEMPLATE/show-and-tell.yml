@@ -1,0 +1,70 @@
+title: "[Usage] "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for telling us how pyobfus went. Reports of what failed are as
+        useful as reports of what worked. **Do not paste proprietary source
+        code, mapping files, licence keys, or customer data.** A short
+        description or a minimal reproduction is enough.
+
+        How we use these reports: [case-study policy](https://pyobfus.readthedocs.io/en/latest/case-studies/).
+  - type: textarea
+    id: task
+    attributes:
+      label: What were you protecting, and why ship it locally?
+      description: e.g. "a CLI sold to three customers who run it offline"
+    validations:
+      required: true
+  - type: dropdown
+    id: delivery
+    attributes:
+      label: How is it delivered?
+      options:
+        - .py files / a library the customer runs with their own Python
+        - Packaged with PyInstaller
+        - Compiled with Nuitka or Cython
+        - Other (describe below)
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: pyobfus version, Python version, OS
+      placeholder: "pyobfus 0.5.30, Python 3.12, Windows 11"
+    validations:
+      required: true
+  - type: textarea
+    id: config
+    attributes:
+      label: Preset or configuration
+      description: Preset name, directory or single-file build, any exclusions you needed.
+  - type: textarea
+    id: verification
+    attributes:
+      label: How did you check the obfuscated output works?
+      description: Your own tests, manual runs, `--verify-syntax`, the MCP `verified` flag... say which.
+    validations:
+      required: true
+  - type: textarea
+    id: problems
+    attributes:
+      label: What went wrong or needed a workaround?
+  - type: textarea
+    id: scope
+    attributes:
+      label: Where does it run now?
+      description: Still evaluating, internal use, or shipped to customers (how many, if you can say).
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: Publishing
+      options:
+        - label: The maintainers may quote this report in a public case study, with the name below.
+        - label: I received a free licence, payment, or other help from the maintainers in return for this report.
+  - type: input
+    id: attribution
+    attributes:
+      label: Name or project to credit (optional)
+      description: Leave empty to stay anonymous.
