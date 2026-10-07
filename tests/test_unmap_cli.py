@@ -218,3 +218,40 @@ def test_unmap_without_trace_on_terminal_does_not_wait(tmp_path: Path, monkeypat
         _handle_unmap(trace_path=None, mapping_path=str(mapping_path))
     assert exc.value.code == 2
     assert "needs a trace" in capsys.readouterr().err
+
+
+def test_unmap_warns_when_trace_has_names_missing_from_mapping(tmp_path: Path) -> None:
+    """A mapping from another build must not be applied silently."""
+    mapping_path = _write_minimal_mapping(tmp_path)
+    trace_file = tmp_path / "trace.txt"
+    trace_file.write_text("in I0\n    I5 = I7 * 2\n", encoding="utf-8")
+
+    result = CliRunner().invoke(
+        main, ["--unmap", "--trace", str(trace_file), "--mapping", str(mapping_path)]
+    )
+    assert result.exit_code == 0
+    assert "in foo" in result.stdout
+    assert "Warning: 2 obfuscated name(s)" in result.stderr
+    assert "I5, I7" in result.stderr
+
+    as_json = CliRunner().invoke(
+        main,
+        ["--unmap", "--trace", str(trace_file), "--mapping", str(mapping_path), "--json"],
+    )
+    payload = json.loads(as_json.stdout)
+    assert payload["unmatched_names"] == ["I5", "I7"]
+    assert "different build" in payload["warning"]
+
+
+def test_unmap_no_warning_when_mapping_covers_trace(tmp_path: Path) -> None:
+    mapping_path = _write_minimal_mapping(tmp_path)
+    trace_file = tmp_path / "trace.txt"
+    trace_file.write_text("in I0 (see MyI9Thing)\n", encoding="utf-8")
+
+    result = CliRunner().invoke(
+        main,
+        ["--unmap", "--trace", str(trace_file), "--mapping", str(mapping_path), "--json"],
+    )
+    payload = json.loads(result.stdout)
+    assert payload["unmatched_names"] == []
+    assert "warning" not in payload

@@ -231,6 +231,28 @@ class ObfuscationMapping:
 
         return _IDENT_RE.sub(_sub, text)
 
+    def unmatched_names(self, text: str) -> List[str]:
+        """
+        Obfuscated-looking names in `text` that this mapping does not know.
+
+        A name "looks obfuscated" when it has the same prefix-plus-digits shape
+        as the names in this mapping (``I0``, ``I17``...). Any of those missing
+        from the mapping usually means the trace came from a different build,
+        so a reversal with this mapping would be incomplete or wrong.
+        """
+        prefixes = {
+            m.group(1)
+            for m in (re.fullmatch(r"([A-Za-z_]+)\d+", obf) for obf in self.global_map)
+            if m
+        }
+        if not prefixes:
+            return []
+        shape = re.compile(r"\b(?:" + "|".join(re.escape(p) for p in sorted(prefixes)) + r")\d+\b")
+        return sorted(
+            {tok for tok in shape.findall(text) if tok not in self.global_map},
+            key=lambda t: (len(t), t),
+        )
+
     def stats(self) -> Dict[str, int]:
         return {
             "modules": len(self.modules),

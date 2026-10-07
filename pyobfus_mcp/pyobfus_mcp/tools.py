@@ -540,7 +540,7 @@ def unmap_stack_trace(trace: str, mapping_path: str) -> Dict[str, Any]:
 
     Returns:
         Dict with keys: status, original_trace, unmapped_trace,
-        mapping_stats, ai_hint.
+        unmatched_names, mapping_stats, ai_hint.
     """
     try:
         from pyobfus.core.mapping import ObfuscationMapping
@@ -568,15 +568,27 @@ def unmap_stack_trace(trace: str, mapping_path: str) -> Dict[str, Any]:
         return _error("InvalidMapping", str(e), "Regenerate the mapping file.")
 
     unmapped = mapping.unmap_text(trace)
+    # unmatched_names() arrived after the oldest pyobfus this server supports.
+    finder = getattr(mapping, "unmatched_names", None)
+    unmatched = finder(trace) if finder else []
+    ai_hint = (
+        "Names are reversed, but line numbers still point to the obfuscated "
+        "file. Cross-reference with the original source if needed."
+    )
+    if unmatched:
+        ai_hint = (
+            f"{len(unmatched)} obfuscated name(s) in the trace are not in this mapping, "
+            "so the trace probably comes from a different build and the reversal "
+            "may be wrong. Find the mapping whose marker_id matches the "
+            "'# pyobfus:obfuscated id=' header of the shipped files. " + ai_hint
+        )
     return {
         "status": "success",
         "original_trace": trace,
         "unmapped_trace": unmapped,
+        "unmatched_names": unmatched,
         "mapping_stats": mapping.stats(),
-        "ai_hint": (
-            "Names are reversed, but line numbers still point to the obfuscated "
-            "file. Cross-reference with the original source if needed."
-        ),
+        "ai_hint": ai_hint,
         "next_tool": _next_tool(
             None, "trace is de-obfuscated; read the unmapped_trace and continue debugging"
         ),

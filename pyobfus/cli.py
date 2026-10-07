@@ -2317,27 +2317,38 @@ def _handle_unmap(
         sys.exit(2)
 
     rewritten = mapping.unmap_text(trace_text)
+    unmatched = mapping.unmatched_names(trace_text)
+    mismatch_warning = (
+        f"{len(unmatched)} obfuscated name(s) in the trace are not in this mapping "
+        f"({', '.join(unmatched[:5])}{', ...' if len(unmatched) > 5 else ''}). "
+        f"The trace may come from a different build; check that the mapping's "
+        f"marker_id ({mapping.marker_id()}) matches the '# pyobfus:obfuscated id=' "
+        f"header of the shipped files."
+        if unmatched
+        else ""
+    )
 
     if json_output:
-        click.echo(
-            json.dumps(
-                {
-                    "version": 1,
-                    "mapping": str(mapping_path),
-                    "mapping_stats": mapping.stats(),
-                    "original_trace": trace_text,
-                    "unmapped_trace": rewritten,
-                    "ai_hint": (
-                        "Unmapped names use the pre-obfuscation identifiers; "
-                        "line numbers still refer to the obfuscated output."
-                    ),
-                },
-                indent=2,
-                ensure_ascii=False,
-            )
-        )
+        payload = {
+            "version": 1,
+            "mapping": str(mapping_path),
+            "mapping_stats": mapping.stats(),
+            "original_trace": trace_text,
+            "unmapped_trace": rewritten,
+            "unmatched_names": unmatched,
+            "ai_hint": (
+                "Unmapped names use the pre-obfuscation identifiers; "
+                "line numbers still refer to the obfuscated output."
+                + (" " + mismatch_warning if mismatch_warning else "")
+            ),
+        }
+        if mismatch_warning:
+            payload["warning"] = mismatch_warning
+        click.echo(json.dumps(payload, indent=2, ensure_ascii=False))
     else:
         click.echo(rewritten, nl=False)
+        if mismatch_warning:
+            click.echo(f"Warning: {mismatch_warning}", err=True)
 
 
 def _handle_check(

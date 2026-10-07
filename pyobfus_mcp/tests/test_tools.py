@@ -209,6 +209,28 @@ def test_unmap_stack_trace_roundtrip(tmp_path: Path) -> None:
     assert result["mapping_stats"]["unique_obfuscated"] == 2
 
 
+def test_unmap_stack_trace_flags_names_from_another_build(tmp_path: Path) -> None:
+    mapping_path = tmp_path / "m.json"
+    mapping_path.write_text(
+        json.dumps(
+            {
+                "version": 1,
+                "modules": {"calc": {"Calculator": "I0"}},
+                "global": {"I0": {"module": "calc", "original": "Calculator"}},
+            }
+        ),
+        encoding="utf-8",
+    )
+    result = unmap_stack_trace("in I0\nNameError: name 'I7' is not defined", str(mapping_path))
+    assert result["status"] == "success"
+    assert result["unmatched_names"] == ["I7"]
+    assert "different build" in result["ai_hint"]
+
+    clean = unmap_stack_trace("in I0", str(mapping_path))
+    assert clean["unmatched_names"] == []
+    assert "different build" not in clean["ai_hint"]
+
+
 def test_unmap_stack_trace_missing_mapping(tmp_path: Path) -> None:
     nonexistent = tmp_path / "does_not_exist.json"
     result = unmap_stack_trace("foo", str(nonexistent))

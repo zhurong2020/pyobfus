@@ -6,6 +6,14 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+### Added
+
+- **`unmap_stack_trace` flags a mapping from another build.** The result
+  gains `unmatched_names`, the obfuscated-looking names in the trace that the
+  mapping does not know; when it is non-empty, `ai_hint` tells the agent the
+  reversal may be wrong and how to find the matching mapping. Needs a `pyobfus`
+  release that includes the check; with older ones the list is always empty.
+
 ### Changed
 
 - **The server now runs on either mcp SDK major.** 2.x renamed `FastMCP` to

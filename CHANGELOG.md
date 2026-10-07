@@ -50,6 +50,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   on an interactive terminal now exits with a usage hint instead of blocking.
   The affected docs now use the explicit `--trace` form, which works on every
   released version.
+- **`--unmap` warns when the mapping does not fit the trace.** A mapping from
+  a different build used to be applied silently, leaving some names mangled
+  and replacing others with the wrong originals. The trace is now checked for
+  obfuscated-looking names (same prefix-and-number shape as the mapping's
+  names) that the mapping does not contain; if any are found, a warning goes
+  to stderr, and `--json` output gains `unmatched_names` plus a `warning`
+  field. The unmapped text and exit code are unchanged.
 
 ## [0.5.30] - 2026-09-26
 
