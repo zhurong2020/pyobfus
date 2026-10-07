@@ -169,9 +169,6 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       属「影响用户的 bug」，可按例外单独发补丁版（需批准）。
 - [ ] **既有缺陷 B**：单文件模式（含 `--preset flask`）会改函数内定义的函数/类名和 dataclass 字段，Flask 应用工厂
       `url_for` 失效、Click 命令找不到。目录模式已在 #57 中修正，单文件模式应采用同一规则。
-- [ ] **非阻断跟进**：`--json` 有文件跳过局部改名时 `ai_hint` 应提及；支持矩阵里打包 lane 的状态改为「tested weekly」
-      或把 `pyobfus/**` 加入其 PR 触发路径；PyInstaller 测试检查归档内容（无 mapping、无原始标识符）；
-      Worker CI / Packaging lane 的 Action 行补版本注释。
 - [ ] **MCP `unmap_stack_trace` 的 mapping 不匹配提示**在 `pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]` 中。
       与 #57 的 mapping 格式调整一起评估后再发 MCP；每次发 MCP 都要手工更新 Glama 的 Build steps。
 - [ ] **第 2 步：参数改名**（#57 已合并，可以开始设计）。会影响调用方的关键字参数，需要跨文件分析调用点，
