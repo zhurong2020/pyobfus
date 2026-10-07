@@ -189,8 +189,6 @@ JOSS 页改为引用页、两张任务页、Pages sitemap、FastAPI 真实应用
       `/pyobfus/sitemap.xml`；RTD 的 sitemap 对脚本返回 Cloudflare 质询，在 GSC 里看抓取状态。域名根 `robots.txt`
       属个人站仓库，没有改。
 - [ ] **mcp.so 列表文案过时**（「50% cheaper than PyArmor」）：维护者在 mcp.so 看能否更新描述。
-- [ ] **打包组合进 CI**：Nuitka `--module` 目前只是 verified once（Linux 单模块）；PyInstaller 仍 advisory-only。
-      有用户反馈打包问题时优先做，否则排在月度版本之后。
 - [ ] **Discussions 置顶一条**指向新的 Show and tell 表单（公开发帖，10-11 之后由维护者发）。
 - 60–90 天后再定（P2）：多工具交付 benchmark、扩展 LLM 实验与期刊论文（都依赖上面的真实应用数据）；
   E 页（AI 写的应用交付）已并入卖前指南的 FAQ，不单独建页。

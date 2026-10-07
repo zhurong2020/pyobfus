@@ -68,3 +68,16 @@ if a single algorithm module is your crown jewel, layering PyArmor Pro or
 Nuitka on that one module on top of this pipeline is a reasonable
 escalation. See [`COMPARISON.md`](COMPARISON.md) for the full
 tool-by-tool tradeoff table.
+
+
+## Automated example checks
+
+`packaging-lane.yml` runs `integration_tests/test_packaging.py` with PyInstaller
+6.22.3 on Linux CPython 3.12: the maintained stdlib-only pricing CLI is
+obfuscated, bundled with `--onefile`, and run for all three tiers after the
+generated source is hidden. Output must match the original; an invalid tier
+must raise and its bundled traceback must reverse through `--unmap --json`.
+The mapping remains outside the shipped directory. Local execution passed on
+2026-10-08; the first hosted run is pending. The workflow runs weekly on main
+and on relevant fixture/workflow PRs. Other platforms, third-party dependencies
+and larger projects remain outside this example's evidence.

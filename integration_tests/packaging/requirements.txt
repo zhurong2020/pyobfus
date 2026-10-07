@@ -1,0 +1,5 @@
+# Pinned toolchains for packaging-lane.yml (Linux, CPython 3.12).
+# Update deliberately with the delivery evidence in SUPPORT_MATRIX.md.
+Cython==3.3.0
+Nuitka==4.2.2
+pyinstaller==6.22.3

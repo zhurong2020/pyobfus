@@ -1,5 +1,10 @@
 # pyobfus 当前计划
 
+**2026-10-08 打包组合 lane**：新增独立 `Packaging lane` 与可选工具链测试，Linux CPython 3.12、
+Cython 3.3.0 / Nuitka 4.2.2 module / PyInstaller 6.22.3 onefile；检查真实产物行为、私有 mapping 与
+CLI traceback 恢复。本地三项通过；支持矩阵暂标本地验证、等待首次 hosted CI。独立 draft PR 待审核，
+不改版本、不发版；其他平台/多模块组合不作已验证承诺。
+
 **2026-10-07 Core 0.5.32 已发布（同日第二版，维护者批准）**：审核 PR #57 时实测确认一个自 0.5.10 起就存在的
 线上 bug——目录（cross-file）构建里，同模块的装饰器、基类、元类、lambda 默认值或函数体所引用的模块级名字没有跟着
 定义一起改名，产物 import 时直接 NameError；导入名用作函数装饰器同样受影响。根因是两个 transformer 访问后丢弃了
