@@ -1,0 +1,51 @@
+# Real-application lane: obfuscates small framework apps and exercises them.
+#
+# Kept out of ci.yml on purpose: it installs third-party frameworks at pinned
+# versions (integration_tests/frameworks/requirements.txt) and is meant to
+# catch drift in those frameworks as much as regressions here. It runs weekly,
+# on demand, and when the fixtures or this workflow change. The support
+# matrix labels what it covers accordingly ("weekly", not "every push").
+
+name: Framework lane
+
+on:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'integration_tests/frameworks/**'
+      - 'integration_tests/test_framework_*.py'
+      - '.github/workflows/framework-lane.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  fastapi:
+    name: FastAPI + Pydantic v2 (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
+
+    - name: Set up Python
+      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5 (pinned 2026-05-09)
+      with:
+        python-version: '3.12'
+        cache: 'pip'
+
+    - name: Install pyobfus and the pinned framework stack
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ./pyobfus_runtime
+        pip install -e ".[dev]"
+        pip install -r integration_tests/frameworks/requirements.txt
+
+    - name: Run the framework tests
+      run: pytest integration_tests/test_framework_fastapi.py -v --no-cov

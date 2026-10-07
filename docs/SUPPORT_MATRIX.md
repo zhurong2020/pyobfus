@@ -42,12 +42,12 @@ combinations; those platform-specific failures can still reach users first.
 
 ## Framework presets
 
-Every preset is tested for **what it excludes**. No preset is tested by
-obfuscating a real application built on that framework and running it.
+Every preset is tested for **what it excludes**. Only `fastapi` is also
+tested by obfuscating a real application and running it; the others are not.
 
 | Preset | Preset contents | Real app runs after obfuscation | Evidence |
 |---|---|---|---|
-| `fastapi` | tested | advisory-only | `tests/test_framework_presets.py` — HTTP verbs, router paths, docstring retention |
+| `fastapi` | tested | verified once, 2026-10-07 (Linux, Python 3.12); `framework-lane.yml` runs it weekly on Ubuntu and Windows | `tests/test_framework_presets.py` for the preset contents. `integration_tests/test_framework_fastapi.py`: a three-module FastAPI 0.142.2 + Pydantic 2.13.5 app built as a directory with `--preset fastapi`; 7 HTTP scenarios (including 422 validation errors) answer identically to the original, the mapping stays out of the build, and a traceback from the build unmaps. One small app, pinned versions; becomes **tested** once the weekly lane has a green record |
 | `django` | tested | advisory-only | same file — ORM surface, migrations, entry points, signal receivers |
 | `flask` | tested | advisory-only | same file — dispatch methods |
 | `pydantic` | tested | advisory-only | same file — v1 and v2 API surface |
