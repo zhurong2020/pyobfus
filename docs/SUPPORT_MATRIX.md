@@ -1,6 +1,6 @@
 # Support matrix
 
-What is actually verified, by what, as of 2026-10-07 (`pyobfus` 0.5.30 /
+What is actually verified, by what, as of 2026-10-07 (`pyobfus` 0.5.32 /
 `pyobfus-mcp` 0.3.12 / `pyobfus-runtime` 0.1.0 / VS Code extension 0.4.3 /
 `pyobfus-action` 1.0.1).
 
@@ -38,7 +38,7 @@ combinations; those platform-specific failures can still reach users first.
 | Build | Renamed | Not renamed | Evidence |
 |---|---|---|---|
 | Single file (or `--no-cross-file`) | Module-level names, method names, local variables, parameters (unless `--preserve-param-names`) | Instance attributes (`self.precision`). Each file is renamed on its own, so imports between modules of one project break in this mode | `tests/`, single-file end-to-end in `integration_tests/` |
-| Directory, default cross-file mode | Module-level classes, functions and variables, consistently in every file, plus the import statements that reference them | Methods, attributes, function-local variables and parameters | `integration_tests/test_cli_end_to_end.py` (multifile); scope observed on 2026-10-07 with 0.5.30, see the [selling guide](guides/protect-python-before-selling.md#what-you-get-measured) |
+| Directory, default cross-file mode | Module-level classes, functions and variables, consistently in every file, plus the import statements that reference them | Methods, attributes, function-local variables and parameters | `integration_tests/test_cli_end_to_end.py` (multifile); `tests/test_crossfile_decorators_bases.py` builds and runs same-module and imported decorators, base classes, metaclasses and lambda references (broken with `NameError` in 0.5.10–0.5.31, fixed in 0.5.32); scope observed on 2026-10-07 with 0.5.30, see the [selling guide](guides/protect-python-before-selling.md#what-you-get-measured) |
 
 ## Framework presets
 
