@@ -4,11 +4,12 @@ What is actually verified, by what, as of 2026-10-07 (`pyobfus` 0.5.32 /
 `pyobfus-mcp` 0.3.12 / `pyobfus-runtime` 0.1.0 / VS Code extension 0.4.3 /
 `pyobfus-action` 1.0.1).
 
-Three labels, used strictly:
+Four labels, used strictly:
 
 | Label | Meaning |
 |---|---|
 | **tested** | An automated check runs it on every push. The cell names that check. |
+| **tested weekly** | An automated check runs it on a schedule and when its own files change, not on every push. The cell names the workflow and a green run. |
 | **verified once** | A human reproduced it on a stated date. It is not re-run automatically, so it can rot. |
 | **advisory-only** | Documented recipe or design intent, no automated or recorded verification. Treat as a starting point, not a guarantee. |
 
@@ -47,7 +48,7 @@ tested by obfuscating a real application and running it; the others are not.
 
 | Preset | Preset contents | Real app runs after obfuscation | Evidence |
 |---|---|---|---|
-| `fastapi` | tested | verified once, 2026-10-07 (Linux, Python 3.12); `framework-lane.yml` runs it weekly on Ubuntu and Windows | `tests/test_framework_presets.py` for the preset contents. `integration_tests/test_framework_fastapi.py`: a three-module FastAPI 0.142.2 + Pydantic 2.13.5 app built as a directory with `--preset fastapi`; 7 HTTP scenarios (including 422 validation errors) answer identically to the original, the mapping stays out of the build, and a traceback from the build unmaps. One small app, pinned versions; becomes **tested** once the weekly lane has a green record |
+| `fastapi` | tested | tested weekly (not every push): `framework-lane.yml` on Ubuntu and Windows, Python 3.12; first green run [`37608069469`](https://github.com/zhurong2020/pyobfus/actions/runs/37608069469) on 2026-10-07 | `tests/test_framework_presets.py` for the preset contents. `integration_tests/test_framework_fastapi.py`: a three-module FastAPI 0.142.2 + Pydantic 2.13.5 app built as a directory with `--preset fastapi`; 7 HTTP scenarios (including 422 validation errors) answer identically to the original, the mapping stays out of the build, and a traceback from the build unmaps. One small app, pinned versions |
 | `django` | tested | advisory-only | same file — ORM surface, migrations, entry points, signal receivers |
 | `flask` | tested | advisory-only | same file — dispatch methods |
 | `pydantic` | tested | advisory-only | same file — v1 and v2 API surface |

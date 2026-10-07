@@ -155,23 +155,27 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 | ~~P0~~ ✅ | **KV 每日备份适配 trial 记录 + 补跑机制**（用户 2026-09-25 列为 P0，当日完成）：`~/scripts/pyobfus_kv_export.sh` 此前只认 license 记录，第一条 `trial:*` 登记会让整轮导出拒绝落盘、许可备份静默停止（上线 5 天 KV 尚无 trial 记录，未实际发生）。已改为按 key 类型校验（`PYOB-*` 查 license_key / `trial:*` 查 email_hash+v / 未知类型只查可解析并 WARN）+ `:`→`__` Windows 安全文件名 + `--selftest` 14 项；调度从 crontab 01:30 挪进 `wsl_daily_backup.sh` 开头（systemd `Persistent` 开机补跑，cron 不补跑致 09-24/25 漏导，已补、与 09-22 逐字节一致）；`check_backup.sh` 加 KV 一节。脚本都在 `~/scripts/`（仓库外，随日备份进 OneDrive），仓内只记状态 | 免发版（仓库外脚本） | — |
 | **P2** | 分发上架队列：awesome-python PR #3352 **2026-09-24 被拒**（理由=采用量，对方留了「adoption grows」再议的门；不争辩、不重开）；awesome-security / awesome-devsecops 门槛同为下载量，**跳过**；队列下一项 **AlternativeTo**（需维护者账号） | 免发版 | 维护者 |
 
-### P0 · 目录构建的改名深度（2026-10-07 实测发现 · 待维护者定方案）
+### P0 · 目录构建的改名深度（2026-10-07 发现 · 第 1 步在 PR #57 返工中）
 
-用 PyPI 0.5.30 跑 `examples/multifile/` 与 FastAPI 夹具时确认：**对目录的默认构建（cross-file 模式）只改模块级
-名字**（类、函数、模块变量）并同步 import；方法名、实例属性、函数局部变量、参数全部保留原名。单文件 /
-`--no-cross-file` 会改方法、局部变量与参数，但逐个模块构建会打断模块间 import。也就是说**多文件项目目前拿不到
-单文件那样的改名深度**，而这正是多数商业交付用户的场景。
+**问题**：对目录的默认构建（cross-file 模式）只改模块级名字（类、函数、模块变量）并同步 import；方法名、实例属性、
+函数局部变量、参数保留原名。单文件模式会改得更深，但逐模块构建会打断模块间 import。公开文档已如实写明当前范围
+（README、产品页、支持矩阵「What gets renamed」、卖前指南）。
 
-- 已做（免发版部分）：README、产品页、支持矩阵「What gets renamed」表、卖前指南都已写明实际范围，不再泛称
-  「project-wide name mangling」。同一轮修了一个相关 bug：目录构建此前**从不删 docstring**（已修，随 0.5.31 发布）。
-- 待定方案（改 Core 行为，需批准；维护者 10-07 定为「后续版本」）：第一步在 cross-file 模式下**改函数局部变量**（只在函数作用域内，
-  跨文件无影响，最安全，收益最大）；第二步参数（与 `--preserve-param-names` 及调用方关键字参数联动，需跨文件
-  调用点分析）；方法名与属性需要类型信息，暂不做。验收：`integration_tests/` 多文件与 FastAPI lane 仍逐字一致。
-- 这条按 GEO 计划 §16「真实转换问题优先于推广」处理，排在下面所有推广项之前。
-- **进展（10-07）**：Codex 已交 draft PR #57；Claude 审核结论为修 2 个必改项（位置键冲突导致 match 嵌套 `as` 生成语法错误、
-  mapping `modules` 段混入 `原名@混淆名`）+ 5 项建议后合并，详见私有 `docs/internal/geo-2026-10/PR57_REVIEW.md`。
-- **分工（10-07 维护者定）**：Codex 在分支 `feat/crossfile-local-names` 实现并开 draft PR，Claude 审核后再合并；
-  不打 tag、不发版。交接说明（含约束、测试清单、文档清单）在 gitignored `docs/internal/geo-2026-10/CODEX_HANDOFF_P0.md`。
+**分工（10-07 维护者定）**：Codex 实现，Claude 审核，维护者批准合并；发版按月度节奏，另需批准。
+
+- [ ] **Codex 返工 PR #57**（分支 `feat/crossfile-local-names`）：先 rebase 到最新 main（#58 动过同一个
+      transformer，冲突时以 #58 的写回逻辑为准，保留 #57 的 `_pyobfus_local_binding` 早退），再处理审核意见：
+      必改 2 项（按源码位置定位改名会冲突，`case [(a as b)]` 生成语法错误；mapping 的 `modules` 段不能混入
+      `原名@混淆名`，改用新增的 `locals` 段）+ 建议 5 项。意见全文：私有 `docs/internal/geo-2026-10/PR57_REVIEW.md`；
+      交接说明：`CODEX_HANDOFF_P0.md`（同目录）。
+- [ ] **Claude 复审 #57**：沿用 10-07 的方法——对抗程序在 3.10/3.12/3.13/3.14 上运行、规划器跑全标准库查崩溃、
+      标准库模块端到端构建比对、两次构建逐字节一致、`--unmap` 恢复局部名；另须逐条核对必改项的回归测试。
+      通过后由维护者决定合并；随 11 月第一周月度版本发布。
+- [ ] **MCP `unmap_stack_trace` 的 mapping 不匹配提示**在 `pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]` 中。
+      与 #57 的 mapping 格式调整一起评估后再发 MCP；每次发 MCP 都要手工更新 Glama 的 Build steps。
+- [ ] **第 2 步：参数改名**（#57 合并之后再设计）。会影响调用方的关键字参数，需要跨文件分析调用点，
+      并与 `--preserve-param-names` 联动。方法名和属性需要类型信息，暂不做。
+- 规则：本条属于「真实转换问题」，优先于下面所有推广项（GEO 计划 §16）。
 
 ### GEO / 外部采用（2026-10-07 登记 · 全部免发版）
 
@@ -185,7 +189,6 @@ JOSS 页改为引用页、两张任务页、Pages sitemap、FastAPI 真实应用
       `/pyobfus/sitemap.xml`；RTD 的 sitemap 对脚本返回 Cloudflare 质询，在 GSC 里看抓取状态。域名根 `robots.txt`
       属个人站仓库，没有改。
 - [ ] **mcp.so 列表文案过时**（「50% cheaper than PyArmor」）：维护者在 mcp.so 看能否更新描述。
-- [ ] **Framework lane 第一次绿灯后**把支持矩阵 fastapi 行从 verified once 改为 tested（weekly）。
 - [ ] **打包组合进 CI**：Nuitka `--module` 目前只是 verified once（Linux 单模块）；PyInstaller 仍 advisory-only。
       有用户反馈打包问题时优先做，否则排在月度版本之后。
 - [ ] **Discussions 置顶一条**指向新的 Show and tell 表单（公开发帖，10-11 之后由维护者发）。
