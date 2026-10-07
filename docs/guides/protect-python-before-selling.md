@@ -100,8 +100,9 @@ What the output looked like is the part to read carefully:
 - **Method names, attributes, function-local variables and parameters keep
   their original names** in directory builds, because renaming them safely
   across files needs type information pyobfus does not have. Single-file
-  builds rename those too, but a single-file build of one module breaks
-  imports from the others.
+  builds also rename method names, locals and parameters (not instance
+  attributes), but building modules one by one breaks the imports between
+  them.
 - In 0.5.30, directory builds also kept docstrings. That is fixed for the
   next release; until then, check your output for docstrings that describe
   your logic.
