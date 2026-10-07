@@ -61,8 +61,6 @@ Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运�
       开票对不上）或 `invoice_creation`（每笔自动发票，可能另收 Invoicing 费，开前看说明）只能走 API；需先在
       Dashboard 建只含 Payment Links 写权限的 restricted key 并存进 Vaultwarden。开票需求 10 个月 1 次，
       等下一次真有人要发票时再做也可以。
-- [ ] **Worker 测试接入 CI**（2026-10-05 登记，可选）：`cloudflare-worker/test/` 5 个文件 34 项目前只能本地
-      `node --test test/<file>.js` 逐个跑，CI 不跑；改 Worker 的 PR 因此没有自动回归。
 - [ ] **开启任何延迟到账付款方式前的检查**（规则，长期有效）：Worker 与 webhook 订阅已支持
       `checkout.session.async_payment_succeeded`，但开 ACH / SEPA / 银行转账等之前先确认 endpoint 仍订阅该事件，
       开后的第一笔按上面「核验新发号流程」走一遍。Stripe 付款方式是账户级配置，会按它动态展示。

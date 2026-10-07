@@ -2,8 +2,12 @@
 
 **2026-10-08 打包组合 lane**：新增独立 `Packaging lane` 与可选工具链测试，Linux CPython 3.12、
 Cython 3.3.0 / Nuitka 4.2.2 module / PyInstaller 6.22.3 onefile；检查真实产物行为、私有 mapping 与
-CLI traceback 恢复。本地三项与首次 [hosted CI](https://github.com/zhurong2020/pyobfus/actions/runs/37690761303) 全通过；支持矩阵升级为该限定范围的 tested。独立 draft PR #60 待审核，
+CLI traceback 恢复。本地三项与首次 [hosted CI](https://github.com/zhurong2020/pyobfus/actions/runs/37690761303) 全通过；支持矩阵升级为该限定范围的 tested。PR #60 经 Claude 交叉审核后于 10-08 合并，
 不改版本、不发版；其他平台/多模块组合不作已验证承诺。
+
+**2026-10-08 Worker 测试接入 CI**：维护者授权推进后续待办；新增独立 `Worker CI`，Node 22 在
+Worker/工作流变更的 PR 与 main push 上运行离线回归，支持手动触发，34 项本地通过。无需生产凭据，
+不部署 Worker，不发 Core/MCP/runtime。PR #59 经 Claude 交叉审核后于 10-08 合并；发版等待维护者通知。
 
 **2026-10-07 Core 0.5.32 已发布（同日第二版，维护者批准）**：审核 PR #57 时实测确认一个自 0.5.10 起就存在的
 线上 bug——目录（cross-file）构建里，同模块的装饰器、基类、元类、lambda 默认值或函数体所引用的模块级名字没有跟着

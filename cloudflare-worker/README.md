@@ -2,6 +2,20 @@
 
 Serverless license verification and Stripe webhook handling for pyobfus Pro.
 
+## Local regression tests
+
+Run the offline regression suite with Node 22:
+
+```bash
+cd cloudflare-worker
+node --test test/*.test.js
+```
+
+The tests use in-memory KV and mocked external services; they do not need
+production credentials. `Worker CI` runs them on pull requests and main pushes
+that change this directory or its workflow, and can also be triggered manually.
+The separate License Endpoint Monitor checks the deployed verification endpoint.
+
 The draft content-membership webhook requires `WP_BASE_URL` to be a public
 HTTPS origin only (for example, `https://www.example.com`): credentials,
 paths, query strings, fragments, localhost, and private/link-local addresses
