@@ -84,7 +84,8 @@ functions you exclude from renaming) instead.
 
 **Upcoming release (not yet published):** default directory builds also rename
 function locals, including closure references, without changing parameters,
-methods or attributes. `safe` and framework presets enable this because function
+methods, attributes or the names of nested functions and classes (Flask app
+factories and Click command groups keep working). `safe` and framework presets enable this because function
 locals are implementation details; reflective functions are conservatively
 skipped. Use `--no-crossfile-local-names` (YAML `crossfile_local_names: false`)
 to retain the published 0.5.32 naming behavior. The measurements below describe the released baseline

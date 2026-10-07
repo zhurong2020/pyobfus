@@ -524,11 +524,11 @@ def test_planning_failure_skips_one_file_and_resets_warning(tmp_path, monkeypatc
     (src / "other.py").write_text("def run():\n    other = 4\n    return other\nprint(run())\n")
     real_plan = orchestrator.plan_locals
 
-    def fail_one(source, config, allocate, module_exports):
+    def fail_one(source, config, allocate, module_exports, filename="<crossfile>"):
         if "value =" in source:
             allocate()  # A failed plan must not consume a name.
             raise ValueError("Cannot resolve lexical scope: run")
-        return real_plan(source, config, allocate, module_exports)
+        return real_plan(source, config, allocate, module_exports, filename)
 
     ob = CrossFileOrchestrator(ObfuscationConfig(max_workers=2))
     monkeypatch.setattr(orchestrator, "plan_locals", fail_one)
@@ -563,3 +563,79 @@ def test_planning_failure_skips_one_file_and_resets_warning(tmp_path, monkeypatc
     assert result.success
     assert result.warnings == []
     assert ob.content_stats["local_files_skipped"] == 0
+
+
+def test_nested_definition_names_stay_observable(tmp_path):
+    # Flask endpoints, Click commands and registries key on __name__.
+    ob, output = build(
+        tmp_path,
+        """import click
+import dataclasses
+REGISTRY = {}
+def register(func):
+    REGISTRY[func.__name__] = func
+    return func
+def create():
+    @register
+    def index():
+        return "home"
+    @click.group()
+    def cli():
+        pass
+    @cli.command()
+    def hello():
+        click.echo("hi")
+    @dataclasses.dataclass
+    class Point:
+        x: int
+    class AppError(Exception):
+        pass
+    rendered = repr(Point(1))
+    return cli, rendered, AppError.__name__
+cli, payload, error = create()
+cli(["hello"], standalone_mode=False)
+print(sorted(REGISTRY), payload.split(".")[-1], error)
+""",
+    )
+    for name in ("def index", "def cli", "def hello", "class Point", "class AppError"):
+        assert name in output
+    assert "rendered" not in output
+    assert "rendered" in ob.local_plans["app"].mappings.values()
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        # Before 3.14 symtable visits a local annotation before its value.
+        "def run():\n    k = 7\n    v: (lambda: 0) = (lambda: k)()\n    return v\nprint(run())\n",
+        "def run():\n    n = 1\n    class C:\n        x: (lambda n: n)(0) = (lambda: n)()\n"
+        "        y: (lambda: n)() = (lambda m=n: m)()\n    return C.x, C.y\nprint(run())\n",
+        "def run():\n    k = 2\n    def f(a: (lambda: k)() = 1, *b: (lambda: k)(), "
+        "c: (lambda: k)() = (lambda: k)(), **d: (lambda: k)()) -> (lambda: k)():\n"
+        "        total = a + c\n        return total\n    return f(), f.__annotations__\n"
+        "print(run())\n",
+    ],
+)
+def test_annotation_scope_tables_follow_cpython_order(tmp_path, source):
+    ob, _ = build(tmp_path, source)
+    assert ob.local_plans["app"].mappings
+
+
+def test_compile_time_error_skips_only_that_file(tmp_path):
+    src = tmp_path / "src"
+    src.mkdir()
+    # ast.parse accepts this file; symtable rejects the late global declaration.
+    (src / "fixture.py").write_text("def broken():\n    x = 1\n    global x\n    return x\n")
+    (src / "app.py").write_text("def run():\n    value = 3\n    return value\nprint(run())\n")
+    ob = CrossFileOrchestrator(ObfuscationConfig(max_workers=1))
+    result = ob.obfuscate(src, tmp_path / "out")
+    assert result.success, result.errors
+    assert len(result.warnings) == 1
+    assert "fixture.py" in result.warnings[0]
+    assert ob.local_plans["fixture"].files_skipped == 1
+    assert list(ob.local_plans["app"].mappings.values()) == ["value"]
+    run = subprocess.run(
+        [sys.executable, str(tmp_path / "out" / "app.py")], capture_output=True, text=True
+    )
+    assert run.returncode == 0, run.stderr
+    assert run.stdout.strip() == "3"

@@ -1,8 +1,9 @@
 # Cross-file function-local names: review evidence
 
-Status: review rework on `feat/crossfile-local-names`, awaiting Claude re-review.
-Rebased onto main `33837b6` (includes the released 0.5.32 / #58 fixes).
-No version change, release, tag, or merge.
+Status: Claude cross review on 2026-10-08 found three further issues, fixed on
+this branch before merge (see "Cross review 2026-10-08" below). Rebased onto main
+after #59/#60; includes the released 0.5.32 / #58 fixes. No version change,
+release or tag.
 
 ## Problem and edition decision
 
@@ -49,8 +50,12 @@ a library/CLI warning; other files continue.
 `--crossfile-local-names` and `--no-crossfile-local-names`, with explicit CLI
 values taking precedence over YAML. All presets, including safe and framework
 presets, inherit true. Function locals are implementation details; parameters,
-method names, attributes and class-body bindings remain unchanged. The FastAPI
-fixture confirms this choice for one pinned application, not all frameworks.
+method names, attributes and class-body bindings remain unchanged. Names of
+functions and classes defined inside functions are preserved as well: their
+`__name__` is observable (Flask app-factory endpoints, Click commands, dataclass
+repr, name-keyed registries); the 2026-10-08 cross review measured both
+frameworks breaking when these were renamed. The FastAPI fixture confirms this
+choice for one pinned application, not all frameworks.
 
 Dunder names, exclusions, `super` and `__class__` stay intact. Lambdas and
 comprehensions retain their own bindings while references to captured function
@@ -120,6 +125,30 @@ including no unmatched-name warnings for known local identifiers.
 `all` intentionally runs A/B/D; Lane C is opt-in/release-time and was not run.
 No artifact was released. Full raw local logs are retained in the ignored
 `docs/internal/geo-2026-10/crossfile-local-names-evidence/` directory.
+
+## Cross review 2026-10-08
+
+- Names of functions/classes defined inside functions were renamed, changing
+  `__name__`: a Flask app factory (`--preset flask`/`safe`) failed `url_for` with
+  `BuildError`, Click commands defined inside a function were not found. Such
+  definition names are now preserved; regression test covers a name-keyed
+  registry, a Click group, dataclass repr and an exception class.
+- Before Python 3.14, CPython's symbol table visits an annotation before the
+  value and creates tables for lambdas in unevaluated function-local annotations;
+  the planner visited value first and skipped those annotations, so same-line
+  lambdas received the wrong scope (`NameError`). Annotations are now traversed
+  in CPython order, unevaluated ones passively (tables consumed, no names
+  recorded); signature annotations follow positional, `*args`, `**kwargs`,
+  keyword-only, return. On 3.14 the shared per-scope `__annotate__` table is
+  reused for later annotations in the same scope.
+- A file that `ast.parse` accepts but `symtable` rejects (for example a late
+  `global`) aborted the whole build with `<crossfile>` as file name. Such
+  `SyntaxError`/`RecursionError` now skip only that file's local renaming, and
+  the warning names the file. A failed plan also restores the reserved-name set.
+
+Verification: core suite, the locals/decorator tests on 3.10/3.13/3.14, planner
+over the whole stdlib on 3.12 (574 files) and 3.14 (610 files) with 0 errors, and
+a six-module stdlib project whose output is identical with locals on and off.
 
 ## Review findings addressed
 

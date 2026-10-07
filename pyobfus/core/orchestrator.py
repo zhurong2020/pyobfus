@@ -392,17 +392,22 @@ class CrossFileOrchestrator:
             for fi in sorted(self.files, key=lambda f: f.relative_path.as_posix()):
                 local_source = fi.path.read_text(encoding="utf-8")
                 counter = self._name_counter
+                reserved = set(self._reserved_names)
                 try:
                     plan = plan_locals(
                         local_source,
                         self.config,
                         self._generate_obfuscated_name,
                         self.global_table.get_module_exports(fi.module_name),
+                        fi.relative_path.as_posix(),
                     )
-                except ValueError as exc:
+                except (ValueError, SyntaxError, RecursionError) as exc:
                     # Discard partial local allocations. The existing module
                     # transformation can still run without a local-name plan.
+                    # SyntaxError covers compile-time checks (for example a late
+                    # `global`) that ast.parse accepts but symtable rejects.
                     self._name_counter = counter
+                    self._reserved_names = reserved
                     plan = LocalPlan(
                         skipped=sum(
                             isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))

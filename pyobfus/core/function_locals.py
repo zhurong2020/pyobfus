@@ -41,9 +41,10 @@ def plan_locals(
     config: ObfuscationConfig,
     allocate: Callable[[], str],
     module_exports: Dict[str, str],
+    filename: str = "<crossfile>",
 ) -> LocalPlan:
     """Allocate in deterministic AST order, without changing module exports."""
-    tree = ast.parse(source)
+    tree = ast.parse(source, filename)
     plan = LocalPlan()
     # Generic annotation scopes vary across 3.12-3.14. Preserve these files
     # until their separate lazy-evaluation scope semantics are supported.
@@ -85,7 +86,7 @@ def plan_locals(
             for n in ast.walk(node)
         ):
             protected.add(node.name)
-    root = symtable.symtable(source, "<crossfile>", "exec")
+    root = symtable.symtable(source, filename, "exec")
     scopes: List[Any] = [root]
     parents: Dict[int, Any] = {}
     nodes: Dict[int, ast.AST] = {}
@@ -128,10 +129,17 @@ def plan_locals(
             return Symbol()
 
     synthetic: List[Any] = []
+    # One shared table per scope holds its variable annotations on 3.14+.
+    variable_annotations: Dict[int, Any] = {}
 
     class Scan(ast.NodeVisitor):
+        # Unevaluated annotations still own symbol tables before Python 3.14.
+        # Passive traversal consumes those tables without recording names.
+        passive = 0
+
         def record(self, node: ast.AST, attr: str, name: str) -> None:
-            references.append((node, attr, name, scopes[-1]))
+            if not self.passive:
+                references.append((node, attr, name, scopes[-1]))
 
         def enter(self, node: ast.AST, name: str, body: Callable[[], Any]) -> None:
             parent = scopes[-1]
@@ -146,6 +154,8 @@ def plan_locals(
                 None,
             )
             if child is None:
+                if self.passive and not isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp)):
+                    return
                 if not isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp)):
                     raise ValueError(f"Cannot resolve lexical scope: {name}")
                 child = ComprehensionScope(parent, node)
@@ -158,7 +168,7 @@ def plan_locals(
             scopes.pop()
 
         def visit_Name(self, node: ast.Name) -> None:
-            if node.id in {"eval", "exec", "locals"}:
+            if node.id in {"eval", "exec", "locals"} and not self.passive:
                 blocked.update(s.get_id() for s in scopes[1:])
             self.record(node, "id", node.id)
 
@@ -174,8 +184,9 @@ def plan_locals(
             name = (
                 node.func.id if isinstance(node.func, ast.Name) else getattr(node.func, "attr", "")
             )
-            if name in {"eval", "exec", "locals"} or (
-                name in {"vars", "dir"} and not node.args and not node.keywords
+            if not self.passive and (
+                name in {"eval", "exec", "locals"}
+                or (name in {"vars", "dir"} and not node.args and not node.keywords)
             ):
                 # Introspection in a child can observe captured outer names.
                 blocked.update(s.get_id() for s in scopes[1:])
@@ -199,14 +210,11 @@ def plan_locals(
                 self.visit(default)
             if future_annotations:
                 return
-            annotations = [
-                a.annotation
-                for a in node.args.posonlyargs + node.args.args + node.args.kwonlyargs
-                if a.annotation is not None
-            ]
-            for arg in (node.args.vararg, node.args.kwarg):
-                if arg is not None and arg.annotation is not None:
-                    annotations.append(arg.annotation)
+            # CPython's symbol-table order: positional, *args, **kwargs,
+            # keyword-only, then return. Same-line lambdas depend on it.
+            args = node.args
+            ordered = args.posonlyargs + args.args + [args.vararg, args.kwarg] + args.kwonlyargs
+            annotations = [a.annotation for a in ordered if a is not None and a.annotation]
             if node.returns is not None:
                 annotations.append(node.returns)
             table = next(
@@ -282,26 +290,38 @@ def plan_locals(
                     self.record(node, f"aliases:{i}", alias.asname or alias.name)
 
         def visit_AnnAssign(self, node: ast.AnnAssign) -> None:
+            # CPython visits target, annotation, then value.
             self.visit(node.target)
+            if not future_annotations:
+                scope = scopes[-1]
+                table = variable_annotations.get(scope.get_id())
+                if table is None:
+                    # The shared table takes the first annotation's line number.
+                    table = next(
+                        (
+                            c
+                            for c in scope.get_children()
+                            if c.get_name() == "__annotate__"
+                            and c.get_lineno() == node.lineno
+                            and c.get_id() not in used
+                        ),
+                        None,
+                    )
+                    if table is not None:
+                        used.add(table.get_id())
+                        variable_annotations[scope.get_id()] = table
+                        parents[table.get_id()] = scope
+                if table is not None:
+                    scopes.append(table)
+                # Function-local variable annotations are never evaluated.
+                unevaluated = str(scope.get_type()) == "function"
+                self.passive += unevaluated
+                self.visit(node.annotation)
+                self.passive -= unevaluated
+                if table is not None:
+                    scopes.pop()
             if node.value is not None:
                 self.visit(node.value)
-            # Function-local variable annotations are never evaluated.
-            if future_annotations or str(scopes[-1].get_type()) == "function":
-                return
-            table = next(
-                (
-                    c
-                    for c in scopes[-1].get_children()
-                    if c.get_name() == "__annotate__" and c.get_lineno() == node.lineno
-                ),
-                None,
-            )
-            if table is not None:
-                parents[table.get_id()] = scopes[-1]
-                scopes.append(table)
-            self.visit(node.annotation)
-            if table is not None:
-                scopes.pop()
 
         def visit_ExceptHandler(self, node: ast.ExceptHandler) -> None:
             if node.name:
@@ -346,12 +366,19 @@ def plan_locals(
     collect(root)
     tables.update({s.get_id(): s for s in synthetic})
     bindings = set()
+    # Nested def/class names are observable through __name__/__qualname__:
+    # Flask endpoints, Click commands and name-keyed registries depend on them.
+    definitions = set()
     for ref_node, attr, ref_name, scope in references:
         binding = owner(scope, ref_name)
         if binding is not None and (
             attr != "id" or isinstance(getattr(ref_node, "ctx", None), (ast.Store, ast.Del))
         ):
             bindings.add((binding.get_id(), ref_name))
+            if attr == "name" and isinstance(
+                ref_node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+            ):
+                definitions.add((binding.get_id(), ref_name))
     for sid, node in nodes.items():
         if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             continue
@@ -363,6 +390,7 @@ def plan_locals(
             name = symbol.get_name()
             if (
                 (sid, name) in bindings
+                and (sid, name) not in definitions
                 and symbol.is_local()
                 and not symbol.is_parameter()
                 and not symbol.is_global()

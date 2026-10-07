@@ -43,7 +43,9 @@ combinations; those platform-specific failures can still reach users first.
 
 The upcoming release defaults `crossfile_local_names` to `true`, including `safe`
 and framework presets. It preserves parameters, class-body bindings, lambda and
-comprehension bindings, dunder names and `exclude_names`, while updating captured
+comprehension bindings, names of functions and classes defined inside functions
+(their `__name__`/`__qualname__` stay observable, e.g. Flask app-factory endpoints
+and Click commands), dunder names and `exclude_names`, while updating captured
 function locals. Direct `locals()`, `eval`, `exec`, zero-argument `vars()` or
 `dir()` cause conservative function/ancestor skips, counted as
 `local_functions_skipped`. Unaliased dotted imports skip their containing scope;

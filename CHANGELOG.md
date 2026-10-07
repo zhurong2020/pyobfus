@@ -11,8 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Community cross-file builds rename function-local bindings with deterministic,
   build-wide unique names, closure-aware references, and private reverse mappings.
-  Parameters, methods, attributes, lambda/comprehension bindings and class bodies
-  remain preserved. Reflection-sensitive functions and their enclosing scopes
+  Parameters, methods, attributes, lambda/comprehension bindings, class bodies
+  and the names of functions/classes defined inside functions remain preserved
+  (their `__name__` drives Flask endpoints, Click commands and name-keyed
+  registries). Reflection-sensitive functions and their enclosing scopes
   are skipped and counted; unaliased dotted imports and generic type parameter
   files are also conservatively skipped. Names required by string/future
   annotations and private class name mangling are preserved. Enabled by default in all presets;
@@ -20,7 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Explicit global declarations follow the module mapping, including inside closures.
   Local reverse mappings use an optional `locals` section in mapping v1;
   `modules` retains its module-level original-to-obfuscated contract. If lexical
-  planning fails, only that file skips local renaming, with a warning and
+  planning fails (including compile-time errors such as a late `global`
+  declaration), only that file skips local renaming, with a warning and
   `local_files_skipped` / `local_functions_skipped` counts. Frame-based reflection
   (`inspect.currentframe().f_locals`, `sys._getframe().f_locals`) is not detected;
   disable local renaming for code that reads locals by their original spelling.
