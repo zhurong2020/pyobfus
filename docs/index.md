@@ -18,12 +18,13 @@ Community is Apache-2.0, has no file or line limits, and requires no trial.
 
 | Task | Go to |
 |---|---|
+| Decide how to protect software you sell | [Protect Python code before selling](guides/protect-python-before-selling.md) |
 | Install and protect a project | [Quick start](#quick-start) |
 | See a minimal before/after transformation | [Canonical README example](https://github.com/zhurong2020/pyobfus#minimal-example) |
 | Find risks before changing code | [`--check` and SARIF](SARIF_CODE_SCANNING.md) |
 | Preview exactly what a build will select | [Structured dry-run and build evidence](VERIFIABLE_BUILD_REPORT.md) |
 | Verify and retain build evidence | [Verifiable build report](VERIFIABLE_BUILD_REPORT.md) and [provenance manifest](PROVENANCE_MANIFEST.md) |
-| Debug an obfuscated production traceback | [README traceback workflow](https://github.com/zhurong2020/pyobfus#how-do-i-debug-an-obfuscated-crash-with-an-ai-assistant) |
+| Debug an obfuscated production traceback | [Debug an obfuscated traceback](guides/debug-obfuscated-python.md) |
 | Package or integrate the result | [PyInstaller](PYINSTALLER_COOKBOOK.md), [compiled packaging](COMPILED_PACKAGING_COOKBOOK.md), or [integration testing](INTEGRATION_TESTING.md) |
 | Choose Community or Pro | [Edition boundary](EDITION_BOUNDARY_POLICY.md) and [comparison overview](COMPARISON.md) |
 

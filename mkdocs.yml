@@ -62,6 +62,9 @@ nav:
     - License activation: LICENSE_ACTIVATION_GUIDE.md
     - Project structure: PROJECT_STRUCTURE.md
     - Community / Pro boundary: EDITION_BOUNDARY_POLICY.md
+  - Guides:
+    - Protect Python before selling: guides/protect-python-before-selling.md
+    - Debug an obfuscated traceback: guides/debug-obfuscated-python.md
   - Compare:
     - Overview: COMPARISON.md
     - vs PyArmor: compare/pyarmor.md
@@ -76,6 +79,7 @@ nav:
   - Cookbooks:
     - Selective opacity config: OPACITY_CONFIG.md
     - PyInstaller: PYINSTALLER_COOKBOOK.md
+    - Nuitka / Cython: COMPILED_PACKAGING_COOKBOOK.md
     - Integration testing: INTEGRATION_TESTING.md
     - Remote-debug hardening (Python 3.14): REMOTE_DEBUG_HARDENING.md
     - Python 3.8 compatibility (historical): PYTHON38_COMPATIBILITY.md
