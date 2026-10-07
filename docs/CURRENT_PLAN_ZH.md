@@ -1,5 +1,18 @@
 # pyobfus 当前计划
 
+**2026-10-07 GEO / 外部采用计划第一轮（免发版；Core 改动留 `[Unreleased]`）**：维护者交来一份外部 GEO 调研方案
+（私有，`docs/internal/geo-2026-10/`），逐条核实后执行。完成：① 主张纠错——编译 cookbook 的 `--remove-output`
+误释与死链修正，并用 PyPI 0.5.30 + Cython 3.3.0 + Nuitka 4.2.2 实测（先混淆则二进制里无原名；字符串字面量照留；
+Nuitka 默认写出含签名与常量的 `.pyi`，须 `--no-pyi-file`），支持矩阵改 verified once；LLM pilot 页前置样本数与
+威胁模型、删竞品断言；`--verify-syntax` / MCP `verified` 写明不是业务测试。② JOSS 页按方案 A 改为引用页，原文
+私有归档。③ 产品页与三处文档的 `pyobfus --unmap trace.txt` 写法实际无效，文档改为 `--trace`，CLI 同时接受位置参数、
+终端无输入时不再挂起。④ `--unmap` 对来自别的构建的 mapping 不再静默——列出未知混淆名并告警（CLI + MCP）。
+⑤ 新增两张任务页（卖前保护、混淆报错诊断）、Pages sitemap 与 workflow 校验、FastAPI + Pydantic v2 真实应用
+lane（7 个 HTTP 场景逐字一致，周跑 + 手动）、Show and tell 表单与案例政策页。⑥ 10-13 前的搜索基线已采
+（12 题 9 题出现 pyobfus 链接；商业交付、PyInstaller、Nuitka 组合三类为空白）。
+**新发现（P0，待维护者定方案）**：目录构建只改模块级名字，方法、属性、局部变量、参数保留原名；同时修了目录构建
+从不删 docstring 的 bug。公开文档已改为如实描述范围。详见 `TODO.md` 两段。
+
 **2026-10-06 周一巡检（静默期第 2 周满，查询于 10-06 13:55 UTC，PyPI 数据截至 10-05）**：仓库与 `origin/main`
 同步，0 open issue/PR，CI / CodeQL / License Endpoint Monitor 全绿。Core 近 7 天安静日中位数 `40`（7 个安静日满一周，
 10-04=26、10-05=40），近 30 天 `31`：首次在完整一周上高于 9 月基线 31，仍只记为苗头，10-25 用 4 周数据判定。MCP 近 7 天
