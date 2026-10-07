@@ -250,8 +250,9 @@ class LocalNameTransformer(ast.NodeTransformer):
             Modified or original FunctionDef node
         """
         # Decorators are evaluated in the enclosing scope, before the body scope.
-        for decorator in node.decorator_list:
-            self.visit(decorator)
+        # Assign the results back: visit_Name returns a new node, so a bare
+        # decorator name would otherwise keep its original spelling.
+        node.decorator_list = [self.visit(d) for d in node.decorator_list]
         self._visit_function_signature(node)
 
         self._local_scopes.append(_function_scope_names(node))
@@ -271,8 +272,9 @@ class LocalNameTransformer(ast.NodeTransformer):
         Returns:
             Modified or original AsyncFunctionDef node
         """
-        for decorator in node.decorator_list:
-            self.visit(decorator)
+        # Assign the results back: visit_Name returns a new node, so a bare
+        # decorator name would otherwise keep its original spelling.
+        node.decorator_list = [self.visit(d) for d in node.decorator_list]
         self._visit_function_signature(node)
 
         self._local_scopes.append(_function_scope_names(node))
@@ -320,11 +322,14 @@ class LocalNameTransformer(ast.NodeTransformer):
             params.add(args.vararg.arg)
         if args.kwarg:
             params.add(args.kwarg.arg)
-        # Defaults are evaluated in the enclosing scope.
-        for default in args.defaults + [d for d in args.kw_defaults if d is not None]:
-            self.visit(default)
+        # Defaults are evaluated in the enclosing scope. Assign results back:
+        # a bare-name default or body would otherwise keep its original name.
+        args.defaults = [self.visit(default) for default in args.defaults]
+        args.kw_defaults = [
+            self.visit(default) if default is not None else None for default in args.kw_defaults
+        ]
         self._local_scopes.append(params)
-        self.visit(node.body)
+        node.body = self.visit(node.body)
         self._local_scopes.pop()
         return node
 
@@ -358,13 +363,12 @@ class LocalNameTransformer(ast.NodeTransformer):
         for stmt in node.body:
             self.visit(stmt)
 
-        # Visit decorators and base classes
-        for decorator in node.decorator_list:
-            self.visit(decorator)
-        for base in node.bases:
-            self.visit(base)
+        # Decorators, bases and class keywords (metaclass=...) are often bare
+        # names; assign the visited nodes back or the renames are lost.
+        node.decorator_list = [self.visit(d) for d in node.decorator_list]
+        node.bases = [self.visit(base) for base in node.bases]
         for keyword in node.keywords:
-            self.visit(keyword.value)
+            keyword.value = self.visit(keyword.value)
 
         return node
 
