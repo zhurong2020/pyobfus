@@ -1,5 +1,12 @@
 # pyobfus 当前计划
 
+**2026-10-08 P0 目录构建局部变量改名合并（PR #57）**：维护者授权依次推进后续任务、直接修改并合并；发版等待另行通知。
+Claude 交叉审核（私有 `docs/internal/geo-2026-10/CROSS_REVIEW_2026-10-08.md`）确认原 2 必改 + 5 建议已落实，另发现并当场修复
+3 项：函数内定义的函数/类名被改导致 Flask 应用工厂 `url_for` 与 Click 命令失效（改为保留这些名字）；3.14 前注解作用域表
+顺序错配导致同行 lambda NameError；symtable 拒绝的文件让整个构建失败（改为仅该文件跳过并在警告中给出文件名）。
+四测试根、quality、3.10/3.13/3.14 关键测试、全 stdlib 规划 0 错误、FastAPI lane 与 dogfood 通过后 squash 合并；
+不改版本、不打 tag、不发版。新功能在 `CHANGELOG.md` `[Unreleased]`，随下一次月度版本发布。
+
 **2026-10-08 打包组合 lane**：新增独立 `Packaging lane` 与可选工具链测试，Linux CPython 3.12、
 Cython 3.3.0 / Nuitka 4.2.2 module / PyInstaller 6.22.3 onefile；检查真实产物行为、私有 mapping 与
 CLI traceback 恢复。本地三项与首次 [hosted CI](https://github.com/zhurong2020/pyobfus/actions/runs/37690761303) 全通过；支持矩阵升级为该限定范围的 tested。PR #60 经 Claude 交叉审核后于 10-08 合并，

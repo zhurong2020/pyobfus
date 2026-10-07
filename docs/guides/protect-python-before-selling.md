@@ -82,6 +82,16 @@ functions you exclude from renaming) instead.
 
 ## What you get, measured
 
+**Upcoming release (not yet published):** default directory builds also rename
+function locals, including closure references, without changing parameters,
+methods, attributes or the names of nested functions and classes (Flask app
+factories and Click command groups keep working). `safe` and framework presets enable this because function
+locals are implementation details; reflective functions are conservatively
+skipped. Use `--no-crossfile-local-names` (YAML `crossfile_local_names: false`)
+to retain the published 0.5.32 naming behavior. The measurements below describe the released baseline
+and remain historical evidence, rather than measurements of this new behavior.
+
+
 We ran steps 1–3 on 2026-10-07 with pyobfus 0.5.30 from PyPI (Linux, Python
 3.12) on [`examples/multifile/`](https://github.com/zhurong2020/pyobfus/tree/main/examples/multifile),
 a three-module calculator:

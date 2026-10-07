@@ -72,6 +72,7 @@ class ObfuscationConfig:
         }
     )
     name_prefix: str = "I"
+    crossfile_local_names: bool = True
     remove_docstrings: bool = True
     remove_comments: bool = True
     string_encoding: bool = False

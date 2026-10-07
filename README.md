@@ -83,8 +83,9 @@ you need to restore names from a shipped traceback.
 ## Features at a glance
 
 Community includes name mangling with import rewriting across a project
-(for directories: module-level names; single files also rename methods,
-locals and parameters, see the
+(in the upcoming release, directories also rename function locals; parameters
+and methods remain unchanged there; single files also rename methods and
+parameters, see the
 [guide](https://pyobfus.readthedocs.io/en/latest/guides/protect-python-before-selling/#what-you-get-measured)),
 string and numeric transforms, framework-aware presets, config-aware pre-flight scanning,
 SARIF, structured dry-run, reverse traceback mapping, syntax verification,

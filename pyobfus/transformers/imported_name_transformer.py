@@ -264,6 +264,9 @@ class ImportedNameTransformer(ast.NodeTransformer):
         Returns:
             Modified or original Name node
         """
+        if getattr(node, "_pyobfus_local_binding", False):
+            return node
+
         # Check if this name is in local scope (don't transform)
         for scope in self._scope_stack:
             if node.id in scope:

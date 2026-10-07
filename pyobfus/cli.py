@@ -173,6 +173,11 @@ def _echo_pro_import_hint() -> None:
     help="Compile generated Python in memory after writing; does not import or execute it",
 )
 @click.option(
+    "--crossfile-local-names/--no-crossfile-local-names",
+    default=None,
+    help="Rename function locals in cross-file builds (default: enabled; parameters preserved)",
+)
+@click.option(
     "--cross-file/--no-cross-file",
     default=True,
     help="Enable cross-file import mapping (default: enabled)",
@@ -493,6 +498,7 @@ def main(
     dry_run: bool,
     verify_syntax: bool,
     cross_file: bool,
+    crossfile_local_names: Optional[bool],
     upgrade: bool,
     control_flow: bool,
     string_encryption: bool,
@@ -855,6 +861,8 @@ def main(
         # otherwise every Pro preset silently degrades to community output.
         if level is not None:
             config.level = level
+        if crossfile_local_names is not None:
+            config.crossfile_local_names = crossfile_local_names
         if remove_docstrings is not None:
             config.remove_docstrings = remove_docstrings
         if remove_comments is not None:
@@ -1677,9 +1685,16 @@ def _obfuscate_directory_crossfile(
 
         global_table = orchestrator.phase1_scan(input_dir)
 
+        if orchestrator.planning_warnings:
+            dir_stats["warnings"] = orchestrator.planning_warnings
+            for warning in orchestrator.planning_warnings:
+                click.echo(f"Warning: {warning}", err=True)
+
         stats = orchestrator.get_statistics()
         dir_stats["files_processed"] = stats.get("files_discovered", 0)
-        dir_stats["total_names_obfuscated"] = stats.get("total_exports", 0)
+        dir_stats["total_names_obfuscated"] = stats.get("total_exports", 0) + stats.get(
+            "total_local_names", 0
+        )
 
         click.echo(f"\nDiscovered {stats['files_discovered']} Python file(s)")
         click.echo(f"  Modules: {stats['total_modules']}")

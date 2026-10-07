@@ -74,6 +74,11 @@
           "default": "I",
           "description": "Prefix for obfuscated identifier names."
         },
+        "crossfile_local_names": {
+          "type": "boolean",
+          "default": true,
+          "description": "Rename function local bindings in directory builds (parameters preserved)."
+        },
         "remove_docstrings": {
           "type": "boolean",
           "default": true,

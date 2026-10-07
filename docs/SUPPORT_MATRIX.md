@@ -39,7 +39,26 @@ combinations; those platform-specific failures can still reach users first.
 | Build | Renamed | Not renamed | Evidence |
 |---|---|---|---|
 | Single file (or `--no-cross-file`) | Module-level names, method names, local variables, parameters (unless `--preserve-param-names`) | Instance attributes (`self.precision`). Each file is renamed on its own, so imports between modules of one project break in this mode | `tests/`, single-file end-to-end in `integration_tests/` |
-| Directory, default cross-file mode | Module-level classes, functions and variables, consistently in every file, plus the import statements that reference them | Methods, attributes, function-local variables and parameters | `integration_tests/test_cli_end_to_end.py` (multifile); `tests/test_crossfile_decorators_bases.py` builds and runs same-module and imported decorators, base classes, metaclasses and lambda references (broken with `NameError` in 0.5.10–0.5.31, fixed in 0.5.32); scope observed on 2026-10-07 with 0.5.30, see the [selling guide](guides/protect-python-before-selling.md#what-you-get-measured) |
+| Directory, default cross-file mode | Module-level classes, functions and variables, consistently in every file, plus the import statements that reference them; function locals in the upcoming release | Methods, attributes, parameters; locals in reflection-sensitive functions | `integration_tests/test_cli_end_to_end.py` (multifile); `tests/test_crossfile_decorators_bases.py` covers decorators, base classes, metaclasses and lambdas (fixed in 0.5.32); new local scope tests in `tests/test_crossfile_function_locals.py`; historical 0.5.30 scope observed on 2026-10-07, see the [selling guide](guides/protect-python-before-selling.md#what-you-get-measured) |
+
+The upcoming release defaults `crossfile_local_names` to `true`, including `safe`
+and framework presets. It preserves parameters, class-body bindings, lambda and
+comprehension bindings, names of functions and classes defined inside functions
+(their `__name__`/`__qualname__` stay observable, e.g. Flask app-factory endpoints
+and Click commands), dunder names and `exclude_names`, while updating captured
+function locals. Direct `locals()`, `eval`, `exec`, zero-argument `vars()` or
+`dir()` cause conservative function/ancestor skips, counted as
+`local_functions_skipped`. Unaliased dotted imports skip their containing scope;
+files with generic type parameters currently skip local renaming. Local names
+used in string/future annotations and class names needed for private name
+mangling are preserved. Disable with
+`--no-crossfile-local-names` or YAML `obfuscation.crossfile_local_names: false`
+for the published 0.5.32 transformation behavior. Lexical planning failures skip
+local renaming for that file with a warning and `local_files_skipped` /
+`local_functions_skipped` counts. Frame-based reflection such as
+`inspect.currentframe().f_locals.get("secret_total")` or
+`sys._getframe().f_locals` is not detected: reading by the original name can fail
+after renaming. Disable local renaming for that code. Always run application tests.
 
 ## Framework presets
 

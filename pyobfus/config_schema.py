@@ -41,6 +41,7 @@ _FIELD_DESCRIPTIONS: Dict[str, str] = {
     "exclude_names": "Names to never rename (builtins, imports, Pro "
     "infrastructure, ...). Extends the preset's baseline.",
     "name_prefix": "Prefix for obfuscated identifier names.",
+    "crossfile_local_names": "Rename function local bindings in directory builds (parameters preserved).",
     "remove_docstrings": "Strip docstrings from the output.",
     "remove_comments": "Strip comments from the output.",
     "string_encoding": "Simple Base64 string encoding (Community).",

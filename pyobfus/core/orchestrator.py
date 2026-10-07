@@ -13,6 +13,7 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 from dataclasses import dataclass
 
 from pyobfus.config import ObfuscationConfig
+from pyobfus.core.function_locals import LocalPlan, plan_locals, apply_local_plan
 from pyobfus.core import content_transforms
 from pyobfus.core.global_table import GlobalSymbolTable
 from pyobfus.core.export_detector import ExportDetector, ReExportSource
@@ -39,6 +40,7 @@ def _transform_single_file(
     output_dir: Path,
     global_table: "GlobalSymbolTable",
     config: Optional[ObfuscationConfig] = None,
+    local_plan: Optional[LocalPlan] = None,
 ) -> Tuple[str, Optional[str], Dict[str, int]]:
     """
     Transform a single file using the global symbol table.
@@ -61,6 +63,11 @@ def _transform_single_file(
 
         original_tree = ast.parse(source)
         tree = ast.parse(source)
+        if local_plan is not None:
+            tree = apply_local_plan(tree, local_plan)
+            file_stats["local_names_obfuscated"] = len(local_plan.mappings)
+            file_stats["local_functions_skipped"] = local_plan.skipped
+            file_stats["local_files_skipped"] = local_plan.files_skipped
 
         # Strip AI provenance markers BEFORE name mangling, so the stripper
         # sees the original docstrings and attribution dunder names (matches
@@ -225,6 +232,14 @@ class CrossFileOrchestrator:
         # encoding, numeric, control-flow, string encryption, anti-debug,
         # dead-code, AI-marker stripping). Populated by phase2_transform.
         self.content_stats: Dict[str, int] = {}
+        self.local_plans: Dict[str, LocalPlan] = {}
+        self._reserved_names: Set[str] = set()
+        self._planning_warnings: List[str] = []
+
+    @property
+    def planning_warnings(self) -> List[str]:
+        """Warnings from the most recent scan, including skipped local plans."""
+        return list(self._planning_warnings)
 
     def obfuscate(self, input_dir: Path, output_dir: Path) -> ObfuscationResult:
         """
@@ -243,6 +258,7 @@ class CrossFileOrchestrator:
         try:
             # Phase 1: Scan
             self.phase1_scan(input_dir)
+            warnings.extend(self._planning_warnings)
 
             # Validate global table
             is_valid, validation_errors = self.global_table.validate()
@@ -286,8 +302,27 @@ class CrossFileOrchestrator:
         Returns:
             Populated GlobalSymbolTable
         """
+        # A repeated build on the same orchestrator starts a fresh plan.
+        self.global_table = GlobalSymbolTable()
+        self._name_counter = 0
+        self.local_plans = {}
+        self._planning_warnings = []
+        self._reserved_names = set()
+
         # 1. Discover files
         self.files = self._discover_files(input_dir)
+
+        if self.config.crossfile_local_names:
+            self._reserved_names.update(self.config.exclude_names)
+            # Reserve every source identifier too: a preserved parameter named
+            # I42 must never capture a newly allocated local I42.
+            for fi in self.files:
+                tree = ASTParser.parse_file(fi.path)
+                for node in ast.walk(tree):
+                    for attr in ("id", "arg", "name", "asname", "rest"):
+                        value = getattr(node, attr, None)
+                        if isinstance(value, str):
+                            self._reserved_names.add(value)
 
         # 2. Detect exports once per file, then register in two passes.
         #
@@ -352,6 +387,39 @@ class CrossFileOrchestrator:
                 )
 
         self._register_reexports(pending_reexports)
+
+        if self.config.crossfile_local_names:
+            for fi in sorted(self.files, key=lambda f: f.relative_path.as_posix()):
+                local_source = fi.path.read_text(encoding="utf-8")
+                counter = self._name_counter
+                reserved = set(self._reserved_names)
+                try:
+                    plan = plan_locals(
+                        local_source,
+                        self.config,
+                        self._generate_obfuscated_name,
+                        self.global_table.get_module_exports(fi.module_name),
+                        fi.relative_path.as_posix(),
+                    )
+                except (ValueError, SyntaxError, RecursionError) as exc:
+                    # Discard partial local allocations. The existing module
+                    # transformation can still run without a local-name plan.
+                    # SyntaxError covers compile-time checks (for example a late
+                    # `global`) that ast.parse accepts but symtable rejects.
+                    self._name_counter = counter
+                    self._reserved_names = reserved
+                    plan = LocalPlan(
+                        skipped=sum(
+                            isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
+                            for n in ast.walk(ast.parse(local_source))
+                        ),
+                        files_skipped=1,
+                    )
+                    self._planning_warnings.append(
+                        f"Skipped function-local renaming for {fi.relative_path.as_posix()}: {exc}"
+                    )
+                self.local_plans[fi.module_name] = plan
+                self.global_table.local_mappings[fi.module_name] = plan.mappings
 
         return self.global_table
 
@@ -456,6 +524,7 @@ class CrossFileOrchestrator:
                         output_dir,
                         self.global_table,
                         self.config,
+                        self.local_plans.get(fi.module_name),
                     ): fi
                     for fi in self.files
                 }
@@ -476,6 +545,7 @@ class CrossFileOrchestrator:
                     output_dir,
                     self.global_table,
                     self.config,
+                    self.local_plans.get(file_info.module_name),
                 )
                 self._accumulate_content_stats(file_stats)
                 if error:
@@ -568,7 +638,8 @@ class CrossFileOrchestrator:
             self._name_counter += 1
 
             # Check if name is already used
-            if not self.global_table.is_name_used(name):
+            if not self.global_table.is_name_used(name) and name not in self._reserved_names:
+                self._reserved_names.add(name)
                 return name
 
     def _should_preserve_name(self, name: str) -> bool:
@@ -601,6 +672,7 @@ class CrossFileOrchestrator:
         """
         return {
             "files_discovered": len(self.files),
+            "total_local_names": sum(len(p.mappings) for p in self.local_plans.values()),
             "total_exports": self.global_table.get_statistics()["total_exports"],
             "total_modules": self.global_table.get_statistics()["total_modules"],
         }

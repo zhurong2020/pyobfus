@@ -13,6 +13,8 @@ exclude_docs: |
   internal/
   # Agent-facing history moved out of CLAUDE.md; maintainer-only.
   CLAUDE_MD_HISTORY.md
+  # Implementation/review evidence belongs to maintainers, not the product site.
+  CROSSFILE_LOCAL_NAMES_REVIEW.md
 
 repo_name: zhurong2020/pyobfus
 repo_url: https://github.com/zhurong2020/pyobfus
