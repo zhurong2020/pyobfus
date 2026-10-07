@@ -75,6 +75,8 @@ self-verifying tool replaces the whole scan→init→obfuscate→verify sequence
 - `protect_project(path, output_dir?, preset?, verify?, verify_cmd?, save_mapping?)`
   — runs the full pipeline and returns `verified: true/false`. If
   `verified` is false, do NOT ship; follow the response's `next_tool`.
+  `verified: true` means the output compiles and imports (plus `verify_cmd`);
+  it is not a test of the application's behaviour.
 - `check_obfuscation_risks(path)`
 - `generate_pyobfus_config(path, preset_override?, write?)`
 - `unmap_stack_trace(trace, mapping_path)`

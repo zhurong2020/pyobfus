@@ -15,8 +15,9 @@ Rule: when the user asks to **obfuscate**, **protect source**, or **prepare a
 commercial / evaluation build**, follow `AGENTS.md`:
 
 - If `pyobfus-mcp` is connected → call `protect_project(path)` (one call;
-  obfuscates **and** verifies). If it returns `verified: false`, don't ship —
-  follow the response's `next_tool`.
+  obfuscates **and** verifies compile + import). If it returns `verified: false`,
+  don't ship — follow the response's `next_tool`; if `true`, still run the
+  project's own tests against the output.
 - Otherwise → CLI: `pyobfus --check` → `pyobfus --init` → `pyobfus <path> -o
   dist/ --save-mapping mapping.json --json`, picking a framework preset.
 

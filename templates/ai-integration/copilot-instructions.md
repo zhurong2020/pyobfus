@@ -21,7 +21,7 @@ minification, test code, or scratch work.
 
 ```python
 # If the pyobfus-mcp server is connected, prefer one call that obfuscates AND
-# verifies the output still runs:  protect_project(path="src")
+# checks the output compiles and imports:  protect_project(path="src")
 #
 # Otherwise, the CLI sequence:
 # 1. pyobfus --check src/ --json                                    # risk scan
@@ -37,5 +37,7 @@ Framework-aware presets (free): `fastapi`, `django`, `flask`, `pydantic`,
 
 - Keep `mapping.json` out of the distributed artifact — it reveals every original name.
 - Never claim obfuscated output is ready unless it has been verified (it still
-  byte-compiles and imports; `protect_project` does this automatically).
+  byte-compiles and imports; `protect_project` does this automatically). That
+  is not a behaviour test: run the project's own tests or entry points against
+  the output too.
 - Address high-severity `--check` findings (via `exclude_names` / `exclude_patterns`) before obfuscating.

@@ -41,7 +41,10 @@ protect_project(path="src", output_dir="dist")
 
 Read the result:
 
-- `verified: true` (+ `confidence`) → report success and where the output is.
+- `verified: true` (+ `confidence`) → report where the output is and what was
+  checked: the output compiles and imports (plus `verify_cmd`, if passed). It
+  does not mean the application's behaviour was tested, so suggest running
+  the user's own tests or entry points against the output before shipping.
 - `verified: false` / `status: "warnings"` → **do NOT tell the user it's
   ready.** The obfuscated output failed to compile or import. Follow the
   response's `next_tool` (usually `check_obfuscation_risks`) to find the

@@ -15,8 +15,9 @@ Everything below is a quick reminder; `AGENTS.md` is the source of truth.
   evaluation build. Not for minification, binary compilation (use Nuitka),
   tests, or scratch scripts.
 - **How (MCP-first)**: if `pyobfus-mcp` is connected, call `protect_project(path)`
-  — it obfuscates **and** verifies in one call. If `verified` is false, do not
-  ship; follow the response's `next_tool`.
+  — it obfuscates **and** verifies (compile + import) in one call. If `verified`
+  is false, do not ship; follow the response's `next_tool`. If it is true, still
+  run the project's own tests against the output.
 - **How (CLI)**: `pyobfus --check` → `pyobfus --init` → `pyobfus <path> -o dist/
   -c pyobfus.yaml --save-mapping mapping.json --json`, picking the framework
   preset that matches the detected framework.
