@@ -19,10 +19,12 @@ handles complete projects, keeps generated output portable, and can reverse-map
 protected production tracebacks for developers and AI coding agents. Community
 is Apache-2.0, has no file or line limits, and requires no trial.
 
-> **What's new in v0.5.31:** directory builds now remove docstrings as
-> configured (0.5.30 shipped them), `--unmap` warns when a mapping comes from a
-> different build, and `pyobfus --unmap trace.txt --mapping map.json` works as
-> written. Details in the [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
+> **What's new in v0.5.32:** fixes directory builds that raised `NameError`
+> on import when a module used its own decorator, base class, metaclass, or a
+> lambda referring to a module name (0.5.10 to 0.5.31). If you shipped a
+> directory build, rebuild and rerun your tests. v0.5.31 also removed
+> docstrings from directory builds and added `--unmap` mapping checks; see the
+> [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
 
 ## Why pyobfus
 
