@@ -118,5 +118,12 @@ on top of this pipeline is a reasonable escalation. See
   Windows and multi-module projects were not part of it.
 - The compiled modules returned the same results as the pure-Python originals
   for the example's functions.
-- Status in the [support matrix](SUPPORT_MATRIX.md): **verified once**. It is
-  not re-run in CI.
+- The 2026-10-07 manual measurements above remain historical evidence.
+- The new `packaging-lane.yml` runs `integration_tests/test_packaging.py` with
+  pinned Cython 3.3.0 / Nuitka 4.2.2 on Linux CPython 3.12, weekly on main and
+  on relevant fixture/workflow PRs. Local execution passed on 2026-10-08; the
+  [first hosted run](https://github.com/zhurong2020/pyobfus/actions/runs/37690761303) also passed. The tests hide the generated source, require
+  native-module execution, compare both fixture outcomes and reverse a
+  TypeError traceback via `--unmap --json`. They also check the two original
+  function/class identifiers are absent in these binaries and no `.pyi` is
+  emitted. This scope excludes multi-module and Nuitka standalone/onefile builds.

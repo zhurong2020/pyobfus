@@ -66,8 +66,8 @@ generated output; `--verify-syntax` compiles it, which is weaker than running.
 
 | Combination | Status | Evidence |
 |---|---|---|
-| PyInstaller | advisory-only | [`PYINSTALLER_COOKBOOK.md`](PYINSTALLER_COOKBOOK.md) + `examples/pyinstaller/`; `--check` emits a `compatibility_advisory` for it |
-| Nuitka / Cython compiled packaging | verified once, 2026-10-07 (Linux, single module, Nuitka `--module`) | Manual run of `examples/compiled_packaging/` with pyobfus 0.5.30 from PyPI, Cython 3.3.0, Nuitka 4.2.2: compiled output matched the original's results, no original identifiers in either binary, traceback from the Nuitka module reversed with `--unmap`. Results and limits in [`COMPILED_PACKAGING_COOKBOOK.md`](COMPILED_PACKAGING_COOKBOOK.md); not in CI. Standalone/onefile, macOS and Windows remain advisory-only |
+| PyInstaller | tested (CI, Linux CPython 3.12) | `integration_tests/test_packaging.py`: PyInstaller 6.22.3 `--onefile`, Linux CPython 3.12, stdlib-only pricing CLI; three tiers match the original and a bundled traceback reverses through CLI JSON. `packaging-lane.yml` passed its [first hosted run](https://github.com/zhurong2020/pyobfus/actions/runs/37690761303) on 2026-10-08; it runs weekly and on relevant fixture PRs after merge. Other platforms and third-party projects remain advisory-only; `--check` still emits a `compatibility_advisory` |
+| Nuitka / Cython compiled packaging | tested (CI, Linux CPython 3.12) | `integration_tests/test_packaging.py`: Cython 3.3.0 / Nuitka 4.2.2 `--module`, Linux CPython 3.12, single module. Both native modules execute without their source, match original behavior, omit the fixture's original function/class names, and reverse a compiled traceback through CLI JSON. `packaging-lane.yml` passed its [first hosted run](https://github.com/zhurong2020/pyobfus/actions/runs/37690761303) on 2026-10-08; it runs weekly and on relevant fixture PRs after merge. Historical public-package measurements remain in [`COMPILED_PACKAGING_COOKBOOK.md`](COMPILED_PACKAGING_COOKBOOK.md). Nuitka standalone/onefile, macOS, Windows and multi-module projects remain advisory-only |
 | Import hook — stdlib `importlib` loader | tested | `integration_tests/test_examples.py` — obfuscated module loads through the custom hook; original identifiers never reach the loaded source |
 | Import hook — SOURCEdefender `.pye` encrypted files | advisory-only | [`IMPORT_HOOK_COOKBOOK.md`](IMPORT_HOOK_COOKBOOK.md); the stdlib path above is what CI covers |
 | Model serving | advisory-only | [`MODEL_SERVING_COOKBOOK.md`](MODEL_SERVING_COOKBOOK.md) |
@@ -81,9 +81,9 @@ each obfuscated, run, and compared against the original behavior:
 `simple.py` and `multifile/` via `test_cli_end_to_end.py`; `string_encoding.py`,
 `keyword_arguments.py` (`--preserve-param-names`), `ai_debugging/`, and
 `import_hook/` via `test_examples.py`. The remaining examples
-(`pyinstaller/`, `compiled_packaging/`, Pro) need external toolchains or a
-license and are not run in CI (`compiled_packaging/` has one dated manual
-run, above); they move to tested only when a named CI check executes them.
+(`pyinstaller/`, `compiled_packaging/`) use pinned optional toolchains in the
+separate `packaging-lane.yml` workflow, not the normal integration job. Pro
+examples require a license and are not part of these Community packaging checks.
 
 ## Dependency and SDK ranges
 

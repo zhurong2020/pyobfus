@@ -1,0 +1,43 @@
+name: Packaging lane
+
+on:
+  schedule:
+    - cron: '43 6 * * 1'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'integration_tests/packaging/**'
+      - 'integration_tests/test_packaging.py'
+      - 'examples/compiled_packaging/**'
+      - 'examples/pyinstaller/**'
+      - '.github/workflows/packaging-lane.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'integration_tests/packaging/**'
+      - 'integration_tests/test_packaging.py'
+      - 'examples/compiled_packaging/**'
+      - 'examples/pyinstaller/**'
+      - '.github/workflows/packaging-lane.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  packaging:
+    name: Linux packaging (CPython 3.12)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install local packages and pinned toolchains
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ./pyobfus_runtime -e ".[dev]"
+          pip install -r integration_tests/packaging/requirements.txt
+      - name: Build, execute and reverse-map packaged examples
+        run: pytest integration_tests/test_packaging.py -v --no-cov
