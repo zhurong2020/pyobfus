@@ -160,6 +160,8 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
   跨文件无影响，最安全，收益最大）；第二步参数（与 `--preserve-param-names` 及调用方关键字参数联动，需跨文件
   调用点分析）；方法名与属性需要类型信息，暂不做。验收：`integration_tests/` 多文件与 FastAPI lane 仍逐字一致。
 - 这条按 GEO 计划 §16「真实转换问题优先于推广」处理，排在下面所有推广项之前。
+- **分工（10-07 维护者定）**：Codex 在分支 `feat/crossfile-local-names` 实现并开 draft PR，Claude 审核后再合并；
+  不打 tag、不发版。交接说明（含约束、测试清单、文档清单）在 gitignored `docs/internal/geo-2026-10/CODEX_HANDOFF_P0.md`。
 
 ### GEO / 外部采用（2026-10-07 登记 · 全部免发版）
 

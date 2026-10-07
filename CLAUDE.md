@@ -18,7 +18,8 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 - **10-07**：维护者批准提前发 `0.5.31`（目录构建不删 docstring 属「影响用户的 bug」例外；另带 `--unmap` 位置参数与
   mapping 不匹配告警）。PyPI/PEP 740/GitHub Release/Zenodo `23210576`/CFF 全部核实。MCP 未随发。
-  **P0 待批方案**：目录（cross-file）构建只改模块级名字，下一步改函数局部变量，见 `docs/TODO.md` 首个 P0 段。
+  **P0**：目录（cross-file）构建只改模块级名字，第 1 步改函数局部变量——**Codex 实现（分支
+  `feat/crossfile-local-names`，draft PR）→ Claude 审核**，交接说明 `docs/internal/geo-2026-10/CODEX_HANDOFF_P0.md`。
   GEO 方案私有原件与基线在 gitignored `docs/internal/geo-2026-10/`、`docs/internal/geo-observations/`。
 
 - **内容引流改为定期发（2026-09-27 定）**：10-11 前只写不发，10-13 那周起 DEV 双周一篇、arong.eu.org + 知乎月度、
