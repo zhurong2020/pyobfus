@@ -4,8 +4,10 @@
 Claude 交叉审核（私有 `docs/internal/geo-2026-10/CROSS_REVIEW_2026-10-08.md`）确认原 2 必改 + 5 建议已落实，另发现并当场修复
 3 项：函数内定义的函数/类名被改导致 Flask 应用工厂 `url_for` 与 Click 命令失效（改为保留这些名字）；3.14 前注解作用域表
 顺序错配导致同行 lambda NameError；symtable 拒绝的文件让整个构建失败（改为仅该文件跳过并在警告中给出文件名）。
-四测试根、quality、3.10/3.13/3.14 关键测试、全 stdlib 规划 0 错误、FastAPI lane 与 dogfood 通过后 squash 合并；
-不改版本、不打 tag、不发版。新功能在 `CHANGELOG.md` `[Unreleased]`，随下一次月度版本发布。
+四测试根、quality、3.10/3.13/3.14 关键测试、全 stdlib 规划 0 错误、FastAPI lane 与 dogfood 通过后 squash 合并为 main `81df698`
+（#59 `f65be9a`、#60 `26337d8`），三次合并后 main CI 全绿；不改版本、不打 tag、不发版。新功能在 `CHANGELOG.md` `[Unreleased]`，
+随下一次月度版本发布。审核中发现两个 0.5.32 已有的转换缺陷（类体引用同名方法被改错、单文件模式改嵌套定义名）和四条
+非阻断跟进，已登记在 `docs/TODO.md` P0 段。
 
 **2026-10-08 打包组合 lane**：新增独立 `Packaging lane` 与可选工具链测试，Linux CPython 3.12、
 Cython 3.3.0 / Nuitka 4.2.2 module / PyInstaller 6.22.3 onefile；检查真实产物行为、私有 mapping 与
