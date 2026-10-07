@@ -1,7 +1,7 @@
 # pyobfus DOI / 如何引用 — 可贴内容块（arong.eu.org WordPress + 任何品牌页）
 
 > 用途：往 arong.eu.org（有心工坊 / 嵘说）的 pyobfus 产品页、个人 projects/about 页粘贴。
-> concept DOI = `10.5281/zenodo.20846053`（始终指向最新版本）。来源：`docs/JOSS_REJECTION_20260624.md`。
+> concept DOI = `10.5281/zenodo.20846053`（始终指向最新版本）。来源：`docs/CITATION.md`。
 
 ---
 
