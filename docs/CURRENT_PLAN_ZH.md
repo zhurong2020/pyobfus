@@ -2,7 +2,7 @@
 
 **2026-10-08 打包组合 lane**：新增独立 `Packaging lane` 与可选工具链测试，Linux CPython 3.12、
 Cython 3.3.0 / Nuitka 4.2.2 module / PyInstaller 6.22.3 onefile；检查真实产物行为、私有 mapping 与
-CLI traceback 恢复。本地三项通过；支持矩阵暂标本地验证、等待首次 hosted CI。独立 draft PR 待审核，
+CLI traceback 恢复。本地三项与首次 [hosted CI](https://github.com/zhurong2020/pyobfus/actions/runs/37690761303) 全通过；支持矩阵升级为该限定范围的 tested。独立 draft PR #60 待审核，
 不改版本、不发版；其他平台/多模块组合不作已验证承诺。
 
 **2026-10-07 Core 0.5.32 已发布（同日第二版，维护者批准）**：审核 PR #57 时实测确认一个自 0.5.10 起就存在的
