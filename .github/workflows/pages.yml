@@ -60,6 +60,20 @@ jobs:
         grep -q 'README.zh-CN.md' landing/zh-cn/index.html
         grep -q 'pyobfus#minimal-example' landing/zh-cn/index.html
 
+    # The project sitemap lists exactly the pages in this artifact. The domain
+    # root's robots.txt belongs to another repository, so this file is found
+    # through Search Console rather than a robots.txt Sitemap line.
+    - name: Check the sitemap lists every HTML page and parses
+      run: |
+        python3 -c "import xml.dom.minidom as m; m.parse('landing/sitemap.xml')"
+        # while-read, not for-in: the root page maps to an empty path, which
+        # word splitting would silently drop.
+        (cd landing && find . -name index.html) | sed 's|^\./||; s|index\.html$||' |
+          while IFS= read -r page; do
+            grep -q "<loc>https://zhurong2020.github.io/pyobfus/${page}</loc>" landing/sitemap.xml \
+              || { echo "sitemap.xml is missing /pyobfus/${page}"; exit 1; }
+          done
+
     # llms.txt has one source of truth. RTD ships the checked-in twin while
     # Pages receives the same bytes at deploy time.
     - name: Add the public Agent guide to the Pages artifact

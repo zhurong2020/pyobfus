@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Product pages only. Documentation has its own sitemap on Read the Docs. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://zhurong2020.github.io/pyobfus/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://zhurong2020.github.io/pyobfus/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://zhurong2020.github.io/pyobfus/zh-cn/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://zhurong2020.github.io/pyobfus/"/>
+  </url>
+  <url>
+    <loc>https://zhurong2020.github.io/pyobfus/zh-cn/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://zhurong2020.github.io/pyobfus/"/>
+    <xhtml:link rel="alternate" hreflang="zh-Hans" href="https://zhurong2020.github.io/pyobfus/zh-cn/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://zhurong2020.github.io/pyobfus/"/>
+  </url>
+</urlset>
