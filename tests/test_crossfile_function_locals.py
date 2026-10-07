@@ -399,3 +399,57 @@ def test_reflective_local_shadows_project_import(tmp_path):
     assert result.returncode == 0, result.stderr
     assert result.stdout.strip() == "3"
     assert "answer = 3" in (out / "app.py").read_text()
+
+
+def test_same_line_dict_comprehension_lambda_scopes(tmp_path):
+    build(
+        tmp_path,
+        """def run():
+    value = 3
+    result = {(lambda key: key): (lambda: value) for item in range(1)}
+    return [(key(4), val()) for key, val in result.items()]
+print(run())
+""",
+    )
+
+
+def test_same_line_lambda_default_scope_order(tmp_path):
+    build(
+        tmp_path,
+        """def run():
+    value = 3
+    callback = lambda arg=(lambda: value), *, keyword=(lambda named: named): (arg(), keyword(4))
+    return callback()
+print(run())
+""",
+    )
+
+
+def test_comprehension_attribute_target_reads_outer(tmp_path):
+    build(
+        tmp_path,
+        """def run():
+    class Box:
+        pass
+    obj = Box()
+    result = [obj.value for obj.value in range(3)]
+    return result, obj.value
+print(run())
+""",
+    )
+
+
+def test_skipped_local_project_import_keeps_binding(tmp_path):
+    src = tmp_path / "src"
+    src.mkdir()
+    (src / "helper.py").write_text("def answer():\n    return 9\n")
+    (src / "app.py").write_text(
+        "def run():\n    from helper import answer\n    locals()\n    return answer()\nprint(run())\n"
+    )
+    ob = CrossFileOrchestrator(ObfuscationConfig())
+    out = tmp_path / "out"
+    assert ob.obfuscate(src, out).success
+    result = subprocess.run([sys.executable, str(out / "app.py")], capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == "9"
+    assert "as answer" in (out / "app.py").read_text()

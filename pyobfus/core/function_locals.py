@@ -84,7 +84,10 @@ def plan_locals(
         def __init__(self, parent: Any, node: Any) -> None:
             self.parent = parent
             self.targets = {
-                n.id for g in node.generators for n in ast.walk(g.target) if isinstance(n, ast.Name)
+                n.id
+                for g in node.generators
+                for n in ast.walk(g.target)
+                if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Store)
             }
 
         def get_id(self) -> int:
@@ -211,7 +214,8 @@ def plan_locals(
         visit_ClassDef = definition
 
         def visit_Lambda(self, node: ast.Lambda) -> None:
-            self.visit(node.args)
+            for default in node.args.defaults + [d for d in node.args.kw_defaults if d is not None]:
+                self.visit(default)
             self.enter(node, "lambda", lambda: self.visit(node.body))
 
         def comprehension(self, node: Any) -> None:
@@ -225,8 +229,10 @@ def plan_locals(
                     for cond in gen.ifs:
                         self.visit(cond)
                 if isinstance(node, ast.DictComp):
-                    self.visit(node.key)
+                    # CPython symbol-table traversal visits the value first.
+                    # Same-line lambdas must consume their matching child table.
                     self.visit(node.value)
+                    self.visit(node.key)
                 else:
                     self.visit(node.elt)
 
@@ -362,6 +368,14 @@ def plan_locals(
         local_replacement = (
             names.get(binding.get_id(), {}).get(name) if binding is not None else None
         )
+        if (
+            attr.startswith("aliases:")
+            and binding is not None
+            and str(binding.get_type()) == "function"
+        ):
+            # Internal import rewriting may change the imported symbol spelling.
+            # An explicit alias retains even skipped/excluded local bindings.
+            local_replacement = local_replacement or name
         # Explicit globals must keep their declarations and references in
         # sync with the existing module mapping, even inside nested closures.
         if binding is None and scope is not root:

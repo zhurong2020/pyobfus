@@ -25,7 +25,8 @@ explicit globals share the existing module mapping and declaration.
 Phase 1 reserves source identifiers and configured exclusions before module
 allocation, then allocates locals in sorted file order, deterministic function
 traversal and sorted binding order using the same build-wide allocator. Workers
-receive frozen source-coordinate plans, including protected lexical references
+receive frozen source-coordinate plans, including explicit aliases for preserved
+function-local imports and protected lexical references
 that the existing import/module passes must leave alone. Workers allocate no
 local names. Reusing an orchestrator resets its allocation state.
 
@@ -88,14 +89,14 @@ All roots ran separately with normal HOME (no home-state workaround).
 | Command | Result |
 |---|---|
 | `scripts/check.sh` | all checks passed: Black, Ruff, mypy, metadata, agent twins, README links, strict MkDocs |
-| `venv/bin/pytest tests/` | 1426 passed, 1 skipped, 7 warnings; core coverage 91% |
+| `venv/bin/pytest tests/` | 1430 passed, 1 skipped, 7 warnings; core coverage 91% |
 | `venv/bin/pytest pyobfus_mcp/tests/` | 98 passed |
 | `venv/bin/pytest integration_tests/` | 12 passed, 1 skipped (optional framework stack absent) |
 | `venv/bin/pytest pyobfus_runtime/tests/` | 24 passed |
 | `venv/bin/python scripts/dogfood/run.py all --out /tmp/dogfood` | A/B/D passed; A findings remain observational; D byte-identical under varied environment |
 | Separate venv: `pip install -e ./pyobfus_runtime -e ".[dev]" -r integration_tests/frameworks/requirements.txt`, then `pytest integration_tests/test_framework_fastapi.py --no-cov` | 3/3 passed; 7 HTTP scenarios equal; private mapping and traceback checks passed |
 | `venv/bin/python scripts/generate_vscode_schema.py --check` | schema current |
-| `tests/test_crossfile_function_locals.py --no-cov` | 28 passed on Python 3.10, 3.12, 3.13 and 3.14 |
+| `tests/test_crossfile_function_locals.py --no-cov` | 32 passed on Python 3.10, 3.12, 3.13 and 3.14 |
 
 The 3.10 checks used a separately installed editable environment; supplemental
 3.13/3.14 checks used their interpreters with the local venv's pure Python test
