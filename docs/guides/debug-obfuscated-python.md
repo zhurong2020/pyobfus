@@ -124,7 +124,7 @@ To avoid this:
 1. Read the `id=` in the `# pyobfus:obfuscated` header of the shipped file
    (ask the customer for the first line of the file, or check your release
    archive) and use the mapping whose `marker_id` matches.
-2. From the next pyobfus release, `--unmap` also prints a warning when the
+2. From pyobfus 0.5.31, `--unmap` also prints a warning when the
    trace contains obfuscated names that are missing from the mapping, and
    `--json` lists them in `unmatched_names`. No warning does not prove the
    mapping is right, so the id check is still the reliable one.

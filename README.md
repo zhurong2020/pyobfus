@@ -19,6 +19,11 @@ handles complete projects, keeps generated output portable, and can reverse-map
 protected production tracebacks for developers and AI coding agents. Community
 is Apache-2.0, has no file or line limits, and requires no trial.
 
+> **What's new in v0.5.31:** directory builds now remove docstrings as
+> configured (0.5.30 shipped them), `--unmap` warns when a mapping comes from a
+> different build, and `pyobfus --unmap trace.txt --mapping map.json` works as
+> written. Details in the [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
+
 ## Why pyobfus
 
 | Advantage | What it means in practice |

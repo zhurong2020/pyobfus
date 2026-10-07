@@ -103,9 +103,9 @@ What the output looked like is the part to read carefully:
   builds also rename method names, locals and parameters (not instance
   attributes), but building modules one by one breaks the imports between
   them.
-- In 0.5.30, directory builds also kept docstrings. That is fixed for the
-  next release; until then, check your output for docstrings that describe
-  your logic.
+- In 0.5.30, directory builds also kept function, method and class
+  docstrings. 0.5.31 removes them as configured; on older versions, check your
+  output for docstrings that describe your logic.
 - String literals are kept as written unless you turn on string encoding
   (`string_encoding: true` in a config file; Pro adds AES-256 string
   encryption). Never rely on either to hide secrets.

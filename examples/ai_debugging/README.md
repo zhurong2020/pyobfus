@@ -55,7 +55,7 @@ the `marker_id` field of the mapping that build produced.
 
 If you pass a mapping from another build, the names it does not know are left
 as they are, and the ones it does know may be replaced with the wrong
-originals. From the next release, `--unmap` prints a warning when the trace
+originals. From pyobfus 0.5.31, `--unmap` prints a warning when the trace
 contains obfuscated names that are missing from the mapping:
 
 ```
