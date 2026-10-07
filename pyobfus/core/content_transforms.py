@@ -70,6 +70,28 @@ def strip_ai_markers(
     return tree
 
 
+def remove_docstrings(tree: ast.Module, config: ObfuscationConfig) -> ast.Module:
+    """Drop function, method and class docstrings when ``remove_docstrings`` is set.
+
+    The single-file path does this inside ``NameMangler``; the cross-file path
+    has no ``NameMangler``, so it calls this instead. Module docstrings are
+    kept, matching the single-file behaviour.
+    """
+    if not config.remove_docstrings:
+        return tree
+    for node in ast.walk(tree):
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            continue
+        first = node.body[0] if node.body else None
+        if (
+            isinstance(first, ast.Expr)
+            and isinstance(first.value, ast.Constant)
+            and isinstance(first.value.value, str)
+        ):
+            node.body = node.body[1:] or [ast.Pass()]
+    return tree
+
+
 def apply_content_transforms(
     tree: ast.Module,
     config: ObfuscationConfig,

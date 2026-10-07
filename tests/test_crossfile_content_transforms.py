@@ -357,3 +357,52 @@ class TestRuntimeAnnotationsFollowRenamedClasses:
         lines = [json.loads(line) for line in proc.stdout.splitlines()]
         assert {"item": "models", "return": "service"} in lines
         assert {"Record": "models", "return": "models"} in lines
+
+
+def _docstring_project(tmp_path):
+    src = tmp_path / "src"
+    src.mkdir()
+    (src / "shapes.py").write_text(
+        '"""Module docstring stays, as in single-file mode."""\n'
+        "class Square:\n"
+        '    """SECRET_CLASS_DOC"""\n'
+        "    def area(self, side):\n"
+        '        """SECRET_METHOD_DOC"""\n'
+        "        return side * side\n"
+        "async def later():\n"
+        '    """SECRET_ASYNC_DOC"""\n'
+        "def only_doc():\n"
+        '    """SECRET_ONLY_DOC"""\n'
+    )
+    (src / "main.py").write_text(
+        "from shapes import Square, only_doc\n" "print(Square().area(3), only_doc())\n"
+    )
+    return src
+
+
+def test_crossfile_removes_docstrings_by_default(runner, tmp_path):
+    """Directory builds used to keep every docstring despite remove_docstrings=True."""
+    src = _docstring_project(tmp_path)
+    out = tmp_path / "out"
+    result = runner.invoke(main, [str(src), "-o", str(out)])
+    assert result.exit_code == 0, result.output
+
+    shapes = (out / "shapes.py").read_text()
+    for marker in ("SECRET_CLASS_DOC", "SECRET_METHOD_DOC", "SECRET_ASYNC_DOC", "SECRET_ONLY_DOC"):
+        assert marker not in shapes
+    assert "Module docstring stays" in shapes
+    ast.parse(shapes)  # a body left empty became `pass`, not a syntax error
+
+    run = subprocess.run(
+        [sys.executable, "main.py"], cwd=out, capture_output=True, text=True, timeout=60
+    )
+    assert run.returncode == 0, run.stderr
+    assert run.stdout.strip() == "9 None"
+
+
+def test_crossfile_keep_docstrings_flag_is_honoured(runner, tmp_path):
+    src = _docstring_project(tmp_path)
+    out = tmp_path / "out"
+    result = runner.invoke(main, [str(src), "-o", str(out), "--keep-docstrings"])
+    assert result.exit_code == 0, result.output
+    assert "SECRET_METHOD_DOC" in (out / "shapes.py").read_text()

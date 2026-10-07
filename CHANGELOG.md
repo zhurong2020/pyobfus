@@ -50,6 +50,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   on an interactive terminal now exits with a usage hint instead of blocking.
   The affected docs now use the explicit `--trace` form, which works on every
   released version.
+- **Directory builds now remove docstrings, as configured.** Docstring
+  removal lived only in the single-file transformer, so the default
+  cross-file mode for directories kept every function, method and class
+  docstring even though `remove_docstrings` defaults to on. Directory output
+  now matches single-file output: those docstrings are dropped (a body left
+  empty becomes `pass`) and module docstrings are kept. `--keep-docstrings`
+  still keeps them.
 - **`--unmap` warns when the mapping does not fit the trace.** A mapping from
   a different build used to be applied silently, leaving some names mangled
   and replacing others with the wrong originals. The trace is now checked for

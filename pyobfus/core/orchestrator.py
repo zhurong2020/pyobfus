@@ -67,6 +67,7 @@ def _transform_single_file(
         # the single-file transform order).
         if config is not None:
             tree = content_transforms.strip_ai_markers(tree, config, None, file_stats)
+            tree = content_transforms.remove_docstrings(tree, config)
 
         # Collect imported names from original tree
         import_collector = ImportCollector(global_table, module_name)
