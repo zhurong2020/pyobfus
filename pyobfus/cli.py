@@ -1685,6 +1685,11 @@ def _obfuscate_directory_crossfile(
 
         global_table = orchestrator.phase1_scan(input_dir)
 
+        if orchestrator.planning_warnings:
+            dir_stats["warnings"] = orchestrator.planning_warnings
+            for warning in orchestrator.planning_warnings:
+                click.echo(f"Warning: {warning}", err=True)
+
         stats = orchestrator.get_statistics()
         dir_stats["files_processed"] = stats.get("files_discovered", 0)
         dir_stats["total_names_obfuscated"] = stats.get("total_exports", 0) + stats.get(

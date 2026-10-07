@@ -231,6 +231,34 @@ def test_unmap_stack_trace_flags_names_from_another_build(tmp_path: Path) -> Non
     assert "different build" not in clean["ai_hint"]
 
 
+def test_unmap_stack_trace_accepts_local_mapping_section(tmp_path: Path) -> None:
+    from pyobfus.config import ObfuscationConfig
+    from pyobfus.core.mapping import ObfuscationMapping
+    from pyobfus.core.orchestrator import CrossFileOrchestrator
+
+    src = tmp_path / "src"
+    src.mkdir()
+    (src / "calc.py").write_text(
+        "def calculate():\n    result = 3\n    return result\n", encoding="utf-8"
+    )
+    ob = CrossFileOrchestrator(ObfuscationConfig())
+    assert ob.obfuscate(src, tmp_path / "out").success
+    mapping = ObfuscationMapping.from_global_table(ob.global_table)
+    mapping_path = tmp_path / "m.json"
+    mapping.save(mapping_path)
+    local_name = next(iter(mapping.locals["calc"]))
+    function_name = mapping.modules["calc"]["calculate"]
+    trace = f"in {function_name}\n    {local_name} = 3"
+    result = unmap_stack_trace(trace, str(mapping_path))
+    assert result["status"] == "success"
+    assert result["unmapped_trace"] == "in calculate\n    result = 3"
+    assert result["unmatched_names"] == []
+    assert result["mapping_stats"]["original_names"] == 1
+    assert result["mapping_stats"]["unique_obfuscated"] == 2
+    assert result["ai_hint"]
+    assert "next_tool" in result
+
+
 def test_unmap_stack_trace_missing_mapping(tmp_path: Path) -> None:
     nonexistent = tmp_path / "does_not_exist.json"
     result = unmap_stack_trace("foo", str(nonexistent))

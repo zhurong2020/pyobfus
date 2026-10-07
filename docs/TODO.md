@@ -153,7 +153,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 | ~~P0~~ ✅ | **KV 每日备份适配 trial 记录 + 补跑机制**（用户 2026-09-25 列为 P0，当日完成）：`~/scripts/pyobfus_kv_export.sh` 此前只认 license 记录，第一条 `trial:*` 登记会让整轮导出拒绝落盘、许可备份静默停止（上线 5 天 KV 尚无 trial 记录，未实际发生）。已改为按 key 类型校验（`PYOB-*` 查 license_key / `trial:*` 查 email_hash+v / 未知类型只查可解析并 WARN）+ `:`→`__` Windows 安全文件名 + `--selftest` 14 项；调度从 crontab 01:30 挪进 `wsl_daily_backup.sh` 开头（systemd `Persistent` 开机补跑，cron 不补跑致 09-24/25 漏导，已补、与 09-22 逐字节一致）；`check_backup.sh` 加 KV 一节。脚本都在 `~/scripts/`（仓库外，随日备份进 OneDrive），仓内只记状态 | 免发版（仓库外脚本） | — |
 | **P2** | 分发上架队列：awesome-python PR #3352 **2026-09-24 被拒**（理由=采用量，对方留了「adoption grows」再议的门；不争辩、不重开）；awesome-security / awesome-devsecops 门槛同为下载量，**跳过**；队列下一项 **AlternativeTo**（需维护者账号） | 免发版 | 维护者 |
 
-### P0 · 目录构建的改名深度（2026-10-07 发现 · 第 1 步在 PR #57 返工中）
+### P0 · 目录构建的改名深度（2026-10-07 发现 · 第 1 步在 PR #57 返工完成，待复审）
 
 **问题**：对目录的默认构建（cross-file 模式）只改模块级名字（类、函数、模块变量）并同步 import；方法名、实例属性、
 函数局部变量、参数保留原名。单文件模式会改得更深，但逐模块构建会打断模块间 import。公开文档已如实写明当前范围
@@ -161,14 +161,9 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 
 **分工（10-07 维护者定）**：Codex 实现，Claude 审核，维护者批准合并；发版按月度节奏，另需批准。
 
-- [ ] **Codex 返工 PR #57**（分支 `feat/crossfile-local-names`）：先 rebase 到最新 main（#58 动过同一个
-      transformer，冲突时以 #58 的写回逻辑为准，保留 #57 的 `_pyobfus_local_binding` 早退），再处理审核意见：
-      必改 2 项（按源码位置定位改名会冲突，`case [(a as b)]` 生成语法错误；mapping 的 `modules` 段不能混入
-      `原名@混淆名`，改用新增的 `locals` 段）+ 建议 5 项。意见全文：私有 `docs/internal/geo-2026-10/PR57_REVIEW.md`；
-      交接说明：`CODEX_HANDOFF_P0.md`（同目录）。
 - [ ] **Claude 复审 #57**：沿用 10-07 的方法——对抗程序在 3.10/3.12/3.13/3.14 上运行、规划器跑全标准库查崩溃、
       标准库模块端到端构建比对、两次构建逐字节一致、`--unmap` 恢复局部名；另须逐条核对必改项的回归测试。
-      通过后由维护者决定合并；随 11 月第一周月度版本发布。
+      通过后由维护者决定合并；发版等待维护者另行通知（10-08）。
 - [ ] **MCP `unmap_stack_trace` 的 mapping 不匹配提示**在 `pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]` 中。
       与 #57 的 mapping 格式调整一起评估后再发 MCP；每次发 MCP 都要手工更新 Glama 的 Build steps。
 - [ ] **第 2 步：参数改名**（#57 合并之后再设计）。会影响调用方的关键字参数，需要跨文件分析调用点，
@@ -198,11 +193,11 @@ JOSS 页改为引用页、两张任务页、Pages sitemap、FastAPI 真实应用
 
 - 方案源：[`AFFILIATE_PROGRAM_DESIGN.md`](AFFILIATE_PROGRAM_DESIGN.md)；条款草案明确
   `DRAFT — NOT IN EFFECT`，不能当报名页或付款承诺。
-- 当前 Worker 的 `checkout.session.completed` 会直接随机发 licence，尚无 event/session 双幂等、
-  paid/async 分流、refund/dispute 回冲；affiliate 上线前必须先修，避免重复 licence + 重复佣金。
+- Worker 10-05 已上线 paid/async 分流与按 Checkout Session 派生的许可号。Affiliate 上线前仍需补齐
+  event/session 双幂等、refund/dispute 回冲和佣金状态机，避免重复处理与重复佣金。
 - v1 不放 cookie、不建 portal、不上 Stripe Connect/第三方 SaaS；只有真实活跃 affiliate 和人工
   工作量达到设计文档门槛后才升级。三个月无可归因成交就停止，不继续自动化。
-- 这项属于商业分发的明确用户触发，但不打破 10-25 前 Core 静默期；Worker 生产部署仍须单独批准。
+- 这项不需要 Core 发版；实现与部署按维护者授权推进，Worker 生产部署仍须单独批准。
 
 ### ✅ 可验证性主线（2026-09-20 完成，随 0.5.28 发布）
 
@@ -256,7 +251,7 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 发版本身是独立 gate。
 
 - **Core `[Unreleased]` 为空**：上述修复已随 `0.5.31` 发布；同日 `0.5.32` 修复目录构建装饰器/基类/lambda 的
-  NameError（0.5.10 起）。下一版带 P0 目录构建局部变量改名（PR #57，审核意见待 Codex 处理），按月度节奏。
+  NameError（0.5.10 起）。下一版带 P0 目录构建局部变量改名（PR #57，返工完成待 Claude 复审），按月度节奏。
 - **`pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]`**：mcp SDK 2.x 兼容。刻意不随 Core
   发，攒够增量或有人明确要 2.x 时再发（每发一次 MCP 要手工改 Glama Build steps）。
 

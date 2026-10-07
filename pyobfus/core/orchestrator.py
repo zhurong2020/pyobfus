@@ -67,6 +67,7 @@ def _transform_single_file(
             tree = apply_local_plan(tree, local_plan)
             file_stats["local_names_obfuscated"] = len(local_plan.mappings)
             file_stats["local_functions_skipped"] = local_plan.skipped
+            file_stats["local_files_skipped"] = local_plan.files_skipped
 
         # Strip AI provenance markers BEFORE name mangling, so the stripper
         # sees the original docstrings and attribution dunder names (matches
@@ -233,6 +234,12 @@ class CrossFileOrchestrator:
         self.content_stats: Dict[str, int] = {}
         self.local_plans: Dict[str, LocalPlan] = {}
         self._reserved_names: Set[str] = set()
+        self._planning_warnings: List[str] = []
+
+    @property
+    def planning_warnings(self) -> List[str]:
+        """Warnings from the most recent scan, including skipped local plans."""
+        return list(self._planning_warnings)
 
     def obfuscate(self, input_dir: Path, output_dir: Path) -> ObfuscationResult:
         """
@@ -251,6 +258,7 @@ class CrossFileOrchestrator:
         try:
             # Phase 1: Scan
             self.phase1_scan(input_dir)
+            warnings.extend(self._planning_warnings)
 
             # Validate global table
             is_valid, validation_errors = self.global_table.validate()
@@ -298,6 +306,7 @@ class CrossFileOrchestrator:
         self.global_table = GlobalSymbolTable()
         self._name_counter = 0
         self.local_plans = {}
+        self._planning_warnings = []
         self._reserved_names = set()
 
         # 1. Discover files
@@ -381,12 +390,29 @@ class CrossFileOrchestrator:
 
         if self.config.crossfile_local_names:
             for fi in sorted(self.files, key=lambda f: f.relative_path.as_posix()):
-                plan = plan_locals(
-                    fi.path.read_text(encoding="utf-8"),
-                    self.config,
-                    self._generate_obfuscated_name,
-                    self.global_table.get_module_exports(fi.module_name),
-                )
+                local_source = fi.path.read_text(encoding="utf-8")
+                counter = self._name_counter
+                try:
+                    plan = plan_locals(
+                        local_source,
+                        self.config,
+                        self._generate_obfuscated_name,
+                        self.global_table.get_module_exports(fi.module_name),
+                    )
+                except ValueError as exc:
+                    # Discard partial local allocations. The existing module
+                    # transformation can still run without a local-name plan.
+                    self._name_counter = counter
+                    plan = LocalPlan(
+                        skipped=sum(
+                            isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
+                            for n in ast.walk(ast.parse(local_source))
+                        ),
+                        files_skipped=1,
+                    )
+                    self._planning_warnings.append(
+                        f"Skipped function-local renaming for {fi.relative_path.as_posix()}: {exc}"
+                    )
                 self.local_plans[fi.module_name] = plan
                 self.global_table.local_mappings[fi.module_name] = plan.mappings
 

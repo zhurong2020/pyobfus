@@ -1,6 +1,8 @@
 """Behavioral checks for directory local bindings and frozen allocation."""
 
 import ast
+import json
+import inspect
 import subprocess
 import sys
 
@@ -453,3 +455,111 @@ def test_skipped_local_project_import_keeps_binding(tmp_path):
     assert result.returncode == 0, result.stderr
     assert result.stdout.strip() == "9"
     assert "as answer" in (out / "app.py").read_text()
+
+
+@pytest.mark.parametrize(
+    "pattern, subject, result",
+    [
+        ("[(a as b)]", "[3]", "(a, b)"),
+        ('{"k": (c as d)}', '{"k": 4}', "(c, d)"),
+        ("(x) as y", "5", "(x, y)"),
+        ("[((a as b) as c)]", "[6]", "(a, b, c)"),
+    ],
+)
+def test_nested_match_capture_positions(tmp_path, pattern, subject, result):
+    if sys.version_info < (3, 10):
+        pytest.skip("match requires Python 3.10")
+    build(
+        tmp_path,
+        f"def run():\n    match {subject}:\n        case {pattern}:\n"
+        f"            return {result}\nprint(run())\n",
+        workers=2,
+    )
+
+
+def test_local_mapping_preserves_module_contract(tmp_path):
+    ob, _ = build(
+        tmp_path,
+        "def first():\n    result = 3\n    return result\n"
+        "def second():\n    result = 4\n    return result\nprint(first(), second())\n",
+    )
+    mapping = ObfuscationMapping.from_global_table(ob.global_table)
+    payload = json.loads(mapping.to_json())
+    assert payload["version"] == 1
+    assert payload["modules"]["app"] == ob.global_table.get_module_exports("app")
+    assert all("@" not in name for names in payload["modules"].values() for name in names)
+    assert list(payload["locals"]["app"].values()) == ["result", "result"]
+    assert mapping.stats()["original_names"] == 2
+    path = tmp_path / "mapping.json"
+    mapping.save(path)
+    loaded = ObfuscationMapping.load(path)
+    assert loaded.locals == mapping.locals
+    assert loaded.global_map == mapping.global_map
+    merged = ObfuscationMapping.merge([loaded])
+    assert merged.locals == loaded.locals
+    assert merged.global_map == loaded.global_map
+    assert merged.marker_id() == loaded.marker_id()
+    trace = " ".join(loaded.locals["app"])
+    assert loaded.unmap_text(trace) == "result result"
+    assert loaded.unmatched_names(trace) == []
+    # A forward-only file can recover local reverse entries too.
+    payload.pop("global")
+    path.write_text(json.dumps(payload))
+    assert ObfuscationMapping.load(path).global_map == mapping.global_map
+    # Existing v1 files have no locals field.
+    payload.pop("locals")
+    path.write_text(json.dumps(payload))
+    legacy = ObfuscationMapping.load(path)
+    assert legacy.locals == {}
+    assert legacy.modules == mapping.modules
+    assert legacy.reverse(mapping.modules["app"]["first"]) == "first"
+
+
+def test_planning_failure_skips_one_file_and_resets_warning(tmp_path, monkeypatch):
+    from pyobfus.core import orchestrator
+
+    src = tmp_path / "src"
+    src.mkdir()
+    (src / "app.py").write_text("def run():\n    value = 3\n    return value\nprint(run())\n")
+    (src / "other.py").write_text("def run():\n    other = 4\n    return other\nprint(run())\n")
+    real_plan = orchestrator.plan_locals
+
+    def fail_one(source, config, allocate, module_exports):
+        if "value =" in source:
+            allocate()  # A failed plan must not consume a name.
+            raise ValueError("Cannot resolve lexical scope: run")
+        return real_plan(source, config, allocate, module_exports)
+
+    ob = CrossFileOrchestrator(ObfuscationConfig(max_workers=2))
+    monkeypatch.setattr(orchestrator, "plan_locals", fail_one)
+    out = tmp_path / "out"
+    result = ob.obfuscate(src, out)
+    assert result.success, result.errors
+    assert len(result.warnings) == 1
+    assert "app.py" in result.warnings[0]
+    assert "Cannot resolve lexical scope" in result.warnings[0]
+    assert ob.content_stats["local_files_skipped"] == 1
+    assert ob.content_stats["local_functions_skipped"] == 1
+    assert not ob.local_plans["app"].mappings
+    assert list(ob.local_plans["other"].mappings.values()) == ["other"]
+    for filename, expected in [("app.py", "3"), ("other.py", "4")]:
+        run = subprocess.run([sys.executable, str(out / filename)], capture_output=True, text=True)
+        assert run.returncode == 0, run.stderr
+        assert run.stdout.strip() == expected
+    # Click 8.1 (the last version on Python 3.9) mixes stderr by default.
+    runner = (
+        CliRunner(mix_stderr=False)
+        if "mix_stderr" in inspect.signature(CliRunner).parameters
+        else CliRunner()
+    )
+    cli = runner.invoke(main, [str(src), "-o", str(tmp_path / "cli"), "--json"])
+    assert cli.exit_code == 0, cli.output
+    payload = json.loads(cli.stdout)
+    assert "Skipped function-local renaming for app.py" in cli.stderr
+    assert payload["stats"]["local_files_skipped"] == 1
+    assert "app.py" in payload["stats"]["warnings"][0]
+    monkeypatch.setattr(orchestrator, "plan_locals", real_plan)
+    result = ob.obfuscate(src, tmp_path / "retry")
+    assert result.success
+    assert result.warnings == []
+    assert ob.content_stats["local_files_skipped"] == 0

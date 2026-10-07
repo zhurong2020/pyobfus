@@ -87,7 +87,7 @@ function locals, including closure references, without changing parameters,
 methods or attributes. `safe` and framework presets enable this because function
 locals are implementation details; reflective functions are conservatively
 skipped. Use `--no-crossfile-local-names` (YAML `crossfile_local_names: false`)
-to retain 0.5.31 behavior. The measurements below describe the released baseline
+to retain the published 0.5.32 naming behavior. The measurements below describe the released baseline
 and remain historical evidence, rather than measurements of this new behavior.
 
 

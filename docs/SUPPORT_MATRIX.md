@@ -51,7 +51,12 @@ files with generic type parameters currently skip local renaming. Local names
 used in string/future annotations and class names needed for private name
 mangling are preserved. Disable with
 `--no-crossfile-local-names` or YAML `obfuscation.crossfile_local_names: false`
-for the published 0.5.32 transformation behavior. Always run application tests.
+for the published 0.5.32 transformation behavior. Lexical planning failures skip
+local renaming for that file with a warning and `local_files_skipped` /
+`local_functions_skipped` counts. Frame-based reflection such as
+`inspect.currentframe().f_locals.get("secret_total")` or
+`sys._getframe().f_locals` is not detected: reading by the original name can fail
+after renaming. Disable local renaming for that code. Always run application tests.
 
 ## Framework presets
 

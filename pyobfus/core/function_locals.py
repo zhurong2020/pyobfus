@@ -11,13 +11,29 @@ from typing import Callable, Dict, List, Set, Tuple, Any
 
 from pyobfus.config import ObfuscationConfig
 
+# Nested match captures can share a start position; the full span and node
+# type identify the binding across the planner's and worker's parses.
+EditKey = Tuple[int, int, int, int, str, str]
+
+
+def _edit_key(node: ast.AST, attr: str) -> EditKey:
+    return (
+        getattr(node, "lineno", -1),
+        getattr(node, "col_offset", -1),
+        getattr(node, "end_lineno", -1),
+        getattr(node, "end_col_offset", -1),
+        type(node).__name__,
+        attr,
+    )
+
 
 @dataclass
 class LocalPlan:
-    edits: Dict[Tuple[int, int, str], str] = field(default_factory=dict)
+    edits: Dict[EditKey, str] = field(default_factory=dict)
     mappings: Dict[str, str] = field(default_factory=dict)
     protected_references: Set[Tuple[int, int]] = field(default_factory=set)
     skipped: int = 0
+    files_skipped: int = 0
 
 
 def plan_locals(
@@ -381,9 +397,7 @@ def plan_locals(
         if binding is None and scope is not root:
             local_replacement = module_exports.get(name)
         if local_replacement:
-            plan.edits[(getattr(node, "lineno", -1), getattr(node, "col_offset", -1), attr)] = (
-                local_replacement
-            )
+            plan.edits[_edit_key(node, attr)] = local_replacement
     return plan
 
 
@@ -395,16 +409,17 @@ def apply_local_plan(tree: ast.Module, plan: LocalPlan) -> ast.Module:
             # Legacy module/import passes must not rename skipped lexical locals.
             setattr(node, "_pyobfus_local_binding", True)
         for attr in ("id", "name", "asname", "rest"):
-            replacement = plan.edits.get((line, col, attr))
+            replacement = plan.edits.get(_edit_key(node, attr))
             if replacement is not None:
                 setattr(node, attr, replacement)
         if isinstance(node, (ast.Import, ast.ImportFrom)):
             for i, alias in enumerate(node.names):
-                replacement = plan.edits.get((line, col, f"aliases:{i}"))
+                replacement = plan.edits.get(_edit_key(node, f"aliases:{i}"))
                 if replacement is not None:
                     alias.asname = replacement
         if isinstance(node, (ast.Nonlocal, ast.Global)):
             node.names = [
-                plan.edits.get((line, col, f"names:{i}"), name) for i, name in enumerate(node.names)
+                plan.edits.get(_edit_key(node, f"names:{i}"), name)
+                for i, name in enumerate(node.names)
             ]
     return tree

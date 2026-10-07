@@ -21,6 +21,9 @@ File format (version 1):
       "modules": {
         "<module>": {"<original>": "<obfuscated>", ...}
       },
+      "locals": {
+        "<module>": {"<obfuscated>": "<original>", ...}
+      },
       "global": {
         "<obfuscated>": {"module": "<module>", "original": "<original>"},
         ...
@@ -61,6 +64,10 @@ class ObfuscationMapping:
 
     # Reverse: obfuscated -> (module, original)
     global_map: Dict[str, Tuple[str, str]] = field(default_factory=dict)
+
+    # Function locals may repeat original spellings across lexical scopes.
+    # Keep them separate from the module-level forward/export mapping.
+    locals: Dict[str, Dict[str, str]] = field(default_factory=dict)
 
     # ---- construction ------------------------------------------------
 
@@ -104,11 +111,10 @@ class ObfuscationMapping:
                 if obfuscated not in m.global_map:
                     m.global_map[obfuscated] = (module, original)
         for module, locals_map in getattr(global_table, "local_mappings", {}).items():
+            if locals_map:
+                m.locals[module] = dict(locals_map)
             for obfuscated, original in locals_map.items():
                 m.global_map[obfuscated] = (module, original)
-                # Scope-qualified keys retain repeated local names without
-                # changing the v1 mapping schema or reverse lookup.
-                m.modules.setdefault(module, {})[f"{original}@{obfuscated}"] = obfuscated
         return m
 
     @classmethod
@@ -122,6 +128,10 @@ class ObfuscationMapping:
                 merged.modules.setdefault(module, {})
                 for original, obfuscated in module_map.items():
                     merged.modules[module][original] = obfuscated
+                    merged.global_map.setdefault(obfuscated, (module, original))
+            for module, local_map in other.locals.items():
+                merged.locals.setdefault(module, {}).update(local_map)
+                for obfuscated, original in local_map.items():
                     merged.global_map.setdefault(obfuscated, (module, original))
             if not merged.root and other.root:
                 merged.root = other.root
@@ -162,6 +172,7 @@ class ObfuscationMapping:
             "root": self.root,
             "mode": self.mode,
             "modules": self.modules,
+            "locals": self.locals,
             "global": {
                 obf: {"module": mod, "original": orig}
                 for obf, (mod, orig) in self.global_map.items()
@@ -190,6 +201,7 @@ class ObfuscationMapping:
             pyobfus_version=data.get("pyobfus_version", ""),
             created_at=data.get("created_at", ""),
             modules={mod: dict(exports) for mod, exports in data.get("modules", {}).items()},
+            locals={mod: dict(names) for mod, names in data.get("locals", {}).items()},
         )
         for obf, info in data.get("global", {}).items():
             m.global_map[obf] = (info.get("module", ""), info.get("original", ""))
@@ -199,6 +211,10 @@ class ObfuscationMapping:
             for mod, exports in m.modules.items():
                 for original, obfuscated in exports.items():
                     m.global_map.setdefault(obfuscated, (mod, original))
+
+        for mod, names in m.locals.items():
+            for obfuscated, original in names.items():
+                m.global_map.setdefault(obfuscated, (mod, original))
 
         return m
 

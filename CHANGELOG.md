@@ -17,11 +17,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   files are also conservatively skipped. Names required by string/future
   annotations and private class name mangling are preserved. Enabled by default in all presets;
   disable with `--no-crossfile-local-names` or YAML `crossfile_local_names: false`.
-
-### Fixed
-
-- Keep explicit global declarations consistent with module mappings when the new
-  cross-file local-name pass is enabled, including globals inside closures.
+  Explicit global declarations follow the module mapping, including inside closures.
+  Local reverse mappings use an optional `locals` section in mapping v1;
+  `modules` retains its module-level original-to-obfuscated contract. If lexical
+  planning fails, only that file skips local renaming, with a warning and
+  `local_files_skipped` / `local_functions_skipped` counts. Frame-based reflection
+  (`inspect.currentframe().f_locals`, `sys._getframe().f_locals`) is not detected;
+  disable local renaming for code that reads locals by their original spelling.
 
 ## [0.5.32] - 2026-10-07
 
