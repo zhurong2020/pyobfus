@@ -6,6 +6,9 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
+      # Core changes can break compiled/frozen output, not only fixture edits.
+      - 'pyobfus/**'
+      - 'pyproject.toml'
       - 'integration_tests/packaging/**'
       - 'integration_tests/test_packaging.py'
       - 'examples/compiled_packaging/**'
@@ -14,6 +17,9 @@ on:
   push:
     branches: [main]
     paths:
+      # Core changes can break compiled/frozen output, not only fixture edits.
+      - 'pyobfus/**'
+      - 'pyproject.toml'
       - 'integration_tests/packaging/**'
       - 'integration_tests/test_packaging.py'
       - 'examples/compiled_packaging/**'
@@ -29,8 +35,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5 (pinned 2026-05-09)
         with:
           python-version: '3.12'
           cache: pip
