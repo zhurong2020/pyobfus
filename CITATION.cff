@@ -17,7 +17,7 @@ authors:
     given-names: Rong
     orcid: "https://orcid.org/0009-0008-6087-0581"
     affiliation: "Independent Researcher, Shanghai, China"
-version: 0.5.31
+version: 0.5.32
 date-released: "2026-10-07"
 license: Apache-2.0
 repository-code: "https://github.com/zhurong2020/pyobfus"

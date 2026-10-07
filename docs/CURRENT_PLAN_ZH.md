@@ -1,5 +1,14 @@
 # pyobfus 当前计划
 
+**2026-10-07 Core 0.5.32 已发布（同日第二版，维护者批准）**：审核 PR #57 时实测确认一个自 0.5.10 起就存在的
+线上 bug——目录（cross-file）构建里，同模块的装饰器、基类、元类、lambda 默认值或函数体所引用的模块级名字没有跟着
+定义一起改名，产物 import 时直接 NameError；导入名用作函数装饰器同样受影响。根因是两个 transformer 访问后丢弃了
+`visit_Name` 返回的新节点。#58 修复并补回归测试（同模块与导入名、全部位置、构建后实跑比对），合并 `00aa954`。
+验收：四测试根 + FastAPI lane + dogfood、候选 wheel 干净环境实测；发布提交 CI/CodeQL 全绿；tag `v0.5.32` 经 OIDC
+发布、PEP 740 provenance 200；PyPI 全新安装复测；GitHub Release 已建；Zenodo record `23212358`；`CITATION.cff` 已同步。
+今天的唯一一次 CI 失败（10:32 UTC，Python 3.9 的 click 不分开捕获 stderr）已在 `734d613` 修复，之后各 workflow 全绿。
+PR #57（局部变量改名）审核意见在私有 `docs/internal/geo-2026-10/PR57_REVIEW.md`：2 必改 + 5 建议，需 rebase 到最新 main。
+
 **2026-10-07 Core 0.5.31 已发布（维护者当日批准，提前结束静默期）**：理由是静默期例外里的「影响用户的 bug」——
 目录构建自 cross-file 默认化以来从不删 docstring。同版带出 `--unmap` 位置参数与 mapping 不匹配告警、Community
 `community_edition()` 规模限制修正。MCP 不随发（`unmap_stack_trace` 提示留 `[Unreleased]`），P0 目录构建局部变量

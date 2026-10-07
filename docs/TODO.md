@@ -160,6 +160,8 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
   跨文件无影响，最安全，收益最大）；第二步参数（与 `--preserve-param-names` 及调用方关键字参数联动，需跨文件
   调用点分析）；方法名与属性需要类型信息，暂不做。验收：`integration_tests/` 多文件与 FastAPI lane 仍逐字一致。
 - 这条按 GEO 计划 §16「真实转换问题优先于推广」处理，排在下面所有推广项之前。
+- **进展（10-07）**：Codex 已交 draft PR #57；Claude 审核结论为修 2 个必改项（位置键冲突导致 match 嵌套 `as` 生成语法错误、
+  mapping `modules` 段混入 `原名@混淆名`）+ 5 项建议后合并，详见私有 `docs/internal/geo-2026-10/PR57_REVIEW.md`。
 - **分工（10-07 维护者定）**：Codex 在分支 `feat/crossfile-local-names` 实现并开 draft PR，Claude 审核后再合并；
   不打 tag、不发版。交接说明（含约束、测试清单、文档清单）在 gitignored `docs/internal/geo-2026-10/CODEX_HANDOFF_P0.md`。
 
@@ -246,8 +248,8 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 
 发版本身是独立 gate。
 
-- **Core `[Unreleased]` 为空**：上述修复已随 `0.5.31`（10-07，维护者批准提前发版）发布。下一版带 P0
-  目录构建局部变量改名，按月度节奏。
+- **Core `[Unreleased]` 为空**：上述修复已随 `0.5.31` 发布；同日 `0.5.32` 修复目录构建装饰器/基类/lambda 的
+  NameError（0.5.10 起）。下一版带 P0 目录构建局部变量改名（PR #57，审核意见待 Codex 处理），按月度节奏。
 - **`pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]`**：mcp SDK 2.x 兼容。刻意不随 Core
   发，攒够增量或有人明确要 2.x 时再发（每发一次 MCP 要手工改 Glama Build steps）。
 
