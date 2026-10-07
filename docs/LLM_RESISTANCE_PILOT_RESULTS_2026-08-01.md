@@ -6,6 +6,16 @@ report/result out of the gitignored `results/` directory before treating a
 run as evidence. Design and methodology: `docs/LLM_RESISTANCE_BENCHMARK.md`.
 Status/next-step tracking: `docs/POST_V0.4_TODO.md` § P2-18.
 
+> **How to read these numbers.** Five samples, of which only two
+> (`billing_auth`, `price_rules`) are custom logic a model cannot recall from
+> memory. Each sample/condition was attempted once per model. The attacker
+> only reads the obfuscated code: it does not run the artifact and has no
+> mapping file or layer key. A real customer can run your program, which is a
+> different and stronger threat model. "Not recovered" means the model's
+> reimplementation failed the sample's functional tests in that attempt, not
+> that the code cannot be understood. Community name mangling alone (C1) gave
+> no resistance. None of this is a rate, a ranking, or a guarantee.
+
 ## Scope
 
 Two model families, five corpus samples, six conditions (C0-C5) each where
@@ -91,13 +101,13 @@ tested.
 | C5 Pro L3 vault | 0 | — | — | (no eligible samples) |
 
 Identical per-sample pattern to Codex: `price_rules` not recovered at C2,
-C3, or C4 — 0% SRR / 100% resistance at every rung, independently confirmed
-by a second model family.
+C3, or C4 in this attempt, the same result as with the first model family.
 
 ## The headline finding
 
 **Both non-public-knowledge samples, tested against both model families,
-held at every condition from C2 upward — 4-for-4, not a single lucky case:**
+held at every condition tested from C2 upward (4 of 4 sample/model pairs; with
+two custom samples this is an early signal, not a rate):**
 
 | Sample | Codex C2/C3/C4/C5 | Claude C2/C3/C4/C5 |
 |---|---|---|
@@ -117,13 +127,12 @@ consistent with this project's own positioning that Core is not a defense
 against LLM analysis; only L2 encryption and L3 opacity/vault are marketed
 as raising that specific cost.
 
-## Why two model families is enough (decision, 2026-08-01)
+## Why the pilot stopped at two model families (decision, 2026-08-01)
 
 The benchmark design left open whether a third model family was needed
-before treating this as a *credible public* result. Decision: no — Codex
-(OpenAI) and Claude (Anthropic) are, as of this pilot, generally regarded as
-two of the current leading model families for code understanding, and they
-independently agree on every non-public-knowledge sample and condition
+for this pilot. Decision: not for this pilot. Codex (OpenAI) and Claude
+(Anthropic) were two widely used model families for code understanding at the
+time, and they agree on every non-public-knowledge sample and condition
 tested. Adding a third family would strengthen the claim further, but the
 marginal value is lower than the cost of doing so today; revisit if a
 reviewer specifically asks for it during any future publication process.

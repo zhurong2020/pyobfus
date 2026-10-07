@@ -1,6 +1,6 @@
 # Support matrix
 
-What is actually verified, by what, as of 2026-10-02 (`pyobfus` 0.5.30 /
+What is actually verified, by what, as of 2026-10-07 (`pyobfus` 0.5.30 /
 `pyobfus-mcp` 0.3.12 / `pyobfus-runtime` 0.1.0 / VS Code extension 0.4.3 /
 `pyobfus-action` 1.0.1).
 
@@ -59,7 +59,7 @@ generated output; `--verify-syntax` compiles it, which is weaker than running.
 | Combination | Status | Evidence |
 |---|---|---|
 | PyInstaller | advisory-only | [`PYINSTALLER_COOKBOOK.md`](PYINSTALLER_COOKBOOK.md) + `examples/pyinstaller/`; `--check` emits a `compatibility_advisory` for it |
-| Nuitka / Cython compiled packaging | advisory-only | [`COMPILED_PACKAGING_COOKBOOK.md`](COMPILED_PACKAGING_COOKBOOK.md) + `examples/compiled_packaging/` |
+| Nuitka / Cython compiled packaging | verified once, 2026-10-07 (Linux, single module, Nuitka `--module`) | Manual run of `examples/compiled_packaging/` with pyobfus 0.5.30 from PyPI, Cython 3.3.0, Nuitka 4.2.2: compiled output matched the original's results, no original identifiers in either binary, traceback from the Nuitka module reversed with `--unmap`. Results and limits in [`COMPILED_PACKAGING_COOKBOOK.md`](COMPILED_PACKAGING_COOKBOOK.md); not in CI. Standalone/onefile, macOS and Windows remain advisory-only |
 | Import hook — stdlib `importlib` loader | tested | `integration_tests/test_examples.py` — obfuscated module loads through the custom hook; original identifiers never reach the loaded source |
 | Import hook — SOURCEdefender `.pye` encrypted files | advisory-only | [`IMPORT_HOOK_COOKBOOK.md`](IMPORT_HOOK_COOKBOOK.md); the stdlib path above is what CI covers |
 | Model serving | advisory-only | [`MODEL_SERVING_COOKBOOK.md`](MODEL_SERVING_COOKBOOK.md) |
@@ -74,8 +74,8 @@ each obfuscated, run, and compared against the original behavior:
 `keyword_arguments.py` (`--preserve-param-names`), `ai_debugging/`, and
 `import_hook/` via `test_examples.py`. The remaining examples
 (`pyinstaller/`, `compiled_packaging/`, Pro) need external toolchains or a
-license and are still advisory-only; they move up only when a named CI check
-executes them.
+license and are not run in CI (`compiled_packaging/` has one dated manual
+run, above); they move to tested only when a named CI check executes them.
 
 ## Dependency and SDK ranges
 

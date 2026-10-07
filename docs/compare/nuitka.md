@@ -6,14 +6,14 @@ distribution workflow rather than source-to-source transformation.
 
 | Feature | pyobfus | Nuitka |
 |---------|---------|--------|
-| **Output** | `.py` files | Standalone binary |
-| **Distribution** | Requires Python installed | Self-contained |
+| **Output** | `.py` files | Native code: a standalone executable or an extension module (`--module`) |
+| **Distribution** | Requires Python installed | Standalone mode is self-contained; `--module` output still needs a matching Python |
 | **Build time** | No native compilation | Native compilation; measure on your project |
 | **File size** | Transformed source | Standalone distributions include runtime dependencies |
 | **Commercial offering** | $45 one-time Pro | Separate vendor offering; check current quote and terms |
 | **Traceback protection** | RSA-2048-OAEP + AES-256-GCM hybrid, reversible via `pyobfus-unscrub` | Vendor-documented traceback encryption; verify the current edition and key-management design |
 
-## Traceback Protection: Hybrid vs Symmetric-Only
+## Traceback protection: different key management
 
 Both tools ship a feature for the same real problem — a production traceback
 can leak internal file/function/variable names to whoever sees it. Nuitka
@@ -43,12 +43,20 @@ one-way trapdoor.
 - Users shouldn't need Python installed
 - You specifically want a native compiled distribution
 
+## Using both
+
+Nuitka keeps Python-visible names (functions, classes, attributes) in the
+compiled output because the program needs them at runtime. Obfuscating with
+pyobfus first means those are the obfuscated names. A measured run, the
+`.pyi` stub Nuitka writes by default, and the limits are in the
+[compiled packaging cookbook](../COMPILED_PACKAGING_COOKBOOK.md).
+
 > **Want a standalone executable without using Nuitka?**
 > pyobfus pairs with the free, MIT-licensed [PyInstaller](https://pyinstaller.org/)
 > to ship a single-file binary with mangled identifiers — obfuscate first,
 > then bundle. See the [PyInstaller Cookbook](../PYINSTALLER_COOKBOOK.md) for a
-> full worked example, including verification that the original names never
-> reach the compiled binary.
+> full worked example and a check of the bundle for the original names.
+> That combination is advisory-only in the [support matrix](../SUPPORT_MATRIX.md).
 
 ---
 

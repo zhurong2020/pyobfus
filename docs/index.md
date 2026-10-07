@@ -38,6 +38,7 @@ pyobfus src/ -o dist/ --dry-run --json
 
 # Build, keep the private mapping, and verify generated syntax
 pyobfus src/ -o dist/ --save-mapping mapping.json --verify-syntax
+# --verify-syntax only compiles the output; run your own tests against dist/
 ```
 
 When a production traceback arrives:

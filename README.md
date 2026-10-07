@@ -38,6 +38,7 @@ pip install pyobfus
 pyobfus --check src/
 pyobfus src/ -o dist/ --dry-run --json
 pyobfus src/ -o dist/ --save-mapping mapping.json --verify-syntax
+# --verify-syntax only compiles the output; run your own tests against dist/
 
 # Restore names when a production traceback arrives
 pyobfus --unmap --trace error.log --mapping mapping.json

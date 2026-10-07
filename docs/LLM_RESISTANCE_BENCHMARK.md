@@ -14,18 +14,19 @@ recovery at C2/C3/C5 on the non-public-knowledge samples; that is a five-sample
 pilot, not a published rate, and the question stays open until the corpus is
 bigger.
 
-This is the "benchmark-only first cut" the ROADMAP scopes at 2–3 days. It is
-both launch content ("no competitor can credibly quantify resistance *to AI*")
-and the seed for a separate research paper (SPRO / ESORICS / ACSAC or JSS/EMSE +
-an arXiv cs.CR preprint) — distinct from the desk-rejected JOSS software paper.
+This is the "benchmark-only first cut" the ROADMAP scopes at 2–3 days. It
+documents what pyobfus measured about its own output and is the seed for a
+possible research paper; it is not an independent evaluation and makes no
+claim about what other tools have or have not measured.
 
 ---
 
 ## Why this is on-brand and defensible
 
-pyobfus is an **AST-based, AI-native** obfuscator. Competitors market against
-human reverse-engineering and none of them publishes a resistance number
-against an LLM analyst — the research community does, and that literature is
+pyobfus is an **AST-based, AI-native** obfuscator. Commercial obfuscators mostly
+market against human reverse-engineering; as of 2026-08 we had not found one
+that publishes a resistance number against an LLM analyst, while the research
+community does, and that literature is
 where this benchmark has to be honest, because some of it cuts against the
 obvious sales pitch:
 

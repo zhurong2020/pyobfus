@@ -16,7 +16,7 @@ obvious names.
 pyobfus module.py -o obf_module.py --save-mapping module.map.json
 
 # 2. Compile the OBFUSCATED file, not the original.
-pip install cython
+pip install cython setuptools   # cythonize needs setuptools on Python 3.12+
 cythonize -i obf_module.py
 ```
 
@@ -36,10 +36,16 @@ $ grep -c proprietary_transform obf_module.c
 
 ```bash
 pip install nuitka
-python -m nuitka --module obf_module.py
+python -m nuitka --module obf_module.py --no-pyi-file --remove-output
 ```
 
 The obfuscate-first ordering is identical — only the compiler changes.
+`--no-pyi-file` matters: by default Nuitka writes a `.pyi` stub with the
+module's signatures and string constants in plain text next to the `.so`.
+`--remove-output` only deletes the build directory.
+
+String literals such as `API_SECRET` stay readable in either compiled
+module. Measured results and limits are in the cookbook.
 
 ## Reverse a traceback from the compiled module
 
@@ -47,5 +53,5 @@ If the compiled module crashes, its frames reference obfuscated names.
 Reverse them with the saved mapping:
 
 ```bash
-pyobfus --unmap traceback.txt --mapping module.map.json
+pyobfus --unmap --trace traceback.txt --mapping module.map.json
 ```
