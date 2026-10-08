@@ -164,9 +164,10 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 - 第 1 步（函数局部变量）已合并：函数内定义的函数/类名、参数、方法、属性、类体保留原名。交叉审核报告与证据在私有
   `docs/internal/geo-2026-10/CROSS_REVIEW_2026-10-08.md`。随下一次月度版本发布（发版另需批准）。
 - 既有缺陷 A（类体引用同名方法被改成模块级/导入名）：Codex 实现、Claude 审核，10-08 合并 #62 → `0653303`，未发版。
-- [ ] **既有缺陷 B**（已交 Codex，指令见私有 `docs/internal/geo-2026-10/CODEX_HANDOFF_A_B_2026-10-08.md`）：单文件模式
-      （含 `--preset flask`）会改函数内定义的函数/类名，Flask 应用工厂 `url_for` 失效、Click 命令找不到；目录模式已在 #57
-      中修正，单文件模式应采用同一规则。dataclass 字段被改名一事由 Codex 先实测并报告，是否修另定。
+- 既有缺陷 B（单文件模式改函数内定义的函数/类名，Flask 应用工厂与 Click 失效）：Codex 实现、Claude 审核，10-08 合并 #63 → `dc516ab`，未发版。
+- [ ] **既有缺陷 E · 单文件模式改类体注解字段名（优先，0.5.32 已存在）**：`@dataclass class Point: x: int` 后同文件
+      `Point(x=1)` 即 TypeError；`asdict()`/JSON 键与 repr 也变。NamedTuple、TypedDict、pydantic、attrs 同类。目录模式不受影响。
+      已交 Codex，指令见私有 `docs/internal/geo-2026-10/CODEX_HANDOFF_E_2026-10-08.md`。
 - [ ] **既有缺陷 C · 运行时注入的模块级名字**（#62 审核中发现，0.5.32 已存在）：`enum.global_enum` 这类装饰器在运行时
       把成员注入模块命名空间，引用与 `__all__` 被改名，但注入的定义改不了 → NameError（标准库 `calendar.py` 默认构建即如此）。
       当前绕法：把这些名字加入 `exclude_names`。先在 `--check` 里检测 `global_enum` 并给出提示，同时在支持矩阵写明；
