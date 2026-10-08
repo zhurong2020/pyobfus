@@ -6,11 +6,44 @@ like I0, I1, I2, etc.
 """
 
 import ast
-from typing import Dict, Optional, cast
+from typing import Dict, Optional, Set, cast
 
 from pyobfus.config import ObfuscationConfig
 from pyobfus.core.analyzer import SymbolAnalyzer
 from pyobfus.core.transformer import BaseTransformer
+
+
+def _function_nested_definition_names(tree: ast.Module) -> Set[str]:
+    """Collect definitions whose immediate lexical parent is a function.
+
+    Control-flow suites do not introduce scopes. A class body does, so its
+    methods/nested classes remain eligible even if that class is in a function.
+    Definitions inside a method's body are function-local and are preserved.
+    """
+    names: Set[str] = set()
+
+    class Scan(ast.NodeVisitor):
+        scope = "module"
+
+        def definition(self, node, scope: str) -> None:
+            if self.scope == "function":
+                names.add(node.name)
+            previous = self.scope
+            self.scope = scope
+            self.generic_visit(node)
+            self.scope = previous
+
+        def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+            self.definition(node, "function")
+
+        def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+            self.definition(node, "function")
+
+        def visit_ClassDef(self, node: ast.ClassDef) -> None:
+            self.definition(node, "class")
+
+    Scan().visit(tree)
+    return names
 
 
 class NameMangler(BaseTransformer):
@@ -36,6 +69,7 @@ class NameMangler(BaseTransformer):
         # Name mapping: original_name -> obfuscated_name
         self._name_map: Dict[str, str] = {}
         self._counter = 0
+        self._preserved_definition_names: Set[str] = set()
 
     def transform(self, tree: ast.Module) -> ast.Module:
         """
@@ -47,10 +81,15 @@ class NameMangler(BaseTransformer):
         Returns:
             ast.Module: Transformed AST with mangled names
         """
+        # __name__ is observable in Flask endpoints, Click commands and
+        # registries. The mapping is file-wide, so preserve each such spelling
+        # everywhere, including same-named module definitions and references.
+        self._preserved_definition_names = _function_nested_definition_names(tree)
+
         # Build name mapping
         if self.analyzer:
             # Filter out parameter names if preserve_param_names is enabled
-            names_to_obfuscate = self.analyzer.obfuscatable_names
+            names_to_obfuscate = self.analyzer.obfuscatable_names - self._preserved_definition_names
             if self.config.preserve_param_names:
                 names_to_obfuscate = names_to_obfuscate - self.analyzer.parameter_names
 
@@ -67,6 +106,10 @@ class NameMangler(BaseTransformer):
         self._validate_tree(transformed)
 
         return transformed
+
+    def _should_transform_name(self, name: str) -> bool:
+        """Enforce preservation for visits and analyzer-free transforms too."""
+        return name not in self._preserved_definition_names and super()._should_transform_name(name)
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> ast.FunctionDef:
         """Transform function definition."""
@@ -172,9 +215,11 @@ class NameMangler(BaseTransformer):
         Returns:
             str: Obfuscated name (e.g., "I0", "I1", "I2", ...)
         """
-        name = f"{self.config.name_prefix}{self._counter}"
-        self._counter += 1
-        return name
+        while True:
+            name = f"{self.config.name_prefix}{self._counter}"
+            self._counter += 1
+            if name not in self._preserved_definition_names:
+                return name
 
     def _get_mangled_name(self, original_name: str) -> str:
         """

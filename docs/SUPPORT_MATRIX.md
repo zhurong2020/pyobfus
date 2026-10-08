@@ -38,8 +38,21 @@ combinations; those platform-specific failures can still reach users first.
 
 | Build | Renamed | Not renamed | Evidence |
 |---|---|---|---|
-| Single file (or `--no-cross-file`) | Module-level names, method names, local variables, parameters (unless `--preserve-param-names`) | Instance attributes (`self.precision`). Each file is renamed on its own, so imports between modules of one project break in this mode | `tests/`, single-file end-to-end in `integration_tests/` |
+| Single file (or `--no-cross-file`) | Module-level names, method names, local variables, parameters (unless `--preserve-param-names`) | Names of functions/classes defined inside functions (upcoming release); instance attributes (`self.precision`). Each file is renamed on its own, so imports between modules of one project break in this mode | `tests/`, single-file end-to-end in `integration_tests/` |
 | Directory, default cross-file mode | Module-level classes, functions and variables, consistently in every file, plus the import statements that reference them; function locals in the upcoming release | Methods, attributes, parameters; locals in reflection-sensitive functions | `integration_tests/test_cli_end_to_end.py` (multifile); `tests/test_crossfile_decorators_bases.py` covers decorators, base classes, metaclasses and lambdas (fixed in 0.5.32); new local scope tests in `tests/test_crossfile_function_locals.py`; historical 0.5.30 scope observed on 2026-10-07, see the [selling guide](guides/protect-python-before-selling.md#what-you-get-measured) |
+
+Single-file builds preserve the spelling of a function or class whose lexical
+parent is a function (including async functions and methods), even inside
+control-flow suites. A class body starts its own scope: its methods and nested
+classes remain eligible for renaming. Because the single-file map is keyed by
+spelling rather than scope, a protected spelling is preserved throughout that
+file, including same-named module definitions, parameters and attributes.
+Other module definitions, methods and class attributes keep their existing
+renaming policy. This preserves nested definitions' `__name__`, not the full
+`__qualname__` when an enclosing module function or class is renamed. Dataclass
+field names and generated keyword/serialization APIs are not protected by this
+rule; explicitly exclude their names when those APIs must remain stable.
+Evidence: `tests/test_singlefile_nested_definition_names.py`.
 
 The upcoming release defaults `crossfile_local_names` to `true`, including `safe`
 and framework presets. It preserves parameters, class-body bindings, lambda and

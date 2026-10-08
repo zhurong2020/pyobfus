@@ -31,6 +31,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Single-file builds in 0.5.32 renamed functions and classes defined inside
+  functions, changing `__name__` and breaking Flask factory endpoints, Click
+  commands and name-keyed registries. These definition spellings are now
+  preserved in every preset, including async function scopes. The single-file
+  map is file-wide, so same-named definitions/references elsewhere in that file
+  are also preserved. Other module definitions, methods and attributes retain
+  their existing policy. Dataclass fields and enclosing `__qualname__` prefixes
+  are outside this fix; see the support matrix.
+
 - Directory builds in 0.5.32 and earlier could rewrite class-body references
   to already bound methods or attributes as same-named module functions or
   imports, breaking patterns such as `calendar.py`'s
