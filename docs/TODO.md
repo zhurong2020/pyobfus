@@ -163,12 +163,16 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 
 - 第 1 步（函数局部变量）已合并：函数内定义的函数/类名、参数、方法、属性、类体保留原名。交叉审核报告与证据在私有
   `docs/internal/geo-2026-10/CROSS_REVIEW_2026-10-08.md`。随下一次月度版本发布（发版另需批准）。
-- [ ] **既有缺陷 A（优先，0.5.32 已存在，影响用户）**：目录构建中，类体引用与模块级函数同名的方法时被改成模块级的
-      混淆名，例如类里 `def setx` 且模块级也有 `setx`，`property(getx, setx)` 运行时 TypeError；标准库 `calendar.py`
-      就是这种写法。先写最小复现的回归测试，再修 `LocalNameTransformer`/`ExportedNameTransformer` 对类体作用域的判断。
-      属「影响用户的 bug」，可按例外单独发补丁版（需批准）。
-- [ ] **既有缺陷 B**：单文件模式（含 `--preset flask`）会改函数内定义的函数/类名和 dataclass 字段，Flask 应用工厂
-      `url_for` 失效、Click 命令找不到。目录模式已在 #57 中修正，单文件模式应采用同一规则。
+- 既有缺陷 A（类体引用同名方法被改成模块级/导入名）：Codex 实现、Claude 审核，10-08 合并 #62 → `0653303`，未发版。
+- [ ] **既有缺陷 B**（已交 Codex，指令见私有 `docs/internal/geo-2026-10/CODEX_HANDOFF_A_B_2026-10-08.md`）：单文件模式
+      （含 `--preset flask`）会改函数内定义的函数/类名，Flask 应用工厂 `url_for` 失效、Click 命令找不到；目录模式已在 #57
+      中修正，单文件模式应采用同一规则。dataclass 字段被改名一事由 Codex 先实测并报告，是否修另定。
+- [ ] **既有缺陷 C · 运行时注入的模块级名字**（#62 审核中发现，0.5.32 已存在）：`enum.global_enum` 这类装饰器在运行时
+      把成员注入模块命名空间，引用与 `__all__` 被改名，但注入的定义改不了 → NameError（标准库 `calendar.py` 默认构建即如此）。
+      当前绕法：把这些名字加入 `exclude_names`。先在 `--check` 里检测 `global_enum` 并给出提示，同时在支持矩阵写明；
+      是否自动保留另议。
+- [ ] **既有缺陷 D · `global` 重新绑定导入名**（#62 审核中发现，0.5.32 已存在，低优先级）：模块级 `from pkg.util import helper`，
+      函数里 `global helper; helper = ...`；关闭局部改名时产物仍调用原导入（默认开启时正确）。
 - [ ] **MCP `unmap_stack_trace` 的 mapping 不匹配提示**在 `pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]` 中。
       与 #57 的 mapping 格式调整一起评估后再发 MCP；每次发 MCP 都要手工更新 Glama 的 Build steps。
 - [ ] **第 2 步：参数改名**（#57 已合并，可以开始设计）。会影响调用方的关键字参数，需要跨文件分析调用点，
