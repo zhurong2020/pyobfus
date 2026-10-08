@@ -167,6 +167,9 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       含 `/`、`*args`、`**kwargs` 的签名还会静默绑错（关键字落进 `**kwargs`、参数取默认值）。无预设、safe、balanced、aggressive
       都是 `preserve_param_names=False`（框架预设与 library 为 True）。处置方案见设计文档 PR #65「Short-term response to F」：
       推荐默认保留参数名；Claude 建议显式写 false 的配置照旧生效但给警告、`--init` 模板改为 true（待维护者拍板）。
+- [ ] **既有限制 H · 通过模块对象访问属性**（10-08 交叉审核发现，0.5.32 已存在）：目录构建里 `from pkg import core` 后
+      `core.LIMIT`（或 `import pkg.core as engine; engine.scale()`）时属性名没跟着改 → AttributeError。至少在支持矩阵
+      「What gets renamed」写明并在 `--check` 提示；是否改写 `模块.属性` 另议（可与缺陷 G 的导入解析一起看）。
 - [ ] **既有缺陷 C · 运行时注入的模块级名字**（#62 审核中发现，0.5.32 已存在）：`enum.global_enum` 这类装饰器在运行时
       把成员注入模块命名空间，引用与 `__all__` 被改名，但注入的定义改不了 → NameError（标准库 `calendar.py` 默认构建即如此）。
       当前绕法：把这些名字加入 `exclude_names`。先在 `--check` 里检测 `global_enum` 并给出提示，同时在支持矩阵写明；

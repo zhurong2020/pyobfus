@@ -1,9 +1,8 @@
 # Cross-file function-local names: review evidence
 
-Status: Claude cross review on 2026-10-08 found three further issues, fixed on
-this branch before merge (see "Cross review 2026-10-08" below). Rebased onto main
-after #59/#60; includes the released 0.5.32 / #58 fixes. No version change,
-release or tag.
+Status: merged as #57 (`81df698`) and released in pyobfus 0.6.0 on 2026-10-08.
+Claude's cross review on 2026-10-08 found three further issues, fixed before
+merge (see "Cross review 2026-10-08" below).
 
 ## Problem and edition decision
 
