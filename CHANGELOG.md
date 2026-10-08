@@ -31,6 +31,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Single-file builds in 0.5.32 renamed class annotation fields, breaking even
+  same-file dataclass keyword construction and changing repr, `asdict()` and
+  JSON keys. All class-body annotated Name targets are now preserved, covering
+  annotation-driven dataclasses, NamedTuple, TypedDict, pydantic and attrs,
+  including same-file inheritance. The file-wide map preserves these spellings
+  elsewhere too; unrelated renaming and directory mode keep their policy.
+  Unannotated/dynamic fields and class/qualname identity changes remain outside
+  this fix; see the support matrix.
+
 - Single-file builds in 0.5.32 renamed functions and classes defined inside
   functions, changing `__name__` and breaking Flask factory endpoints, Click
   commands and name-keyed registries. These definition spellings are now

@@ -46,6 +46,42 @@ def _function_nested_definition_names(tree: ast.Module) -> Set[str]:
     return names
 
 
+def _class_annotated_field_names(tree: ast.Module) -> Set[str]:
+    """Preserve annotation-driven APIs without a framework allowlist.
+
+    Only Name targets evaluated in a class body qualify. Method-local and
+    module annotations, and Attribute/Subscript targets, keep their policy.
+    Control-flow suites retain their scope; nested classes start a class scope.
+    """
+    names: Set[str] = set()
+
+    class Scan(ast.NodeVisitor):
+        in_class = False
+
+        def scope(self, node: ast.AST, in_class: bool) -> None:
+            previous = self.in_class
+            self.in_class = in_class
+            self.generic_visit(node)
+            self.in_class = previous
+
+        def visit_ClassDef(self, node: ast.ClassDef) -> None:
+            self.scope(node, True)
+
+        def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+            self.scope(node, False)
+
+        def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+            self.scope(node, False)
+
+        def visit_AnnAssign(self, node: ast.AnnAssign) -> None:
+            if self.in_class and isinstance(node.target, ast.Name):
+                names.add(node.target.id)
+            self.generic_visit(node)
+
+    Scan().visit(tree)
+    return names
+
+
 class NameMangler(BaseTransformer):
     """
     Obfuscates names by replacing them with short indexed identifiers.
@@ -69,7 +105,7 @@ class NameMangler(BaseTransformer):
         # Name mapping: original_name -> obfuscated_name
         self._name_map: Dict[str, str] = {}
         self._counter = 0
-        self._preserved_definition_names: Set[str] = set()
+        self._preserved_names: Set[str] = set()
 
     def transform(self, tree: ast.Module) -> ast.Module:
         """
@@ -84,12 +120,15 @@ class NameMangler(BaseTransformer):
         # __name__ is observable in Flask endpoints, Click commands and
         # registries. The mapping is file-wide, so preserve each such spelling
         # everywhere, including same-named module definitions and references.
-        self._preserved_definition_names = _function_nested_definition_names(tree)
+        # Class annotation names also define generated field/serialization APIs.
+        self._preserved_names = _function_nested_definition_names(
+            tree
+        ) | _class_annotated_field_names(tree)
 
         # Build name mapping
         if self.analyzer:
             # Filter out parameter names if preserve_param_names is enabled
-            names_to_obfuscate = self.analyzer.obfuscatable_names - self._preserved_definition_names
+            names_to_obfuscate = self.analyzer.obfuscatable_names - self._preserved_names
             if self.config.preserve_param_names:
                 names_to_obfuscate = names_to_obfuscate - self.analyzer.parameter_names
 
@@ -109,7 +148,7 @@ class NameMangler(BaseTransformer):
 
     def _should_transform_name(self, name: str) -> bool:
         """Enforce preservation for visits and analyzer-free transforms too."""
-        return name not in self._preserved_definition_names and super()._should_transform_name(name)
+        return name not in self._preserved_names and super()._should_transform_name(name)
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> ast.FunctionDef:
         """Transform function definition."""
@@ -218,7 +257,7 @@ class NameMangler(BaseTransformer):
         while True:
             name = f"{self.config.name_prefix}{self._counter}"
             self._counter += 1
-            if name not in self._preserved_definition_names:
+            if name not in self._preserved_names:
                 return name
 
     def _get_mangled_name(self, original_name: str) -> str:
