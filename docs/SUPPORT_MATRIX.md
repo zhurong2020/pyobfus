@@ -1,6 +1,6 @@
 # Support matrix
 
-What is actually verified, by what, as of 2026-10-07 (`pyobfus` 0.5.32 /
+What is actually verified, by what, as of 2026-10-08 (`pyobfus` 0.6.0 /
 `pyobfus-mcp` 0.3.12 / `pyobfus-runtime` 0.1.0 / VS Code extension 0.4.3 /
 `pyobfus-action` 1.0.1).
 
@@ -38,8 +38,8 @@ combinations; those platform-specific failures can still reach users first.
 
 | Build | Renamed | Not renamed | Evidence |
 |---|---|---|---|
-| Single file (or `--no-cross-file`) | Module-level names, method names, local variables, parameters (unless `--preserve-param-names`) | Names of functions/classes defined inside functions and class-body annotated field names (upcoming release); instance attributes (`self.precision`). Each file is renamed on its own, so imports between modules of one project break in this mode | `tests/`, single-file end-to-end in `integration_tests/` |
-| Directory, default cross-file mode | Module-level classes, functions and variables, consistently in every file, plus the import statements that reference them; function locals in the upcoming release | Methods, attributes, parameters; locals in reflection-sensitive functions | `integration_tests/test_cli_end_to_end.py` (multifile); `tests/test_crossfile_decorators_bases.py` covers decorators, base classes, metaclasses and lambdas (fixed in 0.5.32); new local scope tests in `tests/test_crossfile_function_locals.py`; historical 0.5.30 scope observed on 2026-10-07, see the [selling guide](guides/protect-python-before-selling.md#what-you-get-measured) |
+| Single file (or `--no-cross-file`) | Module-level names, method names, local variables, parameters (unless `--preserve-param-names`) | Names of functions/classes defined inside functions and class-body annotated field names (since 0.6.0); instance attributes (`self.precision`). Each file is renamed on its own, so imports between modules of one project break in this mode | `tests/`, single-file end-to-end in `integration_tests/` |
+| Directory, default cross-file mode | Module-level classes, functions and variables, consistently in every file, plus the import statements that reference them; function locals (since 0.6.0) | Methods, attributes, parameters; locals in reflection-sensitive functions | `integration_tests/test_cli_end_to_end.py` (multifile); `tests/test_crossfile_decorators_bases.py` covers decorators, base classes, metaclasses and lambdas (fixed in 0.5.32); new local scope tests in `tests/test_crossfile_function_locals.py`; historical 0.5.30 scope observed on 2026-10-07, see the [selling guide](guides/protect-python-before-selling.md#what-you-get-measured) |
 
 Single-file builds preserve the spelling of a function or class whose lexical
 parent is a function (including async functions and methods), even inside
@@ -69,7 +69,7 @@ preservation rule, except when their spelling matches a preserved field.
 Behavioral field evidence: `tests/test_singlefile_class_fields.py`.
 Evidence: `tests/test_singlefile_nested_definition_names.py`.
 
-The upcoming release defaults `crossfile_local_names` to `true`, including `safe`
+Since 0.6.0, `crossfile_local_names` defaults to `true`, including `safe`
 and framework presets. It preserves parameters, class-body bindings, lambda and
 comprehension bindings, names of functions and classes defined inside functions
 (their `__name__`/`__qualname__` stay observable, e.g. Flask app-factory endpoints
@@ -81,7 +81,7 @@ files with generic type parameters currently skip local renaming. Local names
 used in string/future annotations and class names needed for private name
 mangling are preserved. Disable with
 `--no-crossfile-local-names` or YAML `obfuscation.crossfile_local_names: false`
-for the published 0.5.32 transformation behavior. Lexical planning failures skip
+for the 0.5.32 naming behavior. Lexical planning failures skip
 local renaming for that file with a warning and `local_files_skipped` /
 `local_functions_skipped` counts. Frame-based reflection such as
 `inspect.currentframe().f_locals.get("secret_total")` or

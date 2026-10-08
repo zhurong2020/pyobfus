@@ -19,11 +19,13 @@ handles complete projects, keeps generated output portable, and can reverse-map
 protected production tracebacks for developers and AI coding agents. Community
 is Apache-2.0, has no file or line limits, and requires no trial.
 
-> **What's new in v0.5.32:** fixes directory builds that raised `NameError`
-> on import when a module used its own decorator, base class, metaclass, or a
-> lambda referring to a module name (0.5.10 to 0.5.31). If you shipped a
-> directory build, rebuild and rerun your tests. v0.5.31 also removed
-> docstrings from directory builds and added `--unmap` mapping checks; see the
+> **What's new in v0.6.0:** directory builds now also rename function-local
+> variables (parameters, methods and attributes keep their names; turn it off
+> with `--no-crossfile-local-names`). It also fixes three renaming bugs that
+> 0.5.32 had: dataclass, NamedTuple and pydantic fields renamed in single-file
+> builds, functions and classes defined inside functions renamed (Flask app
+> factories, Click commands), and class bodies that referred to their own
+> methods in directory builds. Rebuild and rerun your tests; see the
 > [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
 
 ## Why pyobfus
@@ -83,7 +85,7 @@ you need to restore names from a shipped traceback.
 ## Features at a glance
 
 Community includes name mangling with import rewriting across a project
-(in the upcoming release, directories also rename function locals; parameters
+(directories also rename function locals; parameters
 and methods remain unchanged there; single files also rename methods and
 parameters, see the
 [guide](https://pyobfus.readthedocs.io/en/latest/guides/protect-python-before-selling/#what-you-get-measured)),

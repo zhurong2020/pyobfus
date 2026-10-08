@@ -82,14 +82,16 @@ functions you exclude from renaming) instead.
 
 ## What you get, measured
 
-**Upcoming release (not yet published):** default directory builds also rename
+**Since 0.6.0**, default directory builds also rename
 function locals, including closure references, without changing parameters,
 methods, attributes or the names of nested functions and classes (Flask app
 factories and Click command groups keep working). `safe` and framework presets enable this because function
 locals are implementation details; reflective functions are conservatively
 skipped. Use `--no-crossfile-local-names` (YAML `crossfile_local_names: false`)
-to retain the published 0.5.32 naming behavior. The measurements below describe the released baseline
-and remain historical evidence, rather than measurements of this new behavior.
+to retain the 0.5.32 naming behavior. Rerunning step 2 on the same example
+with 0.6.0 (2026-10-08) gave the same program output and renamed 16 function
+locals, for example `result` in `Calculator.add` became `I5`; the 0.5.30
+measurements below are kept as the historical baseline.
 
 
 We ran steps 1–3 on 2026-10-07 with pyobfus 0.5.30 from PyPI (Linux, Python
@@ -107,9 +109,11 @@ What the output looked like is the part to read carefully:
 - **For a directory, pyobfus 0.5.30 renames module-level names** (classes,
   functions, module variables) consistently across files and rewrites the
   imports. `Calculator` became `I0` in every file that used it.
-- **Method names, attributes, function-local variables and parameters keep
-  their original names** in directory builds, because renaming them safely
-  across files needs type information pyobfus does not have. Single-file
+- **Method names, attributes, function-local variables and parameters kept
+  their original names** in 0.5.30 directory builds (0.6.0 renames function
+  locals; methods, attributes and parameters still keep their names, because
+  renaming them safely across files needs type information pyobfus does not
+  have). Single-file
   builds also rename method names, locals and parameters (not instance
   attributes), but building modules one by one breaks the imports between
   them.

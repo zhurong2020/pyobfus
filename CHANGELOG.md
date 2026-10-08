@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-08
+
+Directory builds now rename function-local variables by default, so their
+output differs from 0.5.32: rebuild from the original source, keep the new
+mapping with the build, and rerun your application tests. Use
+`--no-crossfile-local-names` to keep the 0.5.32 naming. This release also fixes
+three renaming bugs that 0.5.32 already had (see Fixed).
+
 ### Added
 
 - Community cross-file builds rename function-local bindings with deterministic,
