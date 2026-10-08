@@ -18,7 +18,7 @@ Marketplace installs. GitHub Action attribution remains `0` visible repos.
 GitHub's rolling 14-day traffic is `244 views / 122 unique visitors`; referrers
 remain search engines, GitHub, PyPI, and chatgpt.com, with no DEV or Reddit
 referrer yet.
-Current public versions are pyobfus **`0.5.32`** (released 2026-10-07),
+Current public versions are pyobfus **`0.6.0`** (released 2026-10-08),
 pyobfus-mcp `0.3.12`, pyobfus-runtime `0.1.0`, and VS Code/Open VSX **`0.4.3`**.
 Open VSX is live; Glama is listed, searchable and healthy, with all 8 tools.
 No Glama resubmission or Build-steps change remains pending.
@@ -39,7 +39,7 @@ re-runnable source of truth for the calculation is
 
 ### PyPI — `pyobfus`
 - URL: https://pypi.org/project/pyobfus/
-- Current version: **0.5.32** (released 2026-10-07) · ships with PEP 740 attestations via OIDC trusted publishing
+- Current version: **0.6.0** (released 2026-10-08) · ships with PEP 740 attestations via OIDC trusted publishing
 - Current headline: Pro artifacts can warn before a hard expiry with `--expire-warn-days`, and L3 builds can obtain application-authorized key material through `--bind-key-env`; the separately redistributable `pyobfus-runtime` introduced in 0.5.29 remains a declared dependency.
 - Prior headline (0.5.24): `--build-report` writes one versioned, privacy-safe fact model of a completed build — selection/config, transform and cache counters, verification evidence, output digests, artifact roles, marker state, and provenance linkage. Digests are evidence, not signatures; an unrequested syntax check is never reported as passed.
 - Prior headline (0.5.23): generated Community output carries a versioned, transparent build marker; generated output no longer embeds the input file's absolute path. Marker policy is configurable and recorded in dry-run/provenance facts.
@@ -260,7 +260,7 @@ re-runnable source of truth for the calculation is
   prior is not evidence of an actual review. Continue tracking installs and
   real reviews, not raw update/download count alone.
 - Wiki: disabled · Discussions: enabled · Issues: open
-- Releases: latest Core `v0.5.32`, runtime `runtime-v0.1.0`, MCP `mcp-v0.3.12`, and VS Code
+- Releases: latest Core `v0.6.0`, runtime `runtime-v0.1.0`, MCP `mcp-v0.3.12`, and VS Code
   `vscode-v0.4.3`; MCP releases attach wheel+sdist.
 
 ### Open VSX — `zhurong2020.pyobfus` 🟢 LIVE

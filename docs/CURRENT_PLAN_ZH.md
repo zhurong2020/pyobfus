@@ -1,5 +1,13 @@
 # pyobfus 当前计划
 
+**2026-10-08 Core 0.6.0 已发布（维护者批准）**：目录构建默认改函数局部变量（#57），并修复三个 0.5.32 既有缺陷——
+类体引用同名方法时被改错（#62，`calendar.py` 写法）、单文件模式改函数内定义的函数/类名（#63，Flask 应用工厂/Click）、
+单文件模式改类体注解字段名（#64，dataclass 关键字构造 TypeError）。发版前：check.sh、四测试根、dogfood A/B/C/D（Lane C 本地跑，
+候选 wheel 全新安装为 0.6.0）、FastAPI lane、打包 lane（固定 Cython/Nuitka/PyInstaller）全过，发版提交 `30cb13b` CI 全绿。
+tag `v0.6.0` 经 OIDC 发布：PyPI wheel + sdist 均带 PEP 740（publisher GitHub `release.yml`），PyPI 全新安装 0.6.0 实测目录构建
+与 dataclass 用例通过；GitHub Release「v0.6.0 — directory builds rename function locals; dataclass and nested-name fixes」；
+Zenodo record `23228339`（发布后十余分钟查询时已归档，比以往约 2.5 小时快）；`CITATION.cff` 已更新。MCP 未随发。指南按 0.6.0 重跑 multifile 例子（16 个局部改名）。
+
 **2026-10-08 · 审核跟进与缺陷 A 合并**：#61（`--json` 提示跳过的文件、打包 lane 随 Core 改动触发、PyInstaller 归档内容检查、
 Action 版本注释）合并为 `18be3b5`；缺陷 A（目录构建里类体引用同名方法时被改成模块级/导入名，0.5.32 已存在，标准库
 `calendar.py` 即此写法）由 Codex 实现、Claude 审核，#62 合并为 `0653303`。审核中另登记两个既有缺陷（运行时注入的模块级
