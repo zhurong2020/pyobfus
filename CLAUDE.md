@@ -19,7 +19,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 - **0.6.0**（tag `v0.6.0` → `30cb13b`）：目录构建默认改函数局部变量（#57，`--no-crossfile-local-names` 可关），
   修复三个 0.5.32 既有缺陷：类体引用同名方法（#62）、单文件改函数内定义名（#63）、单文件改类体注解字段（#64，dataclass 关键字构造报错）。
   PyPI（PEP 740，publisher=release.yml）、全新安装、GitHub Release、Zenodo `23228339`、`CITATION.cff` 均已核；发布提交 CI 全绿。
-  MCP 未随发（`pyobfus_mcp` 的 `[Unreleased]` 仍待定）。剩余：缺陷 C/D 与参数改名，见 `docs/TODO.md` P0 段。
+  MCP 未随发（`pyobfus_mcp` 的 `[Unreleased]` 仍待定）。
+- 同日收尾：参数改名设计 PR #65 已审（待维护者拍板 6 个决定）；新登记缺陷 G（目录构建 `from x import f as g` NameError）、
+  F（单文件默认改参数不改关键字调用）。下一步顺序 G → F → 参数改名，见 `docs/TODO.md` P0 段。
 
 - Claude 交叉审核三个 PR 后修复 #57 的三处问题（函数内定义的函数/类名不再改、注解作用域顺序、symtable 报错按文件降级），
   三个 PR squash 合并：Worker CI `f65be9a`、打包 lane `26337d8`、目录构建局部变量改名 `81df698`；main CI 全绿。

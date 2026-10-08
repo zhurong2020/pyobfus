@@ -1,5 +1,10 @@
 # pyobfus 当前计划
 
+**2026-10-08 收尾 · 参数改名设计**：Codex 起草 `docs/CROSSFILE_PARAMETER_RENAMING_DESIGN.md`（PR #65，只含文档），Claude 审核通过并复核
+其关键结论：safe/balanced/aggressive 与默认都不保留参数名；单文件默认改参数不改关键字调用（缺陷 F，含静默绑错）；目录构建别名导入
+`from x import f as g` NameError（缺陷 G）。F、G 均为 0.5.32 已有，登记在 `docs/TODO.md` P0 段，建议顺序 G → F（方案 A）→ 参数改名。
+设计文末 6 个决定待维护者拍板。
+
 **2026-10-08 Core 0.6.0 已发布（维护者批准）**：目录构建默认改函数局部变量（#57），并修复三个 0.5.32 既有缺陷——
 类体引用同名方法时被改错（#62，`calendar.py` 写法）、单文件模式改函数内定义的函数/类名（#63，Flask 应用工厂/Click）、
 单文件模式改类体注解字段名（#64，dataclass 关键字构造 TypeError）。发版前：check.sh、四测试根、dogfood A/B/C/D（Lane C 本地跑，
