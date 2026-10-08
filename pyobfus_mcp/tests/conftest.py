@@ -19,7 +19,7 @@ import pytest
 
 
 @pytest.fixture(autouse=True)
-def _security_test_setup(monkeypatch: pytest.MonkeyPatch) -> None:
+def _security_test_setup(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Reset all global security state before each test."""
     monkeypatch.setenv("PYOBFUS_MCP_PROJECT_ROOT", tempfile.gettempdir())
 
@@ -27,3 +27,10 @@ def _security_test_setup(monkeypatch: pytest.MonkeyPatch) -> None:
     from pyobfus_mcp._security import reset_rate_limit_state
 
     reset_rate_limit_state()
+
+    # Trial guidance tests read status before/after the tool call. Keep those
+    # reads off the developer's real ~/.pyobfus, even with the normal HOME.
+    import pyobfus.trial as trial
+
+    monkeypatch.setattr(trial, "TRIAL_DIR", tmp_path / ".pyobfus")
+    monkeypatch.setattr(trial, "TRIAL_FILE", tmp_path / ".pyobfus" / "trial.json")

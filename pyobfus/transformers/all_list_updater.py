@@ -62,6 +62,18 @@ class AllListUpdater(ast.NodeTransformer):
         self.names_updated: int = 0
         self.names_not_found: Set[str] = set()
 
+    def visit_ClassDef(self, node: ast.ClassDef) -> ast.ClassDef:
+        """A class attribute named __all__ is not the module export list."""
+        return node
+
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> ast.FunctionDef:
+        """Function-local __all__ lists are not module exports either."""
+        return node
+
+    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> ast.AsyncFunctionDef:
+        """Async function-local lists are not module exports either."""
+        return node
+
     def visit_Assign(self, node: ast.Assign) -> ast.Assign:
         """
         Visit assignment statement and update __all__ if found.

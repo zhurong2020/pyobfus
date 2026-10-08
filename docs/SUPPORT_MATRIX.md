@@ -60,6 +60,18 @@ local renaming for that file with a warning and `local_files_skipped` /
 `sys._getframe().f_locals` is not detected: reading by the original name can fail
 after renaming. Disable local renaming for that code. Always run application tests.
 
+Directory class bodies preserve references to names already bound in their
+namespace, in execution order; earlier references and method/lambda bodies
+still use module globals. Comprehensions evaluate only their outermost iterable
+in the class namespace. Nested classes start a fresh namespace; an explicit
+`del` removes a binding. An annotation without a value does not bind a name.
+**Limitation:** bindings inside `if`, `try`, `for` and `while` are conservatively
+treated as already bound, including within the suite and afterwards, even if
+that path never executes. There is no control-flow analysis of conditional
+class bindings; a reference that falls back to a renamed module global on an
+untaken path can therefore fail. This policy applies with local renaming both
+on and off. Behavioral evidence: `tests/test_crossfile_classbody_shadow.py`.
+
 ## Framework presets
 
 Every preset is tested for **what it excludes**. Only `fastapi` is also

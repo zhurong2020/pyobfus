@@ -11,6 +11,7 @@ from pathlib import Path
 
 from pyobfus.core.generator import CodeGenerator
 from pyobfus.core.global_table import GlobalSymbolTable
+from pyobfus.transformers.local_name_transformer import _function_scope_names
 
 
 class ImportCollector(ast.NodeVisitor):
@@ -67,6 +68,13 @@ class ImportCollector(ast.NodeVisitor):
                 self.import_mappings[local_name] = obfuscated_name
 
         self.generic_visit(node)
+
+    def visit_ClassDef(self, node: ast.ClassDef) -> None:
+        """Class imports bind attributes, not this module's imported names."""
+        for expr in node.decorator_list + node.bases:
+            self.visit(expr)
+        for keyword in node.keywords:
+            self.visit(keyword.value)
 
     def _resolve_relative_import(self, module: Optional[str], level: int) -> Optional[str]:
         """
@@ -184,7 +192,7 @@ class ImportedNameTransformer(ast.NodeTransformer):
         self._visit_function_signature(node)
 
         # Push new scope
-        self._scope_stack.append(self._parameter_names(node))
+        self._scope_stack.append(_function_scope_names(node))
 
         for stmt in node.body:
             self.visit(stmt)
@@ -201,22 +209,12 @@ class ImportedNameTransformer(ast.NodeTransformer):
         node.decorator_list = [self.visit(d) for d in node.decorator_list]
         self._visit_function_signature(node)
 
-        self._scope_stack.append(self._parameter_names(node))
+        self._scope_stack.append(_function_scope_names(node))
         for stmt in node.body:
             self.visit(stmt)
         self._scope_stack.pop()
 
         return node
-
-    @staticmethod
-    def _parameter_names(node) -> Set[str]:
-        args = node.args
-        names = {arg.arg for arg in args.posonlyargs + args.args + args.kwonlyargs}
-        if args.vararg:
-            names.add(args.vararg.arg)
-        if args.kwarg:
-            names.add(args.kwarg.arg)
-        return names
 
     def _visit_function_signature(self, node) -> None:
         """Rewrite imported references in definition-time expressions."""
@@ -264,7 +262,9 @@ class ImportedNameTransformer(ast.NodeTransformer):
         Returns:
             Modified or original Name node
         """
-        if getattr(node, "_pyobfus_local_binding", False):
+        if getattr(node, "_pyobfus_local_binding", False) or getattr(
+            node, "_pyobfus_class_binding", False
+        ):
             return node
 
         # Check if this name is in local scope (don't transform)

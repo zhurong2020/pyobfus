@@ -13,6 +13,7 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 from dataclasses import dataclass
 
 from pyobfus.config import ObfuscationConfig
+from pyobfus.core.class_bindings import mark_class_bindings
 from pyobfus.core.function_locals import LocalPlan, plan_locals, apply_local_plan
 from pyobfus.core import content_transforms
 from pyobfus.core.global_table import GlobalSymbolTable
@@ -63,6 +64,7 @@ def _transform_single_file(
 
         original_tree = ast.parse(source)
         tree = ast.parse(source)
+        mark_class_bindings(tree)
         if local_plan is not None:
             tree = apply_local_plan(tree, local_plan)
             file_stats["local_names_obfuscated"] = len(local_plan.mappings)
