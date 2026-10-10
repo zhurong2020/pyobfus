@@ -167,9 +167,9 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       模块级 `from pkg.core import helper` + 函数内 `from pkg.core import scale as helper`，加 `--no-crossfile-local-names`
       时模块级的 `helper(...)` NameError。根因：ImportedNameTransformer 的 `import_mappings` 按模块扁平存放，函数内导入覆盖模块级条目。
       默认（开启局部改名）正确。
-- [ ] **既有缺陷 F · 单文件模式默认改参数但不改关键字调用（优先，0.5.32 已存在）**：同文件 `scale(1, factor=3)` 即 TypeError；
+- [x] **既有缺陷 F · 单文件模式默认改参数但不改关键字调用（优先，0.5.32 已存在）**：同文件 `scale(1, factor=3)` 即 TypeError；
       含 `/`、`*args`、`**kwargs` 的签名还会静默绑错（关键字落进 `**kwargs`、参数取默认值）。无预设、safe、balanced、aggressive
-      在 0.5.32 / 0.6.0 都是 `preserve_param_names=False`（框架预设与 library 为 True）。**已提 PR #67，待审**（draft，Claude 审核）：
+      在 0.5.32 / 0.6.0 都是 `preserve_param_names=False`（框架预设与 library 为 True）。**10-10 已合并 PR #67（`ed8cceb`），未发版**；审核记录私有 `docs/internal/geo-2026-10/PR67_REVIEW_2026-10-10.md`：
       按 10-10 已合并设计 PR #65 的维护者决定实现默认保留参数名；显式 false 照旧生效但警告，`--init` 模板改为 true，
       `--check` 加 medium 语法候选风险提示，目录 cross-file 参数保留行为不变。证据私有 `docs/internal/geo-2026-10/param-default-evidence/`。
 - [ ] **既有限制 H · 通过模块对象访问属性**（10-08 交叉审核发现，0.5.32 已存在）：目录构建里 `from pkg import core` 后
