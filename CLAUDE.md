@@ -14,7 +14,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### 🟢 2026-10-08 — Core 0.6.0 已发布（冷启动先读这段）
+### 🟢 2026-10-10 — Core 0.6.1 已发布（G #66 + F 方案 A #67；冷启动先读 `docs/CURRENT_PLAN_ZH.md` 顶部 10-10 段）
+
+### 🟢 2026-10-08 — Core 0.6.0 已发布
 
 - **0.6.0**（tag `v0.6.0` → `30cb13b`）：目录构建默认改函数局部变量（#57，`--no-crossfile-local-names` 可关），
   修复三个 0.5.32 既有缺陷：类体引用同名方法（#62）、单文件改函数内定义名（#63）、单文件改类体注解字段（#64，dataclass 关键字构造报错）。
@@ -75,7 +77,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   10-25 复盘用 09-27→10-06 窗口）**：静默 4 周（10-25 前不发 Core）→ 每月一版
   → 只做有触发的事 → 每周一巡检；全文 `docs/TODO.md`「节奏」段。**查进度固定动作：进度 + 下载量
   （`python scripts/download_snapshot.py`）+ Gmail（`/pyobfus-inbox`），三样一起给**，缺一样不算查过。
-- 「当前状态一句话」：`0.6.0` 是最新 Core（10-08）；Core `[Unreleased]` 为空；下一版按月度节奏，发版需批准。逐轮细节见 `docs/CURRENT_PLAN_ZH.md` 10-07 段。
+- 「当前状态一句话」：`0.6.1` 是最新 Core（10-10）；Core `[Unreleased]` 为空；下一版按月度节奏，发版需批准。逐轮细节见 `docs/CURRENT_PLAN_ZH.md` 10-07 段。
 
 ## 历史进展（已下沉）
 
@@ -111,7 +113,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.9-3.14, AST, setuptools
-- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.6.0，2026-10-08 发布**；完整版本历史见 `CHANGELOG.md`)
+- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.6.1，2026-10-10 发布**；完整版本历史见 `CHANGELOG.md`)
 - **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.3，2026-09-10 发布**；Marketplace 与 Open VSX 两边同版本，均已 `curl` 独立复核；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`。**发版必须两个 registry 都发**：Marketplace 手工上传 + `ovsx publish`，runbook 见 `docs/OPEN_VSX_PUBLISH_PLAN.md`)
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.12，2026-09-07 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.18` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp`（**0.3.12** 2026-09-07 发布，2026-09-10 已核实 `active` / `isLatest=true`）
