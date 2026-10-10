@@ -169,8 +169,9 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       默认（开启局部改名）正确。
 - [ ] **既有缺陷 F · 单文件模式默认改参数但不改关键字调用（优先，0.5.32 已存在）**：同文件 `scale(1, factor=3)` 即 TypeError；
       含 `/`、`*args`、`**kwargs` 的签名还会静默绑错（关键字落进 `**kwargs`、参数取默认值）。无预设、safe、balanced、aggressive
-      都是 `preserve_param_names=False`（框架预设与 library 为 True）。处置方案见设计文档 PR #65「Short-term response to F」：
-      推荐默认保留参数名；Claude 建议显式写 false 的配置照旧生效但给警告、`--init` 模板改为 true（待维护者拍板）。
+      在 0.5.32 / 0.6.0 都是 `preserve_param_names=False`（框架预设与 library 为 True）。**已提 PR #67，待审**（draft，Claude 审核）：
+      按 10-10 已合并设计 PR #65 的维护者决定实现默认保留参数名；显式 false 照旧生效但警告，`--init` 模板改为 true，
+      `--check` 加 medium 语法候选风险提示，目录 cross-file 参数保留行为不变。证据私有 `docs/internal/geo-2026-10/param-default-evidence/`。
 - [ ] **既有限制 H · 通过模块对象访问属性**（10-08 交叉审核发现，0.5.32 已存在）：目录构建里 `from pkg import core` 后
       `core.LIMIT`（或 `import pkg.core as engine; engine.scale()`）时属性名没跟着改 → AttributeError。至少在支持矩阵
       「What gets renamed」写明并在 `--check` 提示；是否改写 `模块.属性` 另议（可与缺陷 G 的导入解析一起看）。

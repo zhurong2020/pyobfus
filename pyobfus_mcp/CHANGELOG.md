@@ -8,6 +8,12 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ### Added
 
+- **`check_obfuscation_risks` reports keyword calls that parameter renaming
+  would break.** When the effective config renames parameters (explicit
+  `preserve_param_names: false` on a single file), same-file keyword calls and
+  `**` forwarding get a medium `compatibility_advisory`, as `pyobfus --check`
+  does. Needs a `pyobfus` release that includes the advisory (after 0.6.0).
+
 - **`unmap_stack_trace` flags a mapping from another build.** The result
   gains `unmatched_names`, the obfuscated-looking names in the trace that the
   mapping does not know; when it is non-empty, `ai_hint` tells the agent the

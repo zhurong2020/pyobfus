@@ -9,11 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Single-file builds preserve parameter names by default, fixing F in 0.5.32
+  and 0.6.0: keyword calls could raise `TypeError`, and mixed signatures with
+  `**kwargs` could silently bind arguments incorrectly. Explicit false still
+  renames parameters and emits a warning in text and JSON `stats.warnings`.
+  `--check` reports a medium compatibility advisory for syntactic same-file
+  keyword calls or `**` forwarding when parameter renaming is enabled.
+
 - Directory builds now keep explicit import aliases and their references in sync,
   including relative imports and chained re-exports. This fixes a runtime
   `NameError` affecting 0.6.0 and earlier releases, with function-local renaming
   both enabled and disabled. Rebuild affected output from the original source
   and retain the matching new mapping.
+
+### Changed
+
+- `preserve_param_names` defaults to true for unpreset, safe, balanced and
+  aggressive builds (including inherited presets); framework/library presets
+  retain true. `--init` templates also use true. Explicit YAML false or
+  `--no-preserve-param-names` retains the unverified legacy behavior. Restore
+  preservation with YAML true or `--preserve-param-names`. Rebuilding removes
+  parameter mapping entries and can shift other mapping numbers: keep each
+  artifact paired with its own mapping; old mappings cannot decode new builds.
+  Cross-file directory builds (the default) still preserve parameters
+  regardless of this option; legacy `--no-cross-file` directory builds follow it.
 
 ## [0.6.0] - 2026-10-08
 

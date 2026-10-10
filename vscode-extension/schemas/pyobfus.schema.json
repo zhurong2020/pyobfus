@@ -106,8 +106,8 @@
         },
         "preserve_param_names": {
           "type": "boolean",
-          "default": false,
-          "description": "Keep function parameter names intact so keyword arguments survive obfuscation."
+          "default": true,
+          "description": "Keep function parameter names intact so keyword arguments survive obfuscation (default: true). Explicit false is unverified for keyword/signature compatibility and emits a build warning."
         },
         "string_encryption": {
           "type": "boolean",

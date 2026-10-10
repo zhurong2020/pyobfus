@@ -774,3 +774,26 @@ def test_start_pro_trial_does_not_invoke_side_effect() -> None:
     _ = start_pro_trial()
     state_after = get_trial_status()
     assert state_before == state_after, "start_pro_trial unexpectedly changed local trial state"
+
+
+def test_all_preset_parameter_defaults() -> None:
+    from pyobfus.config import ObfuscationConfig
+
+    for preset in ObfuscationConfig.list_presets():
+        result = explain_preset(preset)
+        assert result["preserve_param_names"] is True, preset
+        _assert_next_tool_shape(result)
+
+
+def test_parameter_risk_follows_file_config(tmp_path: Path) -> None:
+    src = _write(
+        tmp_path,
+        "app.py",
+        "def scale(value, factor=2): return value * factor\nprint(scale(1, factor=3))\n",
+    )
+    _write(tmp_path, "pyobfus.yaml", "obfuscation:\n  preserve_param_names: false\n")
+    result = check_obfuscation_risks(str(src))
+    assert any("parameter renaming enabled" in r["message"] for r in result["risks"])
+    _assert_next_tool_shape(result)
+    directory = check_obfuscation_risks(str(tmp_path))
+    assert not any("parameter renaming enabled" in r["message"] for r in directory["risks"])

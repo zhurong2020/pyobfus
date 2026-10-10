@@ -114,7 +114,7 @@ What the output looked like is the part to read carefully:
   locals; methods, attributes and parameters still keep their names, because
   renaming them safely across files needs type information pyobfus does not
   have). Single-file
-  builds also rename method names, locals and parameters (not instance
+  builds also rename method names and locals; parameters are preserved by default (not instance
   attributes), but building modules one by one breaks the imports between
   them.
 - In 0.5.30, directory builds also kept function, method and class

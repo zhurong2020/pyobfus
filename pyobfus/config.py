@@ -78,7 +78,7 @@ class ObfuscationConfig:
     string_encoding: bool = False
     numeric_obfuscation: bool = False  # Opaque arithmetic for numeric literals (Community)
     strip_ai_artifacts: bool = False  # Remove AI provenance markers (Community)
-    preserve_param_names: bool = False  # Preserve parameter names for keyword arguments
+    preserve_param_names: bool = True  # Preserve keyword calls and signature compatibility
 
     # Pro Edition features
     string_encryption: bool = False  # AES-256 encryption (Pro only)
@@ -128,6 +128,11 @@ class ObfuscationConfig:
     max_files: Optional[int] = None
     max_total_loc: Optional[int] = None
 
+    @property
+    def _explicit_param_names(self) -> Optional[bool]:
+        """YAML source metadata, excluded from serialization and config hashes."""
+        return self.__dict__.get("_param_names_choice")
+
     @classmethod
     def from_file(cls, config_path: Path) -> "ObfuscationConfig":
         """Load configuration from YAML file.
@@ -175,6 +180,7 @@ class ObfuscationConfig:
             else:
                 raise ValueError(f"Unknown configuration key: {key}")
 
+        base.__dict__["_param_names_choice"] = obf_config.get("preserve_param_names")
         return base
 
     @classmethod
@@ -209,6 +215,7 @@ class ObfuscationConfig:
         - Ideal for libraries and production code
         """
         config = cls()
+        config.preserve_param_names = True  # Explicit safe policy; inherited by frameworks
         config.remove_docstrings = False  # Keep docstrings
         # Will use auto-detection to preserve public APIs
         return config

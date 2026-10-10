@@ -82,12 +82,19 @@ Both print `Hello, world!`. Generated identifiers can differ with input and
 configuration; verify the exact output with your own tests. Keep a mapping when
 you need to restore names from a shipped traceback.
 
+Parameter names are preserved by default in every preset. Explicit
+`--no-preserve-param-names` or YAML `preserve_param_names: false` keeps legacy
+renaming with a warning: keyword calls may raise `TypeError` or silently bind
+incorrectly. Rebuild from original source and keep the new mapping with the
+new artifact; mapping numbers can change and old mappings cannot decode
+rebuilt output. Cross-file directory builds (the default) still preserve parameters; legacy
+`--no-cross-file` directory builds follow the option.
+
 ## Features at a glance
 
 Community includes name mangling with import rewriting across a project
 (directories also rename function locals; parameters
-and methods remain unchanged there; single files also rename methods and
-parameters, see the
+and methods remain unchanged there; single files also rename methods and preserve parameters by default, see the
 [guide](https://pyobfus.readthedocs.io/en/latest/guides/protect-python-before-selling/#what-you-get-measured)),
 string and numeric transforms, framework-aware presets, config-aware pre-flight scanning,
 SARIF, structured dry-run, reverse traceback mapping, syntax verification,

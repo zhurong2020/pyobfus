@@ -38,8 +38,20 @@ combinations; those platform-specific failures can still reach users first.
 
 | Build | Renamed | Not renamed | Evidence |
 |---|---|---|---|
-| Single file (or `--no-cross-file`) | Module-level names, method names, local variables, parameters (unless `--preserve-param-names`) | Names of functions/classes defined inside functions and class-body annotated field names (since 0.6.0); instance attributes (`self.precision`). Each file is renamed on its own, so imports between modules of one project break in this mode | `tests/`, single-file end-to-end in `integration_tests/` |
+| Single file (or `--no-cross-file`) | Module-level names, method names, local variables; parameters only with explicit `--no-preserve-param-names` (unverified keyword/signature compatibility) | Parameters by default (all presets); names of functions/classes defined inside functions and class-body annotated field names (since 0.6.0); instance attributes (`self.precision`). Each file is renamed on its own, so imports between modules of one project break in this mode | `tests/`, single-file end-to-end in `integration_tests/` |
 | Directory, default cross-file mode | Module-level classes, functions and variables, consistently in every file, plus the import statements that reference them; function locals (since 0.6.0) | Methods, attributes, parameters; locals in reflection-sensitive functions | `integration_tests/test_cli_end_to_end.py` (multifile); `tests/test_crossfile_decorators_bases.py` covers decorators, base classes, metaclasses and lambdas (fixed in 0.5.32); new local scope tests in `tests/test_crossfile_function_locals.py`; historical 0.5.30 scope observed on 2026-10-07, see the [selling guide](guides/protect-python-before-selling.md#what-you-get-measured) |
+
+Single-file parameter preservation is the default for every preset. Explicit
+YAML `preserve_param_names: false` or `--no-preserve-param-names` retains legacy
+renaming with a warning; keyword calls and signature compatibility remain
+unverified. Restore true with YAML or `--preserve-param-names`. Rebuilding can
+change mapping numbers: old mappings cannot decode new artifacts. `--check`
+reports a medium advisory for bare same-file function names called with keywords
+or `**` forwarding when renaming is enabled. This is a syntactic candidate
+check, not callable resolution; absence of a finding does not establish safety.
+Existing exit-code rules are unchanged. Default (cross-file) directory builds preserve
+parameters even with explicit false; legacy `--no-cross-file` directory builds
+rename them when false is set.
 
 Directory builds rewrite the imported symbol in `from M import X as A` using
 M's export mapping, while preserving the explicit local alias A (including
@@ -153,7 +165,7 @@ generated output; `--verify-syntax` compiles it, which is weaker than running.
 First-batch examples executed by the `integration` job (Ubuntu and Windows),
 each obfuscated, run, and compared against the original behavior:
 `simple.py` and `multifile/` via `test_cli_end_to_end.py`; `string_encoding.py`,
-`keyword_arguments.py` (`--preserve-param-names`), `ai_debugging/`, and
+`keyword_arguments.py` (parameters preserved by default), `ai_debugging/`, and
 `import_hook/` via `test_examples.py`. The remaining examples
 (`pyinstaller/`, `compiled_packaging/`) use pinned optional toolchains in the
 separate `packaging-lane.yml` workflow, not the normal integration job. Pro
