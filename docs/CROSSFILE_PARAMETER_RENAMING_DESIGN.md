@@ -6,7 +6,7 @@ The failure examples, old preset values and counts below are the pre-A design
 baseline, not the new default behavior. Maintainer decisions at the end
 supersede the earlier unsafe-flag proposal.
 
-Status: **proposal for Claude and maintainer review; not implemented**.
+Status: **maintainer decisions recorded 2026-10-10 (see the end). Option A shipped in 0.6.1 (#67); cross-file parameter renaming is not implemented.**
 Date: 2026-10-08. Baseline: post-release main
 `130b8c15cde8e3eeb1becd9ef64ab323b00d8d5f`, Core 0.6.0.
 This document changes no defaults, CLI contracts or edition boundaries.
