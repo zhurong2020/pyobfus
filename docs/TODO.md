@@ -160,15 +160,6 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 | ~~P0~~ ✅ | **KV 每日备份适配 trial 记录 + 补跑机制**（用户 2026-09-25 列为 P0，当日完成）：`~/scripts/pyobfus_kv_export.sh` 此前只认 license 记录，第一条 `trial:*` 登记会让整轮导出拒绝落盘、许可备份静默停止（上线 5 天 KV 尚无 trial 记录，未实际发生）。已改为按 key 类型校验（`PYOB-*` 查 license_key / `trial:*` 查 email_hash+v / 未知类型只查可解析并 WARN）+ `:`→`__` Windows 安全文件名 + `--selftest` 14 项；调度从 crontab 01:30 挪进 `wsl_daily_backup.sh` 开头（systemd `Persistent` 开机补跑，cron 不补跑致 09-24/25 漏导，已补、与 09-22 逐字节一致）；`check_backup.sh` 加 KV 一节。脚本都在 `~/scripts/`（仓库外，随日备份进 OneDrive），仓内只记状态 | 免发版（仓库外脚本） | — |
 | **P2** | 分发上架队列：awesome-python PR #3352 **2026-09-24 被拒**（理由=采用量，对方留了「adoption grows」再议的门；不争辩、不重开）；awesome-security / awesome-devsecops 门槛同为下载量，**跳过**；队列下一项 **AlternativeTo**（需维护者账号） | 免发版 | 维护者 |
 
-### P1 · 许可证端点监控会把任何 404 判为健康（2026-10-11 Codex 审核第 1 篇文章时发现，Claude 复核属实）
-
-- [ ] `pyobfus_pro/license.py:288-290` 的 `_verify_online()` 对任何 HTTP 404 直接抛 `License key not found`，不读正文；
-      `scripts/monitor_license_endpoint.py` 只比对这句异常文字。所以 Worker 路由丢失、Cloudflare/代理返回的纯文本或 HTML 404
-      也会显示 HEALTHY（Codex 用内存桩复现）。**修法（免发版）**：探针在走完真实客户端路径后，再用同一 `USER_AGENT`
-      直接请求一次，断言 404 正文是 Worker 的 JSON（`error` = `Invalid license key`，见 `cloudflare-worker/src/index.js`）；
-      验收照 `04788b5` 的做法：正常绿、旧 UA 红、不可达红，再加「非 JSON 404 红」。客户端是否也读 404 正文另议（要发版）。
-      修好前第 1 篇 DEV 文章已按「只覆盖拒绝路径、不读 404 正文」的弱化措辞写，修好后可酌情加强。
-
 ### P0 · 目录构建的改名深度（2026-10-07 发现 · 第 1 步与缺陷 A/B/E 已随 0.6.0 发布，10-08；缺陷 G、F 已随 0.6.1 发布，10-10）
 
 **现状**：目录（cross-file）构建改模块级名字和函数局部变量并同步 import；参数、方法名、属性保留原名。单文件模式改得更深
