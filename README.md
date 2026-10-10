@@ -19,14 +19,13 @@ handles complete projects, keeps generated output portable, and can reverse-map
 protected production tracebacks for developers and AI coding agents. Community
 is Apache-2.0, has no file or line limits, and requires no trial.
 
-> **What's new in v0.6.0:** directory builds now also rename function-local
-> variables (parameters, methods and attributes keep their names; turn it off
-> with `--no-crossfile-local-names`). It also fixes three renaming bugs that
-> 0.5.32 had: dataclass, NamedTuple and pydantic fields renamed in single-file
-> builds, functions and classes defined inside functions renamed (Flask app
-> factories, Click commands), and class bodies that referred to their own
-> methods in directory builds. Rebuild and rerun your tests; see the
-> [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
+> **What's new in v0.6.1:** fixes two bugs where the build succeeded but the
+> output failed when run. Directory builds broke `from pkg import f as g`
+> (`NameError`), and single-file builds renamed parameters without updating
+> keyword calls (`TypeError`, or arguments silently bound wrong). Parameter
+> names are now kept by default; `--no-preserve-param-names` restores the old
+> behavior with a warning. Rebuild, keep the new mapping, and rerun your tests;
+> see the [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
 
 ## Why pyobfus
 

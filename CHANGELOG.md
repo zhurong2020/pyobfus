@@ -7,10 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-10-10
+
+Fixes two bugs where a build reported success but the output failed at run
+time. Both affect 0.6.0 and earlier: rebuild from the original source, keep the
+new mapping with the new build, and rerun your application tests. Parameter
+names are now kept by default, so mapping numbers change and old mappings
+cannot decode new builds.
+
 ### Fixed
 
-- Single-file builds preserve parameter names by default, fixing F in 0.5.32
-  and 0.6.0: keyword calls could raise `TypeError`, and mixed signatures with
+- Single-file builds preserve parameter names by default. In 0.5.32 and
+  0.6.0, keyword calls could raise `TypeError`, and mixed signatures with
   `**kwargs` could silently bind arguments incorrectly. Explicit false still
   renames parameters and emits a warning in text and JSON `stats.warnings`.
   `--check` reports a medium compatibility advisory for syntactic same-file
