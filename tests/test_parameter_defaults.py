@@ -15,6 +15,15 @@ from pyobfus.config import ObfuscationConfig
 from pyobfus.config_templates import get_template
 from pyobfus.core.preflight import PreflightChecker
 
+
+def _runner() -> CliRunner:
+    """Separate stderr on Click 8.1 (Python 3.9) and 8.2+."""
+    try:
+        return CliRunner(mix_stderr=False)  # type: ignore[call-arg]
+    except TypeError:  # Click 8.2 removed mix_stderr and always separates
+        return CliRunner()
+
+
 KEYWORDS = """def scale(value, factor=2):
     return value * factor
 print(scale(1, factor=3))
@@ -104,7 +113,7 @@ def test_explicit_false_warning_and_contract(tmp_path, choice, json_output):
         args += ["--preserve-param-names"]
     if json_output:
         args += ["--json"]
-    result = CliRunner().invoke(main, args)
+    result = _runner().invoke(main, args)
     assert result.exit_code == 0, result.output
     unsafe = choice in {"yaml", "cli"}
     assert ("signature compatibility are unverified" in result.stderr) == unsafe
@@ -145,7 +154,7 @@ def test_check_advisory(tmp_path, source):
     assert risks[0].severity == "medium"  # Syntactic candidate, not resolved identity.
     assert report.exit_code() == 0
     assert not PreflightChecker().check_path(src).risks
-    result = CliRunner().invoke(
+    result = _runner().invoke(
         main,
         [str(src), "--check", "--offline", "--no-config", "--no-preserve-param-names", "--json"],
     )
@@ -160,14 +169,14 @@ def test_crossfile_preservation_unchanged(tmp_path):
     src.mkdir()
     (src / "app.py").write_text(MIXED)
     out = tmp_path / "out"
-    result = CliRunner().invoke(
+    result = _runner().invoke(
         main, [str(src), "-o", str(out), "--no-config", "--no-preserve-param-names"]
     )
     assert result.exit_code == 0, result.output
     assert {
         n.arg for n in ast.walk(ast.parse((out / "app.py").read_text())) if isinstance(n, ast.arg)
     } == {"value", "factor", "args", "offset", "kwargs"}
-    checked = CliRunner().invoke(
+    checked = _runner().invoke(
         main,
         [str(src), "--check", "--offline", "--no-config", "--no-preserve-param-names", "--json"],
     )
@@ -181,7 +190,7 @@ def test_init_template_preserves_parameters(tmp_path, monkeypatch):
 
     assert yaml.safe_load(get_template("general"))["obfuscation"]["preserve_param_names"] is True
     monkeypatch.chdir(tmp_path)
-    result = CliRunner().invoke(main, ["--init"])
+    result = _runner().invoke(main, ["--init"])
     assert result.exit_code == 0, result.output
     assert (
         yaml.safe_load((tmp_path / "pyobfus.yaml").read_text())["obfuscation"][
@@ -196,7 +205,7 @@ def test_inherited_false_is_not_explicit_choice(tmp_path, monkeypatch):
     monkeypatch.setattr(ObfuscationConfig, "community_edition", lambda: config)
     src = tmp_path / "app.py"
     src.write_text(KEYWORDS)
-    result = CliRunner().invoke(
+    result = _runner().invoke(
         main, [str(src), "-o", str(tmp_path / "out.py"), "--no-config", "--json"]
     )
     assert result.exit_code == 0, result.output
