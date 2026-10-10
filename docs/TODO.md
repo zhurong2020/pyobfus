@@ -43,7 +43,7 @@ Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运�
       复现锁报错，并于 09-26 在原线程附上「No submissions yet」与 repository/path lock 两张截图，提供
       Claude Code workspace ID，请求后端定位/释放。**09-28 Rudy 回信「已升级内部，有消息再跟进」——球在对方，不必再催；锁没释放前别再点表单或换路径绕过**。字段/描述与证据见
       `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`。
-- [ ] **是否通知 Pro 客户升级到 0.5.32**（2026-10-07 登记，维护者决定）：0.5.10–0.5.31 的目录构建遇到同模块
+- [ ] **通知 Pro 客户升级到 0.6.1**（10-10 维护者定：发；草稿私有 `docs/internal/content-2026-10/pro_customer_notice_0.6.1.md`，待维护者审后逐个/BCC 发送；取代原「是否通知升级到 0.5.32」，0.6.1 已含该修复）。原登记（2026-10-07）：0.5.10–0.5.31 的目录构建遇到同模块
       装饰器/基类/lambda 会 import 时 NameError。两位 10 月新客户如用过目录构建可能受影响；需要的话由 Claude 起草、
       维护者审后发送，AI 代理不直接发信。
 - [ ] **MCP Trust Registry publish**：在其站点注册拿 API token 后
