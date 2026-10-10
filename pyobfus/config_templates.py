@@ -208,8 +208,8 @@ obfuscation:
   name_prefix: "I"
 
   # Preserve function parameter names for keyword argument support
-  # Set to true if your code uses keyword arguments externally
-  preserve_param_names: false
+  # Keep true for keyword calls and signature compatibility (the default)
+  preserve_param_names: true
 
 # Show detailed output
 verbose: false

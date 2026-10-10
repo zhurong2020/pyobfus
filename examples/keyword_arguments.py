@@ -1,7 +1,7 @@
 """
-Demonstration of keyword argument preservation with --preserve-param-names flag.
+Demonstration of keyword argument preservation (enabled by default).
 
-This example shows how to use the --preserve-param-names option to maintain
+This example shows the default preservation policy; --preserve-param-names explicitly maintains
 keyword argument compatibility after obfuscation.
 
 Usage:

@@ -631,6 +631,7 @@ class PreflightChecker:
         effective_config: Optional[Dict[str, object]] = None,
         protection_intent: bool = False,
         target_python_min: Optional[str] = None,
+        preserve_param_names: bool = True,
     ) -> None:
         self.exclude_patterns: List[str] = list(exclude_patterns or [])
         # Opt-in dependency-hallucination advisory (see
@@ -650,6 +651,7 @@ class PreflightChecker:
         # Python 3.14+ (target_python_min, else the running interpreter).
         self.protection_intent = protection_intent
         self.target_python_min = target_python_min
+        self.preserve_param_names = preserve_param_names
 
     def check_path(self, path: Path) -> PreflightReport:
         if path.is_file():
@@ -703,6 +705,35 @@ class PreflightChecker:
         visitor = _RiskVisitor(str(file_path))
         visitor.visit(tree)
         report.risks.extend(visitor.risks)
+        if not self.preserve_param_names:
+            # Syntactic advisory only: same-spelled definitions do not prove
+            # callable identity. Medium keeps existing findings/exit semantics.
+            definitions = {
+                n.name
+                for n in ast.walk(tree)
+                if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
+            }
+            for node in ast.walk(tree):
+                if (
+                    isinstance(node, ast.Call)
+                    and node.keywords
+                    and isinstance(node.func, ast.Name)
+                    and node.func.id in definitions
+                ):
+                    report.risks.append(
+                        Risk(
+                            category=CAT_COMPAT_ADVISORY,
+                            severity=SEVERITY_MEDIUM,
+                            file=str(file_path),
+                            line=node.lineno,
+                            col=node.col_offset,
+                            message="Keyword call or ** forwarding to a same-file function name "
+                            "with parameter renaming enabled may cause TypeError or silently "
+                            "bind arguments incorrectly. Callable identity is unverified.",
+                            suggestion="Set preserve_param_names: true or use --preserve-param-names. "
+                            "Absence of this syntactic finding does not establish safety.",
+                        )
+                    )
         report.files_scanned += 1
 
         # Fold framework detection into the aggregate report.

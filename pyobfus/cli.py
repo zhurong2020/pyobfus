@@ -143,7 +143,7 @@ def _echo_pro_import_hint() -> None:
     "--preserve-param-names/--no-preserve-param-names",
     default=None,
     help="Preserve parameter names to allow keyword arguments after obfuscation "
-    "(default: off, unless a preset/config says otherwise)",
+    "(default: on; disabling may cause TypeError or silently bind keyword arguments incorrectly)",
 )
 @click.option(
     "--numeric-obfuscation",
@@ -613,6 +613,8 @@ def main(
             level=level,
             no_config=no_config,
             sarif_path=sarif_path,
+            preserve_param_names=preserve_param_names,
+            cross_file=cross_file,
         )
         return
 
@@ -1101,6 +1103,19 @@ def main(
             "dead_code_injected": 0,
             "anti_debug_checks": 0,
         }
+        if not config.preserve_param_names and (
+            preserve_param_names is False
+            or (preserve_param_names is None and config._explicit_param_names is False)
+        ):
+            warning = (
+                "Parameter renaming was explicitly enabled: keyword calls and signature "
+                "compatibility are unverified; this may cause TypeError or silently bind "
+                "arguments incorrectly. Set preserve_param_names: true in YAML or use "
+                "--preserve-param-names to restore preservation. "
+                "Cross-file directory builds still preserve parameters."
+            )
+            obfuscation_stats["warnings"] = [warning]
+            click.echo(f"Warning: {warning}", err=True)
         verification: Optional[Dict[str, Any]] = None
 
         # Incremental short-circuit: directory mode only (single-file
@@ -1190,6 +1205,10 @@ def main(
                     save_mapping_path=save_mapping_path,
                 )
                 if dir_stats:
+                    if "warnings" in dir_stats:
+                        dir_stats["warnings"] = (
+                            obfuscation_stats.get("warnings", []) + dir_stats["warnings"]
+                        )
                     obfuscation_stats.update(dir_stats)
             else:
                 # Legacy single-file mode
@@ -1197,6 +1216,10 @@ def main(
                     input_path_obj, output_path_obj, config, verbose, dry_run
                 )
                 if dir_stats:
+                    if "warnings" in dir_stats:
+                        dir_stats["warnings"] = (
+                            obfuscation_stats.get("warnings", []) + dir_stats["warnings"]
+                        )
                     obfuscation_stats.update(dir_stats)
 
             # Save manifest after a successful rebuild (directory mode only)
@@ -2382,6 +2405,8 @@ def _handle_check(
     level: Optional[str] = None,
     no_config: bool = False,
     sarif_path: Optional[str] = None,
+    preserve_param_names: Optional[bool] = None,
+    cross_file: bool = True,
 ) -> None:
     """
     Run pre-flight risk scan and print report.
@@ -2406,7 +2431,10 @@ def _handle_check(
         cwd=Path.cwd(),
         no_config=no_config,
     )
+    if preserve_param_names is not None:
+        config.preserve_param_names = preserve_param_names
     checker = PreflightChecker(
+        preserve_param_names=(config.preserve_param_names or (input_path.is_dir() and cross_file)),
         exclude_patterns=config.exclude_patterns,
         preserve_names=config.exclude_names,
         safe_preset=(provenance.preset == "safe"),
