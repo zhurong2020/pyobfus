@@ -1,5 +1,15 @@
 # pyobfus 当前计划
 
+**2026-10-11 巡检（查询于 10-10 23:09 UTC，PyPI 数据截至 10-09）**：仓库与 `origin/main` 同步，0 open issue/PR，
+main CI / CodeQL / License Endpoint Monitor 全绿。Core 近 7 天安静日中位数 `34`（10-07/08 发版日 268/169，10-09 回落 73），
+近 30 天 `30`——与 9 月基线 31 持平，10-02/03 的苗头未延续；MCP 近 7 天中位数 `5`；Marketplace `13 installs`（+1），
+Open VSX `656`，Action 引用 `0`；GitHub 14 天浏览 `213`/独立 `121`，来源 Google/GitHub/Bing，chatgpt.com 2，内容渠道未出现。
+Gmail：无客户等回复，10-10 的 5 封 0.6.1 通知暂无回信。KV 实读：6 条许可、trial `0`；09-12 报障客户已于 10-05
+（我方去信约 1 小时后）联网激活成功，原「未激活」跟进结案；另有一位 8 月客户从未激活、一位 6 月客户无设备记录，均未来信。
+Glama 10-08、10-10 各报一次 `pyobfus-mcp` 构建失败（与两次 Core 发版同日）；干净 venv 实测 `pyobfus-mcp 0.3.12` +
+Core 0.6.1 + mcp 1.30.0 握手 8 工具正常，公开页与徽章 200，倾向 Glama 侧问题，待维护者看 admin 日志（`TODO.md` 维护者清单）。
+结论：无代码动作，不触发发版。
+
 **2026-10-10 Core 0.6.1 已发布（维护者批准，破月度节奏，属「影响用户的 bug」例外）**：维护者当日批准 PR #65 的 6 个决定（Claude 写入设计文档并合并，`25a118b`）；Codex 无头实现、Claude 审核后合并 G（#66，目录构建显式别名导入 NameError，`b56afe2`）与 F 方案 A（#67，默认保留参数名、显式 false 警告、`--init` 模板 true、`--check` 关键字调用提示，`ed8cceb`）。审核中 Claude 补：#67 的目录模式文案、Click 8.1 下测试 stderr 兼容（CI 3.9 曾 9 例失败）、MCP CHANGELOG 条目；新登记缺陷 I（关闭局部改名时函数内别名覆盖模块级导入，低优先级）。审核记录私有 `docs/internal/geo-2026-10/PR66_/PR67_REVIEW_2026-10-10.md`。发版提交 `62124ad`（check.sh、四测试根全过，CI/CodeQL/打包 lane 全绿）→ tag `v0.6.1` 经 OIDC 发布：wheel + sdist 均带 PEP 740；全新安装 0.6.1 实测 G、F 复现均修复；GitHub Release「v0.6.1 — import aliases in directory builds; parameter names kept by default」；Zenodo record `23273782`（发版后即已归档）；`CITATION.cff` 已更新。MCP 未随发（`[Unreleased]` 新增 advisory 条目）；VS Code 插件 schema 已同步但待插件下次发版（维护者定：MCP 与插件本轮都不发）。Discussions #11/#13/#24 开头加过时说明（#11 改试用命令与「military-grade」措辞），新公告 #68 已发（含 Known limits H/C/I）；Pro 客户 0.6.1 通知按线上许可证记录建 5 封 Gmail 草稿，维护者 12:35 已发出。剩余：H、C、I、D 与参数改名第 2 步见 `docs/TODO.md` P0；ITK #6930 合并后另行跟进。
 
 **2026-10-08 收尾 · 参数改名设计**：Codex 起草 `docs/CROSSFILE_PARAMETER_RENAMING_DESIGN.md`（PR #65，只含文档），Claude 审核通过并复核
