@@ -5,7 +5,7 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-10-08（参数改名设计 PR #65 审核；新登记缺陷 F、G。同日发布 Core `0.6.0`：目录构建改函数局部变量 + 三个 0.5.32 既有缺陷修复，PyPI/PEP 740/Release/Zenodo `23228339` 已核。此前同日：Claude 交叉审核 #57/#59/#60，修复 #57 三处问题后三个 PR 全部 squash 合并：main `f65be9a`/`26337d8`/`81df698`，未发版；P0 第 1 步完成，新登记两个既有转换缺陷与四条非阻断跟进，见「P0 · 目录构建的改名深度」。上一轮 2026-10-07 晚：同日发 0.5.31 与 0.5.32，静默期按「影响用户的 bug」例外提前结束，10-25 复盘照做；PR #57 审核意见已给 Codex；新增维护者动作：是否通知 Pro 客户升级。此前同日：GEO 计划第一轮完成，剩余项见「GEO / 外部采用」；新增 P0「目录构建的改名深度」。上一轮 2026-10-05：Stripe/许可线：两笔新购核对、结账页文案与激活说明更新、Worker 只对已付款发号并部署、webhook 加 async 订阅；新增维护者清单 5 项见下。上一轮 2026-09-30：下载数据留存收口：只保留决策摘要，10-25 复盘后改为月度留存；所有暂不发版的后续改进继续按本文件的触发条件与节奏跟踪。上一轮 09-28：新增「IP 相关」段：专利标识、专有许可专利条款、发版清单 Apache 边界检查，待拍板；选题池加第 7 篇「混淆后让 AI 助手继续帮你调试」并排进 11-24；落地页加 JSON-LD 结构化数据；周一巡检：plugin 锁由 Rudy 09-28 升级到 Anthropic 内部、等其跟进；GitHub 流量来源已并进 `download_snapshot.py`；第 2 篇草稿已写。上一轮 09-27：新增「内容节奏」段：只写不发到 10-11、10-13 那周起 DEV 双周一篇，知乎选定为中文开发者渠道先记录，第 1 篇草稿已写；Show HN 最终结果补记；上一轮 09-26：Claude plugin 孤儿锁已按 Rudy 要求补齐账号核查、workspace ID 与两张截图并在原线程回复，现等后端处理；上一轮 09-25：trial 现状核查 + KV 备份 P0 当日完成；09-24：awesome-python PR #3352 当日被维护者关闭，理由是采用量，见「分发 / 上架队列」；
+最后更新：2026-10-10（维护者批准 PR #65 的 6 个决定并合并；Codex 无头实现、Claude 审核合并 G（#66）与 F 方案 A（#67），**发布 Core `0.6.1`**（PyPI/PEP 740/全新安装/Release/Zenodo `23273782`/CFF 已核）；新登记缺陷 I；Discussions #11/#13/#24 加过时说明、#11 改试用命令与措辞，新公告 #68 已发；Pro 客户 0.6.1 通知已建 5 封 Gmail 草稿待维护者发。上一轮 2026-10-08：参数改名设计 PR #65 审核；新登记缺陷 F、G。同日发布 Core `0.6.0`：目录构建改函数局部变量 + 三个 0.5.32 既有缺陷修复，PyPI/PEP 740/Release/Zenodo `23228339` 已核。此前同日：Claude 交叉审核 #57/#59/#60，修复 #57 三处问题后三个 PR 全部 squash 合并：main `f65be9a`/`26337d8`/`81df698`，未发版；P0 第 1 步完成，新登记两个既有转换缺陷与四条非阻断跟进，见「P0 · 目录构建的改名深度」。上一轮 2026-10-07 晚：同日发 0.5.31 与 0.5.32，静默期按「影响用户的 bug」例外提前结束，10-25 复盘照做；PR #57 审核意见已给 Codex；新增维护者动作：是否通知 Pro 客户升级。此前同日：GEO 计划第一轮完成，剩余项见「GEO / 外部采用」；新增 P0「目录构建的改名深度」。上一轮 2026-10-05：Stripe/许可线：两笔新购核对、结账页文案与激活说明更新、Worker 只对已付款发号并部署、webhook 加 async 订阅；新增维护者清单 5 项见下。上一轮 2026-09-30：下载数据留存收口：只保留决策摘要，10-25 复盘后改为月度留存；所有暂不发版的后续改进继续按本文件的触发条件与节奏跟踪。上一轮 09-28：新增「IP 相关」段：专利标识、专有许可专利条款、发版清单 Apache 边界检查，待拍板；选题池加第 7 篇「混淆后让 AI 助手继续帮你调试」并排进 11-24；落地页加 JSON-LD 结构化数据；周一巡检：plugin 锁由 Rudy 09-28 升级到 Anthropic 内部、等其跟进；GitHub 流量来源已并进 `download_snapshot.py`；第 2 篇草稿已写。上一轮 09-27：新增「内容节奏」段：只写不发到 10-11、10-13 那周起 DEV 双周一篇，知乎选定为中文开发者渠道先记录，第 1 篇草稿已写；Show HN 最终结果补记；上一轮 09-26：Claude plugin 孤儿锁已按 Rudy 要求补齐账号核查、workspace ID 与两张截图并在原线程回复，现等后端处理；上一轮 09-25：trial 现状核查 + KV 备份 P0 当日完成；09-24：awesome-python PR #3352 当日被维护者关闭，理由是采用量，见「分发 / 上架队列」；
 `pyobfus-runtime` 0.1.0 已通过 OIDC/PEP 740 发布并完成 PyPI 验收；
 删除已完全合入 `main` 的本地及远端 `spike/mcp-sdk-2x` 空壳分支；
 修正本文件把已随 0.5.28 发布的邮箱 trial 误列为待实现、仍称 0.5.27 为当前版本的状态漂移。
@@ -43,7 +43,7 @@ Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运�
       复现锁报错，并于 09-26 在原线程附上「No submissions yet」与 repository/path lock 两张截图，提供
       Claude Code workspace ID，请求后端定位/释放。**09-28 Rudy 回信「已升级内部，有消息再跟进」——球在对方，不必再催；锁没释放前别再点表单或换路径绕过**。字段/描述与证据见
       `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`。
-- [ ] **通知 Pro 客户升级到 0.6.1**（10-10 维护者定：发；草稿私有 `docs/internal/content-2026-10/pro_customer_notice_0.6.1.md`，待维护者审后逐个/BCC 发送；取代原「是否通知升级到 0.5.32」，0.6.1 已含该修复）。原登记（2026-10-07）：0.5.10–0.5.31 的目录构建遇到同模块
+- [ ] **通知 Pro 客户升级到 0.6.1**（10-10 维护者定：发；草稿私有 `docs/internal/content-2026-10/pro_customer_notice_0.6.1.md`，10-10 已按线上许可证记录建 5 封 Gmail 草稿（每人一封、排除维护者自用许可证；未激活的那位多一句协助激活），待维护者逐封核对后发送；取代原「是否通知升级到 0.5.32」，0.6.1 已含该修复）。原登记（2026-10-07）：0.5.10–0.5.31 的目录构建遇到同模块
       装饰器/基类/lambda 会 import 时 NameError。两位 10 月新客户如用过目录构建可能受影响；需要的话由 Claude 起草、
       维护者审后发送，AI 代理不直接发信。
 - [ ] **MCP Trust Registry publish**：在其站点注册拿 API token 后
@@ -153,7 +153,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 | ~~P0~~ ✅ | **KV 每日备份适配 trial 记录 + 补跑机制**（用户 2026-09-25 列为 P0，当日完成）：`~/scripts/pyobfus_kv_export.sh` 此前只认 license 记录，第一条 `trial:*` 登记会让整轮导出拒绝落盘、许可备份静默停止（上线 5 天 KV 尚无 trial 记录，未实际发生）。已改为按 key 类型校验（`PYOB-*` 查 license_key / `trial:*` 查 email_hash+v / 未知类型只查可解析并 WARN）+ `:`→`__` Windows 安全文件名 + `--selftest` 14 项；调度从 crontab 01:30 挪进 `wsl_daily_backup.sh` 开头（systemd `Persistent` 开机补跑，cron 不补跑致 09-24/25 漏导，已补、与 09-22 逐字节一致）；`check_backup.sh` 加 KV 一节。脚本都在 `~/scripts/`（仓库外，随日备份进 OneDrive），仓内只记状态 | 免发版（仓库外脚本） | — |
 | **P2** | 分发上架队列：awesome-python PR #3352 **2026-09-24 被拒**（理由=采用量，对方留了「adoption grows」再议的门；不争辩、不重开）；awesome-security / awesome-devsecops 门槛同为下载量，**跳过**；队列下一项 **AlternativeTo**（需维护者账号） | 免发版 | 维护者 |
 
-### P0 · 目录构建的改名深度（2026-10-07 发现 · 第 1 步与缺陷 A/B/E 已随 0.6.0 发布，10-08）
+### P0 · 目录构建的改名深度（2026-10-07 发现 · 第 1 步与缺陷 A/B/E 已随 0.6.0 发布，10-08；缺陷 G、F 已随 0.6.1 发布，10-10）
 
 **现状**：目录（cross-file）构建改模块级名字和函数局部变量并同步 import；参数、方法名、属性保留原名。单文件模式改得更深
 （含方法与参数），但保留函数内定义的函数/类名和类体注解字段名。0.6.0 的内容与审核记录见 `CURRENT_PLAN_ZH.md` 10-08 段。
@@ -162,14 +162,14 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 
 - [x] **既有缺陷 G · 目录构建的别名导入（优先，0.5.32 已存在，影响用户）**：`from pkg import scale as action` 或
       `from pkg.core import scale as action` 后调用 `action(...)` 即 NameError（局部改名开关无关）。参数改名设计审核中发现；
-      应先于参数改名的解析器工作修复。**10-10 已合并 PR #66（`b56afe2`），未发版**（保留显式本地别名，仅同步被导入符号名）；审核记录私有 `docs/internal/geo-2026-10/PR66_REVIEW_2026-10-10.md`。
+      应先于参数改名的解析器工作修复。**10-10 已合并 PR #66（`b56afe2`），随 0.6.1 发布**（保留显式本地别名，仅同步被导入符号名）；审核记录私有 `docs/internal/geo-2026-10/PR66_REVIEW_2026-10-10.md`。
 - [ ] **既有缺陷 I · 关闭局部改名时函数内别名覆盖模块级导入**（10-10 审 #66 发现，main 与 0.6.0 同样失败，低优先级）：
       模块级 `from pkg.core import helper` + 函数内 `from pkg.core import scale as helper`，加 `--no-crossfile-local-names`
       时模块级的 `helper(...)` NameError。根因：ImportedNameTransformer 的 `import_mappings` 按模块扁平存放，函数内导入覆盖模块级条目。
       默认（开启局部改名）正确。
 - [x] **既有缺陷 F · 单文件模式默认改参数但不改关键字调用（优先，0.5.32 已存在）**：同文件 `scale(1, factor=3)` 即 TypeError；
       含 `/`、`*args`、`**kwargs` 的签名还会静默绑错（关键字落进 `**kwargs`、参数取默认值）。无预设、safe、balanced、aggressive
-      在 0.5.32 / 0.6.0 都是 `preserve_param_names=False`（框架预设与 library 为 True）。**10-10 已合并 PR #67（`ed8cceb`），未发版**；审核记录私有 `docs/internal/geo-2026-10/PR67_REVIEW_2026-10-10.md`：
+      在 0.5.32 / 0.6.0 都是 `preserve_param_names=False`（框架预设与 library 为 True）。**10-10 已合并 PR #67（`ed8cceb`），随 0.6.1 发布**；审核记录私有 `docs/internal/geo-2026-10/PR67_REVIEW_2026-10-10.md`：
       按 10-10 已合并设计 PR #65 的维护者决定实现默认保留参数名；显式 false 照旧生效但警告，`--init` 模板改为 true，
       `--check` 加 medium 语法候选风险提示，目录 cross-file 参数保留行为不变。证据私有 `docs/internal/geo-2026-10/param-default-evidence/`。
 - [ ] **既有限制 H · 通过模块对象访问属性**（10-08 交叉审核发现，0.5.32 已存在）：目录构建里 `from pkg import core` 后
@@ -268,8 +268,8 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 
 发版本身是独立 gate。
 
-- **Core `[Unreleased]` 为空**：`0.6.0` 已于 2026-10-08 发布（目录构建改函数局部变量 + 缺陷 A/B/E）。
-- **`pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]`**：mcp SDK 2.x 兼容。刻意不随 Core
+- **Core `[Unreleased]` 为空**：`0.6.1` 已于 2026-10-10 发布（缺陷 G 别名导入 + F 默认保留参数名）；`0.6.0` 于 10-08 发布。
+- **`pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]`**：mcp SDK 2.x 兼容、mapping 不匹配提示、关键字调用 advisory（10-10 维护者定：暂不发）。VS Code 插件 schema 已随 #67 同步 `preserve_param_names` 默认值，也暂不发插件。刻意不随 Core
   发，攒够增量或有人明确要 2.x 时再发（每发一次 MCP 要手工改 Glama Build steps）。
 
 
