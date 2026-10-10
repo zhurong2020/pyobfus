@@ -41,6 +41,21 @@ combinations; those platform-specific failures can still reach users first.
 | Single file (or `--no-cross-file`) | Module-level names, method names, local variables, parameters (unless `--preserve-param-names`) | Names of functions/classes defined inside functions and class-body annotated field names (since 0.6.0); instance attributes (`self.precision`). Each file is renamed on its own, so imports between modules of one project break in this mode | `tests/`, single-file end-to-end in `integration_tests/` |
 | Directory, default cross-file mode | Module-level classes, functions and variables, consistently in every file, plus the import statements that reference them; function locals (since 0.6.0) | Methods, attributes, parameters; locals in reflection-sensitive functions | `integration_tests/test_cli_end_to_end.py` (multifile); `tests/test_crossfile_decorators_bases.py` covers decorators, base classes, metaclasses and lambdas (fixed in 0.5.32); new local scope tests in `tests/test_crossfile_function_locals.py`; historical 0.5.30 scope observed on 2026-10-07, see the [selling guide](guides/protect-python-before-selling.md#what-you-get-measured) |
 
+Directory builds rewrite the imported symbol in `from M import X as A` using
+M's export mapping, while preserving the explicit local alias A (including
+`X as X`) and its references. Explicit aliases remain preserved in functions,
+classes and conditional imports, with `crossfile_local_names` on or off;
+`__all__` and downstream re-exports retain the alias spelling. Third-party
+imports keep their original symbol and alias names. Unaliased imports retain
+the existing cross-file naming rules. Execution evidence:
+`integration_tests/test_crossfile_import_alias.py`.
+
+**Limitation H:** `import pkg.core as engine` binds the module alias correctly,
+but `engine.scale()` still uses the original attribute spelling. If `scale`
+was renamed in the target module, execution raises `AttributeError`.
+Module-object attribute rewriting remains unsupported; preserve those names
+with `exclude_names`. The same test file locks this current limitation.
+
 Single-file builds preserve the spelling of a function or class whose lexical
 parent is a function (including async functions and methods), even inside
 control-flow suites. A class body starts its own scope: its methods and nested

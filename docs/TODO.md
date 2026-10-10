@@ -162,7 +162,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 
 - [ ] **既有缺陷 G · 目录构建的别名导入（优先，0.5.32 已存在，影响用户）**：`from pkg import scale as action` 或
       `from pkg.core import scale as action` 后调用 `action(...)` 即 NameError（局部改名开关无关）。参数改名设计审核中发现；
-      应先于参数改名的解析器工作修复。
+      应先于参数改名的解析器工作修复。**已提 PR #66，待审**（保留显式本地别名，仅同步被导入符号名）。
 - [ ] **既有缺陷 F · 单文件模式默认改参数但不改关键字调用（优先，0.5.32 已存在）**：同文件 `scale(1, factor=3)` 即 TypeError；
       含 `/`、`*args`、`**kwargs` 的签名还会静默绑错（关键字落进 `**kwargs`、参数取默认值）。无预设、safe、balanced、aggressive
       都是 `preserve_param_names=False`（框架预设与 library 为 True）。处置方案见设计文档 PR #65「Short-term response to F」：
