@@ -1,5 +1,12 @@
 # pyobfus 当前计划
 
+**2026-10-11 许可证监控 404 误报修复（免发版）**：Codex 交叉审核第 1 篇 DEV 草稿时指出、Claude 复核属实——客户端
+`_verify_online()` 把任何 HTTP 404 都报成 `License key not found` 且不读正文，监控只比对这句话，所以 Worker 路由丢失或代理/边缘
+返回的非 Worker 404 也会显示健康（旧脚本对 pypi.org 的 HTML 404 实测 exit 0）。`scripts/monitor_license_endpoint.py` 在客户端路径
+通过后再用同一 User-Agent 直接请求一次，断言 404 正文是 Worker 的 JSON（`code=invalid_key` 或旧版 `error=Invalid license key`）。
+新增 `tests/test_monitor_license_endpoint.py` 11 项全离线（旧脚本下 10 项失败）；本地对生产四种情况：正常绿、旧 UA 红、不可达红、
+非 Worker 404 红。只改脚本与测试，不改客户端、不发版；客户端是否读 404 正文另议（要发版）。监控仍只覆盖拒绝路径，不证明有效 key 能激活。
+
 **2026-10-11 巡检（查询于 10-10 23:09 UTC，PyPI 数据截至 10-09）**：仓库与 `origin/main` 同步，0 open issue/PR，
 main CI / CodeQL / License Endpoint Monitor 全绿。Core 近 7 天安静日中位数 `34`（10-07/08 发版日 268/169，10-09 回落 73），
 近 30 天 `30`——与 9 月基线 31 持平，10-02/03 的苗头未延续；MCP 近 7 天中位数 `5`；Marketplace `13 installs`（+1），
