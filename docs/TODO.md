@@ -322,7 +322,7 @@ V2EX 仍卡在账号激活（要邀请码）；Stack Overflow 按 2026-04-22 的
 **选题池**（真实素材，按搜索意图排；Stripe webhook 那段默认不写，待维护者定）
 
 1. Cloudflare 拦 `Python-urllib` UA（403 / error code 1010），全体付费客户两个月激活不了
-   —— **草稿已写**，放在 gitignored 的 `docs/internal/content-2026-10/01-urllib-user-agent-postmortem.md`
+   —— **10-11 已逐条核实事实并修订，待维护者通读后发 DEV（目标 10-13/14）**，放在 gitignored 的 `docs/internal/content-2026-10/01-urllib-user-agent-postmortem.md`
    （`published: false`；维护者 09-27 定：发稿前不进公开仓库）
 2. SARIF 上传前别再 `|| true`（带出 `pyobfus-action`）—— **草稿已写 09-28**，
    `docs/internal/content-2026-10/02-sarif-or-true.md`（`published: false`，待维护者审）
