@@ -450,27 +450,31 @@ A per-function allowlist for public-but-closed-world functions may be introduced
 only with explicit API-contract documentation; it cannot override framework,
 reflection or unresolved-call preservation silently.
 
-## Maintainer decisions still needed
+## Maintainer decisions (2026-10-10)
 
-1. Approve A's default preservation for unpreset/balanced/aggressive and explicit
-   safe correction; retain, deprecate or remove unsafe single-file parameter
-   renaming? Approve the legacy flag name and migration behavior for existing
-   YAML `preserve_param_names: false`.
-2. Accept private/internal-only eligibility initially, or require an explicit
-   function allowlist/deployment closed-world declaration even for private
-   module functions? Public APIs remain preserved unless separately reviewed.
-3. Approve Community classification, proposed switch names/false defaults and
-   hard preserve-flag precedence; decide whether single-file B exposes its own
-   switch or reuses a shared mode-independent policy.
-4. Approve optional mapping v1 parameters shape and new-reader rollout. Choose
-   marker canonicalization strategy or require a mapping format bump if old
-   marker compatibility cannot be demonstrated without weakening verification.
-5. Approve dependency-closure preservation and rare build-wide parameter-off
-   fallback when uncertainty cannot be bounded. Choose whether users can demand
-   a strict failure instead of a successful but less-mangled build.
-6. Decide the order of the existing import-alias defect review and resolver
-   work; choose the performance budget and representative-project corpus before
-   estimating B's actual retained strength.
+1. **Option A is approved.** Unpreset, `safe`, `balanced` and `aggressive`
+   builds preserve parameter names by default. No new
+   `--unsafe-rename-parameters` flag: an explicit `preserve_param_names: false`
+   in YAML or on the command line keeps working but emits a warning that
+   keyword calls may break. The `--init` template writes
+   `preserve_param_names: true`, since its current `false` was never a user
+   choice.
+2. **v1 eligibility is private/internal only:** ordinary functions that are
+   private, only called directly and never escape. No allowlist is required
+   for v1. Public APIs stay preserved.
+3. **Community feature.** The cross-file switch is `crossfile_parameter_names`,
+   default false; `preserve_param_names: true` always wins. Whether single-file
+   B gets its own switch is decided in that phase's PR.
+4. **Optional `parameters` section in mapping v1.** The reader is upgraded
+   first, so load/save keeps the section, before any build emits it. Marker
+   canonicalization is decided in the reader PR; if old-marker compatibility
+   cannot be shown without weakening verification, that PR proposes a format
+   bump instead.
+5. **Dependency-closure preservation and the build-wide parameter-off fallback
+   are approved.** A strict-failure mode is deferred until a user asks for it.
+6. **Order:** fix import-alias defect G first, then Option A for F (PR 1), then
+   the resolver work. The performance budget and corpus are set in the PR that
+   introduces the resolver.
 
 ## Scope of this design review
 
