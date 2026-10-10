@@ -31,7 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   preservation with YAML true or `--preserve-param-names`. Rebuilding removes
   parameter mapping entries and can shift other mapping numbers: keep each
   artifact paired with its own mapping; old mappings cannot decode new builds.
-  Directory builds continue preserving parameters regardless of this option.
+  Cross-file directory builds (the default) still preserve parameters
+  regardless of this option; legacy `--no-cross-file` directory builds follow it.
 
 ## [0.6.0] - 2026-10-08
 

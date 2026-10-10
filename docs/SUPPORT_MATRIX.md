@@ -49,8 +49,9 @@ change mapping numbers: old mappings cannot decode new artifacts. `--check`
 reports a medium advisory for bare same-file function names called with keywords
 or `**` forwarding when renaming is enabled. This is a syntactic candidate
 check, not callable resolution; absence of a finding does not establish safety.
-Existing exit-code rules are unchanged. Default directory builds preserve
-parameters even with explicit false.
+Existing exit-code rules are unchanged. Default (cross-file) directory builds preserve
+parameters even with explicit false; legacy `--no-cross-file` directory builds
+rename them when false is set.
 
 Directory builds rewrite the imported symbol in `from M import X as A` using
 M's export mapping, while preserving the explicit local alias A (including

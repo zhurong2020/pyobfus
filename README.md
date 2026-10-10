@@ -87,7 +87,8 @@ Parameter names are preserved by default in every preset. Explicit
 renaming with a warning: keyword calls may raise `TypeError` or silently bind
 incorrectly. Rebuild from original source and keep the new mapping with the
 new artifact; mapping numbers can change and old mappings cannot decode
-rebuilt output. Directory builds continue preserving parameters.
+rebuilt output. Cross-file directory builds (the default) still preserve parameters; legacy
+`--no-cross-file` directory builds follow the option.
 
 ## Features at a glance
 
