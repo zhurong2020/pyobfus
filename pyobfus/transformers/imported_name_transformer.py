@@ -65,7 +65,12 @@ class ImportCollector(ast.NodeVisitor):
 
             if obfuscated_name:
                 # Map: local_name -> obfuscated_name
-                self.import_mappings[local_name] = obfuscated_name
+                # The export spelling changes independently of an explicit
+                # local alias (including `X as X`). Identity entries also keep
+                # the later module-name pass from rewriting this binding.
+                self.import_mappings[local_name] = (
+                    local_name if alias.asname is not None else obfuscated_name
+                )
 
         self.generic_visit(node)
 

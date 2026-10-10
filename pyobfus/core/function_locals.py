@@ -369,12 +369,17 @@ def plan_locals(
     # Nested def/class names are observable through __name__/__qualname__:
     # Flask endpoints, Click commands and name-keyed registries depend on them.
     definitions = set()
+    explicit_aliases = set()
     for ref_node, attr, ref_name, scope in references:
         binding = owner(scope, ref_name)
         if binding is not None and (
             attr != "id" or isinstance(getattr(ref_node, "ctx", None), (ast.Store, ast.Del))
         ):
             bindings.add((binding.get_id(), ref_name))
+            if attr.startswith("aliases:") and isinstance(ref_node, (ast.Import, ast.ImportFrom)):
+                alias = ref_node.names[int(attr.split(":")[1])]
+                if alias.asname is not None:
+                    explicit_aliases.add((binding.get_id(), ref_name))
             if attr == "name" and isinstance(
                 ref_node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
             ):
@@ -391,6 +396,7 @@ def plan_locals(
             if (
                 (sid, name) in bindings
                 and (sid, name) not in definitions
+                and (sid, name) not in explicit_aliases
                 and symbol.is_local()
                 and not symbol.is_parameter()
                 and not symbol.is_global()

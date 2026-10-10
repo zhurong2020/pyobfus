@@ -22,6 +22,7 @@ class ReExportSource(NamedTuple):
     level: int  # leading dots; 0 for an absolute import
     original_name: str  # name in the source module, before any ``as`` alias
     is_module_binding: bool = False  # ``import json`` binds a module, not a symbol
+    has_explicit_alias: bool = False  # explicit aliases retain their local spelling
 
 
 class ExportDetector(ast.NodeVisitor):
@@ -175,6 +176,7 @@ class ExportDetector(ast.NodeVisitor):
                         module=node.module,
                         level=node.level,
                         original_name=alias.name,
+                        has_explicit_alias=alias.asname is not None,
                     )
 
         self.generic_visit(node)

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Directory builds now keep explicit import aliases and their references in sync,
+  including relative imports and chained re-exports. This fixes a runtime
+  `NameError` affecting 0.6.0 and earlier releases, with function-local renaming
+  both enabled and disabled. Rebuild affected output from the original source
+  and retain the matching new mapping.
+
 ## [0.6.0] - 2026-10-08
 
 Directory builds now rename function-local variables by default, so their

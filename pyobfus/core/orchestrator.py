@@ -316,11 +316,15 @@ class CrossFileOrchestrator:
 
         if self.config.crossfile_local_names:
             self._reserved_names.update(self.config.exclude_names)
-            # Reserve every source identifier too: a preserved parameter named
-            # I42 must never capture a newly allocated local I42.
-            for fi in self.files:
-                tree = ASTParser.parse_file(fi.path)
-                for node in ast.walk(tree):
+        for fi in self.files:
+            tree = ASTParser.parse_file(fi.path)
+            for node in ast.walk(tree):
+                # Explicit aliases survive even when local renaming is off;
+                # newly allocated definitions must not collide with them.
+                if isinstance(node, (ast.Import, ast.ImportFrom)):
+                    self._reserved_names.update(a.asname for a in node.names if a.asname)
+                if self.config.crossfile_local_names:
+                    # A preserved parameter I42 must never capture a new I42.
                     for attr in ("id", "arg", "name", "asname", "rest"):
                         value = getattr(node, attr, None)
                         if isinstance(value, str):
@@ -369,6 +373,10 @@ class CrossFileOrchestrator:
                     continue
 
                 source = detector.imported_from.get(export_name)
+                if source is not None and source.has_explicit_alias:
+                    # `from M import X as A` exports the local binding A, not
+                    # M's renamed X. Consumers and __all__ must retain A too.
+                    continue
                 if source is not None and source.is_module_binding:
                     # A module bound by `import x`: the import statement keeps
                     # the real module name, so this name must keep it too.
