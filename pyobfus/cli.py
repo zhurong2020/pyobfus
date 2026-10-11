@@ -37,7 +37,7 @@ from pyobfus.core.source_prologue import (
 from pyobfus.core.generator import CodeGenerator
 from pyobfus.core.parser import ASTParser
 from pyobfus.core.orchestrator import CrossFileOrchestrator
-from pyobfus.exceptions import LimitExceededError, PyObfusError
+from pyobfus.exceptions import LimitExceededError, ParseError, PyObfusError
 from pyobfus.transformers.name_mangler import NameMangler
 from pyobfus.utils import filter_python_files
 from pyobfus.trial import is_trial_active, get_trial_expiry_message
@@ -1428,7 +1428,7 @@ def main(
 def _report_dropped_encoding(source: str) -> None:
     _, encoding = source_prologue(source)
     if encoding:
-        click.echo(f"  编码声明 {encoding} 未保留，输出为 UTF-8")
+        click.echo(f"  Encoding declaration {encoding!r} not kept: output is UTF-8")
 
 
 def _obfuscate_file(
@@ -1477,7 +1477,11 @@ def _obfuscate_file(
     _fusion = (
         config.level == "pro" and _build_fusion is not None and _build_fusion.fusion_enabled(config)
     )
-    original_source = read_python_source(input_file)
+    try:
+        original_source = read_python_source(input_file)
+    except (SyntaxError, UnicodeDecodeError) as exc:
+        # Same reporting as an unparsable file: bad encodings are input errors.
+        raise ParseError(str(input_file), exc) from exc
     if verbose:
         _report_dropped_encoding(original_source)
     if _fusion:

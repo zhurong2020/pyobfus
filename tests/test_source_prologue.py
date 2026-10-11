@@ -78,7 +78,7 @@ def test_latin1_is_decoded_and_cookie_dropped(build, tmp_path, mode, shebang, ma
     if trace:
         flags.extend(["--trace-marker", "--save-mapping", str(tmp_path / "map.json")])
     script, output, result = build(mode, source, flags, "latin-1")
-    assert "编码声明 latin-1 未保留，输出为 UTF-8" in result.output
+    assert "Encoding declaration 'latin-1' not kept: output is UTF-8" in result.output
     text = output.read_text(encoding="utf-8")
     assert "latin-1" not in text
     if shebang:
@@ -212,3 +212,13 @@ def test_pro_fusion_restores_prologue_after_text_passes(build, monkeypatch):
     assert output.read_text().startswith(SHEBANG + "\n# coding: utf-8\n")
     assert "_pyobfus_expire_check" in output.read_text()
     assert subprocess.check_output([sys.executable, str(output)]) == b"ok\n"
+
+
+def test_single_file_invalid_encoding_is_a_parse_error(tmp_path):
+    """Undecodable input is reported like any unparsable file, not as a crash."""
+    source = tmp_path / "bad.py"
+    source.write_bytes(b'X = "\xff\xfe"\n')
+    result = CliRunner().invoke(main, [str(source), "-o", str(tmp_path / "out.py")])
+    assert result.exit_code != 0
+    assert "Failed to parse" in result.output
+    assert "Unexpected error" not in result.output
