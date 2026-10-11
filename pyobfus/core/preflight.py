@@ -788,6 +788,7 @@ class PreflightChecker:
                 )
 
             def attribute(node: ast.Attribute, module: str) -> None:
+                collision = module in inventory.packages and module in inventory.trees
                 plan = planner.attribute_plans.get(file_info.module_name)
                 if plan is not None and any(
                     edit.location
@@ -802,6 +803,11 @@ class PreflightChecker:
                 ):
                     return  # Suppress only a validated, scheduled original-AST edit.
                 if table.get_obfuscated_import(module, node.attr) is None:
+                    collision_changed = (
+                        config.crossfile_module_attributes
+                        and collision
+                        and table.get_obfuscated_import(inventory.canonical(module), node.attr)
+                    )
                     # On-only uncertainty for a selected package star re-export;
                     # never synthesize an export allocation or a build edit.
                     tree = inventory.packages.get(module)
@@ -818,7 +824,7 @@ class PreflightChecker:
                             for n in ast.walk(tree)
                         )
                     )
-                    if not star_changed:
+                    if not star_changed and not collision_changed:
                         return  # External modules and unchanged names have no mapping.
                 key = (module, node.attr)
                 if key in seen:
@@ -839,8 +845,13 @@ class PreflightChecker:
                             else f"{ast.unparse(node)} accesses {module}.{node.attr}; attribute access through a module "
                             "object is not proved safe for rewriting and may cause AttributeError at runtime."
                         ),
-                        suggestion=f"Use from {module} import {node.attr} and reference "
-                        f"{node.attr} directly, or add {node.attr} to exclude_names.",
+                        suggestion=(
+                            f"Resolve the duplicate file/package import roots for {module}; "
+                            f"add {node.attr} to exclude_names before building."
+                            if config.crossfile_module_attributes and collision
+                            else f"Use from {module} import {node.attr} and reference "
+                            f"{node.attr} directly, or add {node.attr} to exclude_names."
+                        ),
                     )
                 )
 
@@ -877,7 +888,9 @@ class PreflightChecker:
                     listed += f" and {len(ordered) - 10} more"
                 message = (
                     f"Detected {', '.join(sorted(kinds))} for project module candidate "
-                    f"{', '.join(sorted(modules))}; this use is not automatically rewritten. "
+                    f"{', '.join(sorted(modules)[:5])}"
+                    + (f" and {len(modules) - 5} more" if len(modules) > 5 else "")
+                    + "; this use is not automatically rewritten. "
                 )
                 message += (
                     "Renamed exports may cause AttributeError at runtime."
@@ -893,8 +906,14 @@ class PreflightChecker:
                         col=position[1],
                         message=message,
                         suggestion=f"Affected names: {listed}. Add the affected names to "
-                        f"exclude_names or use from {sorted(modules)[0]} import X and reference "
-                        "X directly. Unknown consumers require preserving all module exports.",
+                        "exclude_names. "
+                        + (
+                            "The target is unknown: configure an explicit plugin/API preservation "
+                            "boundary, or establish the target and use a direct from-import. "
+                            if "dynamic module access (unknown target)" in kinds
+                            else f"Alternatively, use from {sorted(modules)[0]} import X and reference X directly. "
+                        )
+                        + "Unknown consumers require preserving all module exports.",
                     )
                 )
 

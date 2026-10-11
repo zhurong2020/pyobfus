@@ -87,7 +87,10 @@ literals, inert definitions and unconditional selected-project imports are
 eligible; a simple module-attribute read into a package definition is also
 supported. Arbitrary initializer calls, dynamic or star re-exports,
 conditional imports, late/competing bindings, namespace packages, cycles,
-mutations, escapes and reflection remain unproved. Existing flat-import and
+mutations, escapes and reflection remain unproved. A rename-table entry must
+also correspond to a proved unconditional source binding; dynamically supplied
+exports (including `enum.global_enum` injections), standard-library root
+collisions and same-named package/module roots are rejected. Existing flat-import and
 global-rebinding conflicts (I/D) are rejected rather than repaired. Preserve
 affected exports with `exclude_names`; a clean check cannot establish safety
 for unknown consumers. Behavioral evidence:
@@ -106,8 +109,10 @@ symbol appears in the build's rename table; single-file checks do not report it.
 This check skips reassigned bindings and does not prove dynamic or star
 imports. With either switch setting, detected assignment/argument/return/yield/
 container escapes, reflection (`getattr`, `hasattr`, `setattr`, `delattr`,
-`vars`, `__dict__`), recognizable literal `sys.modules`/`import_module`
-attribute accesses and module writes receive preservation advice. Detected
+`vars`, `__dict__`), recognizable `sys.modules`/`import_module`
+attribute accesses and module writes receive preservation advice. Computed module
+targets require an explicit plugin/API boundary and conservatively invalidate
+all selected module proofs instead of guessing a target. Detected
 hazards conservatively prevent all edits for the referenced module across
 selected project files. Advice lists at most ten names plus the remaining count;
 unknown consumption requires preserving all exports. Already preserved names

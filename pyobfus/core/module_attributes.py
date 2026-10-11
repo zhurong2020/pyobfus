@@ -9,7 +9,9 @@ from __future__ import annotations
 
 import ast
 import hashlib
+import sys
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Callable, Dict, List, Optional, Set, Tuple
 
 from pyobfus.core.global_table import GlobalSymbolTable
@@ -159,12 +161,21 @@ class ModuleInventory:
         self.resolve_from = resolve_from
         self._package_static: Dict[str, bool] = {}
         self._module_edges: Dict[Tuple[str, str], Optional[str]] = {}
+        self._export_bindings: Dict[str, _Bindings] = {}
+        stdlib = getattr(sys, "stdlib_module_names", None)
+        if stdlib is None:  # Python 3.9; inspect the tool's stdlib, never target imports.
+            root = Path(ast.__file__).parent
+            stdlib = {p.stem for p in root.glob("*.py")}
+            stdlib.update(p.name for p in root.iterdir() if (p / "__init__.py").is_file())
+            stdlib.update(p.name.split(".")[0] for p in (root / "lib-dynload").glob("*"))
+        self.stdlib_roots = set(stdlib) | set(sys.builtin_module_names)
         self.unsafe: Set[str] = set()
         self.edges: Dict[str, Set[str]] = {module: set() for module in self.trees}
         for module, tree in self.trees.items():
             bindings = _Bindings(lambda n: resolve_from(module, n))
             for statement in tree.body:
                 bindings.visit(statement)
+            self._export_bindings[module] = bindings
             # I/D can live in the module supplying an export, not just in
             # its consumer. Do not promise H correctness over those existing
             # flat-import/global-store failures, even for package re-exports.
@@ -244,6 +255,69 @@ class ModuleInventory:
 
     def selected(self, module: str) -> bool:
         return self.canonical(module) in self.trees
+
+    def static_export(
+        self, module: str, name: str, visited: Optional[Set[Tuple[str, str]]] = None
+    ) -> bool:
+        """An allocated __all__ slot alone does not prove an emitted binding.
+
+        Reuse lexical binding collection and the existing relative resolver;
+        this validates the table's spelling without allocating another name.
+        Imported exports require a unique unconditional symbol import, then
+        the same proof at its source. Dynamic/star-created exports are refused.
+        """
+        canonical = self.canonical(module)
+        if module in self.packages and module in self.trees:
+            return False
+        key = (canonical, name)
+        visited = set() if visited is None else set(visited)
+        if key in visited or canonical in self.unsafe:
+            return False
+        visited.add(key)
+        bindings = self._export_bindings.get(canonical)
+        if bindings is None:
+            return False
+        if name not in bindings.imports:
+            for statement in self.trees[canonical].body:
+                if (
+                    isinstance(statement, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+                    and statement.name == name
+                ):
+                    return True
+                if isinstance(statement, (ast.Assign, ast.AnnAssign)):
+                    targets = (
+                        statement.targets
+                        if isinstance(statement, ast.Assign)
+                        else [statement.target]
+                    )
+                    if any(
+                        isinstance(n, ast.Name) and isinstance(n.ctx, ast.Store) and n.id == name
+                        for target in targets
+                        for n in ast.walk(target)
+                    ):
+                        return True
+            return False
+        if name in bindings.shadowed:
+            return False
+        tree = self.trees[canonical]
+        imports = [
+            n
+            for n in _scope_nodes(tree.body)
+            if isinstance(n, (ast.Import, ast.ImportFrom))
+            and any((a.asname or a.name.split(".")[0]) == name for a in n.names)
+        ]
+        if (
+            len(imports) != 1
+            or imports[0] not in tree.body
+            or not isinstance(imports[0], ast.ImportFrom)
+        ):
+            return False
+        statement = imports[0]
+        base = self.resolve_from(canonical, statement)
+        if not base:
+            return False
+        alias = next(a for a in statement.names if (a.asname or a.name) == name)
+        return self.static_export(base, alias.name, visited)
 
     def _static_package(self, package: str) -> bool:
         if package not in self._package_static:
@@ -360,6 +434,10 @@ class ModuleInventory:
 
     def eligible(self, module: str, importer: str) -> bool:
         canonical = self.canonical(module)
+        if module.split(".")[0] in self.stdlib_roots:
+            return False  # A selected filename cannot settle a stdlib import collision.
+        if module in self.packages and module in self.trees:
+            return False  # The file/package collision is ambiguous even at the root.
         if module.endswith(".__init__") or module == "__init__" or not self.selected(module):
             return False
         if any(m in self.unsafe or m in self.cyclic for m in (canonical, importer)):
@@ -414,6 +492,13 @@ def discover_module_hazards(
                         return target
             return None
 
+        def dynamic_expression(self, node: ast.expr) -> bool:
+            return (
+                isinstance(node, ast.Subscript) and self.resolve(node.value) == "sys.modules"
+            ) or (
+                isinstance(node, ast.Call) and self.resolve(node.func) == "importlib.import_module"
+            )
+
         def observe(self, node: ast.expr) -> None:
             module = self.resolve(node)
             if not module or not inventory.selected(module) or not isinstance(node.ctx, ast.Load):  # type: ignore[attr-defined]
@@ -447,8 +532,26 @@ def discover_module_hazards(
         def visit_Name(self, node: ast.Name) -> None:
             self.observe(node)
 
+        def visit_ClassDef(self, node: ast.ClassDef) -> None:
+            if any(
+                self.resolve(d.func if isinstance(d, ast.Call) else d) == "enum.global_enum"
+                for d in node.decorator_list
+            ):
+                inventory.unsafe.add(importer)  # Existing C injection is not repaired by H.
+            super().visit_ClassDef(node)
+
         def visit_Attribute(self, node: ast.Attribute) -> None:
             target = self.resolve(node.value) or self.dynamic(node.value)
+            if (
+                self.dynamic_expression(node.value)
+                and self.dynamic(node.value) is None
+                and (
+                    not (node.attr.startswith("__") and node.attr.endswith("__"))
+                    or node.attr == "__dict__"
+                )
+            ):
+                for candidate in inventory.trees:
+                    self.record(node, candidate, (), "dynamic module access (unknown target)")
             if target and inventory.selected(target):
                 if not isinstance(node.ctx, ast.Load):
                     self.record(node, target, (node.attr,), "module mutation")
@@ -463,6 +566,8 @@ def discover_module_hazards(
         def visit_Call(self, node: ast.Call) -> None:
             helpers = {"getattr", "hasattr", "setattr", "delattr", "vars"}
             helper = self.resolve(node.func)
+            if helper == "enum.global_enum":
+                inventory.unsafe.update(inventory.trees)  # A computed class owner is unknown.
             builtin_helper = (
                 isinstance(node.func, ast.Name)
                 and node.func.id in helpers
@@ -665,6 +770,8 @@ class _ProofVisitor(ImportedAccessVisitor):
         binding = self._binding(root) if root else None
         path = _expression_binding(node.value)
         emitted = self.table.get_obfuscated_import(module, node.attr)
+        if emitted and not self.inventory.static_export(module, node.attr):
+            return  # A rename allocation is not a proof of an emitted export binding.
         if (
             binding
             and path

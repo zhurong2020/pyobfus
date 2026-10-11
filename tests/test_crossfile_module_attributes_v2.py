@@ -649,3 +649,109 @@ def test_shadowed_reflection_helper_is_unknown_consumption(tmp_path):
         exclude_names=ObfuscationConfig().exclude_names | {"LIMIT", "scale", "Settings"},
     )
     assert run(src, tmp_path).stdout == run(tmp_path / "out", tmp_path).stdout == "14\n"
+
+
+@pytest.mark.parametrize("definition", ["LIMIT = 99\n", "OTHER = 99\n"])
+def test_root_file_package_collision_is_unproved(tmp_path, definition):
+    src = project(tmp_path, "import pkg\nprint(pkg.LIMIT)\n", "LIMIT = 7\n")
+    (src / "pkg.py").write_text(definition)
+    ob = build(src, tmp_path / "out")
+    assert not ob.attribute_plans["app"].edits
+    assert "LIMIT" in attrs(tmp_path / "out/app.py")
+    assert any("attribute access through a module" in r.message for r in risks(src))
+    build(src, tmp_path / "preserved", exclude_names=ObfuscationConfig().exclude_names | {"LIMIT"})
+    assert run(src, tmp_path).stdout == run(tmp_path / "preserved", tmp_path).stdout == "7\n"
+
+
+@pytest.mark.parametrize("reexport", [False, True])
+def test_all_slot_supplied_by_runtime_injection_is_not_an_emitted_binding(tmp_path, reexport):
+    src = project(
+        tmp_path,
+        "from pkg import mod\nprint(mod.LIMIT)\n",
+        definitions="__all__ = ['LIMIT']\nglobals()['LIMIT'] = 7\n",
+    )
+    if reexport:
+        (src / "pkg/__init__.py").write_text("from .mod import LIMIT\n")
+        (src / "app.py").write_text("import pkg\nprint(pkg.LIMIT)\n")
+    ob = build(src, tmp_path / "out")
+    assert not ob.attribute_plans["app"].edits
+    assert "LIMIT" in attrs(tmp_path / "out/app.py")
+    assert any("attribute access through a module" in r.message for r in risks(src))
+    build(src, tmp_path / "preserved", exclude_names=ObfuscationConfig().exclude_names | {"LIMIT"})
+    assert run(src, tmp_path).stdout == run(tmp_path / "preserved", tmp_path).stdout == "7\n"
+
+
+def test_known_enum_injection_does_not_become_h_support(tmp_path):
+    import sys
+
+    if sys.version_info < (3, 11):
+        pytest.skip("enum.global_enum requires Python 3.11")
+    src = project(
+        tmp_path,
+        "from pkg import mod\nprint(mod.ROLE)\n",
+        definitions="from enum import global_enum, IntEnum\n__all__ = ['ROLE']\n@global_enum\nclass Flags(IntEnum):\n    ROLE = 7\n",
+    )
+    ob = build(src, tmp_path / "out")
+    assert not ob.attribute_plans["app"].edits
+    assert "ROLE" in attrs(tmp_path / "out/app.py")
+    original, artifact = run(src, tmp_path), run(tmp_path / "out", tmp_path)
+    assert original.returncode == artifact.returncode == 0
+    assert original.stdout == artifact.stdout
+
+
+def test_selected_stdlib_filename_does_not_prove_builtin_identity(tmp_path):
+    src = project(tmp_path, "import sys\nprint(sys.version)\n")
+    (src / "sys.py").write_text("version = 'project value'\n")
+    ob = build(src, tmp_path / "out")
+    assert not ob.attribute_plans["app"].edits
+    assert "version" in attrs(tmp_path / "out/app.py")
+    assert run(src, tmp_path).stdout == run(tmp_path / "out", tmp_path).stdout
+
+
+def test_conditional_symbol_reexport_in_regular_module_is_unproved(tmp_path):
+    src = project(
+        tmp_path,
+        "from pkg import mod\nprint(mod.LIMIT)\n",
+        definitions="if True:\n    from .other import LIMIT\n",
+    )
+    (src / "pkg/other.py").write_text("LIMIT = 7\n")
+    ob = build(src, tmp_path / "out")
+    assert not ob.attribute_plans["app"].edits
+    assert "LIMIT" in attrs(tmp_path / "out/app.py")
+    assert any("attribute access through a module" in r.message for r in risks(src))
+
+
+@pytest.mark.parametrize(
+    "expression", ["sys.modules[KEY].LIMIT", "importlib.import_module(KEY).LIMIT"]
+)
+def test_computed_dynamic_target_keeps_boundary_advice(tmp_path, expression):
+    src = project(
+        tmp_path,
+        f"import sys\nimport importlib\nfrom pkg import mod\nKEY = 'pkg.mod'\nprint({expression}, mod.LIMIT)\n",
+    )
+    ob = build(src, tmp_path / "out")
+    assert not ob.attribute_plans["app"].edits
+    findings = [
+        r for r in risks(src) if "Detected dynamic module access (unknown target)" in r.message
+    ]
+    assert len(findings) == 1 and findings[0].line == 5
+    assert "LIMIT" in findings[0].suggestion and "scale" in findings[0].suggestion
+    assert "boundary" in findings[0].suggestion
+    assert any(
+        "Detected dynamic module access (unknown target)" in r.message for r in risks(src, False)
+    )
+
+
+def test_computed_registry_mutation_cannot_leave_stale_direct_read(tmp_path):
+    src = project(
+        tmp_path,
+        "from pkg import mod\nprint(mod.LIMIT)\n",
+        definitions="import sys\nLIMIT = 7\nsys.modules[__name__].LIMIT = 9\n",
+    )
+    outputs = []
+    for enabled in [False, True]:
+        out = tmp_path / f"out-{enabled}"
+        ob = build(src, out, crossfile_module_attributes=enabled)
+        assert not ob.attribute_plans.get("app") or not ob.attribute_plans["app"].edits
+        outputs.append(run(out, tmp_path).stdout)
+    assert outputs == [run(src, tmp_path).stdout] * 2 == ["9\n", "9\n"]

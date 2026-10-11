@@ -42,6 +42,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   symbol imports. Already preserved names receive informational mitigation;
   legacy H findings are not duplicated when the option is off. Detected hazards
   conservatively invalidate that module's attribute proofs across the project.
+  Computed dynamic targets require an explicit plugin/API boundary and invalidate
+  all selected module proofs; allocated names without proved source bindings
+  cannot authorize edits.
 
 - `--check` adds medium `compatibility_advisory` findings for directory builds
   accessing renamed project symbols through module objects, and for
