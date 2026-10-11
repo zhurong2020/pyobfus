@@ -233,27 +233,17 @@ class ObfuscationMapping:
     # ---- reverse lookup ---------------------------------------------
 
     def resolve_location(self, trace_path: str, line: int) -> Optional[Location]:
-        """Resolve a unique longest path suffix without accessing source files."""
+        """Resolve a complete, unique longest file-key suffix without source access.
+
+        This query only considers the path suffix, not deployment roots. Use
+        unmap_trace() for traceback-wide deployment-root inference.
+        """
         if line < 1:
             return None
-        trace = _path_parts(trace_path)
-        candidates = []
-        for path, record in self.files.items():
-            parts = _path_parts(path)
-            score = 0
-            for left, right in zip(reversed(trace), reversed(parts)):
-                if left != right:
-                    break
-                score += 1
-            if score:
-                candidates.append((score, record))
-        if not candidates:
+        path = self._match_file_path(trace_path)
+        if path is None:
             return None
-        longest = max(score for score, _ in candidates)
-        matches = [record for score, record in candidates if score == longest]
-        if len(matches) != 1:
-            return None
-        record = matches[0]
+        record = self.files[path]
         runs = record.get("lines")
         if runs is None or line > record["line_count"]:
             return None
@@ -268,6 +258,20 @@ class ObfuscationMapping:
             record["module"],
             "generated" if source_line is None else "mapped",
         )
+
+    def _match_file_path(self, trace_path: str) -> Optional[str]:
+        """Match all file-key components, choosing the unique longest key."""
+        trace = _path_parts(trace_path)
+        candidates = []
+        for path in self.files:
+            parts = _path_parts(path)
+            if parts and len(trace) >= len(parts) and trace[-len(parts) :] == parts:
+                candidates.append((len(parts), path))
+        if not candidates:
+            return None
+        longest = max(score for score, _ in candidates)
+        matches = [path for score, path in candidates if score == longest]
+        return matches[0] if len(matches) == 1 else None
 
     def reverse(self, obfuscated_name: str) -> Optional[str]:
         """Look up an obfuscated identifier and return the original name, or None."""

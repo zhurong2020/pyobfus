@@ -130,10 +130,13 @@ class TestAiDebuggingExample:
         assert 'File "pricing.py", line 13, in order_total' in unmapped.stdout
         assert 'File "pricing.py", line 19, in <module>' in unmapped.stdout
         assert f"[obfuscated: {output}:" in unmapped.stdout
+        from pyobfus.core.mapping import ObfuscationMapping
+
+        names = ObfuscationMapping.load(mapping)
         for line in crashed.stderr.splitlines():
             if line.startswith("    "):
-                assert line in unmapped.stdout  # Excerpts and carets stay output code.
-        assert "Code excerpts and caret indicators are unchanged" in unmapped.stderr
+                assert names.unmap_text(line) in unmapped.stdout
+        assert "Code excerpts are artifact code with names restored" in unmapped.stderr
 
 
 class TestImportHookExample:
