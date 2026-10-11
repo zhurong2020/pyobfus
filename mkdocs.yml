@@ -93,6 +93,7 @@ nav:
     - Provenance manifest: PROVENANCE_MANIFEST.md
     - SARIF code scanning: SARIF_CODE_SCANNING.md
     - Threat model: THREAT_MODEL.md
+    - Network behavior: NETWORK_BEHAVIOR.md
     - Supply-chain assurance (SLSA / CycloneDX / PEP 740): SUPPLY_CHAIN_ASSURANCE.md
     - Reason codes: REASON_CODES.md
   - Distribution:
