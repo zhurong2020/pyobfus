@@ -178,6 +178,13 @@ def _echo_pro_import_hint() -> None:
     help="Compile generated Python in memory after writing; does not import or execute it",
 )
 @click.option(
+    "--crossfile-module-attributes/--no-crossfile-module-attributes",
+    default=None,
+    help="Opt-in rewrite of proved module reads/calls through unconditional absolute "
+    "from-package submodules or dotted imports with aliases (default: disabled). "
+    "Unsupported/dynamic accesses require exclude_names.",
+)
+@click.option(
     "--crossfile-local-names/--no-crossfile-local-names",
     default=None,
     help="Rename function locals in cross-file builds (default: enabled; parameters preserved)",
@@ -505,6 +512,7 @@ def main(
     verify_syntax: bool,
     cross_file: bool,
     crossfile_local_names: Optional[bool],
+    crossfile_module_attributes: Optional[bool],
     upgrade: bool,
     control_flow: bool,
     string_encryption: bool,
@@ -621,6 +629,7 @@ def main(
             sarif_path=sarif_path,
             preserve_param_names=preserve_param_names,
             cross_file=cross_file,
+            crossfile_module_attributes=crossfile_module_attributes,
         )
         return
 
@@ -869,6 +878,8 @@ def main(
         # otherwise every Pro preset silently degrades to community output.
         if level is not None:
             config.level = level
+        if crossfile_module_attributes is not None:
+            config.crossfile_module_attributes = crossfile_module_attributes
         if crossfile_local_names is not None:
             config.crossfile_local_names = crossfile_local_names
         if remove_docstrings is not None:
@@ -1856,6 +1867,11 @@ def _obfuscate_directory_crossfile(
             progress_callback=_progress,
         )
 
+        if transform_errors and config.crossfile_module_attributes:
+            from pyobfus.exceptions import TransformError
+
+            raise TransformError("Module attribute build failed: " + "; ".join(transform_errors))
+
         # Merge the per-file content-transform counts (string encoding, numeric,
         # control-flow, string encryption, anti-debug, dead-code, AI stripping)
         # that phase2 aggregated, so directory-mode JSON stats report the same
@@ -1894,6 +1910,8 @@ def _obfuscate_directory_crossfile(
         return dir_stats
 
     except Exception as e:
+        if config.crossfile_module_attributes and isinstance(e, PyObfusError):
+            raise  # The outer CLI handler emits the stable failure JSON envelope.
         click.echo(f"\nError during cross-file obfuscation: {e}", err=True)
         if verbose:
             import traceback
@@ -2500,6 +2518,7 @@ def _handle_check(
     sarif_path: Optional[str] = None,
     preserve_param_names: Optional[bool] = None,
     cross_file: bool = True,
+    crossfile_module_attributes: Optional[bool] = None,
 ) -> None:
     """
     Run pre-flight risk scan and print report.
@@ -2526,6 +2545,10 @@ def _handle_check(
     )
     if preserve_param_names is not None:
         config.preserve_param_names = preserve_param_names
+    if crossfile_module_attributes is not None:
+        config.crossfile_module_attributes = crossfile_module_attributes
+    if not cross_file:
+        config.crossfile_module_attributes = False
     checker = PreflightChecker(
         obfuscation_config=config,
         preserve_param_names=(config.preserve_param_names or (input_path.is_dir() and cross_file)),

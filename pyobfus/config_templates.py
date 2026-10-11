@@ -14,6 +14,11 @@ TEMPLATES: Dict[str, str] = {
 obfuscation:
   level: community
 
+  # Opt-in proved module reads/calls through unconditional absolute imports:
+  # from pkg import mod; mod.X, or import pkg.mod as alias; alias.X.
+  # Unsupported/dynamic accesses still require exclude_names.
+  crossfile_module_attributes: false
+
   # Preserve Django-required names
   exclude_names:
     # Django settings
@@ -77,6 +82,11 @@ verbose: false
 obfuscation:
   level: community
 
+  # Opt-in proved module reads/calls through unconditional absolute imports:
+  # from pkg import mod; mod.X, or import pkg.mod as alias; alias.X.
+  # Unsupported/dynamic accesses still require exclude_names.
+  crossfile_module_attributes: false
+
   # Preserve Flask-required names
   exclude_names:
     # Flask app
@@ -135,6 +145,11 @@ verbose: false
 obfuscation:
   level: community
 
+  # Opt-in proved module reads/calls through unconditional absolute imports:
+  # from pkg import mod; mod.X, or import pkg.mod as alias; alias.X.
+  # Unsupported/dynamic accesses still require exclude_names.
+  crossfile_module_attributes: false
+
   # Preserve public API names
   # Add your public API names here
   exclude_names:
@@ -177,6 +192,11 @@ verbose: false
 
 obfuscation:
   level: community
+
+  # Opt-in proved module reads/calls through unconditional absolute imports:
+  # from pkg import mod; mod.X, or import pkg.mod as alias; alias.X.
+  # Unsupported/dynamic accesses still require exclude_names.
+  crossfile_module_attributes: false
 
   # Names to preserve from obfuscation
   # Add names that must remain unchanged (e.g., external API calls)

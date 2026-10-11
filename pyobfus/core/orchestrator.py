@@ -7,6 +7,7 @@ the two-phase obfuscation process for multi-file projects.
 
 import ast
 import os
+import tempfile
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
@@ -16,6 +17,12 @@ from pyobfus.config import ObfuscationConfig
 from pyobfus.core.class_bindings import mark_class_bindings
 from pyobfus.core.function_locals import LocalPlan, plan_locals, apply_local_plan
 from pyobfus.core import content_transforms
+from pyobfus.core.module_attributes import (
+    AttributePlan,
+    ModuleInventory,
+    plan_attributes,
+    apply_attribute_plan,
+)
 from pyobfus.core.global_table import GlobalSymbolTable
 from pyobfus.core.export_detector import ExportDetector, ReExportSource
 from pyobfus import __version__
@@ -48,6 +55,7 @@ def _transform_single_file(
     global_table: "GlobalSymbolTable",
     config: Optional[ObfuscationConfig] = None,
     local_plan: Optional[LocalPlan] = None,
+    attribute_plan: Optional[AttributePlan] = None,
 ) -> Tuple[str, Optional[str], Dict[str, int], Optional[Dict[str, Any]]]:
     """
     Transform a single file using the global symbol table.
@@ -71,6 +79,10 @@ def _transform_single_file(
         tree = ast.parse(source)
         mark_source_statements(tree)
         mark_class_bindings(tree)
+        if config is not None and config.crossfile_module_attributes:
+            if attribute_plan is None:
+                raise ValueError("Missing module attribute plan")
+            apply_attribute_plan(tree, source, relative_path.as_posix(), attribute_plan)
         if local_plan is not None:
             tree = apply_local_plan(tree, local_plan)
             file_stats["local_names_obfuscated"] = len(local_plan.mappings)
@@ -243,6 +255,7 @@ class CrossFileOrchestrator:
         # dead-code, AI-marker stripping). Populated by phase2_transform.
         self.content_stats: Dict[str, int] = {}
         self.file_line_maps: Dict[str, Dict[str, Any]] = {}
+        self.attribute_plans: Dict[str, AttributePlan] = {}
         self.local_plans: Dict[str, LocalPlan] = {}
         self._reserved_names: Set[str] = set()
         self._planning_warnings: List[str] = []
@@ -317,6 +330,7 @@ class CrossFileOrchestrator:
         self.global_table = GlobalSymbolTable()
         self._name_counter = 0
         self.local_plans = {}
+        self.attribute_plans = {}
         self._planning_warnings = []
         self._reserved_names = set()
 
@@ -440,6 +454,26 @@ class CrossFileOrchestrator:
                 self.local_plans[fi.module_name] = plan
                 self.global_table.local_mappings[fi.module_name] = plan.mappings
 
+        if self.config.crossfile_module_attributes:
+            sources = {fi.module_name: read_python_source(fi.path) for fi in self.files}
+            file_index = {fi.module_name: fi for fi in self.files}
+            inventory = ModuleInventory(
+                sources,
+                lambda module, node: self._resolve_source_module(
+                    file_index[module], ReExportSource(node.module, node.level, "")
+                ),
+            )
+            self.attribute_plans = {
+                fi.module_name: plan_attributes(
+                    sources[fi.module_name],
+                    fi.relative_path.as_posix(),
+                    fi.module_name,
+                    inventory,
+                    self.global_table,
+                )
+                for fi in self.files
+            }
+
         return self.global_table
 
     def _register_reexports(self, pending: List[Tuple[FileInfo, str, ReExportSource]]) -> None:
@@ -500,6 +534,28 @@ class CrossFileOrchestrator:
         return ".".join(parent_parts) if parent_parts else None
 
     def phase2_transform(
+        self, input_dir: Path, output_dir: Path, progress_callback=None
+    ) -> List[str]:
+        """Opt-in builds stage all workers' output until every plan succeeds."""
+        if not self.config.crossfile_module_attributes:
+            return self._phase2_transform(input_dir, output_dir, progress_callback)
+        output_dir = Path(output_dir)
+        output_dir.parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(
+            prefix=".pyobfus-attributes-", dir=output_dir.parent
+        ) as temporary:
+            staging = Path(temporary)
+            errors = self._phase2_transform(input_dir, staging, progress_callback)
+            if errors:
+                self.file_line_maps = {}
+                return errors
+            for fi in self.files:
+                destination = output_dir / fi.relative_path
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                os.replace(staging / fi.relative_path, destination)
+        return []
+
+    def _phase2_transform(
         self,
         input_dir: Path,
         output_dir: Path,
@@ -545,6 +601,7 @@ class CrossFileOrchestrator:
                         self.global_table,
                         self.config,
                         self.local_plans.get(fi.module_name),
+                        self.attribute_plans.get(fi.module_name),
                     ): fi
                     for fi in self.files
                 }
@@ -568,6 +625,7 @@ class CrossFileOrchestrator:
                     self.global_table,
                     self.config,
                     self.local_plans.get(file_info.module_name),
+                    self.attribute_plans.get(file_info.module_name),
                 )
                 if record is not None:
                     self.file_line_maps[file_info.relative_path.as_posix()] = record

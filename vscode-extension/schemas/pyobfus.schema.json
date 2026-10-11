@@ -79,6 +79,11 @@
           "default": "I",
           "description": "Prefix for obfuscated identifier names."
         },
+        "crossfile_module_attributes": {
+          "type": "boolean",
+          "default": false,
+          "description": "Opt-in proved module reads/calls through unconditional absolute from-package submodules or dotted imports with aliases. Unsupported accesses require exclude_names (default: false)."
+        },
         "crossfile_local_names": {
           "type": "boolean",
           "default": true,
