@@ -184,12 +184,6 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       「What gets renamed」写明并在 `--check` 提示——**已随 PR #80 完成（10-11，未发版）**。
       **10-11 证据：比预想常见**——一个私有真实项目的 `--check` 报出 29 处 `from pkg import config` 后 `config.ROLE_X` 式访问，
       目录构建后都会 AttributeError。建议提为 P1：设计并实现改写「项目内模块对象.属性」（复用 #80 的导入解析与跨文件符号表），先出设计。
-- [ ] **既有缺陷 L · 默认不排除虚拟环境目录** — **PR #81 待审**（10-11 审 #80 时发现，0.6.1 已存在）：默认排除只有 `test_*.py` 与 `**/tests/**`，
-      在项目根目录运行 `--check` 或 `pyobfus . -o dist` 会把 `.venv/`（上例 787 个文件中的大部分）一起扫描、一起混淆，
-      #80 的新提示在一个项目的 `.venv` 里报了 370 条。[PR #81](https://github.com/zhurong2020/pyobfus/pull/81) 统一文件发现，
-      按 `pyvenv.cfg` / `conda-meta/` 与固定工具目录剪枝，检查报告与 verbose 构建显示跳过目录；
-      配置 `skip_environment_dirs: false` 可关闭，普通 `venv/env/build/dist` 源码目录保留。CHANGELOG 与支持矩阵已说明行为变化。
-      草稿待 Claude Code 审核；发版另批，不勾完成。
 - [ ] **既有缺陷 C · 运行时注入的模块级名字**（#62 审核中发现，0.5.32 已存在）：`enum.global_enum` 这类装饰器在运行时
       把成员注入模块命名空间，引用与 `__all__` 被改名，但注入的定义改不了 → NameError（标准库 `calendar.py` 默认构建即如此）。
       当前绕法：把这些名字加入 `exclude_names`。`--check` 提示与支持矩阵说明已随 PR #80 完成（10-11，未发版）；是否自动保留另议。

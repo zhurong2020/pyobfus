@@ -1,5 +1,11 @@
 # pyobfus 当前计划
 
+**2026-10-11 缺陷 L 修复（PR #81 合并，未发版，行为变更）**：目录发现改为 `os.walk` 剪枝，默认跳过含 `pyvenv.cfg`/`conda-meta` 的环境目录与
+`site-packages`、`node_modules`、`__pycache__`、`.git` 等工具目录（不按名字排除 `build`/`dist`/`venv`；输入根本身不剪）；`--check` 文本/JSON 与 `-v` 构建列出
+跳过的目录；`obfuscation.skip_environment_dirs: false` 恢复旧行为。Claude 实测：8 类目录规则全对、两次构建逐字节相同、关闭开关恢复 8 文件、
+787 文件真实项目（785 个在 `.venv`）`--check` 16.6 s → 0.3 s、新提示 370 → 0。审核中自修一处越界改动：Codex 删掉了 `--init` 模板对 `build`/`dist`/`venv`
+的显式排除（会让构建到项目内 `dist/` 时重复混淆旧产物），已恢复并改测试。
+
 **2026-10-11 `--check` 新增 H/C 兼容提示（PR #80 合并，未发版）**：目录扫描时报出「项目内模块对象.被改名属性」访问（`from pkg import core; core.X`、
 `import pkg.core as e; e.f()`、`pkg.core.f()`；复用构建规划的跨文件符号表，标准库/第三方不报）与 `enum.global_enum` 注入名字；medium，退出码不变；
 支持矩阵已写明。Claude 实测：三种写法与 global_enum 均报、按建议加 `exclude_names` 后构建运行正确、787 文件项目 `--check` 6.2→16.6 s。
