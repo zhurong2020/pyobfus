@@ -186,7 +186,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       **10-11 证据：比预想常见**——一个私有真实项目的 `--check` 报出 29 处 `from pkg import config` 后 `config.ROLE_X` 式访问，
       目录构建后都会 AttributeError。建议提为 P1：设计并实现改写「项目内模块对象.属性」（复用 #80 的导入解析与跨文件符号表），先出设计。
       **10-11 设计 PR #82 已合并（维护者按 Claude 建议拍板：方案 A、先 opt-in 后默认开启、3 个实现 PR，第 1 个即覆盖
-      `from pkg import config; config.X` 与 `import pkg.mod as alias`）；实现 PR 1 #83 已合并（10-11，opt-in，默认关闭，未发版）；实现 PR 2 #84 已合并（10-11，dotted import、相对导入、包 re-export、escape 提示；仍默认关闭，未发版）；实现 PR 3 #N 待审：补提示 + 默认开启 + 文档 + 发版说明**，
+      `from pkg import config; config.X` 与 `import pkg.mod as alias`）；实现 PR 1 #83 已合并（10-11，opt-in，默认关闭，未发版）；实现 PR 2 #84 已合并（10-11，dotted import、相对导入、包 re-export、escape 提示；仍默认关闭，未发版）；实现 PR 3 #85 待审：补提示 + 默认开启 + 文档 + 发版说明**，
       说明私有 `docs/internal/codex-2026-10/H_IMPL_PR1_PROMPT.md`、`H_IMPL_PR2_PROMPT.md`。
       **#84 审核遗留（本 PR 3 处理，待审）**：模块名在同一作用域被 `del`、`for`、`except as` 或局部赋值占用时，访问被正确拒绝改写
       但开关开或关都**没有任何提示**；`m = importlib.import_module('pkg.core'); m.X` 也无中等提示。本 PR 3 补上「不确定」提示与未改写访问 ⊆ 提示位置测试。

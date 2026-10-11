@@ -1,6 +1,6 @@
 # Cross-file module attribute access design
 
-Status: **implemented 2026-10-11** (PR #83 strict proofs/edits, PR #84 remaining v1 forms, and PR 3 default rollout pending Claude Code review). Any merge or release remains a separate maintainer decision.
+Status: **implemented 2026-10-11** (PR #83 strict proofs/edits, PR #84 remaining v1 forms, and PR #85 default rollout; pending Claude Code review). Any merge or release remains a separate maintainer decision.
 Date: 2026-10-11. Baseline: main
 `bc04a1ee8bd283b5e89ed7bb86be0c85d7afe2da`, Core 0.6.1, including the
 unreleased PR #80 advisories. The historical design baseline below precedes those implementation PRs.
