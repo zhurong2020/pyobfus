@@ -31,6 +31,7 @@ from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 from pyobfus.config import ObfuscationConfig
 from pyobfus.core.import_advisories import ImportedAccessVisitor, enum_members
+from pyobfus.core.import_resolution import discover_accesses
 from pyobfus.core.secret_literals import SUGGESTION, find_secret_literals
 from pyobfus.core.parser import ASTParser
 from pyobfus.exceptions import ParseError
@@ -770,6 +771,19 @@ class PreflightChecker:
                 )
 
             def attribute(node: ast.Attribute, module: str) -> None:
+                plan = planner.attribute_plans.get(file_info.module_name)
+                if plan is not None and any(
+                    edit.location
+                    == (
+                        node.lineno,
+                        node.col_offset,
+                        node.end_lineno or 0,
+                        node.end_col_offset or 0,
+                    )
+                    and edit.expected == node.attr
+                    for edit in plan.edits
+                ):
+                    return  # Suppress only a validated, scheduled original-AST edit.
                 if table.get_obfuscated_import(module, node.attr) is None:
                     return  # External modules and unchanged names have no mapping.
                 key = (module, node.attr)
@@ -791,9 +805,10 @@ class PreflightChecker:
                     )
                 )
 
-            ImportedAccessVisitor(resolve_from, attribute, lambda n: None).visit(
-                ASTParser.parse_file(file_info.path)
-            )
+            for node, module in discover_accesses(
+                ASTParser.parse_file(file_info.path), resolve_from
+            ):
+                attribute(node, module)
 
     def _scan_excluded(self, file_path: Path, report: PreflightReport) -> None:
         try:

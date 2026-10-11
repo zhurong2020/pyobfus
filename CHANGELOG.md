@@ -23,6 +23,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Opt-in `crossfile_module_attributes: true` and
+  `--crossfile-module-attributes` fix reads/calls through statically proved,
+  unconditional `from pkg import mod; mod.X` and
+  `import pkg.mod as alias; alias.X`, at module level and inside functions.
+  The default is false. Dotted imports without aliases, relative imports,
+  package re-exports, conditional imports, ambiguous/mutated bindings and
+  dynamic/escaped module objects remain unsupported; preserve affected names
+  with `exclude_names`. `--check` suppresses H advice only for scheduled edits.
+
 - `--check` adds medium `compatibility_advisory` findings for directory builds
   accessing renamed project symbols through module objects, and for
   `enum.global_enum` decorators that inject module-level names at runtime.

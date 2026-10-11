@@ -88,6 +88,7 @@ def _extract_config_fields(config: object) -> Dict:
         "numeric_obfuscation",
         "strip_ai_artifacts",
         "preserve_param_names",
+        "crossfile_module_attributes",
         "string_encryption",
         "import_obfuscation",
         "anti_debug",

@@ -73,7 +73,20 @@ imports keep their original symbol and alias names. Unaliased imports retain
 the existing cross-file naming rules. Execution evidence:
 `integration_tests/test_crossfile_import_alias.py`.
 
-**Limitation H:** Directory builds rename module-level symbols and direct
+**Limitation H (opt-in fix, unreleased):** Set
+`obfuscation.crossfile_module_attributes: true` or pass
+`--crossfile-module-attributes` to rewrite proved Load reads/calls through
+unconditional absolute `from pkg import mod; mod.X` and
+`import pkg.mod as alias; alias.X`, including function-local imports.
+Explicit aliases keep their spelling; retained exports are unchanged. Only
+selected ordinary project modules under inert, unambiguous package initializers
+are eligible. Re-exports, relative imports, dotted imports without aliases,
+conditional imports, late/competing bindings, mutations, escapes and dynamic
+accesses are not proved. Preserve affected exports with `exclude_names`;
+a clean check cannot establish safety for unknown consumers. Behavioral evidence:
+`tests/test_crossfile_module_attributes.py`. The default remains false.
+
+With the option off, directory builds rename module-level symbols and direct
 `from pkg.core import LIMIT` imports, but leave attributes in `core.LIMIT`
 (after `from pkg import core`), `engine.scale()` (after
 `import pkg.core as engine`) and `pkg.core.scale()` (after `import pkg.core`)
