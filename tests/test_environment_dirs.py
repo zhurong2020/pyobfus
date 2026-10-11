@@ -146,11 +146,13 @@ def test_yaml_opt_out(project, tmp_path):
     )
 
 
-def test_init_preserves_ordinary_source_directory_names(project):
+def test_init_sets_skip_and_keeps_build_output_excludes(project):
+    """--init writes an explicit, editable config: it turns pruning on and
+    still excludes build/dist so rebuilding into dist/ never re-obfuscates
+    previous output. Only the built-in defaults avoid excluding by name."""
     from pyobfus.core.init_config import build_init_result
 
     result = build_init_result(project)
     assert "skip_environment_dirs: true" in result.yaml_text
-    assert not any(
-        name in pattern for pattern in result.excludes for name in ["venv", "build", "dist"]
-    )
+    for pattern in ("**/venv/**", "**/build/**", "**/dist/**"):
+        assert pattern in result.excludes

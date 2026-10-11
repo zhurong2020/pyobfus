@@ -19,10 +19,17 @@ from typing import List, Optional
 from pyobfus import __version__ as PYOBFUS_VERSION
 from pyobfus.core.preflight import PreflightChecker, PreflightReport
 
-# Default file patterns; environment/tool subtrees are pruned separately.
+# Default file patterns. Environment/tool subtrees are also pruned during
+# discovery, but build output directories are not, so keep excluding them here:
+# rebuilding into dist/ inside the project must not re-obfuscate old output.
 _BASELINE_EXCLUDES: List[str] = [
     "test_*.py",
     "**/tests/**",
+    "**/__pycache__/**",
+    "**/.venv/**",
+    "**/venv/**",
+    "**/build/**",
+    "**/dist/**",
 ]
 
 
