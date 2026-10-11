@@ -180,16 +180,15 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       在 0.5.32 / 0.6.0 都是 `preserve_param_names=False`（框架预设与 library 为 True）。**10-10 已合并 PR #67（`ed8cceb`），随 0.6.1 发布**；审核记录私有 `docs/internal/geo-2026-10/PR67_REVIEW_2026-10-10.md`：
       按 10-10 已合并设计 PR #65 的维护者决定实现默认保留参数名；显式 false 照旧生效但警告，`--init` 模板改为 true，
       `--check` 加 medium 语法候选风险提示，目录 cross-file 参数保留行为不变。证据私有 `docs/internal/geo-2026-10/param-default-evidence/`。
-- [ ] **既有限制 H · 通过模块对象访问属性**（10-08 交叉审核发现，0.5.32 已存在）：目录构建里 `from pkg import core` 后
-      `core.LIMIT`（或 `import pkg.core as engine; engine.scale()`）时属性名没跟着改 → AttributeError。至少在支持矩阵
-      「What gets renamed」写明并在 `--check` 提示——**已随 PR #80 完成（10-11，未发版）**。
-      **10-11 证据：比预想常见**——一个私有真实项目的 `--check` 报出 29 处 `from pkg import config` 后 `config.ROLE_X` 式访问，
-      目录构建后都会 AttributeError。建议提为 P1：设计并实现改写「项目内模块对象.属性」（复用 #80 的导入解析与跨文件符号表），先出设计。
-      **10-11 设计 PR #82 已合并（维护者按 Claude 建议拍板：方案 A、先 opt-in 后默认开启、3 个实现 PR，第 1 个即覆盖
-      `from pkg import config; config.X` 与 `import pkg.mod as alias`）；实现 PR 1 #83 已合并（10-11，opt-in，默认关闭，未发版）；实现 PR 2 #84 已合并（10-11，dotted import、相对导入、包 re-export、escape 提示；仍默认关闭，未发版）；实现 PR 3 #85 待审：补提示 + 默认开启 + 文档 + 发版说明**，
-      说明私有 `docs/internal/codex-2026-10/H_IMPL_PR1_PROMPT.md`、`H_IMPL_PR2_PROMPT.md`。
-      **#84 审核遗留（本 PR 3 处理，待审）**：模块名在同一作用域被 `del`、`for`、`except as` 或局部赋值占用时，访问被正确拒绝改写
-      但开关开或关都**没有任何提示**；`m = importlib.import_module('pkg.core'); m.X` 也无中等提示。本 PR 3 补上「不确定」提示与未改写访问 ⊆ 提示位置测试。
+- [x] **既有限制 H · 通过模块对象访问属性**（10-08 交叉审核发现，0.5.32 已存在）：目录构建里 `from pkg import core` 后
+      `core.LIMIT`（或 `import pkg.core as engine; engine.scale()`）时属性名没跟着改 → AttributeError。
+      **10-11 全部完成（未发版）**：提示与文档 #80 → 设计 #82（方案 A，维护者按 Claude 建议拍板）→ 实现 #83（from/别名，opt-in）
+      → #84（dotted、相对导入、包 re-export、escape 提示）→ **#85 默认开启**（`3759000`；补「无法证明」提示，
+      保证产物里未改写且目标被改名的访问都有提示；导入前有 `sys.path`/`logging` 等语句时函数体访问也能改写；
+      `globals()`/`setattr(sys.modules[__name__], …)`/`exec` 等动态改写本模块命名空间时整体拒绝）。
+      退路 `--no-crossfile-module-attributes` 与 main 旧默认产物逐字节一致。发版说明须写「升级后完整重新构建、重新生成 mapping」。
+      私有验证：动机项目副本 127 处 `config.X` 全部改写、`--check` 无剩余提示。审核与提示词私有 `docs/internal/codex-2026-10/H_IMPL_PR*`。
+      后续（不阻塞）：canary 在 N-1 也支持后可加模块属性用例；`__init__` 含带体类/执行默认参数、导入循环等仍拒绝并提示。
 - [ ] **既有缺陷 C · 运行时注入的模块级名字**（#62 审核中发现，0.5.32 已存在）：`enum.global_enum` 这类装饰器在运行时
       把成员注入模块命名空间，引用与 `__all__` 被改名，但注入的定义改不了 → NameError（标准库 `calendar.py` 默认构建即如此）。
       当前绕法：把这些名字加入 `exclude_names`。`--check` 提示与支持矩阵说明已随 PR #80 完成（10-11，未发版）；是否自动保留另议。
