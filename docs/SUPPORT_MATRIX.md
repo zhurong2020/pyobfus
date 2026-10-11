@@ -127,6 +127,18 @@ class bindings; a reference that falls back to a renamed module global on an
 untaken path can therefore fail. This policy applies with local renaming both
 on and off. Behavioral evidence: `tests/test_crossfile_classbody_shadow.py`.
 
+## Pre-flight secret screening
+
+Community `--check` reports `hardcoded_secret`: medium for high-signal
+credential shapes, info for sensitive names with a non-placeholder literal.
+It checks assignments, annotations with literal values, defaults, keywords
+and dictionary values; ignores docstrings, annotation strings, environment
+lookups, dynamic expressions, placeholders, URLs and common field names.
+No entropy detection or value output; exit codes remain unchanged. This is a
+coarse screen; use gitleaks or detect-secrets for full scanning. Evidence:
+`tests/test_preflight_secrets.py` (including text/JSON/SARIF/MCP privacy) and
+`tests/test_sarif_preflight.py`. See [rule details](SARIF_CODE_SCANNING.md#hardcoded-secret-screening-community).
+
 ## Framework presets
 
 Every preset is tested for **what it excludes**. Only `fastapi` is also

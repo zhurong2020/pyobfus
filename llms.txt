@@ -53,6 +53,7 @@ Pro is USD 45 once, not a subscription. The five-day trial needs no card: `pyobf
 ## Important constraints
 
 - Run `--check` before building and `--dry-run --json` before writes.
+- Community `--check` flags common hardcoded-secret shapes and sensitive literal contexts without showing values; medium/info advisories keep exit codes unchanged. This is coarse screening: use gitleaks or detect-secrets, move secrets to runtime environment/secret-manager reads, and rotate any previously shipped or committed credentials. Obfuscation does not hide string values.
 - Use framework presets for reflection-heavy projects.
 - Do not expose source, mappings, licence keys or absolute paths.
 - Online dependency verification sends public package names to public PyPI; use `--offline` for private indexes or offline work.

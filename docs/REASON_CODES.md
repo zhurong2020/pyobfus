@@ -21,7 +21,7 @@ releases. The single source of truth is `pyobfus/core/reason_codes.py`.
 |---|---|---|
 | `--dry-run --json` (plan) | `files.selected[].reason`, `files.excluded[].reason`, `disabled_transforms[].reason`, `reason_codes_version` | selection, disabled |
 | `--build-report` | `selection.selected[].reason`, `selection.excluded[].reason`, `disabled_transforms[].reason`, `reason_codes_version` | selection, disabled |
-| `--check --json` | risk findings use their own stable `category` field (unchanged) | — |
+| `--check --json` | risk findings use their own stable `category` field, including `hardcoded_secret` (no new reason-code domain) | — |
 
 ## Catalog
 

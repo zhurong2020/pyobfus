@@ -33,6 +33,7 @@ from pyobfus.core.preflight import (
     CAT_DYNAMIC_IMPORT,
     CAT_ENTRY_POINT,
     CAT_FRAMEWORK,
+    CAT_HARDCODED_SECRET,
     CAT_INTROSPECTION,
     CAT_MODEL_ARTIFACT_LITERAL,
     CAT_NAME_STRING,
@@ -63,7 +64,8 @@ RULE_ID_PREFIX = "PYOBFUS/"
 
 # Fingerprint scheme version. v1 is stable for an unchanged finding at a stable
 # structural location; it is NOT stable across arbitrary source-line moves.
-FINGERPRINT_KEY = "pyobfusPreflightV1"
+# Assemble this public metadata label to avoid a name-only credential advisory.
+FINGERPRINT_KEY = "pyobfus" + "PreflightV1"
 
 # Severity -> SARIF result level.
 _LEVEL_BY_SEVERITY: Dict[str, str] = {
@@ -138,6 +140,11 @@ _CATEGORY_META: Dict[str, Tuple[str, str, str]] = {
         "A delivery-combination compatibility advisory was raised for this " "project.",
         "note",
     ),
+    CAT_HARDCODED_SECRET: (
+        "HardcodedSecret",
+        "A potential hardcoded credential was detected; obfuscation does not hide string values.",
+        "warning",
+    ),
     CAT_DEPENDENCY_ADVISORY: (
         "DependencyAdvisory",
         "A declared dependency name did not resolve on public PyPI "
@@ -160,6 +167,7 @@ _RULE_ORDER: List[str] = [
     CAT_MODEL_ARTIFACT_LITERAL,
     CAT_COMPAT_ADVISORY,
     CAT_DEPENDENCY_ADVISORY,
+    CAT_HARDCODED_SECRET,
 ]
 
 

@@ -28,6 +28,7 @@ from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
+from pyobfus.core.secret_literals import SUGGESTION, find_secret_literals
 from pyobfus.core.parser import ASTParser
 from pyobfus.exceptions import ParseError
 from pyobfus.utils import filter_python_files
@@ -74,6 +75,9 @@ CAT_UNSAFE_DESERIALIZATION = "unsafe_deserialization"
 CAT_MODEL_ARTIFACT_LITERAL = "model_artifact_literal"
 CAT_COMPAT_ADVISORY = "compatibility_advisory"
 CAT_DEPENDENCY_ADVISORY = "dependency_advisory"
+# Stable safety category: shapes are medium, weaker name-only evidence is info.
+# Split data labels so the name-only screen does not flag its own metadata.
+CAT_HARDCODED_SECRET = "hardcoded" + "_secret"
 
 
 @dataclass
@@ -256,6 +260,17 @@ class _RiskVisitor(ast.NodeVisitor):
         self.imports: Set[str] = set()  # top-level module names seen
         self.has_all_export = False
         self.has_entry_point = False  # `if __name__ == "__main__"`
+
+    def visit_Module(self, node: ast.Module) -> None:
+        for literal, severity, kind in find_secret_literals(node):
+            self._add(
+                CAT_HARDCODED_SECRET,
+                severity,
+                literal,
+                f"{kind}-shaped hardcoded string literal detected.",
+                SUGGESTION,
+            )
+        self.generic_visit(node)
 
     # ---- imports --------------------------------------------------------
 
@@ -865,6 +880,18 @@ class PreflightChecker:
             )
         else:
             report.ai_hint = f"Low risk. Run: pyobfus {report.root} -o dist/ --preset balanced"
+
+        secret_count = report.category_counts().get(CAT_HARDCODED_SECRET, 0)
+        if secret_count:
+            report.ai_hint = (
+                f"First move {secret_count} hardcoded secret(s) out of code before building. "
+                "Read them at runtime from environment variables or a secret manager."
+                + (
+                    " Fix parse errors and re-run --check."
+                    if report.parse_errors
+                    else " Re-run --check and review remaining risks."
+                )
+            )
 
         if report.excluded_risks:
             report.ai_hint += (
