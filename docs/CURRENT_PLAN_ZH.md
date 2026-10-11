@@ -1,5 +1,11 @@
 # pyobfus 当前计划
 
+**2026-10-11 AI 回答基线（首篇 DEV 发出前，维护者手动 + Chrome 插件采集）**：12 个通用问题 + 3 个品牌问题。
+Perplexity（联网）提及 6/12、首选 3/12；ChatGPT 联网 0/12（仅 1 次被引为来源），但点名问时 3/3 描述准确（一处引用了 10-07 的旧快照）；
+ChatGPT 不联网 0/12 且不认识 pyobfus；Gemini 因出口 IP 被 Google 定位为中国记 unavailable，回常住地后补。
+结论：短板是 ChatGPT 通用问题下不被检索到，不是内容不准；维护者账号个性化开启时 ChatGPT 会把 pyobfus 排第一，自己日常看到的推荐不可信。
+明细与条件在私有 `docs/internal/geo-observations/2026-10-07-baseline.md`；后续两项见 `TODO.md` GEO 段。
+
 **2026-10-11 许可证监控 404 误报修复（免发版）**：Codex 交叉审核第 1 篇 DEV 草稿时指出、Claude 复核属实——客户端
 `_verify_online()` 把任何 HTTP 404 都报成 `License key not found` 且不读正文，监控只比对这句话，所以 Worker 路由丢失或代理/边缘
 返回的非 Worker 404 也会显示健康（旧脚本对 pypi.org 的 HTML 404 实测 exit 0）。`scripts/monitor_license_endpoint.py` 在客户端路径

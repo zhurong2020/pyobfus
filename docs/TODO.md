@@ -201,8 +201,12 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 JOSS 页改为引用页、两张任务页、Pages sitemap、FastAPI 真实应用 lane、Nuitka/Cython 实测、案例表单与政策页、
 搜索基线）记在 `CURRENT_PLAN_ZH.md` 10-07 段。剩下：
 
-- [ ] **维护者手工补 AI 回答基线**（10-13 首篇 DEV 前）：ChatGPT（联网/不联网）、Gemini、Perplexity 对 12 题
-      的回答，新会话、无历史；字段与题目见 `docs/internal/geo-observations/2026-10-07-baseline.md`。搜索部分已采。
+- [ ] **README / RTD / Pages 首屏措辞检查**（2026-10-11 AI 基线发现，免发版；README 部分随下次发版到 PyPI）：
+      ChatGPT 联网时把竞品 README 的原句直接当推荐理由（如「原生支持多模块项目」），而 pyobfus 在 12 个通用问题里
+      一次也没进候选。检查三处首屏是否用直白句子写明：支持多文件项目、跨文件改写 import、输出仍是普通 `.py`、
+      可用私有 mapping 还原 traceback；不夸大、不加竞品断言。改后在 11 月观测里对照。
+- [ ] **Gemini 环境补跑 + Perplexity 补 B1–B3**（维护者回常住地后）：方法与条件见私有基线
+      `docs/internal/geo-observations/2026-10-07-baseline.md` 末尾总结。
 - [ ] **Search Console**（维护者账号）：验证 `https://zhurong2020.github.io/pyobfus/`（URL-prefix）并提交
       `/pyobfus/sitemap.xml`；RTD 的 sitemap 对脚本返回 Cloudflare 质询，在 GSC 里看抓取状态。域名根 `robots.txt`
       属个人站仓库，没有改。
