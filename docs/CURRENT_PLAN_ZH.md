@@ -1,5 +1,7 @@
 # pyobfus 当前计划
 
+**2026-10-11 限制 H 实现 PR 2（#84 合并，`b2b0c65`，仍 opt-in、默认关闭，未发版）**：Codex 无头实现 dotted import、相对导入、包 re-export 与 escape 提示（赋值别名、传参、反射、`sys.modules`、写入）；自查中补了同名文件/包目录冲突的拒绝。Claude 独立审核：49 个对抗样例开关打开无一比关闭差、正向写法全部改写且运行一致；43 个 fixture 关闭时产物与 main 逐字节一致、提示只新增 escape 类；`-j1`/`-j4` 一致；dotted/相对/再导出三种真实 traceback 经 CLI `--unmap` 与 MCP 还原文件、行号、函数名全对；CI 20 项全绿。遗留：名字被 `del`/`for`/`except as`/局部赋值占用时无提示（main 同样），记入 TODO，PR 3 前补。下一步 PR 3：默认开启。
+
 **2026-10-11 限制 H 实现 PR 1（#83 合并，opt-in、默认关闭，未发版）**：设计 #82 维护者按 Claude 建议拍板（方案 A、3 个实现 PR）。
 `crossfile_module_attributes: true` / `--crossfile-module-attributes` 改写可静态证明的 `from pkg import mod; mod.X` 与 `import pkg.mod as alias; alias.X`
 （模块级与函数内）；模块被赋值/传参/改写、导入循环、包 `__init__` 非平凡、条件导入等一律不改，`--check` 只对已排期改写的访问取消提示。
