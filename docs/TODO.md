@@ -181,10 +181,10 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       `--check` 加 medium 语法候选风险提示，目录 cross-file 参数保留行为不变。证据私有 `docs/internal/geo-2026-10/param-default-evidence/`。
 - [ ] **既有限制 H · 通过模块对象访问属性**（10-08 交叉审核发现，0.5.32 已存在）：目录构建里 `from pkg import core` 后
       `core.LIMIT`（或 `import pkg.core as engine; engine.scale()`）时属性名没跟着改 → AttributeError。至少在支持矩阵
-      「What gets renamed」写明并在 `--check` 提示。Advisories and documentation PR #N pending review; automatic handling remains a separate design decision.
+      「What gets renamed」写明并在 `--check` 提示。Advisories and documentation PR #80 pending review; automatic handling remains a separate design decision.
 - [ ] **既有缺陷 C · 运行时注入的模块级名字**（#62 审核中发现，0.5.32 已存在）：`enum.global_enum` 这类装饰器在运行时
       把成员注入模块命名空间，引用与 `__all__` 被改名，但注入的定义改不了 → NameError（标准库 `calendar.py` 默认构建即如此）。
-      当前绕法：把这些名字加入 `exclude_names`。Advisories and documentation PR #N pending review; automatic handling remains a separate design decision.
+      当前绕法：把这些名字加入 `exclude_names`。Advisories and documentation PR #80 pending review; automatic handling remains a separate design decision.
 - [ ] **既有缺陷 D · `global` 重新绑定导入名**（#62 审核中发现，0.5.32 已存在，低优先级）：模块级 `from pkg.util import helper`，
       函数里 `global helper; helper = ...`；关闭局部改名时产物仍调用原导入（默认开启时正确）。
 - [ ] **MCP `unmap_stack_trace` 的 mapping 不匹配提示**在 `pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]` 中。
