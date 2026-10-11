@@ -151,8 +151,15 @@ borrow an outer import accidentally.
    reasoning about import-order-dependent package mutation.
 4. Require dominance/order within straight-line code: an access before import
    is not proved by a later import. For globals used by function bodies, require
-   a stable module import and reject observable calls before initialization,
-   circular/partial initialization and unresolved execution order. V1 can
+   an unconditional stable module import before the outermost enclosing
+   function/lambda definition position, including accesses in definition-time
+   defaults, decorators and annotations. Reject any competing store/delete,
+   global/nonlocal rebinding or module-level redefinition anywhere in the module.
+   Opaque statements before that import do not invalidate this proof: the later
+   function cannot run before its definition, and import-path/hook changes
+   affect the already-supported module-level accesses equally. Definitions before
+   the import remain unproved even if called later. Continue rejecting class-body
+   accesses, circular/partial initialization and unresolved execution order. V1 can
    conservatively reject accesses within cycles rather than solve execution
    timing. A function-local import followed by access is the simplest proof.
 5. V1 rejects imports under if/match/loop/try and any binding with competing

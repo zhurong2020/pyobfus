@@ -387,3 +387,97 @@ def test_framework_presets_default_module_attribute_runtime(
     assert original.returncode == artifact.returncode == 0, artifact.stderr
     assert original.stdout == artifact.stdout == "7\n"
     assert ob.attribute_plans["app"].edits
+
+
+PREFIXES = [
+    'import sys\nsys.path.insert(0, "/opt")\n',
+    "import logging\nlog = logging.getLogger(__name__)\n",
+    "import logging\nlogging.basicConfig()\n",
+    "from helper import setup\nsetup()\n",
+]
+PREFIX_IMPORTS = [
+    ("from pkg import mod", "mod.LIMIT", "app.py"),
+    ("import pkg.mod as mod", "mod.LIMIT", "app.py"),
+    ("import pkg.mod", "pkg.mod.LIMIT", "app.py"),
+    ("from . import mod", "mod.LIMIT", "pkg/reader.py"),
+]
+
+
+@pytest.mark.parametrize("prefix", PREFIXES)
+@pytest.mark.parametrize("statement,expression,relative", PREFIX_IMPORTS)
+@pytest.mark.parametrize("form", ["function", "nested", "async", "lambda", "default", "decorator"])
+def test_opaque_prefix_before_stable_global_import(
+    tmp_path, monkeypatch, prefix, statement, expression, relative, form
+):
+    monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("USERPROFILE", str(tmp_path))
+    bodies = {
+        "function": f"def read():\n    return {expression}\nprint(read())\n",
+        "nested": f"def read():\n    def inner():\n        return {expression}\n    return inner()\nprint(read())\n",
+        "async": f"import asyncio\nasync def read():\n    return {expression}\nprint(asyncio.run(read()))\n",
+        "lambda": f"read = lambda: {expression}\nprint(read())\n",
+        "default": f"def read(value={expression}):\n    return value\nprint(read())\n",
+        "decorator": f"def decorate(value):\n    return lambda function: function\n@decorate({expression})\ndef read():\n    return {expression}\nprint(read())\n",
+    }
+    app = prefix + statement + "\n" + bodies[form]
+    src = project(tmp_path, app if relative == "app.py" else "import pkg.reader\n")
+    (src / relative).write_text(app)
+    (src / "helper.py").write_text("def setup():\n    return 1\n")
+    ob = CrossFileOrchestrator(ObfuscationConfig(max_workers=1))
+    out = tmp_path / "out"
+    assert ob.obfuscate(src, out).success
+    original, artifact = run(src, tmp_path), run(out, tmp_path)
+    assert original.returncode == artifact.returncode == 0, artifact.stderr
+    assert original.stdout == artifact.stdout == "7\n"
+    assert not any(
+        isinstance(n, ast.Attribute) and n.attr == "LIMIT"
+        for n in ast.walk(ast.parse((out / relative).read_text()))
+    )
+    assert_retained_accesses_have_advice(src, out, ob)
+    checked = runner().invoke(main, [str(src), "--check", "--json", "--offline", "--no-config"])
+    assert checked.exit_code in {0, 1}, checked.output
+    assert not any(
+        "module identity cannot be proved" in r["message"]
+        for r in json.loads(checked.stdout)["risks"]
+    )
+
+
+@pytest.mark.parametrize(
+    "body",
+    [
+        "def read():\n    return mod.LIMIT\nfrom pkg import mod\nprint(read())\n",
+        "read = lambda: mod.LIMIT\nfrom pkg import mod\nprint(read())\n",
+        "def outer():\n    def read():\n        return mod.LIMIT\n    return read()\nfrom pkg import mod\nprint(outer())\n",
+        "from pkg import mod\ndef read():\n    return mod.LIMIT\ndef replace():\n    global mod\n    mod = None\nprint(read())\n",
+        "from pkg import mod\ndef read():\n    return mod.LIMIT\nprint(read())\nmod = None\n",
+        "from pkg import mod\ndef read():\n    return mod.LIMIT\nprint(read())\ndel mod\n",
+        "from pkg import mod\nclass Reader:\n    value = mod.LIMIT\nprint(Reader.value)\n",
+        "from pkg import mod\nread = lambda mod: mod.LIMIT\nprint(read(mod))\n",
+    ],
+)
+def test_opaque_prefix_does_not_relax_order_or_competing_binding_guards(
+    tmp_path, monkeypatch, body
+):
+    monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("USERPROFILE", str(tmp_path))
+    src = project(tmp_path, PREFIXES[0] + body)
+    ob = CrossFileOrchestrator(ObfuscationConfig(max_workers=1))
+    out = tmp_path / "out"
+    assert ob.obfuscate(src, out).success
+    assert any(
+        isinstance(n, ast.Attribute) and n.attr == "LIMIT"
+        for n in ast.walk(ast.parse((out / "app.py").read_text()))
+    )
+    assert_retained_accesses_have_advice(src, out, ob)
+    checked = runner().invoke(main, [str(src), "--check", "--json", "--offline", "--no-config"])
+    assert checked.exit_code in {0, 1}, checked.output
+    risks = json.loads(checked.stdout)["risks"]
+    assert any(r["category"] == "compatibility_advisory" for r in risks)
+    # Follow the advisory's preservation recovery for runtime equality; the
+    # rejected proof itself deliberately leaves the renamed export access intact.
+    ob.config.exclude_names.add("LIMIT")
+    recovered = tmp_path / "recovered"
+    assert ob.obfuscate(src, recovered).success
+    original, artifact = run(src, tmp_path), run(recovered, tmp_path)
+    assert original.returncode == artifact.returncode == 0, artifact.stderr
+    assert original.stdout == artifact.stdout == "7\n"

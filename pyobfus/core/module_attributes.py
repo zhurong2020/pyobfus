@@ -144,7 +144,6 @@ class _Binding:
     scope: str
     module: str
     position: Tuple[int, int]
-    global_ready: bool
     paths: Tuple[Tuple[str, Tuple[int, int]], ...] = ()
 
 
@@ -767,12 +766,8 @@ class _ProofVisitor(ImportedAccessVisitor):
                 if target and self.inventory.eligible(target, self.module):
                     scope[name] = target
                     first = competing[0]
-                    prefix = body[: body.index(first)]
-                    ready = all(
-                        _inert(s) or isinstance(s, (ast.Import, ast.ImportFrom)) for s in prefix
-                    )
                     self.details[(id(scope), name)] = _Binding(
-                        scope_id, target, (first.lineno, first.col_offset), ready, paths
+                        scope_id, target, (first.lineno, first.col_offset), paths
                     )
         previous_scopes, previous_kinds = self.scopes, self.scope_kinds
         # Function closures need a separate initialization proof (not PR 1).
@@ -800,8 +795,10 @@ class _ProofVisitor(ImportedAccessVisitor):
                     return None
                 position = (node.lineno, node.col_offset)
                 if scope is not self.scopes[-1]:
-                    if not binding.global_ready or not self.function_positions:
+                    if not self.function_positions:
                         return None
+                    # A deferred body cannot run before its outermost definition.
+                    # Competing writes were rejected when collecting this binding.
                     position = min(position, self.function_positions[0])
                 return binding if position > binding.position else None
         return None
@@ -871,10 +868,15 @@ class _ProofVisitor(ImportedAccessVisitor):
     visit_AsyncFunctionDef = visit_FunctionDef
 
     def visit_Lambda(self, node: ast.Lambda) -> None:
-        # Deferred execution and walrus locals require another proof.
+        self.function_positions.append((node.lineno, node.col_offset))
         for expression in [*node.args.defaults, *node.args.kw_defaults]:
             if expression is not None:
                 self.visit(expression)
+        # Reuse function scope collection so parameters shadow imports and
+        # enclosing function locals cannot supply an unproved closure binding.
+        statement = ast.copy_location(ast.Expr(value=node.body), node.body)
+        self._enter([statement], "function", node.args)
+        self.function_positions.pop()
 
 
 def prove_accesses(
