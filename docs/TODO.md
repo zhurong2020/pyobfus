@@ -376,7 +376,7 @@ V2EX 仍卡在账号激活（要邀请码）；Stack Overflow 按 2026-04-22 的
 | 时间 | 事项 |
 |---|---|
 | 09-28 → 10-11 | 只写不发：维护者审第 1 篇、Claude 起草第 2 篇；DEV 个人资料链 GitHub；X 简介加一句 pyobfus maintainer |
-| 10-13 那周（周二/三美东上午） | **10-11 已提前发**：DEV 第 1 篇 <https://dev.to/zhurong2020/cloudflare-blocked-urllibs-default-user-agent-and-it-took-me-two-months-to-notice-3k8e>（05:58 UTC；标签误选 `cloudflarechallenge`，已请维护者改回 `cloudflare`；描述取正文首段）+ X 一条；1–3 天后（10-14 前后）看反响，决定是否由维护者本人投一次 HN |
+| 10-13 那周（周二/三美东上午） | **10-11 已提前发**：DEV 第 1 篇 <https://dev.to/zhurong2020/cloudflare-blocked-urllibs-default-user-agent-and-it-took-me-two-months-to-notice-3k8e>（05:58 UTC；标签已由维护者改回 `cloudflare`；描述取正文首段）+ X 一条（10-11 已发）；1–3 天后（10-14 前后）看反响，决定是否由维护者本人投一次 HN |
 | 10-25 | 节奏复盘，同时看第 1 篇的来源数据 |
 | 10-27 那周 | DEV 发第 2 篇 + X |
 | 11-02 → 11-06 | 月度版本（`[Unreleased]` 非空才发）+ r/Python showcase + WP 中文第 4 篇（1+2 合并）+ 知乎（若届时开动） |
