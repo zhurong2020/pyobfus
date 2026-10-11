@@ -252,16 +252,8 @@ AI 代码、源码不上传（问题在**没被检索到**，不是缺内容）�
 
 **文档（免发版）**
 
-- [ ] **联网行为说明页**。触发：Q8 回答提醒「本地运行不等于保证不联网，自己核实遥测」。10-11 核对代码只有三处联网：
-      `--check` 的依赖查询（PyPI，`--offline` 关闭）、`--email` 试用登记、Pro 许可证验证；**无遥测**；混淆构建本身不联网。
-      写成一页并从 README「local-first」与产品页「Claims you can inspect」链接。附带待维护者决定：CLI `--check` 默认联网
-      与 MCP 默认不联网不一致，是否改为默认离线（行为变更，要发版）。
-- [ ] **按真实问法加标题**：PyInstaller cookbook 加「Does PyInstaller protect your source code?」直接回答；
-      compiled cookbook 加「Should I obfuscate before compiling with Nuitka?」并放实测表（ChatGPT 两种环境都答「一般不用」，
-      B3 还称「只改名会被 Nuitka 抵消」，与我方实测相反）；COMPARISON 加一段「PyInstaller、Nuitka、混淆器各解决什么问题」。
-      只改标题与首段，不复制内容。
-- [ ] **正当用途与名称澄清**（FAQ 一段）：ChatGPT 不联网 B1 反问「是否在恶意软件分析中遇到」——写明 pyobfus 用于保护自己的软件，
-      Community 输出是带生成标记的普通 Python、不用 exec/加壳；顺带说明与 `pyobfuscate`（astrand 老项目）及 pyobfuscate.com 无关。
+- [ ] **待维护者决定：CLI `--check` 是否改为默认离线**（2026-10-11 写联网行为页时登记）：CLI 默认查 PyPI、MCP 默认不查，
+      两处不一致。改为默认离线是行为变更，要发版并在 CHANGELOG 写明；不改则维持 `docs/NETWORK_BEHAVIOR.md` 现有说明。
 - [ ] P2 · 中文任务页「卖给客户前如何保护 Python 源码」。证据：中文 Q9/Q11/Q12 三个环境全空白，而 Perplexity Q10 引用了
       `README.zh-CN.md`（有中文内容就会被用）。与「中文最小维护面」政策冲突，**待维护者定**；如做，只做 Pages `/zh-cn/` 一页。
 

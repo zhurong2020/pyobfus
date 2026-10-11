@@ -109,6 +109,29 @@ Client-side obfuscation raises analysis cost; it cannot make secrets or Python
 logic irrecoverable. Keep credentials in environment variables or an external
 secret manager, and keep security decisions behind a server boundary.
 
+## FAQ
+
+**What is pyobfus for?**
+Protecting Python software that you wrote or are licensed to ship, such as an
+application or library you deliver to customers. Community output is ordinary
+Python that, by default, starts with a `# pyobfus:generated` marker naming the
+tool and version. Community does not use `exec`, packers or encrypted
+payloads, so reviewers and security scanners can still read what it produced.
+See the [threat model](THREAT_MODEL.md) for what obfuscation does and does not
+protect.
+
+**Does pyobfus send anything over the network?**
+It never uploads source code or mappings and has no telemetry. Three features
+make requests: the `--check` PyPI dependency lookup (skip it with `--offline`),
+trial registration with `--email`, and Pro licence verification. See
+[network behavior](NETWORK_BEHAVIOR.md).
+
+**Is pyobfus related to pyobfuscate, PyObfuscator or python-obfuscator?**
+No. Those are separate projects by other authors, as are online services with
+similar names. pyobfus is published on PyPI as
+[`pyobfus`](https://pypi.org/project/pyobfus/) and developed at
+[github.com/zhurong2020/pyobfus](https://github.com/zhurong2020/pyobfus).
+
 ## Community and source
 
 - [GitHub repository](https://github.com/zhurong2020/pyobfus)

@@ -37,7 +37,7 @@ trial.
 | **Complete Community edition** | Obfuscate real projects without a file/line cap or trial clock. Optional limits are your CI safety rails, not an upgrade gate. |
 | **Diagnosable protection** | Keep the private mapping and restore identifiers in production tracebacks without giving customers the original source. |
 | **Evidence, not a black box** | Scan, preview, verify syntax, retain provenance and compare reproducible build reports. |
-| **Portable and local-first** | Source stays local; Community emits ordinary cross-platform Python without a native build matrix. |
+| **Portable and local-first** | Source stays local and there is no telemetry ([what goes over the network](https://pyobfus.readthedocs.io/en/latest/NETWORK_BEHAVIOR/)); Community emits ordinary cross-platform Python without a native build matrix. |
 | **Explicit security claims** | Tested, verified-once and advisory-only claims are separated; deterrents are not presented as irreversible security. |
 
 ## Quick start

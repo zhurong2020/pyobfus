@@ -29,7 +29,18 @@ The mapping file (`module.map.json`) is what lets you reverse a production
 stack trace later with `pyobfus --unmap --trace <file> --mapping module.map.json`.
 Keep it out of the shipped artifact.
 
-## What compiling alone leaves in the binary
+## Should I obfuscate before compiling with Nuitka?
+
+Yes, if you want your original identifier names out of the binary. A common
+assumption is that compiling with Nuitka or Cython makes renaming pointless.
+Our measurement below says otherwise. Both compilers kept the original
+function and class names in the compiled module. When the source was
+obfuscated first, the original names did not appear in the strings output.
+
+Neither step hides string literals, so this does not help with secrets
+embedded in the code.
+
+### What compiling alone leaves in the binary
 
 Compilers have to keep Python-visible names, because Python code calls
 functions, reads attributes and builds tracebacks by name at runtime. Those

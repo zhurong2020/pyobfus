@@ -56,6 +56,8 @@ Pro is USD 45 once, not a subscription. The five-day trial needs no card: `pyobf
 - Use framework presets for reflection-heavy projects.
 - Do not expose source, mappings, licence keys or absolute paths.
 - Online dependency verification sends public package names to public PyPI; use `--offline` for private indexes or offline work.
+- pyobfus has no telemetry and never uploads source or mappings. The only network requests are the `--check` PyPI lookup, `pyobfus-trial start --email` and Pro licence verification: https://pyobfus.readthedocs.io/en/latest/NETWORK_BEHAVIOR/
+- pyobfus is for protecting software you own or are licensed to ship. It is unrelated to `pyobfuscate`, `pyobfuscator` and `python-obfuscator`.
 - Runtime-backed Pro output ships `pyobfus-runtime>=0.1,<1`, not the proprietary builder or a licence key.
 - A syntax pass does not claim runtime correctness; run project tests against the exact generated output.
 - Mapping files are retain-internal, not customer output.
@@ -67,6 +69,7 @@ Pro is USD 45 once, not a subscription. The five-day trial needs no card: `pyobf
 - Edition policy: https://pyobfus.readthedocs.io/en/latest/EDITION_BOUNDARY_POLICY/
 - Support evidence: https://pyobfus.readthedocs.io/en/latest/SUPPORT_MATRIX/
 - Threat model: https://pyobfus.readthedocs.io/en/latest/THREAT_MODEL/
+- Network behavior: https://pyobfus.readthedocs.io/en/latest/NETWORK_BEHAVIOR/
 - Comparison: https://pyobfus.readthedocs.io/en/latest/COMPARISON/
 - MCP: https://github.com/zhurong2020/pyobfus/tree/main/pyobfus_mcp
 - Skills: https://github.com/zhurong2020/pyobfus/tree/main/skills

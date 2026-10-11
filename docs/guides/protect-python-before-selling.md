@@ -182,5 +182,6 @@ so an assistant can run the check, build and verification steps for you.
 It runs locally; nothing is uploaded by pyobfus.
 
 **Is my source uploaded anywhere?**
-No. pyobfus runs on your machine. `--check` looks up dependency metadata on
-PyPI unless you pass `--offline`.
+No. pyobfus runs on your machine and has no telemetry. `--check` looks up
+dependency names on PyPI unless you pass `--offline`. See
+[network behavior](../NETWORK_BEHAVIOR.md) for the complete list.
