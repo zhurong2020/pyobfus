@@ -127,10 +127,16 @@ class TestAiDebuggingExample:
 
         unmapped = run_cli("--unmap", "--trace", str(trace_file), "--mapping", str(mapping))
         assert unmapped.returncode == 0, unmapped.stderr
-        for original_name in ("order_total", "subtotal", "line_items"):
-            assert (
-                original_name in unmapped.stdout
-            ), f"--unmap did not restore {original_name!r}:\n{unmapped.stdout}"
+        assert 'File "pricing.py", line 13, in order_total' in unmapped.stdout
+        assert 'File "pricing.py", line 19, in <module>' in unmapped.stdout
+        assert f"[obfuscated: {output}:" in unmapped.stdout
+        from pyobfus.core.mapping import ObfuscationMapping
+
+        names = ObfuscationMapping.load(mapping)
+        for line in crashed.stderr.splitlines():
+            if line.startswith("    "):
+                assert names.unmap_text(line) in unmapped.stdout
+        assert "Code excerpts are artifact code with names restored" in unmapped.stderr
 
 
 class TestImportHookExample:
