@@ -1,5 +1,12 @@
 # pyobfus 当前计划
 
+**2026-10-11 `--check` 写死密钥提示（PR #74 合并 `2bd69f3`，未发版）**：Codex 无头实现、Claude 两轮审核。新类别 `hardcoded_secret`：
+常见 token 形状（与 pre-commit 钩子同列表 + Stripe）报 medium，敏感变量名 + 字面量报 info；只报位置不回显值（文本/JSON/SARIF 已核）；退出码不变；
+只有 medium 才把 `ai_hint` 改成「先移出密钥」。第 1 轮按名字子串匹配误报过宽（10 个反例全报，Codex 还把自家常量改成拼接躲检测），
+第 2 轮改为按词段 + 元数据后缀 + 值形态排除：反例 0、真阳性 14/14、6 个常见库与本仓库自扫 0、两个私有应用 9→5（剩下 5 处是真写死的 token）。
+已知漏报：带空格的密码短语（为排除提示文字的取舍）。同日 PR #73 改写 MCP `pro_value` 文案（不再称 Pro 加密能隐藏 API key，未发 MCP）。
+随 11 月第一周月度版本发布（需批准）。
+
 **2026-10-11 打包 lane 扩到多模块 + Nuitka standalone（免发版，PR #72）**：新 fixture `integration_tests/packaging/multimodule/`
 （子包、`.`/`..` 相对导入、入口脚本），目录构建后 PyInstaller `--onefile` 与 Nuitka `--mode=standalone` 都测：隐藏产物源码后输出与原版一致、
 三模块 traceback 经 `--unmap --json` 还原、冻结模块/`main.bin` 不含 5 个被改名的原名（未混淆的 standalone 构建 5 个全在，断言有区分力）。

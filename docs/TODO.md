@@ -237,14 +237,7 @@ AI 代码、源码不上传（问题在**没被检索到**，不是缺内容）�
       （思路：转换后的 AST 保留原节点 lineno，unparse 后再 parse，按语句并行遍历对齐；docstring 删除、字符串编码 helper
       等插入语句要单独处理）；mapping 格式加版本号并保持旧 mapping 可读；CLI 与 MCP `unmap_stack_trace` 一起改；
       回归用多行表达式、装饰器、docstring、字符串编码、目录构建。Codex 实现、Claude 审核。
-      **10-11 Codex 说明已备**（私有 `docs/internal/codex-2026-10/UNMAP_LINES_PROMPT.md`，分 PR1 数据/PR2 输出；10-11 维护者定 mapping 顶层 version 保持 1），排在密钥检查之后。
-- [ ] **P1 · `--check` 新增「代码里写死的密钥」提示 · PR #74 待审**。触发：几乎每个回答都警告「不要把 API key 打进交付程序」；
-      10-11 实测含 OpenAI 形 key、数据库密码、Bearer token 的文件，`--check` 报「Risks: 0」并建议直接构建，而混淆不隐藏字符串。
-      版本边界：安全类检查，Community。要点：稳定 `hardcoded_secret` category（不新增 reason code 域）；变量名（`*_KEY`/`*PASSWORD*`/`*TOKEN*`/`*SECRET*`）
-      赋长字符串字面量 + 常见 token 前缀两类启发式；**只报 file:line 不回显值**（同仓库 pre-commit 钩子的做法）；
-      低误报优先，severity 用 medium/info；文档说明它不是专业密钥扫描器，并指向 gitleaks / detect-secrets，不引入新依赖。
-      **10-11 已实现，草稿 [PR #74](https://github.com/zhurong2020/pyobfus/pull/74) 待 Claude 审核**（说明私有 `docs/internal/codex-2026-10/CHECK_SECRETS_PROMPT.md`；证据私有 `docs/internal/codex-2026-10/check-secrets-evidence/`）。
-      （MCP `pro_value` 称 Pro 加密能隐藏 API key 的文案已于 10-11 由 PR #73 改写，未发 MCP。）
+      **10-11 Codex 说明已备**（私有 `docs/internal/codex-2026-10/UNMAP_LINES_PROMPT.md`，分 PR1 数据/PR2 输出；10-11 维护者定 mapping 顶层 version 保持 1），10-11 密钥检查合并后启动 PR1。
 - [ ] P2 · 多版本 mapping 按 trace marker id 自动选取（如 `--unmap --mapping-dir`）。触发弱（回答建议「每次构建一个 Build ID」，
       我们已有 `--trace-marker` 的 id 注释 + 0.5.31 的不匹配告警），等有用户提出再做。
 
@@ -255,7 +248,7 @@ AI 代码、源码不上传（问题在**没被检索到**，不是缺内容）�
 
 **文档（免发版）**
 
-- [ ] **CLI `--check` 是否改为默认离线：10-11 维护者定先保持默认联网，密钥检查（Codex）完成后再审**（2026-10-11 写联网行为页时登记）：CLI 默认查 PyPI、MCP 默认不查，
+- [ ] **CLI `--check` 是否改为默认离线：10-11 维护者定先保持默认联网；密钥检查已于 10-11 合并（PR #74），可随时复审**（2026-10-11 写联网行为页时登记）：CLI 默认查 PyPI、MCP 默认不查，
       两处不一致。改为默认离线是行为变更，要发版并在 CHANGELOG 写明；不改则维持 `docs/NETWORK_BEHAVIOR.md` 现有说明。
 - [ ] P2 · 中文任务页「卖给客户前如何保护 Python 源码」。证据：中文 Q9/Q11/Q12 三个环境全空白，而 Perplexity Q10 引用了
       `README.zh-CN.md`（有中文内容就会被用）。与「中文最小维护面」政策冲突，**待维护者定**；如做，只做 Pages `/zh-cn/` 一页。
