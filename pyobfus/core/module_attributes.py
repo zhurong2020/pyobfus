@@ -1,7 +1,7 @@
 """Conservative module identity proofs and immutable original-AST edit plans.
 
-PR 1 accepts only absolute from-package submodules and dotted imports with an
-explicit alias. Lexical candidates remain a separate, deliberately broader API.
+Static package edges, relative imports and re-exports extend the PR 1 proofs.
+Lexical candidates remain a separate, deliberately broader API.
 No target code is imported, and no names are allocated here.
 """
 
@@ -9,7 +9,9 @@ from __future__ import annotations
 
 import ast
 import hashlib
+import sys
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Callable, Dict, List, Optional, Set, Tuple
 
 from pyobfus.core.global_table import GlobalSymbolTable
@@ -59,14 +61,23 @@ def apply_attribute_plan(
             or node is None
             or node.attr != edit.expected
             or not isinstance(node.ctx, ast.Load)
-            or not isinstance(node.value, ast.Name)
-            or node.value.id != edit.binding
+            or _expression_binding(node.value) != edit.binding
         ):
             raise ValueError("Module attribute plan coordinate/binding mismatch")
         seen.add(edit.location)
         matched.append((node, edit.emitted))
     for node, emitted in matched:
         node.attr = emitted
+
+
+def _expression_binding(node: ast.expr) -> Optional[str]:
+    """An exact Name/Attribute path for plan validation, never an identity proof."""
+    if isinstance(node, ast.Name):
+        return node.id
+    if isinstance(node, ast.Attribute) and isinstance(node.ctx, ast.Load):
+        base = _expression_binding(node.value)
+        return f"{base}.{node.attr}" if base else None
+    return None
 
 
 def _scope_nodes(body: List[ast.stmt]) -> List[ast.AST]:
@@ -92,7 +103,19 @@ def _inert(statement: ast.stmt) -> bool:
         return True
     if isinstance(statement, ast.Expr):
         return isinstance(statement.value, ast.Constant)
+    if isinstance(statement, ast.ClassDef):
+        return (
+            not statement.bases
+            and not statement.keywords
+            and not statement.decorator_list
+            and all(_inert(s) for s in statement.body)
+            and not getattr(statement, "type_params", [])
+        )
     if isinstance(statement, (ast.Assign, ast.AnnAssign)):
+        if isinstance(statement, ast.AnnAssign) and not isinstance(
+            statement.annotation, (ast.Name, ast.Constant)
+        ):
+            return False
         targets = statement.targets if isinstance(statement, ast.Assign) else [statement.target]
         try:
             ast.literal_eval(statement.value)  # type: ignore[arg-type]
@@ -117,13 +140,17 @@ class _Binding:
     module: str
     position: Tuple[int, int]
     global_ready: bool
+    paths: Tuple[Tuple[str, Tuple[int, int]], ...] = ()
 
 
 class ModuleInventory:
     """Selected project files, ordinary package roots, cycles and hazards."""
 
     def __init__(
-        self, sources: Dict[str, str], resolve_from: Callable[[str, ast.ImportFrom], Optional[str]]
+        self,
+        sources: Dict[str, str],
+        resolve_from: Callable[[str, ast.ImportFrom], Optional[str]],
+        table: Optional[GlobalSymbolTable] = None,
     ) -> None:
         self.trees = {module: ast.parse(source) for module, source in sources.items()}
         self.packages = {
@@ -132,18 +159,57 @@ class ModuleInventory:
             if module.endswith(".__init__")
         }
         self.resolve_from = resolve_from
+        self._package_static: Dict[str, bool] = {}
+        self._module_edges: Dict[Tuple[str, str], Optional[str]] = {}
+        self._export_bindings: Dict[str, _Bindings] = {}
+        stdlib = getattr(sys, "stdlib_module_names", None)
+        if stdlib is None:  # Python 3.9; inspect the tool's stdlib, never target imports.
+            root = Path(ast.__file__).parent
+            stdlib = {p.stem for p in root.glob("*.py")}
+            stdlib.update(p.name for p in root.iterdir() if (p / "__init__.py").is_file())
+            stdlib.update(p.name.split(".")[0] for p in (root / "lib-dynload").glob("*"))
+        self.stdlib_roots = set(stdlib) | set(sys.builtin_module_names)
         self.unsafe: Set[str] = set()
         self.edges: Dict[str, Set[str]] = {module: set() for module in self.trees}
         for module, tree in self.trees.items():
+            bindings = _Bindings(lambda n: resolve_from(module, n))
+            for statement in tree.body:
+                bindings.visit(statement)
+            self._export_bindings[module] = bindings
+            # I/D can live in the module supplying an export, not just in
+            # its consumer. Do not promise H correctness over those existing
+            # flat-import/global-store failures, even for package re-exports.
+            for node in ast.walk(tree):
+                if isinstance(node, (ast.Global, ast.Nonlocal)) and set(node.names) & set(
+                    bindings.imports
+                ):
+                    self.unsafe.add(module)
+                if (
+                    isinstance(node, ast.ImportFrom)
+                    and node not in tree.body
+                    and any(
+                        (a.asname or a.name) in bindings.imports
+                        and (
+                            table is None
+                            or table.get_obfuscated_import(resolve_from(module, node) or "", a.name)
+                        )
+                        for a in node.names
+                    )
+                ):
+                    self.unsafe.add(module)
             for node in ast.walk(tree):
                 if isinstance(node, ast.Import):
-                    self.edges[module].update(a.name for a in node.names if a.name in self.trees)
+                    self.edges[module].update(
+                        self.canonical(a.name) for a in node.names if self.selected(a.name)
+                    )
                 elif isinstance(node, ast.ImportFrom):
                     base = resolve_from(module, node)
                     if base:
                         for name in [base, *(f"{base}.{a.name}" for a in node.names)]:
                             canonical = f"{name}.__init__" if name in self.packages else name
-                            if canonical in self.trees:
+                            if canonical in self.trees and not (
+                                canonical == module and node.module is None
+                            ):
                                 self.edges[module].add(canonical)
                 if (
                     isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
@@ -156,11 +222,6 @@ class ModuleInventory:
                     and node.func.id in {"exec", "eval"}
                 ):
                     self.unsafe.add(module)
-            parts = module.split(".")
-            for index in range(1, len(parts)):
-                package = ".".join(parts[:index]) + ".__init__"
-                if package in self.trees and package != module:
-                    self.edges[module].add(package)
         self.cyclic: Set[str] = set()
         for module in self.trees:
             pending = list(self.edges[module])
@@ -173,35 +234,13 @@ class ModuleInventory:
                 if target not in visited:
                     visited.add(target)
                     pending.extend(self.edges.get(target, ()))
-        # Observe mutation/escape hazards using lexical candidates, without
-        # upgrading any such candidate to a proof. Escapes get new advice in PR 2.
+        # Keep PR 1's project-wide guard: an escape anywhere defeats all
+        # proofs for that module, including consumers in other selected files.
+        self.hazards: Dict[str, Tuple[ModuleHazard, ...]] = {}
         for module, tree in self.trees.items():
-            parents = {
-                child: node for node in ast.walk(tree) for child in ast.iter_child_nodes(node)
-            }
-            inventory = self
-
-            class Hazards(ImportedAccessVisitor):
-                def visit_Name(self, node: ast.Name) -> None:
-                    target = self.resolve(node)
-                    parent = parents.get(node)
-                    if target in inventory.trees and isinstance(node.ctx, ast.Load):
-                        if not isinstance(parent, ast.Attribute) or parent.attr == "__dict__":
-                            inventory.unsafe.add(target)
-
-                def visit_Attribute(self, node: ast.Attribute) -> None:
-                    target = self.resolve(node.value)
-                    if target in inventory.trees and not isinstance(node.ctx, ast.Load):
-                        inventory.unsafe.add(target)
-                    path = self.resolve(node)
-                    if path in inventory.trees and not isinstance(node.ctx, ast.Load):
-                        inventory.unsafe.add(path)
-                    self.generic_visit(node)
-
-            Hazards(
-                lambda node: resolve_from(module, node), lambda n, m: None, lambda n: None
-            ).visit(tree)
-            # Recognizable module registry replacement defeats every direct proof.
+            events = discover_module_hazards(tree, module, self)
+            self.hazards[module] = events
+            self.unsafe.update(self.canonical(e.module) for e in events)
             if any(
                 isinstance(n, ast.Subscript)
                 and not isinstance(n.ctx, ast.Load)
@@ -211,38 +250,350 @@ class ModuleInventory:
             ):
                 self.unsafe.update(self.trees)
 
-    def eligible(self, module: str, importer: str) -> bool:
-        if module not in self.trees or module.endswith(".__init__") or module in self.packages:
+    def canonical(self, module: str) -> str:
+        return f"{module}.__init__" if module in self.packages else module
+
+    def selected(self, module: str) -> bool:
+        return self.canonical(module) in self.trees
+
+    def static_export(
+        self, module: str, name: str, visited: Optional[Set[Tuple[str, str]]] = None
+    ) -> bool:
+        """An allocated __all__ slot alone does not prove an emitted binding.
+
+        Reuse lexical binding collection and the existing relative resolver;
+        this validates the table's spelling without allocating another name.
+        Imported exports require a unique unconditional symbol import, then
+        the same proof at its source. Dynamic/star-created exports are refused.
+        """
+        canonical = self.canonical(module)
+        if module in self.packages and module in self.trees:
             return False
+        key = (canonical, name)
+        visited = set() if visited is None else set(visited)
+        if key in visited or canonical in self.unsafe:
+            return False
+        visited.add(key)
+        bindings = self._export_bindings.get(canonical)
+        if bindings is None:
+            return False
+        if name not in bindings.imports:
+            for statement in self.trees[canonical].body:
+                if (
+                    isinstance(statement, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+                    and statement.name == name
+                ):
+                    return True
+                if isinstance(statement, (ast.Assign, ast.AnnAssign)):
+                    targets = (
+                        statement.targets
+                        if isinstance(statement, ast.Assign)
+                        else [statement.target]
+                    )
+                    if any(
+                        isinstance(n, ast.Name) and isinstance(n.ctx, ast.Store) and n.id == name
+                        for target in targets
+                        for n in ast.walk(target)
+                    ):
+                        return True
+            return False
+        if name in bindings.shadowed:
+            return False
+        tree = self.trees[canonical]
+        imports = [
+            n
+            for n in _scope_nodes(tree.body)
+            if isinstance(n, (ast.Import, ast.ImportFrom))
+            and any((a.asname or a.name.split(".")[0]) == name for a in n.names)
+        ]
         if (
-            module in self.unsafe
-            or importer in self.unsafe
-            or module in self.cyclic
-            or importer in self.cyclic
+            len(imports) != 1
+            or imports[0] not in tree.body
+            or not isinstance(imports[0], ast.ImportFrom)
         ):
             return False
-        parts = module.split(".")
-        # Namespace packages and colliding file/package roots are unsupported.
+        statement = imports[0]
+        base = self.resolve_from(canonical, statement)
+        if not base:
+            return False
+        alias = next(a for a in statement.names if (a.asname or a.name) == name)
+        return self.static_export(base, alias.name, visited)
+
+    def _static_package(self, package: str) -> bool:
+        if package not in self._package_static:
+            self._package_static[package] = self._compute_static_package(package)
+        return self._package_static[package]
+
+    def _compute_static_package(self, package: str) -> bool:
+        tree = self.packages.get(package)
+        if tree is None:
+            return False
+        bindings = _Bindings(lambda n: self.resolve_from(f"{package}.__init__", n))
+        for statement in tree.body:
+            bindings.visit(statement)
+        writes: Set[str] = set()
+        for statement in tree.body:
+            names: Set[str] = set()
+            if isinstance(statement, (ast.Import, ast.ImportFrom)):
+                names.update(a.asname or a.name.split(".")[0] for a in statement.names)
+            elif isinstance(statement, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                names.add(statement.name)
+            else:
+                names.update(
+                    n.id
+                    for n in _scope_nodes([statement])
+                    if isinstance(n, ast.Name) and isinstance(n.ctx, (ast.Store, ast.Del))
+                )
+            if writes & names:
+                return False
+            writes.update(names)
+        for statement in tree.body:
+            if _inert(statement):
+                continue
+            if isinstance(statement, ast.ImportFrom):
+                base = self.resolve_from(f"{package}.__init__", statement)
+                if (
+                    not base
+                    or not self.selected(base)
+                    or any(a.name == "*" for a in statement.names)
+                ):
+                    return False
+                continue
+            if isinstance(statement, ast.Import) and all(
+                self.selected(a.name) for a in statement.names
+            ):
+                continue
+            # Static module attribute reads into a package definition do not
+            # call arbitrary initializer code. The worker uses the same access
+            # plan for the RHS. Module __getattr__/mutation hazards still win.
+            if isinstance(statement, (ast.Assign, ast.AnnAssign)) and isinstance(
+                statement.value, ast.Attribute
+            ):
+                value = statement.value
+                targets = (
+                    statement.targets if isinstance(statement, ast.Assign) else [statement.target]
+                )
+                if not all(isinstance(t, ast.Name) for t in targets):
+                    return False
+                if isinstance(statement, ast.AnnAssign) and not isinstance(
+                    statement.annotation, (ast.Name, ast.Constant)
+                ):
+                    return False
+                if any(
+                    isinstance(n, ast.Name) and n.id == "__all__"
+                    for t in targets
+                    for n in ast.walk(t)
+                ):
+                    return False
+                if isinstance(value.value, ast.Name):
+                    target = bindings.imports.get(value.value.id)
+                    if (
+                        target
+                        and self.selected(target)
+                        and target not in self.packages
+                        and target not in self.unsafe
+                    ):
+                        continue
+            return False
+        return True
+
+    def edge(self, package: str, child: str) -> Optional[str]:
+        key = (package, child)
+        if key not in self._module_edges:
+            self._module_edges[key] = self._compute_edge(package, child)
+        return self._module_edges[key]
+
+    def _compute_edge(self, package: str, child: str) -> Optional[str]:
+        """Prove a package member is its child module, never just a filename."""
+        target = f"{package}.{child}"
+        if not self.selected(target) or not self._static_package(package):
+            return None
+        tree = self.packages[package]
+        bindings = _Bindings(lambda n: self.resolve_from(f"{package}.__init__", n))
+        for statement in tree.body:
+            bindings.visit(statement)
+        if any(
+            isinstance(n, (ast.Global, ast.Nonlocal)) and child in n.names for n in ast.walk(tree)
+        ):
+            return None
+        if child in bindings.shadowed:
+            return None
+        imported = bindings.imports.get(child)
+        if imported is not None and imported != target:
+            return None
+        # A matching imported symbol can still be a value exported by the
+        # package supplying it. Reject it unless it is the relative child edge.
+        for statement in tree.body:
+            if isinstance(statement, ast.ImportFrom):
+                for alias in statement.names:
+                    if (alias.asname or alias.name) == child:
+                        base = self.resolve_from(f"{package}.__init__", statement)
+                        if base != package or alias.name != child:
+                            return None
+        return target
+
+    def eligible(self, module: str, importer: str) -> bool:
+        canonical = self.canonical(module)
+        if module.split(".")[0] in self.stdlib_roots:
+            return False  # A selected filename cannot settle a stdlib import collision.
+        if module in self.packages and module in self.trees:
+            return False  # The file/package collision is ambiguous even at the root.
+        if module.endswith(".__init__") or module == "__init__" or not self.selected(module):
+            return False
+        if any(m in self.unsafe or m in self.cyclic for m in (canonical, importer)):
+            return False
+        parts = module.removesuffix(".__init__").split(".")
         for index in range(1, len(parts)):
             package = ".".join(parts[:index])
-            tree = self.packages.get(package)
-            if tree is None or package in self.trees or f"{package}.__init__" in self.cyclic:
+            if package in self.trees or self.edge(package, parts[index]) is None:
                 return False
-            # PR 1 does not prove re-exporting or executable package initializers.
+            if self.canonical(package) in self.unsafe or self.canonical(package) in self.cyclic:
+                return False
+        return module not in self.packages or self._static_package(module)
+
+
+@dataclass(frozen=True)
+class ModuleHazard:
+    location: Tuple[int, int]
+    module: str
+    names: Tuple[str, ...]
+    kind: str
+
+
+def discover_module_hazards(
+    tree: ast.AST, importer: str, inventory: ModuleInventory
+) -> Tuple[ModuleHazard, ...]:
+    """Observe escapes/mutation through the shared lexical candidate traversal.
+
+    These are candidates rather than runtime proofs. No assignment propagation
+    or dynamic-import rewrite is introduced. Helper import aliases are resolved
+    by the same lexical resolver as module candidates.
+    """
+    parents = {c: n for n in ast.walk(tree) for c in ast.iter_child_nodes(n)}
+    events: Dict[Tuple[int, int, str], ModuleHazard] = {}
+
+    class Hazards(ImportedAccessVisitor):
+        def record(self, node: ast.AST, module: str, names: Tuple[str, ...], kind: str) -> None:
+            if inventory.selected(module):
+                key = (node.lineno, node.col_offset, module)  # type: ignore[attr-defined]
+                events[key] = ModuleHazard(key[:2], module, names, kind)
+
+        def dynamic(self, node: ast.expr) -> Optional[str]:
+            if isinstance(node, ast.Subscript) and self.resolve(node.value) == "sys.modules":
+                key = node.slice
+                if isinstance(key, ast.Constant) and isinstance(key.value, str):
+                    return key.value
+            if isinstance(node, ast.Call) and self.resolve(node.func) == "importlib.import_module":
+                if node.args and isinstance(node.args[0], ast.Constant):
+                    target = node.args[0].value
+                    if isinstance(target, str):
+                        if target.startswith("."):
+                            return None  # Dynamic package argument remains unsupported.
+                        return target
+            return None
+
+        def dynamic_expression(self, node: ast.expr) -> bool:
+            return (
+                isinstance(node, ast.Subscript) and self.resolve(node.value) == "sys.modules"
+            ) or (
+                isinstance(node, ast.Call) and self.resolve(node.func) == "importlib.import_module"
+            )
+
+        def observe(self, node: ast.expr) -> None:
+            module = self.resolve(node)
+            if not module or not inventory.selected(module) or not isinstance(node.ctx, ast.Load):  # type: ignore[attr-defined]
+                return
+            parent = parents.get(node)
+            if isinstance(parent, ast.Attribute) and parent.value is node:
+                if parent.attr == "__dict__":
+                    names: Tuple[str, ...] = ()
+                    grandparent = parents.get(parent)
+                    if isinstance(grandparent, ast.Subscript) and isinstance(
+                        grandparent.slice, ast.Constant
+                    ):
+                        if isinstance(grandparent.slice.value, str):
+                            names = (grandparent.slice.value,)
+                    self.record(parent, module, names, "reflection")
+                return
+            if isinstance(parent, (ast.withitem, ast.comprehension)):
+                return
+            # Calls, tuple/container storage, assignment, return/yield and a
+            # bare reference are all opaque module consumption.
+            site = (
+                parent
+                if isinstance(
+                    parent,
+                    (ast.Assign, ast.AnnAssign, ast.Return, ast.Yield, ast.YieldFrom, ast.Call),
+                )
+                else node
+            )
+            self.record(site or node, module, (), "module escape")
+
+        def visit_Name(self, node: ast.Name) -> None:
+            self.observe(node)
+
+        def visit_ClassDef(self, node: ast.ClassDef) -> None:
             if any(
-                not _inert(n) or isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
-                for n in tree.body
+                self.resolve(d.func if isinstance(d, ast.Call) else d) == "enum.global_enum"
+                for d in node.decorator_list
             ):
-                return False
-            child = parts[index]
-            if any(
-                isinstance(n, ast.Name)
-                and isinstance(n.ctx, (ast.Store, ast.Del))
-                and n.id == child
-                for n in ast.walk(tree)
+                inventory.unsafe.add(importer)  # Existing C injection is not repaired by H.
+            super().visit_ClassDef(node)
+
+        def visit_Attribute(self, node: ast.Attribute) -> None:
+            target = self.resolve(node.value) or self.dynamic(node.value)
+            if (
+                self.dynamic_expression(node.value)
+                and self.dynamic(node.value) is None
+                and (
+                    not (node.attr.startswith("__") and node.attr.endswith("__"))
+                    or node.attr == "__dict__"
+                )
             ):
-                return False
-        return True
+                for candidate in inventory.trees:
+                    self.record(node, candidate, (), "dynamic module access (unknown target)")
+            if target and inventory.selected(target):
+                if not isinstance(node.ctx, ast.Load):
+                    self.record(node, target, (node.attr,), "module mutation")
+                elif self.dynamic(node.value):
+                    self.record(node, target, (node.attr,), "dynamic module access")
+            path = self.resolve(node)
+            if path and inventory.selected(path) and not isinstance(node.ctx, ast.Load):
+                self.record(node, path, (), "module path mutation")
+            self.observe(node)
+            self.generic_visit(node)
+
+        def visit_Call(self, node: ast.Call) -> None:
+            helpers = {"getattr", "hasattr", "setattr", "delattr", "vars"}
+            helper = self.resolve(node.func)
+            if helper == "enum.global_enum":
+                inventory.unsafe.update(inventory.trees)  # A computed class owner is unknown.
+            builtin_helper = (
+                isinstance(node.func, ast.Name)
+                and node.func.id in helpers
+                and not any(node.func.id in scope for scope in self.scopes)
+            )
+            if node.args and (builtin_helper or helper in {f"builtins.{name}" for name in helpers}):
+                target = self.resolve(node.args[0])
+                if target:
+                    names: Tuple[str, ...] = ()
+                    if (
+                        len(node.args) > 1
+                        and isinstance(node.args[1], ast.Constant)
+                        and isinstance(node.args[1].value, str)
+                    ):
+                        names = (node.args[1].value,)
+                    self.record(node, target, names, "reflection")
+                    # Avoid a second, less specific escape at the first arg.
+                    for argument in [*node.args[1:], *(k.value for k in node.keywords)]:
+                        self.visit(argument)
+                    return
+            self.generic_visit(node)
+
+    Hazards(
+        lambda node: inventory.resolve_from(importer, node), lambda n, m: None, lambda n: None
+    ).visit(tree)
+    return tuple(events.values())
 
 
 @dataclass(frozen=True)
@@ -257,7 +608,7 @@ class AccessResolution:
 
 
 class _ProofVisitor(ImportedAccessVisitor):
-    """Reuse candidate traversal, but prove only direct, stable Name bases."""
+    """Reuse candidate traversal and prove stable bindings and explicit module edges."""
 
     def __init__(
         self, tree: ast.Module, module: str, inventory: ModuleInventory, table: GlobalSymbolTable
@@ -333,27 +684,47 @@ class _ProofVisitor(ImportedAccessVisitor):
                 continue
             for alias in statement.names:
                 name = alias.asname or alias.name.split(".")[0]
-                if name in bindings.shadowed or name in self.forbidden or len(imports[name]) != 1:
+                if name in bindings.shadowed or name in self.forbidden:
+                    continue
+                competing = imports[name]
+                # Multiple plain imports bind the same top package. Every
+                # member import must be unconditional; unrelated explicit
+                # aliases/from imports remain competing writes.
+                if len(competing) != 1 and not all(
+                    isinstance(n, ast.Import)
+                    and n in body
+                    and all(a.asname is None for a in n.names if a.name.split(".")[0] == name)
+                    for n in competing
+                ):
                     continue
                 target = None
-                if isinstance(statement, ast.Import) and alias.asname and "." in alias.name:
-                    target = alias.name
+                paths: Tuple[Tuple[str, Tuple[int, int]], ...] = ()
+                if isinstance(statement, ast.Import):
+                    target = alias.name if alias.asname else alias.name.split(".")[0]
+                    paths = tuple(
+                        (a.name, (n.lineno, n.col_offset))
+                        for n in competing
+                        if isinstance(n, ast.Import)
+                        for a in n.names
+                        if a.asname is None and a.name.split(".")[0] == name
+                    )
                 elif (
                     isinstance(statement, ast.ImportFrom)
-                    and statement.level == 0
-                    and statement.module in self.inventory.packages
                     and alias.name != "*"
-                    and self.table.get_obfuscated_import(statement.module, alias.name) is None
+                    and statement.level < len(self.module.split("."))
                 ):
-                    target = f"{statement.module}.{alias.name}"
+                    base = self.resolve_from(statement)
+                    if base and self.table.get_obfuscated_import(base, alias.name) is None:
+                        target = self.inventory.edge(base, alias.name)
                 if target and self.inventory.eligible(target, self.module):
                     scope[name] = target
-                    prefix = body[: body.index(statement)]
+                    first = competing[0]
+                    prefix = body[: body.index(first)]
                     ready = all(
                         _inert(s) or isinstance(s, (ast.Import, ast.ImportFrom)) for s in prefix
                     )
                     self.details[(id(scope), name)] = _Binding(
-                        scope_id, target, (statement.lineno, statement.col_offset), ready
+                        scope_id, target, (first.lineno, first.col_offset), ready, paths
                     )
         previous_scopes, previous_kinds = self.scopes, self.scope_kinds
         # Function closures need a separate initialization proof (not PR 1).
@@ -387,18 +758,28 @@ class _ProofVisitor(ImportedAccessVisitor):
                 return binding if position > binding.position else None
         return None
 
+    def _root(self, node: ast.expr) -> Optional[ast.Name]:
+        while isinstance(node, ast.Attribute):
+            node = node.value
+        return node if isinstance(node, ast.Name) else None
+
     def _attribute(self, node: ast.Attribute, module: str) -> None:
-        if (
-            self.unsupported
-            or not isinstance(node.ctx, ast.Load)
-            or not isinstance(node.value, ast.Name)
-        ):
+        if self.unsupported or not isinstance(node.ctx, ast.Load):
             return
-        binding = self._binding(node.value)
+        root = self._root(node.value)
+        binding = self._binding(root) if root else None
+        path = _expression_binding(node.value)
         emitted = self.table.get_obfuscated_import(module, node.attr)
-        if binding:
+        if emitted and not self.inventory.static_export(module, node.attr):
+            return  # A rename allocation is not a proof of an emitted export binding.
+        if (
+            binding
+            and path
+            and self.inventory.eligible(module, self.module)
+            and not self.inventory.selected(f"{module}.{node.attr}")
+        ):
             edit = (
-                AttributeEdit(binding.scope, node.value.id, span(node), node.attr, module, emitted)
+                AttributeEdit(binding.scope, path, span(node), node.attr, module, emitted)
                 if emitted and emitted != node.attr
                 else None
             )
@@ -414,7 +795,25 @@ class _ProofVisitor(ImportedAccessVisitor):
         if isinstance(node, ast.Name):
             binding = self._binding(node)
             return binding.module if binding else None
-        return None  # Never concatenate value attributes into module identities.
+        if isinstance(node, ast.Attribute) and isinstance(node.ctx, ast.Load):
+            base = self.resolve(node.value)
+            root = self._root(node)
+            binding = self._binding(root) if root else None
+            if base and binding:
+                target = self.inventory.edge(base, node.attr)
+                if not target or not self.inventory.eligible(target, self.module):
+                    return None
+                # Each path segment must have been loaded by an explicit
+                # dotted import in this binding's scope, reaching this use.
+                position = (node.lineno, node.col_offset)
+                if self.function_positions and binding.scope.startswith("module:"):
+                    position = min(position, self.function_positions[0])
+                if any(
+                    (path == target or path.startswith(target + ".")) and imported < position
+                    for path, imported in binding.paths
+                ):
+                    return target
+        return None
 
     def visit_FunctionDef(self, node) -> None:
         self.function_positions.append((node.lineno, node.col_offset))

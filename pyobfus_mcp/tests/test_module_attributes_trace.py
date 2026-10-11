@@ -4,13 +4,16 @@ import os
 import subprocess
 import sys
 
+import pytest
+
 from pyobfus.config import ObfuscationConfig
 from pyobfus.core.mapping import ObfuscationMapping
 from pyobfus.core.orchestrator import CrossFileOrchestrator
 from pyobfus_mcp.tools import unmap_stack_trace
 
 
-def test_module_attribute_generated_trace(tmp_path, monkeypatch):
+@pytest.mark.parametrize("style", ["alias", "dotted", "relative", "reexport"])
+def test_module_attribute_generated_trace(tmp_path, monkeypatch, style):
     monkeypatch.setenv("HOME", str(tmp_path))
     monkeypatch.setenv("USERPROFILE", str(tmp_path))
     monkeypatch.setenv("PYOBFUS_MCP_PROJECT_ROOT", str(tmp_path))
@@ -19,6 +22,14 @@ def test_module_attribute_generated_trace(tmp_path, monkeypatch):
     (src / "pkg/__init__.py").write_text("")
     (src / "pkg/mod.py").write_text("def scale():\n    raise ValueError('trace')\n")
     (src / "app.py").write_text("from pkg import mod\nmod.scale()\n")
+    if style == "dotted":
+        (src / "app.py").write_text("import pkg.mod\npkg.mod.scale()\n")
+    elif style == "relative":
+        (src / "app.py").write_text("import pkg.entry\n")
+        (src / "pkg/entry.py").write_text("from . import mod\nmod.scale()\n")
+    elif style == "reexport":
+        (src / "pkg/__init__.py").write_text("from .mod import scale\n__all__ = ['scale']\n")
+        (src / "app.py").write_text("import pkg\npkg.scale()\n")
     out = tmp_path / "out"
     ob = CrossFileOrchestrator(ObfuscationConfig(crossfile_module_attributes=True, max_workers=2))
     result = ob.obfuscate(src, out)
