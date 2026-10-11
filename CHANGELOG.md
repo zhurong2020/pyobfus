@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Community `--check` now flags potential hardcoded secrets by common credential
+  shapes or sensitive literal contexts (`hardcoded_secret`). Reports locations
+  without values; medium/info findings do not change exit codes. Obfuscation
+  does not hide string values. This is a coarse screen: use gitleaks or
+  detect-secrets for a full scan, and rotate credentials previously shipped or
+  committed.
+
 ## [0.6.1] - 2026-10-10
 
 Fixes two bugs where a build reported success but the output failed at run

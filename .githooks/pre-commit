@@ -27,6 +27,7 @@ PII_PATTERN='诸嵘|陈启稚|qizhi_chen|身份证|/home/wuxia/'
 # Anchored to repo root with -x for full-line match.
 PII_ALLOWLIST_RE='docs/V0\.4_EXECUTION_LOG\.md|\.githooks/pre-commit|\.githooks/README\.md|CLAUDE\.md'
 
+# Keep credential shapes aligned with pyobfus/core/secret_literals.py.
 # High-signal credential prefixes/shapes only. Deliberately NOT generic
 # entropy matching: this repo ships a secret *detector*, so broad heuristics
 # would fight its own source and fixtures. Verified 2026-09-07 against every

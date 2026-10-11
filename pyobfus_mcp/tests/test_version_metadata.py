@@ -3,10 +3,14 @@
 from __future__ import annotations
 
 import json
-import tomllib
 from pathlib import Path
 
 import pyobfus_mcp
+
+try:
+    import tomllib
+except ModuleNotFoundError:  # Python 3.10, supported by pyobfus-mcp
+    import tomli as tomllib
 
 
 def test_runtime_version_matches_package_metadata() -> None:

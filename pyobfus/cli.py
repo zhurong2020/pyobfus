@@ -373,7 +373,8 @@ def _echo_pro_import_hint() -> None:
     "check_mode",
     is_flag=True,
     help="Pre-flight risk check: scan for eval/exec, dynamic attributes, "
-    "framework reflection points. No files are written. "
+    "framework reflection points and potential hardcoded secrets (coarse screening). "
+    "No files are written. "
     "Exit code 0=safe, 1=high-risk findings, 2=parse errors.",
 )
 @click.option(

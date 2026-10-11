@@ -113,6 +113,8 @@ venv.bak/
 secrets/
 credentials/
 *_secret*
+# Runtime-generated fake credentials; keep the detector regression tests tracked.
+!tests/test_preflight_secrets.py
 *_password*
 api_keys*
 id_rsa

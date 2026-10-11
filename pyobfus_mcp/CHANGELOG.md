@@ -8,6 +8,10 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ### Added
 
+- `check_obfuscation_risks` forwards Core's new `hardcoded_secret` category
+  without literal values. Requires a pyobfus version containing this check
+  (after 0.6.1); MCP version and `pro_value` behavior are unchanged.
+
 - **`check_obfuscation_risks` reports keyword calls that parameter renaming
   would break.** When the effective config renames parameters (explicit
   `preserve_param_names: false` on a single file), same-file keyword calls and

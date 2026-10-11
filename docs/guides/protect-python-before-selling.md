@@ -168,7 +168,8 @@ Yes. Community is Apache-2.0, with no file or line limit and no trial clock.
 
 **Does obfuscation protect my API keys?**
 No. A key in a client program can be extracted, obfuscated or not. Keep
-high-privilege keys on a server.
+high-privilege keys on a server. `pyobfus --check` flags common hardcoded-key
+shapes without showing values; see [screening limits and remediation](../SARIF_CODE_SCANNING.md#hardcoded-secret-screening-community).
 
 **Does my customer need to install Python?**
 For obfuscated `.py` output, yes. If they should not, add PyInstaller or

@@ -94,7 +94,7 @@ class TestRulesAndSeverity:
     def test_all_categories_have_rules(self):
         doc = sarif.build_sarif(_report(), "1.0.0")
         rules = doc["runs"][0]["tool"]["driver"]["rules"]
-        assert len(rules) == 12
+        assert len(rules) == 13
         ids = {r["id"] for r in rules}
         assert all(i.startswith("PYOBFUS/") for i in ids)
         assert "PYOBFUS/dynamic_exec" in ids
@@ -298,3 +298,15 @@ class TestAtomicWrite:
         # No leftover temp files in the target directory.
         leftovers = [p.name for p in out.parent.iterdir() if p.name != "report.sarif"]
         assert leftovers == []
+
+
+def test_hardcoded_secret_rule(sarif_schema):
+    doc = sarif.build_sarif(
+        _report(risks=[_risk(category="hardcoded_secret", severity=SEVERITY_MEDIUM)]), "1.0.0"
+    )
+    jsonschema.Draft7Validator(sarif_schema).validate(doc)
+    run = doc["runs"][0]
+    rule = next(r for r in run["tool"]["driver"]["rules"] if r["id"] == "PYOBFUS/hardcoded_secret")
+    assert rule["defaultConfiguration"]["level"] == "warning"
+    assert run["results"][0]["level"] == "warning"
+    assert "string values" in run["results"][0]["message"]["text"]

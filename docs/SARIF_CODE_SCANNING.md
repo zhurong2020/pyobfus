@@ -47,6 +47,40 @@ Findings excluded by your effective config are still included, but as
 code. Parse failures are reported as invocation notifications, not as invented
 source rules.
 
+### Hardcoded-secret screening (Community)
+
+| Rule | Default level | Finding severity |
+|------|---------------|------------------|
+| `PYOBFUS/hardcoded_secret` | `warning` | `medium` for recognizable credential shapes; `info` for weaker sensitive-name evidence |
+
+`--check` screens string literals for common Open VSX, PyPI, GitHub, GitLab,
+npm, OpenAI, Anthropic, AWS, Slack, Google, Stripe live/restricted credentials
+and PEM private-key headers. Sensitive assignments, annotated assignments,
+function defaults, keyword arguments and dictionary values also receive a
+weaker advisory. Each literal is reported once, with shape evidence taking
+priority. Messages are fixed descriptions and `snippet` stays empty; text,
+JSON, SARIF and MCP reports never display the credential value.
+
+This deliberately uses no entropy heuristic. Empty/short strings, obvious
+placeholders and templates, repeated characters, URLs, common field-name
+values, docstrings, string annotations and interpolated f-strings are ignored.
+Name evidence uses complete underscore, hyphen or camelCase segments:
+password/passwd/secret/token, or key qualified by api/secret/private/access/
+signing/encryption/auth/client/app/master (joined forms such as apikey also
+qualify). Metadata suffixes such as file/path/endpoint/env/name/hint suppress
+name evidence. Only info excludes whitespace, environment-variable identifiers,
+lowercase snake_case identifiers and paths/common file extensions; Bearer
+headers check their payload. These exclusions do not suppress shape evidence.
+Only medium findings lead the build hint; info appends a review reminder to
+the existing risk guidance. Environment lookups and calls are not resolved. It is a coarse screen, not a
+complete secret scanner: use gitleaks or detect-secrets for a full scan.
+Obfuscation does not hide string values; they appear unchanged in delivered
+artifacts. Read secrets at runtime from environment variables or a secret
+manager. If a credential was ever shipped or committed, rotate it; deletion
+is not rotation. Findings do not change exit codes. Active secret findings
+make `ai_hint` recommend moving secrets out of code before building;
+config-excluded findings remain separate and do not affect that hint.
+
 ## GitHub Actions
 
 ### With the pyobfus action (recommended)

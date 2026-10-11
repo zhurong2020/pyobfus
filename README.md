@@ -98,7 +98,8 @@ Community includes name mangling with import rewriting across a project
 (directories also rename function locals; parameters
 and methods remain unchanged there; single files also rename methods and preserve parameters by default, see the
 [guide](https://pyobfus.readthedocs.io/en/latest/guides/protect-python-before-selling/#what-you-get-measured)),
-string and numeric transforms, framework-aware presets, config-aware pre-flight scanning,
+string and numeric transforms, framework-aware presets, config-aware pre-flight scanning
+(including coarse hardcoded-secret screening without displaying values),
 SARIF, structured dry-run, reverse traceback mapping, syntax verification,
 provenance, reproducible output and verifiable build reports.
 
