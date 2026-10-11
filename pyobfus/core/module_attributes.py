@@ -15,7 +15,12 @@ from pathlib import Path
 from typing import Callable, Dict, List, Optional, Set, Tuple
 
 from pyobfus.core.global_table import GlobalSymbolTable
-from pyobfus.core.import_resolution import ImportedAccessVisitor, _Bindings, discover_accesses
+from pyobfus.core.import_resolution import (
+    ImportedAccessVisitor,
+    _Bindings,
+    discover_accesses,
+    discover_module_bindings,
+)
 
 Span = Tuple[int, int, int, int]
 
@@ -162,6 +167,8 @@ class ModuleInventory:
         self._package_static: Dict[str, bool] = {}
         self._module_edges: Dict[Tuple[str, str], Optional[str]] = {}
         self._export_bindings: Dict[str, _Bindings] = {}
+        self._diagnostic_bindings: Optional[Dict[str, Dict[str, Set[str]]]] = None
+        self._diagnostic_members: Dict[Tuple[str, str], Set[str]] = {}
         stdlib = getattr(sys, "stdlib_module_names", None)
         if stdlib is None:  # Python 3.9; inspect the tool's stdlib, never target imports.
             root = Path(ast.__file__).parent
@@ -255,6 +262,47 @@ class ModuleInventory:
 
     def selected(self, module: str) -> bool:
         return self.canonical(module) in self.trees
+
+    def candidate_member(self, module: str, name: str) -> Set[str]:
+        """Follow observed module members for advice only, including re-export chains.
+
+        Retain competing candidates and terminate cyclic aliases. Selected
+        filenames are observations here; they never authorize an attribute edit.
+        """
+
+        key = (module, name)
+        if key in self._diagnostic_members:
+            return self._diagnostic_members[key]
+        if self._diagnostic_bindings is None:
+            self._diagnostic_bindings = {}
+            for owner, tree in self.trees.items():
+
+                def resolve(node: ast.ImportFrom) -> Optional[str]:
+                    return self.resolve_from(owner, node)
+
+                self._diagnostic_bindings[owner] = discover_module_bindings(tree, resolve)
+        observed = self._diagnostic_bindings
+
+        def expand(path: str, visited: Set[str], edges: Set[Tuple[str, str]]) -> Set[str]:
+            if path in visited:
+                return set()
+            visited = visited | {path}
+            result = {path} if self.selected(path) else set()
+            parts = path.split(".")
+            for split in range(1, len(parts)):
+                for base in expand(".".join(parts[:split]), visited, edges):
+                    edge = (self.canonical(base), parts[split])
+                    if edge in edges:
+                        continue
+                    bindings = observed.get(edge[0], {})
+                    for target in bindings.get(parts[split], set()):
+                        suffix = parts[split + 1 :]
+                        result.update(expand(".".join([target, *suffix]), visited, edges | {edge}))
+            return result
+
+        result = expand(f"{module}.{name}", set(), set())
+        self._diagnostic_members[key] = result
+        return result
 
     def static_export(
         self, module: str, name: str, visited: Optional[Set[Tuple[str, str]]] = None

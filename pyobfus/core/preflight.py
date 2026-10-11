@@ -874,7 +874,9 @@ class PreflightChecker:
                 (node.lineno, node.col_offset, module)
                 for node, module in discover_accesses(tree, resolve_from)
             }
-            for node, module in discover_uncertain_accesses(tree, resolve_from):
+            for node, module in discover_uncertain_accesses(
+                tree, resolve_from, inventory.candidate_member
+            ):
                 if (node.lineno, node.col_offset, module) in legacy_sites:
                     attribute(node, module)
                 elif inventory.selected(module) and table.get_obfuscated_import(module, node.attr):
@@ -884,7 +886,8 @@ class PreflightChecker:
                         report.risks[-1].message = (
                             f"{ast.unparse(node)} accesses project module candidate {module}.{node.attr}; "
                             "module identity cannot be proved because its import binding has competing "
-                            "stores/deletes, assignment aliases or a dynamic import result. Renamed exports may "
+                            "stores/deletes, assignment aliases, a dynamic import result or an imported "
+                            "module member chain. Renamed exports may "
                             "cause AttributeError at runtime."
                         )
 

@@ -227,10 +227,18 @@ class _UncertainAccessVisitor(ImportedAccessVisitor):
     dynamic-import results are candidates, never statically proved identities.
     """
 
-    def __init__(self, *args) -> None:
+    def __init__(self, *args, resolve_member=None) -> None:
         super().__init__(*args)
+        self.resolve_member = resolve_member
         self.alternatives: Dict[int, Dict[str, Set[str]]] = {}
         self.observed_scopes: List[Dict[str, Optional[str]]] = []
+
+    def _members(self, bases: Set[str], name: str) -> Set[str]:
+        candidates = {f"{base}.{name}" for base in bases}
+        if self.resolve_member is not None:
+            for base in bases:
+                candidates.update(self.resolve_member(base, name))
+        return candidates
 
     def _resolve_candidates(self, node: ast.expr) -> Set[str]:
         if isinstance(node, ast.Name):
@@ -242,7 +250,7 @@ class _UncertainAccessVisitor(ImportedAccessVisitor):
                     target = scope[node.id]
                     return {target} if target else set()
         if isinstance(node, ast.Attribute):
-            return {f"{base}.{node.attr}" for base in self._resolve_candidates(node.value)}
+            return self._members(self._resolve_candidates(node.value), node.attr)
         return set()
 
     def visit_Attribute(self, node: ast.Attribute) -> None:
@@ -267,7 +275,7 @@ class _UncertainAccessVisitor(ImportedAccessVisitor):
                         target = outer[node.id]
                         return known if known is not None else ({target} if target else set())
             if isinstance(node, ast.Attribute):
-                return {f"{base}.{node.attr}" for base in candidates(node.value)}
+                return self._members(candidates(node.value), node.attr)
             return set()
 
         def walk(node: ast.AST) -> None:
@@ -304,11 +312,28 @@ class _UncertainAccessVisitor(ImportedAccessVisitor):
 
 
 def discover_uncertain_accesses(
-    tree: ast.AST, resolve_from: Callable[[ast.ImportFrom], Optional[str]]
+    tree: ast.AST,
+    resolve_from: Callable[[ast.ImportFrom], Optional[str]],
+    resolve_member: Optional[Callable[[str, str], Set[str]]] = None,
 ) -> List[tuple]:
     """Broader same-scope import candidates exclusively for preservation advice."""
     accesses: List[tuple] = []
     _UncertainAccessVisitor(
-        resolve_from, lambda node, module: accesses.append((node, module)), lambda node: None
+        resolve_from,
+        lambda node, module: accesses.append((node, module)),
+        lambda node: None,
+        resolve_member=resolve_member,
     ).visit(tree)
     return accesses
+
+
+def discover_module_bindings(
+    tree: ast.Module, resolve_from: Callable[[ast.ImportFrom], Optional[str]]
+) -> Dict[str, Set[str]]:
+    """Observe module-scope import/assignment candidates, never identity proofs."""
+    bindings = _Bindings(resolve_from)
+    for statement in tree.body:
+        bindings.visit(statement)
+    visitor = _UncertainAccessVisitor(resolve_from, lambda node, module: None, lambda node: None)
+    scope = visitor._candidate_scope(tree.body, bindings)
+    return visitor.alternatives[id(scope)]

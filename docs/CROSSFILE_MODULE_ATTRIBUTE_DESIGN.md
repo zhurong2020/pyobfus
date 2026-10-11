@@ -286,6 +286,12 @@ mitigation instead of saying the attribute will raise AttributeError.
   using “may fail” where identity is uncertain. Diagnostics consume the same
   eligibility result/config as the build; do not suppress merely because a
   syntactic candidate exists. Keep separate parameter and injected-name advice.
+  Module members imported by another project module, such as
+  `pkg.a.core.LIMIT` when `pkg.a` imports `pkg.core`, are diagnostic candidates
+  only. Relative/absolute imports, aliases, package exports and observed
+  assignment/re-export chains receive the same medium uncertainty advice for
+  retained renamed exports, with the feature on or off. These observations
+  never expand the rewrite proof boundary.
   Preserve status/ai_hint/next_tool and risk/SARIF contracts. New reason/count
   fields, if needed, are additive and reviewed with CLI/MCP schema tests.
 

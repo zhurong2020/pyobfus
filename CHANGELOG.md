@@ -39,7 +39,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   function-local imports and static package re-exports. Explicit aliases retain
   their spelling. Directory `--check` suppresses H advice for scheduled edits
   and reports retained unsafe project-module accesses, competing stores/deletes,
-  literal dynamic-import results, escapes, reflection and mutation with medium
+  literal dynamic-import results, imported module member chains (including
+  aliases and package re-exports), escapes, reflection and mutation with medium
   `compatibility_advisory` preservation advice. Already preserved hazard names
   receive informational mitigation; single-file checks do not add H advice.
   Conditional/ambiguous bindings, assignment aliases, dynamic access, executable

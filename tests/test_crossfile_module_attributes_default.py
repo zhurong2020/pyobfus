@@ -13,6 +13,7 @@ from pyobfus.core.cache import BuildCache
 from pyobfus.core.export_detector import ReExportSource
 from pyobfus.core.import_resolution import discover_uncertain_accesses
 from pyobfus.core.mapping import ObfuscationMapping
+from pyobfus.core.module_attributes import ModuleInventory
 from pyobfus.core.orchestrator import CrossFileOrchestrator
 from pyobfus.core.preflight import PreflightChecker
 from tests.test_crossfile_module_attributes import project, run, runner
@@ -41,6 +42,28 @@ UNCERTAIN = [
     "import importlib as loader\nm = loader.import_module('pkg.mod')\nprint(m.LIMIT, m.LIMIT)\nprint(m.LIMIT)\n",
 ]
 
+# Scan of module-member routes: relative/absolute imports, import aliases,
+# implicit package roots, package exports, assignment aliases and re-exports.
+MEMBER_CHAINS = [
+    ("", "from . import core\n", "import pkg.a", "pkg.a.core.LIMIT"),
+    ("", "from . import core\n", "from pkg import a", "a.core.LIMIT"),
+    ("", "from . import core\n", "import pkg.a as a", "a.core.LIMIT"),
+    ("", "from . import core as engine\n", "import pkg.a", "pkg.a.engine.LIMIT"),
+    ("", "import pkg.core as engine\n", "from pkg import a", "a.engine.LIMIT"),
+    ("", "import pkg.core\n", "import pkg.a", "pkg.a.pkg.core.LIMIT"),
+    ("from . import a\n", "from . import core\n", "import pkg", "pkg.a.core.LIMIT"),
+    ("from . import a as bridge\n", "from . import core\n", "import pkg", "pkg.bridge.core.LIMIT"),
+    ("from .a import engine\n", "from . import core as engine\n", "import pkg", "pkg.engine.LIMIT"),
+    ("", "from . import core\nengine = core\n", "import pkg.a", "pkg.a.engine.LIMIT"),
+    ("", "from .b import engine\n", "import pkg.a", "pkg.a.engine.LIMIT"),
+    (
+        "",
+        "from . import core as engine\nfrom .b import engine\n",
+        "import pkg.a",
+        "pkg.a.engine.LIMIT",
+    ),
+]
+
 
 def assert_retained_accesses_have_advice(src, out, ob):
     """Compare actual emitted AST/line maps with check positions for every H fixture.
@@ -58,12 +81,21 @@ def assert_retained_accesses_have_advice(src, out, ob):
     mapping = ObfuscationMapping.from_global_table(ob.global_table)
     mapping.files = ob.file_line_maps
     retained = set()
+    index = {fi.module_name: fi for fi in ob.files}
+    inventory = ob.attribute_inventory or ModuleInventory(
+        {fi.module_name: fi.path.read_text() for fi in ob.files},
+        lambda module, node: ob._resolve_source_module(
+            index[module], ReExportSource(node.module, node.level, "")
+        ),
+        ob.global_table,
+    )
     for fi in ob.files:
         relative = fi.relative_path.as_posix()
         original = ast.parse(fi.path.read_text())
         candidates = discover_uncertain_accesses(
             original,
             lambda node: ob._resolve_source_module(fi, ReExportSource(node.module, node.level, "")),
+            inventory.candidate_member,
         )
         # Direct dynamic expressions are observed by the existing hazard API.
         if ob.attribute_inventory is not None:
@@ -88,6 +120,92 @@ def assert_retained_accesses_have_advice(src, out, ob):
     assert (
         retained <= advised
     ), f"Retained renamed project attributes without advice: {retained - advised}"
+
+
+@pytest.mark.parametrize("init,bridge,statement,expression", MEMBER_CHAINS)
+@pytest.mark.parametrize("local", [False, True])
+@pytest.mark.parametrize("enabled", [False, True])
+@pytest.mark.parametrize("locals_enabled", [False, True])
+@pytest.mark.parametrize("workers", [1, 4])
+def test_imported_module_member_chains(
+    tmp_path,
+    monkeypatch,
+    init,
+    bridge,
+    statement,
+    expression,
+    local,
+    enabled,
+    locals_enabled,
+    workers,
+):
+    monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("USERPROFILE", str(tmp_path))
+    app = f"{statement}\nprint({expression}, {expression})\nprint({expression})\n"
+    if local:
+        app = f"def read():\n    {statement}\n    print({expression}, {expression})\n    print({expression})\nread()\n"
+    src = project(tmp_path, app, init=init)
+    (src / "pkg/mod.py").rename(src / "pkg/core.py")
+    (src / "pkg/a.py").write_text(bridge)
+    (src / "pkg/b.py").write_text("from . import core as engine\n")
+    assert run(src, tmp_path).stdout == "7 7\n7\n"
+    ob = CrossFileOrchestrator(
+        ObfuscationConfig(
+            crossfile_module_attributes=enabled,
+            crossfile_local_names=locals_enabled,
+            max_workers=workers,
+        )
+    )
+    out = tmp_path / "out"
+    assert ob.obfuscate(src, out).success
+    assert ob.global_table.get_obfuscated_import("pkg.core", "LIMIT") != "LIMIT"
+    assert (
+        sum(
+            isinstance(n, ast.Attribute) and n.attr == "LIMIT"
+            for n in ast.walk(ast.parse((out / "app.py").read_text()))
+        )
+        == 3
+    )  # Member observations never supply a rewrite.
+    assert_retained_accesses_have_advice(src, out, ob)
+    flag = "--crossfile-module-attributes" if enabled else "--no-crossfile-module-attributes"
+    checked = runner().invoke(
+        main, [str(src), "--check", "--offline", "--no-config", "--json", flag]
+    )
+    assert checked.exit_code in {0, 1}, checked.output
+    findings = [
+        r
+        for r in json.loads(checked.stdout)["risks"]
+        if "module identity cannot be proved" in r["message"] and "pkg.core.LIMIT" in r["message"]
+    ]
+    lines = {
+        n.lineno
+        for n in ast.walk(ast.parse(app))
+        if isinstance(n, ast.Attribute) and n.attr == "LIMIT"
+    }
+    assert {r["line"] for r in findings} == lines
+    assert len(findings) == len(lines)
+    assert all(
+        r["category"] == "compatibility_advisory" and r["severity"] == "medium" for r in findings
+    )
+    assert all(
+        "from pkg.core import LIMIT" in r["suggestion"] and "exclude_names" in r["suggestion"]
+        for r in findings
+    )
+
+
+def test_module_member_candidates_terminate_cycles_and_ignore_external_values():
+    inventory = ModuleInventory(
+        {
+            "a": "from b import link\n",
+            "b": "from a import link\n",
+            "c": "import os as link\nlink = 7\n",
+            "d": "import d\nlink = d.link.link\n",
+        },
+        lambda module, node: node.module,
+    )
+    assert inventory.candidate_member("a", "link") == set()
+    assert inventory.candidate_member("c", "link") == set()
+    assert inventory.candidate_member("d", "link") == set()
 
 
 @pytest.mark.parametrize("app", UNCERTAIN)
