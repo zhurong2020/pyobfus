@@ -1,5 +1,11 @@
 # pyobfus 当前计划
 
+**2026-10-11 开源混淆器比较页 + 缺陷 K**：新页 `docs/compare/open-source-obfuscators.md`，同一多模块 fixture + Python 3.12 模块、
+CPython 3.12.3、各工具 PyPI 版独立 venv 实测：Opy 1.1.28（2018）f-string 内名字不改→NameError、`match` 被改名→SyntaxError；
+pyminifier 2.1（2014）在 3.12 装不上（要 2to3）；python-minifier 3.4.0 默认全过但不改模块级名字，`--rename-globals` 逐文件→ImportError；
+python-obfuscator 0.1.0 逐文件改名→ImportError、字符串编码破坏 `match` 模式→SyntaxError；PyPI 无 `opy2`。实测中发现 **pyobfus 0.6.1
+目录构建丢 PEP 695 类型参数（缺陷 K）**，`def f[T]` → NameError；PR #78 已修（原地改名，顺带保住行号标记），未发版；页面如实写明。
+
 **2026-10-11 缺陷 J 修复（PR #77 合并，未发版；维护者定立即修、发版略缓）**：输出保留原文件的 shebang 与 UTF-8 编码声明（构建标记、
 trace marker 插在其后），源文件可执行则输出复制执行位；非 UTF-8 编码声明不保留（输出一律 UTF-8），源文件改按 Python 自身规则解码
 （认编码声明与 BOM，此前一律按 UTF-8 读）。Claude 实测：shebang 脚本混淆后可直接 `./out.py` 运行、latin-1 文件输出与原版一致、

@@ -56,6 +56,7 @@ with instead of burying it in a document about ten other tools.
 | [pyobfus vs PyLocket](compare/pylocket.md) | Per-function bytecode encryption bundled with a licensing and commerce platform. Answers "how do I sell this app", not "how do I protect this codebase". |
 | [pyobfus vs Oxyry](compare/oxyry.md) | A browser-hosted name mangler. Fastest path for one file; wrong shape for a codebase you ship repeatedly. |
 | [pyobfus vs browser-based obfuscators](compare/browser-based.md) | Free and instant, and they require pasting your source into someone else's web page. |
+| [Open-source obfuscators on a multi-module project](compare/open-source-obfuscators.md) | Opy, pyminifier, python-minifier and python-obfuscator run on the same project (2026-10-11), including where pyobfus failed. |
 | [Other AST, loader, and online tools](compare/other-tools.md) | CodeEnigma, `python-obfuscator`, SOURCEdefender and friends. |
 
 The rest of this page covers what does not belong to any single rivalry: the
