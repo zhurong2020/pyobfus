@@ -6,6 +6,7 @@ exported by a Python module using AST analysis.
 """
 
 import ast
+from pathlib import Path
 from typing import Dict, NamedTuple, Optional, Set
 
 
@@ -326,6 +327,7 @@ def detect_exports_from_file(file_path: str) -> Set[str]:
     Returns:
         Set of exported names
     """
-    with open(file_path, "r", encoding="utf-8") as f:
-        source = f.read()
+    from pyobfus.core.source_prologue import read_python_source
+
+    source = read_python_source(Path(file_path))
     return detect_exports(source)

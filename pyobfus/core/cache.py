@@ -24,6 +24,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import stat
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -130,14 +132,19 @@ class BuildCache:
         to the one stored in the manifest.
         """
         files_map: Dict[str, str] = {}
+        executable_bits: Dict[str, int] = {}
         for f in sorted(input_files, key=lambda p: str(p)):
             try:
                 rel = str(f.relative_to(input_dir))
             except ValueError:
                 rel = str(f)
             files_map[rel] = _sha256_file(f)
+            if os.name != "nt":
+                executable_bits[rel] = stat.S_IMODE(f.stat().st_mode) & 0o111
 
         return {
+            "source_metadata_version": 1,
+            "executable_bits": executable_bits,
             "pyobfus_version": PYOBFUS_VERSION,
             "input_dir": str(input_dir),
             "config": _extract_config_fields(config),

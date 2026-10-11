@@ -6,7 +6,6 @@ Provides a user-friendly CLI for obfuscating Python files and projects.
 
 import io
 import json
-import re
 import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -28,7 +27,13 @@ from pyobfus.config_templates import get_template, list_templates
 from pyobfus.config_validator import validate_config_file, find_config_file
 from pyobfus.core import content_transforms
 from pyobfus.core.analyzer import SymbolAnalyzer
-from pyobfus.core.build_marker import marker_enabled
+from pyobfus.core.build_marker import marker_enabled, insert_after_prologue
+from pyobfus.core.source_prologue import (
+    read_python_source,
+    source_prologue,
+    restore_source_prologue,
+    copy_executable_bits,
+)
 from pyobfus.core.generator import CodeGenerator
 from pyobfus.core.parser import ASTParser
 from pyobfus.core.orchestrator import CrossFileOrchestrator
@@ -1420,6 +1425,12 @@ def main(
             sys.stdout = _saved_stdout
 
 
+def _report_dropped_encoding(source: str) -> None:
+    _, encoding = source_prologue(source)
+    if encoding:
+        click.echo(f"  编码声明 {encoding} 未保留，输出为 UTF-8")
+
+
 def _obfuscate_file(
     input_file: Path,
     output_file: Path,
@@ -1466,8 +1477,11 @@ def _obfuscate_file(
     _fusion = (
         config.level == "pro" and _build_fusion is not None and _build_fusion.fusion_enabled(config)
     )
+    original_source = read_python_source(input_file)
+    if verbose:
+        _report_dropped_encoding(original_source)
     if _fusion:
-        source_text = input_file.read_text(encoding="utf-8")
+        source_text = original_source
         source_text = _build_fusion.apply_pre_passes(
             source_text, config, module_qualname=input_file.stem
         )
@@ -1553,6 +1567,8 @@ def _obfuscate_file(
             if config.scrub_traceback:
                 click.echo(f"  Scrub keypair: {scrub_key_path} (keep private)")
 
+    obfuscated_code = restore_source_prologue(original_source, obfuscated_code)
+
     # Transparent build marker. Applied to the generated *string* so it lands in
     # the file whichever write path runs below -- before 0.5.23 the non-fusion
     # branch regenerated from the tree and silently dropped it, so Community
@@ -1570,6 +1586,7 @@ def _obfuscate_file(
     if not dry_run:
         output_file.parent.mkdir(parents=True, exist_ok=True)
         output_file.write_text(obfuscated_code, encoding="utf-8")
+        copy_executable_bits(input_file, output_file)
         if verbose:
             click.echo(f"  Output: {output_file}")
     else:
@@ -1743,6 +1760,9 @@ def _obfuscate_directory_crossfile(
             click.echo("\n[Phase 1] Scanning project...")
 
         global_table = orchestrator.phase1_scan(input_dir)
+        if verbose:
+            for file_info in orchestrator.files:
+                _report_dropped_encoding(read_python_source(file_info.path))
 
         if orchestrator.planning_warnings:
             dir_stats["warnings"] = orchestrator.planning_warnings
@@ -2057,12 +2077,6 @@ def _emit_success_json_payload(payload: Dict[str, Any]) -> None:
     click.echo(json.dumps(payload, indent=2, ensure_ascii=False))
 
 
-# PEP 263 encoding cookie — must stay within the first two lines of a file, so
-# the trace marker is inserted *after* it (and after any shebang) to avoid
-# silently disabling the declared source encoding.
-_CODING_COOKIE_RE = re.compile(r"coding[:=]\s*([-\w.]+)")
-
-
 def _trace_marker_block(marker_id: str, mapping_basename: str) -> str:
     """Build the '# pyobfus:obfuscated' header block (trailing newline included)."""
     return (
@@ -2076,13 +2090,7 @@ def _trace_marker_block(marker_id: str, mapping_basename: str) -> str:
 def _insert_after_prologue(text: str, marker_block: str) -> str:
     """Prepend `marker_block`, but keep a shebang line first and a PEP 263
     encoding cookie within the first two lines."""
-    lines = text.splitlines(keepends=True)
-    idx = 0
-    if idx < len(lines) and lines[idx].startswith("#!"):
-        idx += 1
-    if idx < len(lines) and idx < 2 and _CODING_COOKIE_RE.search(lines[idx]):
-        idx += 1
-    return "".join(lines[:idx]) + marker_block + "".join(lines[idx:])
+    return insert_after_prologue(text, marker_block)
 
 
 def _apply_trace_markers(output_path: Path, mapping_path: str) -> Optional[str]:

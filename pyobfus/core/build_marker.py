@@ -26,19 +26,15 @@ mapping digest, source hash or other identifier -- see
 
 from __future__ import annotations
 
-import re
 from pathlib import Path
 from typing import List, Optional
+
+from pyobfus.core.source_prologue import prologue_line_count
 
 from pyobfus.constants import BUILD_MARKER_FORMAT, BUILD_MARKER_PREFIX, GITHUB_REPO
 
 # Valid values for the ``community_marker`` config key.
 MARKER_MODES = ("auto", "on", "off")
-
-# PEP 263 encoding cookie -- must stay within a file's first two lines, so a
-# marker is inserted *after* it (and after any shebang) rather than above,
-# which would silently disable the declared source encoding.
-_CODING_COOKIE_RE = re.compile(r"coding[:=]\s*([-\w.]+)")
 
 # How far into a file to look when checking whether a marker is already
 # present. Generous enough to sit below a shebang, an encoding cookie and
@@ -50,11 +46,7 @@ def insert_after_prologue(text: str, block: str) -> str:
     """Prepend ``block``, keeping a shebang first and an encoding cookie
     within the first two lines."""
     lines = text.splitlines(keepends=True)
-    idx = 0
-    if idx < len(lines) and lines[idx].startswith("#!"):
-        idx += 1
-    if idx < len(lines) and idx < 2 and _CODING_COOKIE_RE.search(lines[idx]):
-        idx += 1
+    idx = prologue_line_count(text)
     return "".join(lines[:idx]) + block + "".join(lines[idx:])
 
 

@@ -34,6 +34,17 @@ generated-code execution is now enforced on Linux and Windows. macOS output
 execution remains advisory-only, as do heavyweight framework and packaging
 combinations; those platform-specific failures can still reach users first.
 
+## Executable source metadata (unreleased)
+
+Single-file, default cross-file directory, and `--no-cross-file` builds preserve
+shebangs and UTF-8 encoding declarations. Non-UTF-8 declarations are omitted
+after decoding the source because output is UTF-8. POSIX outputs copy source
+execute bits when any are set; other output permission bits are retained.
+`tests/test_source_prologue.py` covers direct execution on POSIX, CRLF inputs,
+UTF-8 BOMs, latin-1 literals, marker combinations, Pro output, syntax checks,
+dry runs, incremental reuse, and real traceback line restoration. Windows
+skips executable-bit checks; local validation is Linux only.
+
 ## What gets renamed
 
 | Build | Renamed | Not renamed | Evidence |

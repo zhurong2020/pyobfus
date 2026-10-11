@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Union
 
 from pyobfus.exceptions import ParseError
+from pyobfus.core.source_prologue import read_python_source
 
 
 class ASTParser:
@@ -44,7 +45,7 @@ class ASTParser:
             raise ValueError(f"Not a file: {file_path}")
 
         try:
-            source_code = file_path.read_text(encoding="utf-8")
+            source_code = read_python_source(file_path)
             return ASTParser.parse_string(source_code, str(file_path))
         except ParseError:
             raise

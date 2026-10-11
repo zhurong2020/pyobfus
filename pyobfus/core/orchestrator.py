@@ -21,6 +21,11 @@ from pyobfus.core.export_detector import ExportDetector, ReExportSource
 from pyobfus import __version__
 from pyobfus.core.build_marker import apply_marker, marker_enabled
 from pyobfus.core.generator import CodeGenerator
+from pyobfus.core.source_prologue import (
+    read_python_source,
+    restore_source_prologue,
+    copy_executable_bits,
+)
 from pyobfus.core.parser import ASTParser
 from pyobfus.core.line_map import build_line_map, mark_source_statements
 from pyobfus.transformers.import_rewriter import ImportRewriter
@@ -60,8 +65,7 @@ def _transform_single_file(
     """
     file_stats: Dict[str, int] = {}
     try:
-        with open(file_path, "r", encoding="utf-8") as f:
-            source = f.read()
+        source = read_python_source(file_path)
 
         original_tree = ast.parse(source)
         tree = ast.parse(source)
@@ -129,7 +133,7 @@ def _transform_single_file(
             tree = content_transforms.apply_content_transforms(tree, config, None, file_stats)
 
         ast.fix_missing_locations(tree)
-        new_source = CodeGenerator.generate(tree)
+        new_source = restore_source_prologue(source, CodeGenerator.generate(tree))
 
         # Transparent build marker. `relative_path` is already project-relative,
         # so no absolute build path can reach the shipped file.
@@ -145,6 +149,7 @@ def _transform_single_file(
         output_file.parent.mkdir(parents=True, exist_ok=True)
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(new_source)
+        copy_executable_bits(file_path, output_file)
 
         record = build_line_map(tree, new_source, relative_path.as_posix(), module_name)
         return (module_name, None, file_stats, record)
@@ -404,7 +409,7 @@ class CrossFileOrchestrator:
 
         if self.config.crossfile_local_names:
             for fi in sorted(self.files, key=lambda f: f.relative_path.as_posix()):
-                local_source = fi.path.read_text(encoding="utf-8")
+                local_source = read_python_source(fi.path)
                 counter = self._name_counter
                 reserved = set(self._reserved_names)
                 try:
