@@ -323,9 +323,13 @@ def _pro_value_for_scan(
         rationale_parts.append(
             f"Found {sensitive_literal_count} likely-sensitive string "
             f"literal occurrence(s) (API keys, tokens, opaque bearer values). "
-            f"Pro's AES-256 string encryption hides these from `strings`-style "
-            f"inspection; the v0.5 Runtime String Vault (vault_secrets({{...}})) "
-            f"goes further with lazy per-entry decryption."
+            f"Move credentials out of the shipped code first (environment "
+            f"variables, a secret manager or a server-side call), and rotate "
+            f"any that have already shipped: a program that can decrypt a key "
+            f"at runtime lets its recipient recover it, with or without "
+            f"obfuscation. For other embedded strings and data, Pro's AES-256 "
+            f"string encryption and the Runtime String Vault "
+            f"(vault_secrets({{...}})) raise the cost of extraction."
         )
     if pii_literal_count > 0:
         applicable.append("string_encryption")

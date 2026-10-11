@@ -22,6 +22,13 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ### Changed
 
+- **`pro_value` no longer suggests that Pro encryption hides API keys.**
+  When `check_obfuscation_risks` or `protect_project` finds credential-like
+  literals, the `pro_value` rationale now says to move them out of the shipped code and rotate any that
+  have shipped, because a program that can decrypt a key lets its recipient
+  recover it. Pro string encryption is described only as raising the cost of
+  extracting other embedded strings and data.
+
 - **The server now runs on either mcp SDK major.** 2.x renamed `FastMCP` to
   `MCPServer` and moved it to `mcp.server.mcpserver`, so the server could not
   start there at all. It now loads whichever class is installed and passes

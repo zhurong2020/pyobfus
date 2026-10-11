@@ -797,3 +797,14 @@ def test_parameter_risk_follows_file_config(tmp_path: Path) -> None:
     _assert_next_tool_shape(result)
     directory = check_obfuscation_risks(str(tmp_path))
     assert not any("parameter renaming enabled" in r["message"] for r in directory["risks"])
+
+
+def test_pro_value_does_not_claim_encryption_protects_credentials() -> None:
+    """Credential-like literals get "move and rotate" advice; Pro encryption
+    is never offered as the way to keep a shipped key secret."""
+    from pyobfus_mcp.tools import _pro_value_for_scan
+
+    rationale = _pro_value_for_scan(3, 0, 0)["rationale"]
+    assert "Move credentials out of the shipped code" in rationale
+    assert "rotate" in rationale
+    assert "hides these" not in rationale
