@@ -48,7 +48,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "click>=8.0",
+    "click>=8.5.0",
     "pyyaml>=5.4",
     "cryptography>=42.0",  # AES-256-GCM / RSA-OAEP / PBKDF2 for Pro features + license management
     # Artifacts built by the Pro fusion passes import pyobfus_runtime, and the
