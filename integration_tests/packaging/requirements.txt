@@ -2,4 +2,6 @@
 # Update deliberately with the delivery evidence in SUPPORT_MATRIX.md.
 Cython==3.3.0
 Nuitka==4.2.2
+# Nuitka --mode=standalone on Linux needs patchelf on PATH.
+patchelf==0.19.1.0
 pyinstaller==6.22.3

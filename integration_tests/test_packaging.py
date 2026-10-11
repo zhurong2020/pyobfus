@@ -10,6 +10,7 @@ import json
 import marshal
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import sys
 
@@ -18,6 +19,16 @@ import pytest
 from pyobfus.core.mapping import ObfuscationMapping
 
 EXAMPLES = Path(__file__).resolve().parents[1] / "examples"
+MULTIMODULE = Path(__file__).resolve().parent / "packaging" / "multimodule"
+# Names the directory build renames; none may survive into a packaged artifact.
+MULTIMODULE_NAMES = (
+    "quote_order",
+    "lookup_unit_price",
+    "DiscountPolicy",
+    "TIER_RATES",
+    "UNIT_PRICES",
+)
+MULTIMODULE_TIERS = ("free", "pro", "enterprise")
 
 
 @pytest.fixture(autouse=True)
@@ -220,3 +231,127 @@ def test_pyinstaller_onefile_behavior_and_reverse_traceback(tmp_path):
     assert "apply_discount" in _unmap_cli(crash.stderr, tmp_path)
     assert "Unknown pricing tier: bogus_tier" in crash.stderr
     assert mapping.unmatched_names(crash.stderr) == []
+
+
+def _obfuscate_project(work):
+    """Copy the multi-module fixture into ``work`` and obfuscate the directory."""
+    source = work / "src"
+    shutil.copytree(MULTIMODULE, source, ignore=shutil.ignore_patterns("__pycache__", "README.md"))
+    output = work / "obfuscated"
+    mapping_path = work / "private" / "mapping.json"
+    _run(
+        [
+            sys.executable,
+            "-m",
+            "pyobfus",
+            str(source),
+            "-o",
+            str(output),
+            "--save-mapping",
+            str(mapping_path),
+            "--verify-syntax",
+        ],
+        cwd=work,
+    )
+    mapping = ObfuscationMapping.load(mapping_path)
+    for name in MULTIMODULE_NAMES:
+        _mapped(mapping, name)
+    return source, output, mapping
+
+
+def _check_multimodule_artifact(executable, source, output, mapping, work, env=None):
+    """Run the packaged project with its source hidden, compare it with the
+    original, and reverse-map a traceback that crosses three modules."""
+    output.rename(work / "obfuscated.hidden")
+    for tier in MULTIMODULE_TIERS:
+        original = _run([sys.executable, "-B", "main.py", tier], cwd=source)
+        packaged = _run([str(executable), tier], cwd=work, env=env)
+        assert packaged.stdout == original.stdout
+    crash = _run([str(executable), "bogus_tier"], cwd=work, env=env, expected_code=1)
+    assert "Unknown pricing tier: bogus_tier" in crash.stderr
+    quote = _mapped(mapping, "quote_order")
+    assert quote in crash.stderr
+    restored = _unmap_cli(crash.stderr, work)
+    assert "quote_order" in restored
+    assert "quote_order" in mapping.unmap_text(crash.stderr)
+    assert mapping.unmatched_names(crash.stderr) == []
+
+
+def test_multimodule_pyinstaller_onefile(tmp_path):
+    _require_tool("PyInstaller")
+    source, output, mapping = _obfuscate_project(tmp_path)
+    env = {**os.environ, "PYINSTALLER_CONFIG_DIR": str(tmp_path / "cache")}
+    _run(
+        [
+            sys.executable,
+            "-m",
+            "PyInstaller",
+            "--onefile",
+            "--clean",
+            "--noconfirm",
+            "--name",
+            "storefront_app",
+            "--distpath",
+            str(tmp_path / "dist"),
+            "--workpath",
+            str(tmp_path / "build"),
+            "--specpath",
+            str(tmp_path / "spec"),
+            str(output / "main.py"),
+        ],
+        cwd=tmp_path,
+        env=env,
+    )
+    executable = tmp_path / "dist" / "storefront_app"
+    assert executable.is_file()
+    assert not list(executable.parent.rglob("*.json"))
+    # Every module of the package must be frozen from the obfuscated tree.
+    from PyInstaller.archive.readers import CArchiveReader
+
+    archive = CArchiveReader(str(executable))
+    assert not [entry for entry in archive.toc if "mapping" in entry.lower()]
+    pyz = archive.open_embedded_archive("PYZ.pyz")
+    modules = [
+        "storefront",
+        "storefront.catalog",
+        "storefront.checkout",
+        "storefront.rules",
+        "storefront.rules.discounts",
+    ]
+    assert set(modules) <= set(pyz.toc)
+    names = _code_names(marshal.loads(archive.extract("main")))
+    for module in modules:
+        names |= _code_names(pyz.extract(module))
+    assert not names & set(MULTIMODULE_NAMES)
+    _check_multimodule_artifact(executable, source, output, mapping, tmp_path, env=env)
+
+
+def test_multimodule_nuitka_standalone(tmp_path):
+    _require_tool("nuitka")
+    if shutil.which("patchelf") is None:
+        pytest.skip("Nuitka standalone on Linux needs patchelf on PATH")
+    source, output, mapping = _obfuscate_project(tmp_path)
+    build = tmp_path / "nuitka"
+    _run(
+        [
+            sys.executable,
+            "-m",
+            "nuitka",
+            "--mode=standalone",
+            "main.py",
+            f"--output-dir={build}",
+            "--remove-output",
+            "--jobs=2",
+        ],
+        cwd=output,
+    )
+    dist = build / "main.dist"
+    executable = dist / "main.bin"
+    assert executable.is_file()
+    # Compiled into the binary: no Python source, no mapping, no original names.
+    assert not list(dist.rglob("*.py"))
+    assert not list(dist.rglob("*mapping*.json"))
+    binary = executable.read_bytes()
+    for name in MULTIMODULE_NAMES:
+        assert name.encode() not in binary, name
+    _check_multimodule_artifact(executable, source, output, mapping, tmp_path)
