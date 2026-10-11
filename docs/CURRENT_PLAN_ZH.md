@@ -1,5 +1,11 @@
 # pyobfus 当前计划
 
+**2026-10-11 `--unmap` 行号还原 PR2（#76 合并，未发版；P1 两步完成）**：CLI `--unmap` 与 MCP `unmap_stack_trace` 把标准 CPython 帧改写为
+原始相对路径 + 语句级行号，并保留 `[obfuscated: 路径:行]`；JSON 只加 `frames`、`line_map`；摘录行照 0.6.1 还原名字，`^` 指示行不动；
+旧 mapping 只还原名字并提示用新版重建。Claude 审三轮：①摘录行不还原名字（相对 0.6.1 退步，源于说明措辞）②第三方同名文件帧被误认成用户文件
+→ 要求完整路径段匹配 + 按帧推断部署根 ③标准库帧把投票拖成并列、用户帧不还原 → 只有可解析的帧投票、混淆函数名为强证据。
+终测：vendorlib、stdlib json、并列、单文件 4 种构建 ×6 帧、目录、0.6.1 旧 mapping 全部符合预期；CI 全绿。MCP 未发版（`[Unreleased]`）。
+
 **2026-10-11 `--unmap` 行号还原 PR1（#75 合并 `dda9504`，未发版）**：mapping 新增可选 `files` 段（顶层 version 仍为 1，维护者定），
 记录产物文件 → 原始文件与语句级行号表，`ObfuscationMapping.resolve_location()` 查询；CLI/MCP 输出尚未使用（PR2）。Claude 独立实测：
 单文件 4 种构建 24 帧 + 目录 7 帧全部还原正确，PyPI 0.6.1 可读新 mapping、marker_id 相同、产物与 0.6.1 逐字节相同。

@@ -234,13 +234,6 @@ AI 代码、源码不上传（问题在**没被检索到**，不是缺内容）�
 
 **代码（Community，要发版才到用户；按「只做有触发的事」排进 11 月第一周月度版本评估）**
 
-- [ ] **P1 · `--unmap` 还原行号与文件名 · PR1 已合并（#75，mapping 写行号表 + `resolve_location`），PR2（CLI/MCP 输出）PR #76 待审**。触发：ChatGPT Q4/Q11 两种环境都强调「函数名映射不等于行号映射」；
-      10-11 用 0.6.1 实测，原报错行 19/10/16 在产物里是 15/10/14，反解后名字恢复但行号与文件名（`out.py`）仍是产物的，
-      CLI 只附注一句「line numbers still refer to the obfuscated output」。版本边界：属于「本地检查、验证、调试的基本能力」，
-      **必须是 Community**。设计要点（先出设计再实现）：生成时为每个产物文件记录「产物行 → 原始行」与「产物文件 → 原始文件」
-      （思路：转换后的 AST 保留原节点 lineno，unparse 后再 parse，按语句并行遍历对齐；docstring 删除、字符串编码 helper
-      等插入语句要单独处理）；mapping 格式加版本号并保持旧 mapping 可读；CLI 与 MCP `unmap_stack_trace` 一起改；
-      回归用多行表达式、装饰器、docstring、字符串编码、目录构建。Codex 实现、Claude 审核。
 - [ ] **P2 · `--no-cross-file` 目录构建支持 mapping**（需按文件区分名字表，`--unmap` 需按帧所在文件解析）。
       当前各文件独立改名会产生同名冲突；`--save-mapping` 在该模式下不写 mapping，并在 stderr 与 JSON 中警告。
 - [ ] P2 · 多版本 mapping 按 trace marker id 自动选取（如 `--unmap --mapping-dir`）。触发弱（回答建议「每次构建一个 Build ID」，
