@@ -170,7 +170,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 - [x] **既有缺陷 G · 目录构建的别名导入（优先，0.5.32 已存在，影响用户）**：`from pkg import scale as action` 或
       `from pkg.core import scale as action` 后调用 `action(...)` 即 NameError（局部改名开关无关）。参数改名设计审核中发现；
       应先于参数改名的解析器工作修复。**10-10 已合并 PR #66（`b56afe2`），随 0.6.1 发布**（保留显式本地别名，仅同步被导入符号名）；审核记录私有 `docs/internal/geo-2026-10/PR66_REVIEW_2026-10-10.md`。
-- [ ] **既有缺陷 J · 输出丢失 shebang 与 PEP 263 编码行**（10-11 审 #75 发现，PyPI 0.6.1 单文件与目录构建都复现，中优先级）：
+- [ ] **既有缺陷 J · 输出丢失 shebang 与 PEP 263 编码行 · 10-11 维护者定立即修，Codex 实现中（说明私有 `docs/internal/codex-2026-10/DEFECT_J_SHEBANG_PROMPT.md`；含保留 UTF-8 编码行、非 UTF-8 不保留、复制执行位）；发版略缓**（10-11 审 #75 发现，PyPI 0.6.1 单文件与目录构建都复现）：
       `ast.unparse` 不保留注释，原文件第一行 `#!/usr/bin/env python3` 在加构建标记之前就没了，混淆后的脚本不能再 `./script.py` 直接执行；
       CHANGELOG 0.5.23 写的「标记 prologue-safe，shebang 保持第一行」只对标记本身成立。修法：生成前记下原文件的 shebang / 编码行，
       写盘时放回最前（标记仍插在其后）；行号表（#75）的偏移要一起处理。回归：单文件、目录、`--trace-marker`、Windows 换行。
