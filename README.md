@@ -15,9 +15,12 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20846053.svg)](https://doi.org/10.5281/zenodo.20846053)
 
 pyobfus is a local-first, AST-based Python obfuscator for Python 3.9–3.14. It
-handles complete projects, keeps generated output portable, and can reverse-map
-protected production tracebacks for developers and AI coding agents. Community
-is Apache-2.0, has no file or line limits, and requires no trial.
+obfuscates multi-file projects and packages as a whole: names are renamed
+consistently across modules and imports are rewritten to match, so the output
+is still ordinary `.py` that runs without pyobfus installed. It can also
+reverse-map protected production tracebacks for developers and AI coding
+agents. Community is Apache-2.0, has no file or line limits, and requires no
+trial.
 
 > **What's new in v0.6.1:** fixes two bugs where the build succeeded but the
 > output failed when run. Directory builds broke `from pkg import f as g`

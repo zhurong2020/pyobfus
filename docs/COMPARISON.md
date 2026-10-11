@@ -17,7 +17,7 @@ than to win an argument. Where a competitor is genuinely stronger, it says so.
 
 | Tool | Price | Approach | Best For |
 |------|-------|----------|----------|
-| **pyobfus** | Free / $45 Pro | AST transformation | Cross-platform Python distribution |
+| **pyobfus** | Free / $45 Pro | AST transformation of whole multi-file projects | Cross-platform Python distribution |
 | **PyArmor** | Free trial / $89 Pro | Native runtime + encryption | Maximum protection (with complexity) |
 | **Oxyry** | Online service | Name mangling | Quick one-off obfuscation |
 | **Cython** | Free / open source | Compile to C | Performance + obfuscation |

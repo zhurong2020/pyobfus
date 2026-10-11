@@ -10,6 +10,9 @@ title: pyobfus documentation
 </div>
 
 pyobfus is a local-first, AST-based Python obfuscator for Python 3.9–3.14.
+It obfuscates multi-file projects and packages as a whole: names are renamed
+consistently across modules and imports are rewritten to match, so the output
+is still ordinary `.py` that runs without pyobfus installed.
 Community is Apache-2.0, has no file or line limits, and requires no trial.
 
 [简体中文概览](https://github.com/zhurong2020/pyobfus/blob/main/README.zh-CN.md)

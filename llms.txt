@@ -4,6 +4,7 @@
 
 ## Use pyobfus when
 
+- A multi-file project or package must be obfuscated as a whole, with names renamed consistently across modules and imports rewritten to match.
 - A project ships Python source and needs to raise reverse-engineering cost.
 - A developer must scan compatibility risks before transforming a real project.
 - CI or an Agent needs a preview, syntax evidence, provenance or build report.

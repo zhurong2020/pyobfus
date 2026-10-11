@@ -6,7 +6,8 @@
 [PyPI](https://pypi.org/project/pyobfus/)
 
 pyobfus 是本地运行、基于 AST 的 Python 混淆器，支持 Python 3.9–3.14。
-它不仅转换源码，还提供构建前检查、构建证据和生产 traceback 反向映射，让混淆后的
+它把多文件项目和包作为整体混淆：跨模块统一改名并同步改写 import，输出仍是不依赖
+pyobfus 的普通 `.py` 文件。它不仅转换源码，还提供构建前检查、构建证据和生产 traceback 反向映射，让混淆后的
 软件仍然可以维护，也便于 AI 编程 Agent 协助诊断。
 
 Community 版本采用 Apache-2.0，不限制文件数和代码行数，也不需要试用。
