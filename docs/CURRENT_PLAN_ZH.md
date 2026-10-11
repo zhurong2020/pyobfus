@@ -1,5 +1,11 @@
 # pyobfus 当前计划
 
+**2026-10-11 限制 H 实现 PR 1（#83 合并，opt-in、默认关闭，未发版）**：设计 #82 维护者按 Claude 建议拍板（方案 A、3 个实现 PR）。
+`crossfile_module_attributes: true` / `--crossfile-module-attributes` 改写可静态证明的 `from pkg import mod; mod.X` 与 `import pkg.mod as alias; alias.X`
+（模块级与函数内）；模块被赋值/传参/改写、导入循环、包 `__init__` 非平凡、条件导入等一律不改，`--check` 只对已排期改写的访问取消提示。
+Claude 对抗测试：参数/局部/推导式遮蔽、类属性、同名对象属性均未被改，真实访问全改且运行一致；关闭时与 main 逐字节相同；
+真实 traceback 的 `--unmap` 文件/行号/函数名与原版一致；`c = config` 逃逸使该模块整体不改并保留提示（与构建一致）。200 模块构建 0.39→0.49 s。
+
 **2026-10-11 缺陷 L 修复（PR #81 合并，未发版，行为变更）**：目录发现改为 `os.walk` 剪枝，默认跳过含 `pyvenv.cfg`/`conda-meta` 的环境目录与
 `site-packages`、`node_modules`、`__pycache__`、`.git` 等工具目录（不按名字排除 `build`/`dist`/`venv`；输入根本身不剪）；`--check` 文本/JSON 与 `-v` 构建列出
 跳过的目录；`obfuscation.skip_environment_dirs: false` 恢复旧行为。Claude 实测：8 类目录规则全对、两次构建逐字节相同、关闭开关恢复 8 文件、

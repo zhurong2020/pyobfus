@@ -185,7 +185,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       **10-11 证据：比预想常见**——一个私有真实项目的 `--check` 报出 29 处 `from pkg import config` 后 `config.ROLE_X` 式访问，
       目录构建后都会 AttributeError。建议提为 P1：设计并实现改写「项目内模块对象.属性」（复用 #80 的导入解析与跨文件符号表），先出设计。
       **10-11 设计 PR #82 已合并（维护者按 Claude 建议拍板：方案 A、先 opt-in 后默认开启、3 个实现 PR，第 1 个即覆盖
-      `from pkg import config; config.X` 与 `import pkg.mod as alias`）；实现 PR 1 #83 待审**，说明私有 `docs/internal/codex-2026-10/H_IMPL_PR1_PROMPT.md`。
+      `from pkg import config; config.X` 与 `import pkg.mod as alias`）；实现 PR 1 #83 已合并（10-11，opt-in，默认关闭，未发版）；下一步 PR 2：dotted import、相对导入、包 re-export、escape 提示**，说明私有 `docs/internal/codex-2026-10/H_IMPL_PR1_PROMPT.md`。
 - [ ] **既有缺陷 C · 运行时注入的模块级名字**（#62 审核中发现，0.5.32 已存在）：`enum.global_enum` 这类装饰器在运行时
       把成员注入模块命名空间，引用与 `__all__` 被改名，但注入的定义改不了 → NameError（标准库 `calendar.py` 默认构建即如此）。
       当前绕法：把这些名字加入 `exclude_names`。`--check` 提示与支持矩阵说明已随 PR #80 完成（10-11，未发版）；是否自动保留另议。
