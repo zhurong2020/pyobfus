@@ -205,6 +205,10 @@ JOSS 页改为引用页、两张任务页、Pages sitemap、FastAPI 真实应用
       ChatGPT 联网时把竞品 README 的原句直接当推荐理由（如「原生支持多模块项目」），而 pyobfus 在 12 个通用问题里
       一次也没进候选。检查三处首屏是否用直白句子写明：支持多文件项目、跨文件改写 import、输出仍是普通 `.py`、
       可用私有 mapping 还原 traceback；不夸大、不加竞品断言。改后在 11 月观测里对照。
+- [ ] **新增比较页：开源源码级混淆器（Opy / opy2 / Pyminifier / python-minifier / python-obfuscator）**（2026-10-11 AI 基线发现，免发版）：
+      ChatGPT 在「保留 .py 输出 / 多文件 / 本地运行」类问题里推荐的正是这几个，而 `COMPARISON.md` 与 `docs/compare/` 一个都没覆盖。
+      按 AGENTS.md 竞品规则做：注明审阅日期与版本、官方资料或我方可复现实测（同一多文件 fixture：跨模块 import、相对导入、
+      Python 3.12+ 语法能否通过）、如实写对方长处（如 python-minifier 维护活跃、体积压缩）。先实测再写，不凭印象。
 - [ ] **Gemini 环境补跑 + Perplexity 补 B1–B3**（维护者回常住地后）：方法与条件见私有基线
       `docs/internal/geo-observations/2026-10-07-baseline.md` 末尾总结。
 - [ ] **Search Console**（维护者账号）：验证 `https://zhurong2020.github.io/pyobfus/`（URL-prefix）并提交
