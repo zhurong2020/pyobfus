@@ -11,7 +11,8 @@ tracebacks instead of requiring a custom encrypted loader.
 
 **`python-obfuscator` by davidteather** is a small MIT-licensed AST tool with
 independent toggles for renaming, hexadecimal strings, dead code, and an exec
-wrapper. It is useful for experiments and simple scripts; pyobfus adds
+wrapper. It is useful for experiments and simple scripts (see the
+[multi-module test](open-source-obfuscators.md)); pyobfus adds
 scope-aware multi-file rewriting, framework presets, configuration, stable JSON
 interfaces, reverse mapping, and MCP integration.
 

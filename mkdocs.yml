@@ -78,6 +78,7 @@ nav:
     - vs PyLocket: compare/pylocket.md
     - vs Oxyry: compare/oxyry.md
     - vs browser-based obfuscators: compare/browser-based.md
+    - Open-source obfuscators: compare/open-source-obfuscators.md
     - Other tools: compare/other-tools.md
     - What is tested, what is assumed: SUPPORT_MATRIX.md
     - LLM resistance benchmark: LLM_RESISTANCE_BENCHMARK.md
