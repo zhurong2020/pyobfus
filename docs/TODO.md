@@ -237,11 +237,14 @@ AI 代码、源码不上传（问题在**没被检索到**，不是缺内容）�
       （思路：转换后的 AST 保留原节点 lineno，unparse 后再 parse，按语句并行遍历对齐；docstring 删除、字符串编码 helper
       等插入语句要单独处理）；mapping 格式加版本号并保持旧 mapping 可读；CLI 与 MCP `unmap_stack_trace` 一起改；
       回归用多行表达式、装饰器、docstring、字符串编码、目录构建。Codex 实现、Claude 审核。
+      **10-11 Codex 说明已备**（私有 `docs/internal/codex-2026-10/UNMAP_LINES_PROMPT.md`，分 PR1 数据/PR2 输出），等维护者说开始。
 - [ ] **P1 · `--check` 新增「代码里写死的密钥」提示**。触发：几乎每个回答都警告「不要把 API key 打进交付程序」；
       10-11 实测含 OpenAI 形 key、数据库密码、Bearer token 的文件，`--check` 报「Risks: 0」并建议直接构建，而混淆不隐藏字符串。
       版本边界：安全类检查，Community。要点：新 category + reason code；变量名（`*_KEY`/`*PASSWORD*`/`*TOKEN*`/`*SECRET*`）
       赋长字符串字面量 + 常见 token 前缀两类启发式；**只报 file:line 不回显值**（同仓库 pre-commit 钩子的做法）；
       低误报优先，severity 用 medium/info；文档说明它不是专业密钥扫描器，并指向 gitleaks / detect-secrets，不引入新依赖。
+      **10-11 Codex 说明已备**（私有 `docs/internal/codex-2026-10/CHECK_SECRETS_PROMPT.md`），等维护者说开始。
+      附带待定：MCP `pro_value` 文案称 Pro AES 字符串加密能「隐藏」API key，与本项「混淆不是密钥管理」的建议矛盾，是否改写待维护者定。
 - [ ] P2 · 多版本 mapping 按 trace marker id 自动选取（如 `--unmap --mapping-dir`）。触发弱（回答建议「每次构建一个 Build ID」，
       我们已有 `--trace-marker` 的 id 注释 + 0.5.31 的不匹配告警），等有用户提出再做。
 
