@@ -632,3 +632,20 @@ def test_same_module_import_in_child_scope_is_not_flat_symbol_conflict(tmp_path)
     assert len(ob.attribute_plans["app"].edits) == 2
     assert run(src, tmp_path).stdout == run(tmp_path / "out", tmp_path).stdout == "7 7\n"
     assert not [r for r in risks(src) if "attribute access through a module" in r.message]
+
+
+def test_shadowed_reflection_helper_is_unknown_consumption(tmp_path):
+    src = project(
+        tmp_path,
+        "def getattr(module, key):\n    return module.scale()\nfrom pkg import mod\nprint(getattr(mod, 'LIMIT'))\n",
+    )
+    findings = [r for r in risks(src) if "Detected module escape" in r.message]
+    assert len(findings) == 1 and findings[0].line == 4
+    assert "scale" in findings[0].suggestion
+    assert not [r for r in risks(src) if "Detected reflection" in r.message]
+    build(
+        src,
+        tmp_path / "out",
+        exclude_names=ObfuscationConfig().exclude_names | {"LIMIT", "scale", "Settings"},
+    )
+    assert run(src, tmp_path).stdout == run(tmp_path / "out", tmp_path).stdout == "14\n"

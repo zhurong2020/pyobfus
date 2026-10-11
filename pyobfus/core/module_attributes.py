@@ -463,10 +463,12 @@ def discover_module_hazards(
         def visit_Call(self, node: ast.Call) -> None:
             helpers = {"getattr", "hasattr", "setattr", "delattr", "vars"}
             helper = self.resolve(node.func)
-            if node.args and (
-                (isinstance(node.func, ast.Name) and node.func.id in helpers)
-                or helper in {f"builtins.{name}" for name in helpers}
-            ):
+            builtin_helper = (
+                isinstance(node.func, ast.Name)
+                and node.func.id in helpers
+                and not any(node.func.id in scope for scope in self.scopes)
+            )
+            if node.args and (builtin_helper or helper in {f"builtins.{name}" for name in helpers}):
                 target = self.resolve(node.args[0])
                 if target:
                     names: Tuple[str, ...] = ()
