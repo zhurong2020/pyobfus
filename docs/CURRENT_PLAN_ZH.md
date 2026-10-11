@@ -1,5 +1,10 @@
 # pyobfus 当前计划
 
+**2026-10-11 打包 lane 扩到多模块 + Nuitka standalone（免发版，PR #72）**：新 fixture `integration_tests/packaging/multimodule/`
+（子包、`.`/`..` 相对导入、入口脚本），目录构建后 PyInstaller `--onefile` 与 Nuitka `--mode=standalone` 都测：隐藏产物源码后输出与原版一致、
+三模块 traceback 经 `--unmap --json` 还原、冻结模块/`main.bin` 不含 5 个被改名的原名（未混淆的 standalone 构建 5 个全在，断言有区分力）。
+lane 依赖加 `patchelf==0.19.1.0`。本地通过，[托管运行](https://github.com/zhurong2020/pyobfus/actions/runs/38107417778)。顺带发现 mapping `global[*].module` 记的不是定义所在模块，已写进 Codex 行号还原说明。
+
 **2026-10-11 AI 基线衍生的文档三项（免发版；README 部分随下次发版到 PyPI）**：新增 `docs/NETWORK_BEHAVIOR.md`，按 0.6.1 源码列出仅有的三处联网
 （`--check` 查 PyPI 依赖名、`pyobfus-trial start --email`、Pro 许可证验证），无遥测，附可复跑的核验脚本；README「local-first」、落地页、
 卖前指南 FAQ、llms.txt、文档站导航均已链接。PyInstaller cookbook 加「Does PyInstaller protect your source code?」（含 PyInstaller 6.0

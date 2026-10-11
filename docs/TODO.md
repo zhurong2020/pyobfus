@@ -247,9 +247,8 @@ AI 代码、源码不上传（问题在**没被检索到**，不是缺内容）�
 
 **测试证据（免发版，CI）**
 
-- [ ] **P1 · 打包 lane 扩到多模块项目 + Nuitka standalone（Linux）**。触发：ChatGPT 联网 B3 准确复述了我们的限制，并称
-      「最主要的实际限制是缺少跨平台、跨构建模式的端到端测试」。现状：`packaging-lane.yml` 只测单模块 `--module`。
-      先加多模块包（含相对导入）+ `--mode=standalone`，Windows / onefile 视成本再定；通过后同步 SUPPORT_MATRIX 与 cookbook。
+- [ ] P2 · 打包 lane 后续：Nuitka onefile、整包 Cython、Windows runner（多模块 + Nuitka standalone 已于 10-11 加入，见 `CURRENT_PLAN_ZH.md`）。
+      只在有用户问到或成本可接受时做；Windows 打包 runner 每次约多 5–10 分钟。
 
 **文档（免发版）**
 
