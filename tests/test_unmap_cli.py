@@ -65,7 +65,7 @@ def test_save_mapping_and_unmap_roundtrip(tmp_path: Path) -> None:
     assert result2.exit_code == 0, result2.output
     assert "in main" in result2.output  # untouched, real name
     assert "Calculator" in result2.output
-    assert ".add(" in result2.output
+    assert f".{obfuscated_for_add}(" in result2.output  # Excerpt remains output code.
     assert obfuscated_for_calculator not in result2.output
 
 
@@ -256,3 +256,109 @@ def test_unmap_no_warning_when_mapping_covers_trace(tmp_path: Path) -> None:
     payload = json.loads(result.stdout)
     assert payload["unmatched_names"] == []
     assert "warning" not in payload
+
+
+@pytest.mark.parametrize("path", ["/deploy/pkg/out.py", r"C:\app\pkg\out.py", "pkg/out.py"])
+def test_location_paths_and_partial_metadata(tmp_path, path):
+    from pyobfus.core.mapping import ObfuscationMapping
+
+    mapping = ObfuscationMapping.from_single_file({"divide": "I0"})
+    mapping.files = {
+        "pkg/out.py": {
+            "source": "pkg/core.py",
+            "module": "pkg.core",
+            "line_count": 7,
+            "lines": [[1, None], [5, 15]],
+        },
+        "unsupported.py": {
+            "source": "other.py",
+            "module": "other",
+            "line_count": 5,
+            "lines": None,
+            "reason": "Pro fusion text passes enabled",
+        },
+    }
+    mapping_path = tmp_path / "mapping.json"
+    mapping.save(mapping_path)
+    trace = (
+        f'  File "{path}", line 7, in I0\r\n'
+        "    I0()\r\n    ^^^^\r\n"
+        '  File "foreign.py", line 1, in external\r\n'
+        "custom log: pkg/out.py:7 I0\r\n"
+    )
+    # Core preserves line endings; Click's text stdin normalizes CRLF.
+    direct = mapping.unmap_trace(trace)
+    assert "    I0()\r\n    ^^^^\r\n" in direct["unmapped_trace"]
+    result = CliRunner().invoke(
+        main, ["--unmap", "--trace", "-", "--mapping", str(mapping_path), "--json"], input=trace
+    )
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.stdout)
+    assert payload["line_map"] == "partial"
+    assert payload["frames"] == [
+        {
+            "obfuscated_file": path,
+            "obfuscated_line": 7,
+            "original_file": "pkg/core.py",
+            "original_line": 15,
+            "status": "mapped",
+        },
+        {
+            "obfuscated_file": "foreign.py",
+            "obfuscated_line": 1,
+            "original_file": None,
+            "original_line": None,
+            "status": "unmapped",
+        },
+    ]
+    assert 'File "pkg/core.py", line 15, in divide' in payload["unmapped_trace"]
+    assert "    I0()\n    ^^^^\n" in payload["unmapped_trace"]
+    assert '  File "foreign.py", line 1, in external\n' in payload["unmapped_trace"]
+    assert "custom log: pkg/out.py:7 divide\n" in payload["unmapped_trace"]
+    assert "incomplete" in payload["ai_hint"]
+
+
+def test_mismatch_warns_about_line_restoration(tmp_path):
+    from pyobfus.core.mapping import ObfuscationMapping
+
+    mapping = ObfuscationMapping.from_single_file({"divide": "I0"})
+    mapping.files["out.py"] = {
+        "source": "app.py",
+        "module": "app",
+        "line_count": 1,
+        "lines": [[1, 25]],
+    }
+    path = tmp_path / "mapping.json"
+    mapping.save(path)
+    result = CliRunner().invoke(
+        main,
+        ["--unmap", "--mapping", str(path), "--json"],
+        input='  File "out.py", line 1, in I999\n',
+    )
+    payload = json.loads(result.stdout)
+    assert payload["frames"][0]["status"] == "mapped"
+    assert payload["unmatched_names"] == ["I999"]
+    assert "different build" in payload["warning"]
+    assert "line restoration may be untrustworthy" in payload["ai_hint"]
+
+
+def test_ambiguous_and_nonstandard_frames(tmp_path):
+    from pyobfus.core.mapping import ObfuscationMapping
+
+    mapping = ObfuscationMapping.from_single_file({"divide": "I0"})
+    for package in ("a", "b"):
+        mapping.files[f"{package}/util.py"] = {
+            "source": f"{package}/util.py",
+            "module": package,
+            "line_count": 5,
+            "lines": [[1, 2]],
+        }
+    trace = '  File "util.py", line 3, in I0\nFile "a/util.py", line 3\n'
+    restored = mapping.unmap_trace(trace)
+    assert (
+        restored["unmapped_trace"]
+        == '  File "util.py", line 3, in divide\nFile "a/util.py", line 3\n'
+    )
+    assert len(restored["frames"]) == 1
+    assert restored["frames"][0]["status"] == "unmapped"
+    assert restored["line_map"] == "partial"

@@ -114,7 +114,10 @@ the saved mapping:
 - MCP: `unmap_stack_trace(trace="<pasted trace>", mapping_path="dist.mapping.json")`
 - CLI: `pyobfus --unmap --trace error.log --mapping dist.mapping.json --json`
 
-(Names are reversed; line numbers still point at the obfuscated file.)
+(Names are reversed. With mappings rebuilt using line-map-capable pyobfus after
+0.6.1, standard frames also restore relative source files and statement starting
+lines; output positions remain visible. Old mappings restore names only. Code
+excerpts and caret indicators remain unchanged output code.)
 
 ## Safety invariants — always
 

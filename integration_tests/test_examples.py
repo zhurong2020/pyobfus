@@ -127,10 +127,13 @@ class TestAiDebuggingExample:
 
         unmapped = run_cli("--unmap", "--trace", str(trace_file), "--mapping", str(mapping))
         assert unmapped.returncode == 0, unmapped.stderr
-        for original_name in ("order_total", "subtotal", "line_items"):
-            assert (
-                original_name in unmapped.stdout
-            ), f"--unmap did not restore {original_name!r}:\n{unmapped.stdout}"
+        assert 'File "pricing.py", line 13, in order_total' in unmapped.stdout
+        assert 'File "pricing.py", line 19, in <module>' in unmapped.stdout
+        assert f"[obfuscated: {output}:" in unmapped.stdout
+        for line in crashed.stderr.splitlines():
+            if line.startswith("    "):
+                assert line in unmapped.stdout  # Excerpts and carets stay output code.
+        assert "Code excerpts and caret indicators are unchanged" in unmapped.stderr
 
 
 class TestImportHookExample:

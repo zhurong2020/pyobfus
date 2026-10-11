@@ -9,11 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `--unmap` restores original relative file paths and statement-level line numbers
+  in standard CPython traceback frames, retaining output locations for comparison.
+  JSON adds `frames` and `line_map`. Rebuild and save a mapping with a release
+  containing line-map support (after 0.6.1); old mappings still restore names.
+  Code excerpts and caret indicators remain unchanged output code.
+
 - Saved Community mapping files can include relative file paths and statement-level
   output-to-source line tables, queried through `ObfuscationMapping.resolve_location`.
   Mapping format v1 and marker IDs remain compatible with older readers. Generated
   statements are distinguished from source code; Pro fusion text passes omit line
-  tables with a reason. CLI/MCP traceback presentation remains name-only in this step.
+  tables with a reason.
 
 - Community `--check` now flags potential hardcoded secrets by common credential
   shapes or sensitive literal contexts (`hardcoded_secret`). Reports locations

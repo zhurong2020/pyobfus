@@ -8,6 +8,11 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ### Added
 
+- `unmap_stack_trace` restores original relative files and statement-level lines
+  with a line-map-capable Core (after 0.6.1), adding `frames` and `line_map`.
+  Output locations remain visible; code excerpts and carets remain output code.
+  Older supported Core keeps its name-only behavior. No MCP version change.
+
 - `check_obfuscation_risks` forwards Core's new `hardcoded_secret` category
   without literal values. Requires a pyobfus version containing this check
   (after 0.6.1); MCP version and `pro_value` behavior are unchanged.

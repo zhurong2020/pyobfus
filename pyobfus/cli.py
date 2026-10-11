@@ -449,7 +449,7 @@ def _echo_pro_import_hint() -> None:
     "--unmap",
     "unmap_mode",
     is_flag=True,
-    help="Reverse obfuscated names back to originals. Reads stack trace from "
+    help="Restore original names and statement locations when the mapping has line tables. Reads from "
     "--trace FILE (or stdin) and applies --mapping FILE.",
 )
 @click.option(
@@ -2376,11 +2376,11 @@ def _handle_unmap(
     json_output: bool = False,
 ) -> None:
     """
-    Reverse obfuscated identifiers in a stack trace / error log.
+    Restore identifiers and available statement locations in a stack trace / error log.
 
-    Reads text from `trace_path` (or stdin when `-`) and substitutes every
-    known obfuscated identifier with its original name, using a mapping.json
-    produced by --save-mapping. Prints the rewritten text to stdout.
+    Reads text from `trace_path` (or stdin when `-`) using a mapping.json
+    produced by --save-mapping. Keeps traceback code excerpts and indicators
+    unchanged; prints restored frame names/locations and other log names.
     """
     from pyobfus.core.mapping import ObfuscationMapping
 
@@ -2418,14 +2418,15 @@ def _handle_unmap(
         click.echo("Error: no trace input (empty file or stdin).", err=True)
         sys.exit(2)
 
-    rewritten = mapping.unmap_text(trace_text)
+    restored = mapping.unmap_trace(trace_text)
+    rewritten = restored["unmapped_trace"]
     unmatched = mapping.unmatched_names(trace_text)
     mismatch_warning = (
         f"{len(unmatched)} obfuscated name(s) in the trace are not in this mapping "
         f"({', '.join(unmatched[:5])}{', ...' if len(unmatched) > 5 else ''}). "
         f"The trace may come from a different build; check that the mapping's "
         f"marker_id ({mapping.marker_id()}) matches the '# pyobfus:obfuscated id=' "
-        f"header of the shipped files."
+        f"header of the shipped files. Name and line restoration may be untrustworthy."
         if unmatched
         else ""
     )
@@ -2438,17 +2439,16 @@ def _handle_unmap(
             "original_trace": trace_text,
             "unmapped_trace": rewritten,
             "unmatched_names": unmatched,
-            "ai_hint": (
-                "Unmapped names use the pre-obfuscation identifiers; "
-                "line numbers still refer to the obfuscated output."
-                + (" " + mismatch_warning if mismatch_warning else "")
-            ),
+            "frames": restored["frames"],
+            "line_map": restored["line_map"],
+            "ai_hint": restored["ai_hint"] + (" " + mismatch_warning if mismatch_warning else ""),
         }
         if mismatch_warning:
             payload["warning"] = mismatch_warning
         click.echo(json.dumps(payload, indent=2, ensure_ascii=False))
     else:
         click.echo(rewritten, nl=False)
+        click.echo(restored["ai_hint"], err=True)
         if mismatch_warning:
             click.echo(f"Warning: {mismatch_warning}", err=True)
 

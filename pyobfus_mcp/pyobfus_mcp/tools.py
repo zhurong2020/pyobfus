@@ -527,7 +527,7 @@ def generate_pyobfus_config(
 
 @secure_tool(redact_params={"trace"})
 def unmap_stack_trace(trace: str, mapping_path: str) -> Dict[str, Any]:
-    """Reverse obfuscated identifiers in a stack trace using a mapping.json.
+    """Restore names and available statement locations using a mapping.json.
 
     Wraps `pyobfus --unmap`. Accepts the trace as a literal string (most
     useful for agent workflows where the trace is already in the chat
@@ -545,7 +545,7 @@ def unmap_stack_trace(trace: str, mapping_path: str) -> Dict[str, Any]:
 
     Returns:
         Dict with keys: status, original_trace, unmapped_trace,
-        unmatched_names, mapping_stats, ai_hint.
+        unmatched_names, mapping_stats, frames, line_map, ai_hint.
     """
     try:
         from pyobfus.core.mapping import ObfuscationMapping
@@ -572,7 +572,10 @@ def unmap_stack_trace(trace: str, mapping_path: str) -> Dict[str, Any]:
     except (ValueError, OSError) as e:
         return _error("InvalidMapping", str(e), "Regenerate the mapping file.")
 
-    unmapped = mapping.unmap_text(trace)
+    # New Core owns frame presentation; older supported Core keeps name-only behavior.
+    restorer = getattr(mapping, "unmap_trace", None)
+    restored = restorer(trace) if restorer else None
+    unmapped = restored["unmapped_trace"] if restored else mapping.unmap_text(trace)
     # unmatched_names() arrived after the oldest pyobfus this server supports.
     finder = getattr(mapping, "unmatched_names", None)
     unmatched = finder(trace) if finder else []
@@ -580,17 +583,21 @@ def unmap_stack_trace(trace: str, mapping_path: str) -> Dict[str, Any]:
         "Names are reversed, but line numbers still point to the obfuscated "
         "file. Cross-reference with the original source if needed."
     )
+    if restored:
+        ai_hint = restored["ai_hint"]
     if unmatched:
         ai_hint = (
             f"{len(unmatched)} obfuscated name(s) in the trace are not in this mapping, "
             "so the trace probably comes from a different build and the reversal "
-            "may be wrong. Find the mapping whose marker_id matches the "
+            "may be wrong, including restored line locations. Find the mapping whose marker_id matches the "
             "'# pyobfus:obfuscated id=' header of the shipped files. " + ai_hint
         )
     return {
         "status": "success",
         "original_trace": trace,
         "unmapped_trace": unmapped,
+        "frames": restored["frames"] if restored else [],
+        "line_map": restored["line_map"] if restored else "absent",
         "unmatched_names": unmatched,
         "mapping_stats": mapping.stats(),
         "ai_hint": ai_hint,

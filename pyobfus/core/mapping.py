@@ -302,6 +302,12 @@ class ObfuscationMapping:
 
         return _IDENT_RE.sub(_sub, text)
 
+    def unmap_trace(self, text: str) -> Dict[str, Any]:
+        """Restore names and statement locations in standard CPython tracebacks."""
+        from pyobfus.core.traceback_restore import restore_trace
+
+        return restore_trace(self, text)
+
     def unmatched_names(self, text: str) -> List[str]:
         """
         Obfuscated-looking names in `text` that this mapping does not know.
