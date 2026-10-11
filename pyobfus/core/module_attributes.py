@@ -15,7 +15,12 @@ from pathlib import Path
 from typing import Callable, Dict, List, Optional, Set, Tuple
 
 from pyobfus.core.global_table import GlobalSymbolTable
-from pyobfus.core.import_resolution import ImportedAccessVisitor, _Bindings, discover_accesses
+from pyobfus.core.import_resolution import (
+    ImportedAccessVisitor,
+    _Bindings,
+    discover_accesses,
+    discover_module_bindings,
+)
 
 Span = Tuple[int, int, int, int]
 
@@ -98,6 +103,75 @@ def _scope_nodes(body: List[ast.stmt]) -> List[ast.AST]:
     return nodes
 
 
+def _namespace_scope_nodes(body: List[ast.stmt]) -> List[ast.AST]:
+    """Include definition-time expressions evaluated in the containing scope."""
+    nodes = _scope_nodes(body)
+    for node in list(nodes):
+        expressions: List[ast.AST] = []
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            expressions.extend(node.decorator_list)
+            expressions.extend(node.args.defaults)
+            expressions.extend(e for e in node.args.kw_defaults if e is not None)
+            expressions.extend(
+                a.annotation
+                for a in ast.walk(node.args)
+                if isinstance(a, ast.arg) and a.annotation is not None
+            )
+            if node.returns is not None:
+                expressions.append(node.returns)
+        elif isinstance(node, ast.ClassDef):
+            expressions.extend(node.decorator_list)
+            expressions.extend(node.bases)
+            expressions.extend(k.value for k in node.keywords)
+        elif isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
+            # A comprehension can expose its containing function on interpreters
+            # that inline it; conservatively reject that function too.
+            expressions.extend(ast.iter_child_nodes(node))
+        for expression in expressions:
+            nodes.extend(ast.walk(expression))
+    return nodes
+
+
+def _namespace_exposed(
+    nodes: List[ast.AST], aliases: Dict[str, Set[str]], *, global_only: bool = False
+) -> bool:
+    """A namespace capability may escape through aliases and opaque helpers.
+
+    Read-only inspection is conservatively rejected too. Any sys.modules
+    reference can expose the importing module, including via a later lookup.
+    """
+    parents = {id(child): n for n in nodes for child in ast.iter_child_nodes(n)}
+    names = {"globals", "exec", "eval"} if global_only else {"locals", "vars", "exec", "eval"}
+    for node in nodes:
+        path = _expression_binding(node) if isinstance(node, ast.expr) else None
+        paths = {path} if path else set()
+        if path:
+            root, *tail = path.split(".")
+            paths.update(".".join([alias, *tail]) for alias in aliases.get(root, set()))
+        if global_only and (
+            paths & {"sys.modules", "__builtins__"}
+            or isinstance(node, ast.Attribute)
+            and node.attr in {"__globals__", "f_globals"}
+        ):
+            return True
+        if not global_only and isinstance(node, ast.Attribute) and node.attr == "f_locals":
+            return True
+        if not paths & (names | {f"builtins.{name}" for name in names}):
+            continue
+        parent = parents.get(id(node))
+        if (
+            paths & {"vars", "builtins.vars"}
+            and not paths
+            & {"locals", "builtins.locals", "globals", "builtins.globals", "exec", "eval"}
+            and isinstance(parent, ast.Call)
+            and parent.func is node
+            and (parent.args or parent.keywords)
+        ):
+            continue  # vars(obj) inspects obj rather than the current scope.
+        return True
+    return False
+
+
 def _inert(statement: ast.stmt) -> bool:
     if isinstance(statement, ast.Pass):
         return True
@@ -139,7 +213,6 @@ class _Binding:
     scope: str
     module: str
     position: Tuple[int, int]
-    global_ready: bool
     paths: Tuple[Tuple[str, Tuple[int, int]], ...] = ()
 
 
@@ -162,6 +235,8 @@ class ModuleInventory:
         self._package_static: Dict[str, bool] = {}
         self._module_edges: Dict[Tuple[str, str], Optional[str]] = {}
         self._export_bindings: Dict[str, _Bindings] = {}
+        self._diagnostic_bindings: Optional[Dict[str, Dict[str, Set[str]]]] = None
+        self._diagnostic_members: Dict[Tuple[str, str], Set[str]] = {}
         stdlib = getattr(sys, "stdlib_module_names", None)
         if stdlib is None:  # Python 3.9; inspect the tool's stdlib, never target imports.
             root = Path(ast.__file__).parent
@@ -255,6 +330,47 @@ class ModuleInventory:
 
     def selected(self, module: str) -> bool:
         return self.canonical(module) in self.trees
+
+    def candidate_member(self, module: str, name: str) -> Set[str]:
+        """Follow observed module members for advice only, including re-export chains.
+
+        Retain competing candidates and terminate cyclic aliases. Selected
+        filenames are observations here; they never authorize an attribute edit.
+        """
+
+        key = (module, name)
+        if key in self._diagnostic_members:
+            return self._diagnostic_members[key]
+        if self._diagnostic_bindings is None:
+            self._diagnostic_bindings = {}
+            for owner, tree in self.trees.items():
+
+                def resolve(node: ast.ImportFrom) -> Optional[str]:
+                    return self.resolve_from(owner, node)
+
+                self._diagnostic_bindings[owner] = discover_module_bindings(tree, resolve)
+        observed = self._diagnostic_bindings
+
+        def expand(path: str, visited: Set[str], edges: Set[Tuple[str, str]]) -> Set[str]:
+            if path in visited:
+                return set()
+            visited = visited | {path}
+            result = {path} if self.selected(path) else set()
+            parts = path.split(".")
+            for split in range(1, len(parts)):
+                for base in expand(".".join(parts[:split]), visited, edges):
+                    edge = (self.canonical(base), parts[split])
+                    if edge in edges:
+                        continue
+                    bindings = observed.get(edge[0], {})
+                    for target in bindings.get(parts[split], set()):
+                        suffix = parts[split + 1 :]
+                        result.update(expand(".".join([target, *suffix]), visited, edges | {edge}))
+            return result
+
+        result = expand(f"{module}.{name}", set(), set())
+        self._diagnostic_members[key] = result
+        return result
 
     def static_export(
         self, module: str, name: str, visited: Optional[Set[Tuple[str, str]]] = None
@@ -622,6 +738,22 @@ class _ProofVisitor(ImportedAccessVisitor):
         self.details: Dict[Tuple[int, str], _Binding] = {}
         self.resolutions: Dict[Span, AccessResolution] = {}
         self.function_positions: List[Tuple[int, int]] = []
+        self.namespace_aliases: Dict[str, Set[str]] = {}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    if alias.name in {"sys", "builtins"}:
+                        self.namespace_aliases.setdefault(alias.asname or alias.name, set()).add(
+                            alias.name
+                        )
+            elif isinstance(node, ast.ImportFrom) and node.module in {"sys", "builtins"}:
+                for alias in node.names:
+                    self.namespace_aliases.setdefault(alias.asname or alias.name, set()).add(
+                        f"{node.module}.{alias.name}" if node.module == "sys" else alias.name
+                    )
+        self.module_namespace_exposed = _namespace_exposed(
+            list(ast.walk(tree)), self.namespace_aliases, global_only=True
+        ) or _namespace_exposed(_namespace_scope_nodes(tree.body), self.namespace_aliases)
         self.forbidden = {
             name
             for n in ast.walk(tree)
@@ -678,9 +810,18 @@ class _ProofVisitor(ImportedAccessVisitor):
             isinstance(n, ast.ImportFrom) and any(a.name == "*" for a in n.names) for n in nodes
         ):
             bindings.shadowed.update(bindings.imports)
+        namespace_exposed = (
+            self.module_namespace_exposed
+            if kind == "module"
+            else _namespace_exposed(_namespace_scope_nodes(body), self.namespace_aliases)
+        )
         scope_id = f"{kind}:{body[0].lineno if body else 0}:{body[0].col_offset if body else 0}"
         for statement in body:
-            if not isinstance(statement, (ast.Import, ast.ImportFrom)) or kind == "class":
+            if (
+                not isinstance(statement, (ast.Import, ast.ImportFrom))
+                or kind == "class"
+                or namespace_exposed
+            ):
                 continue
             for alias in statement.names:
                 name = alias.asname or alias.name.split(".")[0]
@@ -719,12 +860,8 @@ class _ProofVisitor(ImportedAccessVisitor):
                 if target and self.inventory.eligible(target, self.module):
                     scope[name] = target
                     first = competing[0]
-                    prefix = body[: body.index(first)]
-                    ready = all(
-                        _inert(s) or isinstance(s, (ast.Import, ast.ImportFrom)) for s in prefix
-                    )
                     self.details[(id(scope), name)] = _Binding(
-                        scope_id, target, (first.lineno, first.col_offset), ready, paths
+                        scope_id, target, (first.lineno, first.col_offset), paths
                     )
         previous_scopes, previous_kinds = self.scopes, self.scope_kinds
         # Function closures need a separate initialization proof (not PR 1).
@@ -752,8 +889,10 @@ class _ProofVisitor(ImportedAccessVisitor):
                     return None
                 position = (node.lineno, node.col_offset)
                 if scope is not self.scopes[-1]:
-                    if not binding.global_ready or not self.function_positions:
+                    if not self.function_positions:
                         return None
+                    # A deferred body cannot run before its outermost definition.
+                    # Competing writes were rejected when collecting this binding.
                     position = min(position, self.function_positions[0])
                 return binding if position > binding.position else None
         return None
@@ -823,10 +962,15 @@ class _ProofVisitor(ImportedAccessVisitor):
     visit_AsyncFunctionDef = visit_FunctionDef
 
     def visit_Lambda(self, node: ast.Lambda) -> None:
-        # Deferred execution and walrus locals require another proof.
+        self.function_positions.append((node.lineno, node.col_offset))
         for expression in [*node.args.defaults, *node.args.kw_defaults]:
             if expression is not None:
                 self.visit(expression)
+        # Reuse function scope collection so parameters shadow imports and
+        # enclosing function locals cannot supply an unproved closure binding.
+        statement = ast.copy_location(ast.Expr(value=node.body), node.body)
+        self._enter([statement], "function", node.args)
+        self.function_positions.pop()
 
 
 def prove_accesses(

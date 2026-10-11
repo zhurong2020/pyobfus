@@ -7,6 +7,7 @@ import pytest
 from click.testing import CliRunner
 
 from pyobfus.cli import main
+from pyobfus.config import ObfuscationConfig
 from pyobfus.core.preflight import PreflightChecker
 
 H_CASES = [
@@ -46,9 +47,10 @@ def advisories(report, marker="AttributeError"):
 @pytest.mark.parametrize("import_line,expression,core", H_CASES)
 def test_directory_module_attributes_json(tmp_path, import_line, expression, core):
     source = project(tmp_path, f"{import_line}\nprint({expression})\nprint({expression})\n", core)
-    payload = check_json(source)
+    payload = check_json(source, "--no-crossfile-module-attributes")
     findings = advisories(payload)
-    assert len(findings) == 1
+    assert len(findings) == 2
+    assert {r["line"] for r in findings} == {2, 3}
     risk = findings[0]
     assert risk["severity"] == "medium"
     assert expression.rstrip("()") in risk["message"]
@@ -83,7 +85,11 @@ def test_directory_module_attributes_json(tmp_path, import_line, expression, cor
 )
 def test_unchanged_or_unresolved_attributes(tmp_path, entry, core, preserve):
     source = project(tmp_path, entry, core)
-    assert not advisories(PreflightChecker(preserve_names=preserve).check_path(source))
+    findings = advisories(PreflightChecker(preserve_names=preserve).check_path(source))
+    if "core = object()" in entry:
+        assert len(findings) == 1 and findings[0]["line"] == 3
+    else:
+        assert not findings
 
 
 def test_relative_import_and_alias_dedupe(tmp_path):
@@ -93,7 +99,16 @@ def test_relative_import_and_alias_dedupe(tmp_path):
         "def use(): return core.LIMIT + engine.LIMIT\n",
         encoding="utf-8",
     )
-    assert len(advisories(PreflightChecker().check_path(source))) == 1
+    assert (
+        len(
+            advisories(
+                PreflightChecker(
+                    obfuscation_config=ObfuscationConfig(crossfile_module_attributes=False)
+                ).check_path(source)
+            )
+        )
+        == 1
+    )
 
 
 def test_config_and_preset_exclusions(tmp_path):
@@ -177,7 +192,16 @@ def test_annotations_and_lambda_defaults(tmp_path):
         "import pkg.core as core\ndef use(x: core.LIMIT): pass\n"
         + "fn = lambda value=core.LIMIT: value\n",
     )
-    assert len(advisories(PreflightChecker().check_path(source))) == 1
+    assert (
+        len(
+            advisories(
+                PreflightChecker(
+                    obfuscation_config=ObfuscationConfig(crossfile_module_attributes=False)
+                ).check_path(source)
+            )
+        )
+        == 2
+    )
 
 
 def test_enum_private_and_ignored_members(tmp_path):
@@ -194,7 +218,8 @@ def test_enum_private_and_ignored_members(tmp_path):
 
 def test_conflicting_import_binding_is_unresolved(tmp_path):
     source = project(tmp_path, "import pkg.core as core\nimport other as core\ncore.LIMIT\n")
-    assert not advisories(PreflightChecker().check_path(source))
+    findings = advisories(PreflightChecker().check_path(source))
+    assert len(findings) == 1 and findings[0]["line"] == 3
 
 
 @pytest.mark.parametrize("expression", ["lambda: core.LIMIT", "[core.LIMIT for value in []]"])

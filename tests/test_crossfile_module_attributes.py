@@ -35,12 +35,15 @@ def project(tmp_path, app, init="", definitions=DEFINITIONS):
 
 
 def build(src, out, **choices):
-    config = ObfuscationConfig(crossfile_module_attributes=True, max_workers=1)
+    config = ObfuscationConfig(max_workers=1)
     for name, value in choices.items():
         setattr(config, name, value)
     ob = CrossFileOrchestrator(config)
     result = ob.obfuscate(src, out)
     assert result.success, result.errors
+    from tests.test_crossfile_module_attributes_default import assert_retained_accesses_have_advice
+
+    assert_retained_accesses_have_advice(src, out, ob)
     return ob
 
 
@@ -72,8 +75,9 @@ def runner():
 )
 @pytest.mark.parametrize("locals_enabled", [False, True])
 @pytest.mark.parametrize("params_preserved", [False, True])
+@pytest.mark.parametrize("workers", [1, 2])
 def test_runtime_matrix(
-    tmp_path, statement, local, expression, export, locals_enabled, params_preserved
+    tmp_path, statement, local, expression, export, locals_enabled, params_preserved, workers
 ):
     app = f"{statement}\nprint({expression})\n"
     if local:
@@ -81,7 +85,11 @@ def test_runtime_matrix(
     src = project(tmp_path, app)
     out = tmp_path / "out"
     ob = build(
-        src, out, crossfile_local_names=locals_enabled, preserve_param_names=params_preserved
+        src,
+        out,
+        crossfile_local_names=locals_enabled,
+        preserve_param_names=params_preserved,
+        max_workers=workers,
     )
     original, artifact = run(src, tmp_path), run(out, tmp_path)
     assert original.returncode == artifact.returncode == 0, artifact.stderr
@@ -147,10 +155,12 @@ NEGATIVES = [
 
 
 @pytest.mark.parametrize("app", NEGATIVES)
-def test_rejected_attribute_sites(tmp_path, app):
+@pytest.mark.parametrize("locals_enabled", [False, True])
+@pytest.mark.parametrize("workers", [1, 2])
+def test_rejected_attribute_sites(tmp_path, app, locals_enabled, workers):
     src = project(tmp_path, app)
     out = tmp_path / "out"
-    ob = build(src, out)
+    ob = build(src, out, crossfile_local_names=locals_enabled, max_workers=workers)
     assert "LIMIT" in attrs(out / "app.py")
     assert not any(e.expected == "LIMIT" for e in ob.attribute_plans["app"].edits)
     # The class/factory module export itself can be rewritten; its member cannot.
@@ -272,7 +282,7 @@ def test_advisories_only_suppress_scheduled_sites(tmp_path):
         tmp_path,
         "from pkg import mod\nprint(mod.LIMIT)\nif True:\n    import pkg.mod as conditional\nprint(conditional.LIMIT)\n",
     )
-    assert len(h_risks(src, False)) == 1
+    assert len(h_risks(src, False)) == 2
     risks = h_risks(src, True)
     assert len(risks) == 1 and risks[0].line == 5
     candidates = discover_accesses(ast.parse((src / "app.py").read_text()), lambda n: n.module)
@@ -331,20 +341,24 @@ def test_cli_yaml_precedence_check_help_init_and_singlefile_path(tmp_path, monke
     config.unlink()
     result = cli.invoke(main, [str(src), "--init"])
     assert result.exit_code == 0, result.output
-    assert "crossfile_module_attributes: false" in (src / "pyobfus.yaml").read_text()
+    assert "crossfile_module_attributes: true" in (src / "pyobfus.yaml").read_text()
 
 
 def test_cache_signature_tracks_switch(tmp_path):
     src = project(tmp_path, "pass\n")
     cache = BuildCache(tmp_path / "out")
-    config = ObfuscationConfig()
+    config = ObfuscationConfig(crossfile_module_attributes=False)
     first = cache.build_signature(src, src.rglob("*.py"), config)
     config.crossfile_module_attributes = True
     second = cache.build_signature(src, src.rglob("*.py"), config)
     assert first != second
 
 
-def test_generated_trace_cli_unmap_and_mapping_contract(tmp_path, monkeypatch):
+@pytest.mark.parametrize("workers", [1, 2])
+@pytest.mark.parametrize("locals_enabled", [False, True])
+def test_generated_trace_cli_unmap_and_mapping_contract(
+    tmp_path, monkeypatch, workers, locals_enabled
+):
     monkeypatch.setenv("HOME", str(tmp_path))
     monkeypatch.setenv("USERPROFILE", str(tmp_path))
     src = project(

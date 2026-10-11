@@ -180,8 +180,8 @@ def _echo_pro_import_hint() -> None:
 @click.option(
     "--crossfile-module-attributes/--no-crossfile-module-attributes",
     default=None,
-    help="Opt-in rewrite of proved module reads/calls through unconditional absolute "
-    "from-package submodules or dotted imports with aliases (default: disabled). "
+    help="Rewrite proved module reads/calls through unconditional imports, including "
+    "dotted/relative imports and static package re-exports (default: enabled). "
     "Unsupported/dynamic accesses require exclude_names.",
 )
 @click.option(

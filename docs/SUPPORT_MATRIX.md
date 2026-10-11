@@ -73,9 +73,8 @@ imports keep their original symbol and alias names. Unaliased imports retain
 the existing cross-file naming rules. Execution evidence:
 `integration_tests/test_crossfile_import_alias.py`.
 
-**Limitation H (opt-in fix, unreleased):** Set
-`obfuscation.crossfile_module_attributes: true` or pass
-`--crossfile-module-attributes` to rewrite proved Load reads/calls through
+**Limitation H (fixed by default, unreleased, with exceptions below):**
+Directory builds rewrite proved Load reads/calls through
 unconditional `from pkg import mod; mod.X`,
 `import pkg.mod as alias; alias.X`, `import pkg.sub.core; pkg.sub.core.X`,
 package-relative module imports and static package re-exports, including
@@ -95,7 +94,8 @@ global-rebinding conflicts (I/D) are rejected rather than repaired. Preserve
 affected exports with `exclude_names`; a clean check cannot establish safety
 for unknown consumers. Behavioral evidence:
 `tests/test_crossfile_module_attributes.py` and
-`tests/test_crossfile_module_attributes_v2.py`. The default remains false.
+`tests/test_crossfile_module_attributes_v2.py` and
+`tests/test_crossfile_module_attributes_default.py`. The default is true.
 
 With the option off, directory builds rename module-level symbols and direct
 `from pkg.core import LIMIT` imports, but leave attributes in `core.LIMIT`
@@ -106,8 +106,10 @@ Use `from pkg.core import LIMIT` and reference `LIMIT` directly, or preserve the
 symbol with `exclude_names`. Directory `--check` reports a medium
 `compatibility_advisory` for statically imported project modules whose accessed
 symbol appears in the build's rename table; single-file checks do not report it.
-This check skips reassigned bindings and does not prove dynamic or star
-imports. With either switch setting, detected assignment/argument/return/yield/
+Competing stores/deletes in the import scope and literal dynamic-import
+results receive uncertainty advice; this is candidate observation, not a proof
+of identity. Dynamic or star imports are not rewritten. With either switch
+setting, detected assignment/argument/return/yield/
 container escapes, reflection (`getattr`, `hasattr`, `setattr`, `delattr`,
 `vars`, `__dict__`), recognizable `sys.modules`/`import_module`
 attribute accesses and module writes receive preservation advice. Computed module
@@ -116,10 +118,28 @@ all selected module proofs instead of guessing a target. Detected
 hazards conservatively prevent all edits for the referenced module across
 selected project files. Advice lists at most ten names plus the remaining count;
 unknown consumption requires preserving all exports. Already preserved names
-receive informational mitigation. Off-mode H findings take precedence for the
-same module/export; a with-as target alone is not a module escape. If any project
+receive informational mitigation. Findings are deduplicated per
+file/line/module/export; specific hazard advice covers mutation and direct
+dynamic-access sites. A with-as target alone is not a module escape. If any project
 file fails to parse, the export plan is unavailable and
 this advisory is skipped; fix parse errors and re-run `--check`.
+
+### Upgrading: module attribute rewrites
+
+After upgrading, rebuild the **complete project** and regenerate both artifacts
+and their matching mapping. Installing a newer tool does not repair old output;
+old mappings cannot restore newly generated artifacts. Incremental builds reject
+cache signatures produced with the old effective default.
+
+Directory builds now rewrite eligible module reads/calls automatically. To
+restore legacy artifact bytes, pass `--no-crossfile-module-attributes` or set
+`obfuscation.crossfile_module_attributes: false` in YAML. The switch affects
+project-directory builds, not arbitrary object attributes or single-file builds.
+Run `pyobfus PROJECT --check --offline --no-config --json` to inspect the default
+behavior (omit `--no-config` to inspect your configured build). Scheduled edits
+have no H advisory; remaining medium `compatibility_advisory` findings explain
+uncertainty and suggest direct `from` imports or `exclude_names`. A clean scan
+cannot prove safety for unknown consumers or arbitrary reflection.
 
 **Limitation C:** `@enum.global_enum` (including
 `from enum import global_enum; @global_enum`) injects enum member names into the

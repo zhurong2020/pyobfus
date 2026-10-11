@@ -43,7 +43,7 @@ _FIELD_DESCRIPTIONS: Dict[str, str] = {
     "exclude_names": "Names to never rename (builtins, imports, Pro "
     "infrastructure, ...). Extends the preset's baseline.",
     "name_prefix": "Prefix for obfuscated identifier names.",
-    "crossfile_module_attributes": "Opt-in proved module reads/calls through unconditional absolute from-package submodules or dotted imports with aliases. Unsupported accesses require exclude_names (default: false).",
+    "crossfile_module_attributes": "Rewrite proved module reads/calls through unconditional imports, including dotted/relative imports and static package re-exports. Unsupported accesses require exclude_names; false restores legacy output (default: true).",
     "crossfile_local_names": "Rename function local bindings in directory builds (parameters preserved).",
     "remove_docstrings": "Strip docstrings from the output.",
     "remove_comments": "Strip comments from the output.",

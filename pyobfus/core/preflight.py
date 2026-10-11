@@ -763,6 +763,7 @@ class PreflightChecker:
         planner = CrossFileOrchestrator(config)
         table = planner.phase1_scan(directory)
         from pyobfus.core.module_attributes import ModuleHazard, ModuleInventory
+        from pyobfus.core.import_resolution import discover_uncertain_accesses
         from pyobfus.core.source_prologue import read_python_source
 
         sources = {fi.module_name: read_python_source(fi.path) for fi in planner.files}
@@ -780,7 +781,7 @@ class PreflightChecker:
             detector.visit(tree)
             exports[module] = detector.get_exports()
         for file_info in planner.files:
-            seen: Set[Tuple[str, str]] = set()
+            seen_sites: Set[Tuple[int, str, str]] = set()
 
             def resolve_from(node: ast.ImportFrom) -> Optional[str]:
                 return planner._resolve_source_module(
@@ -788,6 +789,19 @@ class PreflightChecker:
                 )
 
             def attribute(node: ast.Attribute, module: str) -> None:
+                if any(
+                    event.location[0] == node.lineno
+                    and event.module == module
+                    and (
+                        node.attr in event.names
+                        or (
+                            not event.names
+                            and node.attr in exports.get(inventory.canonical(module), set())
+                        )
+                    )
+                    for event in inventory.hazards[file_info.module_name]
+                ):
+                    return  # The more specific mutation/dynamic-access advice covers this site.
                 collision = module in inventory.packages and module in inventory.trees
                 plan = planner.attribute_plans.get(file_info.module_name)
                 if plan is not None and any(
@@ -826,10 +840,10 @@ class PreflightChecker:
                     )
                     if not star_changed and not collision_changed:
                         return  # External modules and unchanged names have no mapping.
-                key = (module, node.attr)
-                if key in seen:
+                site = (node.lineno, module, node.attr)
+                if site in seen_sites:
                     return
-                seen.add(key)
+                seen_sites.add(site)
                 report.risks.append(
                     Risk(
                         category=CAT_COMPAT_ADVISORY,
@@ -855,15 +869,33 @@ class PreflightChecker:
                     )
                 )
 
-            for node, module in discover_accesses(
-                ASTParser.parse_file(file_info.path), resolve_from
+            tree = ASTParser.parse_file(file_info.path)
+            legacy_sites = {
+                (node.lineno, node.col_offset, module)
+                for node, module in discover_accesses(tree, resolve_from)
+            }
+            for node, module in discover_uncertain_accesses(
+                tree, resolve_from, inventory.candidate_member
             ):
-                attribute(node, module)
+                if (node.lineno, node.col_offset, module) in legacy_sites:
+                    attribute(node, module)
+                elif inventory.selected(module) and table.get_obfuscated_import(module, node.attr):
+                    before = len(report.risks)
+                    attribute(node, module)
+                    if len(report.risks) > before:
+                        report.risks[-1].message = (
+                            f"{ast.unparse(node)} accesses project module candidate {module}.{node.attr}; "
+                            "module identity cannot be proved because its import binding has competing "
+                            "stores/deletes, assignment aliases, a dynamic import result or an imported "
+                            "module member chain. Renamed exports may "
+                            "cause AttributeError at runtime."
+                        )
 
-            groups: Dict[Tuple[int, int], List[ModuleHazard]] = {}
+            groups: Dict[int, List[ModuleHazard]] = {}
             for hazard in inventory.hazards[file_info.module_name]:
-                groups.setdefault(hazard.location, []).append(hazard)
-            for position, events in groups.items():
+                groups.setdefault(hazard.location[0], []).append(hazard)
+            for events in groups.values():
+                position = min(event.location for event in events)
                 names: Set[str] = set()
                 modules: Set[str] = set()
                 kinds: Set[str] = set()
@@ -872,10 +904,8 @@ class PreflightChecker:
                     affected = list(event.names) or sorted(
                         exports.get(inventory.canonical(event.module), set())
                     )
-                    if not config.crossfile_module_attributes:
-                        affected = [n for n in affected if (event.module, n) not in seen]
                     if not affected:
-                        continue  # Legacy H already covers this module/name.
+                        continue  # No exported names are affected.
                     names.update(affected)
                     modules.add(event.module)
                     kinds.add(event.kind)

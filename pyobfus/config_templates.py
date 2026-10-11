@@ -14,10 +14,10 @@ TEMPLATES: Dict[str, str] = {
 obfuscation:
   level: community
 
-  # Opt-in proved module reads/calls through unconditional absolute imports:
-  # from pkg import mod; mod.X, or import pkg.mod as alias; alias.X.
+  # Rewrite proved module reads/calls through unconditional imports by default:
+  # Includes dotted/relative imports and static package re-exports.
   # Unsupported/dynamic accesses still require exclude_names.
-  crossfile_module_attributes: false
+  crossfile_module_attributes: true
 
   # Preserve Django-required names
   exclude_names:
@@ -82,10 +82,10 @@ verbose: false
 obfuscation:
   level: community
 
-  # Opt-in proved module reads/calls through unconditional absolute imports:
-  # from pkg import mod; mod.X, or import pkg.mod as alias; alias.X.
+  # Rewrite proved module reads/calls through unconditional imports by default:
+  # Includes dotted/relative imports and static package re-exports.
   # Unsupported/dynamic accesses still require exclude_names.
-  crossfile_module_attributes: false
+  crossfile_module_attributes: true
 
   # Preserve Flask-required names
   exclude_names:
@@ -145,10 +145,10 @@ verbose: false
 obfuscation:
   level: community
 
-  # Opt-in proved module reads/calls through unconditional absolute imports:
-  # from pkg import mod; mod.X, or import pkg.mod as alias; alias.X.
+  # Rewrite proved module reads/calls through unconditional imports by default:
+  # Includes dotted/relative imports and static package re-exports.
   # Unsupported/dynamic accesses still require exclude_names.
-  crossfile_module_attributes: false
+  crossfile_module_attributes: true
 
   # Preserve public API names
   # Add your public API names here
@@ -193,10 +193,10 @@ verbose: false
 obfuscation:
   level: community
 
-  # Opt-in proved module reads/calls through unconditional absolute imports:
-  # from pkg import mod; mod.X, or import pkg.mod as alias; alias.X.
+  # Rewrite proved module reads/calls through unconditional imports by default:
+  # Includes dotted/relative imports and static package re-exports.
   # Unsupported/dynamic accesses still require exclude_names.
-  crossfile_module_attributes: false
+  crossfile_module_attributes: true
 
   # Names to preserve from obfuscation
   # Add names that must remain unchanged (e.g., external API calls)

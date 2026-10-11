@@ -6,6 +6,14 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+### Changed
+
+- With a Core release containing the H default rollout (after 0.6.1), directory
+  scans/builds enable proved module-attribute rewrites by default. Core YAML
+  `crossfile_module_attributes: false` restores legacy output. Rebuild the full
+  project and regenerate its matching mapping after upgrading. MCP contracts
+  and version are unchanged.
+
 ### Added
 
 - Trace restoration keeps code-excerpt name reversal and infers a deployment root

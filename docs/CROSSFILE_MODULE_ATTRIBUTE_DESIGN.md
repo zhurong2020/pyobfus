@@ -1,9 +1,9 @@
 # Cross-file module attribute access design
 
-Status: **accepted 2026-10-11** (Claude Code review; maintainer decisions recorded at the end). Implementation proceeds in the PRs listed below; each still needs review, and any release is a separate decision.
+Status: **implemented 2026-10-11** (PR #83 strict proofs/edits, PR #84 remaining v1 forms, and PR #85 default rollout; pending Claude Code review). Any merge or release remains a separate maintainer decision.
 Date: 2026-10-11. Baseline: main
 `bc04a1ee8bd283b5e89ed7bb86be0c85d7afe2da`, Core 0.6.1, including the
-unreleased PR #80 advisories. This PR changes no product behavior or defaults.
+unreleased PR #80 advisories. The historical design baseline below precedes those implementation PRs.
 
 ## Background and evidence
 
@@ -151,8 +151,15 @@ borrow an outer import accidentally.
    reasoning about import-order-dependent package mutation.
 4. Require dominance/order within straight-line code: an access before import
    is not proved by a later import. For globals used by function bodies, require
-   a stable module import and reject observable calls before initialization,
-   circular/partial initialization and unresolved execution order. V1 can
+   an unconditional stable module import before the outermost enclosing
+   function/lambda definition position, including accesses in definition-time
+   defaults, decorators and annotations. Reject any competing store/delete,
+   global/nonlocal rebinding or module-level redefinition anywhere in the module.
+   Opaque statements before that import do not invalidate this proof: the later
+   function cannot run before its definition, and import-path/hook changes
+   affect the already-supported module-level accesses equally. Definitions before
+   the import remain unproved even if called later. Continue rejecting class-body
+   accesses, circular/partial initialization and unresolved execution order. V1 can
    conservatively reject accesses within cycles rather than solve execution
    timing. A function-local import followed by access is the simplest proof.
 5. V1 rejects imports under if/match/loop/try and any binding with competing
@@ -286,6 +293,12 @@ mitigation instead of saying the attribute will raise AttributeError.
   using “may fail” where identity is uncertain. Diagnostics consume the same
   eligibility result/config as the build; do not suppress merely because a
   syntactic candidate exists. Keep separate parameter and injected-name advice.
+  Module members imported by another project module, such as
+  `pkg.a.core.LIMIT` when `pkg.a` imports `pkg.core`, are diagnostic candidates
+  only. Relative/absolute imports, aliases, package exports and observed
+  assignment/re-export chains receive the same medium uncertainty advice for
+  retained renamed exports, with the feature on or off. These observations
+  never expand the rewrite proof boundary.
   Preserve status/ai_hint/next_tool and risk/SARIF contracts. New reason/count
   fields, if needed, are additive and reviewed with CLI/MCP schema tests.
 
@@ -401,7 +414,7 @@ form seen in the reported evidence instead of deferring it.
 Every PR is reviewed by Claude Code; the maintainer decides merge and any
 release separately. This design PR neither merges changes nor tags/publishes.
 
-## Design-only delivery boundary
+## Historical design-only delivery boundary
 
 Only this document and its MkDocs exclusion are proposed. Like
 CROSSFILE_PARAMETER_RENAMING_DESIGN.md, it remains outside product-site
@@ -455,3 +468,24 @@ Recorded after Claude Code review; the maintainer accepted Claude's recommendati
 7. Community, all presets and tiers.
 8. Three PRs as revised above: the first combines proof and edits and covers `from pkg import mod; mod.X`, the most common reported form, together with `import pkg.mod as alias`.
 
+
+
+## Importer namespace rebinding guard (PR 3 review round 3)
+
+The importer must not expose a writable namespace capability. Any `globals`
+reference, module-scope `locals()`/`vars()` (including definition-time expressions),
+`sys.modules` reference, or function/frame global dictionary access rejects its
+module-level import bindings, including reads in deferred function bodies.
+Builtin and sys import aliases and capabilities assigned to helpers are covered.
+`sys.modules` inspection is conservatively rejected even for unrelated keys or
+read-only usage, since an escaped registry can later expose the importer. This
+is per importing file; it does not invalidate unrelated importing modules.
+
+A module namespace capability does not invalidate an independent function-local
+import. That function's own `locals`/zero-argument `vars` exposure does reject its
+local bindings. Ordinary `vars(obj)` does not expose the current scope. Existing
+whole-file exec/eval rejection remains conservative, including calls in functions;
+builtin aliases also reject affected scopes. Retained accesses still use the
+existing medium compatibility advisories and file/line/module/export deduplication.
+This supplies no automatic export preservation: a read-only rejected use may
+still require the advised `exclude_names` recovery to run correctly.

@@ -36,7 +36,16 @@ def test_suggested_workaround(tmp_path, case):
 
     baseline = run(source / "entry.py")
     assert baseline.returncode == 0, baseline.stderr
-    checked = run("-m", "pyobfus", source, "--check", "--json", "--no-config", "--offline")
+    checked = run(
+        "-m",
+        "pyobfus",
+        source,
+        "--check",
+        "--json",
+        "--no-config",
+        "--offline",
+        "--no-crossfile-module-attributes",
+    )
     assert checked.returncode == 0, checked.stderr
     findings = [
         r for r in json.loads(checked.stdout)["risks"] if r["category"] == "compatibility_advisory"
