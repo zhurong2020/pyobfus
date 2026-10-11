@@ -48,8 +48,11 @@ code. Parse failures are reported as invocation notifications, not as invented
 source rules.
 
 `PYOBFUS/compatibility_advisory` also covers medium warnings for renamed
-project symbols accessed through module objects in directory builds, and for
-`enum.global_enum` member names injected at runtime. These results use
+project symbols accessed through module objects in directory builds, module
+escapes/reflection/mutation and recognizable dynamic module attribute access,
+and `enum.global_enum` member names injected at runtime. Escape advice applies
+with module attribute rewriting on or off; preserved names use informational
+mitigation. These results use
 `warning` even though the category's default level is `note`. JSON/text reports
 provide the source-specific direct-import or `exclude_names` suggestions;
 SARIF retains a static category-level message to avoid exposing source names.

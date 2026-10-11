@@ -750,7 +750,7 @@ class PreflightChecker:
     def _check_module_attributes(self, directory: Path, report: PreflightReport) -> None:
         """Reuse the build's read-only export plan; never run transformations."""
         from pyobfus.core.orchestrator import CrossFileOrchestrator
-        from pyobfus.core.export_detector import ReExportSource
+        from pyobfus.core.export_detector import ExportDetector, ReExportSource
 
         # The build planner requires a completely parseable project. Existing
         # parse-error reporting takes precedence; do not fabricate a partial plan.
@@ -762,6 +762,23 @@ class PreflightChecker:
         config.crossfile_local_names = False  # Only module exports matter here.
         planner = CrossFileOrchestrator(config)
         table = planner.phase1_scan(directory)
+        from pyobfus.core.module_attributes import ModuleHazard, ModuleInventory
+        from pyobfus.core.source_prologue import read_python_source
+
+        sources = {fi.module_name: read_python_source(fi.path) for fi in planner.files}
+        index = {fi.module_name: fi for fi in planner.files}
+        inventory = planner.attribute_inventory or ModuleInventory(
+            sources,
+            lambda module, node: planner._resolve_source_module(
+                index[module], ReExportSource(node.module, node.level, "")
+            ),
+            table,
+        )
+        exports: Dict[str, Set[str]] = {}
+        for module, tree in inventory.trees.items():
+            detector = ExportDetector()
+            detector.visit(tree)
+            exports[module] = detector.get_exports()
         for file_info in planner.files:
             seen: Set[Tuple[str, str]] = set()
 
@@ -785,7 +802,24 @@ class PreflightChecker:
                 ):
                     return  # Suppress only a validated, scheduled original-AST edit.
                 if table.get_obfuscated_import(module, node.attr) is None:
-                    return  # External modules and unchanged names have no mapping.
+                    # On-only uncertainty for a selected package star re-export;
+                    # never synthesize an export allocation or a build edit.
+                    tree = inventory.packages.get(module)
+                    star_changed = (
+                        config.crossfile_module_attributes
+                        and tree is not None
+                        and any(
+                            isinstance(n, ast.ImportFrom)
+                            and any(a.name == "*" for a in n.names)
+                            and table.get_obfuscated_import(
+                                inventory.resolve_from(inventory.canonical(module), n) or "",
+                                node.attr,
+                            )
+                            for n in ast.walk(tree)
+                        )
+                    )
+                    if not star_changed:
+                        return  # External modules and unchanged names have no mapping.
                 key = (module, node.attr)
                 if key in seen:
                     return
@@ -797,9 +831,14 @@ class PreflightChecker:
                         file=str(file_info.path),
                         line=node.lineno,
                         col=node.col_offset,
-                        message=f"{ast.unparse(node)} accesses {module}.{node.attr}; "
-                        "directory builds do not rename attribute access through a module "
-                        "object; this raises AttributeError at runtime.",
+                        message=(
+                            f"{ast.unparse(node)} accesses {module}.{node.attr}; "
+                            "directory builds do not rename attribute access through a module "
+                            "object; this raises AttributeError at runtime."
+                            if not config.crossfile_module_attributes
+                            else f"{ast.unparse(node)} accesses {module}.{node.attr}; attribute access through a module "
+                            "object is not proved safe for rewriting and may cause AttributeError at runtime."
+                        ),
                         suggestion=f"Use from {module} import {node.attr} and reference "
                         f"{node.attr} directly, or add {node.attr} to exclude_names.",
                     )
@@ -809,6 +848,55 @@ class PreflightChecker:
                 ASTParser.parse_file(file_info.path), resolve_from
             ):
                 attribute(node, module)
+
+            groups: Dict[Tuple[int, int], List[ModuleHazard]] = {}
+            for hazard in inventory.hazards[file_info.module_name]:
+                groups.setdefault(hazard.location, []).append(hazard)
+            for position, events in groups.items():
+                names: Set[str] = set()
+                modules: Set[str] = set()
+                kinds: Set[str] = set()
+                changed = False
+                for event in events:
+                    affected = list(event.names) or sorted(
+                        exports.get(inventory.canonical(event.module), set())
+                    )
+                    if not config.crossfile_module_attributes:
+                        affected = [n for n in affected if (event.module, n) not in seen]
+                    if not affected:
+                        continue  # Legacy H already covers this module/name.
+                    names.update(affected)
+                    modules.add(event.module)
+                    kinds.add(event.kind)
+                    changed |= any(table.get_obfuscated_import(event.module, n) for n in affected)
+                if not names:
+                    continue
+                ordered = sorted(names)
+                listed = ", ".join(ordered[:10])
+                if len(ordered) > 10:
+                    listed += f" and {len(ordered) - 10} more"
+                message = (
+                    f"Detected {', '.join(sorted(kinds))} for project module candidate "
+                    f"{', '.join(sorted(modules))}; this use is not automatically rewritten. "
+                )
+                message += (
+                    "Renamed exports may cause AttributeError at runtime."
+                    if changed
+                    else "The affected export names are already preserved."
+                )
+                report.risks.append(
+                    Risk(
+                        category=CAT_COMPAT_ADVISORY,
+                        severity=SEVERITY_MEDIUM if changed else SEVERITY_INFO,
+                        file=str(file_info.path),
+                        line=position[0],
+                        col=position[1],
+                        message=message,
+                        suggestion=f"Affected names: {listed}. Add the affected names to "
+                        f"exclude_names or use from {sorted(modules)[0]} import X and reference "
+                        "X directly. Unknown consumers require preserving all module exports.",
+                    )
+                )
 
     def _scan_excluded(self, file_path: Path, report: PreflightReport) -> None:
         try:

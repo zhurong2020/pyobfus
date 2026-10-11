@@ -76,15 +76,23 @@ the existing cross-file naming rules. Execution evidence:
 **Limitation H (opt-in fix, unreleased):** Set
 `obfuscation.crossfile_module_attributes: true` or pass
 `--crossfile-module-attributes` to rewrite proved Load reads/calls through
-unconditional absolute `from pkg import mod; mod.X` and
-`import pkg.mod as alias; alias.X`, including function-local imports.
-Explicit aliases keep their spelling; retained exports are unchanged. Only
-selected ordinary project modules under inert, unambiguous package initializers
-are eligible. Re-exports, relative imports, dotted imports without aliases,
-conditional imports, late/competing bindings, mutations, escapes and dynamic
-accesses are not proved. Preserve affected exports with `exclude_names`;
-a clean check cannot establish safety for unknown consumers. Behavioral evidence:
-`tests/test_crossfile_module_attributes.py`. The default remains false.
+unconditional `from pkg import mod; mod.X`,
+`import pkg.mod as alias; alias.X`, `import pkg.sub.core; pkg.sub.core.X`,
+package-relative module imports and static package re-exports, including
+function-local imports and literal `__all__`. Module path segments retain their
+spelling. Each dotted edge requires a reaching explicit import; importing
+`pkg.a` does not prove `pkg.b.X`. Unaliased re-exports share the source name;
+explicit aliases keep their spelling and produce no warning. Static package
+literals, inert definitions and unconditional selected-project imports are
+eligible; a simple module-attribute read into a package definition is also
+supported. Arbitrary initializer calls, dynamic or star re-exports,
+conditional imports, late/competing bindings, namespace packages, cycles,
+mutations, escapes and reflection remain unproved. Existing flat-import and
+global-rebinding conflicts (I/D) are rejected rather than repaired. Preserve
+affected exports with `exclude_names`; a clean check cannot establish safety
+for unknown consumers. Behavioral evidence:
+`tests/test_crossfile_module_attributes.py` and
+`tests/test_crossfile_module_attributes_v2.py`. The default remains false.
 
 With the option off, directory builds rename module-level symbols and direct
 `from pkg.core import LIMIT` imports, but leave attributes in `core.LIMIT`
@@ -95,8 +103,17 @@ Use `from pkg.core import LIMIT` and reference `LIMIT` directly, or preserve the
 symbol with `exclude_names`. Directory `--check` reports a medium
 `compatibility_advisory` for statically imported project modules whose accessed
 symbol appears in the build's rename table; single-file checks do not report it.
-This check skips reassigned bindings and does not resolve dynamic or star
-imports. If any project file fails to parse, the export plan is unavailable and
+This check skips reassigned bindings and does not prove dynamic or star
+imports. With either switch setting, detected assignment/argument/return/yield/
+container escapes, reflection (`getattr`, `hasattr`, `setattr`, `delattr`,
+`vars`, `__dict__`), recognizable literal `sys.modules`/`import_module`
+attribute accesses and module writes receive preservation advice. Detected
+hazards conservatively prevent all edits for the referenced module across
+selected project files. Advice lists at most ten names plus the remaining count;
+unknown consumption requires preserving all exports. Already preserved names
+receive informational mitigation. Off-mode H findings take precedence for the
+same module/export; a with-as target alone is not a module escape. If any project
+file fails to parse, the export plan is unavailable and
 this advisory is skipped; fix parse errors and re-run `--check`.
 
 **Limitation C:** `@enum.global_enum` (including

@@ -141,7 +141,6 @@ NEGATIVES = [
     "from pkg import mod\nprint([mod.LIMIT for mod in []])\n",
     "from pkg import mod\ntry:\n    pass\nexcept Exception as mod:\n    print(mod.LIMIT)\n",
     "from pkg import mod\ncopy = mod\nprint(copy.LIMIT)\n",
-    "import pkg.mod\nprint(pkg.mod.LIMIT)\n",
     "from .pkg import mod\nprint(mod.LIMIT)\n",
     "from pkg import mod\nexec('pass')\nprint(mod.LIMIT)\n",
 ]
@@ -162,7 +161,6 @@ def test_rejected_attribute_sites(tmp_path, app):
     [
         "mod = 42\n",
         "def __getattr__(name):\n    return 42\n",
-        "from .mod import LIMIT\n",
         "mod = 42\n__all__ = ['mod']\n",
     ],
 )

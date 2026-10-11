@@ -25,12 +25,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Opt-in `crossfile_module_attributes: true` and
   `--crossfile-module-attributes` fix reads/calls through statically proved,
-  unconditional `from pkg import mod; mod.X` and
-  `import pkg.mod as alias; alias.X`, at module level and inside functions.
-  The default is false. Dotted imports without aliases, relative imports,
-  package re-exports, conditional imports, ambiguous/mutated bindings and
-  dynamic/escaped module objects remain unsupported; preserve affected names
-  with `exclude_names`. `--check` suppresses H advice only for scheduled edits.
+  unconditional module imports at module level and inside functions:
+  `from pkg import mod; mod.X`, `import pkg.mod as alias; alias.X`,
+  `import pkg.sub.core; pkg.sub.core.X`, package-relative module imports,
+  and static package re-exports (with or without literal `__all__`). Unaliased
+  re-exports share the defining module's emitted name; explicit aliases retain
+  their local spelling. The default remains false. Conditional imports,
+  competing bindings, executable/dynamic initializers, mutations, escapes and
+  reflection remain unsupported; preserve affected names with `exclude_names`.
+  `--check` suppresses H advice only for scheduled edits.
+
+- Directory `--check` reports module-object escape, reflection, recognizable
+  dynamic module access and mutation as medium `compatibility_advisory`
+  findings, whether module attribute rewriting is enabled or disabled. Advice
+  lists up to ten affected export names and recommends `exclude_names` or direct
+  symbol imports. Already preserved names receive informational mitigation;
+  legacy H findings are not duplicated when the option is off. Detected hazards
+  conservatively invalidate that module's attribute proofs across the project.
 
 - `--check` adds medium `compatibility_advisory` findings for directory builds
   accessing renamed project symbols through module objects, and for

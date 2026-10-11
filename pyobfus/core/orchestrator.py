@@ -256,6 +256,7 @@ class CrossFileOrchestrator:
         self.content_stats: Dict[str, int] = {}
         self.file_line_maps: Dict[str, Dict[str, Any]] = {}
         self.attribute_plans: Dict[str, AttributePlan] = {}
+        self.attribute_inventory: Optional[ModuleInventory] = None
         self.local_plans: Dict[str, LocalPlan] = {}
         self._reserved_names: Set[str] = set()
         self._planning_warnings: List[str] = []
@@ -331,6 +332,7 @@ class CrossFileOrchestrator:
         self._name_counter = 0
         self.local_plans = {}
         self.attribute_plans = {}
+        self.attribute_inventory = None
         self._planning_warnings = []
         self._reserved_names = set()
 
@@ -462,7 +464,9 @@ class CrossFileOrchestrator:
                 lambda module, node: self._resolve_source_module(
                     file_index[module], ReExportSource(node.module, node.level, "")
                 ),
+                self.global_table,
             )
+            self.attribute_inventory = inventory
             self.attribute_plans = {
                 fi.module_name: plan_attributes(
                     sources[fi.module_name],
