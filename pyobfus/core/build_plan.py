@@ -37,8 +37,16 @@ def build_obfuscation_plan(
     if input_path.is_file():
         selected.append(_file_record(input_path, input_path.parent, output_path.name))
     else:
-        included = set(filter_python_files(input_path, config.exclude_patterns))
-        for source_file in sorted(filter_python_files(input_path, [])):
+        included = set(
+            filter_python_files(
+                input_path,
+                config.exclude_patterns,
+                skip_environment_dirs=config.skip_environment_dirs,
+            )
+        )
+        for source_file in sorted(
+            filter_python_files(input_path, [], skip_environment_dirs=config.skip_environment_dirs)
+        ):
             relative = source_file.relative_to(input_path).as_posix()
             if source_file in included:
                 selected.append(_file_record(source_file, input_path, relative))
@@ -117,6 +125,7 @@ def build_obfuscation_plan(
             "level": config.level,
             "config_hash": f"sha256:{config_hash(config)}",
             "exclude_patterns": list(config.exclude_patterns),
+            "skip_environment_dirs": config.skip_environment_dirs,
             "exclude_names_count": len(config.exclude_names),
         },
         "files": {

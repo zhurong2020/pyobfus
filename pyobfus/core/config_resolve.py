@@ -20,6 +20,7 @@ class ConfigProvenance:
     config_hash: Optional[str]
     exclude_patterns: Tuple[str, ...] = ()
     exclude_names_count: int = 0
+    skip_environment_dirs: bool = True
 
     def to_dict(self) -> Dict[str, Any]:
         data = asdict(self)
@@ -78,6 +79,7 @@ def resolve_effective_config(
         config_hash=f"sha256:{config_hash(config)}",
         exclude_patterns=tuple(config.exclude_patterns),
         exclude_names_count=len(config.exclude_names),
+        skip_environment_dirs=config.skip_environment_dirs,
     )
     return config, provenance
 

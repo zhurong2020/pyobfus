@@ -38,6 +38,8 @@ _FIELD_DESCRIPTIONS: Dict[str, str] = {
     "level": "Obfuscation level.",
     "exclude_patterns": "File patterns to exclude (glob syntax). Extends the "
     "preset's baseline, doesn't replace it.",
+    "skip_environment_dirs": "Prune environment roots (pyvenv.cfg or conda-meta) and "
+    "dependency/tool directories before traversal. Set false to restore legacy discovery.",
     "exclude_names": "Names to never rename (builtins, imports, Pro "
     "infrastructure, ...). Extends the preset's baseline.",
     "name_prefix": "Prefix for obfuscated identifier names.",

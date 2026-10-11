@@ -19,7 +19,9 @@ from typing import List, Optional
 from pyobfus import __version__ as PYOBFUS_VERSION
 from pyobfus.core.preflight import PreflightChecker, PreflightReport
 
-# Always-useful default excludes (test directories, venv, common cache)
+# Default file patterns. Environment/tool subtrees are also pruned during
+# discovery, but build output directories are not, so keep excluding them here:
+# rebuilding into dist/ inside the project must not re-obfuscate old output.
 _BASELINE_EXCLUDES: List[str] = [
     "test_*.py",
     "**/tests/**",
@@ -140,6 +142,9 @@ def _render_yaml(
     lines.append(f"  preset: {preset}")
     lines.append("")
 
+    lines.append("  # Prune environment and tool subtrees; false restores legacy discovery.")
+    lines.append("  skip_environment_dirs: true")
+    lines.append("")
     lines.append("  # File patterns to skip (glob). Preset adds framework defaults;")
     lines.append("  # entries here extend that list.")
     lines.append("  exclude_patterns:")

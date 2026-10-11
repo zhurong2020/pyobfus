@@ -28,6 +28,11 @@
           ],
           "description": "File patterns to exclude (glob syntax). Extends the preset's baseline, doesn't replace it."
         },
+        "skip_environment_dirs": {
+          "type": "boolean",
+          "default": true,
+          "description": "Prune environment roots (pyvenv.cfg or conda-meta) and dependency/tool directories before traversal. Set false to restore legacy discovery."
+        },
         "exclude_names": {
           "type": "array",
           "items": {

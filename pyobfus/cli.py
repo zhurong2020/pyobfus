@@ -39,7 +39,7 @@ from pyobfus.core.parser import ASTParser
 from pyobfus.core.orchestrator import CrossFileOrchestrator
 from pyobfus.exceptions import LimitExceededError, ParseError, PyObfusError
 from pyobfus.transformers.name_mangler import NameMangler
-from pyobfus.utils import filter_python_files
+from pyobfus.utils import filter_python_files, format_skipped_directories
 from pyobfus.trial import is_trial_active, get_trial_expiry_message
 
 # Check if Pro edition is available. pyobfus_pro ships inside this very wheel,
@@ -1133,13 +1133,27 @@ def main(
             save_mapping_path = None
         verification: Optional[Dict[str, Any]] = None
 
+        if verbose and input_path_obj.is_dir():
+            skipped_directories: List[str] = []
+            filter_python_files(
+                input_path_obj,
+                config.exclude_patterns,
+                skip_environment_dirs=config.skip_environment_dirs,
+                skipped_directories=skipped_directories,
+            )
+            click.echo(format_skipped_directories(skipped_directories))
+
         # Incremental short-circuit: directory mode only (single-file
         # rebuilds are cheap enough to skip this machinery)
         if incremental and input_path_obj.is_dir() and not dry_run:
             from pyobfus.core.cache import BuildCache
 
             cache = BuildCache(output_path_obj)
-            input_files_for_sig = filter_python_files(input_path_obj, config.exclude_patterns)
+            input_files_for_sig = filter_python_files(
+                input_path_obj,
+                config.exclude_patterns,
+                skip_environment_dirs=config.skip_environment_dirs,
+            )
             current_sig = cache.build_signature(input_path_obj, input_files_for_sig, config)
             hit, reason, cached_outputs = cache.can_reuse(current_sig)
             if hit:
@@ -1247,7 +1261,11 @@ def main(
                 from pyobfus.core.cache import BuildCache
 
                 cache = BuildCache(output_path_obj)
-                final_inputs = filter_python_files(input_path_obj, config.exclude_patterns)
+                final_inputs = filter_python_files(
+                    input_path_obj,
+                    config.exclude_patterns,
+                    skip_environment_dirs=config.skip_environment_dirs,
+                )
                 output_files = []
                 for f in final_inputs:
                     try:
@@ -1302,7 +1320,11 @@ def main(
                 manifest_files = [input_path_obj]
                 manifest_mode = "single_file"
             else:
-                manifest_files = filter_python_files(input_path_obj, config.exclude_patterns)
+                manifest_files = filter_python_files(
+                    input_path_obj,
+                    config.exclude_patterns,
+                    skip_environment_dirs=config.skip_environment_dirs,
+                )
                 manifest_mode = "cross_file" if cross_file else "directory"
             manifest = build_provenance_manifest(
                 input_root=input_path_obj,
@@ -1659,7 +1681,9 @@ def _obfuscate_directory(
     }
 
     # Find all Python files, excluding patterns from config
-    python_files = filter_python_files(input_dir, config.exclude_patterns)
+    python_files = filter_python_files(
+        input_dir, config.exclude_patterns, skip_environment_dirs=config.skip_environment_dirs
+    )
 
     if not python_files:
         click.echo(f"No Python files found in {input_dir}")

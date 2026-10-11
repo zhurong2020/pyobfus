@@ -22,6 +22,9 @@ import pytest
 def _security_test_setup(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
     """Reset all global security state before each test."""
     monkeypatch.setenv("PYOBFUS_MCP_PROJECT_ROOT", tempfile.gettempdir())
+    # protect_project invokes the CLI in a subprocess.
+    monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("USERPROFILE", str(tmp_path))
 
     # Late import: avoid module-level import side effects in conftest.
     from pyobfus_mcp._security import reset_rate_limit_state
