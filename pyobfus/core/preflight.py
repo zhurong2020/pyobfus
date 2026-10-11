@@ -76,8 +76,7 @@ CAT_MODEL_ARTIFACT_LITERAL = "model_artifact_literal"
 CAT_COMPAT_ADVISORY = "compatibility_advisory"
 CAT_DEPENDENCY_ADVISORY = "dependency_advisory"
 # Stable safety category: shapes are medium, weaker name-only evidence is info.
-# Split data labels so the name-only screen does not flag its own metadata.
-CAT_HARDCODED_SECRET = "hardcoded" + "_secret"
+CAT_HARDCODED_SECRET = "hardcoded_secret"
 
 
 @dataclass
@@ -267,7 +266,11 @@ class _RiskVisitor(ast.NodeVisitor):
                 CAT_HARDCODED_SECRET,
                 severity,
                 literal,
-                f"{kind}-shaped hardcoded string literal detected.",
+                (
+                    f"{kind}-shaped hardcoded string literal detected."
+                    if severity == SEVERITY_MEDIUM
+                    else "String literal assigned to a credential-like name."
+                ),
                 SUGGESTION,
             )
         self.generic_visit(node)
@@ -881,16 +884,24 @@ class PreflightChecker:
         else:
             report.ai_hint = f"Low risk. Run: pyobfus {report.root} -o dist/ --preset balanced"
 
-        secret_count = report.category_counts().get(CAT_HARDCODED_SECRET, 0)
-        if secret_count:
+        secret_risks = [risk for risk in report.risks if risk.category == CAT_HARDCODED_SECRET]
+        medium_secret_count = sum(risk.severity == SEVERITY_MEDIUM for risk in secret_risks)
+        info_secret_count = sum(risk.severity == SEVERITY_INFO for risk in secret_risks)
+        if medium_secret_count:
             report.ai_hint = (
-                f"First move {secret_count} hardcoded secret(s) out of code before building. "
+                f"First move {medium_secret_count} hardcoded secret(s) out of code before building. "
                 "Read them at runtime from environment variables or a secret manager."
                 + (
                     " Fix parse errors and re-run --check."
                     if report.parse_errors
                     else " Re-run --check and review remaining risks."
                 )
+            )
+
+        if info_secret_count:
+            report.ai_hint += (
+                f" {info_secret_count} string literal(s) are assigned to credential-like names; "
+                "check they are not secrets."
             )
 
         if report.excluded_risks:

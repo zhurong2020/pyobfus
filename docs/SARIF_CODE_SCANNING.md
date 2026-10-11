@@ -64,7 +64,15 @@ JSON, SARIF and MCP reports never display the credential value.
 This deliberately uses no entropy heuristic. Empty/short strings, obvious
 placeholders and templates, repeated characters, URLs, common field-name
 values, docstrings, string annotations and interpolated f-strings are ignored.
-Environment lookups and calls are not resolved. It is a coarse screen, not a
+Name evidence uses complete underscore, hyphen or camelCase segments:
+password/passwd/secret/token, or key qualified by api/secret/private/access/
+signing/encryption/auth/client/app/master (joined forms such as apikey also
+qualify). Metadata suffixes such as file/path/endpoint/env/name/hint suppress
+name evidence. Only info excludes whitespace, environment-variable identifiers,
+lowercase snake_case identifiers and paths/common file extensions; Bearer
+headers check their payload. These exclusions do not suppress shape evidence.
+Only medium findings lead the build hint; info appends a review reminder to
+the existing risk guidance. Environment lookups and calls are not resolved. It is a coarse screen, not a
 complete secret scanner: use gitleaks or detect-secrets for a full scan.
 Obfuscation does not hide string values; they appear unchanged in delivered
 artifacts. Read secrets at runtime from environment variables or a secret

@@ -64,8 +64,7 @@ RULE_ID_PREFIX = "PYOBFUS/"
 
 # Fingerprint scheme version. v1 is stable for an unchanged finding at a stable
 # structural location; it is NOT stable across arbitrary source-line moves.
-# Assemble this public metadata label to avoid a name-only credential advisory.
-FINGERPRINT_KEY = "pyobfus" + "PreflightV1"
+FINGERPRINT_KEY = "pyobfusPreflightV1"
 
 # Severity -> SARIF result level.
 _LEVEL_BY_SEVERITY: Dict[str, str] = {

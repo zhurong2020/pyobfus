@@ -72,12 +72,86 @@ def _ignored(value: str) -> bool:
     )
 
 
+# Name-only evidence is intentionally narrow: metadata and ordinary keys are
+# common in real projects. Split word segments rather than matching substrings.
+_KEY_QUALIFIERS = {
+    "api",
+    "secret",
+    "private",
+    "access",
+    "signing",
+    "encryption",
+    "auth",
+    "client",
+    "app",
+    "master",
+}
+_METADATA_SUFFIXES = {
+    "file",
+    "path",
+    "dir",
+    "url",
+    "uri",
+    "endpoint",
+    "env",
+    "var",
+    "name",
+    "field",
+    "header",
+    "type",
+    "prefix",
+    "id",
+    "hint",
+    "label",
+    "message",
+    "msg",
+    "help",
+    "format",
+    "pattern",
+    "regex",
+}
+_FILE_SUFFIXES = (
+    ".json",
+    ".txt",
+    ".yaml",
+    ".yml",
+    ".toml",
+    ".ini",
+    ".env",
+    ".pem",
+    ".key",
+    ".crt",
+    ".db",
+    ".log",
+)
+
+
 def _sensitive_name(name: str) -> bool:
-    lower = name.lower()
+    # Include acronym boundaries (APIKey) and regular camelCase (apiKey).
+    segmented = re.sub(r"([A-Z]+)([A-Z][a-z])", r"\1_\2", name)
+    segmented = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", segmented)
+    words = re.split(r"[_-]+", segmented.lower().strip("_-"))
+    if words[-1] in _METADATA_SUFFIXES:
+        return False
     return (
-        any(word in lower for word in ("password", "passwd", "token", "secret"))
-        or lower.endswith("_key")
-        or lower.endswith(("apikey", "accesskey", "privatekey", "signingkey", "encryptionkey"))
+        any(word in {"password", "passwd", "secret", "token"} for word in words)
+        or any(
+            word == "key" and previous in _KEY_QUALIFIERS
+            for previous, word in zip(words, words[1:])
+        )
+        or any(word in {qualifier + "key" for qualifier in _KEY_QUALIFIERS} for word in words)
+    )
+
+
+def _ignored_info(value: str) -> bool:
+    """Exclude ordinary data only from weak name-based evidence, never shapes."""
+    return (
+        _ignored(value)
+        or any(char.isspace() for char in value)
+        or bool(re.fullmatch(r"[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*", value))
+        or bool(re.fullmatch(r"[a-z][a-z0-9]*(?:_[a-z0-9]+)+", value))
+        or value.startswith(("/", "./", "../", "~/"))
+        or value.lower().endswith(_FILE_SUFFIXES)
     )
 
 
@@ -144,13 +218,13 @@ def find_secret_literals(tree: ast.AST) -> List[Tuple[ast.Constant, str, str]]:
         if kind:
             findings.append((node, "medium", kind))
         elif any(
-            _sensitive_name(name)
+            (_sensitive_name(name) and not _ignored_info(node.value))
             or (
                 name.lower() == "authorization"
                 and node.value.lower().startswith("bearer ")
-                and not _ignored(node.value[7:])
+                and not _ignored_info(node.value[7:])
             )
             for name in names.get(node, [])
         ):
-            findings.append((node, "info", "Potential credential"))
+            findings.append((node, "info", "Credential-like name"))
     return findings
