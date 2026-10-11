@@ -170,10 +170,11 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 - [x] **既有缺陷 G · 目录构建的别名导入（优先，0.5.32 已存在，影响用户）**：`from pkg import scale as action` 或
       `from pkg.core import scale as action` 后调用 `action(...)` 即 NameError（局部改名开关无关）。参数改名设计审核中发现；
       应先于参数改名的解析器工作修复。**10-10 已合并 PR #66（`b56afe2`），随 0.6.1 发布**（保留显式本地别名，仅同步被导入符号名）；审核记录私有 `docs/internal/geo-2026-10/PR66_REVIEW_2026-10-10.md`。
-- [ ] **既有缺陷 I · 关闭局部改名时函数内别名覆盖模块级导入**（10-10 审 #66 发现，main 与 0.6.0 同样失败，低优先级）：
-      模块级 `from pkg.core import helper` + 函数内 `from pkg.core import scale as helper`，加 `--no-crossfile-local-names`
-      时模块级的 `helper(...)` NameError。根因：ImportedNameTransformer 的 `import_mappings` 按模块扁平存放，函数内导入覆盖模块级条目。
-      默认（开启局部改名）正确。
+- [ ] **既有缺陷 I · 函数内别名覆盖模块级导入**（10-10 审 #66 发现，低优先级）：
+      模块级 `from pkg.core import helper` + 函数内 `from pkg.core import scale as helper`，模块级的 `helper(...)` NameError。
+      根因：ImportedNameTransformer 的 `import_mappings` 按模块扁平存放，函数内导入覆盖模块级条目。
+      **10-11 更正**：原记「默认（开启局部改名）正确」不对——Claude 用 PyPI 版在干净 venv 实测，默认模式下 0.6.0（`I2` 未定义）
+      与 0.6.1/main（`helper` 未定义）都失败，`--no-crossfile-local-names` 同样失败。
 - [x] **既有缺陷 F · 单文件模式默认改参数但不改关键字调用（优先，0.5.32 已存在）**：同文件 `scale(1, factor=3)` 即 TypeError；
       含 `/`、`*args`、`**kwargs` 的签名还会静默绑错（关键字落进 `**kwargs`、参数取默认值）。无预设、safe、balanced、aggressive
       在 0.5.32 / 0.6.0 都是 `preserve_param_names=False`（框架预设与 library 为 True）。**10-10 已合并 PR #67（`ed8cceb`），随 0.6.1 发布**；审核记录私有 `docs/internal/geo-2026-10/PR67_REVIEW_2026-10-10.md`：
