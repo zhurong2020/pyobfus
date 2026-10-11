@@ -200,7 +200,9 @@ def test_module_alias_limitation_h(tmp_path, processes, local_names):
     baseline = processes([source / "entry.py"], source)
     assert baseline.returncode == 0, baseline.stderr
     output = tmp_path / "out"
-    flags = [] if local_names else ["--no-crossfile-local-names"]
+    flags = ["--no-crossfile-module-attributes"]
+    if not local_names:
+        flags.append("--no-crossfile-local-names")
     built = processes(["-m", "pyobfus", source, "-o", output, *flags])
     assert built.returncode == 0, built.stdout + built.stderr
     product = processes([output / "entry.py"], output)

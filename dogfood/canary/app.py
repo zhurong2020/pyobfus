@@ -1,10 +1,10 @@
 """Deterministic entry point: prints a stable result for outcome comparison."""
 
-from mathpkg import compute
+import mathpkg
 
 
 def main() -> int:
-    print(compute(6))
+    print(mathpkg.compute(6))
     return 0
 
 

@@ -7,6 +7,7 @@ the two-phase obfuscation process for multi-file projects.
 
 import ast
 import os
+import stat
 import tempfile
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
@@ -540,7 +541,7 @@ class CrossFileOrchestrator:
     def phase2_transform(
         self, input_dir: Path, output_dir: Path, progress_callback=None
     ) -> List[str]:
-        """Opt-in builds stage all workers' output until every plan succeeds."""
+        """Attribute-rewriting builds stage output until every plan succeeds."""
         if not self.config.crossfile_module_attributes:
             return self._phase2_transform(input_dir, output_dir, progress_callback)
         output_dir = Path(output_dir)
@@ -556,7 +557,13 @@ class CrossFileOrchestrator:
             for fi in self.files:
                 destination = output_dir / fi.relative_path
                 destination.parent.mkdir(parents=True, exist_ok=True)
-                os.replace(staging / fi.relative_path, destination)
+                staged = staging / fi.relative_path
+                if os.name != "nt" and destination.exists():
+                    # Replacing a staged inode must preserve the existing
+                    # output's read/write bits, just like the legacy writer.
+                    staged.chmod(stat.S_IMODE(destination.stat().st_mode))
+                    copy_executable_bits(fi.path, staged)
+                os.replace(staged, destination)
         return []
 
     def _phase2_transform(

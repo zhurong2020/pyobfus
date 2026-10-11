@@ -1,9 +1,9 @@
 # Cross-file module attribute access design
 
-Status: **accepted 2026-10-11** (Claude Code review; maintainer decisions recorded at the end). Implementation proceeds in the PRs listed below; each still needs review, and any release is a separate decision.
+Status: **implemented 2026-10-11** (PR #83 strict proofs/edits, PR #84 remaining v1 forms, and PR 3 default rollout pending Claude Code review). Any merge or release remains a separate maintainer decision.
 Date: 2026-10-11. Baseline: main
 `bc04a1ee8bd283b5e89ed7bb86be0c85d7afe2da`, Core 0.6.1, including the
-unreleased PR #80 advisories. This PR changes no product behavior or defaults.
+unreleased PR #80 advisories. The historical design baseline below precedes those implementation PRs.
 
 ## Background and evidence
 
@@ -401,7 +401,7 @@ form seen in the reported evidence instead of deferring it.
 Every PR is reviewed by Claude Code; the maintainer decides merge and any
 release separately. This design PR neither merges changes nor tags/publishes.
 
-## Design-only delivery boundary
+## Historical design-only delivery boundary
 
 Only this document and its MkDocs exclusion are proposed. Like
 CROSSFILE_PARAMETER_RENAMING_DESIGN.md, it remains outside product-site

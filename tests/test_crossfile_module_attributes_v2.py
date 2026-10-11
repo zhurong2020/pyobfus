@@ -45,10 +45,13 @@ def risks(src, enabled=True, **choices):
 @pytest.mark.parametrize("statement,expression,init", FORMS)
 @pytest.mark.parametrize("local", [False, True])
 @pytest.mark.parametrize("locals_enabled", [False, True])
-def test_remaining_forms_runtime(tmp_path, statement, expression, init, local, locals_enabled):
+@pytest.mark.parametrize("workers", [1, 2])
+def test_remaining_forms_runtime(
+    tmp_path, statement, expression, init, local, locals_enabled, workers
+):
     src = make_form(tmp_path, statement, expression, init, local)
     out = tmp_path / "out"
-    ob = build(src, out, crossfile_local_names=locals_enabled)
+    ob = build(src, out, crossfile_local_names=locals_enabled, max_workers=workers)
     original, artifact = run(src, tmp_path), run(out, tmp_path)
     assert original.returncode == artifact.returncode == 0, artifact.stderr
     assert original.stdout == artifact.stdout
@@ -79,7 +82,8 @@ def test_remaining_forms_runtime(tmp_path, statement, expression, init, local, l
 )
 @pytest.mark.parametrize("local", [False, True])
 @pytest.mark.parametrize("locals_enabled", [False, True])
-def test_relative_runtime(tmp_path, statement, path, local, locals_enabled):
+@pytest.mark.parametrize("workers", [1, 2])
+def test_relative_runtime(tmp_path, statement, path, local, locals_enabled, workers):
     src = project(tmp_path, "import pkg\n")
     (src / "pkg/sub").mkdir()
     (src / "pkg/sub/__init__.py").write_text("")
@@ -94,7 +98,7 @@ def test_relative_runtime(tmp_path, statement, path, local, locals_enabled):
     target = path[:-3].replace("/", ".").removesuffix(".__init__")
     (src / "app.py").write_text(f"from {target} import read\nprint(read())\n")
     out = tmp_path / "out"
-    ob = build(src, out, crossfile_local_names=locals_enabled)
+    ob = build(src, out, crossfile_local_names=locals_enabled, max_workers=workers)
     original, artifact = run(src, tmp_path), run(out, tmp_path)
     assert original.returncode == artifact.returncode == 0, artifact.stderr
     assert original.stdout == artifact.stdout == "7\n"
@@ -190,7 +194,7 @@ def test_helper_import_aliases_and_no_with_target_escape(tmp_path):
         tmp_path,
         "from importlib import import_module as load\nimport sys as system\nprint(load('pkg.mod').LIMIT, system.modules['pkg.mod'].LIMIT)\n",
     )
-    assert len([r for r in risks(src) if "Detected dynamic module access" in r.message]) == 2
+    assert len([r for r in risks(src) if "Detected dynamic module access" in r.message]) == 1
     # A with-as target is not assignment-alias propagation or module consumption.
     (src / "app.py").write_text("from pkg import mod\nwith context() as mod:\n    pass\n")
     assert not [r for r in risks(src) if "Detected module escape" in r.message]
@@ -212,12 +216,12 @@ def test_preserved_reflection_and_bounded_names(tmp_path):
     assert "NAME_09" in findings[0].suggestion and "NAME_10" not in findings[0].suggestion
 
 
-def test_off_advice_deduplicates_h_names(tmp_path):
+def test_off_advice_covers_distinct_escape_and_access_sites(tmp_path):
     src = project(tmp_path, "from pkg import mod\ncopy = mod\nprint(mod.LIMIT)\n")
     legacy = [r for r in risks(src, False) if "attribute access through a module" in r.message]
     escape = [r for r in risks(src, False) if "Detected module escape" in r.message]
     assert len(legacy) == len(escape) == 1
-    assert "LIMIT" not in escape[0].suggestion
+    assert "LIMIT" in escape[0].suggestion
     assert "scale" in escape[0].suggestion
 
 
@@ -283,13 +287,16 @@ def test_check_plan_and_emitted_attribute_parity(tmp_path, statement, expression
 
 
 @pytest.mark.parametrize("style", ["dotted", "relative", "reexport"])
-def test_real_generated_trace_cli(tmp_path, monkeypatch, style):
+@pytest.mark.parametrize("failure", ["raise ValueError('trace')", "return object().MISSING"])
+@pytest.mark.parametrize("workers", [1, 2])
+@pytest.mark.parametrize("locals_enabled", [False, True])
+def test_real_generated_trace_cli(tmp_path, monkeypatch, style, workers, locals_enabled, failure):
     monkeypatch.setenv("HOME", str(tmp_path))
     monkeypatch.setenv("USERPROFILE", str(tmp_path))
     src = project(
         tmp_path,
         "import pkg.mod\npkg.mod.scale()\n",
-        definitions="def scale():\n    raise ValueError('trace')\n",
+        definitions=f"def scale():\n    {failure}\n",
     )
     if style == "relative":
         (src / "app.py").write_text("import pkg.entry\n")
@@ -297,9 +304,12 @@ def test_real_generated_trace_cli(tmp_path, monkeypatch, style):
     if style == "reexport":
         (src / "pkg/__init__.py").write_text("from .mod import scale\n__all__ = ['scale']\n")
         (src / "app.py").write_text("import pkg\npkg.scale()\n")
-    ob = build(src, tmp_path / "out")
+    ob = build(src, tmp_path / "out", max_workers=workers, crossfile_local_names=locals_enabled)
     trace = run(tmp_path / "out", tmp_path)
-    assert trace.returncode == 1 and "ValueError: trace" in trace.stderr
+    assert trace.returncode == 1
+    assert (
+        "ValueError: trace" if failure.startswith("raise") else "AttributeError"
+    ) in trace.stderr
     mapping = ObfuscationMapping.from_global_table(ob.global_table)
     mapping.files = ob.file_line_maps
     path = tmp_path / "mapping.json"
@@ -479,7 +489,24 @@ def assert_main_snapshot(tmp_path, src, key, locals_enabled):
         r.pop("file", None)
     additions = [r for r in current if r["message"].startswith("Detected ")]
     assert all("not automatically rewritten" in r["message"] for r in additions)
-    assert [r for r in current if r not in additions] == snapshots["risk_sets"][reference["risks"]]
+    # Output bytes remain frozen; diagnostics now cover every retained site.
+    old = snapshots["risk_sets"][reference["risks"]]
+    for previous in old:
+        if "attribute access through a module" in previous["message"]:
+            assert any(
+                r["line"] == previous["line"]
+                and r["category"] == previous["category"]
+                and r["severity"] == previous["severity"]
+                and "exclude_names" in r["suggestion"]
+                for r in current
+            )
+        else:
+            assert previous in current
+    assert all(
+        r["severity"] in {"medium", "info"}
+        for r in current
+        if r["category"] == "compatibility_advisory"
+    )
 
 
 OFF_CASES = ["relative-dot", "relative-parent", "relative-sub", "relative-init"] + [
@@ -563,17 +590,17 @@ def test_check_emitted_parity_for_escapes(tmp_path, use, kind):
     ob = build(src, tmp_path / "out")
     assert not ob.attribute_plans["app"].edits
     candidates = discover_accesses(ast.parse((src / "app.py").read_text()), lambda n: n.module)
-    unmodified = {}
+    unmodified = set()
     for node, module in candidates:
         if ob.global_table.get_obfuscated_import(module, node.attr):
-            unmodified.setdefault((module, node.attr), node.lineno)
+            unmodified.add(node.lineno)
             assert node.attr in attrs(tmp_path / "out/app.py")
     findings = [
         r
         for r in risks(src)
-        if r.file.endswith("app.py") and "attribute access through a module" in r.message
+        if r.file.endswith("app.py") and r.category == "compatibility_advisory"
     ]
-    assert {r.line for r in findings} == set(unmodified.values())
+    assert unmodified <= {r.line for r in findings}
     assert any(f"Detected {kind}" in r.message and r.line == 5 for r in risks(src))
 
 

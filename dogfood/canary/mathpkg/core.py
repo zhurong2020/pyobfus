@@ -1,8 +1,8 @@
 """Cross-file consumer of the leaf helpers."""
 
-from .helpers import scale
+import mathpkg.helpers as helpers
 
 
 def compute(x: int) -> int:
-    result = scale(x)
+    result = helpers.scale(x)
     return result + 1

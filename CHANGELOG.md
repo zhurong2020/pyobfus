@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Directory builds now enable `crossfile_module_attributes` by default, across
+  Community/Pro presets and CLI/MCP entry points. Existing users with eligible
+  module-object reads/calls receive changed artifact bytes and mappings.
+  **After upgrading, rebuild the complete project and regenerate both artifacts
+  and mapping. Old mappings cannot restore the new artifacts.** Incremental
+  cache signatures include the effective switch value and reject old-default
+  output. Use `--no-crossfile-module-attributes` or YAML
+  `obfuscation.crossfile_module_attributes: false` to restore legacy output.
+  Unsupported uses still require `exclude_names`; run directory `--check`
+  before distributing the rebuilt project.
+
 - Directory discovery now prunes virtual environments identified by `pyvenv.cfg`
   or `conda-meta/`, plus `site-packages`, `dist-packages`, `node_modules`,
   `__pycache__`, `.git`, `.hg`, `.svn`, `.tox`, `.nox`, `.mypy_cache`,
@@ -23,34 +34,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Opt-in `crossfile_module_attributes: true` and
-  `--crossfile-module-attributes` fix reads/calls through statically proved,
-  unconditional module imports at module level and inside functions:
-  `from pkg import mod; mod.X`, `import pkg.mod as alias; alias.X`,
-  `import pkg.sub.core; pkg.sub.core.X`, package-relative module imports,
-  and static package re-exports (with or without literal `__all__`). Unaliased
-  re-exports share the defining module's emitted name; explicit aliases retain
-  their local spelling. The default remains false. Conditional imports,
-  competing bindings, executable/dynamic initializers, mutations, escapes and
-  reflection remain unsupported; preserve affected names with `exclude_names`.
-  `--check` suppresses H advice only for scheduled edits.
+- Proved module-attribute reads/calls now use the defining export's emitted
+  identifier, including unconditional absolute, dotted, relative and
+  function-local imports and static package re-exports. Explicit aliases retain
+  their spelling. Directory `--check` suppresses H advice for scheduled edits
+  and reports retained unsafe project-module accesses, competing stores/deletes,
+  literal dynamic-import results, escapes, reflection and mutation with medium
+  `compatibility_advisory` preservation advice. Already preserved hazard names
+  receive informational mitigation; single-file checks do not add H advice.
+  Conditional/ambiguous bindings, assignment aliases, dynamic access, executable
+  initializers, namespace packages and cycles still need `exclude_names` or
+  direct symbol imports. Detected hazards invalidate the affected module's
+  proofs; unknown dynamic targets require an explicit API preservation boundary.
 
-- Directory `--check` reports module-object escape, reflection, recognizable
-  dynamic module access and mutation as medium `compatibility_advisory`
-  findings, whether module attribute rewriting is enabled or disabled. Advice
-  lists up to ten affected export names and recommends `exclude_names` or direct
-  symbol imports. Already preserved names receive informational mitigation;
-  legacy H findings are not duplicated when the option is off. Detected hazards
-  conservatively invalidate that module's attribute proofs across the project.
-  Computed dynamic targets require an explicit plugin/API boundary and invalidate
-  all selected module proofs; allocated names without proved source bindings
-  cannot authorize edits.
-
-- `--check` adds medium `compatibility_advisory` findings for directory builds
-  accessing renamed project symbols through module objects, and for
-  `enum.global_enum` decorators that inject module-level names at runtime.
-  Suggestions cover direct symbol imports and `exclude_names`; transformation
-  behavior, exit codes and medium-finding AI hints are unchanged.
+- `--check` reports `enum.global_enum` module-name injection as a medium
+  `compatibility_advisory`; preserve injected names with `exclude_names`.
 
 - `--unmap` restores original relative file paths and statement-level line numbers
   in standard CPython traceback frames, retaining output locations for comparison.
