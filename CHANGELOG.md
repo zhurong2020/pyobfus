@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `--check` adds medium `compatibility_advisory` findings for directory builds
+  accessing renamed project symbols through module objects, and for
+  `enum.global_enum` decorators that inject module-level names at runtime.
+  Suggestions cover direct symbol imports and `exclude_names`; transformation
+  behavior, exit codes and medium-finding AI hints are unchanged.
+
 - `--unmap` restores original relative file paths and statement-level line numbers
   in standard CPython traceback frames, retaining output locations for comparison.
   JSON adds `frames` and `line_map`. Rebuild and save a mapping with a release

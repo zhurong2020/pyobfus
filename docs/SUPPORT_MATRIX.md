@@ -73,11 +73,29 @@ imports keep their original symbol and alias names. Unaliased imports retain
 the existing cross-file naming rules. Execution evidence:
 `integration_tests/test_crossfile_import_alias.py`.
 
-**Limitation H:** `import pkg.core as engine` binds the module alias correctly,
-but `engine.scale()` still uses the original attribute spelling. If `scale`
-was renamed in the target module, execution raises `AttributeError`.
-Module-object attribute rewriting remains unsupported; preserve those names
-with `exclude_names`. The same test file locks this current limitation.
+**Limitation H:** Directory builds rename module-level symbols and direct
+`from pkg.core import LIMIT` imports, but leave attributes in `core.LIMIT`
+(after `from pkg import core`), `engine.scale()` (after
+`import pkg.core as engine`) and `pkg.core.scale()` (after `import pkg.core`)
+unchanged. If the target symbol is renamed, execution raises `AttributeError`.
+Use `from pkg.core import LIMIT` and reference `LIMIT` directly, or preserve the
+symbol with `exclude_names`. Directory `--check` reports a medium
+`compatibility_advisory` for statically imported project modules whose accessed
+symbol appears in the build's rename table; single-file checks do not report it.
+This check skips reassigned bindings and does not resolve dynamic or star
+imports. If any project file fails to parse, the export plan is unavailable and
+this advisory is skipped; fix parse errors and re-run `--check`.
+
+**Limitation C:** `@enum.global_enum` (including
+`from enum import global_enum; @global_enum`) injects enum member names into the
+module namespace at runtime. Obfuscation can rename references and `__all__`
+entries while the injected names retain their original spelling, causing
+`NameError`. Add the enum's member names to `exclude_names`. `--check` reports a
+medium `compatibility_advisory` naming the decorated class and listing static
+member candidates (up to ten, with a count of additional names). Only the known
+`enum.global_enum` decorator is detected; other runtime injection mechanisms
+need separate analysis. Neither advisory changes transformation behavior,
+exit-code rules or the existing medium-finding AI hint.
 
 Single-file builds preserve the spelling of a function or class whose lexical
 parent is a function (including async functions and methods), even inside
