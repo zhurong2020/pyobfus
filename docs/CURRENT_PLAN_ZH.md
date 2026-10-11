@@ -1,5 +1,7 @@
 # pyobfus 当前计划
 
+**2026-10-11 下一版定为 Core 0.7.0，10-13 再决定是否发**：维护者同意一次发全部 `[Unreleased]`、版本号 0.7.0（默认产物变化，沿用 0.6.0 先例）。发版前准备已做：dogfood A/B/C/D 全过；新 wheel 在 `examples/multifile` 与动机私有项目副本上验证（127 处 `config.X` 全部改写、`--check` 0 条）；自混淆 `pyobfus/` 新旧两版同样失败（`__init__` 的 `try: __version__ = version(...)` 让包初始化不可证明），非退步，新版 `--check` 全部提示，登记为 H PR 4 候选。发版清单与文案草稿在私有 `docs/internal/release-0.7.0/RELEASE_PREP.md`。
+
 **2026-10-11 限制 H 实现 PR 3（#85 合并，`3759000`，默认开启，未发版）**：Codex 实现补提示 + 默认开启 + 文档，Claude 审 3 轮：① `pkg.a.core.X` 链式访问无提示、Codex 擅改 canary（已恢复，canary 须 N-1 也能构建）；② **用动机私有项目复测发现**导入前有 `sys.path.insert`/`logging` 语句时函数体访问一律不改（PR 1 起即有，PR 1 审核漏测，当时「29 处直接修好」的说法不准确）→ 放宽为「函数定义在导入之后且无竞争写入」；③ `globals()[...]=`/`setattr(sys.modules[__name__],…)` 替换导入名时被错误改写（PR 1 起即有）→ 整体拒绝。终版：66 个对抗样例无一比关闭差、失败处均有提示；关闭开关 43 个 fixture 与 main 逐字节一致；`-j1`/`-j4` 一致；缓存随默认值失效；三种写法真实 traceback `--unmap`（CLI+MCP）全对；私有项目 127 处 `config.X` 全部改写；CI 23 项全绿。Core `[Unreleased]` 现含默认行为变化，**发版需维护者批准**，发版说明要求用户完整重建。
 
 **2026-10-11 限制 H 实现 PR 2（#84 合并，`b2b0c65`，仍 opt-in、默认关闭，未发版）**：Codex 无头实现 dotted import、相对导入、包 re-export 与 escape 提示（赋值别名、传参、反射、`sys.modules`、写入）；自查中补了同名文件/包目录冲突的拒绝。Claude 独立审核：49 个对抗样例开关打开无一比关闭差、正向写法全部改写且运行一致；43 个 fixture 关闭时产物与 main 逐字节一致、提示只新增 escape 类；`-j1`/`-j4` 一致；dotted/相对/再导出三种真实 traceback 经 CLI `--unmap` 与 MCP 还原文件、行号、函数名全对；CI 20 项全绿。遗留：名字被 `del`/`for`/`except as`/局部赋值占用时无提示（main 同样），记入 TODO，PR 3 前补。下一步 PR 3：默认开启。
