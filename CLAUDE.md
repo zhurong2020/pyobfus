@@ -14,7 +14,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### 🟢 2026-10-10 — Core 0.6.1 已发布（G #66 + F 方案 A #67；冷启动先读 `docs/CURRENT_PLAN_ZH.md` 顶部 10-10 段）
+### 🟢 2026-10-11 — 限制 H 三个实现 PR 合并、默认开启；下一版 0.7.0 待 10-13 拍板（冷启动先读 `docs/CURRENT_PLAN_ZH.md` 顶部 10-11 段与 `docs/TODO.md`「下一版 Core 0.7.0」）
+
+### 🟢 2026-10-10 — Core 0.6.1 已发布（G #66 + F 方案 A #67）
 
 ### 🟢 2026-10-08 — Core 0.6.0 已发布
 
@@ -77,7 +79,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   10-25 复盘用 09-27→10-06 窗口）**：静默 4 周（10-25 前不发 Core）→ 每月一版
   → 只做有触发的事 → 每周一巡检；全文 `docs/TODO.md`「节奏」段。**查进度固定动作：进度 + 下载量
   （`python scripts/download_snapshot.py`）+ Gmail（`/pyobfus-inbox`），三样一起给**，缺一样不算查过。
-- 「当前状态一句话」：`0.6.1` 是最新 Core（10-10）；Core `[Unreleased]` 为空；下一版按月度节奏，发版需批准。逐轮细节见 `docs/CURRENT_PLAN_ZH.md` 10-07 段。
+- 「当前状态一句话」：`0.6.1` 是最新 Core（10-10）；main 的 Core `[Unreleased]` 已积累 10-11 一整批（H 模块属性改写**默认开启**、跳过环境目录、密钥提示、`--unmap` 行号、shebang/编码、PEP 695 修复），维护者定下一版为 **0.7.0**，10-13 决定是否发（发版需批准）；准备清单私有 `docs/internal/release-0.7.0/RELEASE_PREP.md`。逐轮细节见 `docs/CURRENT_PLAN_ZH.md` 10-11 段。
 
 ## 历史进展（已下沉）
 
