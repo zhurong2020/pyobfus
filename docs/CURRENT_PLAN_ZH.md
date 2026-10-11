@@ -1,5 +1,11 @@
 # pyobfus 当前计划
 
+**2026-10-11 缺陷 J 修复（PR #77 合并，未发版；维护者定立即修、发版略缓）**：输出保留原文件的 shebang 与 UTF-8 编码声明（构建标记、
+trace marker 插在其后），源文件可执行则输出复制执行位；非 UTF-8 编码声明不保留（输出一律 UTF-8），源文件改按 Python 自身规则解码
+（认编码声明与 BOM，此前一律按 UTF-8 读）。Claude 实测：shebang 脚本混淆后可直接 `./out.py` 运行、latin-1 文件输出与原版一致、
+CRLF、`--trace-marker`、目录与 `--no-cross-file`、`--unmap` 行号（含 shebang 偏移）全部正确；审核中自修两处：单文件遇非法编码报
+「Unexpected error」改回 ParseError，`--verbose` 提示误写成中文改为英文。
+
 **2026-10-11 `--unmap` 行号还原 PR2（#76 合并，未发版；P1 两步完成）**：CLI `--unmap` 与 MCP `unmap_stack_trace` 把标准 CPython 帧改写为
 原始相对路径 + 语句级行号，并保留 `[obfuscated: 路径:行]`；JSON 只加 `frames`、`line_map`；摘录行照 0.6.1 还原名字，`^` 指示行不动；
 旧 mapping 只还原名字并提示用新版重建。Claude 审三轮：①摘录行不还原名字（相对 0.6.1 退步，源于说明措辞）②第三方同名文件帧被误认成用户文件
