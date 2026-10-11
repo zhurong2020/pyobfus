@@ -83,15 +83,10 @@ class ExportedNameTransformer(ast.NodeTransformer):
             # Check if this class should be renamed
             obfuscated_name = self.name_mappings.get(node.name)
             if obfuscated_name:
-                # Create new ClassDef with obfuscated name
-                new_node = ast.ClassDef(
-                    name=obfuscated_name,
-                    bases=node.bases,
-                    keywords=node.keywords,
-                    body=node.body,
-                    decorator_list=node.decorator_list,
-                )
-                ast.copy_location(new_node, node)
+                # Rename in place: rebuilding the node dropped fields such as
+                # PEP 695 type_params (Python 3.12+) and source-line metadata.
+                node.name = obfuscated_name
+                new_node = node
                 self.definitions_renamed += 1
 
                 # Visit children
@@ -124,15 +119,10 @@ class ExportedNameTransformer(ast.NodeTransformer):
             # Check if this function should be renamed
             obfuscated_name = self.name_mappings.get(node.name)
             if obfuscated_name:
-                # Create new FunctionDef with obfuscated name
-                new_node = ast.FunctionDef(
-                    name=obfuscated_name,
-                    args=node.args,
-                    body=node.body,
-                    decorator_list=node.decorator_list,
-                    returns=node.returns,
-                )
-                ast.copy_location(new_node, node)
+                # Rename in place: rebuilding the node dropped fields such as
+                # PEP 695 type_params (Python 3.12+) and type_comment.
+                node.name = obfuscated_name
+                new_node = node
                 self.definitions_renamed += 1
 
                 # Visit children
@@ -165,15 +155,10 @@ class ExportedNameTransformer(ast.NodeTransformer):
             # Check if this function should be renamed
             obfuscated_name = self.name_mappings.get(node.name)
             if obfuscated_name:
-                # Create new AsyncFunctionDef with obfuscated name
-                new_node = ast.AsyncFunctionDef(
-                    name=obfuscated_name,
-                    args=node.args,
-                    body=node.body,
-                    decorator_list=node.decorator_list,
-                    returns=node.returns,
-                )
-                ast.copy_location(new_node, node)
+                # Rename in place: rebuilding the node dropped fields such as
+                # PEP 695 type_params (Python 3.12+) and type_comment.
+                node.name = obfuscated_name
+                new_node = node
                 self.definitions_renamed += 1
 
                 # Visit children
