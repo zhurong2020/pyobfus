@@ -28,6 +28,21 @@ than to win an argument. Where a competitor is genuinely stronger, it says so.
 | **SOURCEdefender** | Commercial | Encrypted `.pye` files + import hook | Encrypting selected modules at rest |
 | **Online obfuscators** | Free / freemium | Browser-hosted transformation | Non-sensitive, one-off scripts |
 
+## PyInstaller, Nuitka and obfuscators: which problem each solves
+
+These tools are often compared as if they were alternatives. They do
+different jobs and are usually combined.
+
+| Tool | Main job | Does it hide your source? |
+|---|---|---|
+| **PyInstaller** | Bundles your code and a Python interpreter into one executable | No. The bundled bytecode can be extracted and decompiled with original names ([details](PYINSTALLER_COOKBOOK.md#does-pyinstaller-protect-your-source-code)). |
+| **Nuitka / Cython** | Compiles Python to C and native code | Partly. Python code is no longer stored as bytecode, but function and class names and string literals remain in the binary ([measurement](COMPILED_PACKAGING_COOKBOOK.md#should-i-obfuscate-before-compiling-with-nuitka)). |
+| **Obfuscator** (pyobfus, PyArmor, …) | Makes the code itself harder to understand | Partly. pyobfus renames identifiers across the project, and the output is still Python. PyArmor encrypts bytecode and needs its runtime. |
+
+A common setup is to obfuscate first and then package with PyInstaller or
+compile with Nuitka. None of these tools makes an embedded API key safe; keep
+secrets on a server.
+
 ## Head-to-head
 
 Each tool gets its own page, so a page answers exactly the question you arrived

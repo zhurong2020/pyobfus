@@ -1,5 +1,12 @@
 # pyobfus 当前计划
 
+**2026-10-11 AI 基线衍生的文档三项（免发版；README 部分随下次发版到 PyPI）**：新增 `docs/NETWORK_BEHAVIOR.md`，按 0.6.1 源码列出仅有的三处联网
+（`--check` 查 PyPI 依赖名、`pyobfus-trial start --email`、Pro 许可证验证），无遥测，附可复跑的核验脚本；README「local-first」、落地页、
+卖前指南 FAQ、llms.txt、文档站导航均已链接。PyInstaller cookbook 加「Does PyInstaller protect your source code?」（含 PyInstaller 6.0
+移除 `--key` 的事实，已对照其 CHANGES.rst），compiled cookbook 加「Should I obfuscate before compiling with Nuitka?」回应「改名会被 Nuitka
+抵消」的说法，COMPARISON 加三类工具分工表；文档站首页加 FAQ（正当用途、联网、与 pyobfuscate / PyObfuscator / python-obfuscator 无关）。
+待维护者决定的 CLI `--check` 默认离线问题留在 `TODO.md`。
+
 **2026-10-11 AI 回答基线（首篇 DEV 发出前，维护者手动 + Chrome 插件采集）**：12 个通用问题 + 3 个品牌问题。
 Perplexity（联网）提及 6/12、首选 3/12；ChatGPT 联网 0/12（仅 1 次被引为来源），但点名问时 3/3 描述准确（一处引用了 10-07 的旧快照）；
 ChatGPT 不联网 0/12 且不认识 pyobfus；Gemini 因出口 IP 被 Google 定位为中国记 unavailable，回常住地后补。

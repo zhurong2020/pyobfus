@@ -13,6 +13,19 @@ compete: pyobfus renames identifiers and (on Pro) encrypts strings;
 PyInstaller bundles a Python interpreter plus your code into one
 executable. Neither replaces the other.
 
+## Does PyInstaller protect your source code?
+
+Not by itself. PyInstaller is a packaging tool: it puts your compiled bytecode
+and a Python interpreter into one executable so the customer does not need
+Python installed. Public tools such as `pyinstxtractor` unpack that archive,
+and decompilers turn the bytecode back into readable Python with your
+original function, class and variable names. PyInstaller 6.0 also removed the
+old `--key` bytecode-encryption option, which was easy to undo anyway.
+
+If you want the unpacked code to be harder to read, obfuscate it before you
+bundle it. That is the workflow below. Keep secrets such as API keys out of
+the executable whichever way you build it.
+
 ## The workflow
 
 ```bash
