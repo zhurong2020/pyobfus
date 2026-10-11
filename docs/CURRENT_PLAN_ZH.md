@@ -1,5 +1,11 @@
 # pyobfus 当前计划
 
+**2026-10-11 `--unmap` 行号还原 PR1（#75 合并 `dda9504`，未发版）**：mapping 新增可选 `files` 段（顶层 version 仍为 1，维护者定），
+记录产物文件 → 原始文件与语句级行号表，`ObfuscationMapping.resolve_location()` 查询；CLI/MCP 输出尚未使用（PR2）。Claude 独立实测：
+单文件 4 种构建 24 帧 + 目录 7 帧全部还原正确，PyPI 0.6.1 可读新 mapping、marker_id 相同、产物与 0.6.1 逐字节相同。
+审核中发现 PR 让 `--no-cross-file` 目录构建写出名字互相覆盖的 mapping（0.6.1 是静默不写），改为不写并警告，正式支持登记 P2；
+另发现既有缺陷 J（输出丢 shebang），已登记。
+
 **2026-10-11 `--check` 写死密钥提示（PR #74 合并 `2bd69f3`，未发版）**：Codex 无头实现、Claude 两轮审核。新类别 `hardcoded_secret`：
 常见 token 形状（与 pre-commit 钩子同列表 + Stripe）报 medium，敏感变量名 + 字面量报 info；只报位置不回显值（文本/JSON/SARIF 已核）；退出码不变；
 只有 medium 才把 `ai_hint` 改成「先移出密钥」。第 1 轮按名字子串匹配误报过宽（10 个反例全报，Codex 还把自家常量改成拼接躲检测），
