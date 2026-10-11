@@ -34,6 +34,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Single-file and directory outputs preserve the original shebang and UTF-8
+  encoding declaration and copy POSIX executable bits. Non-UTF-8 declarations
+  are dropped because generated files are written as UTF-8; verbose builds
+  explain the omission. Source decoding follows PEP 263, including UTF-8 BOMs.
+  Line maps include the restored prologue and subsequent trace markers.
+
 - Directory builds combining `--save-mapping` with `--no-cross-file` now warn
   that no mapping is written, instead of silently omitting it. Independent
   per-file renaming can collide and needs file-specific name tables.
