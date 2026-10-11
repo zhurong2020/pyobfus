@@ -17,6 +17,7 @@ exclude_docs: |
   CROSSFILE_LOCAL_NAMES_REVIEW.md
   # Unimplemented proposal; reviewed in GitHub before product documentation.
   CROSSFILE_PARAMETER_RENAMING_DESIGN.md
+  CROSSFILE_MODULE_ATTRIBUTE_DESIGN.md
 
 repo_name: zhurong2020/pyobfus
 repo_url: https://github.com/zhurong2020/pyobfus
