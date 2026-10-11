@@ -174,6 +174,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       `ast.unparse` 不保留注释，原文件第一行 `#!/usr/bin/env python3` 在加构建标记之前就没了，混淆后的脚本不能再 `./script.py` 直接执行；
       CHANGELOG 0.5.23 写的「标记 prologue-safe，shebang 保持第一行」只对标记本身成立。修法：生成前记下原文件的 shebang / 编码行，
       写盘时放回最前（标记仍插在其后）；行号表（#75）的偏移要一起处理。回归：单文件、目录、`--trace-marker`、Windows 换行。
+      **PR #77 待审**：共用 prologue 恢复与 PEP 263 读取，UTF-8 声明保留、其它声明省略并在 verbose 说明；复制 POSIX 执行位，恢复后的最终文本参与行表，增量签名包含执行位。
 - [ ] **既有缺陷 I · 关闭局部改名时函数内别名覆盖模块级导入**（10-10 审 #66 发现，main 与 0.6.0 同样失败，低优先级）：
       模块级 `from pkg.core import helper` + 函数内 `from pkg.core import scale as helper`，加 `--no-crossfile-local-names`
       时模块级的 `helper(...)` NameError。根因：ImportedNameTransformer 的 `import_mappings` 按模块扁平存放，函数内导入覆盖模块级条目。
