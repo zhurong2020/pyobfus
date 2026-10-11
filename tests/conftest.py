@@ -16,6 +16,9 @@ import pytest
 def isolated_device_id(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     import pyobfus.trial as trial
 
+    # CLI/generated-code subprocesses must inherit an isolated home too.
+    monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("USERPROFILE", str(tmp_path))
     state_dir = tmp_path / ".pyobfus"
     monkeypatch.setattr(trial, "TRIAL_DIR", state_dir)
     monkeypatch.setattr(trial, "TRIAL_FILE", state_dir / "trial.json")

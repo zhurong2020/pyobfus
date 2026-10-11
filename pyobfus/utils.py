@@ -7,6 +7,7 @@ Provides helper functions for file filtering, path matching, etc.
 from pathlib import Path
 from typing import List, Optional
 import fnmatch
+import os
 
 
 def should_exclude_file(
@@ -66,35 +67,72 @@ def should_exclude_file(
     return False
 
 
+ENVIRONMENT_TOOL_DIRS = frozenset(
+    {
+        "site-packages",
+        "dist-packages",
+        "node_modules",
+        "__pycache__",
+        ".git",
+        ".hg",
+        ".svn",
+        ".tox",
+        ".nox",
+        ".mypy_cache",
+        ".pytest_cache",
+        ".ruff_cache",
+    }
+)
+
+
+def format_skipped_directories(directories: List[str]) -> str:
+    """Summarize pruned subtrees without enumerating their files."""
+    sample = ", ".join(directories[:10]) or "none"
+    suffix = ", ..." if len(directories) > 10 else ""
+    return f"Skipped environment/tool directories: {len(directories)} ({sample}{suffix})"
+
+
 def filter_python_files(
-    directory: Path, exclude_patterns: Optional[List[str]] = None
+    directory: Path,
+    exclude_patterns: Optional[List[str]] = None,
+    *,
+    skip_environment_dirs: bool = True,
+    skipped_directories: Optional[List[str]] = None,
 ) -> List[Path]:
+    """Discover sorted Python files, pruning environment/tool subtrees by default.
+
+    The explicit input root is always traversed. Symlink directories are not
+    followed, matching Path.rglob's behavior. ``skipped_directories``, when
+    supplied, receives sorted relative POSIX paths of pruned subtree roots;
+    files inside them are never enumerated, even for exclusion reporting.
+    Set ``skip_environment_dirs=False`` to restore legacy discovery.
     """
-    Find all Python files in a directory, excluding specified patterns.
-
-    Args:
-        directory: Directory to search
-        exclude_patterns: List of glob patterns to exclude
-
-    Returns:
-        List[Path]: List of Python files to process
-    """
-    if exclude_patterns is None:
-        exclude_patterns = []
-
-    # Sorted, not raw rglob order: rglob yields directory-entry order, which
-    # varies by filesystem and machine. Callers use this list to assign
-    # obfuscated names, to build the incremental-cache signature and to order
-    # manifest entries, so an unstable order makes identical inputs produce
-    # different builds on different machines.
-    all_py_files = sorted(directory.rglob("*.py"))
-
-    # Filter out excluded files
-    filtered_files = [
-        f for f in all_py_files if not should_exclude_file(f, exclude_patterns, directory)
-    ]
-
-    return filtered_files
+    files: List[Path] = []
+    skipped: List[str] = []
+    for current, dirs, names in os.walk(directory, topdown=True, followlinks=False):
+        parent = Path(current)
+        if skip_environment_dirs:
+            kept = []
+            for name in dirs:
+                child = parent / name
+                if (
+                    name in ENVIRONMENT_TOOL_DIRS
+                    or (child / "pyvenv.cfg").is_file()
+                    or (child / "conda-meta").is_dir()
+                ):
+                    skipped.append(child.relative_to(directory).as_posix())
+                else:
+                    kept.append(name)
+            dirs[:] = kept
+        for name in names:
+            if name.endswith(".py"):
+                path = parent / name
+                if not should_exclude_file(path, exclude_patterns, directory):
+                    files.append(path)
+    if skipped_directories is not None:
+        skipped_directories.extend(sorted(skipped))
+    # Stable ordering controls name assignment, manifests and cache signatures.
+    return sorted(files)
 
 
 def count_total_lines(files: List[Path]) -> int:

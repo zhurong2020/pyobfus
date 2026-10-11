@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Directory discovery now prunes virtual environments identified by `pyvenv.cfg`
+  or `conda-meta/`, plus `site-packages`, `dist-packages`, `node_modules`,
+  `__pycache__`, `.git`, `.hg`, `.svn`, `.tox`, `.nox`, `.mypy_cache`,
+  `.pytest_cache` and `.ruff_cache`. This avoids scanning or obfuscating bundled
+  dependencies and tool state. Checks report skipped directory paths and counts;
+  verbose builds show a summary. Set `obfuscation.skip_environment_dirs: false`
+  in YAML to restore legacy discovery. Explicit input roots and single files
+  remain processable; ordinary `build`, `dist`, `env` and `venv` source directories
+  remain included unless they contain an environment marker. `--init` now uses
+  this setting instead of excluding `venv`, `build` and `dist` by name.
+
 ### Added
 
 - `--check` adds medium `compatibility_advisory` findings for directory builds

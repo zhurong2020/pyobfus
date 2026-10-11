@@ -601,7 +601,11 @@ class CrossFileOrchestrator:
             List of FileInfo objects
         """
         # Use existing utility to find Python files
-        python_files = filter_python_files(input_dir, self.config.exclude_patterns)
+        python_files = filter_python_files(
+            input_dir,
+            self.config.exclude_patterns,
+            skip_environment_dirs=self.config.skip_environment_dirs,
+        )
 
         file_infos = []
         for file_path in python_files:

@@ -19,6 +19,7 @@ class ObfuscationConfig:
     Attributes:
         level: Obfuscation level ('community' or 'pro')
         exclude_patterns: File patterns to exclude (glob syntax)
+        skip_environment_dirs: Prune environment/tool subtrees during discovery (default: True)
         exclude_names: Names to preserve (builtins, imports, etc.)
         name_prefix: Prefix for obfuscated names (default: 'I')
         remove_docstrings: Remove docstrings (default: True)
@@ -28,6 +29,7 @@ class ObfuscationConfig:
 
     level: str = "community"
     exclude_patterns: List[str] = field(default_factory=lambda: ["test_*.py", "**/tests/**"])
+    skip_environment_dirs: bool = True
     exclude_names: Set[str] = field(
         default_factory=lambda: {
             # Python builtins

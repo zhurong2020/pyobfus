@@ -50,6 +50,9 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
+from pyobfus.config import ObfuscationConfig
+from pyobfus.utils import filter_python_files
+
 from pyobfus_mcp._security import (
     PathScopeError,
     secure_tool,
@@ -219,6 +222,7 @@ def _count_pattern_matches(
     *,
     max_files: int = 200,
     max_bytes_per_file: int = 200_000,
+    config: Optional[ObfuscationConfig] = None,
 ) -> int:
     """Count regex-pattern occurrences across `.py` files under target.
 
@@ -229,7 +233,11 @@ def _count_pattern_matches(
     if target.is_file():
         files: List[Path] = [target] if target.suffix == ".py" else []
     elif target.is_dir():
-        files = sorted(target.rglob("*.py"))[:max_files]
+        files = filter_python_files(
+            target,
+            config.exclude_patterns if config else None,
+            skip_environment_dirs=config.skip_environment_dirs if config else True,
+        )[:max_files]
     else:
         return 0
 
@@ -245,7 +253,11 @@ def _count_pattern_matches(
 
 
 def _count_sensitive_literals(
-    target: Path, *, max_files: int = 200, max_bytes_per_file: int = 200_000
+    target: Path,
+    *,
+    max_files: int = 200,
+    max_bytes_per_file: int = 200_000,
+    config: Optional[ObfuscationConfig] = None,
 ) -> int:
     """Count likely-sensitive (credential-shaped) string-literal occurrences.
 
@@ -257,11 +269,16 @@ def _count_sensitive_literals(
         _SENSITIVE_LITERAL_PATTERNS,
         max_files=max_files,
         max_bytes_per_file=max_bytes_per_file,
+        config=config,
     )
 
 
 def _count_pii_literals(
-    target: Path, *, max_files: int = 200, max_bytes_per_file: int = 200_000
+    target: Path,
+    *,
+    max_files: int = 200,
+    max_bytes_per_file: int = 200_000,
+    config: Optional[ObfuscationConfig] = None,
 ) -> int:
     """Count likely-PII (email / IPv4 / GUID / home-directory-path) occurrences.
 
@@ -273,6 +290,7 @@ def _count_pii_literals(
         _PII_LITERAL_PATTERNS,
         max_files=max_files,
         max_bytes_per_file=max_bytes_per_file,
+        config=config,
     )
 
 
@@ -419,6 +437,7 @@ def check_obfuscation_risks(
         "check_dependencies": True,
         "offline": not verify_dependencies_online,
     }
+    config = None
     if use_project_config:
         from pyobfus.core.config_resolve import resolve_effective_config
 
@@ -446,8 +465,8 @@ def check_obfuscation_risks(
     # features (AES-256 string encryption, anti-debugging) would protect.
     # P2-12: also scan for PII-shaped literals (emails/IPv4/GUIDs/home-dir
     # paths) -- a distinct signal class from credential-shaped literals.
-    sensitive_count = _count_sensitive_literals(target)
-    pii_count = _count_pii_literals(target)
+    sensitive_count = _count_sensitive_literals(target, config=config)
+    pii_count = _count_pii_literals(target, config=config)
     high_sev = int((payload.get("severity_counts") or {}).get("high", 0))
     pro_value = _pro_value_for_scan(sensitive_count, high_sev, pii_count)
     if pro_value is not None:
@@ -671,6 +690,7 @@ def explain_preset(name: str) -> Dict[str, Any]:
         "level": cfg.level,
         "exclude_names_count": len(cfg.exclude_names),
         "exclude_patterns": list(cfg.exclude_patterns),
+        "skip_environment_dirs": cfg.skip_environment_dirs,
         "preserve_param_names": cfg.preserve_param_names,
         "remove_docstrings": cfg.remove_docstrings,
         "string_encoding": cfg.string_encoding,

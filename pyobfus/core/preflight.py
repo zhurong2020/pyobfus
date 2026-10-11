@@ -34,7 +34,7 @@ from pyobfus.core.import_advisories import ImportedAccessVisitor, enum_members
 from pyobfus.core.secret_literals import SUGGESTION, find_secret_literals
 from pyobfus.core.parser import ASTParser
 from pyobfus.exceptions import ParseError
-from pyobfus.utils import filter_python_files
+from pyobfus.utils import filter_python_files, format_skipped_directories
 
 # Severity ordering (higher = more likely to break obfuscation)
 SEVERITY_HIGH = "high"
@@ -126,6 +126,7 @@ class PreflightReport:
     suggested_preset: Optional[str] = None
     suggested_excludes: List[str] = field(default_factory=list)
     ai_hint: str = ""
+    skipped_directories: List[str] = field(default_factory=list)
     files_excluded: int = 0
     excluded_risks: List[Risk] = field(default_factory=list)
     effective_config: Optional[Dict[str, object]] = None
@@ -166,6 +167,8 @@ class PreflightReport:
             "version": 1,
             "root": self.root,
             "files_scanned": self.files_scanned,
+            "skipped_directories": self.skipped_directories[:10],
+            "skipped_directories_count": len(self.skipped_directories),
             "parse_errors": self.parse_errors,
             "severity_counts": self.severity_counts(),
             "category_counts": self.category_counts(),
@@ -701,6 +704,9 @@ class PreflightChecker:
         self.target_python_min = target_python_min
         self.preserve_param_names = preserve_param_names
         self.obfuscation_config = obfuscation_config
+        self.skip_environment_dirs = (
+            obfuscation_config.skip_environment_dirs if obfuscation_config is not None else True
+        )
 
     def check_path(self, path: Path) -> PreflightReport:
         if path.is_file():
@@ -721,13 +727,20 @@ class PreflightChecker:
     def _check_directory(self, directory: Path) -> PreflightReport:
         report = PreflightReport(root=str(directory))
         report.effective_config = self.effective_config
-        files = filter_python_files(directory, self.exclude_patterns)
+        files = filter_python_files(
+            directory,
+            self.exclude_patterns,
+            skip_environment_dirs=self.skip_environment_dirs,
+            skipped_directories=report.skipped_directories,
+        )
         for f in files:
             self._scan_one(f, report)
         self._check_module_attributes(directory, report)
         if self.report_excluded and self.exclude_patterns:
             included = set(files)
-            for f in filter_python_files(directory, []):
+            for f in filter_python_files(
+                directory, [], skip_environment_dirs=self.skip_environment_dirs
+            ):
                 if f not in included:
                     self._scan_excluded(f, report)
         self._finalize(report)
@@ -1054,6 +1067,7 @@ def format_report_text(report: PreflightReport, show_risks_limit: int = 20) -> s
     lines.append("=" * 60)
     lines.append(f"  Root: {report.root}")
     lines.append(f"  Files scanned: {report.files_scanned}")
+    lines.append(f"  {format_skipped_directories(report.skipped_directories)}")
     if report.effective_config is not None:
         config = report.effective_config
         label = config.get("config_path") or config.get("preset") or config.get("source")

@@ -52,7 +52,7 @@ def test_build_init_result_defaults_to_balanced(tmp_path: Path) -> None:
 def test_build_init_result_baseline_excludes_present(tmp_path: Path) -> None:
     _write(tmp_path, "a.py", "x = 1\n")
     result = build_init_result(tmp_path)
-    for pattern in ("test_*.py", "**/tests/**", "**/__pycache__/**"):
+    for pattern in ("test_*.py", "**/tests/**"):
         assert pattern in result.excludes
 
 

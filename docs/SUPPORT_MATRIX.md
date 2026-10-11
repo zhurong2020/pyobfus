@@ -231,3 +231,41 @@ Move a cell up by adding the check, not by gaining confidence. A cell becomes
 **tested** when a named CI job runs it on every push; it becomes **verified
 once** when someone records the run and the date in a document that this table
 links to. Downgrade a cell the moment its evidence stops running.
+
+## Default directory discovery
+
+All editions use the same file discovery for builds (including cross-file and
+incremental builds), `--check`, `--dry-run`, and MCP scanning/building. By default,
+entire environment/tool subtrees are pruned before their files are enumerated:
+
+- Any child directory containing `pyvenv.cfg` (venv, virtualenv, uv) or a
+  `conda-meta/` directory (conda), regardless of its name.
+- `site-packages`, `dist-packages`, `node_modules`, `__pycache__`, `.git`, `.hg`,
+  `.svn`, `.tox`, `.nox`, `.mypy_cache`, `.pytest_cache`, and `.ruff_cache`.
+
+Ordinary source directories named `build`, `dist`, `env`, or `venv` remain
+included unless they contain an environment marker. An explicitly supplied
+input root is always traversed, including an environment root or
+`site-packages/somepkg`; only its child subtrees are candidates for pruning.
+Single-file inputs are unaffected. Directory symlinks are not followed.
+The existing default file patterns `test_*.py` and `**/tests/**` still apply,
+as do preset-specific and user-configured exclusions.
+
+To deliberately include environment/tool directories, use:
+
+```yaml
+obfuscation:
+  skip_environment_dirs: false
+```
+
+This restores discovery behavior from 0.6.1 while retaining configured file
+exclusion patterns. It is available in Community and Pro. Use the same config
+for checks and builds; MCP `check_obfuscation_risks` reads project configuration
+by default (`use_project_config: false` uses default pruning).
+
+`--check` text and verbose directory builds show a skipped-directory summary.
+Check JSON adds `skipped_directories` (up to 10 sorted relative POSIX paths) and
+`skipped_directories_count` (the total number of pruned subtree roots). Descendant
+directories and files inside a pruned subtree are not enumerated or included in
+`files_excluded` / `excluded_findings`; those fields continue to describe
+configured file-pattern exclusions among discovered files.
