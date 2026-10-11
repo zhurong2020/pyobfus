@@ -1,5 +1,9 @@
 # pyobfus 当前计划
 
+**2026-10-11 DEV 第 1 篇已发布（维护者提前发）**：<https://dev.to/zhurong2020/cloudflare-blocked-urllibs-default-user-agent-and-it-took-me-two-months-to-notice-3k8e>，
+标题按维护者选的第一人称版本；Codex 第 3 轮编辑审稿建议已采纳（描述、CDN 释义、去重一句、小标题）。API 核对：正文与稿件一致、表格与 4 个代码块正常；
+标签被自动补全成 `cloudflarechallenge`（挑战赛专用标签），已请维护者改回 `cloudflare`；描述未生效，DEV 取首段，维持。下一步：10-14 前后看反应数与 GitHub 流量来源。
+
 **2026-10-11 开源混淆器比较页 + 缺陷 K**：新页 `docs/compare/open-source-obfuscators.md`，同一多模块 fixture + Python 3.12 模块、
 CPython 3.12.3、各工具 PyPI 版独立 venv 实测：Opy 1.1.28（2018）f-string 内名字不改→NameError、`match` 被改名→SyntaxError；
 pyminifier 2.1（2014）在 3.12 装不上（要 2to3）；python-minifier 3.4.0 默认全过但不改模块级名字，`--rename-globals` 逐文件→ImportError；
