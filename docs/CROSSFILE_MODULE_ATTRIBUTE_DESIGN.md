@@ -468,3 +468,24 @@ Recorded after Claude Code review; the maintainer accepted Claude's recommendati
 7. Community, all presets and tiers.
 8. Three PRs as revised above: the first combines proof and edits and covers `from pkg import mod; mod.X`, the most common reported form, together with `import pkg.mod as alias`.
 
+
+
+## Importer namespace rebinding guard (PR 3 review round 3)
+
+The importer must not expose a writable namespace capability. Any `globals`
+reference, module-scope `locals()`/`vars()` (including definition-time expressions),
+`sys.modules` reference, or function/frame global dictionary access rejects its
+module-level import bindings, including reads in deferred function bodies.
+Builtin and sys import aliases and capabilities assigned to helpers are covered.
+`sys.modules` inspection is conservatively rejected even for unrelated keys or
+read-only usage, since an escaped registry can later expose the importer. This
+is per importing file; it does not invalidate unrelated importing modules.
+
+A module namespace capability does not invalidate an independent function-local
+import. That function's own `locals`/zero-argument `vars` exposure does reject its
+local bindings. Ordinary `vars(obj)` does not expose the current scope. Existing
+whole-file exec/eval rejection remains conservative, including calls in functions;
+builtin aliases also reject affected scopes. Retained accesses still use the
+existing medium compatibility advisories and file/line/module/export deduplication.
+This supplies no automatic export preservation: a read-only rejected use may
+still require the advised `exclude_names` recovery to run correctly.

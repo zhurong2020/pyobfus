@@ -47,6 +47,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   initializers, namespace packages and cycles still need `exclude_names` or
   direct symbol imports. Detected hazards invalidate the affected module's
   proofs; unknown dynamic targets require an explicit API preservation boundary.
+  Importer namespace exposure (`globals`, module-level `locals`/`vars`,
+  `sys.modules`, function/frame global dictionaries) now rejects its module
+  import bindings and retains medium advice at affected accesses. Function-local
+  imports remain eligible unless their own namespace is exposed by `locals`/`vars`;
+  existing conservative exec/eval guards still apply.
 
 - `--check` reports `enum.global_enum` module-name injection as a medium
   `compatibility_advisory`; preserve injected names with `exclude_names`.

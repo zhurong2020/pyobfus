@@ -103,6 +103,75 @@ def _scope_nodes(body: List[ast.stmt]) -> List[ast.AST]:
     return nodes
 
 
+def _namespace_scope_nodes(body: List[ast.stmt]) -> List[ast.AST]:
+    """Include definition-time expressions evaluated in the containing scope."""
+    nodes = _scope_nodes(body)
+    for node in list(nodes):
+        expressions: List[ast.AST] = []
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            expressions.extend(node.decorator_list)
+            expressions.extend(node.args.defaults)
+            expressions.extend(e for e in node.args.kw_defaults if e is not None)
+            expressions.extend(
+                a.annotation
+                for a in ast.walk(node.args)
+                if isinstance(a, ast.arg) and a.annotation is not None
+            )
+            if node.returns is not None:
+                expressions.append(node.returns)
+        elif isinstance(node, ast.ClassDef):
+            expressions.extend(node.decorator_list)
+            expressions.extend(node.bases)
+            expressions.extend(k.value for k in node.keywords)
+        elif isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp)):
+            # A comprehension can expose its containing function on interpreters
+            # that inline it; conservatively reject that function too.
+            expressions.extend(ast.iter_child_nodes(node))
+        for expression in expressions:
+            nodes.extend(ast.walk(expression))
+    return nodes
+
+
+def _namespace_exposed(
+    nodes: List[ast.AST], aliases: Dict[str, Set[str]], *, global_only: bool = False
+) -> bool:
+    """A namespace capability may escape through aliases and opaque helpers.
+
+    Read-only inspection is conservatively rejected too. Any sys.modules
+    reference can expose the importing module, including via a later lookup.
+    """
+    parents = {id(child): n for n in nodes for child in ast.iter_child_nodes(n)}
+    names = {"globals", "exec", "eval"} if global_only else {"locals", "vars", "exec", "eval"}
+    for node in nodes:
+        path = _expression_binding(node) if isinstance(node, ast.expr) else None
+        paths = {path} if path else set()
+        if path:
+            root, *tail = path.split(".")
+            paths.update(".".join([alias, *tail]) for alias in aliases.get(root, set()))
+        if global_only and (
+            paths & {"sys.modules", "__builtins__"}
+            or isinstance(node, ast.Attribute)
+            and node.attr in {"__globals__", "f_globals"}
+        ):
+            return True
+        if not global_only and isinstance(node, ast.Attribute) and node.attr == "f_locals":
+            return True
+        if not paths & (names | {f"builtins.{name}" for name in names}):
+            continue
+        parent = parents.get(id(node))
+        if (
+            paths & {"vars", "builtins.vars"}
+            and not paths
+            & {"locals", "builtins.locals", "globals", "builtins.globals", "exec", "eval"}
+            and isinstance(parent, ast.Call)
+            and parent.func is node
+            and (parent.args or parent.keywords)
+        ):
+            continue  # vars(obj) inspects obj rather than the current scope.
+        return True
+    return False
+
+
 def _inert(statement: ast.stmt) -> bool:
     if isinstance(statement, ast.Pass):
         return True
@@ -669,6 +738,22 @@ class _ProofVisitor(ImportedAccessVisitor):
         self.details: Dict[Tuple[int, str], _Binding] = {}
         self.resolutions: Dict[Span, AccessResolution] = {}
         self.function_positions: List[Tuple[int, int]] = []
+        self.namespace_aliases: Dict[str, Set[str]] = {}
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    if alias.name in {"sys", "builtins"}:
+                        self.namespace_aliases.setdefault(alias.asname or alias.name, set()).add(
+                            alias.name
+                        )
+            elif isinstance(node, ast.ImportFrom) and node.module in {"sys", "builtins"}:
+                for alias in node.names:
+                    self.namespace_aliases.setdefault(alias.asname or alias.name, set()).add(
+                        f"{node.module}.{alias.name}" if node.module == "sys" else alias.name
+                    )
+        self.module_namespace_exposed = _namespace_exposed(
+            list(ast.walk(tree)), self.namespace_aliases, global_only=True
+        ) or _namespace_exposed(_namespace_scope_nodes(tree.body), self.namespace_aliases)
         self.forbidden = {
             name
             for n in ast.walk(tree)
@@ -725,9 +810,18 @@ class _ProofVisitor(ImportedAccessVisitor):
             isinstance(n, ast.ImportFrom) and any(a.name == "*" for a in n.names) for n in nodes
         ):
             bindings.shadowed.update(bindings.imports)
+        namespace_exposed = (
+            self.module_namespace_exposed
+            if kind == "module"
+            else _namespace_exposed(_namespace_scope_nodes(body), self.namespace_aliases)
+        )
         scope_id = f"{kind}:{body[0].lineno if body else 0}:{body[0].col_offset if body else 0}"
         for statement in body:
-            if not isinstance(statement, (ast.Import, ast.ImportFrom)) or kind == "class":
+            if (
+                not isinstance(statement, (ast.Import, ast.ImportFrom))
+                or kind == "class"
+                or namespace_exposed
+            ):
                 continue
             for alias in statement.names:
                 name = alias.asname or alias.name.split(".")[0]

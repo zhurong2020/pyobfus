@@ -481,3 +481,200 @@ def test_opaque_prefix_does_not_relax_order_or_competing_binding_guards(
     original, artifact = run(src, tmp_path), run(recovered, tmp_path)
     assert original.returncode == artifact.returncode == 0, artifact.stderr
     assert original.stdout == artifact.stdout == "7\n"
+
+
+NAMESPACE_WRITES = [
+    "globals()['mod'] = fake",
+    'import builtins as b\nb.exec("mod = fake")',
+    'from builtins import eval as evaluate\nevaluate("globals().update(mod=fake)")',
+    "globals().update(mod=fake)",
+    "vars()['mod'] = fake",
+    "locals()['mod'] = fake",
+    "setattr(sys.modules[__name__], 'mod', fake)",
+    "sys.modules[__name__].mod = fake",
+    "sys.modules[__name__].__dict__['mod'] = fake",
+    "vars(sys.modules[__name__])['mod'] = fake",
+    "owner = sys.modules[__name__]\nsetattr(owner, 'mod', fake)",
+    "__spec__ = types.SimpleNamespace(name=__name__)\nsetattr(sys.modules[__spec__.name], 'mod', fake)",
+    'exec("mod = fake")',
+    'eval("globals().update(mod=fake)")',
+    "def mutate():\n    globals()['mod'] = fake\nmutate()",
+    "def mutate():\n    globals().update(mod=fake)\nmutate()",
+    "def mutate():\n    exec(\"globals()['mod'] = fake\")\nmutate()",
+    'def mutate():\n    eval("globals().update(mod=fake)")\nmutate()',
+    "import builtins as b\nb.globals()['mod'] = fake",
+    "from builtins import globals as namespace\nnamespace()['mod'] = fake",
+    "namespace = globals\nnamespace()['mod'] = fake",
+    "import builtins as b\nnamespace = b.globals\nimport sys as b\nnamespace()['mod'] = fake",
+    "import sys as system\nsetattr(system.modules[__name__], 'mod', fake)",
+    "from sys import modules as registry\nregistry[__name__].mod = fake",
+    "registry = sys.modules\nregistry[__name__].mod = fake",
+    "def mutate():\n    pass\nmutate.__globals__['mod'] = fake",
+    "import inspect\ninspect.currentframe().f_globals['mod'] = fake",
+]
+
+
+@pytest.mark.parametrize("write", NAMESPACE_WRITES)
+@pytest.mark.parametrize("locals_enabled", [False, True])
+def test_importer_namespace_rebinding_runtime_and_advice(
+    tmp_path, monkeypatch, write, locals_enabled
+):
+    monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("USERPROFILE", str(tmp_path))
+    app = (
+        "import sys, types\nfrom pkg import mod\nfake = types.SimpleNamespace(LIMIT='fake')\n"
+        + write
+        + "\nprint(mod.LIMIT, mod.LIMIT)\ndef read():\n    return mod.LIMIT\nprint(read())\n"
+    )
+    src = project(tmp_path, app)
+    original = run(src, tmp_path)
+    assert original.returncode == 0, original.stderr
+    assert original.stdout == "fake fake\nfake\n"
+    for enabled in [True, False]:
+        ob = CrossFileOrchestrator(
+            ObfuscationConfig(
+                crossfile_module_attributes=enabled,
+                crossfile_local_names=locals_enabled,
+                max_workers=1,
+                exclude_names={"fake"},  # exec/eval strings need an explicit name boundary.
+            )
+        )
+        out = tmp_path / str(enabled)
+        result = ob.obfuscate(src, out)
+        assert result.success, result.errors
+        assert ob.global_table.get_obfuscated_import("pkg.mod", "LIMIT") != "LIMIT"
+        artifact = run(out, tmp_path)
+        assert artifact.returncode == 0, artifact.stderr
+        assert artifact.stdout == original.stdout
+        assert_retained_accesses_have_advice(src, out, ob)
+        checked = runner().invoke(
+            main,
+            [
+                str(src),
+                "--check",
+                "--offline",
+                "--no-config",
+                "--json",
+                "--crossfile-module-attributes" if enabled else "--no-crossfile-module-attributes",
+            ],
+        )
+        assert checked.exit_code in {0, 1}, checked.output
+        findings = [
+            r
+            for r in json.loads(checked.stdout)["risks"]
+            if r["category"] == "compatibility_advisory" and "pkg.mod.LIMIT" in r["message"]
+        ]
+        lines = {
+            n.lineno
+            for n in ast.walk(ast.parse(app))
+            if isinstance(n, ast.Attribute) and n.attr == "LIMIT"
+        }
+        assert {r["line"] for r in findings} == lines
+        assert len(findings) == len(lines)
+        assert all(r["severity"] == "medium" for r in findings)
+
+
+@pytest.mark.parametrize(
+    "exposure",
+    [
+        "locals()",
+        "vars()",
+        "from builtins import vars as ns\nns()",
+        "[locals() for _ in range(1)]",
+        "[vars() for _ in range(1)]",
+    ],
+)
+def test_function_namespace_exposure_is_local(tmp_path, exposure):
+    app = (
+        "from pkg import mod\nprint(mod.LIMIT)\ndef read():\n    from pkg import mod\n    "
+        + exposure.replace("\n", "\n    ")
+        + "\n    return mod.LIMIT\nprint(read())\n"
+    )
+    src = project(tmp_path, app)
+    ob = CrossFileOrchestrator(ObfuscationConfig(max_workers=1))
+    out = tmp_path / "out"
+    assert ob.obfuscate(src, out).success
+    emitted = ob.global_table.get_obfuscated_import("pkg.mod", "LIMIT")
+    attributes = [
+        n.attr
+        for n in ast.walk(ast.parse((out / "app.py").read_text()))
+        if isinstance(n, ast.Attribute)
+    ]
+    assert emitted in attributes and "LIMIT" in attributes
+    assert_retained_accesses_have_advice(src, out, ob)
+    # Applying the advisory's preservation recovery restores runtime equality.
+    for enabled in [True, False]:
+        fixed = tmp_path / f"fixed-{enabled}"
+        config = ObfuscationConfig(exclude_names={"LIMIT"}, crossfile_module_attributes=enabled)
+        assert CrossFileOrchestrator(config).obfuscate(src, fixed).success
+        assert run(fixed, tmp_path).stdout == run(src, tmp_path).stdout == "7\n7\n"
+
+
+@pytest.mark.parametrize("exposure", ["globals()", "vars()", "locals()"])
+def test_namespace_exposure_does_not_poison_unrelated_modules_or_local_imports(tmp_path, exposure):
+    src = project(tmp_path, "from pkg import mod\nprint(mod.LIMIT)\n")
+    (src / "other.py").write_text(
+        f"from pkg import mod\n{exposure}\ndef global_read():\n    return mod.LIMIT\ndef read():\n    from pkg import mod\n    return mod.LIMIT\n"
+    )
+    ob = CrossFileOrchestrator(ObfuscationConfig(max_workers=1))
+    out = tmp_path / "out"
+    assert ob.obfuscate(src, out).success
+    emitted = ob.global_table.get_obfuscated_import("pkg.mod", "LIMIT")
+    assert emitted != "LIMIT"
+    for name in ["app.py", "other.py"]:
+        assert any(
+            isinstance(n, ast.Attribute) and n.attr == emitted
+            for n in ast.walk(ast.parse((out / name).read_text()))
+        )
+    assert any(
+        isinstance(n, ast.Attribute) and n.attr == "LIMIT"
+        for n in ast.walk(ast.parse((out / "other.py").read_text()))
+    )
+    assert run(out, tmp_path).stdout == run(src, tmp_path).stdout == "7\n"
+    assert_retained_accesses_have_advice(src, out, ob)
+
+
+@pytest.mark.parametrize(
+    "exposure",
+    [
+        "globals()",
+        "vars()",
+        "locals()",
+        "def expose(ns=vars()):\n    pass",
+        "def expose(ns=locals()):\n    pass",
+    ],
+)
+def test_read_only_namespace_exposure_still_rejects_global_bindings(tmp_path, exposure):
+    src = project(tmp_path, f"from pkg import mod\n{exposure}\nprint(mod.LIMIT)\n")
+    ob = CrossFileOrchestrator(ObfuscationConfig(max_workers=1))
+    out = tmp_path / "out"
+    assert ob.obfuscate(src, out).success
+    assert ob.global_table.get_obfuscated_import("pkg.mod", "LIMIT") != "LIMIT"
+    assert any(
+        isinstance(n, ast.Attribute) and n.attr == "LIMIT"
+        for n in ast.walk(ast.parse((out / "app.py").read_text()))
+    )
+    assert_retained_accesses_have_advice(src, out, ob)
+    for enabled in [True, False]:
+        fixed = tmp_path / f"fixed-{enabled}"
+        config = ObfuscationConfig(exclude_names={"LIMIT"}, crossfile_module_attributes=enabled)
+        assert CrossFileOrchestrator(config).obfuscate(src, fixed).success
+        assert run(fixed, tmp_path).stdout == run(src, tmp_path).stdout == "7\n"
+
+
+def test_function_local_import_survives_own_globals_write(tmp_path):
+    src = project(
+        tmp_path,
+        "import types\ndef read():\n    from pkg import mod\n    globals()['mod'] = types.SimpleNamespace(LIMIT='fake')\n    return mod.LIMIT\nprint(read())\n",
+    )
+    ob = CrossFileOrchestrator(ObfuscationConfig(max_workers=1))
+    out = tmp_path / "out"
+    assert ob.obfuscate(src, out).success
+    emitted = ob.global_table.get_obfuscated_import("pkg.mod", "LIMIT")
+    assert emitted and emitted != "LIMIT"
+    assert any(
+        isinstance(n, ast.Attribute) and n.attr == emitted
+        for n in ast.walk(ast.parse((out / "app.py").read_text()))
+    )
+    assert run(out, tmp_path).stdout == run(src, tmp_path).stdout == "7\n"
+    assert_retained_accesses_have_advice(src, out, ob)
