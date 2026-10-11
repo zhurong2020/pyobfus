@@ -1,5 +1,10 @@
 # pyobfus 当前计划
 
+**2026-10-11 `--check` 新增 H/C 兼容提示（PR #80 合并，未发版）**：目录扫描时报出「项目内模块对象.被改名属性」访问（`from pkg import core; core.X`、
+`import pkg.core as e; e.f()`、`pkg.core.f()`；复用构建规划的跨文件符号表，标准库/第三方不报）与 `enum.global_enum` 注入名字；medium，退出码不变；
+支持矩阵已写明。Claude 实测：三种写法与 global_enum 均报、按建议加 `exclude_names` 后构建运行正确、787 文件项目 `--check` 6.2→16.6 s。
+真实项目：一个私有项目 29 处 `config.X` 式真问题（H 比预想常见，建议提 P1 做自动改写）；另一项目 370 处全在 `.venv` → 登记缺陷 L（默认不排除虚拟环境）。
+
 **2026-10-11 DEV 第 1 篇已发布（维护者提前发）**：<https://dev.to/zhurong2020/cloudflare-blocked-urllibs-default-user-agent-and-it-took-me-two-months-to-notice-3k8e>，
 标题按维护者选的第一人称版本；Codex 第 3 轮编辑审稿建议已采纳（描述、CDN 释义、去重一句、小标题）。API 核对：正文与稿件一致、表格与 4 个代码块正常；
 标签被自动补全成 `cloudflarechallenge`（挑战赛专用标签），已请维护者改回 `cloudflare`；描述未生效，DEV 取首段，维持。下一步：10-14 前后看反应数与 GitHub 流量来源。
