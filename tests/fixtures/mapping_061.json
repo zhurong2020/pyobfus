@@ -1,0 +1,30 @@
+{
+  "created_at": "2026-10-11T04:00:26.954738+00:00",
+  "global": {
+    "I0": {
+      "module": "app",
+      "original": "check_value"
+    },
+    "I1": {
+      "module": "app",
+      "original": "compute_total"
+    },
+    "I2": {
+      "module": "app",
+      "original": "label"
+    }
+  },
+  "locals": {},
+  "marker_id": "24627f1d",
+  "mode": "single_file",
+  "modules": {
+    "app": {
+      "check_value": "I0",
+      "compute_total": "I1",
+      "label": "I2"
+    }
+  },
+  "pyobfus_version": "0.6.1",
+  "root": ".",
+  "version": 1
+}
