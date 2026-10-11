@@ -63,7 +63,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=7.0",
-    "pytest-cov>=4.0",
+    "pytest-cov>=7.1.0",
     "black>=22.0",
     # mypy 2.x no longer accepts python_version=3.9, while mypy 1.20+ itself
     # requires Python 3.10. Allow 1.19.x on the Python 3.9 runtime jobs.
