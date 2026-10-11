@@ -1,5 +1,10 @@
 # pyobfus 当前计划
 
+**2026-10-11 打包 lane 扩到多模块 + Nuitka standalone（免发版，PR #72）**：新 fixture `integration_tests/packaging/multimodule/`
+（子包、`.`/`..` 相对导入、入口脚本），目录构建后 PyInstaller `--onefile` 与 Nuitka `--mode=standalone` 都测：隐藏产物源码后输出与原版一致、
+三模块 traceback 经 `--unmap --json` 还原、冻结模块/`main.bin` 不含 5 个被改名的原名（未混淆的 standalone 构建 5 个全在，断言有区分力）。
+lane 依赖加 `patchelf==0.19.1.0`。本地通过，[托管运行](https://github.com/zhurong2020/pyobfus/actions/runs/38107417778)。顺带发现 mapping `global[*].module` 记的不是定义所在模块，已写进 Codex 行号还原说明。
+
 **2026-10-11 AI 回答基线（首篇 DEV 发出前，维护者手动 + Chrome 插件采集）**：12 个通用问题 + 3 个品牌问题。
 Perplexity（联网）提及 6/12、首选 3/12；ChatGPT 联网 0/12（仅 1 次被引为来源），但点名问时 3/3 描述准确（一处引用了 10-07 的旧快照）；
 ChatGPT 不联网 0/12 且不认识 pyobfus；Gemini 因出口 IP 被 Google 定位为中国记 unavailable，回常住地后补。

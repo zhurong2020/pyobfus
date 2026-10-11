@@ -86,8 +86,14 @@ pyobfus src/ -o obf/ --save-mapping module.map.json
 ```
 
 pyobfus output is ordinary importable Python, so the compiler's dependency
-analysis runs on it the same way it runs on any source. What we have not
-verified is a whole project: reflection (`getattr` with string names),
+analysis runs on it the same way it runs on any source. The packaging lane
+checks this on a small stdlib-only project
+([`integration_tests/packaging/multimodule/`](https://github.com/zhurong2020/pyobfus/tree/main/integration_tests/packaging/multimodule)):
+a package with a subpackage, relative imports and an entry script, obfuscated
+as a directory and compiled with Nuitka `--mode=standalone`. The executable
+runs without the generated source, matches the original output, and contains
+none of the five renamed names; a standalone build of the unobfuscated
+project contains all five. What we have not verified is a real application: reflection (`getattr` with string names),
 dynamic imports, data files and plugin entry points can break after renaming
 or be missed by the compiler. Run your own tests against the compiled output,
 not only against the obfuscated source.
@@ -126,4 +132,10 @@ on top of this pipeline is a reasonable escalation. See
   native-module execution, compare both fixture outcomes and reverse a
   TypeError traceback via `--unmap --json`. They also check the two original
   function/class identifiers are absent in these binaries and no `.pyi` is
-  emitted. This scope excludes multi-module and Nuitka standalone/onefile builds.
+  emitted.
+- Since 2026-10-11 the same lane also builds the multi-module fixture with
+  Nuitka 4.2.2 `--mode=standalone` (patchelf 0.19.1.0) and checks behavior,
+  the absence of the renamed names in `main.bin`, and a traceback crossing
+  three modules reversed through `--unmap --json`. Local execution passed on
+  2026-10-11; the [hosted run](https://github.com/zhurong2020/pyobfus/actions/runs/38107417778) also passed. Nuitka onefile, Cython for
+  a whole package, macOS and Windows remain outside this evidence.

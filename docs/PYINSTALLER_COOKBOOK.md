@@ -79,5 +79,13 @@ generated source is hidden. Output must match the original; an invalid tier
 must raise and its bundled traceback must reverse through `--unmap --json`.
 The mapping remains outside the shipped directory. Local execution passed on
 2026-10-08; the [first hosted run](https://github.com/zhurong2020/pyobfus/actions/runs/37690761303) also passed. The workflow runs weekly on main
-and on PRs that change the obfuscator, the fixtures or the workflow. Other platforms, third-party dependencies
-and larger projects remain outside this example's evidence.
+and on PRs that change the obfuscator, the fixtures or the workflow.
+
+Since 2026-10-11 the lane also freezes a multi-module project
+([`integration_tests/packaging/multimodule/`](https://github.com/zhurong2020/pyobfus/tree/main/integration_tests/packaging/multimodule):
+a package, a subpackage, relative imports and an entry script) obfuscated as a
+directory. Every frozen module in the bundle is checked for the renamed
+original names, the executable must match the original for three tiers, and a
+traceback crossing three modules must reverse through `--unmap --json`
+([hosted run](https://github.com/zhurong2020/pyobfus/actions/runs/38107417778)). Other platforms, third-party dependencies and larger
+projects remain outside this evidence.
