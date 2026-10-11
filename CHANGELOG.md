@@ -14,9 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   JSON adds `frames` and `line_map`. Rebuild and save a mapping with a release
   containing line-map support (after 0.6.1); old mappings still restore names.
   Code excerpts restore names as in 0.6.1; caret columns still follow artifact text.
-  Full mapping-key path suffixes and traceback-wide deployment-root votes prevent
-  foreign same-basename frames from receiving source locations or generated labels;
-  tied deployment roots remain unresolved with an explanatory hint.
+  Deployment-root votes require complete mapping-key path suffixes and resolvable
+  locations; known obfuscated function names take priority over ordinary frames.
+  Frames outside the selected root stay verbatim, without source locations or
+  generated labels; tied root scores remain unresolved with an explanatory hint.
 
 - Saved Community mapping files can include relative file paths and statement-level
   output-to-source line tables, queried through `ObfuscationMapping.resolve_location`.

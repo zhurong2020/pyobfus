@@ -68,18 +68,29 @@ transformers that reorder same-type statements; supported transforms preserve or
 
 CLI and MCP share `ObfuscationMapping.unmap_trace()`, which uses
 complete file-key suffix matching on original frame paths before restoring names.
-Each matching frame votes for the deployment root formed by removing the matched
-key from its normalized path (absolute and relative prefixes remain distinct).
-The unique root supported by the most frames wins, including repeated frames;
-frames with another root remain verbatim and `unmapped`, never `generated`.
-If the highest vote counts tie, all matching frames remain unresolved and the
-hint explains that the deployment root cannot be determined. A single matching
-frame has one root and restores normally. Votes use paths even for generated,
-out-of-range or disabled-table lines, so line-table coverage does not bias root
-selection. Standalone `resolve_location()` only checks suffixes and has no root
-context; its signature is unchanged. CLI and MCP both use `unmap_trace()`.
-This heuristic cannot establish ownership if foreign frames have more votes or
-are the sole matching frame; deployments spanning roots conservatively lose
+Only frames for which `resolve_location(path, line)` succeeds vote for the
+deployment root formed by removing the matched key from its normalized path
+(absolute and relative prefixes remain distinct). Out-of-range lines and
+unavailable line tables contribute no votes; resolvable generated lines do.
+Each root's score is the pair `(known_obfuscated_name_frames, resolvable_frames)`,
+compared lexicographically. Exact identifiers in `global_map` or any `locals`
+key set are strong name evidence; `<module>`, `<lambda>`, `<listcomp>` and other
+CPython labels are not. One strong frame outweighs any number of ordinary
+frames; repeated frames count individually. The unique highest-scoring root
+wins; frames with another root remain verbatim and `unmapped`, never `generated`.
+If both score components tie, all matching frames remain unresolved and the
+hint explains that the deployment root cannot be determined. A single
+resolvable matching frame has one root and restores normally. Standalone
+`resolve_location()` only checks suffixes and has no root context; its signature
+is unchanged. CLI and MCP both use `unmap_trace()`.
+For example, a directly built package has keys `__init__.py` and `core.py`:
+`/run/pkg/core.py:8` resolves, but `/stdlib/json/__init__.py:346` exceeds the
+user package initializer's line count and cannot vote. The user root wins and
+json frames remain unchanged. If both foreign and user lines resolve, a known
+obfuscated function name in the user frame breaks the ordinary-frame tie.
+This heuristic is not proof of ownership: a foreign identifier can collide with
+a mapping key, foreign frames can win without user name evidence, and a sole
+resolvable foreign frame can be selected. Deployments spanning roots lose
 restoration outside the selected root.
 Only whole standard CPython `File "path", line N, in name` lines receive
 location changes. Mapped frames retain editor-recognizable source locations:

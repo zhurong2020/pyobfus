@@ -22,14 +22,25 @@ def restore_trace(mapping: ObfuscationMapping, trace: str) -> Dict[str, Any]:
         # Keep absolute and relative prefixes distinct; normalize Windows drives.
         return (path.startswith(("/", "\\")), tuple(_path_parts(path)[: -len(_path_parts(key))]))
 
+    known_names = set(mapping.global_map)
+    for names in mapping.locals.values():
+        known_names.update(names)
     votes: Counter[Tuple[bool, Tuple[str, ...]]] = Counter()
+    named_votes: Counter[Tuple[bool, Tuple[str, ...]]] = Counter()
     for text in trace.splitlines():
         match = _FRAME.fullmatch(text)
         if match is not None:
             key = mapping._match_file_path(match["path"])
-            if key is not None:
-                votes[deployment_root(match["path"], key)] += 1
-    winners = [root for root, count in votes.items() if count == max(votes.values())]
+            if key is not None and mapping.resolve_location(match["path"], int(match["line"])):
+                candidate = deployment_root(match["path"], key)
+                votes[candidate] += 1
+                # Exact identifiers only: CPython's <module>/<lambda>/etc.
+                # labels and qualified display names are not name evidence.
+                if match["name"].isidentifier() and match["name"] in known_names:
+                    named_votes[candidate] += 1
+    scores = {candidate: (named_votes[candidate], count) for candidate, count in votes.items()}
+    best = max(scores.values(), default=(0, 0))
+    winners = [candidate for candidate, score in scores.items() if score == best]
     root = winners[0] if len(winners) == 1 else None
     tied = len(winners) > 1
     frames: List[Dict[str, Any]] = []

@@ -436,3 +436,105 @@ def test_full_file_key_and_duplicate_filenames():
     assert trace.splitlines()[-1] in result["unmapped_trace"]
     assert mapping.resolve_location("/deploy/b/util.py", 7) is None
     assert mapping.resolve_location("/stdlib/json/__init__.py", 7) is None
+
+
+@pytest.mark.parametrize("local_name", [False, True])
+@pytest.mark.parametrize("foreign_count", [1, 20])
+def test_obfuscated_name_outweighs_ordinary_frames(local_name, foreign_count):
+    mapping = _root_mapping(["core.py"])
+    if local_name:
+        mapping.global_map.clear()
+        mapping.locals = {"core": {"I0": "compute_price"}}
+    foreign = '  File "/site/vendorlib/core.py", line 7, in run_hooks\n'
+    trace = '  File "/run/pkg/core.py", line 8, in I0\n' + foreign * foreign_count
+    result = mapping.unmap_trace(trace)
+    assert result["frames"][0]["status"] == "mapped"
+    assert result["frames"][0]["original_line"] == 20
+    assert all(f["status"] == "unmapped" for f in result["frames"][1:])
+    assert result["unmapped_trace"].endswith(foreign * foreign_count)
+
+
+@pytest.mark.parametrize("name", ["external", "<module>", "<lambda>", "<listcomp>"])
+def test_ordinary_frame_root_tie(name):
+    mapping = _root_mapping(["core.py"])
+    # Even malformed mapping entries cannot make CPython labels strong evidence.
+    if name.startswith("<"):
+        mapping.locals = {"core": {name: "compute_price"}}
+    trace = (
+        f'  File "/run/pkg/core.py", line 8, in {name}\n'
+        '  File "/site/vendorlib/core.py", line 7, in run_hooks\n'
+    )
+    result = mapping.unmap_trace(trace)
+    assert result["unmapped_trace"] == trace
+    assert all(f["status"] == "unmapped" for f in result["frames"])
+    assert "Cannot determine the deployment root" in result["ai_hint"]
+
+
+@pytest.mark.parametrize("unavailable", ["out_of_range", "disabled"])
+def test_unresolvable_frames_do_not_vote(unavailable):
+    mapping = _root_mapping(["core.py", "__init__.py"])
+    if unavailable == "disabled":
+        mapping.files["__init__.py"]["lines"] = None
+    foreign = '  File "/stdlib/json/__init__.py", line 346, in loads\n'
+    if unavailable == "disabled":
+        foreign = foreign.replace("346", "7")
+    trace = '  File "/run/pkg/core.py", line 8, in external\n' + foreign
+    result = mapping.unmap_trace(trace)
+    assert [f["status"] for f in result["frames"]] == ["mapped", "unmapped"]
+    assert result["unmapped_trace"].endswith(foreign)
+
+
+def test_direct_package_json_crash(tmp_path):
+    import os
+    import subprocess
+    import sys
+
+    from pyobfus.core.mapping import ObfuscationMapping
+
+    package = tmp_path / "pkg"
+    package.mkdir()
+    (package / "__init__.py").write_text("")
+    (package / "core.py").write_text(
+        'import json\n\ndef compute_price():\n    return json.loads("{bad")\n'
+    )
+    output = tmp_path / "run" / "pkg"
+    mapping_file = tmp_path / "map.json"
+    built = CliRunner().invoke(
+        main, [str(package), "-o", str(output), "--save-mapping", str(mapping_file)]
+    )
+    assert built.exit_code == 0, built.output
+    env = dict(os.environ, HOME=str(tmp_path), USERPROFILE=str(tmp_path))
+    original = subprocess.run(
+        [sys.executable, "-c", "from pkg.core import compute_price; compute_price()"],
+        cwd=tmp_path,
+        env=env,
+        text=True,
+        capture_output=True,
+    )
+    mapping = ObfuscationMapping.load(mapping_file)
+    name = mapping.modules["core"]["compute_price"]
+    crash = subprocess.run(
+        [sys.executable, "-c", f"from pkg.core import {name}; {name}()"],
+        cwd=output.parent,
+        env=env,
+        text=True,
+        capture_output=True,
+    )
+    assert original.returncode != 0 and crash.returncode != 0
+    assert "JSONDecodeError" in original.stderr and "JSONDecodeError" in crash.stderr
+    assert set(mapping.files) == {"__init__.py", "core.py"}
+    assert f'File "{package / "core.py"}", line 4, in compute_price' in original.stderr
+    result = mapping.unmap_trace(crash.stderr)
+    user = [f for f in result["frames"] if f["obfuscated_file"] == str(output / "core.py")]
+    assert len(user) == 1
+    assert (user[0]["status"], user[0]["original_file"], user[0]["original_line"]) == (
+        "mapped",
+        "core.py",
+        4,
+    )
+    foreign = [line for line in crash.stderr.splitlines() if 'File "' in line and "/json/" in line]
+    assert len(foreign) >= 3
+    assert all(line in result["unmapped_trace"] for line in foreign)
+    assert all(
+        f["status"] == "unmapped" for f in result["frames"] if "/json/" in f["obfuscated_file"]
+    )

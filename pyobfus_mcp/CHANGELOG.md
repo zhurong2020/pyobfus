@@ -9,8 +9,9 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 ### Added
 
 - Trace restoration keeps code-excerpt name reversal and infers a deployment root
-  from complete file-key suffix matches; foreign roots and tied roots stay
-  unresolved, with tied roots explained in the hint.
+  from complete file-key suffix matches with resolvable locations, prioritizing
+  known obfuscated function names over ordinary frames. Foreign roots and tied
+  root scores stay unresolved, with ties explained in the hint.
 
 - `unmap_stack_trace` restores original relative files and statement-level lines
   with a line-map-capable Core (after 0.6.1), adding `frames` and `line_map`.
