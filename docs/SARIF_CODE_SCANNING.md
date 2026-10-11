@@ -47,6 +47,14 @@ Findings excluded by your effective config are still included, but as
 code. Parse failures are reported as invocation notifications, not as invented
 source rules.
 
+`PYOBFUS/compatibility_advisory` also covers medium warnings for renamed
+project symbols accessed through module objects in directory builds, and for
+`enum.global_enum` member names injected at runtime. These results use
+`warning` even though the category's default level is `note`. JSON/text reports
+provide the source-specific direct-import or `exclude_names` suggestions;
+SARIF retains a static category-level message to avoid exposing source names.
+See [What gets renamed](SUPPORT_MATRIX.md#what-gets-renamed) for limitations.
+
 ### Hardcoded-secret screening (Community)
 
 | Rule | Default level | Finding severity |

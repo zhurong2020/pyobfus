@@ -22,12 +22,15 @@ Used by the `pyobfus --check` CLI flag and by the MCP server tool
 from __future__ import annotations
 
 import ast
+from copy import deepcopy
 import json
 import sys
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
+from pyobfus.config import ObfuscationConfig
+from pyobfus.core.import_advisories import ImportedAccessVisitor, enum_members
 from pyobfus.core.secret_literals import SUGGESTION, find_secret_literals
 from pyobfus.core.parser import ASTParser
 from pyobfus.exceptions import ParseError
@@ -273,6 +276,32 @@ class _RiskVisitor(ast.NodeVisitor):
                 ),
                 SUGGESTION,
             )
+
+        # Only enum.global_enum is known here to inject names into the module.
+        # Other decorators need separate evidence and design, not name guessing.
+        def decorated_class(cls: ast.ClassDef) -> None:
+            if not any(accesses.resolve(d) == "enum.global_enum" for d in cls.decorator_list):
+                return
+            members = enum_members(cls)
+            listed = ", ".join(members[:10]) or "(no static members found)"
+            if len(members) > 10:
+                listed += f" and {len(members) - 10} more"
+            self._add(
+                CAT_COMPAT_ADVISORY,
+                SEVERITY_MEDIUM,
+                cls,
+                f"Class {cls.name} uses enum.global_enum, which injects member names "
+                "into the module at runtime; renamed references or __all__ entries "
+                "can raise NameError.",
+                f"Add this enum's member names to exclude_names: {listed}.",
+            )
+
+        accesses = ImportedAccessVisitor(
+            lambda n: n.module if n.level == 0 else None,
+            lambda n, m: None,
+            decorated_class,
+        )
+        accesses.visit(node)
         self.generic_visit(node)
 
     # ---- imports --------------------------------------------------------
@@ -650,6 +679,7 @@ class PreflightChecker:
         protection_intent: bool = False,
         target_python_min: Optional[str] = None,
         preserve_param_names: bool = True,
+        obfuscation_config: Optional[ObfuscationConfig] = None,
     ) -> None:
         self.exclude_patterns: List[str] = list(exclude_patterns or [])
         # Opt-in dependency-hallucination advisory (see
@@ -670,6 +700,7 @@ class PreflightChecker:
         self.protection_intent = protection_intent
         self.target_python_min = target_python_min
         self.preserve_param_names = preserve_param_names
+        self.obfuscation_config = obfuscation_config
 
     def check_path(self, path: Path) -> PreflightReport:
         if path.is_file():
@@ -693,6 +724,7 @@ class PreflightChecker:
         files = filter_python_files(directory, self.exclude_patterns)
         for f in files:
             self._scan_one(f, report)
+        self._check_module_attributes(directory, report)
         if self.report_excluded and self.exclude_patterns:
             included = set(files)
             for f in filter_python_files(directory, []):
@@ -700,6 +732,55 @@ class PreflightChecker:
                     self._scan_excluded(f, report)
         self._finalize(report)
         return report
+
+    def _check_module_attributes(self, directory: Path, report: PreflightReport) -> None:
+        """Reuse the build's read-only export plan; never run transformations."""
+        from pyobfus.core.orchestrator import CrossFileOrchestrator
+        from pyobfus.core.export_detector import ReExportSource
+
+        # The build planner requires a completely parseable project. Existing
+        # parse-error reporting takes precedence; do not fabricate a partial plan.
+        if report.parse_errors:
+            return
+        config = deepcopy(self.obfuscation_config or ObfuscationConfig.community_edition())
+        config.exclude_names.update(self.preserve_names)
+        config.exclude_patterns = list(self.exclude_patterns)
+        config.crossfile_local_names = False  # Only module exports matter here.
+        planner = CrossFileOrchestrator(config)
+        table = planner.phase1_scan(directory)
+        for file_info in planner.files:
+            seen: Set[Tuple[str, str]] = set()
+
+            def resolve_from(node: ast.ImportFrom) -> Optional[str]:
+                return planner._resolve_source_module(
+                    file_info, ReExportSource(node.module, node.level, "")
+                )
+
+            def attribute(node: ast.Attribute, module: str) -> None:
+                if table.get_obfuscated_import(module, node.attr) is None:
+                    return  # External modules and unchanged names have no mapping.
+                key = (module, node.attr)
+                if key in seen:
+                    return
+                seen.add(key)
+                report.risks.append(
+                    Risk(
+                        category=CAT_COMPAT_ADVISORY,
+                        severity=SEVERITY_MEDIUM,
+                        file=str(file_info.path),
+                        line=node.lineno,
+                        col=node.col_offset,
+                        message=f"{ast.unparse(node)} accesses {module}.{node.attr}; "
+                        "directory builds do not rename attribute access through a module "
+                        "object; this raises AttributeError at runtime.",
+                        suggestion=f"Use from {module} import {node.attr} and reference "
+                        f"{node.attr} directly, or add {node.attr} to exclude_names.",
+                    )
+                )
+
+            ImportedAccessVisitor(resolve_from, attribute, lambda n: None).visit(
+                ASTParser.parse_file(file_info.path)
+            )
 
     def _scan_excluded(self, file_path: Path, report: PreflightReport) -> None:
         try:

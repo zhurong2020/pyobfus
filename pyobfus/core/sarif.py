@@ -136,7 +136,8 @@ _CATEGORY_META: Dict[str, Tuple[str, str, str]] = {
     ),
     CAT_COMPAT_ADVISORY: (
         "CompatibilityAdvisory",
-        "A delivery-combination compatibility advisory was raised for this " "project.",
+        "A source-pattern or delivery-combination compatibility advisory was raised "
+        "for this project.",
         "note",
     ),
     CAT_HARDCODED_SECRET: (

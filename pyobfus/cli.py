@@ -2503,6 +2503,7 @@ def _handle_check(
     if preserve_param_names is not None:
         config.preserve_param_names = preserve_param_names
     checker = PreflightChecker(
+        obfuscation_config=config,
         preserve_param_names=(config.preserve_param_names or (input_path.is_dir() and cross_file)),
         exclude_patterns=config.exclude_patterns,
         preserve_names=config.exclude_names,

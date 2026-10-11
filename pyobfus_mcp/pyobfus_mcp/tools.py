@@ -431,6 +431,7 @@ def check_obfuscation_risks(
         )
         checker_kwargs.update(
             exclude_patterns=config.exclude_patterns,
+            obfuscation_config=config,
             preserve_names=config.exclude_names,
             preserve_param_names=(config.preserve_param_names or target.is_dir()),
             safe_preset=(provenance.preset == "safe"),
