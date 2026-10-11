@@ -34,6 +34,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Directory (cross-file) builds dropped PEP 695 type parameters from renamed
+  top-level definitions: `def first[T](items: list[T]) -> T` was emitted as
+  `def I1(items: list[T]) -> T`, and the module failed with `NameError` on
+  import (Python 3.12+; 0.6.1 and earlier). Renamed functions, async functions
+  and classes now keep every field, including their source-line entry in the
+  mapping. Single-file builds were not affected.
+
 - Single-file and directory outputs preserve the original shebang and UTF-8
   encoding declaration and copy POSIX executable bits. Non-UTF-8 declarations
   are dropped because generated files are written as UTF-8; verbose builds
