@@ -41,6 +41,9 @@ from numeric statistics; serial and parallel aggregation are equivalent.
 Single-file mapping is saved after the final text is written. The subsequent
 trace-marker insertion shifts runs after the preserved shebang/encoding prologue
 and inserts four generated lines, then saves the mapping with the same marker ID.
+`--no-cross-file` directory builds do not write a mapping: independent per-file
+renaming can collide, requiring file-specific name tables and frame-aware name
+lookup; requesting `--save-mapping` warns in stderr and JSON.
 Incremental cache hits retain their existing mapping. Pro fusion pre/post text
 passes disable alignment explicitly; this does not attempt to map Pro mechanisms.
 

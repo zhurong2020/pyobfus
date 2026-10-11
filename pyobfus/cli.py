@@ -1117,6 +1117,15 @@ def main(
             )
             obfuscation_stats["warnings"] = [warning]
             click.echo(f"Warning: {warning}", err=True)
+        mapping_warning: Optional[str] = None
+        if save_mapping_path and input_path_obj.is_dir() and not cross_file:
+            mapping_warning = (
+                "--save-mapping is not supported for --no-cross-file directory builds: "
+                "each file is renamed independently, so names collide; no mapping was written."
+            )
+            obfuscation_stats.setdefault("warnings", []).append(mapping_warning)
+            click.echo(f"Warning: {mapping_warning}", err=True)
+            save_mapping_path = None
         verification: Optional[Dict[str, Any]] = None
 
         # Incremental short-circuit: directory mode only (single-file
@@ -1168,6 +1177,7 @@ def main(
                         provenance_manifest_path=None,
                         build_report_path=written_report_path,
                         verification=verification,
+                        warning=mapping_warning,
                     )
                     return
                 if verification is not None:
@@ -1219,7 +1229,6 @@ def main(
                     config,
                     verbose,
                     dry_run,
-                    save_mapping_path=save_mapping_path,
                 )
                 if dir_stats:
                     if "warnings" in dir_stats:
@@ -1341,6 +1350,7 @@ def main(
                 trace_marker_id=trace_marker_id,
                 plan=build_plan,
                 verification=verification,
+                warning=mapping_warning,
             )
             return
 
@@ -1418,7 +1428,6 @@ def _obfuscate_file(
     dry_run: bool = False,
     save_mapping_path: Optional[str] = None,
     source_root: Optional[Path] = None,
-    mapping_collector: Optional[List[Any]] = None,
 ) -> dict:
     """
     Obfuscate a single Python file.
@@ -1572,7 +1581,7 @@ def _obfuscate_file(
                 click.echo(f"    {line}")
 
     # Save single-file mapping if requested
-    if (save_mapping_path or mapping_collector is not None) and not dry_run:
+    if save_mapping_path and not dry_run:
         from pyobfus.core.mapping import ObfuscationMapping
 
         mapping = ObfuscationMapping.from_single_file(
@@ -1588,12 +1597,8 @@ def _obfuscate_file(
             input_file.stem,
             "Pro fusion text passes enabled" if _fusion else None,
         )
-        key = source if mapping_collector is not None else output_file.name
-        mapping.files[key] = record
-        if mapping_collector is not None:
-            mapping_collector.append(mapping)
-        if save_mapping_path:
-            mapping.save(save_mapping_path)
+        mapping.files[output_file.name] = record
+        mapping.save(save_mapping_path)
         if verbose and record.get("reason"):
             click.echo(f"  Line map unavailable: {record['reason']}")
         if verbose and save_mapping_path:
@@ -1608,7 +1613,6 @@ def _obfuscate_directory(
     config: ObfuscationConfig,
     verbose: bool,
     dry_run: bool = False,
-    save_mapping_path: Optional[str] = None,
 ) -> dict:
     """
     Obfuscate all Python files in a directory (legacy single-file mode).
@@ -1662,8 +1666,6 @@ def _obfuscate_directory(
         if total_loc > config.max_total_loc:
             raise LimitExceededError("total_lines_of_code", total_loc, config.max_total_loc)
 
-    mappings: List[Any] = []
-
     # Obfuscate each file
     total = len(python_files)
     for idx, python_file in enumerate(python_files, 1):
@@ -1682,7 +1684,6 @@ def _obfuscate_directory(
                 verbose,
                 dry_run,
                 source_root=input_dir,
-                mapping_collector=mappings if save_mapping_path else None,
             )
             dir_stats["files_processed"] += 1
             for key, value in file_stats.items():
@@ -1694,11 +1695,6 @@ def _obfuscate_directory(
     if not verbose and total > 1:
         click.echo()  # newline after progress
 
-    if save_mapping_path and not dry_run:
-        from pyobfus.core.mapping import ObfuscationMapping
-
-        mapping = ObfuscationMapping.merge(mappings)
-        mapping.save(save_mapping_path)
     return dir_stats
 
 
@@ -2145,6 +2141,7 @@ def _emit_obfuscate_success_json(
     trace_marker_id: Optional[str] = None,
     plan: Optional[Dict[str, Any]] = None,
     verification: Optional[Dict[str, Any]] = None,
+    warning: Optional[str] = None,
 ) -> None:
     """Emit the obfuscation success summary as JSON."""
     # AI hint: suggest the most useful next command based on context
@@ -2187,6 +2184,8 @@ def _emit_obfuscate_success_json(
         "trace_marker_id": trace_marker_id,
         "ai_hint": ai_hint,
     }
+    if warning:
+        payload["warning"] = warning
     if dry_run and plan is not None:
         payload["plan"] = plan
     if verification is not None:

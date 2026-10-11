@@ -231,25 +231,60 @@ def test_directory_parallel_and_paths(tmp_path, trace_marker):
     assert records[0] == records[1]
 
 
-def test_no_cross_file_directory(tmp_path):
+@pytest.mark.parametrize("json_output", [False, True])
+@pytest.mark.parametrize("mode", ["independent_directory", "crossfile_directory", "single_file"])
+def test_mapping_save_modes(tmp_path, json_output, mode):
     source = tmp_path / "src"
-    for name, text in DIRECTORY.items():
-        path = source / name
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(text)
-    out = tmp_path / "out"
+    fixture = {
+        "main.py": "def run():\n    return 1 / 0\nrun()\n",
+        "app/a/util.py": "def parse_amount():\n    return 1\n",
+        "app/b/util.py": "def scaled():\n    return 2\n",
+    }
+    for name, text in fixture.items():
+        file = source / name
+        file.parent.mkdir(parents=True, exist_ok=True)
+        file.write_text(text)
+    single = mode == "single_file"
+    independent = mode == "independent_directory"
+    input_path = source / "main.py" if single else source
+    out = tmp_path / ("out.py" if single else "out")
     path = tmp_path / "mapping.json"
-    result = run(
-        ["-m", "pyobfus", source, "-o", out, "--no-cross-file", "--save-mapping", path], tmp_path
+    flags = [] if mode == "crossfile_directory" else ["--no-cross-file"]
+    if json_output:
+        flags.append("--json")
+    result = run(["-m", "pyobfus", input_path, "-o", out, "--save-mapping", path, *flags], tmp_path)
+    assert result.returncode == 0, result.stderr + result.stdout
+    warning = (
+        "--save-mapping is not supported for --no-cross-file directory builds: "
+        "each file is renamed independently, so names collide; no mapping was written."
     )
-    assert result.returncode == 0, result.stderr
-    mapping = ObfuscationMapping.load(path)
-    assert set(mapping.files) == set(DIRECTORY)
-    assert mapping.resolve_location("pkg/core.py", 1).status == "generated"
-    # Independent per-file renaming is not guaranteed to preserve cross-file imports.
-    trace = run([out / "main.py"], tmp_path)
-    assert frames(trace)
-    assert mapping.resolve_location(str(out / "main.py"), frames(trace)[0][1]) is not None
+    assert (warning in result.stderr) == independent
+    assert path.exists() != independent
+    if json_output:
+        payload = json.loads(result.stdout)
+        assert payload["status"] == "success"
+        if independent:
+            assert payload["warning"] == warning
+            assert warning in payload["stats"]["warnings"]
+            assert payload["mapping"] is None
+        else:
+            assert "warning" not in payload
+            assert payload["mapping"] == str(path)
+    if independent:
+        # Show the actual collision which makes a combined name table unsafe.
+        names = []
+        for name in fixture:
+            tree = ast.parse((out / name).read_text())
+            names.append(next(node.name for node in tree.body if isinstance(node, ast.FunctionDef)))
+        assert names == ["I0", "I0", "I0"]
+    else:
+        mapping = ObfuscationMapping.load(path)
+        assert set(mapping.files) == ({"out.py"} if single else set(fixture))
+    # Both directory modes and the single-file mode still produce runnable output.
+    trace = frames(run([out if single else out / "main.py"], tmp_path))
+    assert len(trace) == 2
+    if not independent:
+        assert mapping.resolve_location(trace[-1][0], trace[-1][1]).line == 2
 
 
 def test_alignment_unavailable_and_legacy(tmp_path):

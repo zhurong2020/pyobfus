@@ -22,6 +22,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   detect-secrets for a full scan, and rotate credentials previously shipped or
   committed.
 
+### Fixed
+
+- Directory builds combining `--save-mapping` with `--no-cross-file` now warn
+  that no mapping is written, instead of silently omitting it. Independent
+  per-file renaming can collide and needs file-specific name tables.
+
 ## [0.6.1] - 2026-10-10
 
 Fixes two bugs where a build reported success but the output failed at run
