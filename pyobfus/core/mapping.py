@@ -39,9 +39,10 @@ import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 from pyobfus import __version__ as PYOBFUS_VERSION
+from pyobfus.core.line_map import Location
 
 # Identifier regex: Python 3 allows Unicode, but obfuscated names are always
 # ASCII-safe, so this simple pattern is enough for stack-trace rewriting.
@@ -68,6 +69,8 @@ class ObfuscationMapping:
     # Function locals may repeat original spellings across lexical scopes.
     # Keep them separate from the module-level forward/export mapping.
     locals: Dict[str, Dict[str, str]] = field(default_factory=dict)
+
+    files: Dict[str, Dict[str, Any]] = field(default_factory=dict)
 
     # ---- construction ------------------------------------------------
 
@@ -133,6 +136,7 @@ class ObfuscationMapping:
                 merged.locals.setdefault(module, {}).update(local_map)
                 for obfuscated, original in local_map.items():
                     merged.global_map.setdefault(obfuscated, (module, original))
+            merged.files.update(other.files)
             if not merged.root and other.root:
                 merged.root = other.root
         merged.mode = (
@@ -178,6 +182,8 @@ class ObfuscationMapping:
                 for obf, (mod, orig) in self.global_map.items()
             },
         }
+        if self.files:
+            payload["files"] = {"line_map_version": 1, "entries": self.files}
         return json.dumps(payload, indent=indent, ensure_ascii=False, sort_keys=True)
 
     @classmethod
@@ -206,6 +212,12 @@ class ObfuscationMapping:
         for obf, info in data.get("global", {}).items():
             m.global_map[obf] = (info.get("module", ""), info.get("original", ""))
 
+        files = data.get("files", {})
+        if isinstance(files, dict) and files.get("line_map_version") == 1:
+            entries = files.get("entries", {})
+            if isinstance(entries, dict):
+                m.files = {key: value for key, value in entries.items() if _valid_file(key, value)}
+
         # Backfill global_map if it was not present (forward-only format)
         if not m.global_map:
             for mod, exports in m.modules.items():
@@ -219,6 +231,43 @@ class ObfuscationMapping:
         return m
 
     # ---- reverse lookup ---------------------------------------------
+
+    def resolve_location(self, trace_path: str, line: int) -> Optional[Location]:
+        """Resolve a unique longest path suffix without accessing source files."""
+        if line < 1:
+            return None
+        trace = _path_parts(trace_path)
+        candidates = []
+        for path, record in self.files.items():
+            parts = _path_parts(path)
+            score = 0
+            for left, right in zip(reversed(trace), reversed(parts)):
+                if left != right:
+                    break
+                score += 1
+            if score:
+                candidates.append((score, record))
+        if not candidates:
+            return None
+        longest = max(score for score, _ in candidates)
+        matches = [record for score, record in candidates if score == longest]
+        if len(matches) != 1:
+            return None
+        record = matches[0]
+        runs = record.get("lines")
+        if runs is None or line > record["line_count"]:
+            return None
+        source_line = None
+        for start, value in runs:
+            if start > line:
+                break
+            source_line = value
+        return Location(
+            record["source"],
+            source_line,
+            record["module"],
+            "generated" if source_line is None else "mapped",
+        )
 
     def reverse(self, obfuscated_name: str) -> Optional[str]:
         """Look up an obfuscated identifier and return the original name, or None."""
@@ -281,3 +330,55 @@ class ObfuscationMapping:
             "original_names": sum(len(m) for m in self.modules.values()),
             "unique_obfuscated": len(self.global_map),
         }
+
+
+def _path_parts(path: str) -> List[str]:
+    parts: List[str] = []
+    for part in path.replace("\\", "/").split("/"):
+        if part in ("", "."):
+            continue
+        if part == ".." and parts and parts[-1] != "..":
+            parts.pop()
+        else:
+            parts.append(part.lower() if re.fullmatch(r"[A-Za-z]:", part) else part)
+    return parts
+
+
+def _relative_path(value: object) -> bool:
+    return (
+        isinstance(value, str)
+        and bool(value)
+        and not value.startswith("/")
+        and "\\" not in value
+        and ":" not in value
+        and all(p not in ("", ".", "..") for p in value.split("/"))
+    )
+
+
+def _valid_file(path: object, record: object) -> bool:
+    """Ignore malformed optional metadata without losing legacy name tables."""
+    if not _relative_path(path) or not isinstance(record, dict):
+        return False
+    if not _relative_path(record.get("source")) or not isinstance(record.get("module"), str):
+        return False
+    count = record.get("line_count")
+    if type(count) is not int or count < 0:
+        return False
+    runs = record.get("lines")
+    if runs is None:
+        return True
+    if not isinstance(runs, list) or (count > 0 and not runs):
+        return False
+    previous = 0
+    for run in runs:
+        if not isinstance(run, list) or len(run) != 2:
+            return False
+        start, source = run
+        if type(start) is not int or not previous < start <= count:
+            return False
+        if previous == 0 and start != 1:
+            return False
+        if source is not None and (type(source) is not int or source < 1):
+            return False
+        previous = start
+    return True

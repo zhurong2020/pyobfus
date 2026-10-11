@@ -242,6 +242,8 @@ AI 代码、源码不上传（问题在**没被检索到**，不是缺内容）�
       等插入语句要单独处理）；mapping 格式加版本号并保持旧 mapping 可读；CLI 与 MCP `unmap_stack_trace` 一起改；
       回归用多行表达式、装饰器、docstring、字符串编码、目录构建。Codex 实现、Claude 审核。
       **10-11 Codex 说明已备**（私有 `docs/internal/codex-2026-10/UNMAP_LINES_PROMPT.md`，分 PR1 数据/PR2 输出；10-11 维护者定 mapping 顶层 version 保持 1），10-11 密钥检查合并后启动 PR1。
+- [ ] **P2 · `--no-cross-file` 目录构建支持 mapping**（需按文件区分名字表，`--unmap` 需按帧所在文件解析）。
+      当前各文件独立改名会产生同名冲突；`--save-mapping` 在该模式下不写 mapping，并在 stderr 与 JSON 中警告。
 - [ ] P2 · 多版本 mapping 按 trace marker id 自动选取（如 `--unmap --mapping-dir`）。触发弱（回答建议「每次构建一个 Build ID」，
       我们已有 `--trace-marker` 的 id 注释 + 0.5.31 的不匹配告警），等有用户提出再做。
 

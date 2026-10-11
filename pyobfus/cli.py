@@ -1117,6 +1117,15 @@ def main(
             )
             obfuscation_stats["warnings"] = [warning]
             click.echo(f"Warning: {warning}", err=True)
+        mapping_warning: Optional[str] = None
+        if save_mapping_path and input_path_obj.is_dir() and not cross_file:
+            mapping_warning = (
+                "--save-mapping is not supported for --no-cross-file directory builds: "
+                "each file is renamed independently, so names collide; no mapping was written."
+            )
+            obfuscation_stats.setdefault("warnings", []).append(mapping_warning)
+            click.echo(f"Warning: {mapping_warning}", err=True)
+            save_mapping_path = None
         verification: Optional[Dict[str, Any]] = None
 
         # Incremental short-circuit: directory mode only (single-file
@@ -1168,6 +1177,7 @@ def main(
                         provenance_manifest_path=None,
                         build_report_path=written_report_path,
                         verification=verification,
+                        warning=mapping_warning,
                     )
                     return
                 if verification is not None:
@@ -1214,7 +1224,11 @@ def main(
             else:
                 # Legacy single-file mode
                 dir_stats = _obfuscate_directory(
-                    input_path_obj, output_path_obj, config, verbose, dry_run
+                    input_path_obj,
+                    output_path_obj,
+                    config,
+                    verbose,
+                    dry_run,
                 )
                 if dir_stats:
                     if "warnings" in dir_stats:
@@ -1336,6 +1350,7 @@ def main(
                 trace_marker_id=trace_marker_id,
                 plan=build_plan,
                 verification=verification,
+                warning=mapping_warning,
             )
             return
 
@@ -1460,6 +1475,10 @@ def _obfuscate_file(
     else:
         tree = ASTParser.parse_file(input_file)
 
+    from pyobfus.core.line_map import build_line_map, mark_source_statements
+
+    mark_source_statements(tree)
+
     # Enforce an explicitly configured line-count limit.
     line_count = ASTParser.count_lines(tree)
     if config.max_total_loc and line_count > config.max_total_loc:
@@ -1494,19 +1513,6 @@ def _obfuscate_file(
 
     if verbose:
         click.echo(f"  Name transformations: {mangler.get_transformation_count()}")
-
-    # Save single-file mapping if requested
-    if save_mapping_path and not dry_run:
-        from pyobfus.core.mapping import ObfuscationMapping
-
-        mapping = ObfuscationMapping.from_single_file(
-            mangler.get_name_mapping(),
-            root=str(input_file.parent),
-            module=input_file.stem,
-        )
-        mapping.save(save_mapping_path)
-        if verbose:
-            click.echo(f"  Wrote mapping: {save_mapping_path}")
 
     # 2. Post-mangle content transforms: string encoding + numeric (Community)
     #    then the Pro block (control-flow, import obfuscation, AES string
@@ -1573,6 +1579,30 @@ def _obfuscate_file(
             lines = obfuscated_code.split("\n")[:10]
             for line in lines:
                 click.echo(f"    {line}")
+
+    # Save single-file mapping if requested
+    if save_mapping_path and not dry_run:
+        from pyobfus.core.mapping import ObfuscationMapping
+
+        mapping = ObfuscationMapping.from_single_file(
+            mangler.get_name_mapping(),
+            root=str(input_file.parent),
+            module=input_file.stem,
+        )
+        source = input_file.relative_to(source_root).as_posix() if source_root else input_file.name
+        record = build_line_map(
+            transformed_tree,
+            obfuscated_code,
+            source,
+            input_file.stem,
+            "Pro fusion text passes enabled" if _fusion else None,
+        )
+        mapping.files[output_file.name] = record
+        mapping.save(save_mapping_path)
+        if verbose and record.get("reason"):
+            click.echo(f"  Line map unavailable: {record['reason']}")
+        if verbose and save_mapping_path:
+            click.echo(f"  Wrote mapping: {save_mapping_path}")
 
     return file_stats
 
@@ -1648,7 +1678,12 @@ def _obfuscate_directory(
 
         try:
             file_stats = _obfuscate_file(
-                python_file, output_file, config, verbose, dry_run, source_root=input_dir
+                python_file,
+                output_file,
+                config,
+                verbose,
+                dry_run,
+                source_root=input_dir,
             )
             dir_stats["files_processed"] += 1
             for key, value in file_stats.items():
@@ -1800,6 +1835,11 @@ def _obfuscate_directory_crossfile(
             mapping = ObfuscationMapping.from_global_table(
                 orchestrator.global_table, root=str(input_dir)
             )
+            mapping.files = orchestrator.file_line_maps
+            if verbose:
+                for path, record in mapping.files.items():
+                    if record.get("reason"):
+                        click.echo(f"  Line map unavailable for {path}: {record['reason']}")
             mapping.save(save_mapping_path)
             click.echo(f"Wrote mapping: {save_mapping_path} ({mapping.stats()})")
 
@@ -2054,7 +2094,8 @@ def _apply_trace_markers(output_path: Path, mapping_path: str) -> Optional[str]:
     """
     mp = Path(mapping_path)
     try:
-        marker_id = json.loads(mp.read_text(encoding="utf-8")).get("marker_id")
+        mapping_data = json.loads(mp.read_text(encoding="utf-8"))
+        marker_id = mapping_data.get("marker_id")
     except (OSError, ValueError):
         return None
     if not isinstance(marker_id, str) or not marker_id:
@@ -2071,7 +2112,19 @@ def _apply_trace_markers(output_path: Path, mapping_path: str) -> Optional[str]:
             continue
         if TRACE_MARKER_PREFIX in txt[:512]:
             continue  # already stamped — keep idempotent
-        f.write_text(_insert_after_prologue(txt, block), encoding="utf-8")
+        stamped = _insert_after_prologue(txt, block)
+        f.write_text(stamped, encoding="utf-8")
+        key = f.name if output_path.is_file() else f.relative_to(output_path).as_posix()
+        record = mapping_data.get("files", {}).get("entries", {}).get(key)
+        if record is not None:
+            from pyobfus.core.line_map import shift_line_map
+
+            # Locate the inserted block after the unchanged prologue.
+            prologue_lines = stamped[: stamped.index(block)].count("\n")
+            shift_line_map(record, prologue_lines, len(block.splitlines()))
+    mp.write_text(
+        json.dumps(mapping_data, indent=2, ensure_ascii=False, sort_keys=True), encoding="utf-8"
+    )
     return marker_id
 
 
@@ -2088,6 +2141,7 @@ def _emit_obfuscate_success_json(
     trace_marker_id: Optional[str] = None,
     plan: Optional[Dict[str, Any]] = None,
     verification: Optional[Dict[str, Any]] = None,
+    warning: Optional[str] = None,
 ) -> None:
     """Emit the obfuscation success summary as JSON."""
     # AI hint: suggest the most useful next command based on context
@@ -2130,6 +2184,8 @@ def _emit_obfuscate_success_json(
         "trace_marker_id": trace_marker_id,
         "ai_hint": ai_hint,
     }
+    if warning:
+        payload["warning"] = warning
     if dry_run and plan is not None:
         payload["plan"] = plan
     if verification is not None:

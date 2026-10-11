@@ -22,6 +22,7 @@ from pyobfus import __version__
 from pyobfus.core.build_marker import apply_marker, marker_enabled
 from pyobfus.core.generator import CodeGenerator
 from pyobfus.core.parser import ASTParser
+from pyobfus.core.line_map import build_line_map, mark_source_statements
 from pyobfus.transformers.import_rewriter import ImportRewriter
 from pyobfus.transformers.all_list_updater import AllListUpdater
 from pyobfus.transformers.exported_name_transformer import ExportedNameTransformer
@@ -42,7 +43,7 @@ def _transform_single_file(
     global_table: "GlobalSymbolTable",
     config: Optional[ObfuscationConfig] = None,
     local_plan: Optional[LocalPlan] = None,
-) -> Tuple[str, Optional[str], Dict[str, int]]:
+) -> Tuple[str, Optional[str], Dict[str, int], Optional[Dict[str, Any]]]:
     """
     Transform a single file using the global symbol table.
 
@@ -55,7 +56,7 @@ def _transform_single_file(
     single-file mode instead of silently dropping those transforms.
 
     Returns:
-        Tuple of (module_name, error_message_or_None, per_file_stats)
+        Tuple of (module_name, error_message_or_None, per_file_stats, line_map_record)
     """
     file_stats: Dict[str, int] = {}
     try:
@@ -64,6 +65,7 @@ def _transform_single_file(
 
         original_tree = ast.parse(source)
         tree = ast.parse(source)
+        mark_source_statements(tree)
         mark_class_bindings(tree)
         if local_plan is not None:
             tree = apply_local_plan(tree, local_plan)
@@ -144,9 +146,10 @@ def _transform_single_file(
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(new_source)
 
-        return (module_name, None, file_stats)
+        record = build_line_map(tree, new_source, relative_path.as_posix(), module_name)
+        return (module_name, None, file_stats, record)
     except Exception as e:
-        return (module_name, str(e), file_stats)
+        return (module_name, str(e), file_stats, None)
 
 
 @dataclass
@@ -234,6 +237,7 @@ class CrossFileOrchestrator:
         # encoding, numeric, control-flow, string encryption, anti-debug,
         # dead-code, AI-marker stripping). Populated by phase2_transform.
         self.content_stats: Dict[str, int] = {}
+        self.file_line_maps: Dict[str, Dict[str, Any]] = {}
         self.local_plans: Dict[str, LocalPlan] = {}
         self._reserved_names: Set[str] = set()
         self._planning_warnings: List[str] = []
@@ -517,6 +521,7 @@ class CrossFileOrchestrator:
         output_dir.mkdir(parents=True, exist_ok=True)
         errors: List[str] = []
         self.content_stats = {}
+        self.file_line_maps = {}
 
         max_workers = self.config.max_workers
         use_parallel = max_workers != 1 and len(self.files) > 1
@@ -539,7 +544,9 @@ class CrossFileOrchestrator:
                     for fi in self.files
                 }
                 for future in as_completed(futures):
-                    module_name, error, file_stats = future.result()
+                    module_name, error, file_stats, record = future.result()
+                    if record is not None:
+                        self.file_line_maps[futures[future].relative_path.as_posix()] = record
                     self._accumulate_content_stats(file_stats)
                     if error:
                         errors.append(f"{module_name}: {error}")
@@ -547,7 +554,7 @@ class CrossFileOrchestrator:
                         progress_callback(module_name, error)
         else:
             for file_info in self.files:
-                module_name, error, file_stats = _transform_single_file(
+                module_name, error, file_stats, record = _transform_single_file(
                     file_info.path,
                     file_info.relative_path,
                     file_info.module_name,
@@ -557,6 +564,8 @@ class CrossFileOrchestrator:
                     self.config,
                     self.local_plans.get(file_info.module_name),
                 )
+                if record is not None:
+                    self.file_line_maps[file_info.relative_path.as_posix()] = record
                 self._accumulate_content_stats(file_stats)
                 if error:
                     errors.append(f"{module_name}: {error}")

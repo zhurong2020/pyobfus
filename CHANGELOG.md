@@ -9,12 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Saved Community mapping files can include relative file paths and statement-level
+  output-to-source line tables, queried through `ObfuscationMapping.resolve_location`.
+  Mapping format v1 and marker IDs remain compatible with older readers. Generated
+  statements are distinguished from source code; Pro fusion text passes omit line
+  tables with a reason. CLI/MCP traceback presentation remains name-only in this step.
+
 - Community `--check` now flags potential hardcoded secrets by common credential
   shapes or sensitive literal contexts (`hardcoded_secret`). Reports locations
   without values; medium/info findings do not change exit codes. Obfuscation
   does not hide string values. This is a coarse screen: use gitleaks or
   detect-secrets for a full scan, and rotate credentials previously shipped or
   committed.
+
+### Fixed
+
+- Directory builds combining `--save-mapping` with `--no-cross-file` now warn
+  that no mapping is written, instead of silently omitting it. Independent
+  per-file renaming can collide and needs file-specific name tables.
 
 ## [0.6.1] - 2026-10-10
 
