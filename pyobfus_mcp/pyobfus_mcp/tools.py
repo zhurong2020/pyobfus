@@ -47,6 +47,7 @@ import re
 import shlex
 import subprocess
 import sys
+import zipfile
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -628,6 +629,65 @@ def unmap_stack_trace(trace: str, mapping_path: str) -> Dict[str, Any]:
 
 
 @secure_tool()
+def check_delivery(
+    path: str,
+    build_report: Optional[str] = None,
+    provenance_manifest: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Check an output directory or wheel before it is shipped.
+
+    Wraps `pyobfus --check-delivery`. Reports a mapping file, a private key or
+    an original source file inside the delivery (high), and Python files the
+    build did not produce or Pro options the build skipped (medium). Reads and
+    hashes files only; nothing is imported or executed, and file contents are
+    never returned.
+
+    Args:
+        path: Output directory or .whl to check.
+        build_report: Optional JSON written by `--build-report` for this build.
+        provenance_manifest: Optional JSON written by `--provenance-manifest`
+            for this build (enables the original-source check).
+
+    Returns:
+        Dict with keys: status ("ok" | "warn" | "fail" | "error"), findings,
+        summary, limitations, ai_hint, next_tool.
+    """
+    try:
+        from pyobfus.core.delivery_check import check_delivery as _check
+    except ImportError:
+        return _error(
+            "FeatureUnavailable",
+            "The installed pyobfus has no delivery check.",
+            "Upgrade pyobfus (the delivery check ships in the release after 0.7.0).",
+        )
+    try:
+        target = validate_path(path, must_exist=True)
+        report = validate_path(build_report, must_exist=True) if build_report else None
+        manifest = (
+            validate_path(provenance_manifest, must_exist=True) if provenance_manifest else None
+        )
+    except PathScopeError as e:
+        return _error("PathScopeError", str(e), "Use paths inside PYOBFUS_MCP_PROJECT_ROOT.")
+    except FileNotFoundError as e:
+        return _error("NotFound", str(e), "Pass an existing directory, .whl or JSON file.")
+    try:
+        result = _check(target, build_report=report, provenance_manifest=manifest)
+    except (OSError, ValueError, zipfile.BadZipFile) as e:
+        return _error(
+            "InvalidInput",
+            str(e),
+            "Pass an output directory or a .whl, and JSON files written by the build.",
+        )
+    if result["status"] == "fail":
+        follow_up = (
+            "remove the high-severity files from the delivery, then call check_delivery again"
+        )
+    else:
+        follow_up = "the delivery has no known pyobfus mistakes; ship it with your usual checks"
+    result["next_tool"] = _next_tool(None, follow_up)
+    return result
+
+
 def list_presets() -> Dict[str, Any]:
     """List every pyobfus preset available, grouped by tier.
 

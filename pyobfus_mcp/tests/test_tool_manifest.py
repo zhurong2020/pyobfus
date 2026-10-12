@@ -19,7 +19,7 @@ class TestComputeLiveManifest:
     def test_returns_all_eight_tools(self) -> None:
         manifest = compute_live_manifest()
         names = [t["name"] for t in manifest["tools"]]
-        assert len(names) == 8
+        assert len(names) == 9
         assert names == sorted(names), "tools must be sorted by name"
         assert "protect_project" in names
         assert "check_obfuscation_risks" in names
@@ -66,7 +66,7 @@ class TestVerifyIntegrity:
         shipped = load_shipped_manifest()
         assert "digest" in shipped
         assert "tools" in shipped
-        assert len(shipped["tools"]) == 8
+        assert len(shipped["tools"]) == 9
 
 
 class TestDiffManifests:
@@ -126,9 +126,9 @@ class TestCliEntryPoint:
         main(["--generate"])
         out = capsys.readouterr().out
         assert "Wrote" in out
-        assert "8 tools" in out
+        assert "9 tools" in out
         assert fake_path.exists()
 
         written = json.loads(fake_path.read_text(encoding="utf-8"))
-        assert len(written["tools"]) == 8
+        assert len(written["tools"]) == 9
         assert written["digest"] == compute_live_manifest()["digest"]
