@@ -390,6 +390,15 @@ def _echo_pro_import_hint() -> None:
     "Exit code 0=safe, 1=high-risk findings, 2=parse errors.",
 )
 @click.option(
+    "--check-delivery",
+    "check_delivery_path",
+    type=click.Path(exists=True),
+    help="Check what you are about to ship (an output directory or a .whl): "
+    "mapping files, private keys, original sources (with --provenance-manifest) "
+    "and files the build did not produce (with --build-report). Reads files only; "
+    "nothing is executed. Exit code 0=ok/warn, 1=high findings, 2=error.",
+)
+@click.option(
     "--json",
     "json_output",
     is_flag=True,
@@ -543,6 +552,7 @@ def main(
     stats: bool,
     jobs: int,
     check_mode: bool,
+    check_delivery_path: Optional[str],
     json_output: bool,
     offline: bool,
     sarif_path: Optional[str],
@@ -575,6 +585,15 @@ def main(
       pyobfus --validate-config pyobfus.yaml
       pyobfus --verify-provenance-manifest provenance.json
     """
+    if check_delivery_path is not None:
+        _handle_check_delivery(
+            Path(check_delivery_path),
+            build_report=build_report_path,
+            provenance_manifest=provenance_manifest_path,
+            json_output=json_output,
+        )
+        return
+
     # --sarif is only meaningful with --check.
     if sarif_path is not None and not check_mode:
         click.echo("Error: --sarif is only valid with --check.", err=True)
@@ -2294,6 +2313,50 @@ def _write_build_report(
 # added to the build stats only when an L3 pass ran, so Community output and
 # its JSON keep their existing shape.
 _PROTECTION_STAT_PREFIX = "l3_"
+
+
+def _handle_check_delivery(
+    target: Path,
+    *,
+    build_report: Optional[str],
+    provenance_manifest: Optional[str],
+    json_output: bool,
+) -> None:
+    """--check-delivery: inspect a delivery directory or wheel; exit 1 on high findings.
+
+    In this mode --build-report and --provenance-manifest name existing files
+    from the build to compare against; nothing is written.
+    """
+    import zipfile
+
+    from pyobfus.core.delivery_check import check_delivery, format_text
+
+    try:
+        result = check_delivery(
+            target,
+            build_report=Path(build_report) if build_report else None,
+            provenance_manifest=Path(provenance_manifest) if provenance_manifest else None,
+        )
+    except (OSError, ValueError, zipfile.BadZipFile) as exc:
+        if json_output:
+            click.echo(
+                json.dumps(
+                    {
+                        "status": "error",
+                        "ai_hint": "Pass an output directory or a .whl, and readable JSON "
+                        "build report / provenance manifest files.",
+                        "error": str(exc),
+                    }
+                )
+            )
+        else:
+            click.echo(f"Error: {exc}", err=True)
+        sys.exit(2)
+    if json_output:
+        click.echo(json.dumps(result, indent=2, sort_keys=True))
+    else:
+        click.echo(format_text(result))
+    sys.exit(1 if result["status"] == "fail" else 0)
 
 
 def _report_fusion_options(
