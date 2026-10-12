@@ -1,0 +1,147 @@
+{
+  "description": "Freight quote: weight tiers (<=5, <=20, >20 kg, 0.5 kg minimum), per-zone multiplier, express surcharge and a heavy zone-4 fee.",
+  "entrypoint": "freight_quote",
+  "io_vectors": [
+    {
+      "args": [
+        0,
+        1,
+        false
+      ],
+      "expect": 0.0
+    },
+    {
+      "args": [
+        0.2,
+        1,
+        false
+      ],
+      "expect": 7.55
+    },
+    {
+      "args": [
+        3,
+        1,
+        false
+      ],
+      "expect": 12.8
+    },
+    {
+      "args": [
+        5,
+        2,
+        false
+      ],
+      "expect": 20.06
+    },
+    {
+      "args": [
+        5.5,
+        2,
+        true
+      ],
+      "expect": 36.56
+    },
+    {
+      "args": [
+        12,
+        3,
+        false
+      ],
+      "expect": 40.04
+    },
+    {
+      "args": [
+        20,
+        1,
+        true
+      ],
+      "expect": 67.55
+    },
+    {
+      "args": [
+        20.5,
+        4,
+        false
+      ],
+      "expect": 79.18
+    },
+    {
+      "args": [
+        31,
+        4,
+        false
+      ],
+      "expect": 118.61
+    },
+    {
+      "args": [
+        31,
+        4,
+        true
+      ],
+      "expect": 180.98
+    },
+    {
+      "args": [
+        45,
+        2,
+        true
+      ],
+      "expect": 140.72
+    },
+    {
+      "args": [
+        8,
+        9,
+        false
+      ],
+      "expect": 52.32
+    },
+    {
+      "args": [
+        2,
+        4,
+        true
+      ],
+      "expect": 35.51
+    },
+    {
+      "args": [
+        30,
+        4,
+        false
+      ],
+      "expect": 103.55
+    },
+    {
+      "args": [
+        60,
+        3,
+        false
+      ],
+      "expect": 134.9
+    },
+    {
+      "args": [
+        1,
+        2,
+        true
+      ],
+      "expect": 19.73
+    },
+    {
+      "args": [
+        100,
+        5,
+        true
+      ],
+      "expect": 558.28
+    }
+  ],
+  "c4_eligible": true,
+  "c4_target": "freight_quote",
+  "c5_eligible": false,
+  "public_knowledge": false,
+  "round": "2026-10-12"
+}

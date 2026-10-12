@@ -1,0 +1,164 @@
+{
+  "description": "Insurance claim risk: additive score from age band, capped prior claims, region and tenure, clamped 0-100, mapped to accept/refer/decline.",
+  "entrypoint": "claim_risk",
+  "io_vectors": [
+    {
+      "args": [
+        30,
+        0,
+        "N",
+        0
+      ],
+      "expect": "accept"
+    },
+    {
+      "args": [
+        19,
+        0,
+        "N",
+        0
+      ],
+      "expect": "refer"
+    },
+    {
+      "args": [
+        22,
+        1,
+        "E",
+        2
+      ],
+      "expect": "refer"
+    },
+    {
+      "args": [
+        80,
+        0,
+        "S",
+        12
+      ],
+      "expect": "accept"
+    },
+    {
+      "args": [
+        40,
+        2,
+        "W",
+        5
+      ],
+      "expect": "refer"
+    },
+    {
+      "args": [
+        40,
+        6,
+        "W",
+        1
+      ],
+      "expect": "decline"
+    },
+    {
+      "args": [
+        18,
+        3,
+        "X",
+        0
+      ],
+      "expect": "decline"
+    },
+    {
+      "args": [
+        35,
+        0,
+        "N",
+        6
+      ],
+      "expect": "accept"
+    },
+    {
+      "args": [
+        35,
+        0,
+        "N",
+        10
+      ],
+      "expect": "accept"
+    },
+    {
+      "args": [
+        25,
+        2,
+        "S",
+        3
+      ],
+      "expect": "decline"
+    },
+    {
+      "args": [
+        26,
+        2,
+        "S",
+        3
+      ],
+      "expect": "refer"
+    },
+    {
+      "args": [
+        74,
+        1,
+        "E",
+        4
+      ],
+      "expect": "accept"
+    },
+    {
+      "args": [
+        75,
+        1,
+        "E",
+        4
+      ],
+      "expect": "refer"
+    },
+    {
+      "args": [
+        50,
+        4,
+        "W",
+        0
+      ],
+      "expect": "decline"
+    },
+    {
+      "args": [
+        60,
+        0,
+        "Z",
+        20
+      ],
+      "expect": "accept"
+    },
+    {
+      "args": [
+        20,
+        4,
+        "W",
+        0
+      ],
+      "expect": "decline"
+    },
+    {
+      "args": [
+        45,
+        1,
+        "N",
+        9
+      ],
+      "expect": "accept"
+    }
+  ],
+  "c4_eligible": true,
+  "c4_target": "claim_risk",
+  "c5_eligible": false,
+  "public_knowledge": false,
+  "round": "2026-10-12"
+}

@@ -1,0 +1,147 @@
+{
+  "description": "Appointment slot allocator: priority-dependent opening time and closing limit, lunch-hour skip, 15-minute rounding, low-priority delay, duration bounds.",
+  "entrypoint": "slot_allocator",
+  "io_vectors": [
+    {
+      "args": [
+        0,
+        8,
+        30
+      ],
+      "expect": 360
+    },
+    {
+      "args": [
+        0,
+        5,
+        30
+      ],
+      "expect": 480
+    },
+    {
+      "args": [
+        700,
+        5,
+        30
+      ],
+      "expect": 705
+    },
+    {
+      "args": [
+        720,
+        5,
+        30
+      ],
+      "expect": 780
+    },
+    {
+      "args": [
+        779,
+        4,
+        60
+      ],
+      "expect": 780
+    },
+    {
+      "args": [
+        481,
+        5,
+        30
+      ],
+      "expect": 495
+    },
+    {
+      "args": [
+        481,
+        2,
+        30
+      ],
+      "expect": 525
+    },
+    {
+      "args": [
+        1000,
+        9,
+        300
+      ],
+      "expect": -1
+    },
+    {
+      "args": [
+        1000,
+        9,
+        0
+      ],
+      "expect": -1
+    },
+    {
+      "args": [
+        1050,
+        5,
+        30
+      ],
+      "expect": 1050
+    },
+    {
+      "args": [
+        1050,
+        5,
+        31
+      ],
+      "expect": -1
+    },
+    {
+      "args": [
+        1290,
+        8,
+        30
+      ],
+      "expect": 1290
+    },
+    {
+      "args": [
+        1290,
+        8,
+        31
+      ],
+      "expect": -1
+    },
+    {
+      "args": [
+        600,
+        1,
+        60
+      ],
+      "expect": 630
+    },
+    {
+      "args": [
+        365,
+        8,
+        15
+      ],
+      "expect": 375
+    },
+    {
+      "args": [
+        1079,
+        7,
+        1
+      ],
+      "expect": -1
+    },
+    {
+      "args": [
+        300,
+        10,
+        240
+      ],
+      "expect": 360
+    }
+  ],
+  "c4_eligible": true,
+  "c4_target": "slot_allocator",
+  "c5_eligible": false,
+  "public_knowledge": false,
+  "round": "2026-10-12"
+}

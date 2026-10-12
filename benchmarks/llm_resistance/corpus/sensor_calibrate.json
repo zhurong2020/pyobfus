@@ -1,0 +1,130 @@
+{
+  "description": "Sensor calibration: 12-bit raw range check, three-segment response curve, temperature drift correction with a cold offset.",
+  "entrypoint": "sensor_calibrate",
+  "io_vectors": [
+    {
+      "args": [
+        63,
+        23
+      ],
+      "expect": -1.0
+    },
+    {
+      "args": [
+        4032,
+        23
+      ],
+      "expect": -1.0
+    },
+    {
+      "args": [
+        64,
+        23
+      ],
+      "expect": 0.0
+    },
+    {
+      "args": [
+        100,
+        23
+      ],
+      "expect": 3.739
+    },
+    {
+      "args": [
+        777,
+        23
+      ],
+      "expect": 74.05
+    },
+    {
+      "args": [
+        778,
+        23
+      ],
+      "expect": 74.154
+    },
+    {
+      "args": [
+        1500,
+        23
+      ],
+      "expect": 118.635
+    },
+    {
+      "args": [
+        2959,
+        23
+      ],
+      "expect": 200.832
+    },
+    {
+      "args": [
+        2960,
+        23
+      ],
+      "expect": 200.872
+    },
+    {
+      "args": [
+        3500,
+        23
+      ],
+      "expect": 214.144
+    },
+    {
+      "args": [
+        4031,
+        23
+      ],
+      "expect": 227.195
+    },
+    {
+      "args": [
+        2000,
+        40
+      ],
+      "expect": 137.649
+    },
+    {
+      "args": [
+        2000,
+        -5
+      ],
+      "expect": 164.948
+    },
+    {
+      "args": [
+        2000,
+        -11
+      ],
+      "expect": 170.287
+    },
+    {
+      "args": [
+        500,
+        0
+      ],
+      "expect": 49.552
+    },
+    {
+      "args": [
+        3900,
+        60
+      ],
+      "expect": 189.998
+    },
+    {
+      "args": [
+        1200,
+        -30
+      ],
+      "expect": 123.989
+    }
+  ],
+  "c4_eligible": true,
+  "c4_target": "sensor_calibrate",
+  "c5_eligible": false,
+  "public_knowledge": false,
+  "round": "2026-10-12"
+}

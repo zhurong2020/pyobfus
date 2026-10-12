@@ -11,6 +11,7 @@ See ``docs/LLM_RESISTANCE_BENCHMARK.md`` for the design rationale.
 from __future__ import annotations
 
 import ast
+import os
 import subprocess
 import sys
 import tempfile
@@ -34,7 +35,15 @@ class Condition:
     # C3). Used to auto-detect a no-op transform (e.g. --string-encryption on
     # a sample with no string literals) before spending an attacker call.
     builds_on: str = ""
+    # Environment variables set only for the build (C4b's application key).
+    build_env: tuple[tuple[str, str], ...] = ()
 
+
+# A fixed, public, benchmark-only L3 key for C4b. It is never shipped in the
+# artifact (that is the point of --bind-key-env); the scorer runs the attacker's
+# reimplementation, not the artifact, so the key is never needed afterwards.
+BENCH_KEY_ENV = "PYOBFUS_BENCH_L3_KEY"
+BENCH_KEY_B64 = "YmVuY2htYXJrLW9ubHktbDMta2V5LTMyLWJ5dGVzISE="
 
 CONDITIONS: tuple[Condition, ...] = (
     Condition("C0", "plaintext (control)", (), "", ""),
@@ -50,7 +59,17 @@ CONDITIONS: tuple[Condition, ...] = (
         "",
         builds_on="C2",
     ),
-    Condition("C4", "Pro L3 opacity", ("--selective-opacity",), "maximum", "opacity"),
+    Condition(
+        "C4", "Pro L3 opacity, key in the artifact", ("--selective-opacity",), "maximum", "opacity"
+    ),
+    Condition(
+        "C4b",
+        "Pro L3 opacity, application-provided key (not in the artifact)",
+        ("--selective-opacity", "--bind-key-env", BENCH_KEY_ENV),
+        "maximum",
+        "opacity",
+        build_env=((BENCH_KEY_ENV, BENCH_KEY_B64),),
+    ),
     Condition("C5", "Pro L3 vault", ("--vault",), "maximum", "vault"),
 )
 
@@ -98,7 +117,10 @@ def _run_pyobfus(source: str, condition: Condition) -> str:
         if condition.preset:
             cmd += ["--preset", condition.preset]
         cmd += list(condition.flags)
-        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
+        env = None
+        if condition.build_env:
+            env = {**os.environ, **dict(condition.build_env)}
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=180, env=env)
         if proc.returncode != 0 or not out.exists():
             raise ConditionError(
                 f"pyobfus failed for {condition.cid}: rc={proc.returncode}\n"

@@ -1,0 +1,147 @@
+{
+  "description": "Loyalty points: per-tier earn rate on whole currency units, November/December double, July bonus for non-bronze, large-order bonus, per-tier cap.",
+  "entrypoint": "loyalty_points",
+  "io_vectors": [
+    {
+      "args": [
+        2.5,
+        "gold",
+        1
+      ],
+      "expect": 0
+    },
+    {
+      "args": [
+        3,
+        "bronze",
+        1
+      ],
+      "expect": 3
+    },
+    {
+      "args": [
+        10.9,
+        "silver",
+        3
+      ],
+      "expect": 20
+    },
+    {
+      "args": [
+        100,
+        "gold",
+        11
+      ],
+      "expect": 600
+    },
+    {
+      "args": [
+        100,
+        "bronze",
+        12
+      ],
+      "expect": 200
+    },
+    {
+      "args": [
+        60,
+        "silver",
+        7
+      ],
+      "expect": 170
+    },
+    {
+      "args": [
+        60,
+        "bronze",
+        7
+      ],
+      "expect": 60
+    },
+    {
+      "args": [
+        250,
+        "gold",
+        5
+      ],
+      "expect": 870
+    },
+    {
+      "args": [
+        250,
+        "silver",
+        5
+      ],
+      "expect": 540
+    },
+    {
+      "args": [
+        249.99,
+        "gold",
+        5
+      ],
+      "expect": 747
+    },
+    {
+      "args": [
+        400,
+        "gold",
+        12
+      ],
+      "expect": 1500
+    },
+    {
+      "args": [
+        900,
+        "silver",
+        2
+      ],
+      "expect": 800
+    },
+    {
+      "args": [
+        700,
+        "gold",
+        11
+      ],
+      "expect": 1500
+    },
+    {
+      "args": [
+        50,
+        "platinum",
+        11
+      ],
+      "expect": 0
+    },
+    {
+      "args": [
+        30,
+        "gold",
+        7
+      ],
+      "expect": 140
+    },
+    {
+      "args": [
+        260,
+        "bronze",
+        7
+      ],
+      "expect": 300
+    },
+    {
+      "args": [
+        1000,
+        "gold",
+        1
+      ],
+      "expect": 1500
+    }
+  ],
+  "c4_eligible": true,
+  "c4_target": "loyalty_points",
+  "c5_eligible": false,
+  "public_knowledge": false,
+  "round": "2026-10-12"
+}

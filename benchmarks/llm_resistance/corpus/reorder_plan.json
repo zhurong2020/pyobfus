@@ -1,0 +1,164 @@
+{
+  "description": "Inventory reorder: seasonal demand, safety stock with a floor, reorder point by lead time, order-up-to target, minimum order and case rounding above 60.",
+  "entrypoint": "reorder_plan",
+  "io_vectors": [
+    {
+      "args": [
+        100,
+        0,
+        5,
+        "normal"
+      ],
+      "expect": 0
+    },
+    {
+      "args": [
+        500,
+        10,
+        5,
+        "normal"
+      ],
+      "expect": 0
+    },
+    {
+      "args": [
+        60,
+        10,
+        5,
+        "normal"
+      ],
+      "expect": 240
+    },
+    {
+      "args": [
+        10,
+        10,
+        5,
+        "normal"
+      ],
+      "expect": 288
+    },
+    {
+      "args": [
+        10,
+        2,
+        3,
+        "low"
+      ],
+      "expect": 0
+    },
+    {
+      "args": [
+        0,
+        2,
+        3,
+        "low"
+      ],
+      "expect": 45
+    },
+    {
+      "args": [
+        40,
+        4,
+        7,
+        "peak"
+      ],
+      "expect": 144
+    },
+    {
+      "args": [
+        200,
+        4,
+        7,
+        "peak"
+      ],
+      "expect": 0
+    },
+    {
+      "args": [
+        5,
+        1,
+        1,
+        "normal"
+      ],
+      "expect": 0
+    },
+    {
+      "args": [
+        30,
+        3,
+        10,
+        "unknown"
+      ],
+      "expect": 72
+    },
+    {
+      "args": [
+        0,
+        30,
+        14,
+        "peak"
+      ],
+      "expect": 1584
+    },
+    {
+      "args": [
+        90,
+        6,
+        2,
+        "low"
+      ],
+      "expect": 0
+    },
+    {
+      "args": [
+        0,
+        1,
+        0,
+        "normal"
+      ],
+      "expect": 24
+    },
+    {
+      "args": [
+        50,
+        5,
+        10,
+        "normal"
+      ],
+      "expect": 120
+    },
+    {
+      "args": [
+        1,
+        0.5,
+        2,
+        "low"
+      ],
+      "expect": 12
+    },
+    {
+      "args": [
+        300,
+        25,
+        9,
+        "peak"
+      ],
+      "expect": 840
+    },
+    {
+      "args": [
+        44,
+        2.2,
+        6,
+        "normal"
+      ],
+      "expect": 0
+    }
+  ],
+  "c4_eligible": true,
+  "c4_target": "reorder_plan",
+  "c5_eligible": false,
+  "public_knowledge": false,
+  "round": "2026-10-12"
+}
