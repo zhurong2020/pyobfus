@@ -192,7 +192,7 @@ jobs:
 
     - name: Run offline benchmark smoke suite
       run: |
-        pytest benchmarks/llm_resistance/test_smoke.py -v --no-cov
+        pytest benchmarks/llm_resistance/test_smoke.py benchmarks/llm_resistance/test_key_exposure.py -v --no-cov
 
   mcp-sdk-latest:
     # Catches mcp SDK API drift against pyobfus-mcp (e.g. the FastMCP version=

@@ -73,9 +73,16 @@ to make that difference measurable, not rhetorical.
 - **Attacker**: an LLM analyst given only the obfuscated artifact and the task
   "recover a clean, readable, functionally-equivalent reimplementation, and
   explain what this code does." Static analysis only — the attacker does **not**
-  execute the artifact and does **not** possess the mapping file, the layer key,
-  or the bound device. (Running the artifact is a separate, out-of-scope threat;
-  L3 defends the *source*, not the runtime process.)
+  execute the artifact and does **not** possess the mapping file or the bound
+  device. (Running the artifact is a separate, out-of-scope threat; L3 defends
+  the *source*, not the runtime process.)
+- **Correction (2026-10-12):** the v0 C4/C5 builds do not use `--bind-device` or
+  `--bind-key-env`, so `_LAYER_KEY` / `_VAULT_KEY_*` are literals in the very
+  artifact the attacker reads. The pilot's C4/C5 "resistance" therefore
+  reflects an attacker with no tools to run a decryption, not a missing key:
+  `benchmarks/llm_resistance/key_exposure.py` decrypts such an artifact
+  statically, without a model. Report v0 C4/C5 results only with this caveat;
+  round 2 below separates key location from attacker permissions.
 - **Defender**: pyobfus, at a chosen condition on the ladder below.
 - **Out of scope for v0**: dynamic analysis / memory dumping of a running
   process, key extraction from a bound device, and multi-file whole-project
@@ -244,6 +251,45 @@ benchmarks/llm_resistance/
    flags the *mode* as separable from and later than the benchmark).
 4. **Research paper**: formalize, add baselines (Acoda transforms, PyArmor,
    Nuitka), scale corpus, arXiv cs.CR preprint → venue.
+
+## Round 2 protocol (2026-10-12)
+
+Set by the AI-era roadmap review (`docs/AI_ERA_PROTECTION_ROADMAP_REVIEW_CLAUDE_2026-10-12.md` §6,
+roadmap §13). Research evidence for choosing techniques, not marketing.
+
+**Accounts.** Only the maintainer's subscriptions, through `CodexCliAttacker` (ChatGPT login) and
+`ClaudeCodeCliAttacker` (Claude login). Both adapters strip `OPENAI_API_KEY` / `CODEX_API_KEY` /
+`ANTHROPIC_API_KEY`; before a run, confirm `codex login status` and `claude` report a subscription
+login. When a quota runs out, stop and resume later; never switch to the API.
+
+**Fixed baselines, no model.** `key_exposure.py` reports, per artifact, whether the key is in the
+file and whether a run with the key exposes the protected bytecode (`marshal.loads` audit hook).
+Expected and tested: default L3 decrypts statically; `--bind-key-env` resists static recovery and
+exposes the bytecode to anyone who runs it with the key. These are reported as facts, not as model
+results.
+
+**Attacker permissions, reported separately.**
+1. Static: the artifact text only (the v0 adapters).
+2. Runnable: a no-network sandbox with Python and a local decompiler, (2a) without the key,
+   (2b) with the key. Needs an agentic adapter; not built yet.
+3. Black box: entrypoint signatures plus a limited number of input/output queries, no artifact.
+
+**Conditions.** C0 plaintext · C-pyc bytecode only (negative baseline) · C1 Community default ·
+C4a L3 with the key in the file · C4b L3 + `--bind-key-env`, no key · C4c the same with the key.
+
+**Corpus.** Six new private synthetic samples with custom logic (at least one multi-module), at
+least 15 hidden I/O vectors each, plus two public-algorithm samples that only measure recall.
+
+**Validity checks before any result counts.** C0 must recover 100% (else fix the harness); a trivial
+attacker baseline; record which protections actually applied (no-op detection); pin model id, CLI
+version, date, prompt, tools and artifact hashes.
+
+**Order and stop rules.**
+1. Static probe: 2 model families × 6 samples × {C0, C1, C4a, C4b} × 1 attempt.
+2. Expand to 3 attempts and the runnable tier only if the probe separates conditions.
+3. Stop extending a transform when it shows no gain (< 1 sample difference) for both families over
+   3 attempts while adding measurable runtime cost.
+4. A budget or quota limit reached means "not recovered within this budget", never "irreversible".
 
 ## Honesty guardrails (non-negotiable)
 
