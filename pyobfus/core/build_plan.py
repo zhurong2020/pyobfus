@@ -9,6 +9,7 @@ from pyobfus.config import ObfuscationConfig
 from pyobfus.core.build_marker import marker_enabled, marker_state
 from pyobfus.core.provenance import config_hash
 from pyobfus.core import reason_codes
+from pyobfus.core.fusion_options import FUSION_FIELDS
 from pyobfus.utils import filter_python_files, should_exclude_file
 
 BUILD_PLAN_VERSION = 1
@@ -146,14 +147,8 @@ def build_obfuscation_plan(
 
 
 # Mechanisms that operate on generated source and are skipped in cross-file
-# directory mode (see cli.py's build-fusion note). Kept in sync with that path.
-_FUSION_MECHANISMS = (
-    "selective_opacity",
-    "seal_code",
-    "vault",
-    "scrub_traceback",
-    "bind_device",
-)
+# directory mode (see cli.py's build-fusion warning).
+_FUSION_MECHANISMS = FUSION_FIELDS
 # Pro-only transforms that will not run when the effective level is community.
 _PRO_TRANSFORMS = (
     "string_encryption",

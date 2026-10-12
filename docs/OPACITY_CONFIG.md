@@ -46,20 +46,28 @@ The four accepted layer names are:
 In the current command-line fusion pipeline, `encrypted` is the only configured
 layer that adds per-function behavior: matching top-level functions receive L3
 encryption. The other three values currently fall through to the normal Core
-pipeline; they do not selectively undo or downgrade Core mangling. The full
-four-layer model is available through the Pro API, but the CLI should not be
-read as providing four independently materialized per-function transformations.
+pipeline; they do not selectively undo or downgrade Core mangling. The Pro API
+names four layers, but only `encrypted` has an implementation today: the
+`transparent` and `ai_readable` values are descriptive and add no behavior
+anywhere, so do not read the model as four independently materialized
+per-function transformations.
 
 Only top-level functions and async functions are matched by the CLI pre-pass.
-Methods and nested functions are not currently selected by `opacity.toml`.
+Methods and nested functions are not currently selected by `opacity.toml`, and
+a rule that would match only a method is silently unmatched. The pass also does
+not run in cross-file directory builds (the CLI warns and lists the skipped
+options); build single files or use `--no-cross-file`.
 
 ## Delivery requirement
 
-Encrypted output imports the Pro runtime. Until the runtime redistribution
-work tracked as Y-1 is complete, do not assume an L3-protected file is
-self-contained or may be delivered without the applicable Pro runtime and
-licence terms. Test the protected output in the same clean offline environment
-in which the recipient will run it.
+Encrypted output imports the redistributable `pyobfus-runtime` package, not
+the builder. Install the runtime beside the artifact on the target (for an
+offline target, stage its wheel and dependencies and use
+`pip install --no-index --find-links <dir> pyobfus-runtime`); the builder's
+declared floor (`pyobfus-runtime>=0.1.1`) is the version the artifact needs.
+Test the protected output in the same clean offline environment in which the
+recipient will run it; `integration_tests/test_offline_target.py` is the
+repository's version of that check.
 
 ## Validation errors
 

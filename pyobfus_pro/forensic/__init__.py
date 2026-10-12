@@ -8,9 +8,10 @@ Public API:
   stream cipher seeded from ``forensic_seed``. Replaces
   ``secrets.token_bytes`` in the watermarked-build path.
 - :func:`derive_layer_key` -- 32-byte AES-256 layer key derived from a
-  buyer's master seed. Feed to ``opacity.transform_module(layer_key=...)``
-  and ``vault.transform_module(vault_keys=...)`` so the buyer's build is
-  byte-deterministic.
+  buyer's master seed. The CLI (``--fingerprint``) feeds it only to
+  ``opacity.transform_module(layer_key=...)``; vault keys are not
+  fingerprinted, and ``--bind-device`` / ``--bind-key-env`` replace the
+  per-buyer key, which leaves nothing to match.
 - :func:`verify_layer_key_match` -- forensic recovery: given a leaked
   artifact + a candidate buyer ID + the original assignment hash, check
   whether the buyer's derived key matches the artifact's embedded

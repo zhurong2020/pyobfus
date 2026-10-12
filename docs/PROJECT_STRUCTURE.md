@@ -88,7 +88,7 @@ pyobfus/
   source-separated.
 - Runtime modules must remain usable without `pyobfus_pro`, the CLI,
   transformers, licence client, or build-time state.
-- `pyobfus` declares `pyobfus-runtime>=0.1,<1` so builder installations can
+- `pyobfus` declares `pyobfus-runtime>=0.1.1,<1` so builder installations can
   test and describe the target requirement. Generated artifacts still need
   that dependency installed in their deployment environment.
 - MCP, VS Code, and Action consume public CLI/JSON contracts. A consumer-side
