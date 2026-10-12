@@ -42,7 +42,7 @@ Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运�
 
 复核已完成（[报告](AI_ERA_PROTECTION_ROADMAP_REVIEW_CLAUDE_2026-10-12.md)），维护者确认按修订执行；修订后的范围与顺序见路线图 §13。
 
-- [ ] **随 0.7.0**：合并 PR #94（runtime 0.1.1 + 离线目标测试 + fusion 如实报告）；发版先 `runtime-v0.1.1` 后 `v0.7.0`，步骤在私有 RELEASE_PREP。PR #93（依赖下限还原）已合并。
+- [ ] **随 0.7.0 发布**：PR #93（依赖下限还原）、#94（runtime 0.1.1 + 离线目标测试 + fusion 如实报告 + runtime 构建需 setuptools>=77）均已合并（main `b81a61d`）。发版**先 `runtime-v0.1.1` 后 `v0.7.0`**，步骤在私有 RELEASE_PREP；发版仍需维护者批准。
 - [ ] 离线交付指南（公开文档）：runtime `--no-index` 安装、离线三档、外部工具组合、fusion 适用范围。验收：按指南在干净环境复现 `integration_tests/test_offline_target.py` 的流程。
 - [ ] 覆盖报告：Pro 写出 opacity 匹配／注入／跳过，build report 读取；收窄版交付检查原型（mapping／原文／scrub 私钥混入、输出哈希对应）。验收：合成 fixture 检出已知遗漏、正常交付零误报。
 - [ ] Agent 实验：协议文档 + 「key 在包内」确定性脚本；付费探针上限 US$30，另行批准后再跑。
