@@ -1228,6 +1228,8 @@ def main(
                 for key, value in file_stats.items():
                     if key in obfuscation_stats:
                         obfuscation_stats[key] += value
+                    elif key.startswith(_PROTECTION_STAT_PREFIX):
+                        obfuscation_stats[key] = value
         elif input_path_obj.is_dir():
             # Directory obfuscation - use CrossFileOrchestrator if enabled
             if cross_file:
@@ -1591,9 +1593,23 @@ def _obfuscate_file(
             module_qualname=input_file.stem,
             scrub_key_path=scrub_key_path,
         )
+        enc, _ = _build_fusion.assignments_summary(obfuscated_code)
+        if config.selective_opacity or config.opacity_config:
+            coverage = _build_fusion.opacity_coverage(
+                original_source, config, module_qualname=input_file.stem
+            )
+            file_stats["l3_functions_encrypted"] = enc
+            file_stats.update(coverage)
+            skipped = sum(coverage.values())
+            if skipped:
+                click.echo(
+                    f"Warning: {input_file.name}: {skipped} function(s) matched by "
+                    "opacity rules were NOT encrypted (methods and nested functions "
+                    "are not supported; only top-level functions are).",
+                    err=True,
+                )
         if verbose:
-            enc, _ = _build_fusion.assignments_summary(obfuscated_code)
-            if config.selective_opacity:
+            if config.selective_opacity or config.opacity_config:
                 click.echo(f"  Selective Opacity: {enc} function(s) L3-encrypted")
             if config.scrub_traceback:
                 click.echo(f"  Scrub keypair: {scrub_key_path} (keep private)")
@@ -1739,6 +1755,8 @@ def _obfuscate_directory(
             for key, value in file_stats.items():
                 if key in dir_stats:
                     dir_stats[key] += value
+                elif key.startswith(_PROTECTION_STAT_PREFIX):
+                    dir_stats[key] = value
         except PyObfusError as e:
             click.echo(f"  Warning: Failed to obfuscate {python_file}: {e}", err=True)
 
@@ -2270,6 +2288,12 @@ def _write_build_report(
     )
     save_build_report(report, build_report_path)
     return build_report_path
+
+
+# Pro opacity coverage counters (l3_functions_encrypted, l3_skipped_*). They are
+# added to the build stats only when an L3 pass ran, so Community output and
+# its JSON keep their existing shape.
+_PROTECTION_STAT_PREFIX = "l3_"
 
 
 def _report_fusion_options(

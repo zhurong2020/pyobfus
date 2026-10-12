@@ -752,6 +752,42 @@ def _inject_embedded_data(source: str, data_path: str) -> str:
     return header + source
 
 
+def opacity_coverage(source: str, config, module_qualname: str) -> dict:
+    """Count what the opacity rules asked for but the CLI pass cannot encrypt.
+
+    The CLI pass encrypts top-level ``def`` / ``async def`` only. Methods and
+    nested functions that ``opacity.toml`` resolves to ENCRYPTED are silently
+    left alone; this returns how many, by reason, so the build can say so.
+    Counts only: names stay out of the build report, which is meant to be
+    shareable. Hand-written ``@opacity`` on such functions already fails the
+    build, so only config rules can produce skips.
+    """
+    counts = {"l3_skipped_methods": 0, "l3_skipped_nested": 0}
+    cfg_path = getattr(config, "opacity_config", None)
+    if not cfg_path:
+        return counts
+    from .opacity.config import OpacityConfig
+    from .opacity.layers import Layer
+    from .opacity.patterns import Resolver
+
+    resolver = Resolver(OpacityConfig.from_toml(cfg_path))
+    prefix = f"{module_qualname}." if module_qualname else ""
+
+    def visit(body, qual: str, parent: str) -> None:
+        for node in body:
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                name = f"{qual}{node.name}"
+                if parent != "module" and resolver.resolve(name) is Layer.ENCRYPTED:
+                    key = "l3_skipped_methods" if parent == "class" else "l3_skipped_nested"
+                    counts[key] += 1
+                visit(node.body, f"{name}.", "function")
+            elif isinstance(node, ast.ClassDef):
+                visit(node.body, f"{qual}{node.name}.", "class")
+
+    visit(ast.parse(source).body, prefix, "module")
+    return counts
+
+
 def assignments_summary(source: str) -> Tuple[int, int]:
     """(encrypted_count, total_layered) — best-effort, for verbose stats."""
     enc = source.count("_l3_dispatch(")
