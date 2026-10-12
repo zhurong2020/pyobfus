@@ -5,6 +5,12 @@ on:
     branches: [ main, develop ]
   pull_request:
     branches: [ main ]
+  # Merges made by Dependabot auto-merge are pushed with GITHUB_TOKEN, which
+  # does not trigger push workflows, so main could go untested between human
+  # pushes. A daily run catches that.
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
 
 # Least privilege: these jobs only read the checkout. No job here publishes,
 # writes releases, or needs OIDC (that lives in release.yml). OSPS-AC-04.01.
