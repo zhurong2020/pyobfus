@@ -32,7 +32,8 @@ Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运�
 ## Core 0.7.0（2026-10-12 已发布）
 
 - **已发布**：维护者 10-12 批准提前发；先 `runtime-v0.1.1`（PyPI/PEP 740/离线目标测试对已发布 wheel 4/4），后 `v0.7.0`（PyPI/PEP 740/3.10 与 3.14 全新安装/GitHub Release）。
-- [ ] 待办：Zenodo 归档后更新 `CITATION.cff`（webhook 通常延迟约 2.5 h）；跨仓同步；Pro 客户通知草稿（Gmail 草稿，维护者发送）。
+- Zenodo record `23318803`（v0.7.0）已归档，`CITATION.cff` 已更新；跨仓同步已做（action、workspace-meta、home 索引）。
+- [ ] Pro 客户通知：5 封 Gmail 草稿已建（含两个可选调研问题；kvikram 那封附未激活提示），待维护者审阅发送。
 - 发版前准备已完成（10-11）：dogfood lane A/B/C/D 全过；`examples/multifile`、动机私有项目副本用新 wheel 验证通过。
   发版清单、README 横幅、GitHub Release 说明与 Pro 客户通知草稿在私有 `docs/internal/release-0.7.0/RELEASE_PREP.md`。
 - 只发 Core：MCP 等 10-19 Glama 测试；VS Code schema 随插件下次发版。
