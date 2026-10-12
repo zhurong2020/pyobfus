@@ -1,5 +1,9 @@
 # pyobfus 当前计划
 
+**2026-10-12 晚 路线图独立复核完成，修复随 0.7.0**：Claude 复核结论「需重大修改」（[报告](AI_ERA_PROTECTION_ROADMAP_REVIEW_CLAUDE_2026-10-12.md)），维护者确认按修订执行（路线图 §13）。复核实测发现已发布 runtime 0.1.0 缺 Y-2／Y-3 接口，0.5.30 起 `--bind-key-env`／`--expire-warn-days` 产物在 PyPI 环境不能运行；另有 fusion 目录模式提示不全、YAML 绕过互斥、水印静默失效、mapping／scrub 私钥落在输出目录无提示。处置：PR #94（runtime 0.1.1、builder 下限 `>=0.1.1`、版本守卫、离线目标集成测试对 0.1.0 红／0.1.1 绿、如实提示）随 0.7.0，发版先 `runtime-v0.1.1`。同轮发现 Dependabot 自动合并把 `click`／`jsonschema` 下限抬到只支持 Python ≥3.10 的版本（3.9 测试不是必需检查、bot 合并不触发 main CI），PR #93 已还原并合并，pip 改 `increase-if-necessary`、CI 加每日定时、规则集加 3.9／3.14 必需检查，#86／#90 已关。
+
+**2026-10-12 增强路线方向已认可，实施前等待独立 LLM 复核**：维护者认可将原 roadmap、AI 逆向趋势与交付需求结合，下一阶段优先服务**离线 Python 应用交付**（商业 wheel／SDK 场景后置）。建议以 Community 交付物检查／覆盖报告、P2-18 有预算 Agent 重建实验、Pro 选择性保护／密钥交付补齐为主线；不收紧 Community、不改 0.7.0 发布范围。研究证据、分层、最小范围、验收与解冻条件见 [增强路线图](AI_ERA_PROTECTION_ROADMAP_2026-10-12.md)；交叉复核任务见 [Claude Prompt](AI_ERA_ROADMAP_REVIEW_PROMPT.md)。方向认可不等于授权全部候选实现；复核后由维护者确认单项范围。
+
 **2026-10-11 下一版定为 Core 0.7.0，10-13 再决定是否发**：维护者同意一次发全部 `[Unreleased]`、版本号 0.7.0（默认产物变化，沿用 0.6.0 先例）。发版前准备已做：dogfood A/B/C/D 全过；新 wheel 在 `examples/multifile` 与动机私有项目副本上验证（127 处 `config.X` 全部改写、`--check` 0 条）；自混淆 `pyobfus/` 新旧两版同样失败（`__init__` 的 `try: __version__ = version(...)` 让包初始化不可证明），非退步，新版 `--check` 全部提示，登记为 H PR 4 候选。发版清单与文案草稿在私有 `docs/internal/release-0.7.0/RELEASE_PREP.md`。
 
 **2026-10-11 限制 H 实现 PR 3（#85 合并，`3759000`，默认开启，未发版）**：Codex 实现补提示 + 默认开启 + 文档，Claude 审 3 轮：① `pkg.a.core.X` 链式访问无提示、Codex 擅改 canary（已恢复，canary 须 N-1 也能构建）；② **用动机私有项目复测发现**导入前有 `sys.path.insert`/`logging` 语句时函数体访问一律不改（PR 1 起即有，PR 1 审核漏测，当时「29 处直接修好」的说法不准确）→ 放宽为「函数定义在导入之后且无竞争写入」；③ `globals()[...]=`/`setattr(sys.modules[__name__],…)` 替换导入名时被错误改写（PR 1 起即有）→ 整体拒绝。终版：66 个对抗样例无一比关闭差、失败处均有提示；关闭开关 43 个 fixture 与 main 逐字节一致；`-j1`/`-j4` 一致；缓存随默认值失效；三种写法真实 traceback `--unmap`（CLI+MCP）全对；私有项目 127 处 `config.X` 全部改写；CI 23 项全绿。Core `[Unreleased]` 现含默认行为变化，**发版需维护者批准**，发版说明要求用户完整重建。
