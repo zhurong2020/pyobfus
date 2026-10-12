@@ -85,21 +85,23 @@ def target_python(tmp_path_factory) -> Path:
     """A fresh venv with only the runtime wheel installed, offline."""
     root = tmp_path_factory.mktemp("offline_target")
     wheelhouse = root / "wheelhouse"
-    subprocess.run(
+    # Build with isolation so the runtime's declared build requirements are
+    # used, not whatever setuptools the test environment happens to have.
+    built = subprocess.run(
         [
             sys.executable,
             "-m",
             "pip",
             "wheel",
             "--no-deps",
-            "--no-build-isolation",
             "-w",
             str(wheelhouse),
             str(REPO_ROOT / "pyobfus_runtime"),
         ],
-        check=True,
         capture_output=True,
+        text=True,
     )
+    assert built.returncode == 0, built.stdout[-2000:] + built.stderr[-2000:]
     runtime_wheel = next(wheelhouse.glob("pyobfus_runtime-*.whl"))
     staged = subprocess.run(
         [

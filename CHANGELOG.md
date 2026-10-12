@@ -91,7 +91,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   the runtime from source; a new integration test installs the runtime wheel
   into a fresh environment with `pip install --no-index` and runs the
   artifacts there, and CI now fails when the runtime source changes without a
-  version bump (`scripts/check_runtime_version.py`).
+  version bump (`scripts/check_runtime_version.py`). The runtime's build
+  requirement is now `setuptools>=77` (its PEP 639 licence expression did not
+  build with the declared `>=61`, for example in offline builds without build
+  isolation).
 
 - Build-fusion option checks now run on the merged configuration, so YAML
   `vault: true` with `bind_key_env` is rejected like the CLI flags were
