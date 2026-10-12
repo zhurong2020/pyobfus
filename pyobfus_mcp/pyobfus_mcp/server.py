@@ -32,6 +32,7 @@ from __future__ import annotations
 from typing import Any, Dict, Optional
 
 from pyobfus_mcp.tools import (
+    check_delivery,
     check_obfuscation_risks,
     explain_preset,
     generate_pyobfus_config,
@@ -260,6 +261,25 @@ def _build_server() -> Any:
         return unmap_stack_trace(trace, mapping_path)
 
     @app.tool(
+        name="check_delivery",
+        description=(
+            "Check an output directory or .whl right before shipping: fails on a "
+            "pyobfus mapping file, a private key or an original source file inside "
+            "it, and warns about Python files the build did not produce or Pro "
+            "options the build skipped. Pass the build's --build-report and "
+            "--provenance-manifest JSON for the full check. Read-only: files are "
+            "hashed, never imported or executed, and contents are not returned."
+        ),
+        meta=dict(_META_COMMUNITY),
+    )
+    def _check_delivery(
+        path: str,
+        build_report: Optional[str] = None,
+        provenance_manifest: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        return check_delivery(path, build_report, provenance_manifest)
+
+    @app.tool(
         name="list_presets",
         description=(
             "List every pyobfus preset available, grouped by tier "
@@ -333,6 +353,7 @@ tool_functions = [
     check_obfuscation_risks,
     generate_pyobfus_config,
     unmap_stack_trace,
+    check_delivery,
     list_presets,
     explain_preset,
     recommend_tier,

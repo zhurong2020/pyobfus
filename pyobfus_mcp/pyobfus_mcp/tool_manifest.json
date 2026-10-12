@@ -1,6 +1,51 @@
 {
-  "digest": "ed4541b572e2211c715bf0e3bc357a937ad4c3aff1eaea2c5d02cab522aed70d",
+  "digest": "765499ebc866211a2417b14774f17a6da1e2fee7a2764907a51c77b1a8188e48",
   "tools": [
+    {
+      "description": "Check an output directory or .whl right before shipping: fails on a pyobfus mapping file, a private key or an original source file inside it, and warns about Python files the build did not produce or Pro options the build skipped. Pass the build's --build-report and --provenance-manifest JSON for the full check. Read-only: files are hashed, never imported or executed, and contents are not returned.",
+      "input_schema": {
+        "properties": {
+          "build_report": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Build Report"
+          },
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "provenance_manifest": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Provenance Manifest"
+          }
+        },
+        "required": [
+          "path"
+        ],
+        "title": "_check_deliveryArguments",
+        "type": "object"
+      },
+      "meta": {
+        "tier": "community",
+        "version": "1"
+      },
+      "name": "check_delivery"
+    },
     {
       "description": "Scan a Python project for patterns that may break obfuscation (eval/exec, dynamic attribute access, framework reflection, unsafe model loading). Returns severity counts, detected frameworks (FastAPI/Django/Flask/Pydantic/Click/SQLAlchemy/ML), and a suggested preset. Also locates requirements*.txt / pyproject.toml and, only if verify_dependencies_online=true, checks each declared dependency against public PyPI to flag AI-hallucinated ('slopsquatting') package names -- off by default, this tool makes no outbound network calls unless you opt in. By default the scan honors the project's pyobfus config; set use_project_config=false for the legacy config-free scan.",
       "input_schema": {

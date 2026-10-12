@@ -262,7 +262,7 @@ jobs:
         app = _build_server()
         tools = asyncio.run(app.list_tools())
         names = sorted(t.name for t in tools)
-        assert len(names) == 8, names
+        assert len(names) == 9, names
         print('tools:', names)
         "
 

@@ -6,6 +6,15 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+### Added
+
+- `check_delivery` (community): wraps `pyobfus --check-delivery` for an output
+  directory or `.whl` inside the project root. Returns `status`
+  (`ok`/`warn`/`fail`), findings with stable codes, `limitations`, `ai_hint`
+  and `next_tool`. Read-only; file contents are never returned. With a Core
+  that predates the delivery check it returns `FeatureUnavailable`. The tool
+  manifest now lists 9 tools.
+
 ### Changed
 
 - With a Core release containing the H default rollout (after 0.6.1), directory

@@ -18,6 +18,7 @@ and the agent will autonomously call `check_obfuscation_risks` and `generate_pyo
 | `check_obfuscation_risks(path, verify_dependencies_online=false, use_project_config=true)` | Config-aware pre-flight scan for `eval`/`exec`, dynamic attribute access, and framework reflection. Set `use_project_config=false` for the legacy config-free scan. Opt into public-PyPI dependency-name verification with `verify_dependencies_online=true`; outbound network access remains off by default. Returns severity counts, detected frameworks, and a suggested preset. |
 | `generate_pyobfus_config(path, preset_override?, write?)` | Auto-detect framework → generate `pyobfus.yaml`. Returns the YAML text without writing by default; `write=True` persists to disk. |
 | `unmap_stack_trace(trace, mapping_path)` | Reverse obfuscated identifiers in a production stack trace using a `mapping.json`. |
+| `check_delivery(path, build_report?, provenance_manifest?)` | Before shipping, check an output directory or `.whl` for a mapping file, a private key or an original source, and for files the build did not produce. Read-only; needs a pyobfus release after 0.7.0. |
 | `list_presets()` | Enumerate every preset (community / framework-aware / Pro). |
 | `explain_preset(name)` | Describe what a named preset changes: exclusions, docstring handling, parameter preservation. |
 | `recommend_tier(path)` | Analyze a project and recommend community vs Pro, with reasoning and concrete next-step commands. |

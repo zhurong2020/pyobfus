@@ -362,6 +362,7 @@ def test_build_server_attaches_meta_to_each_tool() -> None:
         "check_obfuscation_risks",
         "generate_pyobfus_config",
         "unmap_stack_trace",
+        "check_delivery",
         "list_presets",
         "explain_preset",
     }
