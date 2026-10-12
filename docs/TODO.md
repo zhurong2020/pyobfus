@@ -51,7 +51,7 @@ Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运�
 - [x] 静态探针（10-12，只用订阅，48 次调用）：C0 6/6、**C1 社区版 6/6 被还原**、C4/C4b 0/6（两模型一致）→ 不为「抗 AI」新增社区 AST 变换。见 `docs/LLM_RESISTANCE_STATIC_PROBE_2026-10-12.md`。
 - 可运行档（带工具的 Agent 还原）：**暂停**（10-12）。已完成两个订阅 CLI 的沙箱实测：Codex 用户配置开着 `network_access = true`，需 `--ignore-user-config` 并排除 `/tmp` 才断网、禁止工作区外写入；Claude Code 用 `--settings` 开 sandbox 后联网被拒、工作区外只读。后续实现在会话中被安全分类器拦下，未继续。路线图需要的结论已由不用模型的 `key_exposure.py` 给出（密钥在包内可直接解密；应用提供密钥时运行者可见字节码），暂停不影响决策。
 - [x] 覆盖报告第一步 PR #95 已合并（opacity 规则命中方法/嵌套函数时警告，build report 记计数），未发版，随下一版。
-- [x] 交付检查 `--check-delivery`（PR #96 已合并，社区版，未发版）：mapping／私钥／原文混入为 high（exit 1），构建报告外的 .py、Pro 选项被跳过为 medium；7 个真实 wheel 与 2.8 万文件 site-packages 零误报。后续候选：MCP 工具接入、`.pyc` 是否由原文编译的判定、PyInstaller/Nuitka 冻结包解析（等需求）。
+- [x] 交付检查 `--check-delivery`（PR #96 已合并，社区版，未发版）：mapping／私钥／原文混入为 high（exit 1），构建报告外的 .py、Pro 选项被跳过为 medium；7 个真实 wheel 与 2.8 万文件 site-packages 零误报。MCP 工具 `check_delivery` 已由 PR #97 合并（MCP `[Unreleased]`，工具数 9，公开「8 tools」表述待 MCP 发版时再改）。后续候选：`.pyc` 是否由原文编译的判定、PyInstaller/Nuitka 冻结包解析（等需求）。
 - 待需求信号：「fusion × 目录构建」设计（多模块离线应用拿到 Pro 保护的前提）、embed-data／vault 接 key provider、L3 覆盖方法。
 - 已认可方向不变：离线应用交付优先；不新增项目规模门槛；路线图每轮先检验现有功能、修缺陷，再扩展。
 
