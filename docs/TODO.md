@@ -48,7 +48,9 @@ Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运�
 - [x] 离线交付指南：`docs/guides/ship-python-offline.md`（已上导航；staging 命令实跑过）。
 - [ ] 覆盖报告：Pro 写出 opacity 匹配／注入／跳过，build report 读取；收窄版交付检查原型（mapping／原文／scrub 私钥混入、输出哈希对应）。验收：合成 fixture 检出已知遗漏、正常交付零误报。
 - [x] Agent 实验协议（`docs/LLM_RESISTANCE_BENCHMARK.md`「Round 2 protocol」）+ 确定性脚本 `benchmarks/llm_resistance/key_exposure.py`（进 CI）。
-- [ ] 静态探针：只用订阅（Codex CLI / Claude Code，环境无 API key），先补 6 个自定义合成样例与 C4b 条件。
+- [x] 静态探针（10-12，只用订阅，48 次调用）：C0 6/6、**C1 社区版 6/6 被还原**、C4/C4b 0/6（两模型一致）→ 不为「抗 AI」新增社区 AST 变换。见 `docs/LLM_RESISTANCE_STATIC_PROBE_2026-10-12.md`。
+- [ ] 可运行档：给 harness 加带工具的 Agent 适配器（断网容器 + Python + 反编译器），比较 C4 与 C4b，并补一个多模块样例；做完再用订阅额度。
+- [ ] 覆盖报告第一步 PR #95（opacity 规则命中方法/嵌套函数时警告并计数）：CI 通过后合并，随下一版。
 - 待需求信号：「fusion × 目录构建」设计（多模块离线应用拿到 Pro 保护的前提）、embed-data／vault 接 key provider、L3 覆盖方法。
 - 已认可方向不变：离线应用交付优先；不新增项目规模门槛；路线图每轮先检验现有功能、修缺陷，再扩展。
 

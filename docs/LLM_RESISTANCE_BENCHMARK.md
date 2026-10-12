@@ -291,6 +291,9 @@ version, date, prompt, tools and artifact hashes.
    3 attempts while adding measurable runtime cost.
 4. A budget or quota limit reached means "not recovered within this budget", never "irreversible".
 
+**Results so far:** [static probe 2026-10-12](LLM_RESISTANCE_STATIC_PROBE_2026-10-12.md) —
+C0 6/6, C1 6/6 recovered, C4 and C4b 0/6 for both model families.
+
 ## Honesty guardrails (non-negotiable)
 
 - **Never market Community-tier obfuscation as AI resistance.** Renaming,
