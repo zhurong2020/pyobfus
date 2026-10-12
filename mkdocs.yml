@@ -71,6 +71,7 @@ nav:
   - Guides:
     - Protect Python before selling: guides/protect-python-before-selling.md
     - Debug an obfuscated traceback: guides/debug-obfuscated-python.md
+    - Ship Python offline: guides/ship-python-offline.md
   - Compare:
     - Overview: COMPARISON.md
     - vs PyArmor: compare/pyarmor.md

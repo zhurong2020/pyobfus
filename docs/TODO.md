@@ -29,9 +29,10 @@ Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运�
   下游是否选择混淆自己的代码由其分发边界决定；公开第三方依赖不因被打包而自动成为
   pyobfus 的处理目标。
 
-## 下一版 Core 0.7.0（2026-10-11 定，10-13 决定是否发）
+## Core 0.7.0（2026-10-12 已发布）
 
-- 版本号 **0.7.0**（默认产物变化，沿用 0.6.0 先例）；一次发全部 `[Unreleased]`，不拆分。**发版需维护者 10-13 批准**。
+- **已发布**：维护者 10-12 批准提前发；先 `runtime-v0.1.1`（PyPI/PEP 740/离线目标测试对已发布 wheel 4/4），后 `v0.7.0`（PyPI/PEP 740/3.10 与 3.14 全新安装/GitHub Release）。
+- [ ] 待办：Zenodo 归档后更新 `CITATION.cff`（webhook 通常延迟约 2.5 h）；跨仓同步；Pro 客户通知草稿（Gmail 草稿，维护者发送）。
 - 发版前准备已完成（10-11）：dogfood lane A/B/C/D 全过；`examples/multifile`、动机私有项目副本用新 wheel 验证通过。
   发版清单、README 横幅、GitHub Release 说明与 Pro 客户通知草稿在私有 `docs/internal/release-0.7.0/RELEASE_PREP.md`。
 - 只发 Core：MCP 等 10-19 Glama 测试；VS Code schema 随插件下次发版。
@@ -42,10 +43,11 @@ Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运�
 
 复核已完成（[报告](AI_ERA_PROTECTION_ROADMAP_REVIEW_CLAUDE_2026-10-12.md)），维护者确认按修订执行；修订后的范围与顺序见路线图 §13。
 
-- [ ] **随 0.7.0 发布**：PR #93（依赖下限还原）、#94（runtime 0.1.1 + 离线目标测试 + fusion 如实报告 + runtime 构建需 setuptools>=77）均已合并（main `b81a61d`）。发版**先 `runtime-v0.1.1` 后 `v0.7.0`**，步骤在私有 RELEASE_PREP；发版仍需维护者批准。
-- [ ] 离线交付指南（公开文档）：runtime `--no-index` 安装、离线三档、外部工具组合、fusion 适用范围。验收：按指南在干净环境复现 `integration_tests/test_offline_target.py` 的流程。
+- 随 0.7.0 已发布：PR #93、#94。
+- [x] 离线交付指南：`docs/guides/ship-python-offline.md`（已上导航；staging 命令实跑过）。
 - [ ] 覆盖报告：Pro 写出 opacity 匹配／注入／跳过，build report 读取；收窄版交付检查原型（mapping／原文／scrub 私钥混入、输出哈希对应）。验收：合成 fixture 检出已知遗漏、正常交付零误报。
-- [ ] Agent 实验：协议文档 + 「key 在包内」确定性脚本；付费探针上限 US$30，另行批准后再跑。
+- [x] Agent 实验协议（`docs/LLM_RESISTANCE_BENCHMARK.md`「Round 2 protocol」）+ 确定性脚本 `benchmarks/llm_resistance/key_exposure.py`（进 CI）。
+- [ ] 静态探针：只用订阅（Codex CLI / Claude Code，环境无 API key），先补 6 个自定义合成样例与 C4b 条件。
 - 待需求信号：「fusion × 目录构建」设计（多模块离线应用拿到 Pro 保护的前提）、embed-data／vault 接 key provider、L3 覆盖方法。
 - 已认可方向不变：离线应用交付优先；不新增项目规模门槛；路线图每轮先检验现有功能、修缺陷，再扩展。
 

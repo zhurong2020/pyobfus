@@ -14,6 +14,8 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
+### 🟢 2026-10-12 — Core 0.7.0 + runtime 0.1.1 已发布；路线图复核修复随发（冷启动先读 `docs/CURRENT_PLAN_ZH.md` 顶部 10-12 段、路线图 §13、`docs/TODO.md`「增强路线复核」）
+
 ### 🟢 2026-10-11 — 限制 H 三个实现 PR 合并、默认开启；下一版 0.7.0 待 10-13 拍板（冷启动先读 `docs/CURRENT_PLAN_ZH.md` 顶部 10-11 段与 `docs/TODO.md`「下一版 Core 0.7.0」）
 
 ### 🟢 2026-10-10 — Core 0.6.1 已发布（G #66 + F 方案 A #67）
@@ -79,7 +81,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   10-25 复盘用 09-27→10-06 窗口）**：静默 4 周（10-25 前不发 Core）→ 每月一版
   → 只做有触发的事 → 每周一巡检；全文 `docs/TODO.md`「节奏」段。**查进度固定动作：进度 + 下载量
   （`python scripts/download_snapshot.py`）+ Gmail（`/pyobfus-inbox`），三样一起给**，缺一样不算查过。
-- 「当前状态一句话」：`0.6.1` 是最新 Core（10-10）；main 的 Core `[Unreleased]` 已积累 10-11 一整批（H 模块属性改写**默认开启**、跳过环境目录、密钥提示、`--unmap` 行号、shebang/编码、PEP 695 修复），维护者定下一版为 **0.7.0**，10-13 决定是否发（发版需批准）；准备清单私有 `docs/internal/release-0.7.0/RELEASE_PREP.md`。逐轮细节见 `docs/CURRENT_PLAN_ZH.md` 10-11 段。
+- 「当前状态一句话」：`0.7.0` 是最新 Core（10-12，维护者批准提前发），同日先发 `pyobfus-runtime` 0.1.1（Y-2/Y-3 产物在 0.1.0 上不能运行，builder 现要求 `>=0.1.1`）。**以后 runtime 源码改动必须先升版本**（CI `scripts/check_runtime_version.py` 拦截），发版顺序 runtime 先于 Core。Agent 实验只用维护者订阅（Codex CLI / Claude Code），不用 API。逐轮细节见 `docs/CURRENT_PLAN_ZH.md` 10-12 段。
 
 ## 历史进展（已下沉）
 
@@ -115,7 +117,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.9-3.14, AST, setuptools
-- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.6.1，2026-10-10 发布**；完整版本历史见 `CHANGELOG.md`)
+- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.7.0，2026-10-12 发布**；完整版本历史见 `CHANGELOG.md`)
 - **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.3，2026-09-10 发布**；Marketplace 与 Open VSX 两边同版本，均已 `curl` 独立复核；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`。**发版必须两个 registry 都发**：Marketplace 手工上传 + `ovsx publish`，runbook 见 `docs/OPEN_VSX_PUBLISH_PLAN.md`)
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.12，2026-09-07 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.18` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp`（**0.3.12** 2026-09-07 发布，2026-09-10 已核实 `active` / `isLatest=true`）

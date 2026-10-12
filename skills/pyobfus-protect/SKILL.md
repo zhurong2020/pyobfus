@@ -114,8 +114,8 @@ the saved mapping:
 - MCP: `unmap_stack_trace(trace="<pasted trace>", mapping_path="dist.mapping.json")`
 - CLI: `pyobfus --unmap --trace error.log --mapping dist.mapping.json --json`
 
-(Names are reversed. With mappings rebuilt using line-map-capable pyobfus after
-0.6.1, standard frames also restore relative source files and statement starting
+(Names are reversed. With mappings rebuilt using pyobfus 0.7.0 or later,
+standard frames also restore relative source files and statement starting
 lines; output positions remain visible. Old mappings restore names only. Code
 excerpts and caret indicators remain unchanged output code.)
 

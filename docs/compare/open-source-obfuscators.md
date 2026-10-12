@@ -61,8 +61,8 @@ On 0.6.1 the Python 3.12 module failed: a directory build dropped the PEP 695
 type parameter list from renamed functions and classes, so `def first_of[T]`
 became `def I1(items: list[T]) -> T` and the import raised `NameError`.
 Single-file builds were not affected. We found this defect while preparing
-this page. It is fixed on `main` and will ship in the next release; until then,
-build Python 3.12 generics as single files or exclude those names.
+this page. It is fixed in 0.7.0 (2026-10-12); on 0.6.1 and earlier, build
+Python 3.12 generics as single files or exclude those names.
 
 ### Opy
 

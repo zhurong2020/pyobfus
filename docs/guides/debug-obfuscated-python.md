@@ -101,7 +101,7 @@ easier to hand to a script or an agent.
 - **Names come back**: functions, classes, methods, variables and parameters
   that pyobfus renamed.
 - **Original files and line numbers come back with new mappings**: rebuild and
-  save your mapping with a release containing line-map support (after 0.6.1).
+  save your mapping with pyobfus 0.7.0 or later (line-map support).
   Standard CPython frames use relative source paths and statement starting lines,
   with `[obfuscated: path:line]` retained for comparison. Multiline expressions
   map to their statement's first line. Old mappings still restore names, and
