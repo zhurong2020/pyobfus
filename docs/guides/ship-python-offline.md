@@ -14,7 +14,8 @@ firewalls. Everything here was checked against pyobfus 0.7.0 and
 ## 1. Build, then keep private files out of what you ship
 
 ```bash
-pyobfus src/ -o dist/ --save-mapping private/mapping.json --build-report private/build-report.json
+pyobfus src/ -o dist/ --save-mapping private/mapping.json --build-report private/build-report.json \
+    --provenance-manifest private/provenance.json
 pyobfus --check src/            # before you ship, not after
 ```
 
@@ -26,6 +27,16 @@ pyobfus --check src/            # before you ship, not after
   package it, and keep them to decode error IDs with `pyobfus-unscrub`.
 - Ship `dist/`, not `src/`. A `.pyc`-only build is not protection: public
   decompilers recover source from nearly all CPython 3.8–3.14 bytecode.
+- Check what you are about to ship (available from the release after 0.7.0; a directory or a `.whl`):
+
+  ```bash
+  pyobfus --check-delivery dist/ --build-report private/build-report.json \
+      --provenance-manifest private/provenance.json
+  ```
+
+  It fails on a mapping file, a private key, or a byte-identical original
+  source in the delivery, and warns about Python files the build did not
+  produce or Pro options the build skipped. It only reads files.
 - Optional, from other tools: `check-wheel-contents` for stray `.pyc` or
   test directories in a wheel, `gitleaks dir dist/` for credentials.
 

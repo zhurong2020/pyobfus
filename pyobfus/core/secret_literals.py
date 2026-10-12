@@ -150,6 +150,8 @@ def _ignored_info(value: str) -> bool:
         or any(char.isspace() for char in value)
         or bool(re.fullmatch(r"[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*", value))
         or bool(re.fullmatch(r"[a-z][a-z0-9]*(?:_[a-z0-9]+)+", value))
+        # Dotted settings keys and codes such as "app.private_key".
+        or bool(re.fullmatch(r"[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)+", value))
         or value.startswith(("/", "./", "../", "~/"))
         or value.lower().endswith(_FILE_SUFFIXES)
     )

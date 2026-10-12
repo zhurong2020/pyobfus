@@ -223,6 +223,8 @@ def test_detector_does_not_flag_own_metadata():
         'PRIMARY_KEY = "customer_id"',
         'TOKEN_ENV = "MYAPP_SERVICE_TOKEN"',
         'TOKEN_ENDPOINT = "/oauth/token"',
+        'PRIVATE_KEY = "delivery.private_key"',
+        'SECRET_SETTING = "app.client_secret"',
         'PASSWORD_HINT = "At least 8 characters"',
         'TOKENIZER_NAME = "bert-base-uncased"',
         'secretary_name = "Alice Johnson"',

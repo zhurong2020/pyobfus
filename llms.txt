@@ -19,6 +19,7 @@ pip install pyobfus
 pyobfus --check src/ --json
 pyobfus src/ -o dist/ --dry-run --json
 pyobfus src/ -o dist/ --save-mapping mapping.json --verify-syntax --json
+pyobfus --check-delivery dist/ --json   # before shipping: no mapping, keys or originals in dist/
 ```
 
 Keep `mapping.json` private. To restore a traceback:

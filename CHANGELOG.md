@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `--check-delivery PATH` (Community) checks what you are about to ship, an
+  output directory or a `.whl`, after packaging. It fails (exit 1) on a pyobfus
+  mapping file (recognised by content), a private key such as the
+  `--scrub-traceback` key, or a file byte-identical to an original source
+  (with `--provenance-manifest`), and warns about Python files the build
+  report does not list as outputs and Pro options the report says were skipped
+  or only partly applied (with `--build-report`). It reads and hashes files
+  only; nothing is imported or executed and no file content is printed. An
+  empty result is not a security guarantee: use credential scanners and wheel
+  linters alongside it.
+
+### Fixed
+
+- `--check` no longer reports a dotted settings key or code assigned to a
+  credential-like name (`PRIVATE_KEY = "app.private_key"`) as a possible
+  hardcoded secret. Known credential shapes are still reported regardless of
+  the name.
+
 - **Pro:** builds with `--selective-opacity` or `--opacity-config` now warn when
   opacity rules matched methods or nested functions, which the pass does not
   encrypt (previously they were skipped silently), and `--build-report`
