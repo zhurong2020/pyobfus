@@ -53,8 +53,10 @@ anywhere, so do not read the model as four independently materialized
 per-function transformations.
 
 Only top-level functions and async functions are matched by the CLI pre-pass.
-Methods and nested functions are not currently selected by `opacity.toml`, and
-a rule that would match only a method is silently unmatched. The pass also does
+Methods and nested functions are not currently encrypted even when an
+`opacity.toml` rule matches them; the build warns with how many were skipped,
+and `--build-report` records the counts (`l3_skipped_methods`,
+`l3_skipped_nested`). The pass also does
 not run in cross-file directory builds (the CLI warns and lists the skipped
 options); build single files or use `--no-cross-file`.
 

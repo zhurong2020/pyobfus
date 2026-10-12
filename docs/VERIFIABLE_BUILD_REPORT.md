@@ -62,3 +62,10 @@ The stable top-level fields are `format`, `version`, `tool`, `state`, `mode`,
 `effective_config`, `selection`, `transformations`, `cache`, `verification`,
 `outputs`, `artifacts`, `output_marker`, `provenance`, and `privacy`. Output
 records contain only `path`, `sha256`, `size_bytes`, and `role`.
+
+When a Pro L3 pass ran (`--selective-opacity` or `--opacity-config`, single-file
+or `--no-cross-file` builds), `transformations` also carries
+`l3_functions_encrypted` and `l3_skipped_methods` / `l3_skipped_nested`: how
+many functions the opacity rules resolved to `encrypted` but the pass could not
+encrypt, by reason. These are counts only; function names are not recorded.
+Builds without an L3 pass do not include these keys.

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Pro:** builds with `--selective-opacity` or `--opacity-config` now warn when
+  opacity rules matched methods or nested functions, which the pass does not
+  encrypt (previously they were skipped silently), and `--build-report`
+  records `l3_functions_encrypted`, `l3_skipped_methods` and
+  `l3_skipped_nested` (counts only, no names). Builds without an L3 pass keep
+  their report shape.
+
 ## [0.7.0] - 2026-10-12
 
 ### Changed
