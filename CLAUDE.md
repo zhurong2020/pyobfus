@@ -81,7 +81,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   10-25 复盘用 09-27→10-06 窗口）**：静默 4 周（10-25 前不发 Core）→ 每月一版
   → 只做有触发的事 → 每周一巡检；全文 `docs/TODO.md`「节奏」段。**查进度固定动作：进度 + 下载量
   （`python scripts/download_snapshot.py`）+ Gmail（`/pyobfus-inbox`），三样一起给**，缺一样不算查过。
-- 「当前状态一句话」：`0.7.0` 是最新 Core（10-12，维护者批准提前发），同日先发 `pyobfus-runtime` 0.1.1（Y-2/Y-3 产物在 0.1.0 上不能运行，builder 现要求 `>=0.1.1`）。**以后 runtime 源码改动必须先升版本**（CI `scripts/check_runtime_version.py` 拦截），发版顺序 runtime 先于 Core。Agent 实验只用维护者订阅（Codex CLI / Claude Code），不用 API。逐轮细节见 `docs/CURRENT_PLAN_ZH.md` 10-12 段。
+- 「当前状态一句话」：`0.7.0` 是最新 Core（10-12，维护者批准提前发），同日先发 `pyobfus-runtime` 0.1.1（Y-2/Y-3 产物在 0.1.0 上不能运行，builder 现要求 `>=0.1.1`）。**以后 runtime 源码改动必须先升版本**（CI `scripts/check_runtime_version.py` 拦截），发版顺序 runtime 先于 Core。Agent 实验只用维护者订阅（Codex CLI / Claude Code），不用 API。同日后续合并 #95/#96/#97（opacity 覆盖计数、`--check-delivery`、MCP `check_delivery`），**未发版，等 11 月月度版本**（计划见 `docs/TODO.md`「下一次发版」）。逐轮细节见 `docs/CURRENT_PLAN_ZH.md` 10-12 段。
 
 ## 历史进展（已下沉）
 
