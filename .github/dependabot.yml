@@ -12,6 +12,12 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    # pyproject.toml lists lower bounds for a library, not pins. The default
+    # strategy raised them to the newest release (2026-10-11: click>=8.5.0,
+    # jsonschema>=4.26.0, both Python >=3.10), which would have made pyobfus
+    # uninstallable on Python 3.9. Only touch a bound when the new release
+    # falls outside it.
+    versioning-strategy: increase-if-necessary
     open-pull-requests-limit: 5
     groups:
       python-minor-patch:
