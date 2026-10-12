@@ -290,6 +290,24 @@ def lane_c(out_dir: Path) -> None:
             raise LaneError("no pyobfus wheel was built")
         wheel = wheels[0]
         _log(f"Lane C: built {wheel.name}")
+        # Build the runtime from this checkout too: the candidate builder may
+        # require a runtime version that is not on PyPI yet, and the pair is
+        # what gets released together.
+        _run(
+            [
+                sys.executable,
+                "-m",
+                "build",
+                "--wheel",
+                "-o",
+                str(dist),
+                str(REPO_ROOT / "pyobfus_runtime"),
+            ],
+            cwd=REPO_ROOT,
+        )
+        runtime_wheels = list(dist.glob("pyobfus_runtime-*.whl"))
+        if not runtime_wheels:
+            raise LaneError("no pyobfus_runtime wheel was built")
 
         _log("Lane C: twine check")
         _run([sys.executable, "-m", "twine", "check", *[str(p) for p in dist.iterdir()]])
@@ -304,7 +322,7 @@ def lane_c(out_dir: Path) -> None:
         venv.create(env_dir, with_pip=True)
         vpy = env_dir / "bin" / "python"
         vpyobfus = env_dir / "bin" / "pyobfus"
-        _run([str(vpy), "-m", "pip", "install", "-q", str(wheel)])
+        _run([str(vpy), "-m", "pip", "install", "-q", str(runtime_wheels[0]), str(wheel)])
         installed_version = _run(
             [str(vpy), "-c", "import pyobfus; print(pyobfus.__version__)"]
         ).stdout.strip()

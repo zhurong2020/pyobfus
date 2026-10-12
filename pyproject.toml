@@ -56,7 +56,7 @@ dependencies = [
     # line a licensed Pro install could not import pyobfus_pro and would silently
     # run as Community. Keep in sync with pyobfus.constants.RUNTIME_REQUIREMENT
     # (docs/Y1_RUNTIME_DISTRIBUTION_DESIGN.md, "Versioning").
-    "pyobfus-runtime>=0.1,<1",
+    "pyobfus-runtime>=0.1.1,<1",
     'tomli>=2.0; python_version<"3.11"',  # opacity-config TOML parser (tomllib is stdlib on 3.11+)
 ]
 

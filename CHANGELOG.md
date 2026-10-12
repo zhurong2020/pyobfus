@@ -81,6 +81,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Pro artifacts built with `--bind-key-env` or `--expire-warn-days` (0.5.30
+  and later) failed on the published `pyobfus-runtime` 0.1.0** with
+  `ImportError: cannot import name 'provided_key'` or `TypeError: ... 'warn_days'`:
+  the runtime functions they call were added to the runtime source after 0.1.0
+  was released. `pyobfus-runtime` 0.1.1 contains them and the builder now
+  requires `pyobfus-runtime>=0.1.1,<1`. **If you shipped such an artifact,
+  install runtime 0.1.1 on the target.** Every repository test had imported
+  the runtime from source; a new integration test installs the runtime wheel
+  into a fresh environment with `pip install --no-index` and runs the
+  artifacts there, and CI now fails when the runtime source changes without a
+  version bump (`scripts/check_runtime_version.py`). The runtime's build
+  requirement is now `setuptools>=77` (its PEP 639 licence expression did not
+  build with the declared `>=61`, for example in offline builds without build
+  isolation).
+
+- Build-fusion option checks now run on the merged configuration, so YAML
+  `vault: true` with `bind_key_env` is rejected like the CLI flags were
+  (previously the vault key was baked into the artifact while the build
+  appeared to use the application-provided key). `--fingerprint` now warns
+  when it has no effect: without an L3 layer, or together with
+  `--bind-device` / `--bind-key-env`, which replace the per-buyer key.
+
+- Directory builds now name every requested Pro build-fusion option that
+  does not run in cross-file mode (previously the note listed five and
+  omitted key binding, expiry, run limits, platform policy and embedded
+  data), and `disabled_transforms` in `--dry-run --json` / `--build-report`
+  lists them all.
+
+- Builds warn when `--save-mapping` points inside the output directory, and
+  `--scrub-traceback` builds warn that the private key file written next to
+  each output (`<output>.scrub.key.pem`) must be moved out before shipping.
+
 - Directory (cross-file) builds dropped PEP 695 type parameters from renamed
   top-level definitions: `def first[T](items: list[T]) -> T` was emitted as
   `def I1(items: list[T]) -> T`, and the module failed with `NameError` on

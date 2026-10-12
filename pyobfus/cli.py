@@ -1053,22 +1053,16 @@ def main(
                 if verbose:
                     click.echo(f"Enabled: Embedded encrypted data ({embed_data}, P2-14)")
 
-            if fusion_requested and cross_file and Path(input_path).is_dir():
-                click.echo(
-                    "Note: the v0.5.1 build-fusion mechanisms "
-                    "(--selective-opacity / --seal-code / --vault / "
-                    "--scrub-traceback / --fingerprint) operate on generated "
-                    "source and are not applied in cross-file directory mode. "
-                    "Use --no-cross-file or a single file for those. Other Pro "
-                    "and content transforms (control-flow, string encryption, "
-                    "anti-debug, dead-code, numeric, AI-marker stripping) do "
-                    "apply in directory mode.",
-                    err=True,
-                )
-
         # Determine if input is file or directory
         input_path_obj = Path(input_path)
         output_path_obj = Path(output_path)
+        _report_fusion_options(
+            config,
+            input_path=input_path_obj,
+            output_path=output_path_obj,
+            cross_file=cross_file,
+            mapping_path=save_mapping_path,
+        )
         _validate_build_report_destination(
             build_report_path=build_report_path,
             input_path=input_path_obj,
@@ -2276,6 +2270,70 @@ def _write_build_report(
     )
     save_build_report(report, build_report_path)
     return build_report_path
+
+
+def _report_fusion_options(
+    config: ObfuscationConfig,
+    *,
+    input_path: Path,
+    output_path: Path,
+    cross_file: bool,
+    mapping_path: Optional[str],
+) -> None:
+    """Reject contradictory fusion settings and say which requested options won't run.
+
+    Runs on the merged config, so options set in YAML get the same checks as
+    CLI flags.
+    """
+    from pyobfus.core.fusion_options import check_fusion_combinations, requested_fusion_fields
+
+    errors, warnings = check_fusion_combinations(config)
+    if errors:
+        for message in errors:
+            click.echo(f"Error: {message}", err=True)
+        sys.exit(1)
+
+    requested = requested_fusion_fields(config)
+    skipped_in_directory_mode = cross_file and input_path.is_dir()
+    if requested and skipped_in_directory_mode:
+        click.echo(
+            "Warning: these Pro build-fusion options are NOT applied in cross-file "
+            f"directory mode: {', '.join(requested)}. Use --no-cross-file (note: "
+            "--save-mapping is not written in that mode) or build single files. "
+            "Other Pro and content transforms (control-flow, string encryption, "
+            "anti-debug, dead-code, numeric, AI-marker stripping) do apply in "
+            "directory mode.",
+            err=True,
+        )
+    else:
+        for message in warnings:
+            click.echo(f"Warning: {message}", err=True)
+
+    if (
+        getattr(config, "scrub_traceback", False)
+        and config.level == "pro"
+        and not skipped_in_directory_mode
+    ):
+        click.echo(
+            "Warning: --scrub-traceback writes each RSA private key to a "
+            "'<output>.scrub.key.pem' file next to the output. Move these files "
+            "out of the output directory before you package or ship it; keep them "
+            "to decode error IDs with pyobfus-unscrub.",
+            err=True,
+        )
+
+    if mapping_path:
+        try:
+            Path(mapping_path).resolve().relative_to(output_path.resolve())
+        except ValueError:
+            pass
+        else:
+            if output_path.resolve() != input_path.resolve():
+                click.echo(
+                    "Warning: the mapping file is inside the output directory. It "
+                    "restores the original names; keep it out of anything you ship.",
+                    err=True,
+                )
 
 
 def _validate_build_report_destination(

@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=77.0", "wheel"]  # PEP 639 license expression below
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "pyobfus-runtime"
-version = "0.1.0"
+version = "0.1.1"
 description = "Redistributable runtime support for artifacts produced by pyobfus Pro."
 readme = "README.md"
 requires-python = ">=3.9"

@@ -99,6 +99,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
+        pip install -e ./pyobfus_runtime
         pip install -e ".[dev]"
         pip install -e ./pyobfus_mcp
 
@@ -144,6 +145,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
+      with:
+        fetch-depth: 0  # runtime-v* tags for the version guard
+
+    - name: Runtime source must not change without a version bump
+      run: python scripts/check_runtime_version.py
 
     - name: Set up Python
       uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5 (pinned 2026-05-09)
@@ -216,7 +222,7 @@ jobs:
         python -m pip install --upgrade pip
         # Install both packages from this checkout so a release-candidate MCP
         # dependency floor can be tested before that Core version reaches PyPI.
-        pip install -e . -e ./pyobfus_mcp 'mcp>=1.20'
+        pip install -e ./pyobfus_runtime -e . -e ./pyobfus_mcp 'mcp>=1.20'
         pip show mcp | grep -E '^(Name|Version):'
 
     - name: Instantiate FastMCP server
@@ -244,7 +250,7 @@ jobs:
     - name: Install pyobfus-mcp, then force the 2.x SDK over the cap
       run: |
         python -m pip install --upgrade pip
-        pip install -e ".[dev]" -e ./pyobfus_mcp
+        pip install -e ./pyobfus_runtime -e ".[dev]" -e ./pyobfus_mcp
         pip install 'mcp>=2,<3'
         pip show mcp | grep -E '^(Name|Version):'
 

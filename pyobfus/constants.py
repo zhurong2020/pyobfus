@@ -87,5 +87,5 @@ TRIAL_API_URL = "https://pyobfus-license-server.zhurong0525.workers.dev/api/tria
 # tests/test_runtime_requirement.py asserts it.
 RUNTIME_DISTRIBUTION = "pyobfus-runtime"
 RUNTIME_IMPORT_NAME = "pyobfus_runtime"
-RUNTIME_REQUIREMENT_SPECIFIER = ">=0.1,<1"
+RUNTIME_REQUIREMENT_SPECIFIER = ">=0.1.1,<1"
 RUNTIME_REQUIREMENT = RUNTIME_DISTRIBUTION + RUNTIME_REQUIREMENT_SPECIFIER

@@ -1,7 +1,9 @@
 # Redistributable Pro runtime design
 
-Status: published `pyobfus-runtime` 0.1.0 (2026-09-24); the builder dependency
-is declared on `main` (2026-09-24) and only the Core release gate remains
+Status: `pyobfus-runtime` 0.1.0 published 2026-09-24 and adopted by Core 0.5.29.
+Y-2/Y-3 (Core 0.5.30) added runtime calls after that release, so their
+artifacts need runtime 0.1.1, prepared on `main` 2026-10-12 to ship with Core
+0.7.0 (see Versioning)
 
 Local evidence: standalone boundary tests 2/2; focused runtime/fusion tests
 189/189; compatibility regression tests 76/76; standalone wheel built and
@@ -138,6 +140,14 @@ only dependency, `cryptography`, Core already requires. The requirement string
 lives in `pyobfus.constants.RUNTIME_REQUIREMENT`, is mirrored into provenance
 manifests as `runtime_requirement`, and is checked against `pyproject.toml` and
 the shipped runtime version by `tests/test_runtime_requirement.py`.
+
+2026-10-12 correction: Core 0.5.30 emitted `provided_key` and
+`expire_check(..., warn_days=)`, which landed in the runtime source after the
+0.1.0 tag, without a runtime release, so those artifacts failed against the
+published 0.1.0 while every repository test passed against the source tree.
+The floor is now `>=0.1.1`, and `scripts/check_runtime_version.py` fails CI
+when the runtime package source differs from the tag of its declared version,
+so a new runtime call cannot reach `main` without a version bump.
 
 ## Acceptance criteria
 

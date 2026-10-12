@@ -67,7 +67,7 @@ jobs:
           python-version: '3.12'
 
       - name: Install pyobfus (contract test target -- real CLI, not mocked)
-        run: python -m pip install -e .
+        run: python -m pip install -e ./pyobfus_runtime -e .
         working-directory: .
 
       - name: Install extension dependencies

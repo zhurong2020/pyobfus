@@ -12,8 +12,10 @@ python -m pip install pyobfus-runtime
 ```
 
 Creating protected artifacts still requires a valid pyobfus Pro licence.
-The first runtime release is `0.1.0`; install it in the environment where a
-protected artifact runs. The builder declares `pyobfus-runtime>=0.1,<1`, and a
+Install it in the environment where a protected artifact runs. Version
+`0.1.1` adds `provided_key` / `set_key_provider` (used by `--bind-key-env`)
+and the `warn_days` argument of `expire_check` (used by `--expire-warn-days`);
+artifacts built with those options fail on `0.1.0`. The builder declares `pyobfus-runtime>=0.1.1,<1`, and a
 provenance manifest written with `--provenance-manifest` records that
 requirement for any artifact that needs it.
 
