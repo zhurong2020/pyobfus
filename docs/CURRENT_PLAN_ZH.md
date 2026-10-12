@@ -1,5 +1,7 @@
 # pyobfus 当前计划
 
+**2026-10-12 收尾（冷启动先读这段）**：同日发版后又合并三项、均未发版——#95（opacity 规则命中方法/嵌套函数时警告，build report 记计数）、#96（社区版 `--check-delivery`：mapping／私钥／原文混入交付目录或 wheel 为 high，7 个真实 wheel 与 2.8 万文件 site-packages 零误报；附带修 `--check` 点号设置键误报）、#97（MCP `check_delivery` 工具，9 个工具）。订阅静态探针 48 次：C0 6/6、社区版 C1 6/6 被还原、L3 C4/C4b 0/6 → 不为「抗 AI」新增社区 AST 变换。可运行档 Agent 实验暂停（会话中被安全分类器拦下，结论已由 `key_exposure.py` 覆盖）。维护者定：**下次发版等 11 月月度版本**，此前只观察 0.7.0 反馈与调研回答，10-25 照常复盘；计划见 `docs/TODO.md`「下一次发版」。
+
 **2026-10-12 夜 Core 0.7.0 + runtime 0.1.1 已发布**：维护者批准立即发版、Agent 实验只用订阅。先发 `runtime-v0.1.1`（PyPI/PEP 740，离线目标测试对已发布 wheel 4/4），再发 `v0.7.0`（`aaf4e32`；PyPI/PEP 740，3.10/3.14 全新安装自动带 runtime 0.1.1，multifile 实跑，GitHub Release 已建）。发版时 CI 暴露两处：快照测试比对含版本号的构建标记（本地 editable 元数据停在 0.6.1 所以没发现，`e07de03` 规范化）；新增 `key_exposure.py` 确定性基线 + Round 2 实验协议（`aaf4e32`），离线交付指南上线。Zenodo/CFF 待归档后补，跨仓同步与客户通知草稿见 TODO。
 
 **2026-10-12 晚 路线图独立复核完成，修复随 0.7.0**：Claude 复核结论「需重大修改」（[报告](AI_ERA_PROTECTION_ROADMAP_REVIEW_CLAUDE_2026-10-12.md)），维护者确认按修订执行（路线图 §13）。复核实测发现已发布 runtime 0.1.0 缺 Y-2／Y-3 接口，0.5.30 起 `--bind-key-env`／`--expire-warn-days` 产物在 PyPI 环境不能运行；另有 fusion 目录模式提示不全、YAML 绕过互斥、水印静默失效、mapping／scrub 私钥落在输出目录无提示。处置：PR #94 已合并（`b81a61d`；runtime 0.1.1、builder 下限 `>=0.1.1`、版本守卫、离线目标集成测试对 0.1.0 红／0.1.1 绿并在 ubuntu／windows 跑、如实提示；Windows 首跑还暴露 runtime 构建需求 `setuptools>=61` 与其 PEP 639 许可写法不符，已改 `>=77`），随 0.7.0，发版先 `runtime-v0.1.1`。同轮发现 Dependabot 自动合并把 `click`／`jsonschema` 下限抬到只支持 Python ≥3.10 的版本（3.9 测试不是必需检查、bot 合并不触发 main CI），PR #93 已还原并合并，pip 改 `increase-if-necessary`、CI 加每日定时、规则集加 3.9／3.14 必需检查，#86／#90 已关。

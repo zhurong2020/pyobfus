@@ -33,12 +33,23 @@ Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运�
 
 - **已发布**：维护者 10-12 批准提前发；先 `runtime-v0.1.1`（PyPI/PEP 740/离线目标测试对已发布 wheel 4/4），后 `v0.7.0`（PyPI/PEP 740/3.10 与 3.14 全新安装/GitHub Release）。
 - Zenodo record `23318803`（v0.7.0）已归档，`CITATION.cff` 已更新；跨仓同步已做（action、workspace-meta、home 索引）。
-- [ ] Pro 客户通知：5 封 Gmail 草稿已建（含两个可选调研问题；kvikram 那封附未激活提示），待维护者审阅发送。
+- Pro 客户通知已由维护者发出（10-12，5 封，含两个可选调研问题）。注意：Gmail 连接器建的草稿会把所有链接改写成 `google.com/url?q=…`（10-10 的 0.6.1 通知也是这样寄出的），以后发送前在网页编辑器里换成干净链接。
 - 发版前准备已完成（10-11）：dogfood lane A/B/C/D 全过；`examples/multifile`、动机私有项目副本用新 wheel 验证通过。
   发版清单、README 横幅、GitHub Release 说明与 Pro 客户通知草稿在私有 `docs/internal/release-0.7.0/RELEASE_PREP.md`。
 - 只发 Core：MCP 等 10-19 Glama 测试；VS Code schema 随插件下次发版。
 - 观察到的后续（不阻塞 0.7.0）：包 `__init__` 用 `try: __version__ = version(...)` 时整个包的子模块访问都不改写（pyobfus 自身即如此），
   可做 H PR 4 放宽「与子模块名无关的初始化语句」。
+
+## 下一次发版（11 月月度版本 · 2026-10-12 维护者定）
+
+0.7.0 当天已发，main 上新增的都是新功能，不够「影响用户的 bug」例外，**等月度版本，不再单独发**。发版仍需维护者批准。
+
+- **现在 → 10-19 左右：只观察，不加新功能。** 每周一巡检（进度 + 下载量 + Gmail）时看 0.7.0 反馈与两个调研问题的回答（离线/平台、单文件/多模块）。出现影响用户的 bug 再按例外处理。
+- **10-25 复盘**照原计划，并据客户回答决定后续优先级（例如「fusion × 目录构建」是否值得做）。
+- **11 月月度版本**（顺序：Core 先于 MCP）：
+  - Core：#95 opacity 覆盖计数与警告、#96 `--check-delivery`、`--check` 点号设置键误报修复（均在 `[Unreleased]`）。发版前用一个真实交付目录（动机私有项目副本）实跑 `--check-delivery`，确认无误报。
+  - MCP：#97 `check_delivery` 工具（工具数 8 → 9）。发版时同步改各处「8 tools」表述（README、`docs/DISTRIBUTION_CHANNELS.md`、CLAUDE.md、server.json 描述等），并手工更新 Glama Build steps。
+  - runtime 源码若有改动必须先升版本、先发 runtime（CI 守卫 `scripts/check_runtime_version.py`）；改版本号后先 `pip install -e .` 再跑全套测试（快照测试含版本号）。
 
 ## 增强路线复核（2026-10-12 · 实施前 gate）
 
@@ -351,8 +362,8 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 
 发版本身是独立 gate。
 
-- **Core `[Unreleased]` 为空**：`0.6.1` 已于 2026-10-10 发布（缺陷 G 别名导入 + F 默认保留参数名）；`0.6.0` 于 10-08 发布。
-- **`pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]`**：mcp SDK 2.x 兼容、mapping 不匹配提示、关键字调用 advisory（10-10 维护者定：暂不发）。VS Code 插件 schema 已随 #67 同步 `preserve_param_names` 默认值，也暂不发插件。刻意不随 Core
+- **Core `[Unreleased]`**：#95、#96 与 `--check` 误报修复，排 11 月月度版本（见「下一次发版」）。`0.7.0` 于 2026-10-12 发布。
+- **`pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]`**：`check_delivery` 工具（#97）、H 默认开启说明、mcp SDK 2.x 兼容、mapping 不匹配提示、关键字调用 advisory；随 11 月 Core 之后发。VS Code 插件 schema 已随 #67 同步 `preserve_param_names` 默认值，也暂不发插件。刻意不随 Core
   发，攒够增量或有人明确要 2.x 时再发（每发一次 MCP 要手工改 Glama Build steps）。
 
 
