@@ -50,7 +50,7 @@ Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运�
 - [x] Agent 实验协议（`docs/LLM_RESISTANCE_BENCHMARK.md`「Round 2 protocol」）+ 确定性脚本 `benchmarks/llm_resistance/key_exposure.py`（进 CI）。
 - [x] 静态探针（10-12，只用订阅，48 次调用）：C0 6/6、**C1 社区版 6/6 被还原**、C4/C4b 0/6（两模型一致）→ 不为「抗 AI」新增社区 AST 变换。见 `docs/LLM_RESISTANCE_STATIC_PROBE_2026-10-12.md`。
 - [ ] 可运行档：给 harness 加带工具的 Agent 适配器（断网容器 + Python + 反编译器），比较 C4 与 C4b，并补一个多模块样例；做完再用订阅额度。
-- [ ] 覆盖报告第一步 PR #95（opacity 规则命中方法/嵌套函数时警告并计数）：CI 通过后合并，随下一版。
+- [x] 覆盖报告第一步 PR #95 已合并（opacity 规则命中方法/嵌套函数时警告，build report 记计数），未发版，随下一版。下一步：交付检查原型（mapping／原文／scrub 私钥混入交付目录或 wheel）。
 - 待需求信号：「fusion × 目录构建」设计（多模块离线应用拿到 Pro 保护的前提）、embed-data／vault 接 key provider、L3 覆盖方法。
 - 已认可方向不变：离线应用交付优先；不新增项目规模门槛；路线图每轮先检验现有功能、修缺陷，再扩展。
 
