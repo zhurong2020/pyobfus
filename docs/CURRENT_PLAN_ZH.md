@@ -1,5 +1,7 @@
 # pyobfus 当前计划
 
+**2026-10-13 待审 PR #98 `--verify-names`（下游实测触发，未合并、未发版）**：新增 Community 参数，构建写出前记录源码各模块「用到却未绑定」的全局名，写出后报产物新增的这类名字并 exit 1（`--json` 给 `NameVerificationError`）；只用 `ast`/`symtable`，不执行代码；原地构建也有基线。起因：下游 0.5.28 目录构建过了 `--verify-syntax`，装机后每次运行 `name 'I72' is not defined`（缺陷 G）。实测：该构建 1 秒指出；main 上 `calendar.py`（缺陷 C）被指出，`json`/`email`/`textwrap`/71 模块应用构建无误报；`tests/` 3277 + `integration_tests/` 44 通过，PR CI 20/20。**审核时看**：误报面（`symtable` 对 `global`、类体、推导式、`__class__` 的处理）、`from x import *` 跳过是否该改成告警、单文件模式基线键名、是否纳入 `--build-report`/MCP、是否以后随 `--verify-syntax` 默认开启。合并后：等 11 月月度版本随发；README「What's new」在发版提交里写。下游（一个私有医院分发构建）现用本地副本做同样检查，上游发版后改用本参数。详情 `gh pr view 98`。
+
 **2026-10-12 收尾（冷启动先读这段）**：同日发版后又合并三项、均未发版——#95（opacity 规则命中方法/嵌套函数时警告，build report 记计数）、#96（社区版 `--check-delivery`：mapping／私钥／原文混入交付目录或 wheel 为 high，7 个真实 wheel 与 2.8 万文件 site-packages 零误报；附带修 `--check` 点号设置键误报）、#97（MCP `check_delivery` 工具，9 个工具）。订阅静态探针 48 次：C0 6/6、社区版 C1 6/6 被还原、L3 C4/C4b 0/6 → 不为「抗 AI」新增社区 AST 变换。可运行档 Agent 实验暂停（会话中被安全分类器拦下，结论已由 `key_exposure.py` 覆盖）。维护者定：**下次发版等 11 月月度版本**，此前只观察 0.7.0 反馈与调研回答，10-25 照常复盘；计划见 `docs/TODO.md`「下一次发版」。
 
 **2026-10-12 夜 Core 0.7.0 + runtime 0.1.1 已发布**：维护者批准立即发版、Agent 实验只用订阅。先发 `runtime-v0.1.1`（PyPI/PEP 740，离线目标测试对已发布 wheel 4/4），再发 `v0.7.0`（`aaf4e32`；PyPI/PEP 740，3.10/3.14 全新安装自动带 runtime 0.1.1，multifile 实跑，GitHub Release 已建）。发版时 CI 暴露两处：快照测试比对含版本号的构建标记（本地 editable 元数据停在 0.6.1 所以没发现，`e07de03` 规范化）；新增 `key_exposure.py` 确定性基线 + Round 2 实验协议（`aaf4e32`），离线交付指南上线。Zenodo/CFF 待归档后补，跨仓同步与客户通知草稿见 TODO。
