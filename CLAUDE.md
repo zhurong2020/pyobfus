@@ -14,6 +14,10 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
+### 2026-10-14 — PR #98 Codex 审核修订及本地验证完成，待 CI / 合并；仅推进到发版前
+
+当前入口为 `docs/CURRENT_PLAN_ZH.md` 顶部及 `docs/TODO.md`。0.7.0/runtime 0.1.1 已发布，归档与客户通知完成；新增变更仍未发版。维护者要求实际发布等待另行通知，不创建发布标签或触发发布工作流。
+
 ### 🟢 2026-10-12 — Core 0.7.0 + runtime 0.1.1 已发布；路线图复核修复随发（冷启动先读 `docs/CURRENT_PLAN_ZH.md` 顶部 10-12 段、路线图 §13、`docs/TODO.md`「增强路线复核」）
 
 ### 🟢 2026-10-11 — 限制 H 三个实现 PR 合并、默认开启；下一版 0.7.0 待 10-13 拍板（冷启动先读 `docs/CURRENT_PLAN_ZH.md` 顶部 10-11 段与 `docs/TODO.md`「下一版 Core 0.7.0」）

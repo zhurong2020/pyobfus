@@ -24,13 +24,14 @@ def build_report(
     provenance_manifest_path: Optional[Union[str, Path]],
     cwd: Path,
     cache_hit: bool = False,
+    name_verification: Optional[Mapping[str, Any]] = None,
 ) -> Dict[str, Any]:
     """Build the v1 fact model without exposing source text or absolute paths."""
     output_files = _output_records(output_path)
     manifest_label = (
         _safe_path_label(Path(provenance_manifest_path), cwd) if provenance_manifest_path else None
     )
-    return {
+    report = {
         "format": BUILD_REPORT_FORMAT,
         "version": BUILD_REPORT_VERSION,
         "tool": {"name": "pyobfus", "version": PYOBFUS_VERSION},
@@ -70,6 +71,10 @@ def build_report(
             "secrets_included": False,
         },
     }
+
+    if name_verification is not None:
+        report["name_verification"] = dict(name_verification)
+    return report
 
 
 def save_build_report(report: Mapping[str, Any], path: Union[str, Path]) -> None:

@@ -92,6 +92,7 @@ nav:
     - Remote-debug hardening (Python 3.14): REMOTE_DEBUG_HARDENING.md
     - Python 3.8 compatibility (historical): PYTHON38_COMPATIBILITY.md
   - Verifying a build:
+    - Generated name verification (after 0.7.0): NAME_VERIFICATION.md
     - Verifiable build report: VERIFIABLE_BUILD_REPORT.md
     - Provenance manifest: PROVENANCE_MANIFEST.md
     - SARIF code scanning: SARIF_CODE_SCANNING.md

@@ -178,6 +178,12 @@ def _echo_pro_import_hint() -> None:
     help="Compile generated Python in memory after writing; does not import or execute it",
 )
 @click.option(
+    "--verify-names",
+    is_flag=True,
+    help="After writing, fail if a generated module uses a global name it never binds "
+    "and its source did not (possible NameError); static, nothing is executed",
+)
+@click.option(
     "--crossfile-module-attributes/--no-crossfile-module-attributes",
     default=None,
     help="Rewrite proved module reads/calls through unconditional imports, including "
@@ -519,6 +525,7 @@ def main(
     verbose: bool,
     dry_run: bool,
     verify_syntax: bool,
+    verify_names: bool,
     cross_file: bool,
     crossfile_local_names: Optional[bool],
     crossfile_module_attributes: Optional[bool],
@@ -724,6 +731,23 @@ def main(
             )
         else:
             click.echo("Error: Missing required option '-o' / '--output'.", err=True)
+        sys.exit(1)
+
+    if dry_run and verify_names:
+        if json_output:
+            _emit_error_json(
+                "UsageError",
+                "--verify-names requires generated output and cannot be combined with --dry-run.",
+                "Run without --dry-run to write and name-check the generated files.",
+                "pyobfus INPUT -o OUTPUT --verify-names --json",
+                exit_code=1,
+            )
+        else:
+            click.echo(
+                "Error: --verify-names cannot be combined with --dry-run; "
+                "name verification checks generated output.",
+                err=True,
+            )
         sys.exit(1)
 
     if dry_run and verify_syntax:
@@ -1156,6 +1180,24 @@ def main(
             click.echo(f"Warning: {mapping_warning}", err=True)
             save_mapping_path = None
         verification: Optional[Dict[str, Any]] = None
+        name_verification: Optional[Dict[str, Any]] = None
+        # --verify-names: take the source baseline now, before anything is
+        # written, so an in-place build (-o equal to the input) is still
+        # compared with its real source.
+        name_baseline: Optional[Dict[str, Any]] = None
+        if verify_names and not dry_run:
+            from pyobfus.core.name_verify import snapshot_source
+
+            baseline_files = (
+                [input_path_obj]
+                if input_path_obj.is_file()
+                else filter_python_files(
+                    input_path_obj,
+                    config.exclude_patterns,
+                    skip_environment_dirs=config.skip_environment_dirs,
+                )
+            )
+            name_baseline = snapshot_source(input_path_obj, baseline_files)
 
         if verbose and input_path_obj.is_dir():
             skipped_directories: List[str] = []
@@ -1198,6 +1240,14 @@ def main(
                         verification=verification,
                         json_output=json_output,
                     )
+                if name_baseline is not None:
+                    name_verification = _run_name_verification(
+                        name_baseline,
+                        input_path=input_path,
+                        output_path=output_path,
+                        json_output=json_output,
+                        saved_stdout=_saved_stdout,
+                    )
                 written_report_path = _write_build_report(
                     build_report_path=build_report_path,
                     plan=build_plan,
@@ -1206,6 +1256,7 @@ def main(
                     verification=verification,
                     provenance_manifest_path=None,
                     cache_hit=True,
+                    name_verification=name_verification,
                 )
                 if json_output:
                     sys.stdout = _saved_stdout
@@ -1221,6 +1272,7 @@ def main(
                         build_report_path=written_report_path,
                         verification=verification,
                         warning=mapping_warning,
+                        name_verification=name_verification,
                     )
                     return
                 if verification is not None:
@@ -1335,6 +1387,15 @@ def main(
             if not json_output:
                 _display_syntax_verification_success(verification)
 
+        if name_baseline is not None:
+            name_verification = _run_name_verification(
+                name_baseline,
+                input_path=input_path,
+                output_path=output_path,
+                json_output=json_output,
+                saved_stdout=_saved_stdout,
+            )
+
         written_manifest_path: Optional[str] = None
         if provenance_manifest_path and not dry_run:
             from pyobfus.core.provenance import (
@@ -1380,6 +1441,7 @@ def main(
             verification=verification,
             provenance_manifest_path=written_manifest_path,
             cache_hit=False,
+            name_verification=name_verification,
         )
         if build_report_path and dry_run and not json_output:
             click.echo(
@@ -1404,6 +1466,7 @@ def main(
                 plan=build_plan,
                 verification=verification,
                 warning=mapping_warning,
+                name_verification=name_verification,
             )
             return
 
@@ -2227,6 +2290,7 @@ def _emit_obfuscate_success_json(
     plan: Optional[Dict[str, Any]] = None,
     verification: Optional[Dict[str, Any]] = None,
     warning: Optional[str] = None,
+    name_verification: Optional[Dict[str, Any]] = None,
 ) -> None:
     """Emit the obfuscation success summary as JSON."""
     # AI hint: suggest the most useful next command based on context
@@ -2275,6 +2339,12 @@ def _emit_obfuscate_success_json(
         payload["plan"] = plan
     if verification is not None:
         payload["verification"] = verification
+    if name_verification is not None:
+        payload["name_verification"] = name_verification
+        if not name_verification["coverage_complete"]:
+            payload[
+                "ai_hint"
+            ] += " Name verification coverage is partial; review name_verification.skipped."
     _emit_success_json_payload(payload)
 
 
@@ -2287,6 +2357,7 @@ def _write_build_report(
     verification: Optional[Dict[str, Any]],
     provenance_manifest_path: Optional[str],
     cache_hit: bool,
+    name_verification: Optional[Dict[str, Any]] = None,
 ) -> Optional[str]:
     """Write the optional unified report after all requested build evidence exists."""
     if not build_report_path:
@@ -2304,6 +2375,7 @@ def _write_build_report(
         provenance_manifest_path=provenance_manifest_path,
         cwd=Path.cwd(),
         cache_hit=cache_hit,
+        name_verification=name_verification,
     )
     save_build_report(report, build_report_path)
     return build_report_path
@@ -2487,6 +2559,62 @@ def _report_syntax_verification_failure(
     else:
         click.echo("Error: generated output failed syntax verification.", err=True)
         for error in verification["errors"]:
+            location = error["path"]
+            if error["line"] is not None:
+                location += f":{error['line']}"
+            click.echo(f"  {location}: {error['message']}", err=True)
+    raise SystemExit(1)
+
+
+def _run_name_verification(
+    baseline: Dict[str, Any],
+    *,
+    input_path: str,
+    output_path: str,
+    json_output: bool,
+    saved_stdout: Any,
+) -> Dict[str, Any]:
+    """Run --verify-names, retaining coverage and exiting 1 on failed checks."""
+    from pyobfus.core.name_verify import verify_generated_names
+
+    result = verify_generated_names(baseline, Path(input_path), Path(output_path))
+    if result["names_valid"]:
+        if not json_output:
+            if result["coverage_complete"]:
+                click.echo(
+                    f"Name verification passed: {result['files_checked']} generated module(s) "
+                    "have no newly unbound global names; nothing was executed."
+                )
+            else:
+                click.echo(
+                    f"Warning: name verification coverage is partial "
+                    f"({result['files_checked']} checked, {result['files_skipped']} skipped); "
+                    "skipped modules have not been verified.",
+                    err=True,
+                )
+                for skipped in result["skipped"]:
+                    click.echo(f"  {skipped['path']}: {skipped['reason']}", err=True)
+        return result
+    sys.stdout = saved_stdout
+    if json_output:
+        _emit_success_json_payload(
+            {
+                "version": 1,
+                "status": "error",
+                "error_type": "NameVerificationError",
+                "input": input_path,
+                "output": output_path,
+                "verification": result,
+                "ai_hint": (
+                    "Generated output could not be verified or has newly unbound names; it may "
+                    "raise NameError when reached. Do not ship them; report the file and name, "
+                    "inspect the original source and consider exclude_names where appropriate."
+                ),
+            }
+        )
+    else:
+        click.echo("Error: generated output failed static name verification.", err=True)
+        for error in result["errors"]:
             location = error["path"]
             if error["line"] is not None:
                 location += f":{error['line']}"
