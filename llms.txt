@@ -20,6 +20,7 @@ pyobfus --check src/ --json
 pyobfus src/ -o dist/ --dry-run --json
 pyobfus src/ -o dist/ --save-mapping mapping.json --verify-syntax --json
 pyobfus --check-delivery dist/ --json   # release after 0.7.0: no mapping, keys or originals in dist/
+# release after 0.7.0: add --verify-names to the build to fail on names the output uses but never binds
 ```
 
 Keep `mapping.json` private. To restore a traceback:

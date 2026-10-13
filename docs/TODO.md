@@ -211,7 +211,12 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 
 **分工（10-07 维护者定）**：Codex 实现，Claude 审核，维护者批准合并；发版另需批准。
 
-- [x] **既有缺陷 G · 目录构建的别名导入（优先，0.5.32 已存在，影响用户）**：`from pkg import scale as action` 或
+- [ ] **构建后名字校验 `--verify-names`（10-13 下游实测触发，PR 待审）**：NameError 类转换缺陷反复出现（Y-7、#58、G、I、C），
+      `--verify-syntax` 都看不见。下游一个 0.5.28 目录构建过了 `--verify-syntax`、装机后每次运行都 `name 'I72' is not defined`；
+      stdlib `symtable` 对比源与产物约 1 秒就能指出。实现：写出前取源基线（原地构建也成立），写出后报「产物用到却从未绑定、源里有绑定」的名字。
+      main 上实测：`calendar.py`（缺陷 C）被指出，`json`/`email`/`textwrap`/71 模块应用构建无误报。Community（属「本地验证产物」）。
+      后续候选：纳入 `--build-report`、MCP 工具、默认随 `--verify-syntax` 开启（先观察误报）。
+- [x] **既有缺陷 G · 目录构建的别名导入（优先，0.5.28 已存在——10-13 下游构建实证，早于原记的 0.5.32；影响用户）**：`from pkg import scale as action` 或
       `from pkg.core import scale as action` 后调用 `action(...)` 即 NameError（局部改名开关无关）。参数改名设计审核中发现；
       应先于参数改名的解析器工作修复。**10-10 已合并 PR #66（`b56afe2`），随 0.6.1 发布**（保留显式本地别名，仅同步被导入符号名）；审核记录私有 `docs/internal/geo-2026-10/PR66_REVIEW_2026-10-10.md`。
 - [ ] **既有缺陷 I · 函数内别名覆盖模块级导入**（10-10 审 #66 发现，低优先级）：
