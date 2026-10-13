@@ -57,6 +57,12 @@ pyobfus src/ -o dist/ --save-mapping mapping.json --verify-syntax
 pyobfus --unmap --trace error.log --mapping mapping.json
 ```
 
+Merged on `main`, not yet published: opt-in `--verify-names` adds a static
+check for newly unbound globals and reports partial coverage explicitly.
+PyPI 0.7.0 does not include it. See
+[name verification](https://pyobfus.readthedocs.io/en/latest/NAME_VERIFICATION/)
+for candidate/source-checkout usage and limits.
+
 For framework presets, configuration discovery, packaging and verification,
 start at the [task-oriented documentation](https://pyobfus.readthedocs.io/).
 

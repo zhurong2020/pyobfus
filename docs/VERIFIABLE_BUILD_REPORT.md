@@ -71,7 +71,7 @@ encrypt, by reason. These are counts only; function names are not recorded.
 Builds without an L3 pass do not include these keys.
 
 
-## Name verification (release after 0.7.0)
+## Name verification (merged on main, not in PyPI 0.7.0)
 
 When a build requests `--verify-names`, the successful report includes a separate
 `name_verification` object with checked/expected/skipped file counts, coverage,

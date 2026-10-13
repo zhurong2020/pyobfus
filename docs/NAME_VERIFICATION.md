@@ -1,7 +1,8 @@
 # Check generated names before delivery
 
-`--verify-names` is an opt-in Community build check, available in the release
-after 0.7.0. It supplements `--verify-syntax`: valid Python can still refer to
+`--verify-names` is an opt-in Community build check merged in PR #98.
+It is not yet published and is absent from PyPI 0.7.0; the commands below
+apply to a source checkout or candidate build containing the change. It supplements `--verify-syntax`: valid Python can still refer to
 a name that a renaming transform failed to bind.
 
 ```bash
@@ -28,6 +29,11 @@ or generated code. Python encoding declarations and UTF-8 BOMs are respected.
   the same result is recorded in the report, separately from the existing
   syntax `verification`. Incremental cache hits retain the name-check result.
 - Without `--verify-names`, the JSON and report shapes are unchanged.
+
+`names_valid: true` means no failure was detected among the checked pairs;
+it is not a pass for skipped modules. Inspect `coverage_complete` and `skipped`
+alongside it. Source/output read failures and output parse failures are errors, not successful
+skips; unparsable source baselines are explicitly listed as skipped.
 
 The result includes `files_expected`, `files_checked`, `files_skipped`,
 `coverage_complete`, `skipped` (relative path and reason), `errors`,

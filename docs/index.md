@@ -45,6 +45,10 @@ pyobfus src/ -o dist/ --save-mapping mapping.json --verify-syntax
 # --verify-syntax only compiles the output; run your own tests against dist/
 ```
 
+`--verify-names` is merged on main but not in PyPI 0.7.0. It remains opt-in
+and reports partial coverage explicitly. See [name verification](NAME_VERIFICATION.md)
+for source-checkout/candidate usage and static-analysis limits.
+
 When a production traceback arrives:
 
 ```bash

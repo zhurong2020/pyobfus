@@ -11,6 +11,11 @@ firewalls. Everything here was checked against pyobfus 0.7.0 and
 `integration_tests/test_offline_target.py` repeats the Pro steps on every CI run
 (Linux and Windows).
 
+Before delivery, run the application tests against generated output. Core
+PR #98 also adds optional static [name verification](../NAME_VERIFICATION.md),
+merged on main but not yet in PyPI 0.7.0; it does not execute code and cannot
+replace target-environment tests.
+
 ## 1. Build, then keep private files out of what you ship
 
 ```bash

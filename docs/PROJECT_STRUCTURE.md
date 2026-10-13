@@ -5,6 +5,14 @@ cross-repository boundaries. Current priorities belong in
 [`CURRENT_PLAN_ZH.md`](CURRENT_PLAN_ZH.md); historical implementation detail
 belongs in dated design documents.
 
+## Name-verification ownership (PR #98, unreleased)
+
+The optional static `--verify-names` build check belongs to Core. Its successful
+CLI JSON and build report carry `name_verification` separately from syntax
+evidence. It is merged on main but absent from PyPI 0.7.0. No MCP tool or
+build-option contract was added by #98, and the Action does not enable it
+through `verify-syntax`. See [name verification](NAME_VERIFICATION.md).
+
 ## System topology
 
 ```text

@@ -29,7 +29,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `name 'I72' is not defined` (defect G, fixed in 0.6.1); the check flags that
   build in about a second, and on current `main` it reports the known
   `calendar.py` limitation (C) while passing `json`, `email` and a 71-module
-  application build.
+  application build. PR [#98](https://github.com/zhurong2020/pyobfus/pull/98)
+  is merged but remains unreleased; see [name verification](docs/NAME_VERIFICATION.md)
+  for coverage and limitations.
 
 - `--check-delivery PATH` (Community) checks what you are about to ship, an
   output directory or a `.whl`, after packaging. It fails (exit 1) on a pyobfus

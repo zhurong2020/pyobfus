@@ -246,7 +246,7 @@ names we intended. It does not prove a Django project survives obfuscation,
 because no Django project is built and served in CI. Anyone who needs that
 guarantee should run `--check` and then their own test suite against the
 generated output; `--verify-syntax` compiles it, which is weaker than running.
-`--verify-names` (after 0.7.0) adds one static check that catches renaming
+`--verify-names` (PR #98 merged on main; not yet in PyPI 0.7.0) adds one static check that catches renaming
 defects compilation misses: a global name the output uses but never binds.
 It still does not run anything. The opt-in check records source/output coverage,
 warns explicitly about skipped star-import modules, and fails on unreadable or
