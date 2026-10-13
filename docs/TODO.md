@@ -211,7 +211,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 
 **分工（10-07 维护者定）**：Codex 实现，Claude 审核，维护者批准合并；发版另需批准。
 
-- [ ] **构建后名字校验 `--verify-names`（10-13 下游实测触发，PR 待审）**：NameError 类转换缺陷反复出现（Y-7、#58、G、I、C），
+- [ ] **构建后名字校验 `--verify-names`（10-13 下游实测触发，PR #98 待审）**：NameError 类转换缺陷反复出现（Y-7、#58、G、I、C），
       `--verify-syntax` 都看不见。下游一个 0.5.28 目录构建过了 `--verify-syntax`、装机后每次运行都 `name 'I72' is not defined`；
       stdlib `symtable` 对比源与产物约 1 秒就能指出。实现：写出前取源基线（原地构建也成立），写出后报「产物用到却从未绑定、源里有绑定」的名字。
       main 上实测：`calendar.py`（缺陷 C）被指出，`json`/`email`/`textwrap`/71 模块应用构建无误报。Community（属「本地验证产物」）。
