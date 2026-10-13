@@ -5,18 +5,7 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-10-11 晚（限制 H 实现 #83/#84/#85 合并并默认开启；下一版定 0.7.0、10-13 拍板；缺陷 I 范围更正；会话遗留小事见维护者清单。此前同日：AI 回答基线完成并衍生改进清单（见「2026-10-11 AI 回答基线衍生的改进」）；首屏多文件措辞 PR #70 已合并；周巡检：09-12 报障客户已激活、原跟进项结案；Glama 两次构建失败经 admin 日志确认是其 Docker 构建服务 502，结案。上一轮 2026-10-10：维护者批准 PR #65 的 6 个决定并合并；Codex 无头实现、Claude 审核合并 G（#66）与 F 方案 A（#67），**发布 Core `0.6.1`**（PyPI/PEP 740/全新安装/Release/Zenodo `23273782`/CFF 已核）；新登记缺陷 I；Discussions #11/#13/#24 加过时说明、#11 改试用命令与措辞，新公告 #68 已发；Pro 客户 0.6.1 通知 5 封已由维护者发出。上一轮 2026-10-08：参数改名设计 PR #65 审核；新登记缺陷 F、G。同日发布 Core `0.6.0`：目录构建改函数局部变量 + 三个 0.5.32 既有缺陷修复，PyPI/PEP 740/Release/Zenodo `23228339` 已核。此前同日：Claude 交叉审核 #57/#59/#60，修复 #57 三处问题后三个 PR 全部 squash 合并：main `f65be9a`/`26337d8`/`81df698`，未发版；P0 第 1 步完成，新登记两个既有转换缺陷与四条非阻断跟进，见「P0 · 目录构建的改名深度」。上一轮 2026-10-07 晚：同日发 0.5.31 与 0.5.32，静默期按「影响用户的 bug」例外提前结束，10-25 复盘照做；PR #57 审核意见已给 Codex；新增维护者动作：是否通知 Pro 客户升级。此前同日：GEO 计划第一轮完成，剩余项见「GEO / 外部采用」；新增 P0「目录构建的改名深度」。上一轮 2026-10-05：Stripe/许可线：两笔新购核对、结账页文案与激活说明更新、Worker 只对已付款发号并部署、webhook 加 async 订阅；新增维护者清单 5 项见下。上一轮 2026-09-30：下载数据留存收口：只保留决策摘要，10-25 复盘后改为月度留存；所有暂不发版的后续改进继续按本文件的触发条件与节奏跟踪。上一轮 09-28：新增「IP 相关」段：专利标识、专有许可专利条款、发版清单 Apache 边界检查，待拍板；选题池加第 7 篇「混淆后让 AI 助手继续帮你调试」并排进 11-24；落地页加 JSON-LD 结构化数据；周一巡检：plugin 锁由 Rudy 09-28 升级到 Anthropic 内部、等其跟进；GitHub 流量来源已并进 `download_snapshot.py`；第 2 篇草稿已写。上一轮 09-27：新增「内容节奏」段：只写不发到 10-11、10-13 那周起 DEV 双周一篇，知乎选定为中文开发者渠道先记录，第 1 篇草稿已写；Show HN 最终结果补记；上一轮 09-26：Claude plugin 孤儿锁已按 Rudy 要求补齐账号核查、workspace ID 与两张截图并在原线程回复，现等后端处理；上一轮 09-25：trial 现状核查 + KV 备份 P0 当日完成；09-24：awesome-python PR #3352 当日被维护者关闭，理由是采用量，见「分发 / 上架队列」；
-`pyobfus-runtime` 0.1.0 已通过 OIDC/PEP 740 发布并完成 PyPI 验收；
-删除已完全合入 `main` 的本地及远端 `spike/mcp-sdk-2x` 空壳分支；
-修正本文件把已随 0.5.28 发布的邮箱 trial 误列为待实现、仍称 0.5.27 为当前版本的状态漂移。
-上一轮 2026-09-22：迁移到 WSL 后的核查与收尾，抗 AI 措辞改写完成、Alipay 句已删、
-awesome-python PR #3352 已提交（09-24 被拒）、Claude plugin 需重提、MCP Trust Checker 已实扫；详见
-`CURRENT_PLAN_ZH.md` 09-22 段。上一轮 2026-09-20：对标竞品 + 国际最佳实践 + 本地已完成/未发版做了一次三透镜
-重排，见 `FEATURE_EXPANSION_RESEARCH_2026-09-12.md` 之上的本轮外部核查；新增
-**服务端邮箱登记 trial** 为 P1（现已完成并随 0.5.28 发布），依据见
-`TRIAL_STRATEGY_DECISION_2026-09-20.md`；
-把 provenance / SARIF / build-report / CycloneDX 收拢为一条「可验证性主线」抬为 P0。
-Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运营复查见 `CURRENT_PLAN_ZH.md`）。
+最后更新：2026-10-14。Core 0.7.0 / runtime 0.1.1 已发布，Zenodo/CFF 与客户通知已完成；MCP 当前公开版 0.3.12。#95/#96/#97 已合并未发布。#98 已完成 Codex 审核修订及本地验证，等待修订 head 的 CI / 合并，状态见 `CURRENT_PLAN_ZH.md` 顶部。**维护者要求：完成到发版之前，具体发版等待另行通知；不创建发布标签、不触发发布工作流。**
 
 ## 状态口径
 
@@ -47,7 +36,7 @@ Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运�
 - **现在 → 10-19 左右：只观察，不加新功能。** 每周一巡检（进度 + 下载量 + Gmail）时看 0.7.0 反馈与两个调研问题的回答（离线/平台、单文件/多模块）。出现影响用户的 bug 再按例外处理。
 - **10-25 复盘**照原计划，并据客户回答决定后续优先级（例如「fusion × 目录构建」是否值得做）。
 - **11 月月度版本**（顺序：Core 先于 MCP）：
-  - Core：#95 opacity 覆盖计数与警告、#96 `--check-delivery`、`--check` 点号设置键误报修复（均在 `[Unreleased]`）。发版前用一个真实交付目录（动机私有项目副本）实跑 `--check-delivery`，确认无误报。
+  - Core：#98 `--verify-names`（审核修订及 CI 通过后纳入）、#95 opacity 覆盖计数与警告、#96 `--check-delivery`、`--check` 点号设置键误报修复（均在 `[Unreleased]`）。发版前用一个真实交付目录（动机私有项目副本）实跑 `--check-delivery`，确认无误报。
   - MCP：#97 `check_delivery` 工具（工具数 8 → 9）。发版时同步改各处「8 tools」表述（README、`docs/DISTRIBUTION_CHANNELS.md`、CLAUDE.md、server.json 描述等），并手工更新 Glama Build steps。
   - runtime 源码若有改动必须先升版本、先发 runtime（CI 守卫 `scripts/check_runtime_version.py`）；改版本号后先 `pip install -e .` 再跑全套测试（快照测试含版本号）。
 
@@ -57,7 +46,6 @@ Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运�
 
 - 随 0.7.0 已发布：PR #93、#94。
 - [x] 离线交付指南：`docs/guides/ship-python-offline.md`（已上导航；staging 命令实跑过）。
-- [ ] 覆盖报告：Pro 写出 opacity 匹配／注入／跳过，build report 读取；收窄版交付检查原型（mapping／原文／scrub 私钥混入、输出哈希对应）。验收：合成 fixture 检出已知遗漏、正常交付零误报。
 - [x] Agent 实验协议（`docs/LLM_RESISTANCE_BENCHMARK.md`「Round 2 protocol」）+ 确定性脚本 `benchmarks/llm_resistance/key_exposure.py`（进 CI）。
 - [x] 静态探针（10-12，只用订阅，48 次调用）：C0 6/6、**C1 社区版 6/6 被还原**、C4/C4b 0/6（两模型一致）→ 不为「抗 AI」新增社区 AST 变换。见 `docs/LLM_RESISTANCE_STATIC_PROBE_2026-10-12.md`。
 - 可运行档（带工具的 Agent 还原）：**暂停**（10-12）。已完成两个订阅 CLI 的沙箱实测：Codex 用户配置开着 `network_access = true`，需 `--ignore-user-config` 并排除 `/tmp` 才断网、禁止工作区外写入；Claude Code 用 `--settings` 开 sandbox 后联网被拒、工作区外只读。后续实现在会话中被安全分类器拦下，未继续。路线图需要的结论已由不用模型的 `key_exposure.py` 给出（密钥在包内可直接解密；应用提供密钥时运行者可见字节码），暂停不影响决策。
@@ -96,7 +84,6 @@ Core `0.5.30` 是当前公开版本，已进入 10-25 前静默观察期；运�
       ② Anthropic 目录支持（Tiffany 10-11 来信「仍在处理」）：可选致谢回信，草稿在 10-11 会话，未发；插件提交的是仓库+manifest 路径，
       会按最新 GitHub 代码安装，**无需更新提交内容**；
       ③ `--check` 仍默认联网（CLI，MCP 默认关）——10-11 定「等 Codex 这波完成后再审」，现可决定是否改默认离线；
-      ④ 10-13 定 0.7.0 是否发版、是否通知 Pro 客户（见上方「下一版 Core 0.7.0」）；
       ⑤ 约 10-14 看 DEV 第 1 篇反响与 GitHub 流量来源，再决定是否投 HN（Show HN 已用过，只能普通投稿）。
 - [ ] **Glama 构建服务 502，10-19 周一巡检时重试一次**（2026-10-11 登记，维护者）：10-08、10-10、10-11 三次测试都在
       毫秒级失败、无构建日志，错误为 Glama 自家 docker-modem 调构建后端得到 nginx `502 Bad Gateway`，与我们的包无关
@@ -211,11 +198,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 
 **分工（10-07 维护者定）**：Codex 实现，Claude 审核，维护者批准合并；发版另需批准。
 
-- [ ] **构建后名字校验 `--verify-names`（10-13 下游实测触发，PR #98 待审）**：NameError 类转换缺陷反复出现（Y-7、#58、G、I、C），
-      `--verify-syntax` 都看不见。下游一个 0.5.28 目录构建过了 `--verify-syntax`、装机后每次运行都 `name 'I72' is not defined`；
-      stdlib `symtable` 对比源与产物约 1 秒就能指出。实现：写出前取源基线（原地构建也成立），写出后报「产物用到却从未绑定、源里有绑定」的名字。
-      main 上实测：`calendar.py`（缺陷 C）被指出，`json`/`email`/`textwrap`/71 模块应用构建无误报。Community（属「本地验证产物」）。
-      后续候选：纳入 `--build-report`、MCP 工具、默认随 `--verify-syntax` 开启（先观察误报）。
+- [ ] **构建后名字校验 `--verify-names`（PR #98，本地审核修订已完成、待 CI / 合并）**：Community 显式开启，源码基线在写出前保存，不执行代码。Codex 修订全局声明/类体隐式名字边界、缺失/不可读/语法错误输出不再假通过、星号导入列出部分覆盖警告；成功 JSON 与构建报告增加独立 `name_verification`，增量缓存保留结果。支持范围见 `NAME_VERIFICATION.md`。审核与验证完成后合并，**等待维护者通知发版**；默认开启与 MCP 专用入口继续后置。
 - [x] **既有缺陷 G · 目录构建的别名导入（优先，0.5.28 已存在——10-13 下游构建实证，早于原记的 0.5.32；影响用户）**：`from pkg import scale as action` 或
       `from pkg.core import scale as action` 后调用 `action(...)` 即 NameError（局部改名开关无关）。参数改名设计审核中发现；
       应先于参数改名的解析器工作修复。**10-10 已合并 PR #66（`b56afe2`），随 0.6.1 发布**（保留显式本地别名，仅同步被导入符号名）；审核记录私有 `docs/internal/geo-2026-10/PR66_REVIEW_2026-10-10.md`。
@@ -231,7 +214,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       `--check` 加 medium 语法候选风险提示，目录 cross-file 参数保留行为不变。证据私有 `docs/internal/geo-2026-10/param-default-evidence/`。
 - [x] **既有限制 H · 通过模块对象访问属性**（10-08 交叉审核发现，0.5.32 已存在）：目录构建里 `from pkg import core` 后
       `core.LIMIT`（或 `import pkg.core as engine; engine.scale()`）时属性名没跟着改 → AttributeError。
-      **10-11 全部完成（未发版）**：提示与文档 #80 → 设计 #82（方案 A，维护者按 Claude 建议拍板）→ 实现 #83（from/别名，opt-in）
+      **10-11 全部完成，随 Core 0.7.0 于 10-12 发布**：提示与文档 #80 → 设计 #82（方案 A，维护者按 Claude 建议拍板）→ 实现 #83（from/别名，opt-in）
       → #84（dotted、相对导入、包 re-export、escape 提示）→ **#85 默认开启**（`3759000`；补「无法证明」提示，
       保证产物里未改写且目标被改名的访问都有提示；导入前有 `sys.path`/`logging` 等语句时函数体访问也能改写；
       `globals()`/`setattr(sys.modules[__name__], …)`/`exec` 等动态改写本模块命名空间时整体拒绝）。
@@ -240,7 +223,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       后续（不阻塞）：canary 在 N-1 也支持后可加模块属性用例；`__init__` 含带体类/执行默认参数、导入循环等仍拒绝并提示。
 - [ ] **既有缺陷 C · 运行时注入的模块级名字**（#62 审核中发现，0.5.32 已存在）：`enum.global_enum` 这类装饰器在运行时
       把成员注入模块命名空间，引用与 `__all__` 被改名，但注入的定义改不了 → NameError（标准库 `calendar.py` 默认构建即如此）。
-      当前绕法：把这些名字加入 `exclude_names`。`--check` 提示与支持矩阵说明已随 PR #80 完成（10-11，未发版）；是否自动保留另议。
+      当前绕法：把这些名字加入 `exclude_names`。`--check` 提示与支持矩阵说明已随 PR #80 完成并随 0.7.0 发布；是否自动保留另议。
 - [ ] **候选 · 3.12 嵌套 f-string 的 `--check` 提示**（低优先级，10-11 登记）：3.12 起允许 f-string 内复用同种引号/嵌套，
       产物在 3.9–3.11 上无法解析；目录/单文件构建若面向旧解释器分发，`--check` 可提示目标版本不兼容。先确认 `--verify-syntax`
       与 `target_python` 现有行为再定是否需要。
@@ -250,7 +233,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       与 #57 的 mapping 格式调整一起评估后再发 MCP；每次发 MCP 都要手工更新 Glama 的 Build steps。
 - [ ] **第 2 步：参数改名**：设计文档 `docs/CROSSFILE_PARAMETER_RENAMING_DESIGN.md`（PR #65，Codex 起草、Claude 审核通过）。
       分 5 个 PR：F 的方案 A → mapping 读取端与分析（观察模式）→ 同文件私有函数 → 跨文件 → 扩展；默认关闭。
-      文末 6 个问题待维护者拍板；Claude 的建议在私有 `docs/internal/geo-2026-10/PR65_REVIEW_2026-10-08.md`。
+      文末 6 个问题已于 10-10 由维护者拍板（PR #65）；后续实现范围仍需确认。Claude 的建议在私有 `docs/internal/geo-2026-10/PR65_REVIEW_2026-10-08.md`。
 - 规则：本条属于「真实转换问题」，优先于下面所有推广项（GEO 计划 §16）。
 
 ### GEO / 外部采用（2026-10-07 登记 · 全部免发版）
@@ -367,7 +350,7 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 
 发版本身是独立 gate。
 
-- **Core `[Unreleased]`**：#95、#96 与 `--check` 误报修复，排 11 月月度版本（见「下一次发版」）。`0.7.0` 于 2026-10-12 发布。
+- **Core `[Unreleased]`**：#98（审核修订与 CI 通过后纳入）、#95、#96 与 `--check` 误报修复，排 11 月月度版本（见「下一次发版」）。`0.7.0` 于 2026-10-12 发布。
 - **`pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]`**：`check_delivery` 工具（#97）、H 默认开启说明、mcp SDK 2.x 兼容、mapping 不匹配提示、关键字调用 advisory；随 11 月 Core 之后发。VS Code 插件 schema 已随 #67 同步 `preserve_param_names` 默认值，也暂不发插件。刻意不随 Core
   发，攒够增量或有人明确要 2.x 时再发（每发一次 MCP 要手工改 Glama Build steps）。
 
@@ -587,13 +570,7 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
 
 ## 外部等待（不阻塞本地开发）
 
-- **Claude Plugin Marketplace —— 需重新提交（维护者动作）**。2026-09-22 维护者看到 Console
-  「Plugin submissions · No submissions yet」，08-02 的记录已消失；同日核实公开目录
-  `claude-plugins-community/.claude-plugin/marketplace.json`（2,320 条）无 `pyobfus` → 从未被批准。
-  官方文档现写明流程是 **Console 表单 <https://platform.claude.com/plugins/submit>** → 内部管线
-  （跑 `claude plugin validate` + 安全扫描）→ 每夜同步目录；旧记录大概率随管线重建作废，
-  「被动等待」已无对象。本地 `validate` 通过、从本仓库以 marketplace 方式实装成功（2 skills）。
-  表单文案见 `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`（已修 `protected_project` 笔误）。
+- **Claude Plugin Marketplace —— 等待支持团队解除提交锁**。09-28 已升级内部；10-11 Tiffany 回信仍在处理、无需补充材料。此前“需要重提”的记录已被后端锁事实取代；不反复提交或换路径绕过。维护者清单与私有 `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md` 保留原始证据。
 - Open VSX namespace 归属验证：可选，`not verified` 是「未申请」不是「被拒」。
 - **Canopii [`canopii-cli#6`](https://github.com/canopii-dev/canopii-cli/issues/6)
   —— 单次 follow-up 已发，等待上游**。2026-09-23 确认 issue 仍 `OPEN`、0 条上游回复后，

@@ -10,15 +10,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - `--verify-names` (Community) fails the build (exit 1) when a generated
-  module uses a global name that it never binds and that its source did bind,
+  module has a newly unbound global name absent from its source baseline,
   the defect class that compiles cleanly and raises `NameError` only when the
   line runs (an aliased import renamed at the call site but not at the import,
   a decorator, a class-body reference). `--verify-syntax` cannot see these.
   The source baseline is taken before anything is written, so an in-place
   build (`-o` equal to the input) is still compared with its real source.
   Static analysis with the standard library (`ast`, `symtable`); nothing is
-  imported or executed. Modules using `from x import *` are skipped and
-  counted. Motivated by a downstream directory build that passed
+  imported or executed. Missing, unreadable or unparsable output fails the
+  check. Star-import modules are listed as skipped with partial-coverage
+  warnings. Successful JSON and build reports retain a separate
+  `name_verification` result, including on incremental cache hits. Python
+  encoding declarations and UTF-8 BOMs are respected; bare `global`
+  declarations are not bindings and class-only names are scoped correctly.
+  Findings are possible NameErrors; dynamic bindings and control flow are
+  not proved. Motivated by a downstream directory build that passed
   `--verify-syntax` on 0.5.28 and then failed every run with
   `name 'I72' is not defined` (defect G, fixed in 0.6.1); the check flags that
   build in about a second, and on current `main` it reports the known

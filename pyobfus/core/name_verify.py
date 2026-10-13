@@ -17,10 +17,11 @@ from __future__ import annotations
 import ast
 import builtins
 import symtable
+import tokenize
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Set
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple, TypedDict
 
-# Names Python provides to every module or class body without a binding.
+# Module globals supplied by Python. Class-only names are handled per scope.
 _IMPLICIT = set(dir(builtins)) | {
     "__file__",
     "__name__",
@@ -32,12 +33,13 @@ _IMPLICIT = set(dir(builtins)) | {
     "__path__",
     "__cached__",
     "__annotations__",
-    "__dict__",
-    "__module__",
-    "__qualname__",
-    "__class__",
     "__debug__",
 }
+
+
+class SourceAnalysis(TypedDict):
+    undefined_globals: Optional[Set[str]]
+    skip_reason: Optional[str]
 
 
 def undefined_globals(source: str, label: str = "<module>") -> Optional[Set[str]]:
@@ -46,29 +48,37 @@ def undefined_globals(source: str, label: str = "<module>") -> Optional[Set[str]
     ``None`` means the module cannot be judged statically: it does not parse,
     or it uses ``from x import *``, which binds names nobody can list.
     """
+    return _analyze_source(source, label)[0]
+
+
+def _analyze_source(source: str, label: str) -> Tuple[Optional[Set[str]], Optional[str]]:
     try:
         tree = ast.parse(source)
         top = symtable.symtable(source, label, "exec")
     except (SyntaxError, ValueError):
-        return None
+        return None, "syntax_error"
     for node in ast.walk(tree):
         if isinstance(node, ast.ImportFrom) and any(alias.name == "*" for alias in node.names):
-            return None
+            return None, "star_import"
 
     bound = {
         symbol.get_name()
         for symbol in top.get_symbols()
         if symbol.is_assigned() or symbol.is_imported() or symbol.is_namespace()
     }
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Global):
-            bound.update(node.names)
-
     used: Set[str] = set()
 
     def visit(table: symtable.SymbolTable, is_module: bool) -> None:
         for symbol in table.get_symbols():
+            # A global declaration alone is not a binding. Actual global
+            # assignments/imports in child scopes can populate the module.
+            if symbol.is_global() and (
+                symbol.is_assigned() or symbol.is_imported() or symbol.is_namespace()
+            ):
+                bound.add(symbol.get_name())
             if not symbol.is_referenced():
+                continue
+            if table.get_type() == "class" and symbol.get_name() in {"__module__", "__qualname__"}:
                 continue
             if is_module:
                 if not (symbol.is_assigned() or symbol.is_imported() or symbol.is_namespace()):
@@ -79,50 +89,59 @@ def undefined_globals(source: str, label: str = "<module>") -> Optional[Set[str]
             visit(child, False)
 
     visit(top, True)
-    return {name for name in used if name not in bound and name not in _IMPLICIT}
+    return {name for name in used if name not in bound and name not in _IMPLICIT}, None
 
 
-def snapshot_source(input_path: Path, files: Iterable[Path]) -> Dict[str, Optional[Set[str]]]:
+def snapshot_source(input_path: Path, files: Iterable[Path]) -> Dict[str, SourceAnalysis]:
     """Record undefined globals of each source file, keyed by output-relative path."""
     root = input_path.parent if input_path.is_file() else input_path
-    baseline: Dict[str, Optional[Set[str]]] = {}
+    baseline: Dict[str, SourceAnalysis] = {}
     for path in files:
+        key = _label(path, root)
         try:
-            text = path.read_text(encoding="utf-8")
-        except (OSError, UnicodeError):
+            with tokenize.open(path) as stream:
+                text = stream.read()
+        except (OSError, UnicodeError, SyntaxError):
+            baseline[key] = {"undefined_globals": None, "skip_reason": "read_error"}
             continue
-        baseline[_label(path, root)] = undefined_globals(text, str(path))
+        names, reason = _analyze_source(text, key)
+        baseline[key] = {"undefined_globals": names, "skip_reason": reason}
     return baseline
 
 
 def verify_generated_names(
-    baseline: Dict[str, Optional[Set[str]]], input_path: Path, output_path: Path
+    baseline: Dict[str, SourceAnalysis], input_path: Path, output_path: Path
 ) -> Dict[str, Any]:
     """Compare generated modules with the source baseline taken before writing."""
     if input_path.is_file():
-        targets = [output_path]
-        root = output_path.parent
-        keys = {output_path: next(iter(baseline), output_path.name)}
+        targets = {key: output_path for key in baseline}
     else:
-        targets = sorted(output_path.rglob("*.py")) if output_path.exists() else []
-        root = output_path
-        keys = {target: _label(target, root) for target in targets}
+        targets = {key: output_path / key for key in baseline}
 
     errors: List[Dict[str, Any]] = []
     checked = 0
-    skipped = 0
-    for target in targets:
-        key = keys[target]
-        if key not in baseline:
-            continue  # not a module pyobfus generated from the source tree
-        before = baseline[key]
-        try:
-            text = target.read_text(encoding="utf-8")
-        except (OSError, UnicodeError):
+    skipped: List[Dict[str, str]] = []
+    for key, target in sorted(targets.items()):
+        entry = baseline[key]
+        before = entry["undefined_globals"]
+        if entry["skip_reason"] == "read_error":
+            errors.append(_file_error(key, "Cannot read source for name verification."))
             continue
-        after = undefined_globals(text, str(target))
-        if before is None or after is None:
-            skipped += 1
+        try:
+            with tokenize.open(target) as stream:
+                text = stream.read()
+        except (OSError, UnicodeError, SyntaxError):
+            errors.append(_file_error(key, "Cannot read generated output for name verification."))
+            continue
+        after, after_reason = _analyze_source(text, key)
+        if after_reason == "syntax_error":
+            errors.append(_file_error(key, "Cannot parse generated output for name verification."))
+            continue
+        if before is None:
+            skipped.append({"path": key, "reason": "source_" + str(entry["skip_reason"])})
+            continue
+        if after is None:
+            skipped.append({"path": key, "reason": "output_" + str(after_reason)})
             continue
         checked += 1
         for name in sorted(after - before):
@@ -131,19 +150,30 @@ def verify_generated_names(
                     "path": key,
                     "line": _first_use(text, name),
                     "name": name,
-                    "message": f"name {name!r} is used but never bound (NameError when reached)",
+                    "message": f"name {name!r} has no static global binding (possible NameError)",
                 }
             )
 
-    errors.sort(key=lambda e: (e["path"], e["line"] or 0, e["name"]))
+    if not baseline:
+        errors.append(
+            _file_error(output_path.name, "No source modules available for name verification.")
+        )
+    errors.sort(key=lambda e: (e["path"], e["line"] or 0, e["name"] or ""))
     return {
         "mode": "names",
         "names_valid": not errors,
         "files_checked": checked,
-        "files_skipped": skipped,
+        "files_skipped": len(skipped),
+        "files_expected": len(baseline),
+        "coverage_complete": not skipped and checked == len(baseline) and bool(baseline),
+        "skipped": skipped,
         "errors": errors,
         "execution_performed": False,
     }
+
+
+def _file_error(path: str, message: str) -> Dict[str, Any]:
+    return {"path": path, "line": None, "name": None, "message": message}
 
 
 def _first_use(text: str, name: str) -> Optional[int]:

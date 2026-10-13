@@ -69,3 +69,14 @@ or `--no-cross-file` builds), `transformations` also carries
 many functions the opacity rules resolved to `encrypted` but the pass could not
 encrypt, by reason. These are counts only; function names are not recorded.
 Builds without an L3 pass do not include these keys.
+
+
+## Name verification (release after 0.7.0)
+
+When a build requests `--verify-names`, the successful report includes a separate
+`name_verification` object with checked/expected/skipped file counts, coverage,
+skip reasons, and findings. Existing syntax evidence stays in `verification`.
+The CLI success JSON carries the same object; incremental cache hits retain it.
+Without the option, neither envelope gains this field. Failed name verification
+exits before a completed report is written. See [name verification](NAME_VERIFICATION.md)
+for partial coverage and static-analysis limitations.
