@@ -178,6 +178,12 @@ def _echo_pro_import_hint() -> None:
     help="Compile generated Python in memory after writing; does not import or execute it",
 )
 @click.option(
+    "--verify-names",
+    is_flag=True,
+    help="After writing, fail if a generated module uses a global name it never binds "
+    "and its source did not (would raise NameError); static, nothing is executed",
+)
+@click.option(
     "--crossfile-module-attributes/--no-crossfile-module-attributes",
     default=None,
     help="Rewrite proved module reads/calls through unconditional imports, including "
@@ -519,6 +525,7 @@ def main(
     verbose: bool,
     dry_run: bool,
     verify_syntax: bool,
+    verify_names: bool,
     cross_file: bool,
     crossfile_local_names: Optional[bool],
     crossfile_module_attributes: Optional[bool],
@@ -724,6 +731,23 @@ def main(
             )
         else:
             click.echo("Error: Missing required option '-o' / '--output'.", err=True)
+        sys.exit(1)
+
+    if dry_run and verify_names:
+        if json_output:
+            _emit_error_json(
+                "UsageError",
+                "--verify-names requires generated output and cannot be combined with --dry-run.",
+                "Run without --dry-run to write and name-check the generated files.",
+                "pyobfus INPUT -o OUTPUT --verify-names --json",
+                exit_code=1,
+            )
+        else:
+            click.echo(
+                "Error: --verify-names cannot be combined with --dry-run; "
+                "name verification checks generated output.",
+                err=True,
+            )
         sys.exit(1)
 
     if dry_run and verify_syntax:
@@ -1156,6 +1180,23 @@ def main(
             click.echo(f"Warning: {mapping_warning}", err=True)
             save_mapping_path = None
         verification: Optional[Dict[str, Any]] = None
+        # --verify-names: take the source baseline now, before anything is
+        # written, so an in-place build (-o equal to the input) is still
+        # compared with its real source.
+        name_baseline: Optional[Dict[str, Any]] = None
+        if verify_names and not dry_run:
+            from pyobfus.core.name_verify import snapshot_source
+
+            baseline_files = (
+                [input_path_obj]
+                if input_path_obj.is_file()
+                else filter_python_files(
+                    input_path_obj,
+                    config.exclude_patterns,
+                    skip_environment_dirs=config.skip_environment_dirs,
+                )
+            )
+            name_baseline = snapshot_source(input_path_obj, baseline_files)
 
         if verbose and input_path_obj.is_dir():
             skipped_directories: List[str] = []
@@ -1197,6 +1238,14 @@ def main(
                         output_path=output_path,
                         verification=verification,
                         json_output=json_output,
+                    )
+                if name_baseline is not None:
+                    _run_name_verification(
+                        name_baseline,
+                        input_path=input_path,
+                        output_path=output_path,
+                        json_output=json_output,
+                        saved_stdout=_saved_stdout,
                     )
                 written_report_path = _write_build_report(
                     build_report_path=build_report_path,
@@ -1334,6 +1383,15 @@ def main(
                 )
             if not json_output:
                 _display_syntax_verification_success(verification)
+
+        if name_baseline is not None:
+            _run_name_verification(
+                name_baseline,
+                input_path=input_path,
+                output_path=output_path,
+                json_output=json_output,
+                saved_stdout=_saved_stdout,
+            )
 
         written_manifest_path: Optional[str] = None
         if provenance_manifest_path and not dry_run:
@@ -2487,6 +2545,54 @@ def _report_syntax_verification_failure(
     else:
         click.echo("Error: generated output failed syntax verification.", err=True)
         for error in verification["errors"]:
+            location = error["path"]
+            if error["line"] is not None:
+                location += f":{error['line']}"
+            click.echo(f"  {location}: {error['message']}", err=True)
+    raise SystemExit(1)
+
+
+def _run_name_verification(
+    baseline: Dict[str, Any],
+    *,
+    input_path: str,
+    output_path: str,
+    json_output: bool,
+    saved_stdout: Any,
+) -> None:
+    """Run --verify-names; exit 1 on a name the output uses but never binds."""
+    from pyobfus.core.name_verify import verify_generated_names
+
+    result = verify_generated_names(baseline, Path(input_path), Path(output_path))
+    if result["names_valid"]:
+        if not json_output:
+            click.echo(
+                f"Name verification passed: {result['files_checked']} generated module(s) "
+                "bind every global name they use that their source bound; nothing was executed."
+            )
+        return
+    sys.stdout = saved_stdout
+    if json_output:
+        _emit_success_json_payload(
+            {
+                "version": 1,
+                "status": "error",
+                "error_type": "NameVerificationError",
+                "input": input_path,
+                "output": output_path,
+                "verification": result,
+                "ai_hint": (
+                    "Generated files were written but use names they never bind; they would "
+                    "raise NameError when reached. Do not ship them; report the file and name, "
+                    "and add the source name to exclude_names as a workaround."
+                ),
+            }
+        )
+    else:
+        click.echo(
+            "Error: generated output uses names it never binds (NameError at run time).", err=True
+        )
+        for error in result["errors"]:
             location = error["path"]
             if error["line"] is not None:
                 location += f":{error['line']}"
