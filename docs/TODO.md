@@ -5,7 +5,7 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-10-14。Core 0.7.0 / runtime 0.1.1 已发布，Zenodo/CFF 与客户通知已完成；MCP 当前公开版 0.3.12。#95/#96/#97 已合并未发布。#98 已完成 Codex 审核修订及本地验证，等待修订 head 的 CI / 合并，状态见 `CURRENT_PLAN_ZH.md` 顶部。**维护者要求：完成到发版之前，具体发版等待另行通知；不创建发布标签、不触发发布工作流。**
+最后更新：2026-10-14。Core 0.7.0 / runtime 0.1.1 已发布，Zenodo/CFF 与客户通知已完成；MCP 当前公开版 0.3.12。#95/#96/#97 已合并未发布。#98 已完成 Codex 审核修订、完整 CI 与本地发版前验证，并合并 main `93d3ecd`，状态见 `CURRENT_PLAN_ZH.md` 顶部。**维护者要求：完成到发版之前，具体发版等待另行通知；不创建发布标签、不触发发布工作流。**
 
 ## 状态口径
 
@@ -36,8 +36,9 @@
 - **现在 → 10-19 左右：只观察，不加新功能。** 每周一巡检（进度 + 下载量 + Gmail）时看 0.7.0 反馈与两个调研问题的回答（离线/平台、单文件/多模块）。出现影响用户的 bug 再按例外处理。
 - **10-25 复盘**照原计划，并据客户回答决定后续优先级（例如「fusion × 目录构建」是否值得做）。
 - **11 月月度版本**（顺序：Core 先于 MCP）：
-  - Core：#98 `--verify-names`（审核修订及 CI 通过后纳入）、#95 opacity 覆盖计数与警告、#96 `--check-delivery`、`--check` 点号设置键误报修复（均在 `[Unreleased]`）。发版前用一个真实交付目录（动机私有项目副本）实跑 `--check-delivery`，确认无误报。
+  - Core：#98 `--verify-names`（已合并）、#95 opacity 覆盖计数与警告、#96 `--check-delivery`、`--check` 点号设置键误报修复（均在 `[Unreleased]`）。发版前用一个真实交付目录（动机私有项目副本）实跑 `--check-delivery`，确认无误报。
   - MCP：#97 `check_delivery` 工具（工具数 8 → 9）。发版时同步改各处「8 tools」表述（README、`docs/DISTRIBUTION_CHANNELS.md`、CLAUDE.md、server.json 描述等），并手工更新 Glama Build steps。
+  - #98 发版前检查已完成：四测试根 3521 passed / 8 skipped、check.sh、完整 PR CI、标准库 35 模块与独立 wheel 正常/部分/失败路径通过。使用范围见 `NAME_VERIFICATION.md`；实际版本确定后仍须按发布清单重建该版本，不复用标记为 0.7.0 的本地审阅 wheel。
   - runtime 源码若有改动必须先升版本、先发 runtime（CI 守卫 `scripts/check_runtime_version.py`）；改版本号后先 `pip install -e .` 再跑全套测试（快照测试含版本号）。
 
 ## 增强路线复核（2026-10-12 · 实施前 gate）
@@ -198,7 +199,6 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 
 **分工（10-07 维护者定）**：Codex 实现，Claude 审核，维护者批准合并；发版另需批准。
 
-- [ ] **构建后名字校验 `--verify-names`（PR #98，本地审核修订已完成、待 CI / 合并）**：Community 显式开启，源码基线在写出前保存，不执行代码。Codex 修订全局声明/类体隐式名字边界、缺失/不可读/语法错误输出不再假通过、星号导入列出部分覆盖警告；成功 JSON 与构建报告增加独立 `name_verification`，增量缓存保留结果。支持范围见 `NAME_VERIFICATION.md`。审核与验证完成后合并，**等待维护者通知发版**；默认开启与 MCP 专用入口继续后置。
 - [x] **既有缺陷 G · 目录构建的别名导入（优先，0.5.28 已存在——10-13 下游构建实证，早于原记的 0.5.32；影响用户）**：`from pkg import scale as action` 或
       `from pkg.core import scale as action` 后调用 `action(...)` 即 NameError（局部改名开关无关）。参数改名设计审核中发现；
       应先于参数改名的解析器工作修复。**10-10 已合并 PR #66（`b56afe2`），随 0.6.1 发布**（保留显式本地别名，仅同步被导入符号名）；审核记录私有 `docs/internal/geo-2026-10/PR66_REVIEW_2026-10-10.md`。
@@ -350,7 +350,7 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 
 发版本身是独立 gate。
 
-- **Core `[Unreleased]`**：#98（审核修订与 CI 通过后纳入）、#95、#96 与 `--check` 误报修复，排 11 月月度版本（见「下一次发版」）。`0.7.0` 于 2026-10-12 发布。
+- **Core `[Unreleased]`**：#98（已合并）、#95、#96 与 `--check` 误报修复，排 11 月月度版本（见「下一次发版」）。`0.7.0` 于 2026-10-12 发布。
 - **`pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]`**：`check_delivery` 工具（#97）、H 默认开启说明、mcp SDK 2.x 兼容、mapping 不匹配提示、关键字调用 advisory；随 11 月 Core 之后发。VS Code 插件 schema 已随 #67 同步 `preserve_param_names` 默认值，也暂不发插件。刻意不随 Core
   发，攒够增量或有人明确要 2.x 时再发（每发一次 MCP 要手工改 Glama Build steps）。
 
