@@ -24,8 +24,12 @@ reports version `0.3.13`, `active`, and `isLatest=true` (9 tools).
 Glama's October 12 notifications confirm a successful build at 22:14 UTC
 (test `01a1322c-b3ff-7825-86c1-f27005b90423`) and a channel release labelled
 `0.7.0` at 22:15 UTC. The channel label is not the PyPI MCP version.
-The October 19 retry of the earlier 502 is no longer needed. MCP's next
-publication still needs its Glama admin Build steps pinned and tested.
+The October 19 retry of the earlier 502 is no longer needed. The October 14 maintainer-supplied test
+`01a138af-a110-78b1-a230-a403c2b9b63c` succeeds in 8.6s: Core 0.7.1,
+MCP 0.3.13 and runtime 0.1.1 installed; handshake 0.3.13 and 9 tools
+confirmed. Recent Releases displays channel label 0.7.1. The cloned source
+still checks out d2d5703 despite pinnedCommit=null; package/handshake evidence
+does not establish source-pin alignment or execution of every tool in the image.
 
 Periodic checks retain only decision summaries, not full stdout or separate
 CSV/JSON snapshots. During the quiet-period experiment, retain the Core/MCP

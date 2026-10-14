@@ -16,7 +16,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ### 2026-10-14 — Core 0.7.1 / MCP 0.3.13 已发布
 
-维护者授权本次状态报告 1–4 项，取代此前观察/等待通知。`v0.7.1` / `mcp-v0.3.13` → `37c3c41`，完整 CI 27/27、CodeQL、Packaging 通过；PyPI 四产物密码学证明验证、Python 3.10/3.14 全新安装与实跑通过，MCP 9 tools，官方 Registry active/isLatest；Zenodo `23356723` 与 CFF 已同步。runtime 保持 0.1.1。私有历史库 CI 为公开产品已修复的旧问题，历史库不改；Glama 502 已恢复，仅剩维护者在后台固定新版本后测试/发布。详情读当前计划顶部与 TODO。
+维护者授权本次状态报告 1–4 项，取代此前观察/等待通知。`v0.7.1` / `mcp-v0.3.13` → `37c3c41`，完整 CI 27/27、CodeQL、Packaging 通过；PyPI 四产物密码学证明验证、Python 3.10/3.14 全新安装与实跑通过，MCP 9 tools，官方 Registry active/isLatest；Zenodo `23356723` 与 CFF 已同步。runtime 保持 0.1.1。私有历史库 CI 为公开产品已修复的旧问题，历史库不改；Glama 502 已恢复，维护者随后提供 10-14 成功测试与渠道记录更新证据；源码 checkout 仍旧，详见当前计划顶部。详情读当前计划顶部与 TODO。
 
 ### 🟢 2026-10-12 — Core 0.7.0 + runtime 0.1.1 已发布；路线图复核修复随发（冷启动先读 `docs/CURRENT_PLAN_ZH.md` 顶部 10-12 段、路线图 §13、`docs/TODO.md`「增强路线复核」）
 
@@ -85,7 +85,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   10-25 复盘用 09-27→10-06 窗口）**：静默 4 周（10-25 前不发 Core）→ 每月一版
   → 只做有触发的事 → 每周一巡检；全文 `docs/TODO.md`「节奏」段。**查进度固定动作：进度 + 下载量
   （`python scripts/download_snapshot.py`）+ Gmail（`/pyobfus-inbox`），三样一起给**，缺一样不算查过。
-- 「当前状态一句话」：Core 0.7.1 / MCP 0.3.13 已于 10-14 发布，MCP 9 工具，runtime 0.1.1 不变；#95–#98 已发布，Core/MCP Unreleased 为空。公开源与测试全绿，Registry/Zenodo/CFF 已同步。剩余 Glama 后台固定版本测试与发布见 TODO。以后 runtime 源码改动仍必须先升版本、先发 runtime。
+- 「当前状态一句话」：Core 0.7.1 / MCP 0.3.13 已于 10-14 发布，MCP 9 工具，runtime 0.1.1 不变；#95–#98 已发布，Core/MCP Unreleased 为空。公开源与测试全绿，Registry/Zenodo/CFF 已同步。Glama 10-14 后台测试成功（0.3.13 / 9 tools），渠道记录显示 0.7.1；旧源码 checkout 差异见当前计划顶部。以后 runtime 源码改动仍必须先升版本、先发 runtime。
 
 
 ## 历史进展（已下沉）

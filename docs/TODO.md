@@ -5,7 +5,7 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-10-14。Core 0.7.1 / MCP 0.3.13 已发布，runtime 0.1.1 保持不变；#95/#96/#97/#98 已全部随本次发布，Core/MCP Unreleased 均为空。发布前完整 CI 与本地四测试根通过，PyPI 发布包和 PEP 740 已独立验证，Registry 与 Zenodo/CFF 已同步。私有历史库 CI 已定性，Glama 502 已恢复；余下 Glama 后台版本同步见维护者清单。
+最后更新：2026-10-14。Core 0.7.1 / MCP 0.3.13 已发布，runtime 0.1.1 保持不变；#95/#96/#97/#98 已全部随本次发布，Core/MCP Unreleased 均为空。发布前完整 CI 与本地四测试根通过，PyPI 发布包和 PEP 740 已独立验证，Registry 与 Zenodo/CFF 已同步。私有历史库 CI 已定性，Glama 502 已恢复；Glama 安装/握手/9 工具测试与渠道记录更新已由维护者完成，源码 checkout 与 release commit 的差异见当前计划顶部。
 
 ## 状态口径
 
@@ -44,7 +44,6 @@
 
 按顺手程度排，每项的细节都在本文件后面对应小节或所指文件里，这里只是一处能勾掉的总表。
 
-- [ ] **Glama 本次版本同步**：已恢复构建，原 10-19 重试 502 待办撤销。登录 admin Dockerfile 页，将安装命令设为 `pip install --no-cache-dir pyobfus-mcp==0.3.13 pyobfus==0.7.1`；测试一次，确认握手 MCP 0.3.13 / 9 tools，再发布 Glama 渠道版本。仓内 Dockerfile 已同步，但 Glama 使用后台 Build steps 合成镜像，需手工更新；本会话无认证后台浏览器能力。不要重提 listing。
 
 - [ ] **Claude plugin — 已由真人支持升级到内部，等待后端解除锁**（2026-09-28 更新）：Console 重提被拒
       「Another submission already holds this repository and path」，但两个工作区 submissions 页都 `No submissions yet`。
