@@ -34,6 +34,7 @@ from pyobfus.core.source_prologue import (
     restore_source_prologue,
     copy_executable_bits,
 )
+from pyobfus.core.star_imports import plan_stars, expand_stars
 from pyobfus.core.parser import ASTParser
 from pyobfus.core.line_map import build_line_map, mark_source_statements
 from pyobfus.transformers.import_rewriter import ImportRewriter
@@ -97,6 +98,9 @@ def _transform_single_file(
         if config is not None:
             tree = content_transforms.strip_ai_markers(tree, config, None, file_stats)
             tree = content_transforms.remove_docstrings(tree, config)
+
+        expand_stars(original_tree, global_table.star_import_plans.get(module_name, {}))
+        expand_stars(tree, global_table.star_import_plans.get(module_name, {}))
 
         # Collect imported names from original tree
         import_collector = ImportCollector(global_table, module_name)
@@ -362,6 +366,16 @@ class CrossFileOrchestrator:
                         if isinstance(value, str):
                             self._reserved_names.add(value)
 
+        sources = {fi.module_name: read_python_source(fi.path) for fi in self.files}
+        star_plans, unknown_stars = plan_stars(sources)
+        self.global_table.star_import_plans = star_plans
+        self._preserve_star_globals = unknown_stars
+        if unknown_stars:
+            self._planning_warnings.append(
+                "Preserved project global names: an internal wildcard import has "
+                "a dynamic, conditional, external-derived, or cyclic export namespace."
+            )
+
         # 2. Detect exports once per file, then register in two passes.
         #
         # A name a module re-exports (`from .core import run` plus `run` in
@@ -375,9 +389,17 @@ class CrossFileOrchestrator:
         for file_info in self.files:
             tree = ASTParser.parse_file(file_info.path)
 
-            detector = ExportDetector()
+            expand_stars(tree, star_plans[file_info.module_name])
+            star_bindings = {
+                name for names in star_plans[file_info.module_name].values() for name in names
+            }
+            detector = ExportDetector(overridden_imports=star_bindings)
             detector.visit(tree)
             exports = detector.get_exports()
+            # __all__ controls wildcard visibility, not explicit importability.
+            # Every binding introduced by an expanded star needs a table entry,
+            # including private names and names omitted from the shim's __all__.
+            exports.update(star_bindings)
 
             # Update file_info
             file_info.exports = exports
@@ -436,7 +458,7 @@ class CrossFileOrchestrator:
         for fi in self.files:
             try:
                 ImportCollector(self.global_table, fi.module_name).visit(
-                    ast.parse(read_python_source(fi.path))
+                    expand_stars(ast.parse(read_python_source(fi.path)), star_plans[fi.module_name])
                 )
             except ScopeResolutionError as exc:
                 self.global_table.conservative_import_modules.add(fi.module_name)
@@ -785,7 +807,7 @@ class CrossFileOrchestrator:
             True if name should be preserved, False otherwise
         """
         # Check against exclude_names in config
-        if name in self.config.exclude_names:
+        if getattr(self, "_preserve_star_globals", False) or name in self.config.exclude_names:
             return True
 
         # Check against preserve_patterns (if implemented)

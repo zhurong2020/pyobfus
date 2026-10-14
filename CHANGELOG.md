@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Project-internal wildcard forwarding modules now register importable bindings
+  consistently with their source modules (defect M). Statically enumerable
+  wildcard imports expand into explicit imports, including relative imports,
+  chains, literal `__all__`, and same-name overrides. Proved module attribute
+  access follows the existing cross-file rules. Dynamic, conditional or cyclic
+  wildcard namespaces preserve project global spellings with a build warning;
+  external wildcard imports retain their behavior. `--verify-names` checks
+  statically expanded internal wildcard modules instead of skipping them.
+
 ## [0.7.2] - 2026-10-14
 
 ### Fixed

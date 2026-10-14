@@ -96,6 +96,20 @@ def snapshot_source(input_path: Path, files: Iterable[Path]) -> Dict[str, Source
     """Record undefined globals of each source file, keyed by output-relative path."""
     root = input_path.parent if input_path.is_file() else input_path
     baseline: Dict[str, SourceAnalysis] = {}
+    files = list(files)
+    star_plans: Dict[str, Dict[Tuple[int, int, str], List[str]]] = {}
+    if input_path.is_dir():
+        from pyobfus.core.star_imports import expand_stars, plan_stars
+        from pyobfus.core.source_prologue import read_python_source
+
+        try:
+            sources = {
+                _label(path, root)[:-3].replace("/", "."): read_python_source(path)
+                for path in files
+            }
+            star_plans, _ = plan_stars(sources)
+        except (OSError, UnicodeError, SyntaxError, ValueError, RecursionError):
+            pass  # Retain the existing per-file read/parse diagnostics.
     for path in files:
         key = _label(path, root)
         try:
@@ -104,6 +118,9 @@ def snapshot_source(input_path: Path, files: Iterable[Path]) -> Dict[str, Source
         except (OSError, UnicodeError, SyntaxError):
             baseline[key] = {"undefined_globals": None, "skip_reason": "read_error"}
             continue
+        plan = star_plans.get(key[:-3].replace("/", "."), {})
+        if plan:
+            text = ast.unparse(expand_stars(ast.parse(text), plan))
         names, reason = _analyze_source(text, key)
         baseline[key] = {"undefined_globals": names, "skip_reason": reason}
     return baseline

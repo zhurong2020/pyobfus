@@ -44,7 +44,7 @@ class ExportDetector(ast.NodeVisitor):
         {'public'}
     """
 
-    def __init__(self):
+    def __init__(self, overridden_imports: Optional[Set[str]] = None):
         """Initialize export detector."""
         # All potential exports (top-level definitions)
         self.potential_exports: Set[str] = set()
@@ -58,6 +58,7 @@ class ExportDetector(ast.NodeVisitor):
         # Names this module imported rather than defined, keyed by the local
         # name. Used to resolve re-exports back to their defining module.
         self.imported_from: Dict[str, ReExportSource] = {}
+        self.overridden_imports = overridden_imports or set()
 
         # Track nesting level (only process top-level)
         self._nesting_level: int = 0
@@ -76,6 +77,7 @@ class ExportDetector(ast.NodeVisitor):
         Only top-level classes are potential exports.
         """
         if self._is_top_level():
+            self._forget_overridden_import(node.name)
             # Top-level class
             if not node.name.startswith("_"):
                 self.potential_exports.add(node.name)
@@ -97,6 +99,7 @@ class ExportDetector(ast.NodeVisitor):
         Only top-level functions are potential exports.
         """
         if self._is_top_level():
+            self._forget_overridden_import(node.name)
             # Top-level function
             if not node.name.startswith("_"):
                 self.potential_exports.add(node.name)
@@ -113,6 +116,7 @@ class ExportDetector(ast.NodeVisitor):
         Treat same as regular function.
         """
         if self._is_top_level():
+            self._forget_overridden_import(node.name)
             if not node.name.startswith("_"):
                 self.potential_exports.add(node.name)
 
@@ -131,6 +135,7 @@ class ExportDetector(ast.NodeVisitor):
         if self._is_top_level():
             for target in node.targets:
                 if isinstance(target, ast.Name):
+                    self._forget_overridden_import(target.id)
                     # Check for __all__
                     if target.id == "__all__":
                         self.has_all = True
@@ -151,6 +156,7 @@ class ExportDetector(ast.NodeVisitor):
         if self._is_top_level():
             if isinstance(node.target, ast.Name):
                 name = node.target.id
+                self._forget_overridden_import(name)
                 if name == "__all__" and node.value:
                     self.has_all = True
                     self.all_names = self._extract_all_names(node.value)
@@ -170,9 +176,10 @@ class ExportDetector(ast.NodeVisitor):
                 # Get the name as it appears in the importing module
                 name = alias.asname if alias.asname else alias.name
 
-                if name != "*" and not name.startswith("_"):
-                    # This could be a re-export
-                    self.potential_exports.add(name)
+                if name != "*":
+                    # Private names can be explicitly listed in __all__.
+                    if not name.startswith("_"):
+                        self.potential_exports.add(name)
                     self.imported_from[name] = ReExportSource(
                         module=node.module,
                         level=node.level,
@@ -207,6 +214,12 @@ class ExportDetector(ast.NodeVisitor):
                     )
 
         self.generic_visit(node)
+
+    def _forget_overridden_import(self, name: str) -> None:
+        # Limit the new binding-order rule to planned wildcard bindings.
+        # Ordinary module-object rebinding retains the existing H policy.
+        if name in self.overridden_imports:
+            self.imported_from.pop(name, None)
 
     def _is_top_level(self) -> bool:
         """
