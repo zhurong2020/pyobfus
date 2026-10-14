@@ -216,7 +216,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       私有验证：动机项目副本 127 处 `config.X` 全部改写、`--check` 无剩余提示。审核与提示词私有 `docs/internal/codex-2026-10/H_IMPL_PR*`。
       后续（不阻塞）：canary 在 N-1 也支持后可加模块属性用例；`__init__` 含带体类/执行默认参数、导入循环等仍拒绝并提示。
 - [ ] **H PR 4 候选 · 放宽无关包初始化语句**：包 `__init__` 里 `try: __version__ = version(...)` 会阻止整个包的子模块属性改写（pyobfus 自身可复现）；评估仅绑定与子模块名无关的语句能否安全放宽。需单独确认范围，不阻塞已发布版本。
-- [ ] **既有缺陷 C · 运行时注入的模块级名字** — PR #N 待审。
+- [ ] **既有缺陷 C · 运行时注入的模块级名字** — PR #100 待审。
       Community correctness fix: automatically preserve static `enum.global_enum` members in single-file and directory builds;
       preserve module export spellings when module-level `__getattr__` prevents H proofs, and reject unsupported dynamic enums explicitly.
       Artifact regressions cover references, `__all__`, imports, module attributes and standard-library `calendar`.
@@ -225,7 +225,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       与 `target_python` 现有行为再定是否需要。
 - [ ] **新缺陷 M · 项目内星号转发后再从转发模块导入**（10-14 Claude 用 PyPI 0.7.2 复现）：`pkg/shim.py` 写 `from pkg.core import *`，`app.py` 写 `from pkg.shim import helper` → 产物 ImportError（开/关局部改名一样）。兼容转发模块常见；外部模块的星号导入不受影响（私有下游 4 处均转发外部 wheel 或显式列名）。10-14 维护者批准交 Codex 修（`docs/internal/codex-2026-10/DEFECT_M_PROMPT.md`），合并与发版另批。
 - [x] **既有缺陷 D · `global` 重新绑定导入名** — fixed by 0.7.2 (PR #99).
-      This PR adds artifact regressions for assignment and re-import after `global helper`, printing before and after rebinding,
+      PR #100 adds artifact regressions for assignment and re-import after `global helper`, printing before and after rebinding,
       with local renaming and name verification both enabled and disabled.
 - [ ] **第 2 步：参数改名**：设计文档 `docs/CROSSFILE_PARAMETER_RENAMING_DESIGN.md`（PR #65，Codex 起草、Claude 审核通过）。
       分 5 个 PR：F 的方案 A → mapping 读取端与分析（观察模式）→ 同文件私有函数 → 跨文件 → 扩展；默认关闭。
