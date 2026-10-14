@@ -374,6 +374,18 @@ class CrossFileOrchestrator:
                         if isinstance(value, str):
                             self._reserved_names.add(value)
 
+        if not self.config.crossfile_local_names and self.global_table.conservative_import_modules:
+            # An unknown injected spelling may occur only in a consumer import.
+            # Reserving owner names alone lets a generated I0 definition capture
+            # `from owner import I0`. Keep allocation clear of consumer bindings
+            # and references even when function-local renaming is disabled.
+            for fi in self.files:
+                for node in ast.walk(ASTParser.parse_file(fi.path)):
+                    for attr in ("id", "arg", "name", "asname", "rest"):
+                        value = getattr(node, attr, None)
+                        if isinstance(value, str):
+                            self._reserved_names.add(value)
+
         # A non-static injection in a package initializer can observe its
         # sibling modules through module attributes and star-import chains.
         # Preserve that package's names together: otherwise the initializer's

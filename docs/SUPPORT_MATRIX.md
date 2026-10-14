@@ -157,7 +157,9 @@ in their module. A non-static enum in a package initializer also preserves
 that package's modules, so opaque module attributes and internal star-import
 chains (such as `re`'s constants) keep their original spellings. Builds
 continue with a planning warning; `--check` explains
-the fallback, and user `exclude_names` remains effective. This analysis resolves explicit
+the fallback, and user `exclude_names` remains effective. Consumer binding and
+reference spellings are reserved against generated-name capture even when local
+renaming is disabled. This analysis resolves explicit
 lexical imports; helper aliases assigned at runtime, star-imported decorators,
 and other runtime injection mechanisms require separate analysis. These rules
 are Community correctness behavior and do not change the JSON contract,

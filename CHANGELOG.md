@@ -17,7 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with a planning warning and `--check` advisory instead of refusing the build.
   Package initializers with non-static enum injection preserve their package
   dependencies too, keeping the standard-library `re` package usable; `exclude_names`
-  remains effective.
+  remains effective. Consumer binding spellings are reserved against generated
+  name collisions even when function-local renaming is disabled.
 - Add artifact execution regressions for global rebinding of imported names by
   assignment and re-import (already fixed in 0.7.2, PR #99).
 

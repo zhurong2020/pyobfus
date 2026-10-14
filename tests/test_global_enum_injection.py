@@ -337,3 +337,23 @@ def test_stdlib_re_direct_directory(tmp_path, local, verify):
     )
     result = execute([sys.executable, "-S", "-c", probe], out.parent, tmp_path / "home")
     assert result.returncode == 0, result.stderr
+
+
+@pytest.mark.skipif(sys.version_info < (3, 11), reason="global_enum requires Python 3.11")
+@pytest.mark.parametrize("local", [False, True])
+@pytest.mark.parametrize("verify", [False, True])
+def test_dynamic_injection_reserves_consumer_binding(tmp_path, local, verify):
+    # The earlier A export shifts main's class allocation away from I0,
+    # keeping the baseline executable while exposing consumer capture.
+    artifact(
+        tmp_path,
+        {
+            "a_owner.py": "import enum\ndef A():\n    pass\n@enum.global_enum\n"
+            "class Color(enum.IntEnum):\n    locals()['I0'] = 1\n",
+            "b_app.py": "from a_owner import I0\ndef helper():\n    return 3\n"
+            "print(I0.value, helper())\n",
+            "app.py": "import b_app\n",
+        },
+        local,
+        verify,
+    )
