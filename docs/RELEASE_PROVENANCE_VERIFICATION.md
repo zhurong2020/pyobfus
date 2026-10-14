@@ -59,7 +59,21 @@ pypi-attestations verify pypi \
 Repeat for each wheel/sdist you intend to trust or mirror. Do not verify only
 one file and assume the whole release is covered.
 
-## Latest Verified Snapshot
+## Latest Verified Snapshot — 2026-10-14
+
+Core 0.7.1 and MCP 0.3.13 wheel/sdist were each verified with
+`pypi-attestations 0.0.30 verify pypi --repository https://github.com/zhurong2020/pyobfus`
+against their exact PyPI artifact URLs. All four cryptographic verifications
+passed; publisher repository/workflow were independently checked as
+`zhurong2020/pyobfus` / `release.yml`. Full release-commit CI passed 27/27;
+fresh Python 3.10/3.14 installations and generated-code smoke checks passed.
+
+| Project | Version | Artifacts verified |
+|---|---:|---|
+| `pyobfus` | `0.7.1` | wheel and sdist |
+| `pyobfus-mcp` | `0.3.13` | wheel and sdist |
+
+## Historical endpoint snapshot — 2026-09-16
 
 Checked on 2026-09-16 after the v0.5.27 release (pyobfus-mcp last released
 `0.3.12` on 2026-09-07 and remains independently verified):

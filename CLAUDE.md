@@ -14,9 +14,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### 2026-10-14 — 维护者授权状态整理与 Core → MCP 发布
+### 2026-10-14 — Core 0.7.1 / MCP 0.3.13 已发布
 
-当前入口为 `docs/CURRENT_PLAN_ZH.md` 顶部及 `docs/TODO.md`。维护者本次明确授权完成状态报告 1–4 项，取代此前一天观察和等待通知。私有历史库 CI 为公开产品早已修复的旧问题；Glama 502 已恢复；10-14 提前复查 main 与反馈无新增公开回归。准备 Core 0.7.1、MCP 0.3.13，runtime 0.1.1 不变；正式版本/归档以发布后验证为准。
+维护者授权本次状态报告 1–4 项，取代此前观察/等待通知。`v0.7.1` / `mcp-v0.3.13` → `37c3c41`，完整 CI 27/27、CodeQL、Packaging 通过；PyPI 四产物密码学证明验证、Python 3.10/3.14 全新安装与实跑通过，MCP 9 tools，官方 Registry active/isLatest；Zenodo `23356723` 与 CFF 已同步。runtime 保持 0.1.1。私有历史库 CI 为公开产品已修复的旧问题，历史库不改；Glama 502 已恢复，仅剩维护者在后台固定新版本后测试/发布。详情读当前计划顶部与 TODO。
 
 ### 🟢 2026-10-12 — Core 0.7.0 + runtime 0.1.1 已发布；路线图复核修复随发（冷启动先读 `docs/CURRENT_PLAN_ZH.md` 顶部 10-12 段、路线图 §13、`docs/TODO.md`「增强路线复核」）
 
@@ -85,7 +85,8 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   10-25 复盘用 09-27→10-06 窗口）**：静默 4 周（10-25 前不发 Core）→ 每月一版
   → 只做有触发的事 → 每周一巡检；全文 `docs/TODO.md`「节奏」段。**查进度固定动作：进度 + 下载量
   （`python scripts/download_snapshot.py`）+ Gmail（`/pyobfus-inbox`），三样一起给**，缺一样不算查过。
-- 「当前状态一句话」：`0.7.0` 是最新 Core（10-12，维护者批准提前发），同日先发 `pyobfus-runtime` 0.1.1（Y-2/Y-3 产物在 0.1.0 上不能运行，builder 现要求 `>=0.1.1`）。**以后 runtime 源码改动必须先升版本**（CI `scripts/check_runtime_version.py` 拦截），发版顺序 runtime 先于 Core。Agent 实验只用维护者订阅（Codex CLI / Claude Code），不用 API。同日后续合并 #95/#96/#97（opacity 覆盖计数、`--check-delivery`、MCP `check_delivery`），**未发版，等 11 月月度版本**（计划见 `docs/TODO.md`「下一次发版」）。逐轮细节见 `docs/CURRENT_PLAN_ZH.md` 10-12 段。
+- 「当前状态一句话」：Core 0.7.1 / MCP 0.3.13 已于 10-14 发布，MCP 9 工具，runtime 0.1.1 不变；#95–#98 已发布，Core/MCP Unreleased 为空。公开源与测试全绿，Registry/Zenodo/CFF 已同步。剩余 Glama 后台固定版本测试与发布见 TODO。以后 runtime 源码改动仍必须先升版本、先发 runtime。
+
 
 ## 历史进展（已下沉）
 
@@ -121,12 +122,13 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.9-3.14, AST, setuptools
-- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.7.0，2026-10-12 发布**；完整版本历史见 `CHANGELOG.md`)
+- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.7.1，2026-10-14 发布**；完整版本历史见 `CHANGELOG.md`)
 - **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.3，2026-09-10 发布**；Marketplace 与 Open VSX 两边同版本，均已 `curl` 独立复核；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`。**发版必须两个 registry 都发**：Marketplace 手工上传 + `ovsx publish`，runbook 见 `docs/OPEN_VSX_PUBLISH_PLAN.md`)
-- **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.12，2026-09-07 发布**；8 tools: 6 community + 2 pro_funnel · dep `pyobfus>=0.5.18` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
-- **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp`（**0.3.12** 2026-09-07 发布，2026-09-10 已核实 `active` / `isLatest=true`）
+- **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.13，2026-10-14 发布**；9 tools: 7 community + 2 pro_funnel · dep `pyobfus>=0.5.18` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
+- **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp`（**0.3.13** 2026-10-14 发布并核实 `active` / `isLatest=true`）
 - **Smithery (Skill)**: https://smithery.ai/skills/zhurong2020/pyobfus-protect (2026-06-22 上线 · 本地工具走 Skill 渠道非 MCP 渠道) · **mcp.so**: 已收录
-- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus — 页面在线且渲染完整 8 工具，**状态：已上架且健康**（2026-09-07 核验：公开搜索 `?query=pyobfus` 返回该 server，A license / A quality / A maintenance，无 pending/unapproved 标记，详情页与徽章均 200）。2026-09-05 Frank Fiegel 邮件曾称「2026-05-03 被拒后从未批准、需重新提交」，**该说法已被公开目录证据证伪**——那封信的主题行是 5 月拒信 thread，应属照旧工单回复；**不要重新提交**（有产生重复条目 / 改动 URL 打断 README 徽章的风险）。⚠️ 方法教训：`/api/mcp/v1/...` 返回 `not_found`/`401` 曾被当作「不在目录里」的证据用了数周，401 只是**认证失败**（现对所有人要 API key），**拿不到访问权 ≠ 东西不存在**，正确探针是公开搜索页。admin「Build steps」**不会自动跟版**（停在 0.3.8、跨过 0.3.9/0.3.10，2026-09-06 由维护者手工改到 0.3.10；**已于 2026-09-07 手工改到 0.3.12**）；Glama 构建**不读仓库里的 `pyobfus_mcp/Dockerfile`**，而是用 admin Build Spec 合成一份。构建曾连续失败于其自家 BuildKit 拉 `debian:trixie-slim`（08-07 / 08-17 / 09-05 / 09-06 ×2），**2026-09-07 已确认修复**：test `01a07845-…` 详情页显式 `Status: success`/14s，8 工具握手正常。构建侧不再是阻塞项；**Glama 这条线已无待办**。历史排障见 memory `glama_introspection_dockerfile_pin_2026-06-05`、`glama_zero_tools_repro_2026-08-07`，最新证据见 `docs/DISTRIBUTION_CHANNELS.md`。
+- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus — 已上架；10-12 22:14 UTC 构建成功，22:15 UTC 渠道 release 标识 0.7.0 通知，此前 502 已恢复。PyPI MCP 当前 0.3.13（9 工具）；Glama 后台 Build steps **不会自动跟版**且不读取仓内 Dockerfile，需维护者设为 `pip install --no-cache-dir pyobfus-mcp==0.3.13 pyobfus==0.7.1`，测试握手 0.3.13 / 9 tools 后发布渠道版本。不要重提 listing，401/not_found 不能当未收录证据。详细历史与当前待办见 `docs/DISTRIBUTION_CHANNELS.md` / `docs/TODO.md`。
+
 - **GitHub Action**: https://github.com/zhurong2020/pyobfus-action (**v1.0.1**，2026-09-10 建仓发版并上架 Marketplace：<https://github.com/marketplace/actions/pyobfus-scan-and-build>)。独立仓库**是硬性要求**——Marketplace 要求 `action.yml` 在仓库根目录且一仓一 action；另外 action 的移动 `v1` tag 会与 Core 的 `v*` 命名空间冲突并重新触发 `release.yml`。⚠️ 两个只会在上架页面才暴露的限制：**listing 名不能与已有 GitHub 用户重名**（`github.com/pyobfus` 是第三方账号，故名为 `pyobfus scan and build`；GitHub **不因不活跃释放用户名**，只受理商标投诉，此事已定论），以及 **description 上限 125 字符**（首版 151 被拒 → v1.0.1）。两条现均由该仓库 CI 断言拦截。**归因查询**（本 action 存在的理由，周期性复盘时与下载量一起看）：<https://github.com/search?q=%22zhurong2020%2Fpyobfus-action%22+path%3A.github%2Fworkflows&type=code>
 - **GitHub**: https://github.com/zhurong2020/pyobfus (public)
 - **文档**: https://pyobfus.readthedocs.io
@@ -219,5 +221,5 @@ vX.Y.Z"横幅），跟徽标是两回事。
 | 关联项目 | 所在 Workspace | 关系 |
 |----------|---------------|------|
 | `pyobfus-legal/` | cardiac-research.code-workspace（WSL 本地同级目录 `~/projects/pyobfus-legal/` · 2026-09-21 起为真实目录，不再是 OneDrive 软链接）| pyobfus 软著 + 专利申报材料的物理仓库（**不在 git repo 内** · 含 PII，不公开）。包含 `software_copyright/` (V0.4.0 软著已 2026-05-09 提交 CCPC) 和未来的 `patent/` (v0.5 专利申请目录)。物理路径：`~/projects/pyobfus-legal/`（旧 OneDrive 副本 `/mnt/c/onedrive/msft/OneDrive - MSFT/rong/3-job/program/pyobfus-legal/` 已过期勿再编辑），工作区入口：`~/projects/pyobfus-legal/`（symlink） |
-| `pyobfus-pro-dev/` | 本地 `~/projects/pyobfus-pro-dev`；GitHub `zhurong2020/pyobfus-pro-dev`（**private + archived，只读，推送 403**） | **专利 `202610712171X` 的发明/实现时间线证据库，不是开发源**。v0.5 Pro 机制 2026-05-09 起在此开发（早于 05-22 申请日），06-17 初审合格后 squash 合入公开仓库，逐提交历史只在这里；`pyobfus-legal/patent/01_权利要求书/disclosure_v1.md` 依据其 `PATENT_NOTES.md`（28 条）与集成测试撰写，第 12 节引用它。**用途**：实审请求（≈2029-05）、审查答复、无效/维权时证明实现时间与方式。**规则**：保留远端归档、不删不公开；不在其中开发/发版/拷回公开仓库；跨仓同步时跳过它。本地比远端多 2 个文档/`.gitignore` 提交（推不上去，无需推）；10-11 已删本地 `venv-3.10/`。可选加固：`git bundle` 离线备份放 `pyobfus-legal/patent/`（未做）。 |
+| `pyobfus-pro-dev/` | 本地 `~/projects/pyobfus-pro-dev`；GitHub `zhurong2020/pyobfus-pro-dev`（**private + archived，只读，推送 403**） | **专利 `202610712171X` 的发明/实现时间线证据库，不是开发源**。v0.5 Pro 机制 2026-05-09 起在此开发（早于 05-22 申请日），06-17 初审合格后 squash 合入公开仓库，逐提交历史只在这里；`pyobfus-legal/patent/01_权利要求书/disclosure_v1.md` 依据其 `PATENT_NOTES.md`（28 条）与集成测试撰写，第 12 节引用它。**用途**：实审请求（≈2029-05）、审查答复、无效/维权时证明实现时间与方式。**规则**：保留远端归档、不删不公开；不在其中开发/发版/拷回公开仓库；跨仓同步时跳过它。2026-10-14 远端已包含两个历史标记/`.gitignore` 提交，仍为 archived；10-11 已删本地 `venv-3.10/`。可选加固：`git bundle` 离线备份放 `pyobfus-legal/patent/`（未做）。 |
 | `cac-plus-ip/` | cardiac-research.code-workspace（同 workspace 内）| **同申请人的并行 IP 工作流**。CAC Plus 医学 AI 项目的 3 件中国发明专利 + 2 件软著申请仓库。**与 pyobfus 内容无关、但工作流共享**：同一个 CCPC 账号 / 同一个 CPC 客户端 USB Key / 同一个 85% 个人申请减免资格 / 同一套 CNIPA 官方申请模板（位于 `cac-plus-ip/02_china_发明专利/_templates_CNIPA/`，pyobfus v0.5 专利申请直接复用，不重复下载）|

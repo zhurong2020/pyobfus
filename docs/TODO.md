@@ -5,7 +5,7 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-10-14。Core 0.7.0 / runtime 0.1.1 已发布，MCP 当前公开版 0.3.12。维护者本次明确授权完成状态核查、文档整理和 Core → MCP 发布，取代此前观察一天/等待通知；正在准备 Core 0.7.1 / MCP 0.3.13。私有历史库 CI 已定性，Glama 502 已恢复，见 `CURRENT_PLAN_ZH.md` 顶部。
+最后更新：2026-10-14。Core 0.7.1 / MCP 0.3.13 已发布，runtime 0.1.1 保持不变；#95/#96/#97/#98 已全部随本次发布，Core/MCP Unreleased 均为空。发布前完整 CI 与本地四测试根通过，PyPI 发布包和 PEP 740 已独立验证，Registry 与 Zenodo/CFF 已同步。私有历史库 CI 已定性，Glama 502 已恢复；余下 Glama 后台版本同步见维护者清单。
 
 ## 状态口径
 
@@ -18,28 +18,13 @@
   下游是否选择混淆自己的代码由其分发边界决定；公开第三方依赖不因被打包而自动成为
   pyobfus 的处理目标。
 
-## Core 0.7.0（2026-10-12 已发布）
+## 发布后观察与下次发版
 
-- **已发布**：维护者 10-12 批准提前发；先 `runtime-v0.1.1`（PyPI/PEP 740/离线目标测试对已发布 wheel 4/4），后 `v0.7.0`（PyPI/PEP 740/3.10 与 3.14 全新安装/GitHub Release）。
-- Zenodo record `23318803`（v0.7.0）已归档，`CITATION.cff` 已更新；跨仓同步已做（action、workspace-meta、home 索引）。
-- Pro 客户通知已由维护者发出（10-12，5 封，含两个可选调研问题）。注意：Gmail 连接器建的草稿会把所有链接改写成 `google.com/url?q=…`（10-10 的 0.6.1 通知也是这样寄出的），以后发送前在网页编辑器里换成干净链接。
-- 发版前准备已完成（10-11）：dogfood lane A/B/C/D 全过；`examples/multifile`、动机私有项目副本用新 wheel 验证通过。
-  发版清单、README 横幅、GitHub Release 说明与 Pro 客户通知草稿在私有 `docs/internal/release-0.7.0/RELEASE_PREP.md`。
-- 当时只发 Core；Glama 已于 10-13 恢复，MCP 现获本次发版授权；VS Code schema 随插件下次发版。
-- 观察到的后续（不阻塞 0.7.0）：包 `__init__` 用 `try: __version__ = version(...)` 时整个包的子模块访问都不改写（pyobfus 自身即如此），
-  可做 H PR 4 放宽「与子模块名无关的初始化语句」。
-
-## 本次发版（2026-10-14 已获授权；Core → MCP）
-
-**当前决定（2026-10-14）**：维护者已授权发布；按兼容增量准备 Core 0.7.1、MCP 0.3.13。已于 10-14 完成 main CI、反馈和新问题复查，未发现公开产品回归；不将这次提前复查写作 10-15。原等待通知已被本次指令取代。
-
-- **观察与每周巡检继续。** 每周一巡检（进度 + 下载量 + Gmail）时看 0.7.0 反馈与两个调研问题的回答（离线/平台、单文件/多模块）。出现影响用户的 bug 再按例外处理。
-- **10-25 复盘**照原计划，并据客户回答决定后续优先级（例如「fusion × 目录构建」是否值得做）。
-- **待发布内容**（顺序：Core 先于 MCP；本次已授权）：
-  - Core：#98 `--verify-names`（已合并）、#95 opacity 覆盖计数与警告、#96 `--check-delivery`、`--check` 点号设置键误报修复（均在 `[Unreleased]`）。发版前用一个真实交付目录（动机私有项目副本）实跑 `--check-delivery`，确认无误报。
-  - MCP：#97 `check_delivery` 工具（工具数 8 → 9）。发版时同步改各处「8 tools」表述（README、`docs/DISTRIBUTION_CHANNELS.md`、CLAUDE.md、server.json 描述等），并手工更新 Glama Build steps。
-  - #98 发版前检查已完成：四测试根 3521 passed / 8 skipped、check.sh、完整 PR CI、标准库 35 模块与独立 wheel 正常/部分/失败路径通过。使用范围见 `NAME_VERIFICATION.md`；实际版本确定后仍须按发布清单重建该版本，不复用标记为 0.7.0 的本地审阅 wheel。
-  - runtime 源码若有改动必须先升版本、先发 runtime（CI 守卫 `scripts/check_runtime_version.py`）；改版本号后先 `pip install -e .` 再跑全套测试（快照测试含版本号）。
+- 每周一巡检继续观察 Core 0.7.1 / MCP 0.3.13 反馈、下载安静日、客户调研回答、CI 与备份。无新缺陷时不重复全量测试、不主动增加功能。
+- **10-25 复盘**照原计划；发布日、次日与内容投放流量分开记录，据客户回答调整后续优先级。
+- 下次发布按实际新增改动与维护者授权确定，不恢复此前 10-15 的等待通知状态。
+- runtime 源码若有改动必须先升版本、先发 runtime（`scripts/check_runtime_version.py`）；改版本号后先刷新 editable 元数据，再按发布清单验证。
+- VS Code schema 随插件下次发版，不因本次 Core/MCP 发布自动发插件。
 
 ## 增强路线复核（2026-10-12 · 实施前 gate）
 
@@ -50,14 +35,16 @@
 - [x] Agent 实验协议（`docs/LLM_RESISTANCE_BENCHMARK.md`「Round 2 protocol」）+ 确定性脚本 `benchmarks/llm_resistance/key_exposure.py`（进 CI）。
 - [x] 静态探针（10-12，只用订阅，48 次调用）：C0 6/6、**C1 社区版 6/6 被还原**、C4/C4b 0/6（两模型一致）→ 不为「抗 AI」新增社区 AST 变换。见 `docs/LLM_RESISTANCE_STATIC_PROBE_2026-10-12.md`。
 - 可运行档（带工具的 Agent 还原）：**暂停**（10-12）。已完成两个订阅 CLI 的沙箱实测：Codex 用户配置开着 `network_access = true`，需 `--ignore-user-config` 并排除 `/tmp` 才断网、禁止工作区外写入；Claude Code 用 `--settings` 开 sandbox 后联网被拒、工作区外只读。后续实现在会话中被安全分类器拦下，未继续。路线图需要的结论已由不用模型的 `key_exposure.py` 给出（密钥在包内可直接解密；应用提供密钥时运行者可见字节码），暂停不影响决策。
-- [x] 覆盖报告第一步 PR #95 已合并（opacity 规则命中方法/嵌套函数时警告，build report 记计数），未发版，随下一版。
-- [x] 交付检查 `--check-delivery`（PR #96 已合并，社区版，未发版）：mapping／私钥／原文混入为 high（exit 1），构建报告外的 .py、Pro 选项被跳过为 medium；7 个真实 wheel 与 2.8 万文件 site-packages 零误报。MCP 工具 `check_delivery` 已由 PR #97 合并（MCP `[Unreleased]`，工具数 9，公开「8 tools」表述待 MCP 发版时再改）。后续候选：`.pyc` 是否由原文编译的判定、PyInstaller/Nuitka 冻结包解析（等需求）。
+- [x] 覆盖报告第一步 PR #95 已随 Core 0.7.1 发布（opacity 规则命中方法/嵌套函数时警告，build report 记计数）。
+- [x] 交付检查 `--check-delivery`（PR #96，社区版，Core 0.7.1 已发布）：mapping／私钥／原文混入为 high（exit 1），构建报告外的 .py、Pro 选项被跳过为 medium；7 个真实 wheel 与 2.8 万文件 site-packages 零误报。MCP 工具 `check_delivery` 已随 MCP 0.3.13 发布（工具数 9）。后续候选：`.pyc` 是否由原文编译的判定、PyInstaller/Nuitka 冻结包解析（等需求）。
 - 待需求信号：「fusion × 目录构建」设计（多模块离线应用拿到 Pro 保护的前提）、embed-data／vault 接 key provider、L3 覆盖方法。
 - 已认可方向不变：离线应用交付优先；不新增项目规模门槛；路线图每轮先检验现有功能、修缺陷，再扩展。
 
 ## 维护者动作清单（2026-09-22 收尾 · Claude 做不了、只等你）
 
 按顺手程度排，每项的细节都在本文件后面对应小节或所指文件里，这里只是一处能勾掉的总表。
+
+- [ ] **Glama 本次版本同步**：已恢复构建，原 10-19 重试 502 待办撤销。登录 admin Dockerfile 页，将安装命令设为 `pip install --no-cache-dir pyobfus-mcp==0.3.13 pyobfus==0.7.1`；测试一次，确认握手 MCP 0.3.13 / 9 tools，再发布 Glama 渠道版本。仓内 Dockerfile 已同步，但 Glama 使用后台 Build steps 合成镜像，需手工更新；本会话无认证后台浏览器能力。不要重提 listing。
 
 - [ ] **Claude plugin — 已由真人支持升级到内部，等待后端解除锁**（2026-09-28 更新）：Console 重提被拒
       「Another submission already holds this repository and path」，但两个工作区 submissions 页都 `No submissions yet`。
@@ -216,6 +203,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       退路 `--no-crossfile-module-attributes` 与 main 旧默认产物逐字节一致。发版说明须写「升级后完整重新构建、重新生成 mapping」。
       私有验证：动机项目副本 127 处 `config.X` 全部改写、`--check` 无剩余提示。审核与提示词私有 `docs/internal/codex-2026-10/H_IMPL_PR*`。
       后续（不阻塞）：canary 在 N-1 也支持后可加模块属性用例；`__init__` 含带体类/执行默认参数、导入循环等仍拒绝并提示。
+- [ ] **H PR 4 候选 · 放宽无关包初始化语句**：包 `__init__` 里 `try: __version__ = version(...)` 会阻止整个包的子模块属性改写（pyobfus 自身可复现）；评估仅绑定与子模块名无关的语句能否安全放宽。需单独确认范围，不阻塞已发布版本。
 - [ ] **既有缺陷 C · 运行时注入的模块级名字**（#62 审核中发现，0.5.32 已存在）：`enum.global_enum` 这类装饰器在运行时
       把成员注入模块命名空间，引用与 `__all__` 被改名，但注入的定义改不了 → NameError（标准库 `calendar.py` 默认构建即如此）。
       当前绕法：把这些名字加入 `exclude_names`。`--check` 提示与支持矩阵说明已随 PR #80 完成并随 0.7.0 发布；是否自动保留另议。
@@ -224,8 +212,6 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       与 `target_python` 现有行为再定是否需要。
 - [ ] **既有缺陷 D · `global` 重新绑定导入名**（#62 审核中发现，0.5.32 已存在，低优先级）：模块级 `from pkg.util import helper`，
       函数里 `global helper; helper = ...`；关闭局部改名时产物仍调用原导入（默认开启时正确）。
-- [ ] **MCP `unmap_stack_trace` 的 mapping 不匹配提示**在 `pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]` 中。
-      与 #57 的 mapping 格式调整一起评估后再发 MCP；每次发 MCP 都要手工更新 Glama 的 Build steps。
 - [ ] **第 2 步：参数改名**：设计文档 `docs/CROSSFILE_PARAMETER_RENAMING_DESIGN.md`（PR #65，Codex 起草、Claude 审核通过）。
       分 5 个 PR：F 的方案 A → mapping 读取端与分析（观察模式）→ 同文件私有函数 → 跨文件 → 扩展；默认关闭。
       文末 6 个问题已于 10-10 由维护者拍板（PR #65）；后续实现范围仍需确认。Claude 的建议在私有 `docs/internal/geo-2026-10/PR65_REVIEW_2026-10-08.md`。
@@ -343,12 +329,8 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 
 ## 待发内容
 
-发版本身是独立 gate。
-
-- **Core `[Unreleased]`**：#98（已合并）、#95、#96 与 `--check` 误报修复，已获本次发版授权（见「本次发版」）。`0.7.0` 于 2026-10-12 发布。
-- **`pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]`**：`check_delivery` 工具（#97）、H 默认开启说明、mcp SDK 2.x 兼容、mapping 不匹配提示、关键字调用 advisory；本次随 Core 0.7.1 之后发。VS Code 插件 schema 已随 #67 同步 `preserve_param_names` 默认值，也暂不发插件。刻意不随 Core
-  发，攒够增量或有人明确要 2.x 时再发（每发一次 MCP 要手工改 Glama Build steps）。
-
+- Core/MCP 当前没有未发布 changelog 内容。
+- VS Code schema 已同步 `preserve_param_names` 默认值，随插件自己的后续版本发布。
 
 ## IP 相关（2026-09-28 登记 · 待维护者拍板，未执行）
 
