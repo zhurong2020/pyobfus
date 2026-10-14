@@ -222,7 +222,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 - [ ] **候选 · 3.12 嵌套 f-string 的 `--check` 提示**（低优先级，10-11 登记）：3.12 起允许 f-string 内复用同种引号/嵌套，
       产物在 3.9–3.11 上无法解析；目录/单文件构建若面向旧解释器分发，`--check` 可提示目标版本不兼容。先确认 `--verify-syntax`
       与 `target_python` 现有行为再定是否需要。
-- [ ] **新缺陷 M · 项目内星号转发后再从转发模块导入**（10-14 Claude 用 PyPI 0.7.2 复现）：`pkg/shim.py` 写 `from pkg.core import *`，`app.py` 写 `from pkg.shim import helper` → 产物 ImportError（开/关局部改名一样）。兼容转发模块常见；外部模块的星号导入不受影响（私有下游 4 处均转发外部 wheel 或显式列名）。10-14 维护者批准交 Codex 修（`docs/internal/codex-2026-10/DEFECT_M_PROMPT.md`），合并与发版另批。
+- [ ] **新缺陷 M · 项目内星号转发后再从转发模块导入**（10-14 Claude 用 PyPI 0.7.2 复现）：`pkg/shim.py` 写 `from pkg.core import *`，`app.py` 写 `from pkg.shim import helper` → 产物 ImportError（开/关局部改名一样）。兼容转发模块常见；外部模块的星号导入不受影响（私有下游 4 处均转发外部 wheel 或显式列名）。**PR #101 待审**；合并与发版另批。
 - [ ] **既有缺陷 D · `global` 重新绑定导入名**（**10-14 实测已由 0.7.2 / PR #99 修好**：`global helper` 后赋值或重新导入，开/关局部改名均正确；补回归随缺陷 C 的 PR）（#62 审核中发现，0.5.32 已存在，低优先级）：模块级 `from pkg.util import helper`，
       函数里 `global helper; helper = ...`；关闭局部改名时产物仍调用原导入（默认开启时正确）。
 - [ ] **第 2 步：参数改名**：设计文档 `docs/CROSSFILE_PARAMETER_RENAMING_DESIGN.md`（PR #65，Codex 起草、Claude 审核通过）。
