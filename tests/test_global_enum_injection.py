@@ -15,7 +15,7 @@ ENUM_VARIANTS = [
 ]
 ENUM_VARIANTS += [
     "import enum\n@enum.global_enum\nclass Color(enum.IntEnum):\n    RED = 1\n    BLUE = 2\n    def label(self):\n        return self.name.lower()\n",
-    "import enum\n@enum.global_enum\nclass Color(enum.IntFlag):\n    RED = 1 << 3\n    BLUE = RED | 2\n    __str__ = object.__str__\n",
+    "import enum\n@enum.global_enum\nclass Color(enum.IntFlag):\n    RED = 1 << 3\n    GREEN = 2\n    BLUE = RED | GREEN\n    __str__ = object.__str__\n",
     "import enum\n@enum.global_enum\n@enum._simple_enum(enum.IntFlag, boundary=enum.KEEP)\nclass Color:\n    RED = 1\n    BLUE = 2\n    __str__ = object.__str__\n",
     "import enum\n@enum.global_enum\nclass Color(enum.StrEnum):\n    RED = enum.auto()\n    BLUE = enum.auto()\n",
     "import enum\ndef extra(cls):\n    return cls\n@enum.global_enum\n@extra\nclass Color(enum.IntEnum):\n    RED = 1\n    BLUE = 2\n",
@@ -244,12 +244,23 @@ def test_enum_module_fallback_preserves_internal_imports(tmp_path, local, verify
     )
 
 
+def stdlib_re_source():
+    if sys.version_info < (3, 11):
+        pytest.skip("requires a re package with global_enum")
+    source = Path(sysconfig.get_path("stdlib")) / "re"
+    system_source = Path("/usr/lib/python3.12/re")
+    if sys.version_info[:2] == (3, 12) and system_source.is_dir():
+        source = system_source
+    if not source.is_dir():
+        pytest.skip("requires compatible re package sources")
+    # re's Python opcodes must match the running interpreter's native _sre.
+    return source
+
+
 @pytest.mark.parametrize("local", [False, True])
 @pytest.mark.parametrize("verify", [False, True])
 def test_stdlib_re_package(tmp_path, local, verify):
-    source = Path("/usr/lib/python3.12/re")
-    if not source.is_dir() or sys.version_info < (3, 12):
-        pytest.skip("requires CPython 3.12 re sources and compatible runtime")
+    source = stdlib_re_source()
     files = {
         "app.py": "import re; from pathlib import Path; "
         "assert str(re.__file__).startswith(str(Path.cwd())); print(re.compile('abc', re.I).search('ABC').group()); "
@@ -307,9 +318,7 @@ def test_non_static_enum_package_preserves_dependencies(tmp_path, local, verify)
 def test_stdlib_re_direct_directory(tmp_path, local, verify):
     import shutil
 
-    source = Path("/usr/lib/python3.12/re")
-    if not source.is_dir() or sys.version_info < (3, 12):
-        pytest.skip("requires CPython 3.12 re sources and compatible runtime")
+    source = stdlib_re_source()
     src = tmp_path / "src" / "re"
     shutil.copytree(source, src, ignore=shutil.ignore_patterns("__pycache__"))
     out = tmp_path / "out" / "re"
