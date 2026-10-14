@@ -100,7 +100,10 @@ def _transform_single_file(
         # Collect imported names from original tree
         import_collector = ImportCollector(global_table, module_name)
         import_collector.visit(original_tree)
-        imported_names = set(import_collector.import_mappings.keys())
+        # ImportedNameTransformer marks references to their actual imported
+        # binding. A flat union is unsafe: a class-only import can suppress
+        # rewriting a same-spelled module export after class-body `del`.
+        imported_names: Set[str] = set()
 
         # Apply transformers in order
         exported_name_transformer = ExportedNameTransformer(
@@ -114,6 +117,7 @@ def _transform_single_file(
             global_table,
             module_name,
             file_path,
+            preserved_imports=import_collector.preserved_imports,
         )
         tree = import_rewriter.visit(tree)
 
@@ -122,6 +126,7 @@ def _transform_single_file(
             global_table,
             module_name,
             file_path,
+            collector=import_collector,
         )
         tree = imported_name_transformer.visit(tree)
 
