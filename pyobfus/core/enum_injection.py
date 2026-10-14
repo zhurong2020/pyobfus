@@ -8,7 +8,6 @@ from typing import List, Optional, Set
 
 from pyobfus.core.import_advisories import enum_members
 from pyobfus.core.import_resolution import ImportedAccessVisitor
-from pyobfus.exceptions import AnalysisError
 
 _ENUM_BASES = {f"enum.{name}" for name in ("Enum", "IntEnum", "StrEnum", "Flag", "IntFlag")}
 
@@ -27,13 +26,12 @@ class EnumInjectionPlan:
     errors: List[str] = field(default_factory=list)
     preserve_module: bool = False
 
-    def require_static(self) -> None:
-        if self.errors:
-            raise AnalysisError(
-                "Cannot safely obfuscate enum.global_enum injection: "
-                + "; ".join(self.errors)
-                + ". Use a statically decorated enum with simple member assignments."
-            )
+    @property
+    def warning(self) -> Optional[str]:
+        if not self.preserve_module:
+            return None
+        reason = "; ".join(self.errors) or "module-level __getattr__"
+        return f"Preserved all module names and import bindings for enum.global_enum: {reason}"
 
 
 def enum_injection_plan(tree: ast.Module) -> EnumInjectionPlan:
@@ -127,14 +125,17 @@ def enum_injection_plan(tree: ast.Module) -> EnumInjectionPlan:
             self.generic_visit(node)
 
     Scan().visit(tree)
-    if plan.classes and any(
-        isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name == "__getattr__"
-        for n in tree.body
+    if plan.errors or (
+        plan.classes
+        and any(
+            isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)) and n.name == "__getattr__"
+            for n in tree.body
+        )
     ):
         plan.preserve_module = True
-        # H cannot prove module identity with a runtime attribute fallback.
-        # Keep every possible binding spelling, including calendar's ordinary
-        # exports, so callers and __all__ remain synchronized without H edits.
+        # Unknown injected members or runtime attribute fallback: preserve all
+        # possible bindings and references, including imports and class methods.
+        # Consumers and __all__ must retain the same spellings.
         for node in ast.walk(tree):
             for attr in ("id", "arg", "name", "asname", "rest"):
                 name = getattr(node, attr, None)

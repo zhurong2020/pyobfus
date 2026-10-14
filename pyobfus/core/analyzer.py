@@ -75,7 +75,6 @@ class SymbolAnalyzer(ast.NodeVisitor):
             tree: AST module to analyze
         """
         injection = enum_injection_plan(tree)
-        injection.require_static()
         self._injected_names = injection.preserved
 
         # Visit all nodes in the tree

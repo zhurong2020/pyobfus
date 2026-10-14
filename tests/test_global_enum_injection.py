@@ -1,6 +1,5 @@
 """Execute real CLI artifacts for runtime enum exports and global rebinding."""
 
-import json
 import os
 from pathlib import Path
 import subprocess
@@ -14,6 +13,15 @@ ENUM_VARIANTS = [
     "from enum import global_enum, IntEnum, auto\n@global_enum\nclass Color(IntEnum):\n    RED = 1\n    BLUE = auto()\n",
     "from enum import global_enum as g, _simple_enum, IntEnum, auto\n@g\n@_simple_enum(IntEnum)\nclass Color:\n    RED = 1\n    BLUE = auto()\n",
 ]
+ENUM_VARIANTS += [
+    "import enum\n@enum.global_enum\nclass Color(enum.IntEnum):\n    RED = 1\n    BLUE = 2\n    def label(self):\n        return self.name.lower()\n",
+    "import enum\n@enum.global_enum\nclass Color(enum.IntFlag):\n    RED = 1 << 3\n    BLUE = RED | 2\n    __str__ = object.__str__\n",
+    "import enum\n@enum.global_enum\n@enum._simple_enum(enum.IntFlag, boundary=enum.KEEP)\nclass Color:\n    RED = 1\n    BLUE = 2\n    __str__ = object.__str__\n",
+    "import enum\n@enum.global_enum\nclass Color(enum.StrEnum):\n    RED = enum.auto()\n    BLUE = enum.auto()\n",
+    "import enum\ndef extra(cls):\n    return cls\n@enum.global_enum\n@extra\nclass Color(enum.IntEnum):\n    RED = 1\n    BLUE = 2\n",
+    "import enum\nclass Color(enum.IntEnum):\n    RED = 1\n    BLUE = 2\nColor = enum.global_enum(Color)\n",
+    'import enum\n@enum.global_enum\nclass Color(enum.IntEnum):\n    _ignore_ = "key value"\n    for key, value in [("RED", 1), ("BLUE", 2)]:\n        locals()[key] = value\n    del key, value\n',
+]
 
 
 def execute(args, cwd, home):
@@ -22,14 +30,14 @@ def execute(args, cwd, home):
     return subprocess.run(args, cwd=cwd, env=env, capture_output=True, text=True, timeout=90)
 
 
-def artifact(tmp_path, files, local, verify, single=False):
+def artifact(tmp_path, files, local, verify, single=False, exclude=False):
     src = tmp_path / "src"
     src.mkdir()
     for name, text in files.items():
         target = src / name
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(text, encoding="utf-8")
-    expected = execute([sys.executable, "app.py"], src, tmp_path / "home")
+    expected = execute([sys.executable, "-S", "app.py"], src, tmp_path / "home")
     assert expected.returncode == 0, expected.stderr
     out = tmp_path / "out"
     out.mkdir()
@@ -43,26 +51,32 @@ def artifact(tmp_path, files, local, verify, single=False):
         "--no-config",
         "--json",
     ]
+    if exclude:
+        config = tmp_path / "config.yaml"
+        config.write_text("exclude_names: [RED, BLUE, label]\n", encoding="utf-8")
+        args.remove("--no-config")
+        args.extend(["--config", str(config)])
     if not local:
         args.append("--no-crossfile-local-names")
     if verify:
         args.append("--verify-names")
     result = execute(args, tmp_path, tmp_path / "home")
     assert result.returncode == 0, result.stdout + result.stderr
-    actual = execute([sys.executable, "app.py"], out, tmp_path / "home")
+    actual = execute([sys.executable, "-S", "app.py"], out, tmp_path / "home")
     assert actual.returncode == 0, actual.stderr
-    assert actual.stdout == expected.stdout  # text=True normalizes Windows newlines.
+    assert actual.stdout.replace("\r\n", "\n") == expected.stdout.replace("\r\n", "\n")
     return out
 
 
 @pytest.mark.skipif(sys.version_info < (3, 11), reason="global_enum requires Python 3.11")
+@pytest.mark.parametrize("exclude", [False, True])
 @pytest.mark.parametrize("definition", ENUM_VARIANTS)
 @pytest.mark.parametrize("single", [False, True])
 @pytest.mark.parametrize("local", [False, True])
 @pytest.mark.parametrize("verify", [False, True])
-def test_injected_enum_names(tmp_path, definition, single, local, verify):
+def test_injected_enum_names(tmp_path, definition, single, local, verify, exclude):
     definition += (
-        "__all__ = ['RED', 'BLUE', 'read']\ndef read():\n    return RED.value + BLUE.value\n"
+        "__all__ = ['RED', 'BLUE', 'read']\ndef read():\n    return (RED.value, BLUE.value)\n"
     )
     if single:
         files = {"app.py": definition + "print(RED.value, BLUE.value, read())\n"}
@@ -76,14 +90,15 @@ def test_injected_enum_names(tmp_path, definition, single, local, verify):
             "import star\n",
             "star.py": "from pkg.colors import *\nprint(RED.value, BLUE.value)\n",
         }
-    out = artifact(tmp_path, files, local, verify, single)
+    out = artifact(tmp_path, files, local, verify, single, exclude)
     statement = "import app as m" if single else "from pkg import colors as m"
     checked = execute(
         [
             sys.executable,
+            "-S",
             "-c",
             statement + "; assert 'RED' in m.__all__ and 'BLUE' in m.__all__; "
-            "assert m.RED.value == 1 and m.BLUE.value == 2",
+            "assert type(m.RED).RED is m.RED and type(m.BLUE).BLUE is m.BLUE",
         ],
         out,
         tmp_path / "home",
@@ -132,6 +147,7 @@ def test_calendar_injected_and_ordinary_exports(tmp_path, local, verify):
     result = execute(
         [
             sys.executable,
+            "-S",
             "-c",
             "import lib_calendar as c; assert all(hasattr(c, n) for n in c.__all__)",
         ],
@@ -154,7 +170,7 @@ def test_calendar_injected_and_ordinary_exports(tmp_path, local, verify):
 @pytest.mark.parametrize("single", [False, True])
 @pytest.mark.parametrize("local", [False, True])
 @pytest.mark.parametrize("verify", [False, True])
-def test_dynamic_enum_is_rejected(tmp_path, body, single, local, verify):
+def test_dynamic_enum_build_falls_back(tmp_path, body, single, local, verify):
     src = tmp_path / "src"
     src.mkdir()
     (src / "app.py").write_text(
@@ -175,12 +191,8 @@ def test_dynamic_enum_is_rejected(tmp_path, body, single, local, verify):
     if verify:
         args.append("--verify-names")
     result = execute(args, tmp_path, tmp_path / "home")
-    assert result.returncode != 0
-    payload = json.loads(result.stdout)
-    assert payload["status"] == "error"
-    assert payload["error_type"] == "AnalysisError"
-    assert payload["ai_hint"]
-    assert "Cannot safely obfuscate enum.global_enum injection" in payload["message"]
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "Preserved all module names" in result.stderr
 
 
 @pytest.mark.skipif(sys.version_info < (3, 11), reason="global_enum requires Python 3.11")
@@ -230,3 +242,89 @@ def test_enum_module_fallback_preserves_internal_imports(tmp_path, local, verify
         local,
         verify,
     )
+
+
+@pytest.mark.parametrize("local", [False, True])
+@pytest.mark.parametrize("verify", [False, True])
+def test_stdlib_re_package(tmp_path, local, verify):
+    source = Path("/usr/lib/python3.12/re")
+    if not source.is_dir() or sys.version_info < (3, 12):
+        pytest.skip("requires CPython 3.12 re sources and compatible runtime")
+    files = {
+        "app.py": "import re; from pathlib import Path; "
+        "assert str(re.__file__).startswith(str(Path.cwd())); print(re.compile('abc', re.I).search('ABC').group()); "
+        "print(re.I is re.IGNORECASE, bool(re.search('a', 'A', re.IGNORECASE)))\n"
+    }
+    for path in source.rglob("*.py"):
+        files["re/" + path.relative_to(source).as_posix()] = path.read_text(encoding="utf-8")
+    artifact(tmp_path, files, local, verify)
+
+
+@pytest.mark.skipif(sys.version_info < (3, 11), reason="global_enum requires Python 3.11")
+@pytest.mark.parametrize("single", [False, True])
+@pytest.mark.parametrize("local", [False, True])
+@pytest.mark.parametrize("verify", [False, True])
+def test_custom_enum_method_is_callable(tmp_path, single, local, verify):
+    definition = (
+        "import enum\n@enum.global_enum\nclass Color(enum.IntEnum):\n"
+        "    RED = 1\n    GREEN = 2\n    def label(self):\n        return self.name.lower()\n"
+        "def pick():\n    return RED.label()\n"
+    )
+    app = "print(RED, Color.GREEN.label(), pick())\n"
+    files = (
+        {"app.py": definition + app}
+        if single
+        else {
+            "pkg/__init__.py": "",
+            "pkg/colors.py": definition,
+            "app.py": "from pkg.colors import RED, Color, pick\n" + app,
+        }
+    )
+    artifact(tmp_path, files, local, verify, single)
+
+
+@pytest.mark.skipif(sys.version_info < (3, 11), reason="global_enum requires Python 3.11")
+@pytest.mark.parametrize("local", [False, True])
+@pytest.mark.parametrize("verify", [False, True])
+def test_non_static_enum_package_preserves_dependencies(tmp_path, local, verify):
+    artifact(
+        tmp_path,
+        {
+            "pkg/__init__.py": "import enum\nfrom . import reader\n@enum.global_enum\n"
+            "class Color(enum.IntEnum):\n    RED = 1\n    def label(self):\n"
+            "        return self.name.lower()\ndef read():\n    return reader.read()\n",
+            "pkg/constants.py": "LIMIT = 7\n",
+            "pkg/reader.py": "from .constants import *\ndef read():\n    return LIMIT\n",
+            "app.py": "from pkg import RED, read\nimport pkg\nprint(RED.label(), read(), pkg.read())\n",
+        },
+        local,
+        verify,
+    )
+
+
+@pytest.mark.parametrize("local", [False, True])
+@pytest.mark.parametrize("verify", [False, True])
+def test_stdlib_re_direct_directory(tmp_path, local, verify):
+    import shutil
+
+    source = Path("/usr/lib/python3.12/re")
+    if not source.is_dir() or sys.version_info < (3, 12):
+        pytest.skip("requires CPython 3.12 re sources and compatible runtime")
+    src = tmp_path / "src" / "re"
+    shutil.copytree(source, src, ignore=shutil.ignore_patterns("__pycache__"))
+    out = tmp_path / "out" / "re"
+    args = [sys.executable, "-m", "pyobfus", str(src), "-o", str(out), "--no-config", "--json"]
+    if not local:
+        args.append("--no-crossfile-local-names")
+    if verify:
+        args.append("--verify-names")
+    build = execute(args, tmp_path, tmp_path / "home")
+    assert build.returncode == 0, build.stdout + build.stderr
+    probe = (
+        "import re; from pathlib import Path; "
+        "assert str(re.__file__).startswith(str(Path.cwd())); "
+        "assert re.compile('abc', re.I).search('ABC').group() == 'ABC'; "
+        "assert re.I is re.IGNORECASE; assert re.search('a', 'A', re.IGNORECASE)"
+    )
+    result = execute([sys.executable, "-S", "-c", probe], out.parent, tmp_path / "home")
+    assert result.returncode == 0, result.stderr

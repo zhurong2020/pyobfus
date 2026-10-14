@@ -349,16 +349,18 @@ class CrossFileOrchestrator:
 
         if self.config.crossfile_local_names:
             self._reserved_names.update(self.config.exclude_names)
+        enum_package_fallbacks: Set[Path] = set()
         for fi in self.files:
             tree = ASTParser.parse_file(fi.path)
             injection = enum_injection_plan(tree)
-            injection.require_static()
             self._reserved_names.update(injection.preserved)
+            if injection.errors and fi.relative_path.name == "__init__.py":
+                enum_package_fallbacks.add(fi.relative_path.parent)
             if injection.preserve_module:
                 self.global_table.conservative_import_modules.add(fi.module_name)
                 self._planning_warnings.append(
                     f"Preserved module names and import bindings for {fi.relative_path.as_posix()}: "
-                    "enum.global_enum combined with module-level __getattr__"
+                    f"{injection.warning}"
                 )
             for node in ast.walk(tree):
                 # Explicit aliases survive even when local renaming is off;
@@ -367,6 +369,24 @@ class CrossFileOrchestrator:
                     self._reserved_names.update(a.asname for a in node.names if a.asname)
                 if self.config.crossfile_local_names:
                     # A preserved parameter I42 must never capture a new I42.
+                    for attr in ("id", "arg", "name", "asname", "rest"):
+                        value = getattr(node, attr, None)
+                        if isinstance(value, str):
+                            self._reserved_names.add(value)
+
+        # A non-static injection in a package initializer can observe its
+        # sibling modules through module attributes and star-import chains.
+        # Preserve that package's names together: otherwise the initializer's
+        # fallback alone leaves dependencies (notably re._constants) renamed.
+        # This is scoped to enum packages, not general star-import resolution.
+        for fi in self.files:
+            if any(parent in fi.relative_path.parents for parent in enum_package_fallbacks):
+                self.global_table.conservative_import_modules.add(fi.module_name)
+                self._planning_warnings.append(
+                    f"Preserved all module names and import bindings for {fi.relative_path.as_posix()}: "
+                    "non-static enum injection in package initializer"
+                )
+                for node in ast.walk(ASTParser.parse_file(fi.path)):
                     for attr in ("id", "arg", "name", "asname", "rest"):
                         value = getattr(node, attr, None)
                         if isinstance(value, str):
@@ -388,7 +408,6 @@ class CrossFileOrchestrator:
             detector = ExportDetector()
             detector.visit(tree)
             injection = enum_injection_plan(tree)
-            injection.require_static()
             exports = detector.get_exports() | set(
                 name for cls in injection.classes for name in cls.members
             )
@@ -415,7 +434,10 @@ class CrossFileOrchestrator:
             # reproduce.
             for export_name in sorted(exports):
                 # Skip names that should be preserved
-                if export_name in injection.preserved:
+                if (
+                    export_name in injection.preserved
+                    or file_info.module_name in self.global_table.conservative_import_modules
+                ):
                     self.global_table.register_preserved_export(file_info.module_name, export_name)
                     continue
                 if self._should_preserve_name(export_name):

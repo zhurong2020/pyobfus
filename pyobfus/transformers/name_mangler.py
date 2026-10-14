@@ -126,7 +126,6 @@ class NameMangler(BaseTransformer):
             tree
         ) | _class_annotated_field_names(tree)
         injection = enum_injection_plan(tree)
-        injection.require_static()
         self._preserved_names.update(injection.preserved)
 
         # Build name mapping

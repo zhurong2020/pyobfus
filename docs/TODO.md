@@ -218,8 +218,8 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 - [ ] **H PR 4 候选 · 放宽无关包初始化语句**：包 `__init__` 里 `try: __version__ = version(...)` 会阻止整个包的子模块属性改写（pyobfus 自身可复现）；评估仅绑定与子模块名无关的语句能否安全放宽。需单独确认范围，不阻塞已发布版本。
 - [ ] **既有缺陷 C · 运行时注入的模块级名字** — PR #100 待审。
       Community correctness fix: automatically preserve static `enum.global_enum` members in single-file and directory builds;
-      preserve module export spellings when module-level `__getattr__` prevents H proofs, and reject unsupported dynamic enums explicitly.
-      Artifact regressions cover references, `__all__`, imports, module attributes and standard-library `calendar`.
+      preserve module export spellings when module-level `__getattr__` prevents H proofs, and conservatively preserve non-static enum modules with a planning warning.
+      Artifact regressions cover references, `__all__`, imports, module attributes, dynamic enums, exclude_names and standard-library `calendar` / `re`.
 - [ ] **候选 · 3.12 嵌套 f-string 的 `--check` 提示**（低优先级，10-11 登记）：3.12 起允许 f-string 内复用同种引号/嵌套，
       产物在 3.9–3.11 上无法解析；目录/单文件构建若面向旧解释器分发，`--check` 可提示目标版本不兼容。先确认 `--verify-syntax`
       与 `target_python` 现有行为再定是否需要。

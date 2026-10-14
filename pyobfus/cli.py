@@ -1297,7 +1297,9 @@ def main(
             if file_stats:
                 obfuscation_stats["files_processed"] = 1
                 for key, value in file_stats.items():
-                    if key in obfuscation_stats:
+                    if key == "warnings":
+                        obfuscation_stats.setdefault("warnings", []).extend(value)
+                    elif key in obfuscation_stats:
                         obfuscation_stats[key] += value
                     elif key.startswith(_PROTECTION_STAT_PREFIX):
                         obfuscation_stats[key] = value
@@ -1613,6 +1615,13 @@ def _obfuscate_file(
     if config.max_total_loc and line_count > config.max_total_loc:
         raise LimitExceededError("lines_of_code", line_count, config.max_total_loc)
 
+    from pyobfus.core.enum_injection import enum_injection_plan
+
+    injection_warning = enum_injection_plan(tree).warning
+    if injection_warning:
+        file_stats["warnings"] = [injection_warning]
+        click.echo(f"Warning: {injection_warning}", err=True)
+
     # Analyze symbols
     analyzer = SymbolAnalyzer(config)
     analyzer.analyze(tree)
@@ -1835,7 +1844,9 @@ def _obfuscate_directory(
             )
             dir_stats["files_processed"] += 1
             for key, value in file_stats.items():
-                if key in dir_stats:
+                if key == "warnings":
+                    dir_stats.setdefault("warnings", []).extend(value)
+                elif key in dir_stats:
                     dir_stats[key] += value
                 elif key.startswith(_PROTECTION_STAT_PREFIX):
                     dir_stats[key] = value

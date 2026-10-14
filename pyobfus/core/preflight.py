@@ -301,8 +301,9 @@ class _RiskVisitor(ast.NodeVisitor):
                 (
                     f"Automatically preserved member names: {listed}."
                     if injection.reason is None
-                    else f"Add this enum's member names to exclude_names: {listed}. "
-                    "Builds reject this dynamic enum; use simple static member assignments."
+                    else "All module names and import bindings are automatically preserved "
+                    "because the injected member set is uncertain. For a package initializer, "
+                    "its package modules are preserved too; exclude_names remains effective."
                 ),
             )
         for error in plan.errors:
@@ -312,7 +313,8 @@ class _RiskVisitor(ast.NodeVisitor):
                     SEVERITY_MEDIUM,
                     node,
                     f"enum.global_enum has an unknown member set: {error}.",
-                    "Builds reject computed enum owners; use a statically decorated enum.",
+                    "All module names and import bindings are automatically preserved; "
+                    "exclude_names remains effective.",
                 )
         self.generic_visit(node)
 

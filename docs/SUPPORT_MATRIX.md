@@ -152,8 +152,12 @@ exports remain accessible even when H cannot prove attribute rewrites.
 
 Computed enum owners, custom bases/metaclasses, additional unknown decorators,
 computed member values, control flow in the class body and custom enum methods
-other than `_missing_` are rejected with an explicit build diagnostic. Rewrite
-these as static decorated enums before building. This analysis resolves explicit
+other than `_missing_` conservatively preserve all names and import bindings
+in their module. A non-static enum in a package initializer also preserves
+that package's modules, so opaque module attributes and internal star-import
+chains (such as `re`'s constants) keep their original spellings. Builds
+continue with a planning warning; `--check` explains
+the fallback, and user `exclude_names` remains effective. This analysis resolves explicit
 lexical imports; helper aliases assigned at runtime, star-imported decorators,
 and other runtime injection mechanisms require separate analysis. These rules
 are Community correctness behavior and do not change the JSON contract,
