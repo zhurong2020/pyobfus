@@ -27,9 +27,16 @@ Glama's October 12 notifications confirm a successful build at 22:14 UTC
 The October 19 retry of the earlier 502 is no longer needed. The October 14 maintainer-supplied test
 `01a138af-a110-78b1-a230-a403c2b9b63c` succeeds in 8.6s: Core 0.7.1,
 MCP 0.3.13 and runtime 0.1.1 installed; handshake 0.3.13 and 9 tools
-confirmed. Recent Releases displays channel label 0.7.1. The cloned source
-still checks out d2d5703 despite pinnedCommit=null; package/handshake evidence
-does not establish source-pin alignment or execution of every tool in the image.
+confirmed. The maintainer supplied explicit Release Created / version 0.7.1 /
+published October 14 at 12:33 (Asia/Shanghai). A second test at 13:08,
+`01a138cf-75c7-7438-9379-3a10be59dc47`, succeeds in 7.8s but still checks
+out d2d5703 with pinnedCommit=null. Glama rejects the release SHA as Commit
+not found although GitHub independently confirms it exists. Repository Sync
+was requested; the last observed state is Sync in Progress. Await completion
+and verify the saved source pin; do not repeat the existing channel release.
+Sync/index lag is an inference, not a confirmed diagnosis. Package/handshake
+evidence does not establish source-pin alignment or execution of every tool
+in the image.
 
 Periodic checks retain only decision summaries, not full stdout or separate
 CSV/JSON snapshots. During the quiet-period experiment, retain the Core/MCP
