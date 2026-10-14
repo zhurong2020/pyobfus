@@ -5,7 +5,7 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-10-14。Core 0.7.1 / MCP 0.3.13 已发布，runtime 0.1.1 保持不变；#95/#96/#97/#98 已全部随本次发布，Core/MCP Unreleased 均为空。发布前完整 CI 与本地四测试根通过，PyPI 发布包和 PEP 740 已独立验证，Registry 与 Zenodo/CFF 已同步。私有历史库 CI 已定性，Glama 502 已恢复；Glama 安装/握手/9 工具测试、渠道记录与源码 pin（`22ecd62`）均已完成。
+最后更新：2026-10-14。Core 0.7.1 / MCP 0.3.13 已发布，runtime 0.1.1 保持不变；#95/#96/#97/#98 已全部随本次发布，发布时 Core/MCP Unreleased 均为空；Core 的缺陷 I 修复现为 PR #99 待审。发布前完整 CI 与本地四测试根通过，PyPI 发布包和 PEP 740 已独立验证，Registry 与 Zenodo/CFF 已同步。私有历史库 CI 已定性，Glama 502 已恢复；Glama 安装/握手/9 工具测试、渠道记录与源码 pin（`22ecd62`）均已完成。
 
 ## 状态口径
 
@@ -20,11 +20,11 @@
 
 ## 本 session 收尾后的任务顺序（2026-10-14）
 
-本轮只记录待办与收尾，不开始新功能、缺陷 I 实现或下一次发版。
+维护者已于 10-14 授权缺陷 I 修复，现为 PR #99 待审；独立审核后再决定合并，发版另行授权。
 
 | 顺序 | 待办 | 验收 / 下一步 |
 |---|---|---|
-| 1 | **缺陷 I：词法作用域导入映射修复** | 按下方已评估范围补回归并修复；覆盖模块/函数/nested/async、定义时表达式和作用域边界，对照原文/产物行为，确认原 48 次评估中的故障样例运行正确。独立审核后再由维护者决定合并，发版另行授权。 |
+| 1 | **缺陷 I：词法作用域导入映射修复** | [PR #99](https://github.com/zhurong2020/pyobfus/pull/99) 待审；词法作用域映射、局部改名同步与真实产物回归已实现。等待 Claude 独立审核，再由维护者决定合并，发版另行授权。 |
 | 2 | **私有下游下一候选验收** | 构建工具迁移已完成，但未重建交付包；下一候选须审查 4 个星号导入跳过项，区分 Community 合同验证与真实 Pro/Windows 验收，并执行下游现有安装/升级/运行闸门，不将旧候选测试当新构建证据。 |
 | 3 | ~~Glama 仓库同步与源码 pin~~（10-14 完成） | 维护者提供页面：Repository Sync 13:51 完成、known commit `22ecd62`；Dockerfile 已 pin `22ecd62`（发布 `37c3c41` 的后代，仅文档/CFF 差异，服务来自 PyPI 包，接受）。下次发 MCP 时同时更新 Build steps 包版本与 commit pin（或清空）。无剩余动作。 |
 | 4 | **10-19 周一巡检** | 下载安静日、客户反馈/调研回答、CI、许可证监控、KV 备份、Anthropic 插件解锁消息；仅留决策摘要。 |
@@ -197,13 +197,13 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 - [x] **既有缺陷 G · 目录构建的别名导入（优先，0.5.28 已存在——10-13 下游构建实证，早于原记的 0.5.32；影响用户）**：`from pkg import scale as action` 或
       `from pkg.core import scale as action` 后调用 `action(...)` 即 NameError（局部改名开关无关）。参数改名设计审核中发现；
       应先于参数改名的解析器工作修复。**10-10 已合并 PR #66（`b56afe2`），随 0.6.1 发布**（保留显式本地别名，仅同步被导入符号名）；审核记录私有 `docs/internal/geo-2026-10/PR66_REVIEW_2026-10-10.md`。
-- [ ] **既有缺陷 I · 函数内别名覆盖模块级导入**（10-10 审 #66 发现，低优先级）：
+- [ ] **既有缺陷 I · 函数内别名覆盖模块级导入**（PR #99 待审；10-10 审 #66 发现）：
       模块级 `from pkg.core import helper` + 函数内 `from pkg.core import scale as helper`，模块级的 `helper(...)` NameError。
       根因：ImportedNameTransformer 的 `import_mappings` 按模块扁平存放，函数内导入覆盖模块级条目。
       **10-11 更正**：原记「默认（开启局部改名）正确」不对——Claude 用 PyPI 版在干净 venv 实测，默认模式下 0.6.0（`I2` 未定义）
       与 0.6.1/main（`helper` 未定义）都失败，`--no-crossfile-local-names` 同样失败。
       **10-14 复评**：发布版 0.7.1 / 当前源码、局部改名开/关共 48 次构建；函数/嵌套函数/async 同名别名的 12 个未检查构建都在运行时报 NameError，`--verify-names` 对应 12 次均在构建期 exit 1。反向定义顺序与非冲突对照正常，说明结果受收集顺序影响；`--check` 未提示最小复现。精确保留冲突导出名 `helper` 的 YAML 绕法在开/关局部改名时均通过，不推广为任意导入冲突的保证。
-      **建议修复范围**：导入映射按 Python 词法作用域收集/查询，模块级映射不受函数局部别名污染；保留函数内无别名导入改写，并覆盖定义时表达式、nested/async、global/nonlocal 与类体边界。先写有区分力的回归与关闭开关/真实产物对照，再独立审核。本轮只评估、未修改转换器、未发新版。
+      **建议修复范围**：导入映射按 Python 词法作用域收集/查询，模块级映射不受函数局部别名污染；保留函数内无别名导入改写，并覆盖定义时表达式、nested/async、global/nonlocal 与类体边界。**10-14 实现**：[PR #99](https://github.com/zhurong2020/pyobfus/pull/99) 待审，已补原六个评估 case 与作用域边界的真实 CLI 产物回归、四测试根验收及主分支逐字节对照。等待 Claude 独立审核；合并与发版另批，版本号未变。
 - [x] **既有缺陷 F · 单文件模式默认改参数但不改关键字调用（优先，0.5.32 已存在）**：同文件 `scale(1, factor=3)` 即 TypeError；
       含 `/`、`*args`、`**kwargs` 的签名还会静默绑错（关键字落进 `**kwargs`、参数取默认值）。无预设、safe、balanced、aggressive
       在 0.5.32 / 0.6.0 都是 `preserve_param_names=False`（框架预设与 library 为 True）。**10-10 已合并 PR #67（`ed8cceb`），随 0.6.1 发布**；审核记录私有 `docs/internal/geo-2026-10/PR67_REVIEW_2026-10-10.md`：

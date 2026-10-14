@@ -219,7 +219,7 @@ class LocalNameTransformer(ast.NodeTransformer):
             return node
 
         # Don't rename imported names (those are handled by ImportedNameTransformer)
-        if node.id in self.imported_names:
+        if node.id in self.imported_names or getattr(node, "_pyobfus_import_binding", False):
             return node
 
         # Don't rename if shadowed by a local variable/parameter in any scope

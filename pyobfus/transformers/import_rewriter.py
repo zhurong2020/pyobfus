@@ -6,7 +6,9 @@ to use obfuscated names from the GlobalSymbolTable.
 """
 
 import ast
-from typing import Optional, Set, Tuple
+from typing import Optional, Set, Tuple, Dict
+
+from pyobfus.transformers.scoped_imports import ImportKey, key
 from pathlib import Path
 
 from pyobfus.core.generator import CodeGenerator
@@ -46,6 +48,7 @@ class ImportRewriter(ast.NodeTransformer):
         global_table: GlobalSymbolTable,
         current_module: str,
         current_file: Optional[Path] = None,
+        preserved_imports: Optional[Dict[ImportKey, Tuple[str, str]]] = None,
     ):
         """
         Initialize import rewriter.
@@ -55,6 +58,7 @@ class ImportRewriter(ast.NodeTransformer):
             current_module: Name of current module (e.g., "main", "utils.helpers")
             current_file: Path to current file (optional, for tracking)
         """
+        self.preserved_imports = preserved_imports or {}
         self.global_table = global_table
         self.current_module = current_module
         self.current_file = current_file
@@ -97,9 +101,14 @@ class ImportRewriter(ast.NodeTransformer):
         new_names = []
         any_rewritten = False
 
-        for alias in node.names:
+        for position, alias in enumerate(node.names):
             original_name = alias.name
             asname = alias.asname
+            if (key(node), position) in self.preserved_imports:
+                original_binding, planned_binding = self.preserved_imports[(key(node), position)]
+                # The function-local plan may already have allocated an alias.
+                if asname is None or asname == original_binding:
+                    asname = planned_binding
 
             # Look up obfuscated name in global table
             obfuscated_name = self.global_table.get_obfuscated_import(module, original_name)

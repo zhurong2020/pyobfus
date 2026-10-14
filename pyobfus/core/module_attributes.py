@@ -760,18 +760,6 @@ class _ProofVisitor(ImportedAccessVisitor):
             if isinstance(n, (ast.Global, ast.Nonlocal))
             for name in n.names
         }
-        # Existing flat import synchronization (limitation I) cannot safely
-        # share this spelling with a renamed direct-symbol import in a child
-        # scope. Reject the H proof rather than claiming that prerequisite fixed.
-        for node in ast.walk(tree):
-            if isinstance(node, ast.ImportFrom):
-                source = self.resolve_from(node)
-                if source:
-                    self.forbidden.update(
-                        alias.name
-                        for alias in node.names
-                        if alias.asname is None and table.get_obfuscated_import(source, alias.name)
-                    )
         self.unsupported = any(
             isinstance(n, ast.NamedExpr)
             or getattr(n, "type_params", [])

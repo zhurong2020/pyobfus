@@ -365,6 +365,16 @@ def plan_locals(
 
     collect(root)
     tables.update({s.get_id(): s for s in synthetic})
+    # Imported globals are synchronized by the lexical import pass. Rewriting
+    # them here can split a `global` import from the module binding when that
+    # pass conservatively preserves its spelling.
+    imported_globals = {
+        symbol.get_name()
+        for table in tables.values()
+        if hasattr(table, "get_symbols")
+        for symbol in table.get_symbols()
+        if symbol.is_imported() and (table is root or symbol.is_global())
+    }
     bindings = set()
     # Nested def/class names are observable through __name__/__qualname__:
     # Flask endpoints, Click commands and name-keyed registries depend on them.
@@ -428,7 +438,7 @@ def plan_locals(
             local_replacement = local_replacement or name
         # Explicit globals must keep their declarations and references in
         # sync with the existing module mapping, even inside nested closures.
-        if binding is None and scope is not root:
+        if binding is None and scope is not root and name not in imported_globals:
             local_replacement = module_exports.get(name)
         if local_replacement:
             plan.edits[_edit_key(node, attr)] = local_replacement

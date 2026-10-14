@@ -6,20 +6,20 @@ references to imported names throughout the file body.
 """
 
 import ast
-from typing import Optional, Set, Dict, Tuple, List
+from typing import Optional, Dict, Tuple, Set, Any
 from pathlib import Path
 
 from pyobfus.core.generator import CodeGenerator
 from pyobfus.core.global_table import GlobalSymbolTable
-from pyobfus.transformers.local_name_transformer import _function_scope_names
+from pyobfus.transformers.scoped_imports import import_plan, key, Key, ImportKey
 
 
 class ImportCollector(ast.NodeVisitor):
     """
     Collect imported names from the original source before transformation.
 
-    This visitor analyzes import statements to build a mapping of:
-    original_name -> obfuscated_name for all imported symbols.
+    Resolve each reference to its lexical binding before transformation.
+    ``import_mappings`` is a diagnostic union, not a reference lookup table.
     """
 
     def __init__(self, global_table: GlobalSymbolTable, current_module: str):
@@ -33,53 +33,30 @@ class ImportCollector(ast.NodeVisitor):
         self.global_table = global_table
         self.current_module = current_module
 
-        # Mapping: original_name -> obfuscated_name
         self.import_mappings: Dict[str, str] = {}
+        self.reference_edits: Dict[Key, Any] = {}
+        self.preserved_imports: Dict[ImportKey, Tuple[str, str]] = {}
+        self.protected_references: Set[Key] = set()
 
-    def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
-        """
-        Visit ImportFrom statement and collect imported names.
-
-        Args:
-            node: ImportFrom AST node
-        """
-        module = node.module
-
-        # Handle relative imports
-        if node.level > 0:
-            module = self._resolve_relative_import(node.module, node.level)
-
-        if module is None:
+    def visit_Module(self, node: ast.Module) -> None:
+        if self.current_module in self.global_table.conservative_import_modules:
+            # Dependency exports still require synchronization. Explicit aliases
+            # retain every original binding without rewriting lexical references.
+            for part in ast.walk(node):
+                if isinstance(part, ast.Name):
+                    self.protected_references.add(key(part))
+                elif isinstance(part, ast.ImportFrom):
+                    for position, alias in enumerate(part.names):
+                        if alias.name != "*":
+                            name = alias.asname or alias.name
+                            self.preserved_imports[(key(part), position)] = (name, name)
             return
-
-        # Collect each imported name
-        for alias in node.names:
-            if alias.name == "*":
-                continue
-
-            original_name = alias.name
-            local_name = alias.asname if alias.asname else original_name
-
-            # Look up obfuscated name
-            obfuscated_name = self.global_table.get_obfuscated_import(module, original_name)
-
-            if obfuscated_name:
-                # Map: local_name -> obfuscated_name
-                # The export spelling changes independently of an explicit
-                # local alias (including `X as X`). Identity entries also keep
-                # the later module-name pass from rewriting this binding.
-                self.import_mappings[local_name] = (
-                    local_name if alias.asname is not None else obfuscated_name
-                )
-
-        self.generic_visit(node)
-
-    def visit_ClassDef(self, node: ast.ClassDef) -> None:
-        """Class imports bind attributes, not this module's imported names."""
-        for expr in node.decorator_list + node.bases:
-            self.visit(expr)
-        for keyword in node.keywords:
-            self.visit(keyword.value)
+        (
+            self.reference_edits,
+            self.preserved_imports,
+            self.import_mappings,
+            self.protected_references,
+        ) = import_plan(node, self.global_table, self.current_module)
 
     def _resolve_relative_import(self, module: Optional[str], level: int) -> Optional[str]:
         """
@@ -152,6 +129,7 @@ class ImportedNameTransformer(ast.NodeTransformer):
         global_table: GlobalSymbolTable,
         current_module: str,
         current_file: Optional[Path] = None,
+        collector: Optional[ImportCollector] = None,
     ):
         """
         Initialize imported name transformer.
@@ -167,128 +145,81 @@ class ImportedNameTransformer(ast.NodeTransformer):
         self.current_file = current_file
 
         # Collect import mappings from original tree
-        collector = ImportCollector(global_table, current_module)
-        collector.visit(original_tree)
+        if collector is None:
+            collector = ImportCollector(global_table, current_module)
+            collector.visit(original_tree)
+        self.original_names = {
+            key(n): n.id for n in ast.walk(original_tree) if isinstance(n, ast.Name)
+        }
+        self.original_binders = {
+            key(n): getattr(n, "rest", getattr(n, "name", None))
+            for n in ast.walk(original_tree)
+            if type(n).__name__ in {"ExceptHandler", "MatchAs", "MatchStar", "MatchMapping"}
+        }
         self.import_mappings = collector.import_mappings
 
         # Track statistics
         self.references_updated: int = 0
         self.references_unchanged: int = 0
 
-        # Track scope (don't rename function parameters, local variables, etc.)
-        self._local_names: Set[str] = set()
-        self._scope_stack: List[Set[str]] = []
-
-    def visit_FunctionDef(self, node: ast.FunctionDef) -> ast.FunctionDef:
-        """
-        Visit function definition and track local scope.
-
-        Args:
-            node: FunctionDef AST node
-
-        Returns:
-            Transformed FunctionDef node
-        """
-        # Decorators, defaults and annotations are evaluated in the enclosing
-        # scope, before parameter names begin shadowing imports.
-        # Assign the results back: visit_Name returns a new node, so a bare
-        # decorator name would otherwise keep its original spelling.
-        node.decorator_list = [self.visit(d) for d in node.decorator_list]
-        self._visit_function_signature(node)
-
-        # Push new scope
-        self._scope_stack.append(_function_scope_names(node))
-
-        for stmt in node.body:
-            self.visit(stmt)
-
-        # Pop scope
-        self._scope_stack.pop()
-
-        return node
-
-    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> ast.AsyncFunctionDef:
-        """Visit async function definition."""
-        # Assign the results back: visit_Name returns a new node, so a bare
-        # decorator name would otherwise keep its original spelling.
-        node.decorator_list = [self.visit(d) for d in node.decorator_list]
-        self._visit_function_signature(node)
-
-        self._scope_stack.append(_function_scope_names(node))
-        for stmt in node.body:
-            self.visit(stmt)
-        self._scope_stack.pop()
-
-        return node
-
-    def _visit_function_signature(self, node) -> None:
-        """Rewrite imported references in definition-time expressions."""
-        args = node.args
-        for arg in args.posonlyargs + args.args + args.kwonlyargs:
-            if arg.annotation is not None:
-                arg.annotation = self.visit(arg.annotation)
-        if args.vararg and args.vararg.annotation is not None:
-            args.vararg.annotation = self.visit(args.vararg.annotation)
-        if args.kwarg and args.kwarg.annotation is not None:
-            args.kwarg.annotation = self.visit(args.kwarg.annotation)
-        args.defaults = [self.visit(default) for default in args.defaults]
-        args.kw_defaults = [
-            self.visit(default) if default is not None else None for default in args.kw_defaults
-        ]
-        if node.returns is not None:
-            node.returns = self.visit(node.returns)
-        for type_param in getattr(node, "type_params", []):
-            self.visit(type_param)
-
-    def visit_ClassDef(self, node: ast.ClassDef) -> ast.ClassDef:
-        """
-        Visit class definition and track scope.
-
-        Args:
-            node: ClassDef AST node
-
-        Returns:
-            Transformed ClassDef node
-        """
-        # Push new scope for class
-        self._scope_stack.append(set())
-        self.generic_visit(node)
-        self._scope_stack.pop()
-
-        return node
+        self.reference_edits = collector.reference_edits
+        self.preserved_imports = collector.preserved_imports
+        self.protected_references = collector.protected_references
 
     def visit_Name(self, node: ast.Name) -> ast.Name:
-        """
-        Visit Name node and replace if it references an imported name.
-
-        Args:
-            node: Name AST node
-
-        Returns:
-            Modified or original Name node
-        """
+        if key(node) in self.protected_references:
+            setattr(node, "_pyobfus_local_binding", True)
+        if key(node) in self.reference_edits:
+            setattr(node, "_pyobfus_import_binding", True)
         if getattr(node, "_pyobfus_local_binding", False) or getattr(
             node, "_pyobfus_class_binding", False
         ):
             return node
-
-        # Check if this name is in local scope (don't transform)
-        for scope in self._scope_stack:
-            if node.id in scope:
-                self.references_unchanged += 1
-                return node
-
-        # Check if this name is an imported name
-        if node.id in self.import_mappings:
-            obfuscated_name = self.import_mappings[node.id]
-
-            # Create new Name node with obfuscated name
-            new_node = ast.Name(id=obfuscated_name, ctx=node.ctx)
-            ast.copy_location(new_node, node)
+        replacement = self.reference_edits.get(key(node), node.id)
+        # Earlier local/export passes may already have changed this node.
+        # Only apply an import edit if the original spelling still matches.
+        if replacement != node.id and node.id == self.original_names.get(key(node)):
             self.references_updated += 1
-            return new_node
-
+            return ast.copy_location(ast.Name(id=replacement, ctx=node.ctx), node)
         self.references_unchanged += 1
+        return node
+
+    def visit_Global(self, node: ast.Global) -> ast.Global:
+        replacements = self.reference_edits.get(key(node))
+        if replacements is not None:
+            node.names = [
+                replacement if name in self.import_mappings else name
+                for name, replacement in zip(node.names, replacements)
+            ]
+        return node
+
+    def visit_Nonlocal(self, node: ast.Nonlocal) -> ast.Nonlocal:
+        replacements = self.reference_edits.get(key(node))
+        if replacements is not None:
+            node.names = [
+                replacement if name in self.import_mappings else name
+                for name, replacement in zip(node.names, replacements)
+            ]
+        return node
+
+    def visit_ExceptHandler(self, node: ast.ExceptHandler) -> ast.ExceptHandler:
+        self.generic_visit(node)
+        if node.name == self.original_binders.get(key(node)):
+            node.name = self.reference_edits.get(key(node), node.name)
+        return node
+
+    def visit_MatchAs(self, node: Any) -> Any:
+        self.generic_visit(node)
+        if node.name == self.original_binders.get(key(node)):
+            node.name = self.reference_edits.get(key(node), node.name)
+        return node
+
+    visit_MatchStar = visit_MatchAs
+
+    def visit_MatchMapping(self, node: Any) -> Any:
+        self.generic_visit(node)
+        if node.rest == self.original_binders.get(key(node)):
+            node.rest = self.reference_edits.get(key(node), node.rest)
         return node
 
     def get_statistics(self) -> dict:
