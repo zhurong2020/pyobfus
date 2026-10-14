@@ -22,14 +22,11 @@ reverse-map protected production tracebacks for developers and AI coding
 agents. Community is Apache-2.0, has no file or line limits, and requires no
 trial.
 
-> **What's new in v0.7.0:** directory builds now rename attribute access through
-> project modules (`from pkg import config; config.LIMIT`, `import pkg.core`,
-> relative imports and package re-exports), which previously raised
-> `AttributeError`. This changes build output: rebuild the whole project, keep the
-> new mapping, and rerun your tests. `--no-crossfile-module-attributes` restores
-> the old output. `--check` now also flags hardcoded secrets, and `--unmap` restores
-> file paths and line numbers. Pro: artifacts using `--bind-key-env` or
-> `--expire-warn-days` need `pyobfus-runtime` 0.1.1 on the target; see the
+> **What's new in v0.7.1:** opt-in `--verify-names` checks generated modules
+> for newly unbound globals without executing code. `--check-delivery` inspects
+> final directories and wheels for private mappings, private keys and original
+> source; Pro opacity reports now count encrypted and skipped functions.
+> Review partial coverage and rerun your application tests; see the
 > [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
 
 ## Why pyobfus
@@ -57,11 +54,11 @@ pyobfus src/ -o dist/ --save-mapping mapping.json --verify-syntax
 pyobfus --unmap --trace error.log --mapping mapping.json
 ```
 
-Merged on `main`, not yet published: opt-in `--verify-names` adds a static
-check for newly unbound globals and reports partial coverage explicitly.
-PyPI 0.7.0 does not include it. See
+Since 0.7.1, add opt-in `--verify-names` to check newly unbound globals
+without execution. Success JSON reports partial coverage explicitly; see
 [name verification](https://pyobfus.readthedocs.io/en/latest/NAME_VERIFICATION/)
-for candidate/source-checkout usage and limits.
+for usage and limits. Check the final directory or wheel with
+`pyobfus --check-delivery dist/ --json` before shipping.
 
 For framework presets, configuration discovery, packaging and verification,
 start at the [task-oriented documentation](https://pyobfus.readthedocs.io/).

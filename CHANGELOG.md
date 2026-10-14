@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-10-14
+
 ### Added
 
 - `--verify-names` (Community) fails the build (exit 1) when a generated
@@ -30,7 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   build in about a second, and on current `main` it reports the known
   `calendar.py` limitation (C) while passing `json`, `email` and a 71-module
   application build. PR [#98](https://github.com/zhurong2020/pyobfus/pull/98)
-  is merged but remains unreleased; see [name verification](docs/NAME_VERIFICATION.md)
+  ships in 0.7.1; see [name verification](docs/NAME_VERIFICATION.md)
   for coverage and limitations.
 
 - `--check-delivery PATH` (Community) checks what you are about to ship, an

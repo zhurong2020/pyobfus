@@ -6,81 +6,38 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
-### Added
-
-- `check_delivery` (community): wraps `pyobfus --check-delivery` for an output
-  directory or `.whl` inside the project root. Returns `status`
-  (`ok`/`warn`/`fail`), findings with stable codes, `limitations`, `ai_hint`
-  and `next_tool`. Read-only; file contents are never returned. With a Core
-  that predates the delivery check it returns `FeatureUnavailable`. The tool
-  manifest now lists 9 tools.
-
-### Changed
-
-- With a Core release containing the H default rollout (after 0.6.1), directory
-  scans/builds enable proved module-attribute rewrites by default. Core YAML
-  `crossfile_module_attributes: false` restores legacy output. Rebuild the full
-  project and regenerate its matching mapping after upgrading. MCP contracts
-  and version are unchanged.
+## [0.3.13] - 2026-10-14
 
 ### Added
 
-- Trace restoration keeps code-excerpt name reversal and infers a deployment root
-  from complete file-key suffix matches with resolvable locations, prioritizing
-  known obfuscated function names over ordinary frames. Foreign roots and tied
-  root scores stay unresolved, with ties explained in the hint.
-
-- `unmap_stack_trace` restores original relative files and statement-level lines
-  with a line-map-capable Core (after 0.6.1), adding `frames` and `line_map`.
-  Output locations remain visible; excerpts restore names and carets retain
-  artifact columns.
-  Older supported Core keeps its name-only behavior. No MCP version change.
-
-- `check_obfuscation_risks` forwards Core's new `hardcoded_secret` category
-  without literal values. Requires a pyobfus version containing this check
-  (after 0.6.1); MCP version and `pro_value` behavior are unchanged.
-
-- **`check_obfuscation_risks` reports keyword calls that parameter renaming
-  would break.** When the effective config renames parameters (explicit
-  `preserve_param_names: false` on a single file), same-file keyword calls and
-  `**` forwarding get a medium `compatibility_advisory`, as `pyobfus --check`
-  does. Needs a `pyobfus` release that includes the advisory (after 0.6.0).
-
-- **`unmap_stack_trace` flags a mapping from another build.** The result
-  gains `unmatched_names`, the obfuscated-looking names in the trace that the
-  mapping does not know; when it is non-empty, `ai_hint` tells the agent the
-  reversal may be wrong and how to find the matching mapping. Needs a `pyobfus`
-  release that includes the check; with older ones the list is always empty.
+- `check_delivery` (Community): read-only final-directory/wheel inspection for
+  private mappings, private keys, original source and build-report coverage.
+  Returns `status`, stable findings, `limitations`, `ai_hint` and `next_tool`.
+  Requires Core >=0.7.1; older Core returns `FeatureUnavailable`. The server
+  exposes 9 tools (7 Community and 2 tier/trial guidance tools).
+- With Core >=0.7.0, `unmap_stack_trace` restores relative source files and
+  statement lines through additive `frames` and `line_map` results. Excerpt
+  names are restored; artifact locations and caret columns remain visible.
+  Complete file-key suffix matches infer deployment roots, with obfuscated
+  function names preferred as evidence. Foreign roots and ties stay unresolved.
+- With a compatible Core, `unmap_stack_trace` adds `unmatched_names` and warns
+  about mappings from another build; older Core keeps name-only behaviour.
+- `check_obfuscation_risks` forwards Core's hardcoded-secret category without
+  literal values and warns about keyword calls when explicit single-file
+  parameter renaming would break them.
 
 ### Changed
 
-- **`pro_value` no longer suggests that Pro encryption hides API keys.**
-  When `check_obfuscation_risks` or `protect_project` finds credential-like
-  literals, the `pro_value` rationale now says to move them out of the shipped code and rotate any that
-  have shipped, because a program that can decrypt a key lets its recipient
-  recover it. Pro string encryption is described only as raising the cost of
-  extracting other embedded strings and data.
-
-- **The server now runs on either mcp SDK major.** 2.x renamed `FastMCP` to
-  `MCPServer` and moved it to `mcp.server.mcpserver`, so the server could not
-  start there at all. It now loads whichever class is installed and passes
-  `version=` at construction when the SDK accepts it — 2.x does, which retires
-  the private `_mcp_server` write that 1.x needs. The eight tool registrations
-  are unchanged: 2.x still takes `meta=` on the decorator.
-
-  Two internals-dependent spots were made version-agnostic: the live tool
-  manifest (`Tool.inputSchema` became `input_schema`, though the schema JSON is
-  identical so the shipped digest still verifies) and the version test (2.x
-  exposes a public `.version`; the inner server was renamed
-  `_lowlevel_server`).
-
-  **The `mcp<2.0.0` dependency cap is unchanged**, so installs are unaffected.
-  Upgrading buys no protocol currency for a stdio server — both majors
-  negotiate `2025-11-25`, and 2.x rejects a `2026-07-28`-enveloped request on a
-  stdio connection, because that protocol is reached through the stateless
-  transports this project does not implement. See
-  [docs/MCP_SDK_2X_SPIKE.md](../docs/MCP_SDK_2X_SPIKE.md) for the measurements
-  and for what would justify lifting the cap.
+- Core >=0.7.0 enables proved module-attribute rewrites for directory builds.
+  `crossfile_module_attributes: false` restores legacy output. Rebuild the
+  complete project and keep the new matching mapping after upgrading.
+- `pro_value` explains that obfuscation cannot hide shipped API keys. Move
+  credentials out of delivered code and rotate any that have shipped.
+- The server supports either MCP SDK major's server/manifest interfaces and
+  stamps its own version in the handshake. The dependency remains
+  `mcp>=1.27.0,<2.0.0`; normal installs stay on SDK 1.x. SDK 2.x support is
+  exercised in a separate CI job, not a change of stdio protocol support.
+  See [MCP SDK spike](../docs/MCP_SDK_2X_SPIKE.md).
 
 ## [0.3.12] - 2026-09-07
 

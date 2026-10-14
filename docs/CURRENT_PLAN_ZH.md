@@ -1,5 +1,7 @@
 # pyobfus 当前计划
 
+**2026-10-14 本次维护与发布授权（取代此前一天观察/等待通知）**：维护者明确要求依次完成状态报告中的 1–4 项，包含 Core → MCP 发布。私有 `pyobfus-pro-dev` 仍为 archived 历史证据库：新 push 的 Python 3.9 红灯是旧 Vault `zip(strict=True)`，公开仓库早在 #18（`29edb05`）修复；当前 Vault 定向测试 46 passed / 1 skipped，main Python 3.9 三平台 CI 全绿，不修改历史库。Glama 10-12 22:14 UTC 构建成功（test `01a1322c-b3ff-7825-86c1-f27005b90423`），22:15 UTC 发渠道 release 0.7.0 通知；这是 Glama 渠道标识，PyPI MCP 仍 0.3.12，原 10-19 重试 502 待办已撤。Anthropic 10-14 支持确认无需补材料，旧提交归属当前账号、锁必须目录团队解除；解除后在 developer portal 重提，Console 表单已停用。本次复查发生在 10-14，不冒称 10-15 已到；公开 main `4c107f8` 的 CI/CodeQL/Pages/许可证监控绿、0 open issue/PR，客户暂无新报障/调研回复。计划发布 Core 0.7.1 / MCP 0.3.13，runtime 0.1.1 不变；下方观察期文字为被本次授权取代的历史记录。
+
 **2026-10-14 维护者决定：再观察一天，2026-10-15 复查；届时仍须维护者明确通知才发版，不自动发布。** 已合并的 #95/#96/#97/#98 保留在 Unreleased，Core 0.7.0 / MCP 0.3.12 / runtime 0.1.1 的公开版本不变。
 
 **2026-10-14 PR #98 审核修订完成并合并，发版等待维护者通知**：维护者授权同步文档、完成审核修订至发版前；实际发版等待另行通知。修订 head `10129ec` 完整 CI（27 项任务，含 Python 3.9–3.14 × Ubuntu/Windows/macOS）、CodeQL/Dogfood/Packaging 均通过；PR 已于 2026-10-13T16:23:32Z（北京时间 10-14 00:23:32）squash 合并到 main `93d3ecd`，合并后代码与测试树逐项比对一致。发现并修正：裸 `global` 声明误作绑定、类体专用名字被全局豁免、文件缺失/读取或解析失败假通过、星号导入覆盖未提示、成功 JSON 丢失检查结果。增加覆盖状态、跳过原因、PEP 263/BOM 读取与构建报告独立 `name_verification`；增量和单文件也保留结果。不改默认行为、不新增 MCP 工具、不改版本/标签。验证：Core 3302 passed / 4 skipped，MCP 151 passed，integration 44 passed / 4 skipped，runtime 24 passed；40 项定向测试、check.sh、35 个标准库模块、独立 wheel 构建/安装/canary 与新参数正常/部分/失败三种结果均通过。0.7.0 的 Zenodo/CFF 与客户通知已完成；TODO 中相关旧待办已清理。原始 #98 与历史快照如下，不能覆盖本段。

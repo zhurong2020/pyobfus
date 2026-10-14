@@ -2,20 +2,20 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.zhurong2020/pyobfus-mcp",
   "title": "pyobfus-mcp",
-  "description": "Obfuscate Python before shipping; reverse-map tracebacks with your AI agent. No phone-home.",
+  "description": "9 local Python protection tools, delivery checks and traceback reverse mapping. No telemetry.",
   "repository": {
     "url": "https://github.com/zhurong2020/pyobfus",
     "id": "1093960892",
     "source": "github",
     "subfolder": "pyobfus_mcp"
   },
-  "version": "0.3.12",
+  "version": "0.3.13",
   "packages": [
     {
       "registryType": "pypi",
       "registryBaseUrl": "https://pypi.org",
       "identifier": "pyobfus-mcp",
-      "version": "0.3.12",
+      "version": "0.3.13",
       "transport": { "type": "stdio" }
     }
   ],

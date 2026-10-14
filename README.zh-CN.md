@@ -33,7 +33,7 @@ pyobfus src/ -o dist/ --save-mapping mapping.json --verify-syntax
 pyobfus --unmap --trace error.log --mapping mapping.json
 ```
 
-`--verify-names` 已合入 main、尚未发布，PyPI 0.7.0 不包含此参数。它是可选的静态全局名字检查，会明确提示未覆盖的模块；源码或候选构建的用法与限制见[名字验证说明](https://pyobfus.readthedocs.io/en/latest/NAME_VERIFICATION/)。
+0.7.1 起提供可选的 `--verify-names` 静态全局名字检查，会明确提示未覆盖的模块；用法与限制见[名字验证说明](https://pyobfus.readthedocs.io/en/latest/NAME_VERIFICATION/)。
 
 框架预设包括 FastAPI、Django、Flask、Pydantic、Click、SQLAlchemy 和 ML。
 完整配置、打包与验证流程请从[任务型文档首页](https://pyobfus.readthedocs.io/)进入。

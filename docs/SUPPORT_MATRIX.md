@@ -34,7 +34,7 @@ generated-code execution is now enforced on Linux and Windows. macOS output
 execution remains advisory-only, as do heavyweight framework and packaging
 combinations; those platform-specific failures can still reach users first.
 
-## Executable source metadata (unreleased)
+## Executable source metadata (since 0.7.0)
 
 Single-file, default cross-file directory, and `--no-cross-file` builds preserve
 shebangs and UTF-8 encoding declarations. Non-UTF-8 declarations are omitted
@@ -73,7 +73,7 @@ imports keep their original symbol and alias names. Unaliased imports retain
 the existing cross-file naming rules. Execution evidence:
 `integration_tests/test_crossfile_import_alias.py`.
 
-**Limitation H (fixed by default, unreleased, with exceptions below):**
+**Limitation H (fixed by default since 0.7.0, with exceptions below):**
 Directory builds rewrite proved Load reads/calls through
 unconditional `from pkg import mod; mod.X`,
 `import pkg.mod as alias; alias.X`, `import pkg.sub.core; pkg.sub.core.X`,
@@ -246,7 +246,7 @@ names we intended. It does not prove a Django project survives obfuscation,
 because no Django project is built and served in CI. Anyone who needs that
 guarantee should run `--check` and then their own test suite against the
 generated output; `--verify-syntax` compiles it, which is weaker than running.
-`--verify-names` (PR #98 merged on main; not yet in PyPI 0.7.0) adds one static check that catches renaming
+`--verify-names` (since 0.7.1; PR #98) adds one static check that catches renaming
 defects compilation misses: a global name the output uses but never binds.
 It still does not run anything. The opt-in check records source/output coverage,
 warns explicitly about skipped star-import modules, and fails on unreadable or

@@ -19,8 +19,8 @@ pip install pyobfus
 pyobfus --check src/ --json
 pyobfus src/ -o dist/ --dry-run --json
 pyobfus src/ -o dist/ --save-mapping mapping.json --verify-syntax --json
-pyobfus --check-delivery dist/ --json   # release after 0.7.0: no mapping, keys or originals in dist/
-# merged on main, absent from PyPI 0.7.0: --verify-names checks newly unbound globals without execution
+pyobfus --check-delivery dist/ --json   # since 0.7.1: check for mappings, keys or originals in dist/
+# since 0.7.1: --verify-names checks newly unbound globals without execution
 # success JSON includes name_verification; review skipped modules when coverage_complete is false
 ```
 
@@ -38,7 +38,7 @@ pyobfus --unmap --trace error.log --mapping mapping.json --json
 - CLI: every mode offers a stable JSON envelope with `ai_hint`.
 - VS Code/Open VSX: diagnostics, configuration, protection and traceback mapping.
 
-Prefer MCP tools when available: `check_obfuscation_risks`, `generate_pyobfus_config`, `protect_project`, `unmap_stack_trace`, `list_presets`, `explain_preset`, `recommend_tier`, `start_pro_trial`.
+Prefer MCP tools when available: `check_obfuscation_risks`, `generate_pyobfus_config`, `protect_project`, `unmap_stack_trace`, `check_delivery`, `list_presets`, `explain_preset`, `recommend_tier`, `start_pro_trial`.
 
 ## Community / Pro decision
 

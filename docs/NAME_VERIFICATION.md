@@ -1,8 +1,7 @@
 # Check generated names before delivery
 
-`--verify-names` is an opt-in Community build check merged in PR #98.
-It is not yet published and is absent from PyPI 0.7.0; the commands below
-apply to a source checkout or candidate build containing the change. It supplements `--verify-syntax`: valid Python can still refer to
+`--verify-names` is an opt-in Community build check available since 0.7.1
+(PR #98). It supplements `--verify-syntax`: valid Python can still refer to
 a name that a renaming transform failed to bind.
 
 ```bash

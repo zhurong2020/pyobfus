@@ -12,13 +12,15 @@ and the agent will autonomously call `check_obfuscation_risks` and `generate_pyo
 
 ## Tools exposed
 
+Version 0.3.13 exposes 9 tools: 7 Community tools and 2 tier/trial guidance tools.
+
 | Tool | What it does |
 |---|---|
 | `protect_project(path, output_dir?, preset?, verify?, verify_cmd?, save_mapping?)` | **One-call, self-verifying pipeline.** Scans risks, picks a framework-aware preset, obfuscates, then byte-compiles and import-smoke-tests the output in isolated subprocesses and returns `verified: true/false` (+ `confidence`). `verified` covers compilation and an import smoke test, plus `verify_cmd` if you pass one; it does not mean your application's behaviour was tested. Writes a private de-obfuscation mapping *alongside* (never inside) the output. Reach for this when the user wants to "protect/obfuscate before shipping" and expects a green check, not just a transform. |
 | `check_obfuscation_risks(path, verify_dependencies_online=false, use_project_config=true)` | Config-aware pre-flight scan for `eval`/`exec`, dynamic attribute access, and framework reflection. Set `use_project_config=false` for the legacy config-free scan. Opt into public-PyPI dependency-name verification with `verify_dependencies_online=true`; outbound network access remains off by default. Returns severity counts, detected frameworks, and a suggested preset. |
 | `generate_pyobfus_config(path, preset_override?, write?)` | Auto-detect framework → generate `pyobfus.yaml`. Returns the YAML text without writing by default; `write=True` persists to disk. |
 | `unmap_stack_trace(trace, mapping_path)` | Reverse obfuscated identifiers in a production stack trace using a `mapping.json`. |
-| `check_delivery(path, build_report?, provenance_manifest?)` | Before shipping, check an output directory or `.whl` for a mapping file, a private key or an original source, and for files the build did not produce. Read-only; needs a pyobfus release after 0.7.0. |
+| `check_delivery(path, build_report?, provenance_manifest?)` | Before shipping, check an output directory or `.whl` for a mapping file, a private key or an original source, and for files the build did not produce. Read-only; requires pyobfus >=0.7.1; older Core returns `FeatureUnavailable`. |
 | `list_presets()` | Enumerate every preset (community / framework-aware / Pro). |
 | `explain_preset(name)` | Describe what a named preset changes: exclusions, docstring handling, parameter preservation. |
 | `recommend_tier(path)` | Analyze a project and recommend community vs Pro, with reasoning and concrete next-step commands. |

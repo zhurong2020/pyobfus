@@ -7,21 +7,23 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-**Last updated**: 2026-10-02 (queried 10:57 UTC; PyPI data through 10-01).
-Core's 7-day non-release-day median is `40`, but it covers only three quiet
-days; its 30-day median remains `30`, next to the September baseline of `31`,
-so there is not yet evidence of organic baseline uplift. MCP's corresponding
-medians are `4 / 7`. Marketplace reports `12 installs`; Open VSX reports
-`612 downloads`, but that cumulative fetch
-counter includes mirrors and automated clients and is not additive with
-Marketplace installs. GitHub Action attribution remains `0` visible repos.
-GitHub's rolling 14-day traffic is `244 views / 122 unique visitors`; referrers
-remain search engines, GitHub, PyPI, and chatgpt.com, with no DEV or Reddit
-referrer yet.
-Current public versions are pyobfus **`0.6.0`** (released 2026-10-08),
-pyobfus-mcp `0.3.12`, pyobfus-runtime `0.1.0`, and VS Code/Open VSX **`0.4.3`**.
-Open VSX is live; Glama is listed, searchable and healthy, with all 8 tools.
-No Glama resubmission or Build-steps change remains pending.
+**Last updated**: 2026-10-14 (PyPI data through 10-13).
+Core's 30-day quiet-day median is `30`; the latest seven days contain no quiet
+samples after excluding release days and the next day, so the printed `0` is
+not a measured baseline. MCP quiet-day medians are `10 / 6` (7 / 30 days).
+Marketplace reports `14 installs`; Open VSX reports `682 downloads` (fetches,
+not unique installs). Action attribution remains `0` visible repositories.
+GitHub rolling 14-day traffic is `182 views / 106 unique visitors`; Google is
+first (`23 / 20`) and DEV/Reddit do not appear in the referrers.
+Current public versions are Core `0.7.0`, MCP `0.3.12`, runtime `0.1.1`,
+and VS Code/Open VSX `0.4.3`. Core `0.7.1` and MCP `0.3.13` publication is
+now authorized, pending release validation.
+
+Glama's October 12 notifications confirm a successful build at 22:14 UTC
+(test `01a1322c-b3ff-7825-86c1-f27005b90423`) and a channel release labelled
+`0.7.0` at 22:15 UTC. The channel label is not the PyPI MCP version.
+The October 19 retry of the earlier 502 is no longer needed. MCP's next
+publication still needs its Glama admin Build steps pinned and tested.
 
 Periodic checks retain only decision summaries, not full stdout or separate
 CSV/JSON snapshots. During the quiet-period experiment, retain the Core/MCP
@@ -39,7 +41,7 @@ re-runnable source of truth for the calculation is
 
 ### PyPI — `pyobfus`
 - URL: https://pypi.org/project/pyobfus/
-- Current version: **0.6.0** (released 2026-10-08) · ships with PEP 740 attestations via OIDC trusted publishing
+- Current version: **0.7.0** (released 2026-10-12) · ships with PEP 740 attestations via OIDC trusted publishing
 - Current headline: Pro artifacts can warn before a hard expiry with `--expire-warn-days`, and L3 builds can obtain application-authorized key material through `--bind-key-env`; the separately redistributable `pyobfus-runtime` introduced in 0.5.29 remains a declared dependency.
 - Prior headline (0.5.24): `--build-report` writes one versioned, privacy-safe fact model of a completed build — selection/config, transform and cache counters, verification evidence, output digests, artifact roles, marker state, and provenance linkage. Digests are evidence, not signatures; an unrequested syntax check is never reported as passed.
 - Prior headline (0.5.23): generated Community output carries a versioned, transparent build marker; generated output no longer embeds the input file's absolute path. Marker policy is configurable and recorded in dry-run/provenance facts.
@@ -643,6 +645,7 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
 ### Claude Plugin Marketplace 🔴 BLOCKED — stale repository lock (2026-09-24)
+- **2026-10-14 support update:** the original submission is under the current account; no material or other account is missing. Only the directory team can release the lock. After release, resubmit at <https://claude.ai/directory/manage> using a paid-plan account; the Console form is no longer supported. Do not change repository/path to bypass the lock.
 - **2026-09-24 resubmission attempt: the Console form rejects it with "Another submission already holds this
   repository and path" for `github.com/zhurong2020/pyobfus` (repository root).** Yet the maintainer's
   `platform.claude.com/plugins/submissions` shows `No submissions yet` in *both* workspaces on the account
@@ -664,12 +667,12 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   hidden-record symptom above, not a released record).
   Public catalog `anthropics/claude-plugins-community/.claude-plugin/marketplace.json` (2,320 entries, fetched raw) has no
   `pyobfus`, and `gh search code pyobfus --owner anthropics` is empty, so it was never approved into the public catalog.
-- Official docs (<https://code.claude.com/docs/en/plugins#submit-your-plugin-to-the-community-marketplace>) now route
+- Historical September documentation (<https://code.claude.com/docs/en/plugins#submit-your-plugin-to-the-community-marketplace>) routed
   individual authors to the Console form <https://platform.claude.com/plugins/submit>; approved plugins are pinned to a
   commit SHA and synced nightly.
 - Verified locally the same day: `claude plugin validate .` passes; installing from this checkout as a local marketplace
   succeeds (`pyobfus@pyobfus`, 2 skills, ~396 always-on tokens), then uninstalled.
-- Action: maintainer resubmits via the Console form. Copy (typo fixed) in `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`.
+- Action: wait for the directory team to release the lock, then resubmit through the developer portal. Copy (typo fixed) in `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`.
 - Console entry: `pyobfus`
 - 2026-08-24 maintainer recheck: still `Submitted and pending review`, submission date Aug 2.
 - 2026-09-07 maintainer recheck (console dump): unchanged — still `Submitted and pending review`, still dated Aug 2, now **36 days** in queue with no state transition and no request for changes. Nothing actionable; keep the passive-wait policy and re-check on the next periodic sweep.

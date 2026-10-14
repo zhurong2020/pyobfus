@@ -5,7 +5,7 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-10-14。Core 0.7.0 / runtime 0.1.1 已发布，Zenodo/CFF 与客户通知已完成；MCP 当前公开版 0.3.12。#95/#96/#97 已合并未发布。#98 已完成 Codex 审核修订、完整 CI 与本地发版前验证，并合并 main `93d3ecd`，状态见 `CURRENT_PLAN_ZH.md` 顶部。**2026-10-14 维护者决定：再观察一天，10-15 复查；届时仍等待明确发版通知，不自动发布，不创建标签或触发发布工作流。**
+最后更新：2026-10-14。Core 0.7.0 / runtime 0.1.1 已发布，MCP 当前公开版 0.3.12。维护者本次明确授权完成状态核查、文档整理和 Core → MCP 发布，取代此前观察一天/等待通知；正在准备 Core 0.7.1 / MCP 0.3.13。私有历史库 CI 已定性，Glama 502 已恢复，见 `CURRENT_PLAN_ZH.md` 顶部。
 
 ## 状态口径
 
@@ -25,18 +25,17 @@
 - Pro 客户通知已由维护者发出（10-12，5 封，含两个可选调研问题）。注意：Gmail 连接器建的草稿会把所有链接改写成 `google.com/url?q=…`（10-10 的 0.6.1 通知也是这样寄出的），以后发送前在网页编辑器里换成干净链接。
 - 发版前准备已完成（10-11）：dogfood lane A/B/C/D 全过；`examples/multifile`、动机私有项目副本用新 wheel 验证通过。
   发版清单、README 横幅、GitHub Release 说明与 Pro 客户通知草稿在私有 `docs/internal/release-0.7.0/RELEASE_PREP.md`。
-- 只发 Core：MCP 等 10-19 Glama 测试；VS Code schema 随插件下次发版。
+- 当时只发 Core；Glama 已于 10-13 恢复，MCP 现获本次发版授权；VS Code schema 随插件下次发版。
 - 观察到的后续（不阻塞 0.7.0）：包 `__init__` 用 `try: __version__ = version(...)` 时整个包的子模块访问都不改写（pyobfus 自身即如此），
   可做 H PR 4 放宽「与子模块名无关的初始化语句」。
 
-## 下一次发版（日期待维护者通知；11 月月度版本为此前计划）
+## 本次发版（2026-10-14 已获授权；Core → MCP）
 
-**当前决定（2026-10-14）**：#98 已合并且完成发版前验证；再观察一天，10-15 复查反馈与 CI。复查不等于发版授权。此前 11 月月度节奏保留为排期背景，实际发布日期以维护者后续明确通知为准。
+**当前决定（2026-10-14）**：维护者已授权发布；按兼容增量准备 Core 0.7.1、MCP 0.3.13。已于 10-14 完成 main CI、反馈和新问题复查，未发现公开产品回归；不将这次提前复查写作 10-15。原等待通知已被本次指令取代。
 
-- [ ] **10-15 复查**：检查主分支 CI、0.7.0 反馈与新问题；若没有新缺陷，不重复全量测试、不自行增加功能、不自动发版。
 - **观察与每周巡检继续。** 每周一巡检（进度 + 下载量 + Gmail）时看 0.7.0 反馈与两个调研问题的回答（离线/平台、单文件/多模块）。出现影响用户的 bug 再按例外处理。
 - **10-25 复盘**照原计划，并据客户回答决定后续优先级（例如「fusion × 目录构建」是否值得做）。
-- **待发布内容**（顺序：Core 先于 MCP；日期等待维护者通知）：
+- **待发布内容**（顺序：Core 先于 MCP；本次已授权）：
   - Core：#98 `--verify-names`（已合并）、#95 opacity 覆盖计数与警告、#96 `--check-delivery`、`--check` 点号设置键误报修复（均在 `[Unreleased]`）。发版前用一个真实交付目录（动机私有项目副本）实跑 `--check-delivery`，确认无误报。
   - MCP：#97 `check_delivery` 工具（工具数 8 → 9）。发版时同步改各处「8 tools」表述（README、`docs/DISTRIBUTION_CHANNELS.md`、CLAUDE.md、server.json 描述等），并手工更新 Glama Build steps。
   - #98 发版前检查已完成：四测试根 3521 passed / 8 skipped、check.sh、完整 PR CI、标准库 35 模块与独立 wheel 正常/部分/失败路径通过。使用范围见 `NAME_VERIFICATION.md`；实际版本确定后仍须按发布清单重建该版本，不复用标记为 0.7.0 的本地审阅 wheel。
@@ -68,7 +67,7 @@
       自动回信称只懂 Claude Code worktree 锁、需真人释放提交锁并主动提出转人工,维护者已回「yes」转人工**。
       09-25 真人支持 Rudy 回信要求核对原提交账号；维护者已查三个常用邮箱均无确认邮件，随后以同一仓库根路径
       复现锁报错，并于 09-26 在原线程附上「No submissions yet」与 repository/path lock 两张截图，提供
-      Claude Code workspace ID，请求后端定位/释放。**09-28 Rudy 回信「已升级内部，有消息再跟进」——球在对方，不必再催；锁没释放前别再点表单或换路径绕过**。**10-11 支持 Tiffany 主动回信：团队仍在处理、有进展会再联系（无需我方提供新材料）**。字段/描述与证据见
+      Claude Code workspace ID，请求后端定位/释放。**09-28 Rudy 回信「已升级内部，有消息再跟进」——球在对方，不必再催；锁没释放前别再点表单或换路径绕过**。**10-14 Tiffany 确认：原提交归属当前账号，无需补材料或寻找别的账号；目录团队解除锁后，使用 `claude.ai/directory/manage` developer portal 重提，Console 表单已停用。继续等待，不换仓库/路径重提。**。字段/描述与证据见
       `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`。
 - [x] **通知 Pro 客户升级到 0.6.1**（10-10 维护者定：发；草稿私有 `docs/internal/content-2026-10/pro_customer_notice_0.6.1.md`，10-10 已按线上许可证记录建 5 封 Gmail 草稿（每人一封、排除维护者自用许可证；未激活的那位多一句协助激活），维护者 10-10 12:35 已逐封发出（Gmail「已发送」核实 5 封、草稿箱清空）；有回信按 `/pyobfus-inbox` 跟进；取代原「是否通知升级到 0.5.32」，0.6.1 已含该修复）。原登记（2026-10-07）：0.5.10–0.5.31 的目录构建遇到同模块
       装饰器/基类/lambda 会 import 时 NameError。两位 10 月新客户如用过目录构建可能受影响；需要的话由 Claude 起草、
@@ -87,11 +86,6 @@
       会按最新 GitHub 代码安装，**无需更新提交内容**；
       ③ `--check` 仍默认联网（CLI，MCP 默认关）——10-11 定「等 Codex 这波完成后再审」，现可决定是否改默认离线；
       ⑤ 约 10-14 看 DEV 第 1 篇反响与 GitHub 流量来源，再决定是否投 HN（Show HN 已用过，只能普通投稿）。
-- [ ] **Glama 构建服务 502，10-19 周一巡检时重试一次**（2026-10-11 登记，维护者）：10-08、10-10、10-11 三次测试都在
-      毫秒级失败、无构建日志，错误为 Glama 自家 docker-modem 调构建后端得到 nginx `502 Bad Gateway`，与我们的包无关
-      （本地实测 `pyobfus-mcp 0.3.12` + Core 0.6.1 正常；公开页、徽章正常）。维护者定先等。10-19 在 Dockerfile 页点一次
-      测试：成功即勾掉；仍 502 再给 `support@glama.ai` 发一次报告（附三个 test ID，草稿见 10-11 会话），不要反复点，
-      也**不要重新提交条目**。下次发 MCP 前此项必须先通过，否则 Build steps 改版本后无法验证。
 - [ ] **0.6.1 通知的回信**（10-10 发出 5 封，身份记在私有 memory）：随每周一巡检看 Gmail。10-11 KV 实读：
       09-12 报障客户已于 10-05 联网激活成功（原「未激活」跟进结案）；另有一位 8 月客户至今从未联网激活、
       一位 6 月客户当前无设备记录，二人均未来信——回信若报激活问题按 `LICENSE_ACTIVATION_GUIDE.md` 排障，
@@ -351,8 +345,8 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 
 发版本身是独立 gate。
 
-- **Core `[Unreleased]`**：#98（已合并）、#95、#96 与 `--check` 误报修复，等待维护者通知发版（见「下一次发版」）。`0.7.0` 于 2026-10-12 发布。
-- **`pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]`**：`check_delivery` 工具（#97）、H 默认开启说明、mcp SDK 2.x 兼容、mapping 不匹配提示、关键字调用 advisory；随 11 月 Core 之后发。VS Code 插件 schema 已随 #67 同步 `preserve_param_names` 默认值，也暂不发插件。刻意不随 Core
+- **Core `[Unreleased]`**：#98（已合并）、#95、#96 与 `--check` 误报修复，已获本次发版授权（见「本次发版」）。`0.7.0` 于 2026-10-12 发布。
+- **`pyobfus_mcp/CHANGELOG.md` 的 `[Unreleased]`**：`check_delivery` 工具（#97）、H 默认开启说明、mcp SDK 2.x 兼容、mapping 不匹配提示、关键字调用 advisory；本次随 Core 0.7.1 之后发。VS Code 插件 schema 已随 #67 同步 `preserve_param_names` 默认值，也暂不发插件。刻意不随 Core
   发，攒够增量或有人明确要 2.x 时再发（每发一次 MCP 要手工改 Glama Build steps）。
 
 
@@ -398,7 +392,7 @@ V2EX 仍卡在账号激活（要邀请码）；Stack Overflow 按 2026-04-22 的
 **选题池**（真实素材，按搜索意图排；Stripe webhook 那段默认不写，待维护者定）
 
 1. Cloudflare 拦 `Python-urllib` UA（403 / error code 1010），全体付费客户两个月激活不了
-   —— **10-11 已逐条核实事实并修订，待维护者通读后发 DEV（目标 10-13/14）**，放在 gitignored 的 `docs/internal/content-2026-10/01-urllib-user-agent-postmortem.md`
+   —— **10-11 已发布 DEV，下一步观察来源与反响**，放在 gitignored 的 `docs/internal/content-2026-10/01-urllib-user-agent-postmortem.md`
    （`published: false`；维护者 09-27 定：发稿前不进公开仓库）
 2. SARIF 上传前别再 `|| true`（带出 `pyobfus-action`）—— **草稿已写 09-28**，
    `docs/internal/content-2026-10/02-sarif-or-true.md`（`published: false`，待维护者审）

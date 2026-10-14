@@ -12,8 +12,7 @@ firewalls. Everything here was checked against pyobfus 0.7.0 and
 (Linux and Windows).
 
 Before delivery, run the application tests against generated output. Core
-PR #98 also adds optional static [name verification](../NAME_VERIFICATION.md),
-merged on main but not yet in PyPI 0.7.0; it does not execute code and cannot
+Core 0.7.1 adds optional static [name verification](../NAME_VERIFICATION.md); it does not execute code and cannot
 replace target-environment tests.
 
 ## 1. Build, then keep private files out of what you ship
@@ -32,7 +31,7 @@ pyobfus --check src/            # before you ship, not after
   package it, and keep them to decode error IDs with `pyobfus-unscrub`.
 - Ship `dist/`, not `src/`. A `.pyc`-only build is not protection: public
   decompilers recover source from nearly all CPython 3.8–3.14 bytecode.
-- Check what you are about to ship (available from the release after 0.7.0; a directory or a `.whl`):
+- Check what you are about to ship (available since 0.7.1; a directory or a `.whl`):
 
   ```bash
   pyobfus --check-delivery dist/ --build-report private/build-report.json \
