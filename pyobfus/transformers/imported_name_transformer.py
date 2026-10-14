@@ -39,6 +39,18 @@ class ImportCollector(ast.NodeVisitor):
         self.protected_references: Set[Key] = set()
 
     def visit_Module(self, node: ast.Module) -> None:
+        if self.current_module in self.global_table.conservative_import_modules:
+            # Dependency exports still require synchronization. Explicit aliases
+            # retain every original binding without rewriting lexical references.
+            for part in ast.walk(node):
+                if isinstance(part, ast.Name):
+                    self.protected_references.add(key(part))
+                elif isinstance(part, ast.ImportFrom):
+                    for position, alias in enumerate(part.names):
+                        if alias.name != "*":
+                            name = alias.asname or alias.name
+                            self.preserved_imports[(key(part), position)] = (name, name)
+            return
         (
             self.reference_edits,
             self.preserved_imports,
@@ -139,6 +151,11 @@ class ImportedNameTransformer(ast.NodeTransformer):
         self.original_names = {
             key(n): n.id for n in ast.walk(original_tree) if isinstance(n, ast.Name)
         }
+        self.original_binders = {
+            key(n): getattr(n, "rest", getattr(n, "name", None))
+            for n in ast.walk(original_tree)
+            if type(n).__name__ in {"ExceptHandler", "MatchAs", "MatchStar", "MatchMapping"}
+        }
         self.import_mappings = collector.import_mappings
 
         # Track statistics
@@ -183,6 +200,26 @@ class ImportedNameTransformer(ast.NodeTransformer):
                 replacement if name in self.import_mappings else name
                 for name, replacement in zip(node.names, replacements)
             ]
+        return node
+
+    def visit_ExceptHandler(self, node: ast.ExceptHandler) -> ast.ExceptHandler:
+        self.generic_visit(node)
+        if node.name == self.original_binders.get(key(node)):
+            node.name = self.reference_edits.get(key(node), node.name)
+        return node
+
+    def visit_MatchAs(self, node: Any) -> Any:
+        self.generic_visit(node)
+        if node.name == self.original_binders.get(key(node)):
+            node.name = self.reference_edits.get(key(node), node.name)
+        return node
+
+    visit_MatchStar = visit_MatchAs
+
+    def visit_MatchMapping(self, node: Any) -> Any:
+        self.generic_visit(node)
+        if node.rest == self.original_binders.get(key(node)):
+            node.rest = self.reference_edits.get(key(node), node.rest)
         return node
 
     def get_statistics(self) -> dict:

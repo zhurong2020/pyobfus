@@ -18,6 +18,10 @@ Key = Tuple[int, int, str]
 ImportKey = Tuple[Key, int]
 
 
+class ScopeResolutionError(ValueError):
+    """The AST could not be paired with compiler scopes; preserve this module."""
+
+
 def key(node: ast.AST) -> Key:
     return (getattr(node, "lineno", -1), getattr(node, "col_offset", -1), type(node).__name__)
 
@@ -51,11 +55,16 @@ def import_plan(
         return {}, {}, {}, set()
     source = ast.unparse(tree)
     normalized = ast.parse(source)
-    relevant = (ast.Name, ast.Global, ast.Nonlocal, ast.ImportFrom)
+    string_binders = (ast.ExceptHandler,) + tuple(
+        getattr(ast, name)
+        for name in ("MatchAs", "MatchStar", "MatchMapping")
+        if hasattr(ast, name)
+    )
+    relevant = (ast.Name, ast.Global, ast.Nonlocal, ast.ImportFrom) + string_binders
     originals = [n for n in ast.walk(tree) if isinstance(n, relevant)]
     copies = [n for n in ast.walk(normalized) if isinstance(n, relevant)]
     if len(originals) != len(copies):
-        raise ValueError("Cannot correlate import binding scopes")
+        raise ScopeResolutionError("Cannot correlate import binding scopes")
     coordinates = {id(n): key(o) for o, n in zip(originals, copies)}
     mark_class_bindings(normalized)
     root = symtable.symtable(source, "<imports>", "exec")
@@ -146,7 +155,7 @@ def import_plan(
             )
             if child is None:
                 if not isinstance(node, (ast.ListComp, ast.SetComp, ast.DictComp)):
-                    raise ValueError("Cannot resolve import scope: " + name)
+                    raise ScopeResolutionError("Cannot resolve import scope: " + name)
                 child = ComprehensionScope(parent, node)
                 synthetic.append(child)
             used.add(child.get_id())
@@ -159,8 +168,45 @@ def import_plan(
             references.append((node, scopes[-1]))
             if isinstance(node.ctx, ast.Store):
                 bind(node.id)
-            if node.id in {"exec", "eval", "locals", "globals"}:
-                dynamic.update(s.get_id() for s in scopes)
+            if node.id in {"locals", "globals"}:
+                dynamic.update(s.get_id() for s in scopes if s is not root)
+
+        def visit_Call(self, node):
+            def globals_call(expr):
+                return (
+                    isinstance(expr, ast.Call)
+                    and isinstance(expr.func, ast.Name)
+                    and expr.func.id == "globals"
+                )
+
+            if (isinstance(node.func, ast.Name) and node.func.id in {"exec", "eval"}) or (
+                isinstance(node.func, ast.Attribute)
+                and globals_call(node.func.value)
+                and node.func.attr
+                not in {
+                    "keys",
+                    "values",
+                    "items",
+                    "get",
+                    "copy",
+                    "__contains__",
+                    "__getitem__",
+                    "__iter__",
+                    "__len__",
+                }
+            ):
+                dynamic.update(s.get_id() for s in scopes if s is not root or scopes[-1] is root)
+            self.generic_visit(node)
+
+        def visit_Subscript(self, node):
+            if (
+                isinstance(node.ctx, (ast.Store, ast.Del))
+                and isinstance(node.value, ast.Call)
+                and isinstance(node.value.func, ast.Name)
+                and node.value.func.id == "globals"
+            ):
+                dynamic.update(s.get_id() for s in scopes if s is not root or scopes[-1] is root)
+            self.generic_visit(node)
 
         def visit_Global(self, node):
             references.append((node, scopes[-1]))
@@ -170,11 +216,13 @@ def import_plan(
         def visit_ExceptHandler(self, node):
             if node.name:
                 bind(node.name)
+                references.append((node, scopes[-1]))
             self.generic_visit(node)
 
         def visit_MatchAs(self, node):
             if node.name:
                 bind(node.name)
+                references.append((node, scopes[-1]))
             self.generic_visit(node)
 
         visit_MatchStar = visit_MatchAs
@@ -182,12 +230,16 @@ def import_plan(
         def visit_MatchMapping(self, node):
             if node.rest:
                 bind(node.rest)
+                references.append((node, scopes[-1]))
             self.generic_visit(node)
 
-        def signature(self, node):
+        def defaults(self, node):
             args = node.args
             for default in args.defaults + [d for d in args.kw_defaults if d is not None]:
                 self.visit(default)
+
+        def signature(self, node):
+            args = node.args
             annotations = [
                 a.annotation
                 for a in args.posonlyargs + args.args + [args.vararg, args.kwarg] + args.kwonlyargs
@@ -195,11 +247,15 @@ def import_plan(
             ]
             if getattr(node, "returns", None) is not None:
                 annotations.append(node.returns)
+            self.annotations(node, annotations, signature=True)
+
+        def annotations(self, node, annotations, signature=False):
             annotation_scope = next(
                 (
                     c
                     for c in scopes[-1].get_children()
-                    if c.get_name() == "__annotate__" and c.get_lineno() == node.lineno
+                    if c.get_name() == "__annotate__"
+                    and (not signature or c.get_lineno() == node.lineno)
                 ),
                 None,
             )
@@ -218,26 +274,47 @@ def import_plan(
             if annotation_scope is not None:
                 scopes.pop()
 
+        def visit_AnnAssign(self, node):
+            self.visit(node.target)
+            if node.value is not None:
+                self.visit(node.value)
+            # Function-local variable annotations are never evaluated.
+            if str(scopes[-1].get_type()) in {"module", "class"}:
+                self.annotations(node, [node.annotation])
+
+        def type_parameters(self, node, name):
+            if not getattr(node, "type_params", []):
+                return None
+            child = next(
+                (
+                    c
+                    for c in scopes[-1].get_children()
+                    if c.get_name() == name
+                    and c.get_lineno() == node.lineno
+                    and str(c.get_type()) in {"type parameter", "type parameters"}
+                ),
+                None,
+            )
+            if child is None:
+                raise ScopeResolutionError("Cannot resolve import type-parameter scope")
+            parents[child.get_id()] = scopes[-1]
+            scopes.append(child)
+            return child
+
+        def visit_TypeAlias(self, node):
+            self.visit(node.name)
+            type_scope = self.type_parameters(node, node.name.id)
+            self.enter(node, node.name.id, lambda: self.visit(node.value))
+            if type_scope is not None:
+                scopes.pop()
+
         def definition(self, node):
             bind(node.name)
             for expr in node.decorator_list:
                 self.visit(expr)
-            type_scope = None
-            if getattr(node, "type_params", []):
-                type_scope = next(
-                    (
-                        c
-                        for c in scopes[-1].get_children()
-                        if c.get_name() == node.name and c.get_lineno() == node.lineno
-                        # 3.12 reports "type parameter"; 3.13+ "type parameters".
-                        and str(c.get_type()) in {"type parameter", "type parameters"}
-                    ),
-                    None,
-                )
-                if type_scope is None:
-                    raise ValueError("Cannot resolve import type-parameter scope")
-                parents[type_scope.get_id()] = scopes[-1]
-                scopes.append(type_scope)
+            if not isinstance(node, ast.ClassDef):
+                self.defaults(node)
+            type_scope = self.type_parameters(node, node.name)
             if isinstance(node, ast.ClassDef):
                 for expr in node.bases:
                     self.visit(expr)
@@ -254,6 +331,7 @@ def import_plan(
         visit_ClassDef = definition
 
         def visit_Lambda(self, node):
+            self.defaults(node)
             self.signature(node)
             self.enter(node, "lambda", lambda: self.visit(node.body))
 
@@ -321,15 +399,15 @@ def import_plan(
 
     def rebound(binding, name):
         assigned = binding.lookup(name).is_assigned()
-        return assigned and (binding is not root or name in rebinds)
+        return name in rebinds if binding is root else assigned
 
     for node, alias, name, replacement, binding, scope in imports:
         sid = binding.get_id()
         symbol = binding.lookup(name)
-        # At module level only a real conflict makes the spelling uncertain;
-        # `globals()` and `del` there behave as they did with the flat map.
+        # Read-only module globals() and standalone del retain normal rewriting.
+        # Dynamic execution and namespace writes must preserve bindings.
         if (
-            (sid in dynamic and binding is not root)
+            (sid in dynamic)
             or binding is not scope
             or str(binding.get_type()) in {"class", "function"}
             or rebound(binding, name)
@@ -367,11 +445,20 @@ def import_plan(
             binding = owner(scope, node.id)
             if binding is not root and str(binding.get_type()) == "function":
                 protected.add(coordinates[id(node)])
-        names = [node.id] if isinstance(node, ast.Name) else node.names
+        binder = isinstance(node, string_binders)
+        names = (
+            [node.id]
+            if isinstance(node, ast.Name)
+            else (
+                [node.rest if type(node).__name__ == "MatchMapping" else node.name]
+                if binder
+                else node.names
+            )
+        )
         replacements = [mappings[owner(scope, name).get_id()].get(name, name) for name in names]
         if any(name in mappings[owner(scope, name).get_id()] for name in names):
             edits[coordinates[id(node)]] = (
-                replacements[0] if isinstance(node, ast.Name) else replacements
+                replacements[0] if isinstance(node, ast.Name) or binder else replacements
             )
     union = {name: value for mapping in mappings.values() for name, value in mapping.items()}
     return edits, preserve, union, protected

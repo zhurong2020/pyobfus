@@ -44,6 +44,7 @@ from pyobfus.transformers.imported_name_transformer import (
     ImportCollector,
 )
 from pyobfus.transformers.local_name_transformer import LocalNameTransformer
+from pyobfus.transformers.scoped_imports import ScopeResolutionError
 from pyobfus.utils import filter_python_files
 
 
@@ -429,8 +430,37 @@ class CrossFileOrchestrator:
 
         self._register_reexports(pending_reexports)
 
+        # Prove import scopes before local and attribute plans are allocated.
+        # A compiler shape we do not understand must reduce protection rather
+        # than fail an otherwise valid project or guess reference ownership.
+        for fi in self.files:
+            try:
+                ImportCollector(self.global_table, fi.module_name).visit(
+                    ast.parse(read_python_source(fi.path))
+                )
+            except ScopeResolutionError as exc:
+                self.global_table.conservative_import_modules.add(fi.module_name)
+                for name in self.global_table.get_module_exports(fi.module_name):
+                    self.global_table.register_reexport(fi.module_name, name, name)
+                self._planning_warnings.append(
+                    f"Preserved module names and import bindings for {fi.relative_path.as_posix()}: {exc}"
+                )
+        if self.global_table.conservative_import_modules:
+            # Consumers and re-export chains must see the preserved public names.
+            for _ in range(len(pending_reexports) + 1):
+                self._register_reexports(
+                    [
+                        entry
+                        for entry in pending_reexports
+                        if entry[0].module_name not in self.global_table.conservative_import_modules
+                    ]
+                )
+
         if self.config.crossfile_local_names:
             for fi in sorted(self.files, key=lambda f: f.relative_path.as_posix()):
+                if fi.module_name in self.global_table.conservative_import_modules:
+                    self.local_plans[fi.module_name] = LocalPlan(files_skipped=1)
+                    continue
                 local_source = read_python_source(fi.path)
                 counter = self._name_counter
                 reserved = set(self._reserved_names)

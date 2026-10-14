@@ -1964,7 +1964,7 @@ def _obfuscate_directory_crossfile(
         if transform_errors and config.crossfile_module_attributes:
             from pyobfus.exceptions import TransformError
 
-            raise TransformError("Module attribute build failed: " + "; ".join(transform_errors))
+            raise TransformError("Cross-file transformation failed: " + "; ".join(transform_errors))
 
         # Merge the per-file content-transform counts (string encoding, numeric,
         # control-flow, string encryption, anti-debug, dead-code, AI stripping)

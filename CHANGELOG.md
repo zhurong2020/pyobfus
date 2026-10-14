@@ -18,7 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   rewriting can handle aliases that share a spelling with a direct import in
   another scope. Ambiguous bindings preserve local import aliases; dynamic
   module rebinding that cannot be synchronized safely rejects the build with
-  an `exclude_names` hint.
+  an `exclude_names` hint. PEP 695 defaults and type-alias values, and Python
+  3.14 deferred variable annotations, now follow their compiler scopes.
+  Unrecognized import scopes preserve module names and report the reason.
+  Exception and pattern capture bindings stay synchronized with their uses;
+  module `exec`/`eval` and namespace writes retain conservative handling while
+  read-only `globals()` and standalone deletion keep normal rewriting.
 
 ## [0.7.1] - 2026-10-14
 

@@ -52,6 +52,8 @@ class GlobalSymbolTable:
         self.module_exports: Dict[str, Dict[str, str]] = {}
         # Local reverse mappings are separate from importable exports.
         self.local_mappings: Dict[str, Dict[str, str]] = {}
+        # Modules whose compiler scopes could not be proved safe for renaming.
+        self.conservative_import_modules: Set[str] = set()
 
         # Import statements: file_path -> [ImportInfo, ...]
         # Track what each file imports for validation
