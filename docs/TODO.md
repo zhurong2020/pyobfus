@@ -188,6 +188,8 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       根因：ImportedNameTransformer 的 `import_mappings` 按模块扁平存放，函数内导入覆盖模块级条目。
       **10-11 更正**：原记「默认（开启局部改名）正确」不对——Claude 用 PyPI 版在干净 venv 实测，默认模式下 0.6.0（`I2` 未定义）
       与 0.6.1/main（`helper` 未定义）都失败，`--no-crossfile-local-names` 同样失败。
+      **10-14 复评**：发布版 0.7.1 / 当前源码、局部改名开/关共 48 次构建；函数/嵌套函数/async 同名别名的 12 个未检查构建都在运行时报 NameError，`--verify-names` 对应 12 次均在构建期 exit 1。反向定义顺序与非冲突对照正常，说明结果受收集顺序影响；`--check` 未提示最小复现。精确保留冲突导出名 `helper` 的 YAML 绕法在开/关局部改名时均通过，不推广为任意导入冲突的保证。
+      **建议修复范围**：导入映射按 Python 词法作用域收集/查询，模块级映射不受函数局部别名污染；保留函数内无别名导入改写，并覆盖定义时表达式、nested/async、global/nonlocal 与类体边界。先写有区分力的回归与关闭开关/真实产物对照，再独立审核。本轮只评估、未修改转换器、未发新版。
 - [x] **既有缺陷 F · 单文件模式默认改参数但不改关键字调用（优先，0.5.32 已存在）**：同文件 `scale(1, factor=3)` 即 TypeError；
       含 `/`、`*args`、`**kwargs` 的签名还会静默绑错（关键字落进 `**kwargs`、参数取默认值）。无预设、safe、balanced、aggressive
       在 0.5.32 / 0.6.0 都是 `preserve_param_names=False`（框架预设与 library 为 True）。**10-10 已合并 PR #67（`ed8cceb`），随 0.6.1 发布**；审核记录私有 `docs/internal/geo-2026-10/PR67_REVIEW_2026-10-10.md`：
