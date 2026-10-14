@@ -32,11 +32,17 @@ published October 14 at 12:33 (Asia/Shanghai). A second test at 13:08,
 `01a138cf-75c7-7438-9379-3a10be59dc47`, succeeds in 7.8s but still checks
 out d2d5703 with pinnedCommit=null. Glama rejects the release SHA as Commit
 not found although GitHub independently confirms it exists. Repository Sync
-was requested; the last observed state is Sync in Progress. Await completion
-and verify the saved source pin; do not repeat the existing channel release.
-Sync/index lag is an inference, not a confirmed diagnosis. Package/handshake
-evidence does not establish source-pin alignment or execution of every tool
-in the image.
+was requested and completed: the maintainer-supplied Repository page shows last sync
+attempt October 14 13:51 (Asia/Shanghai) and last known commit `22ecd62`. The
+Dockerfile page now pins `22ecd62`, and the generated Dockerfile runs
+`git checkout 22ecd6200e6a2ea57ad254997f5244a3a692aec0` before installing the
+pinned PyPI packages. `22ecd62` descends from release commit `37c3c41` and
+differs only in documentation and `CITATION.cff`; the server itself is the
+PyPI-installed package, so this pin is accepted instead of the release SHA,
+which Glama apparently cannot select because it only records synced heads
+(inference, not confirmed). At the next MCP release, update both the Build
+steps package pins and this commit pin (or clear it). Package/handshake
+evidence does not establish execution of every tool in the image.
 
 Periodic checks retain only decision summaries, not full stdout or separate
 CSV/JSON snapshots. During the quiet-period experiment, retain the Core/MCP

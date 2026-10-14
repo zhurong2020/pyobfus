@@ -162,7 +162,9 @@ def test_dynamic_module_rebinding_requires_preservation(tmp_path, local_names):
     assert rebuilt.returncode == 0, rebuilt.stdout + rebuilt.stderr
     actual = run(["app.py"], output)
     assert actual.returncode == 0, actual.stderr
-    assert actual.stdout == original.stdout == b"300\n"
+    assert (
+        actual.stdout.replace(b"\r\n", b"\n") == original.stdout.replace(b"\r\n", b"\n") == b"300\n"
+    )
 
 
 # Independent round-two review: execute each artifact, including expected failures.
@@ -335,7 +337,7 @@ def test_globals_mutation_keeps_import_binding(tmp_path, operation):
     assert built.returncode == 0, built.stdout + built.stderr
     actual = subprocess.run([sys.executable, "app.py"], cwd=output, env=env, capture_output=True)
     assert actual.returncode == 0, actual.stderr
-    assert actual.stdout == b"9\n"
+    assert actual.stdout.replace(b"\r\n", b"\n") == b"9\n"
 
 
 def test_unresolved_import_scope_preserves_module_and_consumers(tmp_path, monkeypatch):
@@ -373,7 +375,7 @@ def test_unresolved_import_scope_preserves_module_and_consumers(tmp_path, monkey
     env = dict(os.environ, HOME=str(tmp_path / "home"), USERPROFILE=str(tmp_path / "home"))
     actual = subprocess.run([sys.executable, "app.py"], cwd=output, env=env, capture_output=True)
     assert actual.returncode == 0, actual.stderr
-    assert actual.stdout == b"4\n"
+    assert actual.stdout.replace(b"\r\n", b"\n") == b"4\n"
 
 
 @pytest.mark.parametrize("local_names", [True, False])
