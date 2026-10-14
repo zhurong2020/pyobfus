@@ -16,6 +16,7 @@ from dataclasses import dataclass
 
 from pyobfus.config import ObfuscationConfig
 from pyobfus.core.class_bindings import mark_class_bindings
+from pyobfus.core.enum_injection import enum_injection_plan
 from pyobfus.core.function_locals import LocalPlan, plan_locals, apply_local_plan
 from pyobfus.core import content_transforms
 from pyobfus.core.module_attributes import (
@@ -350,6 +351,15 @@ class CrossFileOrchestrator:
             self._reserved_names.update(self.config.exclude_names)
         for fi in self.files:
             tree = ASTParser.parse_file(fi.path)
+            injection = enum_injection_plan(tree)
+            injection.require_static()
+            self._reserved_names.update(injection.preserved)
+            if injection.preserve_module:
+                self.global_table.conservative_import_modules.add(fi.module_name)
+                self._planning_warnings.append(
+                    f"Preserved module names and import bindings for {fi.relative_path.as_posix()}: "
+                    "enum.global_enum combined with module-level __getattr__"
+                )
             for node in ast.walk(tree):
                 # Explicit aliases survive even when local renaming is off;
                 # newly allocated definitions must not collide with them.
@@ -377,7 +387,11 @@ class CrossFileOrchestrator:
 
             detector = ExportDetector()
             detector.visit(tree)
-            exports = detector.get_exports()
+            injection = enum_injection_plan(tree)
+            injection.require_static()
+            exports = detector.get_exports() | set(
+                name for cls in injection.classes for name in cls.members
+            )
 
             # Update file_info
             file_info.exports = exports
@@ -401,6 +415,9 @@ class CrossFileOrchestrator:
             # reproduce.
             for export_name in sorted(exports):
                 # Skip names that should be preserved
+                if export_name in injection.preserved:
+                    self.global_table.register_preserved_export(file_info.module_name, export_name)
+                    continue
                 if self._should_preserve_name(export_name):
                     continue
 

@@ -147,7 +147,7 @@ def test_global_enum_json(tmp_path, imports, decorator, base):
     assert len(findings) == 1
     assert findings[0]["severity"] == "medium"
     assert "Color" in findings[0]["message"]
-    assert "exclude_names: RED, BLUE." in findings[0]["suggestion"]
+    assert "Automatically preserved member names: RED, BLUE." in findings[0]["suggestion"]
     assert payload["ai_hint"].startswith("Low risk. Run:")
 
 
@@ -212,7 +212,7 @@ def test_enum_private_and_ignored_members(tmp_path):
         encoding="utf-8",
     )
     suggestion = advisories(check_json(source), "enum.global_enum")[0]["suggestion"]
-    assert "exclude_names: _RED, BLUE." in suggestion
+    assert "Automatically preserved member names: _RED, BLUE." in suggestion
     assert "ignored" not in suggestion
 
 

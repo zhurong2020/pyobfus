@@ -2004,7 +2004,7 @@ def _obfuscate_directory_crossfile(
         return dir_stats
 
     except Exception as e:
-        if config.crossfile_module_attributes and isinstance(e, PyObfusError):
+        if isinstance(e, PyObfusError):
             raise  # The outer CLI handler emits the stable failure JSON envelope.
         click.echo(f"\nError during cross-file obfuscation: {e}", err=True)
         if verbose:

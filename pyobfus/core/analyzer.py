@@ -11,6 +11,7 @@ from collections import defaultdict
 from typing import Dict, Set, Optional
 
 from pyobfus.config import ObfuscationConfig
+from pyobfus.core.enum_injection import enum_injection_plan
 
 
 class SymbolAnalyzer(ast.NodeVisitor):
@@ -29,6 +30,7 @@ class SymbolAnalyzer(ast.NodeVisitor):
             config: Obfuscation configuration
         """
         self.config = config
+        self._injected_names: Set[str] = set()
 
         # Symbol tables
         self.local_names: Set[str] = set()  # Local variables, functions, classes
@@ -72,6 +74,10 @@ class SymbolAnalyzer(ast.NodeVisitor):
         Args:
             tree: AST module to analyze
         """
+        injection = enum_injection_plan(tree)
+        injection.require_static()
+        self._injected_names = injection.preserved
+
         # Visit all nodes in the tree
         self.visit(tree)
 
@@ -332,6 +338,7 @@ class SymbolAnalyzer(ast.NodeVisitor):
 
         # Remove globally excluded names from config
         candidates -= self.config.exclude_names
+        candidates -= self._injected_names
 
         # Remove auto-detected public APIs if enabled
         if self._auto_detect_public:

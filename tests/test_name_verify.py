@@ -302,8 +302,8 @@ def test_global_declaration_does_not_hide_generated_defect(tmp_path: Path) -> No
     assert [e["name"] for e in result["errors"]] == ["I0"]
 
 
-def test_name_failure_on_actual_transformed_runtime_injection(tmp_path: Path) -> None:
-    """A real transform can compile successfully and still lose injected names."""
+def test_names_valid_on_actual_transformed_runtime_injection(tmp_path: Path) -> None:
+    """Preserved runtime-injected members must pass name verification."""
     source = tmp_path / "app.py"
     source.write_text(
         "from enum import global_enum, IntEnum\n@global_enum\nclass Color(IntEnum):\n    RED = 1\nprint(RED)\n"
@@ -319,10 +319,9 @@ def test_name_failure_on_actual_transformed_runtime_injection(tmp_path: Path) ->
             "--json",
         ],
     )
-    assert result.exit_code == 1, result.output
+    assert result.exit_code == 0, result.output
     payload = json.loads(result.output)
-    assert payload["error_type"] == "NameVerificationError"
-    assert payload["verification"]["errors"]
+    assert payload["name_verification"]["names_valid"]
 
 
 def test_unrequested_names_leave_existing_json_contract_unchanged(tmp_path: Path) -> None:

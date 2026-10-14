@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Preserve statically assigned `enum.global_enum` member names automatically in
+  single-file and directory builds, including references, `__all__`, imports,
+  and module attribute access. Modules with a module-level `__getattr__` retain
+  their binding names too, keeping standard-library `calendar` exports usable.
+  Dynamic enum construction and unsupported metaprogramming fail with an
+  explicit diagnostic rather than silently producing broken artifacts.
+- Add artifact execution regressions for global rebinding of imported names by
+  assignment and re-import (already fixed in 0.7.2, PR #99).
+
 ## [0.7.2] - 2026-10-14
 
 ### Fixed

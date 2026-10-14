@@ -10,6 +10,7 @@ from typing import Dict, Optional, Set, cast
 
 from pyobfus.config import ObfuscationConfig
 from pyobfus.core.analyzer import SymbolAnalyzer
+from pyobfus.core.enum_injection import enum_injection_plan
 from pyobfus.core.transformer import BaseTransformer
 
 
@@ -124,6 +125,9 @@ class NameMangler(BaseTransformer):
         self._preserved_names = _function_nested_definition_names(
             tree
         ) | _class_annotated_field_names(tree)
+        injection = enum_injection_plan(tree)
+        injection.require_static()
+        self._preserved_names.update(injection.preserved)
 
         # Build name mapping
         if self.analyzer:

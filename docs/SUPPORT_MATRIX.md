@@ -88,8 +88,8 @@ supported. Arbitrary initializer calls, dynamic or star re-exports,
 conditional imports, late/competing bindings, namespace packages, cycles,
 mutations, escapes and reflection remain unproved. A rename-table entry must
 also correspond to a proved unconditional source binding; dynamically supplied
-exports (including `enum.global_enum` injections), standard-library root
-collisions and same-named package/module roots are rejected. Existing flat-import and
+exports other than supported static `enum.global_enum` injections,
+standard-library root collisions and same-named package/module roots are rejected. Existing flat-import and
 global-rebinding conflicts (I/D) are rejected rather than repaired. Preserve
 affected exports with `exclude_names`; a clean check cannot establish safety
 for unknown consumers. Behavioral evidence:
@@ -141,15 +141,22 @@ have no H advisory; remaining medium `compatibility_advisory` findings explain
 uncertainty and suggest direct `from` imports or `exclude_names`. A clean scan
 cannot prove safety for unknown consumers or arbitrary reflection.
 
-**Limitation C:** `@enum.global_enum` (including
-`from enum import global_enum; @global_enum`) injects enum member names into the
-module namespace at runtime. Obfuscation can rename references and `__all__`
-entries while the injected names retain their original spelling, causing
-`NameError`. Add the enum's member names to `exclude_names`. `--check` reports a
-medium `compatibility_advisory` naming the decorated class and listing static
-member candidates (up to ten, with a count of additional names). Only the known
-`enum.global_enum` decorator is detected; other runtime injection mechanisms
-need separate analysis. Neither advisory changes transformation behavior,
+**Runtime enum exports (C):** `@enum.global_enum` (including explicit import
+aliases and `@enum._simple_enum(enum.IntEnum)`) automatically preserves static
+member assignments and `auto()` members in single-file and directory builds.
+References, `__all__`, imports and module attributes retain the member spelling.
+`--check` reports the automatically preserved names. `_ignore_` spellings and
+`_missing_` methods remain intact. For modules that also define module-level
+`__getattr__`, all module export spellings are conservatively preserved so ordinary
+exports remain accessible even when H cannot prove attribute rewrites.
+
+Computed enum owners, custom bases/metaclasses, additional unknown decorators,
+computed member values, control flow in the class body and custom enum methods
+other than `_missing_` are rejected with an explicit build diagnostic. Rewrite
+these as static decorated enums before building. This analysis resolves explicit
+lexical imports; helper aliases assigned at runtime, star-imported decorators,
+and other runtime injection mechanisms require separate analysis. These rules
+are Community correctness behavior and do not change the JSON contract,
 exit-code rules or the existing medium-finding AI hint.
 
 Single-file builds preserve the spelling of a function or class whose lexical
