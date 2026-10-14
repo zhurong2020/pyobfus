@@ -22,11 +22,12 @@ reverse-map protected production tracebacks for developers and AI coding
 agents. Community is Apache-2.0, has no file or line limits, and requires no
 trial.
 
-> **What's new in v0.7.1:** opt-in `--verify-names` checks generated modules
-> for newly unbound globals without executing code. `--check-delivery` inspects
-> final directories and wheels for private mappings, private keys and original
-> source; Pro opacity reports now count encrypted and skipped functions.
-> Review partial coverage and rerun your application tests; see the
+> **What's new in v0.7.2:** directory builds no longer break when a function
+> imports a name under an alias that is also imported at module level
+> (`from pkg.core import scale as helper` next to `from pkg.core import helper`),
+> which raised `NameError`. Import references now follow Python's scope rules,
+> including closures, `global`/`nonlocal`, class bodies, comprehensions and
+> PEP 695 generics. Rebuild and rerun your tests; see the
 > [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
 
 ## Why pyobfus
