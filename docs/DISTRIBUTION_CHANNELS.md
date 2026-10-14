@@ -15,7 +15,7 @@ Marketplace reports `14 installs`; Open VSX reports `682 downloads` (fetches,
 not unique installs). Action attribution remains `0` visible repositories.
 GitHub rolling 14-day traffic is `182 views / 106 unique visitors`; Google is
 first (`23 / 20`) and DEV/Reddit do not appear in the referrers.
-Current public versions are Core `0.7.1`, MCP `0.3.13`, runtime `0.1.1`,
+Current public versions are Core `0.7.2`, MCP `0.3.13`, runtime `0.1.1`,
 and VS Code/Open VSX `0.4.3`. Core/MCP were published on October 14 with
 verified PEP 740 attestations for both wheel and sdist; fresh Python 3.10/3.14
 installations and contract smoke checks passed. The official MCP Registry
@@ -60,8 +60,8 @@ re-runnable source of truth for the calculation is
 
 ### PyPI — `pyobfus`
 - URL: https://pypi.org/project/pyobfus/
-- Current version: **0.7.1** (released 2026-10-14) · ships with PEP 740 attestations via OIDC trusted publishing
-- Current headline (0.7.1): optional static global-name verification and final directory/wheel delivery checks; Pro opacity coverage counts and warnings.
+- Current version: **0.7.2** (released 2026-10-14) · ships with PEP 740 attestations via OIDC trusted publishing
+- Current headline (0.7.2): directory builds resolve imported names by lexical scope, so a function-local alias no longer breaks a module-level import of the same name (defect I).
 - Prior headline: Pro artifacts can warn before a hard expiry with `--expire-warn-days`, and L3 builds can obtain application-authorized key material through `--bind-key-env`; the separately redistributable `pyobfus-runtime` introduced in 0.5.29 remains a declared dependency.
 - Prior headline (0.5.24): `--build-report` writes one versioned, privacy-safe fact model of a completed build — selection/config, transform and cache counters, verification evidence, output digests, artifact roles, marker state, and provenance linkage. Digests are evidence, not signatures; an unrequested syntax check is never reported as passed.
 - Prior headline (0.5.23): generated Community output carries a versioned, transparent build marker; generated output no longer embeds the input file's absolute path. Marker policy is configurable and recorded in dry-run/provenance facts.
@@ -282,7 +282,7 @@ re-runnable source of truth for the calculation is
   prior is not evidence of an actual review. Continue tracking installs and
   real reviews, not raw update/download count alone.
 - Wiki: disabled · Discussions: enabled · Issues: open
-- Releases: latest Core `v0.7.1`, runtime `runtime-v0.1.1`, MCP `mcp-v0.3.13`, and VS Code
+- Releases: latest Core `v0.7.2`, runtime `runtime-v0.1.1`, MCP `mcp-v0.3.13`, and VS Code
   `vscode-v0.4.3`; MCP releases attach wheel+sdist.
 
 ### Open VSX — `zhurong2020.pyobfus` 🟢 LIVE
