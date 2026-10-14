@@ -23,6 +23,8 @@ class _ModuleEffects(ast.NodeVisitor):
         self.dynamic = True
 
     def visit_FunctionDef(self, node: Union[ast.FunctionDef, ast.AsyncFunctionDef]) -> None:
+        if node.decorator_list:
+            self.dynamic = True  # Applying a decorator is an implicit call.
         for expr in (
             node.decorator_list
             + node.args.defaults
@@ -41,6 +43,17 @@ class _ModuleEffects(ast.NodeVisitor):
             self.visit(node.returns)
 
     visit_AsyncFunctionDef = visit_FunctionDef
+
+    def visit_ClassDef(self, node: ast.ClassDef) -> None:
+        if node.decorator_list or node.bases or node.keywords or getattr(node, "type_params", []):
+            # Decorators, metaclasses and inherited __init_subclass__ can
+            # mutate the defining module while constructing the class.
+            self.dynamic = True
+        self.generic_visit(node)
+
+    def visit_Global(self, node: ast.Global) -> None:
+        # A class body can bind module globals without a visible module store.
+        self.dynamic = True
 
     def visit_Lambda(self, node: ast.Lambda) -> None:
         for expr in node.args.defaults + [d for d in node.args.kw_defaults if d is not None]:

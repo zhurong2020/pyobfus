@@ -80,7 +80,8 @@ export set; otherwise underscore names are excluded. Explicit imports can still
 access forwarded bindings omitted from the shim's own `__all__`. Definitions
 and imports that overwrite a forwarded name retain execution order. Dynamic
 `__all__`, module `__getattr__`, conditional namespaces, external-derived
-wildcard namespaces, executable initializer effects and cycles retain wildcard statements and preserve **all
+wildcard namespaces, executable initializer effects (including decorators,
+metaclasses and class-body global stores) and cycles retain wildcard statements and preserve **all
 project global spellings**, with a build warning. This intentionally sacrifices
 global renaming for that build rather than guessing an incomplete export set;
 function-local renaming remains available. External wildcard statements are

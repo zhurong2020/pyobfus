@@ -121,6 +121,24 @@ import pytest
             "",
             "import pkg\nprint(pkg.helper(1), pkg.LIMIT)\n",
         ),
+        (
+            "from pkg.bridge import inject\n@inject\nclass Marker: pass\nLIMIT = 7\n",
+            "from pkg.core import *\n",
+            "def inject(cls):\n    import sys\n    sys.modules['pkg.core'].helper = lambda value: value + 1\n    return cls\n",
+            "from pkg.shim import helper, LIMIT\nprint(helper(1), LIMIT)\n",
+        ),
+        (
+            "from pkg.bridge import Meta\nclass Marker(metaclass=Meta): pass\nLIMIT = 7\n",
+            "from pkg.core import *\n",
+            "class Meta(type):\n    def __new__(mcls, name, bases, namespace):\n        import sys\n        sys.modules['pkg.core'].helper = lambda value: value + 1\n        return super().__new__(mcls, name, bases, namespace)\n",
+            "from pkg.shim import helper, LIMIT\nprint(helper(1), LIMIT)\n",
+        ),
+        (
+            "class Namespace:\n    global helper\n    helper = lambda value: value + 1\nLIMIT = 7\n",
+            "from pkg.core import *\n",
+            "",
+            "from pkg.shim import helper, LIMIT\nprint(helper(1), LIMIT)\n",
+        ),
     ],
 )
 def test_star_forwarding(tmp_path, local_names, verify, core, shim, bridge, app):
