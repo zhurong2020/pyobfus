@@ -5,7 +5,7 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-10-14。Core 0.7.1 / MCP 0.3.13 已发布，runtime 0.1.1 保持不变；#95/#96/#97/#98 已全部随本次发布，Core/MCP Unreleased 均为空。发布前完整 CI 与本地四测试根通过，PyPI 发布包和 PEP 740 已独立验证，Registry 与 Zenodo/CFF 已同步。私有历史库 CI 已定性，Glama 502 已恢复；Glama 安装/握手/9 工具测试与渠道记录更新已由维护者完成，源码 checkout 与 release commit 的差异见当前计划顶部。
+最后更新：2026-10-14。Core 0.7.1 / MCP 0.3.13 已发布，runtime 0.1.1 保持不变；#95/#96/#97/#98 已全部随本次发布，Core/MCP Unreleased 均为空。发布前完整 CI 与本地四测试根通过，PyPI 发布包和 PEP 740 已独立验证，Registry 与 Zenodo/CFF 已同步。私有历史库 CI 已定性，Glama 502 已恢复；Glama 安装/握手/9 工具测试、渠道记录与源码 pin（`22ecd62`）均已完成。
 
 ## 状态口径
 
@@ -26,7 +26,7 @@
 |---|---|---|
 | 1 | **缺陷 I：词法作用域导入映射修复** | 按下方已评估范围补回归并修复；覆盖模块/函数/nested/async、定义时表达式和作用域边界，对照原文/产物行为，确认原 48 次评估中的故障样例运行正确。独立审核后再由维护者决定合并，发版另行授权。 |
 | 2 | **私有下游下一候选验收** | 构建工具迁移已完成，但未重建交付包；下一候选须审查 4 个星号导入跳过项，区分 Community 合同验证与真实 Pro/Windows 验收，并执行下游现有安装/升级/运行闸门，不将旧候选测试当新构建证据。 |
-| 3 | **Glama 仓库同步与源码 pin 收尾** | 维护者已点 Repository Sync，最后反馈为 **Sync in Progress**。等其结束，不重复点击/构建；GitHub 已确认 `v0.7.1` 与发布 SHA `37c3c4165e0507ea6a421380867de2f2031eb060` 存在。此前 Glama 报 Commit not found、known head/checkout 仍 `d2d5703`，只推测平台同步滞后，未确认根因。同步后核实 known commit，再保存发布 SHA，并以预览/新测试 checkout 为准；仍失败则保留包版本 pin，记录平台问题，不反复测试、不重新提交 listing。此前 release 0.7.1 已明确创建，MCP 0.3.13 / 9 tools 启动测试已成功，无需重复发布相同配置。 |
+| 3 | ~~Glama 仓库同步与源码 pin~~（10-14 完成） | 维护者提供页面：Repository Sync 13:51 完成、known commit `22ecd62`；Dockerfile 已 pin `22ecd62`（发布 `37c3c41` 的后代，仅文档/CFF 差异，服务来自 PyPI 包，接受）。下次发 MCP 时同时更新 Build steps 包版本与 commit pin（或清空）。无剩余动作。 |
 | 4 | **10-19 周一巡检** | 下载安静日、客户反馈/调研回答、CI、许可证监控、KV 备份、Anthropic 插件解锁消息；仅留决策摘要。 |
 | 5 | **10-25 复盘** | 区分发布/次日/内容流量，综合下载、trial、客户回答和 DEV 来源，决定下轮优先级与发布节奏。 |
 
