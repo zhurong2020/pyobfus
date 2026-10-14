@@ -63,7 +63,23 @@ CASES = {
     "module-assignment": PREFIX + "helper = lambda value: value*10\nprint(helper(3))\n",
     "del": PREFIX
     + "def local():\n    try:\n        del helper\n    except UnboundLocalError:\n        return 'unbound'\nprint(helper(3), local())\n",
+    "duplicate-name": "from pkg.core import helper, helper as again\n"
+    + "def local():\n    from pkg.core import scale as again\n    return again(2)\nprint(helper(3), again(3), local())\n",
+    "module-del": PREFIX + "print(helper(3))\ndel helper\nprint('helper' in globals())\n",
+    "module-globals": PREFIX
+    + "def names():\n    return sorted(k for k in globals() if not k.startswith('_'))\n"
+    + "def local():\n    from pkg.core import scale as helper\n    return helper(2)\nprint(helper(3), local(), len(names()))\n",
+    "pep695-function": PREFIX
+    + "def local[T](value: T) -> T:\n    from pkg.core import scale as helper\n    return helper(value)\n"
+    + "def plain[T](value: T) -> T:\n    return helper(value)\nprint(local(2), plain(2))\n",
+    "pep695-class": PREFIX + "class Box[T]:\n    value = helper(1)\nprint(Box.value)\n",
 }
+
+# PEP 695 syntax: the source itself only runs on Python 3.12+.
+NEEDS_312 = {"pep695-function", "pep695-class"}
+# Collision-free module bindings keep the main-branch rewriting: `del` and a
+# read of globals() alone must not fall back to the original spelling.
+OBFUSCATED_IMPORT = {"module-del", "module-globals"}
 
 
 @pytest.mark.parametrize("cross_file", [True, False])
@@ -71,6 +87,8 @@ CASES = {
 @pytest.mark.parametrize("local_names", [True, False])
 @pytest.mark.parametrize("verify", [True, False])
 def test_scoped_import_artifact(tmp_path, case, local_names, verify, cross_file):
+    if case in NEEDS_312 and sys.version_info < (3, 12):
+        pytest.skip("PEP 695 syntax requires Python 3.12+")
     src = tmp_path / "src"
     (src / "pkg").mkdir(parents=True)
     (src / "pkg/__init__.py").write_text("")
@@ -104,6 +122,10 @@ def test_scoped_import_artifact(tmp_path, case, local_names, verify, cross_file)
     actual = run(entry, out)
     assert actual.returncode == 0, actual.stderr
     assert actual.stdout == original.stdout
+    if cross_file and case in OBFUSCATED_IMPORT:
+        emitted = (out / relative).read_text().splitlines()
+        module_imports = [line for line in emitted if line.startswith("from pkg.core import")]
+        assert module_imports and all(" as " not in line for line in module_imports), emitted
 
 
 @pytest.mark.parametrize("local_names", [True, False])

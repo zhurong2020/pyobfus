@@ -13,7 +13,9 @@ from typing import Any, Dict, Set, Tuple
 from pyobfus.core.class_bindings import mark_class_bindings
 
 Key = Tuple[int, int, str]
-ImportKey = Tuple[Key, str]
+# (statement coordinate, alias position): one statement may import the same
+# original name twice (`from m import f, f as g`), so the name is not unique.
+ImportKey = Tuple[Key, int]
 
 
 def key(node: ast.AST) -> Key:
@@ -72,6 +74,13 @@ def import_plan(
     used = set()
     dynamic = set()
     synthetic = []
+    # Module names rebound other than by import or `del`. symtable reports a
+    # deleted import as assigned; `del X` alone leaves the import binding sound.
+    rebinds: Set[str] = set()
+
+    def bind(name):
+        if owner(scopes[-1], name) is root:
+            rebinds.add(name)
 
     class ComprehensionScope:
         """PEP 709 omits tables for inlined comprehensions on Python 3.12+."""
@@ -148,6 +157,8 @@ def import_plan(
 
         def visit_Name(self, node):
             references.append((node, scopes[-1]))
+            if isinstance(node.ctx, ast.Store):
+                bind(node.id)
             if node.id in {"exec", "eval", "locals", "globals"}:
                 dynamic.update(s.get_id() for s in scopes)
 
@@ -155,6 +166,23 @@ def import_plan(
             references.append((node, scopes[-1]))
 
         visit_Nonlocal = visit_Global
+
+        def visit_ExceptHandler(self, node):
+            if node.name:
+                bind(node.name)
+            self.generic_visit(node)
+
+        def visit_MatchAs(self, node):
+            if node.name:
+                bind(node.name)
+            self.generic_visit(node)
+
+        visit_MatchStar = visit_MatchAs
+
+        def visit_MatchMapping(self, node):
+            if node.rest:
+                bind(node.rest)
+            self.generic_visit(node)
 
         def signature(self, node):
             args = node.args
@@ -191,6 +219,7 @@ def import_plan(
                 scopes.pop()
 
         def definition(self, node):
+            bind(node.name)
             for expr in node.decorator_list:
                 self.visit(expr)
             type_scope = None
@@ -199,9 +228,9 @@ def import_plan(
                     (
                         c
                         for c in scopes[-1].get_children()
-                        if c.get_name() == node.name
-                        and c.get_lineno() == node.lineno
-                        and str(c.get_type()) == "type parameters"
+                        if c.get_name() == node.name and c.get_lineno() == node.lineno
+                        # 3.12 reports "type parameter"; 3.13+ "type parameters".
+                        and str(c.get_type()) in {"type parameter", "type parameters"}
                     ),
                     None,
                 )
@@ -289,14 +318,21 @@ def import_plan(
     for binding, name in other_imports:
         candidates[(binding.get_id(), name)].add(name)
     uncertain = set()
+
+    def rebound(binding, name):
+        assigned = binding.lookup(name).is_assigned()
+        return assigned and (binding is not root or name in rebinds)
+
     for node, alias, name, replacement, binding, scope in imports:
         sid = binding.get_id()
         symbol = binding.lookup(name)
+        # At module level only a real conflict makes the spelling uncertain;
+        # `globals()` and `del` there behave as they did with the flat map.
         if (
-            sid in dynamic
+            (sid in dynamic and binding is not root)
             or binding is not scope
             or str(binding.get_type()) in {"class", "function"}
-            or symbol.is_assigned()
+            or rebound(binding, name)
             or symbol.is_parameter()
             or len(candidates[(sid, name)]) > 1
         ):
@@ -306,7 +342,7 @@ def import_plan(
         spelling = name if alias.asname or (sid, name) in uncertain else replacement
         # Module assignments are already rewritten by the export pass. Keep
         # the import and all references on that same registered spelling.
-        if binding is root and binding.lookup(name).is_assigned():
+        if binding is root and rebound(binding, name):
             if sid in dynamic:
                 raise ValueError(
                     f"Cannot safely synchronize dynamic module import binding {name!r}; "
@@ -315,7 +351,7 @@ def import_plan(
             spelling = table.get_obfuscated_import(module, name) or name
         mappings[sid][name] = spelling
         if spelling != replacement or alias.asname is not None:
-            preserve[(coordinates[id(node)], alias.name)] = (name, spelling)
+            preserve[(coordinates[id(node)], node.names.index(alias))] = (name, spelling)
     edits = {}
     protected = set()
     for node, scope in references:

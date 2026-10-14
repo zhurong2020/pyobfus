@@ -101,13 +101,11 @@ class ImportRewriter(ast.NodeTransformer):
         new_names = []
         any_rewritten = False
 
-        for alias in node.names:
+        for position, alias in enumerate(node.names):
             original_name = alias.name
             asname = alias.asname
-            if (key(node), original_name) in self.preserved_imports:
-                original_binding, planned_binding = self.preserved_imports[
-                    (key(node), original_name)
-                ]
+            if (key(node), position) in self.preserved_imports:
+                original_binding, planned_binding = self.preserved_imports[(key(node), position)]
                 # The function-local plan may already have allocated an alias.
                 if asname is None or asname == original_binding:
                     asname = planned_binding
