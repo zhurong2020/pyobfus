@@ -85,7 +85,7 @@ Core 0.7.2（缺陷 I，PR #99）与 0.7.3（缺陷 C #100、M #101）均经 Cod
   10-25 复盘用 09-27→10-06 窗口）**：静默 4 周（10-25 前不发 Core）→ 每月一版
   → 只做有触发的事 → 每周一巡检；全文 `docs/TODO.md`「节奏」段。**查进度固定动作：进度 + 下载量
   （`python scripts/download_snapshot.py`）+ Gmail（`/pyobfus-inbox`），三样一起给**，缺一样不算查过。
-- 「当前状态一句话」：Core 0.7.3（缺陷 C global_enum #100、M 星号转发 #101）已于 10-15 发布，0.7.2 为缺陷 I；MCP 0.3.13 / runtime 0.1.1 不变，MCP 9 工具；Core/MCP Unreleased 为空。PEP 740、全新安装、Release、Zenodo `23395580`、CFF 已核。下游医院版候选 `2.6.2-20261014-e7e96fb`（基于 0.7.2）待 Windows 闸门；微信付款未完成买家已于 10-14 发跟进邮件、被动等待。以后 runtime 源码改动仍必须先升版本、先发 runtime。
+- 「当前状态一句话」：Core 0.7.3（缺陷 C global_enum #100、M 星号转发 #101）已于 10-15 发布，0.7.2 为缺陷 I；MCP 0.3.13 / runtime 0.1.1 不变，MCP 9 工具；Core/MCP Unreleased 为空。PEP 740、全新安装、Release、Zenodo `23395580`、CFF 已核。下游医院版候选 `2.6.2-20261015-e7e96fb`（cand4，基于 0.7.3）待 Windows 闸门；微信付款未完成买家已于 10-14 发跟进邮件、被动等待。以后 runtime 源码改动仍必须先升版本、先发 runtime。
 
 
 ## 历史进展（已下沉）
