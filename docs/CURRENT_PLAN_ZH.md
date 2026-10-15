@@ -1,5 +1,7 @@
 # pyobfus 当前计划
 
+**2026-10-15 本 session 收尾**：0.7.2 / 0.7.3 已发布并核实，无开着的 PR、无运行中的 Codex 任务。后续顺序见 `TODO.md` 顶部：① 维护者为下游 cand4 跑 Windows 闸门 ② 可选 Glama 装 0.7.3 ③ 10-19 巡检 ④ 10-25 复盘 ⑤ H PR 4 / 参数改名待定范围。交接 `workspace-meta/archives/SESSION_CLOSEOUT_20261015_PYOBFUS_073_DEFECTS.md`。
+
 **2026-10-15 Core 0.7.3（缺陷 C + M）**：维护者批准合并 PR #100（`bde110c`）并发版；只发 Core，MCP 0.3.13 / runtime 0.1.1 不变。**已发布并核实**：tag `v0.7.3` → `ef28178`（发版前 CI 27/27、CodeQL、Packaging 通过）；release workflow 成功，PyPI wheel/sdist PEP 740 验证 OK；Python 3.10/3.14 全新安装自动带 runtime 0.1.1、pip check 通过，multifile 与标准库 `calendar`（`--verify-names`）产物运行一致；GitHub Release 已建；Zenodo record `23395580` 已核，CFF 已同步。发版记录在私有 `docs/internal/release-0.7.3/`。
 
 **2026-10-15 PR #101 已合并、PR #100 复审通过待合并**：维护者批准后 #101（缺陷 M）squash 合并为 `b6c06b2`（代码与审核头一致，main CI/CodeQL/Packaging/Dogfood 通过）。Codex 第 3 轮把 main 合入 #100 并解冲突（head `f29d561`，CI 27/27，MERGEABLE）；Claude 复审通过：对合并后 main，global_enum 12 例 0 差 1 优、星号 13 例全同、`re`/`calendar` 开 `--verify-names` 构建且运行正确、保守回退不扩散到同包无关模块。**待维护者决定合并 #100，以及是否发 0.7.3**。

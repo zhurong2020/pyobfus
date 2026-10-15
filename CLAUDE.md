@@ -14,9 +14,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### 2026-10-14 — 本 session 收尾；下一轮先读当前计划/TODO 顶部
+### 2026-10-15 — 本 session 收尾；下一轮先读当前计划/TODO 顶部
 
-Core 0.7.1 / MCP 0.3.13 已发布，runtime 0.1.1 不变，Registry/Zenodo/CFF 已同步；发布包与完整 CI 验证通过。Glama 0.7.1 release 已明确创建，0.3.13 / 9 tools 测试成功，但源码 checkout 仍旧；正式 SHA 被平台报 Commit not found，GitHub 已证实存在，维护者正等 Repository Sync（最后状态 Sync in Progress），不重复 build/release。私有下游迁移已推送并验证，未重建 Windows 候选。缺陷 I 已完成 48 次构建复评，只登记修复范围，尚未实现。维护者本轮要求只记后续 TODO 与收尾；下一轮按 TODO 顺序处理，10-19 巡检、10-25 复盘。不要恢复旧等待通知、把 Community 合同验证写作 Pro/Windows 验收，或自动发布。
+Core 0.7.2（缺陷 I，PR #99）与 0.7.3（缺陷 C #100、M #101）均经 Codex 实现 + Claude 审核、维护者批准后发布并全渠道核实；缺陷 D 已由 0.7.2 修好；Glama 源码 pin 已收尾；微信付款未完成买家已发跟进邮件。下游医院版候选 cand4（0.7.3 构建）待维护者 Windows 闸门。代码修改先交无头 Codex、Claude 审核；H PR 4 与参数改名需维护者先定范围。交接见 `../workspace-meta/archives/SESSION_CLOSEOUT_20261015_PYOBFUS_073_DEFECTS.md`。不要自动发布。
 
 ### 🟢 2026-10-12 — Core 0.7.0 + runtime 0.1.1 已发布；路线图复核修复随发（冷启动先读 `docs/CURRENT_PLAN_ZH.md` 顶部 10-12 段、路线图 §13、`docs/TODO.md`「增强路线复核」）
 
