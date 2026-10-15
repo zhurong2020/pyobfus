@@ -50,6 +50,7 @@ class GlobalSymbolTable:
         # Module exports: module_name -> {original_name -> obfuscated_name}
         # Example: {"calculator": {"Calculator": "I0", "add": "I1"}}
         self.module_exports: Dict[str, Dict[str, str]] = {}
+        self.star_import_plans: Dict[str, Dict[Tuple[int, int, str], List[str]]] = {}
         # Local reverse mappings are separate from importable exports.
         self.local_mappings: Dict[str, Dict[str, str]] = {}
         # Modules whose compiler scopes could not be proved safe for renaming.

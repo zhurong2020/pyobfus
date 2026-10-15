@@ -226,6 +226,11 @@ class ModuleInventory:
         table: Optional[GlobalSymbolTable] = None,
     ) -> None:
         self.trees = {module: ast.parse(source) for module, source in sources.items()}
+        if table is not None:
+            from pyobfus.core.star_imports import expand_stars
+
+            for module, tree in self.trees.items():
+                expand_stars(tree, table.star_import_plans.get(module, {}))
         self.packages = {
             module[: -len(".__init__")]: tree
             for module, tree in self.trees.items()

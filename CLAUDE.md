@@ -85,7 +85,7 @@ Core 0.7.1 / MCP 0.3.13 已发布，runtime 0.1.1 不变，Registry/Zenodo/CFF �
   10-25 复盘用 09-27→10-06 窗口）**：静默 4 周（10-25 前不发 Core）→ 每月一版
   → 只做有触发的事 → 每周一巡检；全文 `docs/TODO.md`「节奏」段。**查进度固定动作：进度 + 下载量
   （`python scripts/download_snapshot.py`）+ Gmail（`/pyobfus-inbox`），三样一起给**，缺一样不算查过。
-- 「当前状态一句话」：Core 0.7.2（缺陷 I 修复，PR #99）已于 10-14 晚发布，MCP 0.3.13 / runtime 0.1.1 不变，MCP 9 工具；Core/MCP Unreleased 为空。PEP 740、全新安装、Release、Zenodo `23363337`、CFF 已核；Glama 源码 pin `22ecd62` 已收尾。下游医院版候选 `2.6.2-20261014-e7e96fb` 待 Windows 闸门；微信付款未完成买家已于 10-14 发跟进邮件、被动等待。以后 runtime 源码改动仍必须先升版本、先发 runtime。
+- 「当前状态一句话」：Core 0.7.2（缺陷 I 修复，PR #99）已于 10-14 晚发布，MCP 0.3.13 / runtime 0.1.1 不变，MCP 9 工具；Core/MCP Unreleased 为空。PEP 740、全新安装、Release、Zenodo `23363337`、CFF 已核；Glama 源码 pin `22ecd62` 已收尾。下游医院版候选 `2.6.2-20261014-e7e96fb` 待 Windows 闸门；微信付款未完成买家已于 10-14 发跟进邮件、被动等待。10-15：PR #101（缺陷 M）审核通过待合并，PR #100（缺陷 C）Codex 第 2 轮待复审，见当前计划顶部。以后 runtime 源码改动仍必须先升版本、先发 runtime。
 
 
 ## 历史进展（已下沉）

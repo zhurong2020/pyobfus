@@ -357,3 +357,37 @@ def test_dynamic_injection_reserves_consumer_binding(tmp_path, local, verify):
         local,
         verify,
     )
+
+
+@pytest.mark.skipif(sys.version_info < (3, 11), reason="global_enum requires Python 3.11")
+@pytest.mark.parametrize("local", [False, True])
+@pytest.mark.parametrize("verify", [False, True])
+@pytest.mark.parametrize("method", [False, True])
+@pytest.mark.parametrize("route", ["direct", "shim", "chain"])
+def test_global_enum_star_forwarding(tmp_path, local, verify, method, route):
+    definition = (
+        "import enum\n__all__ = ['Color', 'RED', 'GREEN', 'helper']\n"
+        "@enum.global_enum\nclass Color(enum.Enum):\n    RED = 1\n    GREEN = 2\n"
+    )
+    if method:
+        definition += "    def label(self):\n        return self.name.lower()\n"
+    definition += "def helper():\n    return GREEN\n"
+    files = {"pkg/__init__.py": "", "pkg/colors.py": definition}
+    if route == "direct":
+        files["app.py"] = "from pkg.colors import *\nprint(RED, helper())\n"
+    else:
+        files["pkg/shim.py"] = "from pkg.colors import *\n"
+        target = "shim"
+        if route == "chain":
+            # Exercise a forwarding chain through a conservatively preserved
+            # global_enum owner with an incoming star import as well.
+            files["pkg/base.py"] = "def extra():\n    return 7\n"
+            files["pkg/colors.py"] = "from .base import *\n" + definition
+            files["pkg/bridge.py"] = "from .shim import *\n"
+            target = "bridge"
+        files["app.py"] = (
+            f"from pkg.{target} import RED, Color, helper\n"
+            f"import pkg.{target} as s\n"
+            "print(RED, helper())\nprint(s.RED, s.helper(), Color.GREEN)\n"
+        )
+    artifact(tmp_path, files, local, verify)
