@@ -22,12 +22,12 @@ reverse-map protected production tracebacks for developers and AI coding
 agents. Community is Apache-2.0, has no file or line limits, and requires no
 trial.
 
-> **What's new in v0.7.2:** directory builds no longer break when a function
-> imports a name under an alias that is also imported at module level
-> (`from pkg.core import scale as helper` next to `from pkg.core import helper`),
-> which raised `NameError`. Import references now follow Python's scope rules,
-> including closures, `global`/`nonlocal`, class bodies, comprehensions and
-> PEP 695 generics. Rebuild and rerun your tests; see the
+> **What's new in v0.7.3:** directory builds keep `enum.global_enum` members
+> (such as `calendar.JANUARY` or `re.IGNORECASE`) under their original names, so
+> they no longer break at runtime, and a module that re-exports another project
+> module with `from .core import *` now works when other modules import from it.
+> Enums that cannot be analysed statically keep that module's names with a
+> warning instead of failing the build. Rebuild and rerun your tests; see the
 > [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
 
 ## Why pyobfus

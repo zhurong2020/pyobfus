@@ -1,5 +1,7 @@
 # pyobfus 当前计划
 
+**2026-10-15 Core 0.7.3（缺陷 C + M）**：维护者批准合并 PR #100（`bde110c`）并发版；只发 Core，MCP 0.3.13 / runtime 0.1.1 不变。发版记录在私有 `docs/internal/release-0.7.3/`。
+
 **2026-10-15 PR #101 已合并、PR #100 复审通过待合并**：维护者批准后 #101（缺陷 M）squash 合并为 `b6c06b2`（代码与审核头一致，main CI/CodeQL/Packaging/Dogfood 通过）。Codex 第 3 轮把 main 合入 #100 并解冲突（head `f29d561`，CI 27/27，MERGEABLE）；Claude 复审通过：对合并后 main，global_enum 12 例 0 差 1 优、星号 13 例全同、`re`/`calendar` 开 `--verify-names` 构建且运行正确、保守回退不扩散到同包无关模块。**待维护者决定合并 #100，以及是否发 0.7.3**。
 
 **2026-10-15 凌晨 后续缺陷交 Codex（维护者 10-14 批准，合并与发版另批）**：用 PyPI 0.7.2 实测：缺陷 D 已由 0.7.2（PR #99）修好，只补回归；缺陷 C（`enum.global_enum` 注入名，`calendar.py` 目录构建产物 AttributeError）仍在；新登记缺陷 M（项目内 `from x import *` 转发后再从转发模块导入 → ImportError）。

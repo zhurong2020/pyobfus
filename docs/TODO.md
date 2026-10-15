@@ -5,7 +5,7 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-10-14。Core 0.7.2（缺陷 I，PR #99）/ MCP 0.3.13 已发布，runtime 0.1.1 保持不变；Core/MCP Unreleased 均为空。发布前完整 CI 与本地四测试根通过，PyPI 发布包和 PEP 740 已独立验证，Registry 与 Zenodo/CFF 已同步。私有历史库 CI 已定性，Glama 502 已恢复；Glama 安装/握手/9 工具测试、渠道记录与源码 pin（`22ecd62`）均已完成。
+最后更新：2026-10-15。Core 0.7.3（缺陷 C #100、M #101）/ MCP 0.3.13 已发布（0.7.2 为缺陷 I），runtime 0.1.1 保持不变；Core/MCP Unreleased 均为空。发布前完整 CI 与本地四测试根通过，PyPI 发布包和 PEP 740 已独立验证，Registry 与 Zenodo/CFF 已同步。私有历史库 CI 已定性，Glama 502 已恢复；Glama 安装/握手/9 工具测试、渠道记录与源码 pin（`22ecd62`）均已完成。
 
 ## 状态口径
 
@@ -29,7 +29,7 @@
 | 3 | **10-19 周一巡检** | 下载安静日（0.7.2 发布日与次日不计）、客户反馈/调研回答、微信付款跟进线程（`/pyobfus-inbox`）、Stripe Alipay 审批状态、CI、许可证监控、KV 备份、Anthropic 插件解锁消息；仅留决策摘要。 |
 | 4 | **10-25 复盘** | 区分发布/次日/内容流量，综合下载、trial、客户回答和 DEV 来源，决定下轮优先级与发布节奏；评估一周两笔微信付款未完成是否需要更多动作（Alipay、弃单提醒需 Stripe restricted key）。 |
 
-后续代码候选仍为缺陷 C/D、H 包初始化限制与参数改名；Pro 扩展等真实需求信号，详见各条目。本次没有授权额外部署或客户邮件发送。
+后续代码候选为 H 包初始化限制（PR 4）与参数改名（均需维护者先定范围）；Pro 扩展等真实需求信号，详见各条目。本次没有授权额外部署或客户邮件发送。
 
 ## 发布后观察与下次发版
 
@@ -216,14 +216,14 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       私有验证：动机项目副本 127 处 `config.X` 全部改写、`--check` 无剩余提示。审核与提示词私有 `docs/internal/codex-2026-10/H_IMPL_PR*`。
       后续（不阻塞）：canary 在 N-1 也支持后可加模块属性用例；`__init__` 含带体类/执行默认参数、导入循环等仍拒绝并提示。
 - [ ] **H PR 4 候选 · 放宽无关包初始化语句**：包 `__init__` 里 `try: __version__ = version(...)` 会阻止整个包的子模块属性改写（pyobfus 自身可复现）；评估仅绑定与子模块名无关的语句能否安全放宽。需单独确认范围，不阻塞已发布版本。
-- [ ] **既有缺陷 C · 运行时注入的模块级名字** — PR #100 待审。
+- [x] **既有缺陷 C · 运行时注入的模块级名字** — **10-15 合并 PR #100（`bde110c`），随 0.7.3 发布**。
       Community correctness fix: automatically preserve static `enum.global_enum` members in single-file and directory builds;
       preserve module export spellings when module-level `__getattr__` prevents H proofs, and conservatively preserve non-static enum modules with a planning warning.
       Artifact regressions cover references, `__all__`, imports, module attributes, dynamic enums, exclude_names and standard-library `calendar` / `re`.
 - [ ] **候选 · 3.12 嵌套 f-string 的 `--check` 提示**（低优先级，10-11 登记）：3.12 起允许 f-string 内复用同种引号/嵌套，
       产物在 3.9–3.11 上无法解析；目录/单文件构建若面向旧解释器分发，`--check` 可提示目标版本不兼容。先确认 `--verify-syntax`
       与 `target_python` 现有行为再定是否需要。
-- [x] **新缺陷 M · 项目内星号转发后再从转发模块导入**（10-14 Claude 用 PyPI 0.7.2 复现）：`pkg/shim.py` 写 `from pkg.core import *`，`app.py` 写 `from pkg.shim import helper` → 产物 ImportError（开/关局部改名一样）。兼容转发模块常见；外部模块的星号导入不受影响（私有下游 4 处均转发外部 wheel 或显式列名）。**10-15 已合并 PR #101**。
+- [x] **新缺陷 M · 项目内星号转发后再从转发模块导入**（10-14 Claude 用 PyPI 0.7.2 复现）：`pkg/shim.py` 写 `from pkg.core import *`，`app.py` 写 `from pkg.shim import helper` → 产物 ImportError（开/关局部改名一样）。兼容转发模块常见；外部模块的星号导入不受影响（私有下游 4 处均转发外部 wheel 或显式列名）。**10-15 已合并 PR #101（`b6c06b2`），随 0.7.3 发布**。
 - [x] **既有缺陷 D · `global` 重新绑定导入名** — fixed by 0.7.2 (PR #99).
       PR #100 adds artifact regressions for assignment and re-import after `global helper`, printing before and after rebinding,
       with local renaming and name verification both enabled and disabled.
