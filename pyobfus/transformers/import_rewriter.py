@@ -121,7 +121,11 @@ class ImportRewriter(ast.NodeTransformer):
                 self.imports_rewritten += 1
             else:
                 # Not found - keep original (might be stdlib or external)
-                new_names.append(alias)
+                if asname != alias.asname:
+                    new_names.append(ast.alias(name=original_name, asname=asname))
+                    any_rewritten = True
+                else:
+                    new_names.append(alias)
                 self.imports_not_found.add(f"{module}.{original_name}")
                 self.imports_unchanged += 1
 

@@ -35,6 +35,9 @@ def import_plan(
     alias. Export names still change, so merely skipping reference edits would
     leave an unbound name. No executable input is evaluated here.
     """
+    star_bindings = {
+        name for names in table.star_import_plans.get(module, {}).values() for name in names
+    }
     # symtable accepts text only. Reparse the canonical text and pair the
     # relevant nodes in AST walk order, retaining the caller's coordinates.
     if not any(
@@ -47,6 +50,10 @@ def import_plan(
                     else n.module or ""
                 ),
                 a.name,
+            )
+            or (
+                (a.asname or a.name) in star_bindings
+                and table.get_obfuscated_import(module, a.asname or a.name)
             )
             for a in n.names
         )
@@ -380,6 +387,15 @@ def import_plan(
             for alias in node.names:
                 name = alias.asname or alias.name
                 replacement = table.get_obfuscated_import(target, alias.name) if target else None
+                if (
+                    replacement is None
+                    and name in star_bindings
+                    and table.get_obfuscated_import(module, name)
+                ):
+                    # A forwarded external/module binding can be overwritten
+                    # by a renamed definition in this module. Alias its original
+                    # source spelling to the same destination as that definition.
+                    replacement = alias.name
                 if replacement:
                     binding = owner(scopes[-1], name)
                     imports.append((node, alias, name, replacement, binding, scopes[-1]))
@@ -420,7 +436,13 @@ def import_plan(
         spelling = name if alias.asname or (sid, name) in uncertain else replacement
         # Module assignments are already rewritten by the export pass. Keep
         # the import and all references on that same registered spelling.
-        if binding is root and rebound(binding, name):
+        if binding is root and (
+            rebound(binding, name)
+            or (
+                len(candidates[(sid, name)]) > 1
+                and table.get_obfuscated_import(module, name) is not None
+            )
+        ):
             if sid in dynamic:
                 raise ValueError(
                     f"Cannot safely synchronize dynamic module import binding {name!r}; "

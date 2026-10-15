@@ -109,7 +109,6 @@ def test_relative_runtime(tmp_path, statement, path, local, locals_enabled, work
 
 UNSUPPORTED = [
     ("import pkg.mod\nprint(pkg.other.LIMIT)\n", ""),
-    ("import pkg\nprint(pkg.LIMIT)\n", "from .mod import *\n"),
     ("import pkg\nprint(pkg.LIMIT)\n", "if True:\n    from .mod import LIMIT\n"),
     (
         "import pkg\nprint(pkg.LIMIT)\n",

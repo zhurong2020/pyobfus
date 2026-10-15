@@ -73,6 +73,23 @@ imports keep their original symbol and alias names. Unaliased imports retain
 the existing cross-file naming rules. Execution evidence:
 `integration_tests/test_crossfile_import_alias.py`.
 
+Internal wildcard forwarding (`from pkg.core import *`) is expanded into
+explicit imports when its namespace is unconditional, acyclic and statically
+enumerable. Literal list/tuple `__all__` (including concatenation) controls the
+export set; otherwise underscore names are excluded. Explicit imports can still
+access forwarded bindings omitted from the shim's own `__all__`. Definitions
+and imports that overwrite a forwarded name retain execution order. Dynamic
+`__all__`, module `__getattr__`, conditional namespaces, external-derived
+wildcard namespaces, executable initializer effects (including decorators,
+metaclasses and class-body global stores) and cycles retain wildcard statements and preserve **all
+project global spellings**, with a build warning. This intentionally sacrifices
+global renaming for that build rather than guessing an incomplete export set;
+function-local renaming remains available. External wildcard statements are
+unchanged. `--verify-names` checks statically expanded internal wildcard files;
+conservative builds, empty export sets and external wildcard files retain
+their skip diagnostics. Executable
+regressions: `tests/test_star_reexport_imports.py`.
+
 **Limitation H (fixed by default since 0.7.0, with exceptions below):**
 Directory builds rewrite proved Load reads/calls through
 unconditional `from pkg import mod; mod.X`,
@@ -84,7 +101,8 @@ spelling. Each dotted edge requires a reaching explicit import; importing
 explicit aliases keep their spelling and produce no warning. Static package
 literals, inert definitions and unconditional selected-project imports are
 eligible; a simple module-attribute read into a package definition is also
-supported. Arbitrary initializer calls, dynamic or star re-exports,
+supported. Statically enumerable internal wildcard forwarding is also
+supported (see below). Arbitrary initializer calls, dynamic re-exports,
 conditional imports, late/competing bindings, namespace packages, cycles,
 mutations, escapes and reflection remain unproved. A rename-table entry must
 also correspond to a proved unconditional source binding; dynamically supplied
