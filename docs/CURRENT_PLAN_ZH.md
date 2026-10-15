@@ -1,5 +1,7 @@
 # pyobfus 当前计划
 
+**2026-10-15 PR #101 已合并、PR #100 复审通过待合并**：维护者批准后 #101（缺陷 M）squash 合并为 `b6c06b2`（代码与审核头一致，main CI/CodeQL/Packaging/Dogfood 通过）。Codex 第 3 轮把 main 合入 #100 并解冲突（head `f29d561`，CI 27/27，MERGEABLE）；Claude 复审通过：对合并后 main，global_enum 12 例 0 差 1 优、星号 13 例全同、`re`/`calendar` 开 `--verify-names` 构建且运行正确、保守回退不扩散到同包无关模块。**待维护者决定合并 #100，以及是否发 0.7.3**。
+
 **2026-10-15 凌晨 后续缺陷交 Codex（维护者 10-14 批准，合并与发版另批）**：用 PyPI 0.7.2 实测：缺陷 D 已由 0.7.2（PR #99）修好，只补回归；缺陷 C（`enum.global_enum` 注入名，`calendar.py` 目录构建产物 AttributeError）仍在；新登记缺陷 M（项目内 `from x import *` 转发后再从转发模块导入 → ImportError）。
 - **PR #101（缺陷 M，head `181fbd3`）**：CI 27/27、CodeQL/Packaging/Dogfood 通过、无冲突。Claude 审核通过：13 个自写样例 11 个优于 main、2 个相同（反射 `hasattr` 两边都坏且 `--check` 有提示）、0 个更差；无星号项目产物与 main 一致。**待维护者决定合并**。
 - **PR #100（缺陷 C + D 回归）**：第 1 轮（`f02553a`）审出阻塞退步——不完全静态的 `global_enum` 类（如带普通方法）整次构建 `AnalysisError`，而 main 能正确产出、`exclude_names` 绕法也有效；标准库 `re` main 产物导入即 NameError、PR 拒绝构建。Codex 第 2 轮（`8afe008`，CI 27/27）改为保守保留+提示，**Claude 复审通过（附合并顺序条件）**：方法枚举加不加 `exclude_names` 都正确、标准库 `re` 由 main 的导入即 NameError 变为运行正确、`calendar` 3.14 正确、保守回退不扩散到同包其他模块；12 种 global_enum 形态运行结果无一比 main 差。遗留：`__all__` 含成员 + 消费方 `from m import *` 两边都坏（缺陷 M 的星号消费形态），需两 PR 合并后在合并树上复测。
