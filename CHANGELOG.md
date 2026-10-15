@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Preserve statically assigned `enum.global_enum` member names automatically in
+  single-file and directory builds, including references, `__all__`, imports,
+  and module attribute access. Modules with a module-level `__getattr__` retain
+  their binding names too, keeping standard-library `calendar` exports usable.
+  Non-static enums conservatively preserve all module names and import bindings
+  with a planning warning and `--check` advisory instead of refusing the build.
+  Package initializers with non-static enum injection preserve their package
+  dependencies too, keeping the standard-library `re` package usable; `exclude_names`
+  remains effective. Consumer binding spellings are reserved against generated
+  name collisions even when function-local renaming is disabled.
+- Add artifact execution regressions for global rebinding of imported names by
+  assignment and re-import (already fixed in 0.7.2, PR #99).
 - Project-internal wildcard forwarding modules now register importable bindings
   consistently with their source modules (defect M). Statically enumerable
   wildcard imports expand into explicit imports, including relative imports,

@@ -653,14 +653,6 @@ def discover_module_hazards(
         def visit_Name(self, node: ast.Name) -> None:
             self.observe(node)
 
-        def visit_ClassDef(self, node: ast.ClassDef) -> None:
-            if any(
-                self.resolve(d.func if isinstance(d, ast.Call) else d) == "enum.global_enum"
-                for d in node.decorator_list
-            ):
-                inventory.unsafe.add(importer)  # Existing C injection is not repaired by H.
-            super().visit_ClassDef(node)
-
         def visit_Attribute(self, node: ast.Attribute) -> None:
             target = self.resolve(node.value) or self.dynamic(node.value)
             if (

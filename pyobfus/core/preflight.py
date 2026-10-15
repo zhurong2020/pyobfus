@@ -30,7 +30,7 @@ from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 from pyobfus.config import ObfuscationConfig
-from pyobfus.core.import_advisories import ImportedAccessVisitor, enum_members
+from pyobfus.core.enum_injection import enum_injection_plan
 from pyobfus.core.import_resolution import discover_accesses
 from pyobfus.core.secret_literals import SUGGESTION, find_secret_literals
 from pyobfus.core.parser import ASTParser
@@ -281,31 +281,41 @@ class _RiskVisitor(ast.NodeVisitor):
                 SUGGESTION,
             )
 
-        # Only enum.global_enum is known here to inject names into the module.
-        # Other decorators need separate evidence and design, not name guessing.
-        def decorated_class(cls: ast.ClassDef) -> None:
-            if not any(accesses.resolve(d) == "enum.global_enum" for d in cls.decorator_list):
-                return
-            members = enum_members(cls)
+        plan = enum_injection_plan(node)
+        for injection in plan.classes:
+            members = injection.members
             listed = ", ".join(members[:10]) or "(no static members found)"
             if len(members) > 10:
                 listed += f" and {len(members) - 10} more"
             self._add(
                 CAT_COMPAT_ADVISORY,
                 SEVERITY_MEDIUM,
-                cls,
-                f"Class {cls.name} uses enum.global_enum, which injects member names "
-                "into the module at runtime; renamed references or __all__ entries "
-                "can raise NameError.",
-                f"Add this enum's member names to exclude_names: {listed}.",
+                injection.node,
+                f"Class {injection.node.name} uses enum.global_enum, which injects member names "
+                "into the module at runtime. "
+                + (
+                    "Static member names are automatically preserved."
+                    if injection.reason is None
+                    else f"The member set cannot be safely determined: {injection.reason}."
+                ),
+                (
+                    f"Automatically preserved member names: {listed}."
+                    if injection.reason is None
+                    else "All module names and import bindings are automatically preserved "
+                    "because the injected member set is uncertain. For a package initializer, "
+                    "its package modules are preserved too; exclude_names remains effective."
+                ),
             )
-
-        accesses = ImportedAccessVisitor(
-            lambda n: n.module if n.level == 0 else None,
-            lambda n, m: None,
-            decorated_class,
-        )
-        accesses.visit(node)
+        for error in plan.errors:
+            if error.startswith("computed enum owner"):
+                self._add(
+                    CAT_COMPAT_ADVISORY,
+                    SEVERITY_MEDIUM,
+                    node,
+                    f"enum.global_enum has an unknown member set: {error}.",
+                    "All module names and import bindings are automatically preserved; "
+                    "exclude_names remains effective.",
+                )
         self.generic_visit(node)
 
     # ---- imports --------------------------------------------------------

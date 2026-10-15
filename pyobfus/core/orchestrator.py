@@ -16,6 +16,7 @@ from dataclasses import dataclass
 
 from pyobfus.config import ObfuscationConfig
 from pyobfus.core.class_bindings import mark_class_bindings
+from pyobfus.core.enum_injection import enum_injection_plan
 from pyobfus.core.function_locals import LocalPlan, plan_locals, apply_local_plan
 from pyobfus.core import content_transforms
 from pyobfus.core.module_attributes import (
@@ -352,8 +353,19 @@ class CrossFileOrchestrator:
 
         if self.config.crossfile_local_names:
             self._reserved_names.update(self.config.exclude_names)
+        enum_package_fallbacks: Set[Path] = set()
         for fi in self.files:
             tree = ASTParser.parse_file(fi.path)
+            injection = enum_injection_plan(tree)
+            self._reserved_names.update(injection.preserved)
+            if injection.errors and fi.relative_path.name == "__init__.py":
+                enum_package_fallbacks.add(fi.relative_path.parent)
+            if injection.preserve_module:
+                self.global_table.conservative_import_modules.add(fi.module_name)
+                self._planning_warnings.append(
+                    f"Preserved module names and import bindings for {fi.relative_path.as_posix()}: "
+                    f"{injection.warning}"
+                )
             for node in ast.walk(tree):
                 # Explicit aliases survive even when local renaming is off;
                 # newly allocated definitions must not collide with them.
@@ -366,6 +378,38 @@ class CrossFileOrchestrator:
                         if isinstance(value, str):
                             self._reserved_names.add(value)
 
+        if not self.config.crossfile_local_names and self.global_table.conservative_import_modules:
+            # An unknown injected spelling may occur only in a consumer import.
+            # Reserving owner names alone lets a generated I0 definition capture
+            # `from owner import I0`. Keep allocation clear of consumer bindings
+            # and references even when function-local renaming is disabled.
+            for fi in self.files:
+                for node in ast.walk(ASTParser.parse_file(fi.path)):
+                    for attr in ("id", "arg", "name", "asname", "rest"):
+                        value = getattr(node, attr, None)
+                        if isinstance(value, str):
+                            self._reserved_names.add(value)
+
+        # A non-static injection in a package initializer can observe its
+        # sibling modules through module attributes and star-import chains.
+        # Preserve that package's names together: otherwise the initializer's
+        # fallback alone leaves dependencies (notably re._constants) renamed.
+        # This is scoped to enum packages, not general star-import resolution.
+        for fi in self.files:
+            if any(parent in fi.relative_path.parents for parent in enum_package_fallbacks):
+                self.global_table.conservative_import_modules.add(fi.module_name)
+                self._planning_warnings.append(
+                    f"Preserved all module names and import bindings for {fi.relative_path.as_posix()}: "
+                    "non-static enum injection in package initializer"
+                )
+                for node in ast.walk(ASTParser.parse_file(fi.path)):
+                    for attr in ("id", "arg", "name", "asname", "rest"):
+                        value = getattr(node, attr, None)
+                        if isinstance(value, str):
+                            self._reserved_names.add(value)
+        # Plan stars after enum fallbacks, before registering any exports.
+        # Unknown star namespaces preserve globals; known expansions still need
+        # the enum identity mappings when re-export chains resolve below.
         sources = {fi.module_name: read_python_source(fi.path) for fi in self.files}
         star_plans, unknown_stars = plan_stars(sources)
         self.global_table.star_import_plans = star_plans
@@ -395,7 +439,10 @@ class CrossFileOrchestrator:
             }
             detector = ExportDetector(overridden_imports=star_bindings)
             detector.visit(tree)
-            exports = detector.get_exports()
+            injection = enum_injection_plan(tree)
+            exports = detector.get_exports() | set(
+                name for cls in injection.classes for name in cls.members
+            )
             # __all__ controls wildcard visibility, not explicit importability.
             # Every binding introduced by an expanded star needs a table entry,
             # including private names and names omitted from the shim's __all__.
@@ -423,6 +470,12 @@ class CrossFileOrchestrator:
             # reproduce.
             for export_name in sorted(exports):
                 # Skip names that should be preserved
+                if (
+                    export_name in injection.preserved
+                    or file_info.module_name in self.global_table.conservative_import_modules
+                ):
+                    self.global_table.register_preserved_export(file_info.module_name, export_name)
+                    continue
                 if self._should_preserve_name(export_name):
                     continue
 

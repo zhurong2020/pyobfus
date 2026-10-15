@@ -29,9 +29,14 @@ def test_suggested_workaround(tmp_path, case):
     (source / "entry.py").write_text(entry, encoding="utf-8")
     env = dict(os.environ, HOME=str(tmp_path / "home"), USERPROFILE=str(tmp_path / "home"))
 
-    def run(*args):
+    def run(*args, cwd=tmp_path):
         return subprocess.run(
-            [sys.executable, *map(str, args)], env=env, capture_output=True, text=True, timeout=60
+            [sys.executable, *map(str, args)],
+            cwd=cwd,
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=60,
         )
 
     baseline = run(source / "entry.py")
@@ -51,8 +56,12 @@ def test_suggested_workaround(tmp_path, case):
         r for r in json.loads(checked.stdout)["risks"] if r["category"] == "compatibility_advisory"
     ]
     assert len(findings) == 1
-    assert "exclude_names" in findings[0]["suggestion"]
-    flags = ["--config", config]
+    if case == "global-enum":
+        assert "Automatically preserved" in findings[0]["suggestion"]
+        flags = ["--no-config"]
+    else:
+        assert "exclude_names" in findings[0]["suggestion"]
+        flags = ["--config", config]
     if case == "module-from":
         assert "from pkg.core import LIMIT" in findings[0]["suggestion"]
         (source / "entry.py").write_text(
@@ -62,6 +71,6 @@ def test_suggested_workaround(tmp_path, case):
     output = tmp_path / "out"
     built = run("-m", "pyobfus", source, "-o", output, *flags)
     assert built.returncode == 0, built.stdout + built.stderr
-    product = run(output / "entry.py")
+    product = run(output / "entry.py", cwd=output)
     assert product.returncode == 0, product.stderr
     assert product.stdout == baseline.stdout

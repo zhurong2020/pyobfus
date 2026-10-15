@@ -117,6 +117,15 @@ class GlobalSymbolTable:
         self.module_exports[module][original_name] = obfuscated_name
         self.used_names.add(obfuscated_name)
 
+    def register_preserved_export(self, module: str, name: str) -> None:
+        """Register an original spelling without claiming a unique renamed owner.
+
+        Runtime-injected members such as RED can exist in several modules.
+        Consumers need an identity mapping, while reverse mappings only need
+        ownership for names that were actually obfuscated.
+        """
+        self.register_reexport(module, name, name)
+
     def register_module_alias(self, alias: str, target: str) -> None:
         """Let ``alias`` resolve to the exports registered under ``target``."""
         if alias != target:

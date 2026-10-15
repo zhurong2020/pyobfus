@@ -147,7 +147,7 @@ def test_global_enum_json(tmp_path, imports, decorator, base):
     assert len(findings) == 1
     assert findings[0]["severity"] == "medium"
     assert "Color" in findings[0]["message"]
-    assert "exclude_names: RED, BLUE." in findings[0]["suggestion"]
+    assert "Automatically preserved member names: RED, BLUE." in findings[0]["suggestion"]
     assert payload["ai_hint"].startswith("Low risk. Run:")
 
 
@@ -212,7 +212,7 @@ def test_enum_private_and_ignored_members(tmp_path):
         encoding="utf-8",
     )
     suggestion = advisories(check_json(source), "enum.global_enum")[0]["suggestion"]
-    assert "exclude_names: _RED, BLUE." in suggestion
+    assert "Automatically preserved member names: _RED, BLUE." in suggestion
     assert "ignored" not in suggestion
 
 
@@ -226,3 +226,15 @@ def test_conflicting_import_binding_is_unresolved(tmp_path):
 def test_class_import_does_not_escape_into_child_scope(tmp_path, expression):
     source = project(tmp_path, f"class Box:\n    from pkg import core\n    value = {expression}\n")
     assert not advisories(PreflightChecker().check_path(source))
+
+
+def test_non_static_enum_check_explains_fallback(tmp_path):
+    source = tmp_path / "colors.py"
+    source.write_text(
+        "import enum\n@enum.global_enum\nclass Color(enum.IntEnum):\n"
+        "    RED = 1 << 3\n    def label(self):\n        return self.name\n",
+        encoding="utf-8",
+    )
+    suggestion = advisories(check_json(source), "enum.global_enum")[0]["suggestion"]
+    assert "All module names and import bindings are automatically preserved" in suggestion
+    assert "exclude_names remains effective" in suggestion
