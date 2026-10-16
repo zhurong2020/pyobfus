@@ -25,7 +25,7 @@
 | 顺序 | 待办 | 验收 / 下一步 |
 |---|---|---|
 | 1 | **私有下游候选 Windows 闸门（维护者）** | 10-15 已用 0.7.3 重建候选 `2.6.2-20261015-e7e96fb`（`build/release-v2.6.2-cand4`，取代 0.7.2 的 cand3）：SHA256、名字检查 59/63（4 处星号转发：3 处外部 wheel，`nifti_loader` 为项目内转发但被转发模块导出不可静态确定→保守保留）、交付检查 0 发现。剩：发布机授权续签 → 装机评分、M2 升级、生命周期、向导目视。 |
-| 2 | **（可选，维护者）Glama Build steps 改装 `pyobfus==0.7.3`** | 现装 0.7.1；0.7.2/0.7.3 修复影响 `protect_project` 目录构建。改后跑一次测试看 9 tools；不必新建 channel release，除非平台要求。不急，可与下次 MCP 发版合并。 |
+| 2 | **（可选，维护者）Glama Build steps 改装 `pyobfus==0.7.3`** | 10-17 维护者核实 Build steps **仍是** `pyobfus-mcp==0.3.13 pyobfus==0.7.1`（10-15/10-17 两次手动 Make Release 产生渠道 `0.7.3`/`0.7.4`，未换包）；0.7.2/0.7.3 修复影响 `protect_project` 目录构建。改为 `pyobfus==0.7.3` → 跑一次测试，安装日志见 Core 0.7.3、9 tools 即关闭，结果记进 `DISTRIBUTION_CHANNELS.md` Glama 段。pin `964b248` 可保留。 |
 | 3 | **10-19 周一巡检** | 下载安静日（0.7.2 发布日与次日不计）、客户反馈/调研回答、微信付款跟进线程（`/pyobfus-inbox`）、Stripe Alipay 审批状态、CI、许可证监控、KV 备份、Anthropic 插件解锁消息；仅留决策摘要。 |
 | 4 | **10-25 复盘** | 区分发布/次日/内容流量，综合下载、trial、客户回答和 DEV 来源，决定下轮优先级与发布节奏；评估一周两笔微信付款未完成是否需要更多动作（Alipay、弃单提醒需 Stripe restricted key）。 |
 

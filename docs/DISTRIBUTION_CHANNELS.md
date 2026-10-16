@@ -7,7 +7,7 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-**Last updated**: 2026-10-14 (PyPI data through 10-13).
+**Last updated**: 2026-10-17 (PyPI data through 10-15).
 Core's 30-day quiet-day median is `30`; the latest seven days contain no quiet
 samples after excluding release days and the next day, so the printed `0` is
 not a measured baseline. MCP quiet-day medians are `10 / 6` (7 / 30 days).
@@ -43,6 +43,19 @@ which Glama apparently cannot select because it only records synced heads
 (inference, not confirmed). At the next MCP release, update both the Build
 steps package pins and this commit pin (or clear it). Package/handshake
 evidence does not establish execution of every tool in the image.
+2026-10-17: Glama sent "Build succeeded" plus channel releases labelled
+`0.7.3` (October 15 14:30 UTC) and `0.7.4` (October 16 19:35 UTC). These are
+channel labels, not PyPI versions; PyPI is Core 0.7.3 and MCP 0.3.13. The
+maintainer-supplied Dockerfile page (October 17) shows both came from manual
+"Make Release" runs (October 15 19:38 and October 17 01:46, Asia/Shanghai;
+tests `01a13ff5-55db-7738-831f-d19a48df63e0` and
+`01a14631-5c66-7c76-bce8-6acd4586533b`) **without a package change**: Build
+steps still read `pyobfus-mcp==0.3.13 pyobfus==0.7.1`, so the Glama image
+still lacks the 0.7.2/0.7.3 directory-build fixes. The pinned commit is now
+`964b248` (synced head, a documentation-only descendant of release commit
+`ef28178`); it does not affect the installed server. Next step: maintainer
+changes Build steps to `pyobfus==0.7.3`, runs one test and checks the install
+log shows Core 0.7.3 and 9 tools.
 
 Periodic checks retain only decision summaries, not full stdout or separate
 CSV/JSON snapshots. During the quiet-period experiment, retain the Core/MCP
