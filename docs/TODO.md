@@ -562,7 +562,7 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
 
 ## 外部等待（不阻塞本地开发）
 
-- **Claude Plugin Marketplace —— 等待支持团队解除提交锁**。09-28 已升级内部；10-11 Tiffany 回信仍在处理、无需补充材料。此前“需要重提”的记录已被后端锁事实取代；不反复提交或换路径绕过。维护者清单与私有 `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md` 保留原始证据。
+- **Claude Plugin Marketplace —— 等待支持团队解除提交锁**。09-28 已升级内部；10-11 Tiffany 回信仍在处理、无需补充材料；10-14 再确认旧提交就在当前账号下、只能由目录团队释放，释放后改到 <https://claude.ai/directory/manage> 用付费账号重提（Console 表单已停用）。截至 10-17 无新消息。此前“需要重提”的记录已被后端锁事实取代；不反复提交或换路径绕过。维护者清单与私有 `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md` 保留原始证据。
 - Open VSX namespace 归属验证：可选，`not verified` 是「未申请」不是「被拒」。
 - **Canopii [`canopii-cli#6`](https://github.com/canopii-dev/canopii-cli/issues/6)
   —— 单次 follow-up 已发，等待上游**。2026-09-23 确认 issue 仍 `OPEN`、0 条上游回复后，

@@ -1,5 +1,7 @@
 # pyobfus 当前计划
 
+**2026-10-17 状态核查（只读 + 文档补记）**：main `964b248` 干净，0 open PR/issue，10-15 推送 CI/CodeQL、10-16 定时 CI 与许可证监控均绿；PyPI 最新 Core 0.7.3。下载（截至 10-15）：Core 30 天安静日中位数 30/天（近 7 天 4 个发版相关日，不看总数），MCP 安静日中位数 12/天，Marketplace 安装 14，GitHub 两周 153 次浏览/91 独立访客。Gmail：Glama 10-15、10-16 各一次构建成功 + 渠道 release `0.7.3`/`0.7.4`（渠道标识，非 PyPI 版本）；维护者贴出的 Dockerfile 页确认这两次是手动 Make Release，Build steps 仍装 `pyobfus==0.7.1`，待改为 0.7.3（见 `DISTRIBUTION_CHANNELS.md` Glama 段、`TODO.md` 顺序 2）；Anthropic 插件锁自 10-14 Tiffany 回信（已记于下方 10-14 段）后无新消息，仍等目录团队；微信付款跟进无回复。路线图 §13.3 近期四项已全部完成，后续均卡在需求信号或维护者定范围（见 `TODO.md`「增强路线复核」）。
+
 **2026-10-15 本 session 收尾**：0.7.2 / 0.7.3 已发布并核实，无开着的 PR、无运行中的 Codex 任务。后续顺序见 `TODO.md` 顶部：① 维护者为下游 cand4 跑 Windows 闸门 ② 可选 Glama 装 0.7.3 ③ 10-19 巡检 ④ 10-25 复盘 ⑤ H PR 4 / 参数改名待定范围。交接 `workspace-meta/archives/SESSION_CLOSEOUT_20261015_PYOBFUS_073_DEFECTS.md`。
 
 **2026-10-15 Core 0.7.3（缺陷 C + M）**：维护者批准合并 PR #100（`bde110c`）并发版；只发 Core，MCP 0.3.13 / runtime 0.1.1 不变。**已发布并核实**：tag `v0.7.3` → `ef28178`（发版前 CI 27/27、CodeQL、Packaging 通过）；release workflow 成功，PyPI wheel/sdist PEP 740 验证 OK；Python 3.10/3.14 全新安装自动带 runtime 0.1.1、pip check 通过，multifile 与标准库 `calendar`（`--verify-names`）产物运行一致；GitHub Release 已建；Zenodo record `23395580` 已核，CFF 已同步。发版记录在私有 `docs/internal/release-0.7.3/`。
