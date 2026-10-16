@@ -56,6 +56,17 @@ still lacks the 0.7.2/0.7.3 directory-build fixes. The pinned commit is now
 `ef28178`); it does not affect the installed server. Next step: maintainer
 changes Build steps to `pyobfus==0.7.3`, runs one test and checks the install
 log shows Core 0.7.3 and 9 tools.
+**Closed 2026-10-17 05:00 (Asia/Shanghai):** the maintainer changed Build
+steps to `pyobfus-mcp==0.3.13 pyobfus==0.7.3`. Test
+`01a14684-4953-7c29-839d-3d2567142a33` succeeded in 12.1s: the install log
+shows `pyobfus==0.7.3`, `pyobfus-mcp==0.3.13` and `pyobfus-runtime==0.1.1`;
+the handshake reports server version 0.3.13 and `ListToolsRequest` returns all
+9 tools. Glama created channel release `0.7.5` from this build (05:01). The
+build spec shows `pinnedCommit: null`, yet the build still checked out
+`964b248` (the synced head at the time), and uv reported the system Python
+3.13.5 environment although the spec says 3.12; neither affects the
+PyPI-installed server. At the next MCP or Core release, update the Build
+steps package pins again.
 
 Periodic checks retain only decision summaries, not full stdout or separate
 CSV/JSON snapshots. During the quiet-period experiment, retain the Core/MCP
