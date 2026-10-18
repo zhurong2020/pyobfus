@@ -19,15 +19,16 @@ obfuscates multi-file projects and packages as a whole: names are renamed
 consistently across modules and imports are rewritten to match, so Community
 output is still ordinary `.py` that runs without pyobfus installed. Keep the
 mapping file from the build private, and `pyobfus --unmap` turns a production
-traceback back into your original names, for you or an AI coding agent. Community is Apache-2.0, has no file or line limits, and requires no
-trial.
+traceback back into your original names, for you or an AI coding agent.
+Community is Apache-2.0, has no file or line limits, and requires no trial.
 
-> **What's new in v0.7.3:** directory builds keep `enum.global_enum` members
-> (such as `calendar.JANUARY` or `re.IGNORECASE`) under their original names, so
-> they no longer break at runtime, and a module that re-exports another project
-> module with `from .core import *` now works when other modules import from it.
-> Enums that cannot be analysed statically keep that module's names with a
-> warning instead of failing the build. Rebuild and rerun your tests; see the
+> **What's new in v0.7.4:** builds made on CPython 3.12.0–3.12.8 (for example
+> Ubuntu 24.04's Python 3.12.3) no longer rewrite f-strings into a form that only
+> Python 3.12+ can parse, so the output runs on 3.9–3.11 again; a build now stops
+> with a file and line if it would introduce that syntax. Directory builds also
+> stop treating any `obj.modules[...] = ...` write as a `sys.modules` change, and
+> report how many module attribute accesses they could not prove safe. Rebuild
+> and rerun your tests; see the
 > [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
 
 ## Why pyobfus

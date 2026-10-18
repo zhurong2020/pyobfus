@@ -5,10 +5,11 @@ about a build decision uses a code from this single catalog, so consumers
 (the VS Code extension, CI, MCP, auditors) can branch on a stable token instead
 of parsing English prose whose wording may change between releases.
 
-Three domains are covered:
+Four domains are covered:
 
 - ``selected.*`` / ``excluded.*`` — why a file was or was not obfuscated.
 - ``disabled.*`` — why a requested transform / mechanism will not run.
+- ``module_attribute.*`` — refused module-attribute proofs in compatibility advice.
 - ``preserved.*`` — why a symbol was kept (not renamed). **Reserved
   vocabulary: defined and documented here, but not yet emitted** on any JSON
   surface. Emitting per-symbol preserve reasons needs the analyzer to record a
@@ -43,7 +44,18 @@ PRESERVED_CONFIG_EXCLUDE = "preserved.config_exclude"
 PRESERVED_PUBLIC_API = "preserved.public_api"
 PRESERVED_OTHER = "preserved.other"
 
+# Refused module-attribute proofs (H); additive to catalog v1.
+MODULE_ATTRIBUTE_REASONS = {
+    "module_attribute.modules_store": "A sys.modules store/delete may replace project modules.",
+    "module_attribute.package_init_not_static": "Package __init__ is not static under the package proof rules.",
+    "module_attribute.import_cycle": "The importer, target or containing package participates in an import cycle.",
+    "module_attribute.module_hazard": "A module escape, mutation or namespace hazard prevents the proof.",
+    "module_attribute.nested_reimport": "A nested re-import competes with a module import binding.",
+    "module_attribute.other": "Module identity, scope, export binding or execution order is not proved.",
+}
+
 _DESCRIPTIONS: Dict[str, str] = {
+    **MODULE_ATTRIBUTE_REASONS,
     SELECTED_INCLUDED: "File selected for obfuscation.",
     EXCLUDED_PATTERN: "File skipped because it matched a configured exclude pattern.",
     DISABLED_CROSS_FILE_MODE: (
@@ -89,6 +101,7 @@ __all__ = [
     "PRESERVED_CONFIG_EXCLUDE",
     "PRESERVED_PUBLIC_API",
     "PRESERVED_OTHER",
+    "MODULE_ATTRIBUTE_REASONS",
     "ALL_REASON_CODES",
     "describe",
     "is_known",

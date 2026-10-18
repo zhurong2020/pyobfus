@@ -21,6 +21,7 @@ from pyobfus.core.function_locals import LocalPlan, plan_locals, apply_local_pla
 from pyobfus.core import content_transforms
 from pyobfus.core.module_attributes import (
     AttributePlan,
+    count_unproved_accesses,
     ModuleInventory,
     plan_attributes,
     apply_attribute_plan,
@@ -272,6 +273,7 @@ class CrossFileOrchestrator:
         self.file_line_maps: Dict[str, Dict[str, Any]] = {}
         self.attribute_plans: Dict[str, AttributePlan] = {}
         self.attribute_inventory: Optional[ModuleInventory] = None
+        self.module_attribute_accesses_unproved = 0
         self.local_plans: Dict[str, LocalPlan] = {}
         self._reserved_names: Set[str] = set()
         self._planning_warnings: List[str] = []
@@ -570,18 +572,20 @@ class CrossFileOrchestrator:
                 self.local_plans[fi.module_name] = plan
                 self.global_table.local_mappings[fi.module_name] = plan.mappings
 
+        # Observation runs for opt-out builds too; it never supplies edits.
+        sources = {fi.module_name: read_python_source(fi.path) for fi in self.files}
+        file_index = {fi.module_name: fi for fi in self.files}
+        inventory = ModuleInventory(
+            sources,
+            lambda module, node: self._resolve_source_module(
+                file_index[module], ReExportSource(node.module, node.level, "")
+            ),
+            self.global_table,
+        )
         if self.config.crossfile_module_attributes:
-            sources = {fi.module_name: read_python_source(fi.path) for fi in self.files}
-            file_index = {fi.module_name: fi for fi in self.files}
-            inventory = ModuleInventory(
-                sources,
-                lambda module, node: self._resolve_source_module(
-                    file_index[module], ReExportSource(node.module, node.level, "")
-                ),
-                self.global_table,
-            )
             self.attribute_inventory = inventory
-            self.attribute_plans = {
+        self.attribute_plans = (
+            {
                 fi.module_name: plan_attributes(
                     sources[fi.module_name],
                     fi.relative_path.as_posix(),
@@ -591,6 +595,12 @@ class CrossFileOrchestrator:
                 )
                 for fi in self.files
             }
+            if self.config.crossfile_module_attributes
+            else {}
+        )
+        self.module_attribute_accesses_unproved = count_unproved_accesses(
+            sources, inventory, self.global_table, self.attribute_plans
+        )
 
         return self.global_table
 
@@ -881,6 +891,7 @@ class CrossFileOrchestrator:
             - total_modules: Number of modules
         """
         return {
+            "module_attribute_accesses_unproved": self.module_attribute_accesses_unproved,
             "files_discovered": len(self.files),
             "total_local_names": sum(len(p.mappings) for p in self.local_plans.values()),
             "total_exports": self.global_table.get_statistics()["total_exports"],

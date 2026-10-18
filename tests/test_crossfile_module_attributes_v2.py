@@ -493,6 +493,17 @@ def assert_main_snapshot(tmp_path, src, key, locals_enabled):
     current = [dataclasses.asdict(r) for r in risks(src, False)]
     for r in current:
         r.pop("file", None)
+        # H4 adds explanations and catalog fields; the historical snapshot
+        # still locks every legacy diagnostic fact and all artifact bytes.
+        reason = r.pop("reason", None)
+        reasons = r.pop("reasons", None)
+        if reason is not None:
+            from pyobfus.core.reason_codes import is_known
+
+            assert is_known(reason) and reasons and reason == reasons[0]
+            assert all(is_known(code) for code in reasons)
+            assert " Reason: " in r["message"]
+        r["message"] = r["message"].split(" Reason: ", 1)[0]
     additions = [r for r in current if r["message"].startswith("Detected ")]
     assert all("not automatically rewritten" in r["message"] for r in additions)
     # Output bytes remain frozen; diagnostics now cover every retained site.

@@ -5,7 +5,7 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-10-15。Core 0.7.3（缺陷 C #100、M #101）/ MCP 0.3.13 已发布（0.7.2 为缺陷 I），runtime 0.1.1 保持不变；Core/MCP Unreleased 均为空。发布前完整 CI 与本地四测试根通过，PyPI 发布包和 PEP 740 已独立验证，Registry 与 Zenodo/CFF 已同步。私有历史库 CI 已定性，Glama 502 已恢复；Glama 安装/握手/9 工具测试、渠道记录与源码 pin（`22ecd62`）均已完成。
+最后更新：2026-10-18。Core 0.7.4（缺陷 N #102、H PR 4 选项 1 #103）已发布；此前 Core 0.7.3（缺陷 C #100、M #101）/ MCP 0.3.13 已发布（0.7.2 为缺陷 I），runtime 0.1.1 保持不变；Core/MCP Unreleased 均为空。发布前完整 CI 与本地四测试根通过，PyPI 发布包和 PEP 740 已独立验证，Registry 与 Zenodo/CFF 已同步。私有历史库 CI 已定性，Glama 502 已恢复；Glama 安装/握手/9 工具测试、渠道记录与源码 pin（`22ecd62`）均已完成。
 
 ## 状态口径
 
@@ -28,7 +28,7 @@
 | 2 | **10-19 周一巡检** | 下载安静日（0.7.2 发布日与次日不计）、客户反馈/调研回答、微信付款跟进线程（`/pyobfus-inbox`）、Stripe Alipay 审批状态、CI、许可证监控、KV 备份、Anthropic 插件解锁消息；仅留决策摘要。 |
 | 3 | **10-25 复盘** | 区分发布/次日/内容流量，综合下载、trial、客户回答和 DEV 来源，决定下轮优先级与发布节奏；评估一周两笔微信付款未完成是否需要更多动作（Alipay、弃单提醒需 Stripe restricted key）。 |
 
-10-18 维护者批准两项代码任务（14:05 后交 Codex、Claude 审，顺序：缺陷 N → H PR 4 选项 1；发版另批）；参数改名暂缓；Pro 扩展等真实需求信号，详见各条目。本次没有授权额外部署或客户邮件发送。
+缺陷 N 与 H PR 4 选项 1 已随 Core 0.7.4（10-18）发布；缺陷 O（PR #104）、P（Codex 实现中）待合并，下次发版另批；参数改名暂缓；Pro 扩展等真实需求信号，详见各条目。本次没有授权额外部署或客户邮件发送。
 
 ## 发布后观察与下次发版
 
@@ -214,24 +214,24 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       退路 `--no-crossfile-module-attributes` 与 main 旧默认产物逐字节一致。发版说明须写「升级后完整重新构建、重新生成 mapping」。
       私有验证：动机项目副本 127 处 `config.X` 全部改写、`--check` 无剩余提示。审核与提示词私有 `docs/internal/codex-2026-10/H_IMPL_PR*`。
       后续（不阻塞）：canary 在 N-1 也支持后可加模块属性用例；`__init__` 含带体类/执行默认参数、导入循环等仍拒绝并提示。
-- [ ] **H PR 4 · 10-18 维护者定选项 1（批准实现，14:05 后交 Codex、Claude 审；发版另批）**：10-18 实测 0.7.3 自混淆构建无告警、运行即 AttributeError，三个独立阻断：
+- [x] **H PR 4 选项 1 — PR #103 合并，随 Core 0.7.4（10-18）发布；B2/B3 未做（等用户触发）**：10-18 实测 0.7.3 自混淆构建无告警、运行即 AttributeError，三个独立阻断：
       B1 `module_attributes.py` 对任何 `x.modules[k] = v` 写入（不论是否 `sys`）把全项目标为不安全（`core/mapping.py` 一处即关掉 61 个模块）；
       B2 包 `__init__` 的 try/外部导入；B3 再导出子模块回导包内 `__version__` 的导入环。本 PR 只做：修 B1 误判、`--check` 写明拒绝原因、构建时提示未证明安全的属性访问数。
-      B2/B3 等用户触发。范围备忘与 Codex 提示词私有 `docs/internal/codex-2026-10/SCOPE_H4_PARAMS_2026-10-18.md`。原登记：包 `__init__` 里 `try: __version__ = version(...)` 会阻止整个包的子模块属性改写（pyobfus 自身可复现）；评估仅绑定与子模块名无关的语句能否安全放宽。需单独确认范围，不阻塞已发布版本。
+      选项 1 PR #103 待审，B2/B3 未做（等用户触发）。范围备忘与 Codex 提示词私有 `docs/internal/codex-2026-10/SCOPE_H4_PARAMS_2026-10-18.md`。原登记：包 `__init__` 里 `try: __version__ = version(...)` 会阻止整个包的子模块属性改写（pyobfus 自身可复现）；评估仅绑定与子模块名无关的语句能否安全放宽。需单独确认范围，不阻塞已发布版本。
 - [x] **既有缺陷 C · 运行时注入的模块级名字** — **10-15 合并 PR #100（`bde110c`），随 0.7.3 发布**。
       Community correctness fix: automatically preserve static `enum.global_enum` members in single-file and directory builds;
       preserve module export spellings when module-level `__getattr__` prevents H proofs, and conservatively preserve non-static enum modules with a planning warning.
       Artifact regressions cover references, `__all__`, imports, module attributes, dynamic enums, exclude_names and standard-library `calendar` / `re`.
-- [ ] **缺陷 N · 在 CPython 3.12.0–3.12.8 上构建，兼容 3.9 的 f-string 被改成同引号复用，产物在 3.9–3.11 上 SyntaxError**（10-18 复现，Community 正确性）：
-      PR #102 待审 (`fix/fstring-quote-312`); regression coverage and compatibility guard implemented.
+- [x] **缺陷 N · 在 CPython 3.12.0–3.12.8 上构建，兼容 3.9 的 f-string 被改成同引号复用，产物在 3.9–3.11 上 SyntaxError**（10-18 复现，Community 正确性）：
+      **PR #102 合并，随 Core 0.7.4（10-18）发布。**
       根因是这些补丁版的 `ast.unparse` 选引号不避开内层引号（3.12.9 / 3.13 已修；Ubuntu 24.04 自带 3.12.3，CI 用最新补丁版所以测不到）。
       最小复现 `python3.12 -c "import ast;print(ast.unparse(ast.parse('''f\"{f'{x}'}\"''')))"` → `f'{f'{x}'}'`。
       `generator.py` 的 `_fix_fstring_quotes` 只修 `['k']` 下标；`--verify-syntax` 只用构建解释器 compile，均兜不住。运行语义不变，只是语法层。
       建议：子类化 unparser，在 <3.12.9 时用 3.13 的引号选择；源码未用 PEP 701 专属写法时断言产物也不用（tokenize 检测）；测试与补丁版本无关；3.13+ 产物逐字节不变。10-18 维护者批准实现（含 `--check` 提示），14:05 后交 Codex、Claude 审；发版另批。
-- [ ] **缺陷 P · `sys.modules.update()/setdefault()/pop()` 换掉项目模块时不被识别**（10-18 审核 PR #103 时发现，main 同样存在）：
+- [ ] **缺陷 P（10-18 批准，Codex 实现中；17:40 额度用完中断，19:10 后续跑）· `sys.modules.update()/setdefault()/pop()` 换掉项目模块时不被识别**（10-18 审核 PR #103 时发现，main 同样存在）：
       `sys.modules.update({'pkg.core': m})` 后 `core.f` 仍被改写，产物运行 AttributeError，构建与 `--check` 都无提示；下标写入形式已正确识别。
       修法：把 `sys.modules` 上的变更方法调用并入 `discover_modules_stores`。未批准实现。
-- [ ] **缺陷 O · 下标里的带星号元组丢括号，产物需 Python ≥3.11**（10-18 审核 PR #102 时发现; CPython 3.11+ builders, independent of N）：
+- [ ] **缺陷 O（10-18 批准；PR #104 Claude 审核通过，0.7.4 后合并）· 下标里的带星号元组丢括号，产物需 Python ≥3.11**（10-18 审核 PR #102 时发现，所有构建版本都有，与 N 无关）：
       源码 `Annotated[(x, *y)]`（3.9/3.10 合法）经 `ast.unparse` 变成 `Annotated[x, *y]`（PEP 646，3.11+ 才合法）；3.12/3.13/3.14 一致。
       实测 pydantic 3 个文件中招。修法同 N：在共享 unparser 里给含 `Starred` 的下标元组保留括号，并让兼容自检覆盖这一类。PR #104 待审 (`fix/starred-subscript-parens`); shared unparser fix and compatibility regressions implemented.
 - [ ] **候选 · 3.12 嵌套 f-string 的 `--check` 提示**（低优先级，10-11 登记；可随缺陷 N 一起做：源码用了 PEP 701 专属写法时提示产物需 ≥3.12）：3.12 起允许 f-string 内复用同种引号/嵌套，

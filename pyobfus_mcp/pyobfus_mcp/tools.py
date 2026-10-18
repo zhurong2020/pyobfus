@@ -1352,6 +1352,9 @@ def protect_project(
         )
         next_tool = _next_tool(None, "pipeline complete; obfuscated output is ready to ship")
 
+    if stats.get("module_attribute_accesses_unproved", 0):
+        ai_hint += " Run check_obfuscation_risks to inspect unproved module attribute accesses before shipping."
+
     payload: Dict[str, Any] = {
         "status": status,
         "verified": verified,
@@ -1363,6 +1366,9 @@ def protect_project(
             "files_processed": stats.get("files_processed"),
             "total_names_obfuscated": stats.get("total_names_obfuscated"),
             "strings_encoded": stats.get("strings_encoded"),
+            "module_attribute_accesses_unproved": stats.get(
+                "module_attribute_accesses_unproved", 0
+            ),
             "level": obf.get("level"),
             "trace_marker_id": obf.get("trace_marker_id"),
         },
