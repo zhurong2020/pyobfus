@@ -14,6 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (defect O). Builds reject newly introduced PEP 646 starred subscript syntax
   with the existing compatibility error and file/line diagnostics. Mixed slice
   subscripts such as `a[1:2, *xs]` retain their valid Python 3.11+ syntax.
+- Detect `sys.modules` mutator calls and `|=` through supported import and
+  assignment aliases before proving cross-file module attribute rewrites.
+  Registry mutations now produce the existing `module_attribute.modules_store`
+  check reason and unproved-access build warning; ordinary objects and read-only
+  registry calls retain their existing behavior. Incremental builds invalidate
+  cached module attribute analysis from earlier versions.
 
 ## [0.7.4] - 2026-10-18
 

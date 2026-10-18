@@ -696,31 +696,72 @@ def discover_modules_stores(
         visit_DictComp = visit_ListComp
         visit_GeneratorExp = visit_ListComp
 
+        def mutation(self, receiver: ast.expr, site: ast.AST) -> None:
+            resolved = self.resolve(receiver)
+            candidates = self._resolve_candidates(receiver)
+            path = _expression_binding(receiver)
+            if path is None and isinstance(receiver, ast.Attribute):
+                # AugAssign attributes carry Store context; retain the lexical
+                # root for the same uncertain-import guard as subscript stores.
+                lexical_owner = _expression_binding(receiver.value)
+                path = f"{lexical_owner}.{receiver.attr}" if lexical_owner else None
+            reason = None
+            if resolved == "sys.modules":
+                reason = "resolved sys.modules store/delete"
+            elif "sys.modules" in candidates:
+                reason = "possible sys.modules alias with competing or indirect binding"
+            elif resolved is None:
+                root = path.split(".")[0] if path else None
+                imported = False
+                for scope in reversed(self.scopes):
+                    if root in scope:
+                        imported = root in self.imported_roots.get(id(scope), set())
+                        break
+                if (
+                    isinstance(receiver, ast.Attribute)
+                    and receiver.attr == "modules"
+                    and (candidates or imported or path == "sys.modules")
+                ) or (isinstance(receiver, ast.Name) and imported):
+                    reason = "unresolved imported or possible sys receiver"
+                elif (
+                    isinstance(receiver, ast.Call)
+                    and isinstance(receiver.func, ast.Name)
+                    and receiver.func.id == "getattr"
+                    and len(receiver.args) >= 2
+                ):
+                    # Dynamic lookup is an observation, never an identity proof.
+                    owner = receiver.args[0]
+                    owner_path = _expression_binding(owner)
+                    if (
+                        "sys" in self._resolve_candidates(owner)
+                        or self.resolve(owner) == "sys"
+                        or owner_path == "sys"
+                    ):
+                        reason = "dynamic attribute lookup on a possible sys receiver"
+            if reason:
+                stores.append((site.lineno, site.col_offset, reason))  # type: ignore[attr-defined]
+
         def visit_Subscript(self, node: ast.Subscript) -> None:
             if not isinstance(node.ctx, ast.Load):
-                resolved = self.resolve(node.value)
-                candidates = self._resolve_candidates(node.value)
-                path = _expression_binding(node.value)
-                reason = None
-                if resolved == "sys.modules":
-                    reason = "resolved sys.modules store/delete"
-                elif "sys.modules" in candidates:
-                    reason = "possible sys.modules alias with competing or indirect binding"
-                elif resolved is None:
-                    root = path.split(".")[0] if path else None
-                    imported = False
-                    for scope in reversed(self.scopes):
-                        if root in scope:
-                            imported = root in self.imported_roots.get(id(scope), set())
-                            break
-                    if (
-                        isinstance(node.value, ast.Attribute)
-                        and node.value.attr == "modules"
-                        and (candidates or imported or path == "sys.modules")
-                    ) or (isinstance(node.value, ast.Name) and imported):
-                        reason = "unresolved imported or possible sys receiver"
-                if reason:
-                    stores.append((node.lineno, node.col_offset, reason))
+                self.mutation(node.value, node)
+            self.generic_visit(node)
+
+        def visit_Call(self, node: ast.Call) -> None:
+            if isinstance(node.func, ast.Attribute) and node.func.attr in {
+                "update",
+                "setdefault",
+                "pop",
+                "popitem",
+                "clear",
+                "__setitem__",
+                "__delitem__",
+            }:
+                self.mutation(node.func.value, node)
+            self.generic_visit(node)
+
+        def visit_AugAssign(self, node: ast.AugAssign) -> None:
+            if isinstance(node.op, ast.BitOr):
+                self.mutation(node.target, node)
             self.generic_visit(node)
 
     Stores(resolve_from, lambda n, m: None, lambda n: None).visit(tree)
