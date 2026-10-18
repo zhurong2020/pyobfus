@@ -27,6 +27,7 @@ docs/P2-10_DESIGN.md for the threat model.
 from __future__ import annotations
 
 import ast
+from pyobfus.core.unparse import unparse
 import os
 from pathlib import Path
 
@@ -158,7 +159,7 @@ def transform_module(
 
     tree.body[insert_at:insert_at] = [import_stmt, key_assign, install_call]
     ast.fix_missing_locations(tree)
-    return ast.unparse(tree)
+    return unparse(tree)
 
 
 def _already_transformed(tree: ast.Module) -> bool:

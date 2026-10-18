@@ -60,6 +60,7 @@ Patent-gated. See ``../runtime/vault.py`` for the runtime side and
 from __future__ import annotations
 
 import ast
+from pyobfus.core.unparse import unparse
 import secrets
 
 from pyobfus_pro.runtime.vault import Vault
@@ -189,7 +190,7 @@ def transform_module(
     tree.body = new_body
     _ensure_vault_class_import(tree)
     ast.fix_missing_locations(tree)
-    return ast.unparse(tree), schemas
+    return unparse(tree), schemas
 
 
 # ---------------------------------------------------------------------------

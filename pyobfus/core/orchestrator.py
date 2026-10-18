@@ -169,6 +169,9 @@ def _transform_single_file(
                 source_label=Path(relative_path).as_posix(),
             )
 
+        from pyobfus.core.fstring_compat import ensure_fstring_compatibility
+
+        ensure_fstring_compatibility(source, new_source, str(file_path))
         output_file = output_dir / relative_path
         output_file.parent.mkdir(parents=True, exist_ok=True)
         with open(output_file, "w", encoding="utf-8") as f:

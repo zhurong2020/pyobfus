@@ -6,6 +6,7 @@ use source coordinates so separate worker parses and earlier edits are safe.
 """
 
 import ast
+from pyobfus.core.unparse import unparse
 import symtable
 from collections import defaultdict
 from typing import Any, Dict, Set, Tuple
@@ -60,7 +61,7 @@ def import_plan(
         for n in ast.walk(tree)
     ):
         return {}, {}, {}, set()
-    source = ast.unparse(tree)
+    source = unparse(tree)
     normalized = ast.parse(source)
     string_binders = (ast.ExceptHandler,) + tuple(
         getattr(ast, name)
