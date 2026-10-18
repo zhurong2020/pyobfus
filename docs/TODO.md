@@ -230,7 +230,8 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       建议：子类化 unparser，在 <3.12.9 时用 3.13 的引号选择；源码未用 PEP 701 专属写法时断言产物也不用（tokenize 检测）；测试与补丁版本无关；3.13+ 产物逐字节不变。10-18 维护者批准实现（含 `--check` 提示），14:05 后交 Codex、Claude 审；发版另批。
 - [ ] **缺陷 P · `sys.modules.update()/setdefault()/pop()` 换掉项目模块时不被识别**（10-18 审核 PR #103 时发现，main 同样存在）：
       `sys.modules.update({'pkg.core': m})` 后 `core.f` 仍被改写，产物运行 AttributeError，构建与 `--check` 都无提示；下标写入形式已正确识别。
-      修法：把 `sys.modules` 上的变更方法调用并入 `discover_modules_stores`。未批准实现。
+      10-18 维护者批准实现；PR #N 待审 (`fix/sys-modules-mutators`)。
+      Detect registry mutators and `|=` with the existing conservative receiver rules; retain build warnings and check reasons.
 - [ ] **缺陷 O · 下标里的带星号元组丢括号，产物需 Python ≥3.11**（10-18 审核 PR #102 时发现，所有构建版本都有，与 N 无关）：
       源码 `Annotated[(x, *y)]`（3.9/3.10 合法）经 `ast.unparse` 变成 `Annotated[x, *y]`（PEP 646，3.11+ 才合法）；3.12/3.13/3.14 一致。
       实测 pydantic 3 个文件中招。修法同 N：在共享 unparser 里给含 `Starred` 的下标元组保留括号，并让兼容自检覆盖这一类。未批准实现。

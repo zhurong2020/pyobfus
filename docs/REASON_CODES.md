@@ -73,7 +73,7 @@ package initializer, containing-package cycle, other. The strict eligibility rul
 
 | Code | Meaning |
 |---|---|
-| `module_attribute.modules_store` | A resolved or possible `sys.modules` store/delete closes all project proofs. |
+| `module_attribute.modules_store` | A resolved or possible `sys.modules` store/delete, mutator call (`update`, `setdefault`, `pop`, `popitem`, `clear`, `__setitem__`, `__delitem__`), or `|=` closes all project proofs. |
 | `module_attribute.package_init_not_static` | A containing package initializer fails the existing static package rules. |
 | `module_attribute.import_cycle` | The importer, target or containing package is in an import cycle. |
 | `module_attribute.module_hazard` | An escape, mutation or namespace hazard prevents the proof. |
@@ -88,4 +88,4 @@ Stores/deletes and observed dynamic attribute hazards count too. The count is
 observational and does not imply every unproved candidate will fail at runtime.
 Other build modes expose zero because they do not create an H project export plan.
 Positive counts emit one stderr warning and suggest `--check` in the JSON AI
-hint. Incremental hits retain the count; pre-H4 cache signatures invalidate.
+hint. Incremental hits retain the count; older module attribute analysis cache signatures invalidate.
