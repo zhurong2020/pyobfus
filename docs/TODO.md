@@ -217,7 +217,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 - [ ] **H PR 4 · 10-18 维护者定选项 1（批准实现，14:05 后交 Codex、Claude 审；发版另批）**：10-18 实测 0.7.3 自混淆构建无告警、运行即 AttributeError，三个独立阻断：
       B1 `module_attributes.py` 对任何 `x.modules[k] = v` 写入（不论是否 `sys`）把全项目标为不安全（`core/mapping.py` 一处即关掉 61 个模块）；
       B2 包 `__init__` 的 try/外部导入；B3 再导出子模块回导包内 `__version__` 的导入环。本 PR 只做：修 B1 误判、`--check` 写明拒绝原因、构建时提示未证明安全的属性访问数。
-      选项 1 实现待审，B2/B3 未做（等用户触发）；PR 编号将在草稿创建后补齐。范围备忘与 Codex 提示词私有 `docs/internal/codex-2026-10/SCOPE_H4_PARAMS_2026-10-18.md`。原登记：包 `__init__` 里 `try: __version__ = version(...)` 会阻止整个包的子模块属性改写（pyobfus 自身可复现）；评估仅绑定与子模块名无关的语句能否安全放宽。需单独确认范围，不阻塞已发布版本。
+      选项 1 PR #103 待审，B2/B3 未做（等用户触发）。范围备忘与 Codex 提示词私有 `docs/internal/codex-2026-10/SCOPE_H4_PARAMS_2026-10-18.md`。原登记：包 `__init__` 里 `try: __version__ = version(...)` 会阻止整个包的子模块属性改写（pyobfus 自身可复现）；评估仅绑定与子模块名无关的语句能否安全放宽。需单独确认范围，不阻塞已发布版本。
 - [x] **既有缺陷 C · 运行时注入的模块级名字** — **10-15 合并 PR #100（`bde110c`），随 0.7.3 发布**。
       Community correctness fix: automatically preserve static `enum.global_enum` members in single-file and directory builds;
       preserve module export spellings when module-level `__getattr__` prevents H proofs, and conservatively preserve non-static enum modules with a planning warning.
