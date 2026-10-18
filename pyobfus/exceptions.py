@@ -67,4 +67,4 @@ class LimitExceededError(PyObfusError):
 
 
 class FStringCompatibilityError(PyObfusError):
-    """Generated source introduced a PEP 701 syntax requirement."""
+    """Generated source introduced a PEP 701 or PEP 646 syntax requirement."""

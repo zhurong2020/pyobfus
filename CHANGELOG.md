@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Preserve parentheses around starred tuple subscripts on every builder, so
+  Python 3.9-compatible source does not acquire a Python 3.11 requirement
+  (defect O). Builds reject newly introduced PEP 646 starred subscript syntax
+  with the existing compatibility error and file/line diagnostics. Mixed slice
+  subscripts such as `a[1:2, *xs]` retain their valid Python 3.11+ syntax.
+
 ## [0.7.4] - 2026-10-18
 
 ### Fixed
