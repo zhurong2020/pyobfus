@@ -16,10 +16,10 @@
 
 pyobfus is a local-first, AST-based Python obfuscator for Python 3.9–3.14. It
 obfuscates multi-file projects and packages as a whole: names are renamed
-consistently across modules and imports are rewritten to match, so the output
-is still ordinary `.py` that runs without pyobfus installed. It can also
-reverse-map protected production tracebacks for developers and AI coding
-agents. Community is Apache-2.0, has no file or line limits, and requires no
+consistently across modules and imports are rewritten to match, so Community
+output is still ordinary `.py` that runs without pyobfus installed. Keep the
+mapping file from the build private, and `pyobfus --unmap` turns a production
+traceback back into your original names, for you or an AI coding agent. Community is Apache-2.0, has no file or line limits, and requires no
 trial.
 
 > **What's new in v0.7.3:** directory builds keep `enum.global_enum` members

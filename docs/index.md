@@ -12,7 +12,9 @@ title: pyobfus documentation
 pyobfus is a local-first, AST-based Python obfuscator for Python 3.9–3.14.
 It obfuscates multi-file projects and packages as a whole: names are renamed
 consistently across modules and imports are rewritten to match, so the output
-is still ordinary `.py` that runs without pyobfus installed.
+is still ordinary `.py` that runs without pyobfus installed (Community output).
+Keep the mapping file from the build private, and `pyobfus --unmap` turns a
+production traceback back into your original names.
 Community is Apache-2.0, has no file or line limits, and requires no trial.
 
 [简体中文概览](https://github.com/zhurong2020/pyobfus/blob/main/README.zh-CN.md)
@@ -45,9 +47,9 @@ pyobfus src/ -o dist/ --save-mapping mapping.json --verify-syntax
 # --verify-syntax only compiles the output; run your own tests against dist/
 ```
 
-`--verify-names` is merged on main but not in PyPI 0.7.0. It remains opt-in
-and reports partial coverage explicitly. See [name verification](NAME_VERIFICATION.md)
-for source-checkout/candidate usage and static-analysis limits.
+Since 0.7.1, add opt-in `--verify-names` to check newly unbound globals
+without execution. It reports partial coverage explicitly. See
+[name verification](NAME_VERIFICATION.md) for static-analysis limits.
 
 When a production traceback arrives:
 
