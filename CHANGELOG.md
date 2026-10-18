@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Preserve parentheses around starred tuple subscripts on every builder, so
+  Python 3.9-compatible source does not acquire a Python 3.11 requirement
+  (defect O). Builds reject newly introduced PEP 646 starred subscript syntax
+  with the existing compatibility error and file/line diagnostics. Mixed slice
+  subscripts such as `a[1:2, *xs]` retain their valid Python 3.11+ syntax.
+
 - Preserve pre-3.12 f-string syntax when building on CPython 3.12.0–3.12.8
   (defect N), including nested expressions and format specifications. Core and
   Pro source generation share the CPython 3.13 quote selector on these builders.

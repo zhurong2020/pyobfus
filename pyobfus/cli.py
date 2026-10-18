@@ -1992,7 +1992,15 @@ def _obfuscate_directory_crossfile(
         )
 
         if transform_errors and any(
-            "generated f-string requires Python" in e for e in transform_errors
+            any(
+                marker in e
+                for marker in (
+                    "generated f-string requires Python",
+                    "generated subscript requires Python",
+                    "generated syntax is invalid on this builder",
+                )
+            )
+            for e in transform_errors
         ):
             raise FStringCompatibilityError("; ".join(transform_errors))
         if transform_errors and config.crossfile_module_attributes:

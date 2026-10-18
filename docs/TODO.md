@@ -231,9 +231,9 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 - [ ] **缺陷 P · `sys.modules.update()/setdefault()/pop()` 换掉项目模块时不被识别**（10-18 审核 PR #103 时发现，main 同样存在）：
       `sys.modules.update({'pkg.core': m})` 后 `core.f` 仍被改写，产物运行 AttributeError，构建与 `--check` 都无提示；下标写入形式已正确识别。
       修法：把 `sys.modules` 上的变更方法调用并入 `discover_modules_stores`。未批准实现。
-- [ ] **缺陷 O · 下标里的带星号元组丢括号，产物需 Python ≥3.11**（10-18 审核 PR #102 时发现，所有构建版本都有，与 N 无关）：
+- [ ] **缺陷 O · 下标里的带星号元组丢括号，产物需 Python ≥3.11**（10-18 审核 PR #102 时发现; CPython 3.11+ builders, independent of N）：
       源码 `Annotated[(x, *y)]`（3.9/3.10 合法）经 `ast.unparse` 变成 `Annotated[x, *y]`（PEP 646，3.11+ 才合法）；3.12/3.13/3.14 一致。
-      实测 pydantic 3 个文件中招。修法同 N：在共享 unparser 里给含 `Starred` 的下标元组保留括号，并让兼容自检覆盖这一类。未批准实现。
+      实测 pydantic 3 个文件中招。修法同 N：在共享 unparser 里给含 `Starred` 的下标元组保留括号，并让兼容自检覆盖这一类。PR #104 待审 (`fix/starred-subscript-parens`); shared unparser fix and compatibility regressions implemented.
 - [ ] **候选 · 3.12 嵌套 f-string 的 `--check` 提示**（低优先级，10-11 登记；可随缺陷 N 一起做：源码用了 PEP 701 专属写法时提示产物需 ≥3.12）：3.12 起允许 f-string 内复用同种引号/嵌套，
       产物在 3.9–3.11 上无法解析；目录/单文件构建若面向旧解释器分发，`--check` 可提示目标版本不兼容。先确认 `--verify-syntax`
       与 `target_python` 现有行为再定是否需要。

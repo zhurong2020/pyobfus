@@ -4,6 +4,7 @@ feature_version on ast.parse does not enforce the old f-string lexer on
 Python 3.12. Inspect tokens instead; never execute the inspected source.
 """
 
+import ast
 import io
 import re
 import token
@@ -85,14 +86,70 @@ def pep701_locations(source: str) -> List[Tuple[int, int]]:
     return sorted(locations)
 
 
+def pep646_locations(source: str) -> List[Tuple[int, int]]:
+    """Find bare starred tuple subscripts using AST locations and tokens.
+
+    AST identifies subscripts without mistaking lists, strings or comments for
+    them. Tokens distinguish enclosing parentheses, which AST discards.
+    On pre-3.11 builders bare starred subscripts already fail parsing; callers
+    reject that invalid generated syntax too.
+    """
+    locations = []
+    for node in ast.walk(ast.parse(source)):
+        if not (
+            isinstance(node, ast.Subscript)
+            and isinstance(node.slice, ast.Tuple)
+            and any(isinstance(elt, ast.Starred) for elt in node.slice.elts)
+        ):
+            continue
+        segment = ast.get_source_segment(source, node.slice)
+        assert segment is not None
+        tokens = [
+            item.string
+            for item in tokenize.generate_tokens(io.StringIO(segment).readline)
+            if item.type
+            not in (tokenize.ENDMARKER, tokenize.NEWLINE, tokenize.NL, tokenize.COMMENT)
+        ]
+        enclosed = False
+        if tokens and tokens[0] == "(":
+            depth = 0
+            for index, value in enumerate(tokens):
+                if value == "(":
+                    depth += 1
+                elif value == ")":
+                    depth -= 1
+                    if depth == 0:
+                        enclosed = index == len(tokens) - 1
+                        break
+        if not enclosed:
+            locations.append((node.slice.lineno, node.slice.col_offset))
+    return sorted(locations)
+
+
 def ensure_fstring_compatibility(original: str, generated: str, filename: str) -> None:
-    """Reject newly introduced PEP 701 requirements before writing output."""
-    if pep701_locations(original):
-        return
-    locations = pep701_locations(generated)
-    if locations:
+    """Reject newly introduced PEP 701/646 syntax before writing output.
+
+    Keep the existing exception and JSON error_type for compatibility.
+    """
+    if not pep701_locations(original):
+        locations = pep701_locations(generated)
+        if locations:
+            line, column = locations[0]
+            raise FStringCompatibilityError(
+                f"{filename}:{line}:{column + 1}: generated f-string requires Python >= 3.12 "
+                "although the source does not use PEP 701 syntax"
+            )
+    try:
+        original_locations = pep646_locations(original)
+        locations = pep646_locations(generated)
+    except SyntaxError as exc:
+        raise FStringCompatibilityError(
+            f"{filename}:{exc.lineno}:{exc.offset}: generated syntax is invalid on this "
+            "builder (bare starred subscripts require Python >= 3.11): " + exc.msg
+        ) from exc
+    if not original_locations and locations:
         line, column = locations[0]
         raise FStringCompatibilityError(
-            f"{filename}:{line}:{column + 1}: generated f-string requires Python >= 3.12 "
-            "although the source does not use PEP 701 syntax"
+            f"{filename}:{line}:{column + 1}: generated subscript requires Python >= 3.11 "
+            "although the source does not use PEP 646 starred subscript syntax"
         )
