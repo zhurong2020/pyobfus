@@ -22,12 +22,12 @@ mapping file from the build private, and `pyobfus --unmap` turns a production
 traceback back into your original names, for you or an AI coding agent.
 Community is Apache-2.0, has no file or line limits, and requires no trial.
 
-> **What's new in v0.7.4:** builds made on CPython 3.12.0–3.12.8 (for example
-> Ubuntu 24.04's Python 3.12.3) no longer rewrite f-strings into a form that only
-> Python 3.12+ can parse, so the output runs on 3.9–3.11 again; a build now stops
-> with a file and line if it would introduce that syntax. Directory builds also
-> stop treating any `obj.modules[...] = ...` write as a `sys.modules` change, and
-> report how many module attribute accesses they could not prove safe. Rebuild
+> **What's new in v0.7.5:** builds keep the parentheses in subscripts such as
+> `Annotated[(x, *extras)]`, so Python 3.9/3.10-compatible source no longer comes
+> out needing Python 3.11 (this affected pydantic, among others). Directory builds
+> also recognise `sys.modules.update()`, `setdefault()`, `pop()` and `|=` as
+> replacing modules, instead of producing output that fails with
+> `AttributeError`. 0.7.4 fixed f-strings built on CPython 3.12.0–3.12.8. Rebuild
 > and rerun your tests; see the
 > [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
 
