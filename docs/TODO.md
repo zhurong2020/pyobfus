@@ -5,7 +5,7 @@
 顺序做」，不记录历史。依据与实测证据见
 [`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
 
-最后更新：2026-10-18。Core 0.7.4（缺陷 N #102、H PR 4 选项 1 #103）已发布；此前 Core 0.7.3（缺陷 C #100、M #101）/ MCP 0.3.13 已发布（0.7.2 为缺陷 I），runtime 0.1.1 保持不变；Core/MCP Unreleased 均为空。发布前完整 CI 与本地四测试根通过，PyPI 发布包和 PEP 740 已独立验证，Registry 与 Zenodo/CFF 已同步。私有历史库 CI 已定性，Glama 502 已恢复；Glama 安装/握手/9 工具测试、渠道记录与源码 pin（`22ecd62`）均已完成。
+最后更新：2026-10-18。Core 0.7.5（缺陷 O #104、P #105）与 0.7.4（缺陷 N #102、H PR 4 选项 1 #103）已发布；此前 Core 0.7.3（缺陷 C #100、M #101）/ MCP 0.3.13 已发布（0.7.2 为缺陷 I），runtime 0.1.1 保持不变；Core/MCP Unreleased 均为空。发布前完整 CI 与本地四测试根通过，PyPI 发布包和 PEP 740 已独立验证，Registry 与 Zenodo/CFF 已同步。私有历史库 CI 已定性，Glama 502 已恢复；Glama 安装/握手/9 工具测试、渠道记录与源码 pin（`22ecd62`）均已完成。
 
 ## 状态口径
 
@@ -28,7 +28,7 @@
 | 2 | **10-19 周一巡检** | 下载安静日（0.7.2 发布日与次日不计）、客户反馈/调研回答、微信付款跟进线程（`/pyobfus-inbox`）、Stripe Alipay 审批状态、CI、许可证监控、KV 备份、Anthropic 插件解锁消息；仅留决策摘要。 |
 | 3 | **10-25 复盘** | 区分发布/次日/内容流量，综合下载、trial、客户回答和 DEV 来源，决定下轮优先级与发布节奏；评估一周两笔微信付款未完成是否需要更多动作（Alipay、弃单提醒需 Stripe restricted key）。 |
 
-缺陷 N 与 H PR 4 选项 1 已随 Core 0.7.4（10-18）发布；缺陷 O（PR #104）、P（Codex 实现中）待合并，下次发版另批；参数改名暂缓；Pro 扩展等真实需求信号，详见各条目。本次没有授权额外部署或客户邮件发送。
+缺陷 N、H PR 4 选项 1 随 Core 0.7.4，缺陷 O、P 随 0.7.5（均 10-18）发布；参数改名暂缓；Pro 扩展等真实需求信号，详见各条目。本次没有授权额外部署或客户邮件发送。
 
 ## 发布后观察与下次发版
 
@@ -228,10 +228,10 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       最小复现 `python3.12 -c "import ast;print(ast.unparse(ast.parse('''f\"{f'{x}'}\"''')))"` → `f'{f'{x}'}'`。
       `generator.py` 的 `_fix_fstring_quotes` 只修 `['k']` 下标；`--verify-syntax` 只用构建解释器 compile，均兜不住。运行语义不变，只是语法层。
       建议：子类化 unparser，在 <3.12.9 时用 3.13 的引号选择；源码未用 PEP 701 专属写法时断言产物也不用（tokenize 检测）；测试与补丁版本无关；3.13+ 产物逐字节不变。10-18 维护者批准实现（含 `--check` 提示），14:05 后交 Codex、Claude 审；发版另批。
-- [ ] **缺陷 P（10-18 批准；PR 待审，分支 `fix/sys-modules-mutators`）· `sys.modules.update()/setdefault()/pop()` 换掉项目模块时不被识别**（10-18 审核 PR #103 时发现，main 同样存在）：
+- [x] **缺陷 P — PR #105，随 Core 0.7.5（10-18）发布 · `sys.modules.update()/setdefault()/pop()` 换掉项目模块时不被识别**（10-18 审核 PR #103 时发现，main 同样存在）：
       `sys.modules.update({'pkg.core': m})` 后 `core.f` 仍被改写，产物运行 AttributeError，构建与 `--check` 都无提示；下标写入形式已正确识别。
       Detect registry mutators and `|=` with the existing conservative receiver rules; retain build warnings and check reasons.
-- [ ] **缺陷 O（PR #104 已合并 10-18，待下次发版）· 下标里的带星号元组丢括号，产物需 Python ≥3.11**（10-18 审核 PR #102 时发现，所有构建版本都有，与 N 无关）：
+- [x] **缺陷 O — PR #104，随 Core 0.7.5（10-18）发布 · 下标里的带星号元组丢括号，产物需 Python ≥3.11**（10-18 审核 PR #102 时发现，所有构建版本都有，与 N 无关）：
       源码 `Annotated[(x, *y)]`（3.9/3.10 合法）经 `ast.unparse` 变成 `Annotated[x, *y]`（PEP 646，3.11+ 才合法）；3.12/3.13/3.14 一致。
       实测 pydantic 3 个文件中招。修法同 N：在共享 unparser 里给含 `Starred` 的下标元组保留括号，并让兼容自检覆盖这一类。PR #104 待审 (`fix/starred-subscript-parens`); shared unparser fix and compatibility regressions implemented.
 - [ ] **候选 · 3.12 嵌套 f-string 的 `--check` 提示**（低优先级，10-11 登记；可随缺陷 N 一起做：源码用了 PEP 701 专属写法时提示产物需 ≥3.12）：3.12 起允许 f-string 内复用同种引号/嵌套，
