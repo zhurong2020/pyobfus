@@ -22,6 +22,7 @@ Used by the `pyobfus --check` CLI flag and by the MCP server tool
 from __future__ import annotations
 
 import ast
+from pyobfus.core.unparse import unparse
 from copy import deepcopy
 import json
 import sys
@@ -862,11 +863,11 @@ class PreflightChecker:
                         line=node.lineno,
                         col=node.col_offset,
                         message=(
-                            f"{ast.unparse(node)} accesses {module}.{node.attr}; "
+                            f"{unparse(node)} accesses {module}.{node.attr}; "
                             "directory builds do not rename attribute access through a module "
                             "object; this raises AttributeError at runtime."
                             if not config.crossfile_module_attributes
-                            else f"{ast.unparse(node)} accesses {module}.{node.attr}; attribute access through a module "
+                            else f"{unparse(node)} accesses {module}.{node.attr}; attribute access through a module "
                             "object is not proved safe for rewriting and may cause AttributeError at runtime."
                         ),
                         suggestion=(
@@ -894,7 +895,7 @@ class PreflightChecker:
                     attribute(node, module)
                     if len(report.risks) > before:
                         report.risks[-1].message = (
-                            f"{ast.unparse(node)} accesses project module candidate {module}.{node.attr}; "
+                            f"{unparse(node)} accesses project module candidate {module}.{node.attr}; "
                             "module identity cannot be proved because its import binding has competing "
                             "stores/deletes, assignment aliases, a dynamic import result or an imported "
                             "module member chain. Renamed exports may "
@@ -975,6 +976,59 @@ class PreflightChecker:
         except (ParseError, FileNotFoundError, ValueError) as e:
             report.parse_errors.append(f"{file_path}: {e}")
             return
+
+        from pyobfus.core.fstring_compat import pep701_locations
+        from pyobfus.core.source_prologue import read_python_source
+        from pyobfus.core.dependency_advisory import _load_toml
+
+        try:  # optional: only refines the severity from pyproject requires-python
+            from packaging.specifiers import InvalidSpecifier, SpecifierSet
+            from packaging.version import InvalidVersion, Version
+        except ImportError:  # pragma: no cover - packaging is present in most environments
+            SpecifierSet = None  # type: ignore[assignment,misc]
+
+        sites = pep701_locations(read_python_source(file_path))
+        if sites:
+            declared = _parse_python_minor(self.target_python_min)
+            below = declared is not None and declared < (3, 12)
+            root = Path(report.root)
+            project_root = root.parent if root.is_file() else root
+            # The nearest project metadata also applies to single-file scans.
+            for directory in (project_root, *project_root.parents):
+                if SpecifierSet is None:
+                    break
+                metadata = directory / "pyproject.toml"
+                if not metadata.is_file():
+                    continue
+                data = _load_toml(metadata) or {}
+                project = data.get("project", {})
+                requirement = (
+                    project.get("requires-python", "") if isinstance(project, dict) else ""
+                )
+                if requirement:
+                    try:
+                        spec = SpecifierSet(requirement)
+                        floors = [
+                            Version(item.version.rstrip(".*"))
+                            for item in spec
+                            if item.operator in (">=", ">", "~=", "==", "===")
+                        ]
+                        below |= max(floors, default=Version("0")) < Version("3.12")
+                    except (InvalidSpecifier, InvalidVersion):
+                        pass
+                break
+            report.risks.append(
+                Risk(
+                    category=CAT_COMPAT_ADVISORY,
+                    severity=SEVERITY_MEDIUM if below else SEVERITY_INFO,
+                    file=str(file_path),
+                    line=sites[0][0],
+                    col=sites[0][1],
+                    message="PEP 701 f-string syntax: output requires Python >= 3.12.",
+                    suggestion="Use Python >= 3.12 to run the output, or rewrite the source "
+                    "f-string for older interpreters before building.",
+                )
+            )
 
         visitor = _RiskVisitor(str(file_path))
         visitor.visit(tree)

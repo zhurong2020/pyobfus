@@ -223,6 +223,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       preserve module export spellings when module-level `__getattr__` prevents H proofs, and conservatively preserve non-static enum modules with a planning warning.
       Artifact regressions cover references, `__all__`, imports, module attributes, dynamic enums, exclude_names and standard-library `calendar` / `re`.
 - [ ] **缺陷 N · 在 CPython 3.12.0–3.12.8 上构建，兼容 3.9 的 f-string 被改成同引号复用，产物在 3.9–3.11 上 SyntaxError**（10-18 复现，Community 正确性）：
+      PR #102 待审 (`fix/fstring-quote-312`); regression coverage and compatibility guard implemented.
       根因是这些补丁版的 `ast.unparse` 选引号不避开内层引号（3.12.9 / 3.13 已修；Ubuntu 24.04 自带 3.12.3，CI 用最新补丁版所以测不到）。
       最小复现 `python3.12 -c "import ast;print(ast.unparse(ast.parse('''f\"{f'{x}'}\"''')))"` → `f'{f'{x}'}'`。
       `generator.py` 的 `_fix_fstring_quotes` 只修 `['k']` 下标；`--verify-syntax` 只用构建解释器 compile，均兜不住。运行语义不变，只是语法层。

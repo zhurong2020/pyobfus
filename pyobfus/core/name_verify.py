@@ -15,6 +15,7 @@ The baseline must be taken before output is written, so an in-place build
 from __future__ import annotations
 
 import ast
+from pyobfus.core.unparse import unparse
 import builtins
 import symtable
 import tokenize
@@ -120,7 +121,7 @@ def snapshot_source(input_path: Path, files: Iterable[Path]) -> Dict[str, Source
             continue
         plan = star_plans.get(key[:-3].replace("/", "."), {})
         if plan:
-            text = ast.unparse(expand_stars(ast.parse(text), plan))
+            text = unparse(expand_stars(ast.parse(text), plan))
         names, reason = _analyze_source(text, key)
         baseline[key] = {"undefined_globals": names, "skip_reason": reason}
     return baseline

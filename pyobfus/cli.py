@@ -37,7 +37,12 @@ from pyobfus.core.source_prologue import (
 from pyobfus.core.generator import CodeGenerator
 from pyobfus.core.parser import ASTParser
 from pyobfus.core.orchestrator import CrossFileOrchestrator
-from pyobfus.exceptions import LimitExceededError, ParseError, PyObfusError
+from pyobfus.exceptions import (
+    FStringCompatibilityError,
+    LimitExceededError,
+    ParseError,
+    PyObfusError,
+)
 from pyobfus.transformers.name_mangler import NameMangler
 from pyobfus.utils import filter_python_files, format_skipped_directories
 from pyobfus.trial import is_trial_active, get_trial_expiry_message
@@ -391,7 +396,8 @@ def _echo_pro_import_hint() -> None:
     "check_mode",
     is_flag=True,
     help="Pre-flight risk check: scan for eval/exec, dynamic attributes, "
-    "framework reflection points and potential hardcoded secrets (coarse screening). "
+    "framework reflection points, PEP 701 compatibility, and potential hardcoded secrets "
+    "(coarse screening). "
     "No files are written. "
     "Exit code 0=safe, 1=high-risk findings, 2=parse errors.",
 )
@@ -1223,6 +1229,13 @@ def main(
             current_sig = cache.build_signature(input_path_obj, input_files_for_sig, config)
             hit, reason, cached_outputs = cache.can_reuse(current_sig)
             if hit:
+                from pyobfus.core.fstring_compat import ensure_fstring_compatibility
+
+                for original in input_files_for_sig:
+                    generated = output_path_obj / original.relative_to(input_path_obj)
+                    ensure_fstring_compatibility(
+                        read_python_source(original), read_python_source(generated), str(original)
+                    )
                 click.echo(
                     f"\nIncremental: skipping — {reason} "
                     f"({len(cached_outputs or [])} output file(s) reused)"
@@ -1720,6 +1733,10 @@ def _obfuscate_file(
             source_root=source_root if source_root is not None else input_file.parent,
         )
 
+    from pyobfus.core.fstring_compat import ensure_fstring_compatibility
+
+    ensure_fstring_compatibility(original_source, obfuscated_code, str(input_file))
+
     # Write output
     if not dry_run:
         output_file.parent.mkdir(parents=True, exist_ok=True)
@@ -1850,6 +1867,8 @@ def _obfuscate_directory(
                     dir_stats[key] += value
                 elif key.startswith(_PROTECTION_STAT_PREFIX):
                     dir_stats[key] = value
+        except FStringCompatibilityError:
+            raise
         except PyObfusError as e:
             click.echo(f"  Warning: Failed to obfuscate {python_file}: {e}", err=True)
 
@@ -1972,6 +1991,10 @@ def _obfuscate_directory_crossfile(
             progress_callback=_progress,
         )
 
+        if transform_errors and any(
+            "generated f-string requires Python" in e for e in transform_errors
+        ):
+            raise FStringCompatibilityError("; ".join(transform_errors))
         if transform_errors and config.crossfile_module_attributes:
             from pyobfus.exceptions import TransformError
 

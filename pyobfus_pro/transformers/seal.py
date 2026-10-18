@@ -44,6 +44,7 @@ inventive-step framing of the coupling.
 from __future__ import annotations
 
 import ast
+from pyobfus.core.unparse import unparse
 import types
 from collections.abc import Iterable
 
@@ -148,7 +149,7 @@ def transform_module(
     _ensure_runtime_import(tree)
 
     ast.fix_missing_locations(tree)
-    return ast.unparse(tree)
+    return unparse(tree)
 
 
 def _is_seal_code_decorator(dec: ast.expr) -> bool:

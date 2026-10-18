@@ -45,6 +45,7 @@ framing.
 from __future__ import annotations
 
 import ast
+from pyobfus.core.unparse import unparse
 import secrets
 import types
 from collections.abc import Iterable
@@ -222,7 +223,7 @@ def transform_module(
         _ensure_layer_key_constant(tree, effective_key)
 
     ast.fix_missing_locations(tree)
-    return ast.unparse(tree), assignments
+    return unparse(tree), assignments
 
 
 # ---------------------------------------------------------------------------

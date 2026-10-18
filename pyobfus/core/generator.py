@@ -11,6 +11,7 @@ import sys
 from pathlib import Path
 from typing import Optional, Union, cast
 
+from pyobfus.core.unparse import unparse
 from pyobfus import __version__
 from pyobfus.core.build_marker import apply_marker, safe_source_label
 from pyobfus.exceptions import GenerationError
@@ -41,13 +42,16 @@ class CodeGenerator:
         try:
             # Python 3.9+ has ast.unparse
             if sys.version_info >= (3, 9):
-                source_code = ast.unparse(tree)
+                source_code = unparse(tree)
             else:
                 # Fallback for Python 3.8
                 source_code = CodeGenerator._unparse_fallback(tree)
 
             # Validate and fix any f-string quote conflicts
-            source_code = CodeGenerator._fix_fstring_quotes(source_code)
+            # Preserve historical bytes outside the affected patch releases.
+            # On affected builders the backport supersedes the subscript-only fix.
+            if not (3, 12) <= sys.version_info < (3, 12, 9):
+                source_code = CodeGenerator._fix_fstring_quotes(source_code)
 
             return source_code
         except Exception as e:
