@@ -1,7 +1,9 @@
-"""CPython 3.13 f-string quote selection for CPython 3.12.0–3.12.8.
+"""Shared source generation with starred subscript compatibility.
+
+CPython 3.13 f-string quote selection is backported only for 3.12.0–3.12.8.
 
 Adapted from CPython Lib/ast.py (PSF license). Keep the backport local:
-other builders must continue using their native ast.unparse implementation.
+other builders retain native formatting except for starred subscript tuples.
 """
 
 import ast
@@ -10,10 +12,37 @@ from typing import cast
 
 _ALL_QUOTES = ("'", '"', "'" * 3, '"' * 3)
 _MULTI_QUOTES = ("'" * 3, '"' * 3)
+if sys.version_info >= (3, 14):
+    from _ast_unparse import Unparser as _NativeUnparser
+else:
+    _NativeUnparser = getattr(ast, "_Unparser")
 _BaseUnparser = getattr(ast, "_Unparser", object)
 
 
-class FStringUnparser(_BaseUnparser):  # type: ignore[misc, valid-type]
+class SubscriptUnparser(_NativeUnparser):  # type: ignore[misc, valid-type]
+    """Keep starred tuple subscripts valid on Python 3.9 and 3.10."""
+
+    def visit_Subscript(self, node):
+        if (
+            isinstance(node.slice, ast.Tuple)
+            and any(isinstance(elt, ast.Starred) for elt in node.slice.elts)
+            and not any(isinstance(elt, ast.Slice) for elt in node.slice.elts)
+        ):
+            # The native method bypasses visit_Tuple and omits its parentheses.
+            # Use its own precedence enum (moved to _ast_unparse in 3.14).
+            precedence = _NativeUnparser.visit_Subscript.__globals__["_Precedence"]
+            self.set_precedence(precedence.ATOM, node.value)
+            self.traverse(node.value)
+            with self.delimit("[", "]"):
+                with self.delimit("(", ")"):
+                    self.items_view(self.traverse, node.slice.elts)
+        else:
+            # Mixed slices such as a[1:2, *xs] already require 3.11+ and
+            # cannot be parenthesized: (1:2, *xs) is not a valid tuple.
+            super().visit_Subscript(node)
+
+
+class FStringUnparser(SubscriptUnparser):  # type: ignore[misc, valid-type]
     """Backport the quote selector and its mutually dependent methods."""
 
     def visit(self, node):
@@ -166,11 +195,18 @@ def _backport_available():
 
 
 def unparse(tree: ast.AST) -> str:
-    """Use the backport only on affected CPython patch releases.
+    """Preserve starred tuple parentheses on every supported builder.
 
-    If the private API is unavailable, defer to the native implementation;
-    the source/output compatibility guard still rejects a syntax regression.
+    Keep the f-string backport restricted to affected CPython patch releases.
+    The source/output compatibility guard also rejects syntax regressions.
     """
     if (3, 12) <= sys.version_info < (3, 12, 9) and _backport_available():
         return cast(str, FStringUnparser().visit(tree))
+    if any(
+        isinstance(node, ast.Subscript)
+        and isinstance(node.slice, ast.Tuple)
+        and any(isinstance(elt, ast.Starred) for elt in node.slice.elts)
+        for node in ast.walk(tree)
+    ):
+        return cast(str, SubscriptUnparser().visit(tree))
     return ast.unparse(tree)
