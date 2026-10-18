@@ -35,6 +35,7 @@ from pyobfus.core.enum_injection import enum_injection_plan
 from pyobfus.core.import_resolution import discover_accesses
 from pyobfus.core.secret_literals import SUGGESTION, find_secret_literals
 from pyobfus.core.parser import ASTParser
+from pyobfus.core.reason_codes import REASON_CODES_VERSION, describe
 from pyobfus.exceptions import ParseError
 from pyobfus.utils import filter_python_files, format_skipped_directories
 
@@ -98,12 +99,18 @@ class Risk:
     snippet: str = ""
     mitigated_by: Optional[str] = None
     _target_name: Optional[str] = field(default=None, repr=False)
+    reason: Optional[str] = None
+    reasons: Optional[List[str]] = None
 
     def to_dict(self) -> dict:
         data = asdict(self)
         data.pop("_target_name", None)
         if data["mitigated_by"] is None:
             data.pop("mitigated_by")
+        if data["reason"] is None:
+            data.pop("reason")
+        if data["reasons"] is None:
+            data.pop("reasons")
         return data
 
 
@@ -167,6 +174,7 @@ class PreflightReport:
     def to_dict(self) -> dict:
         payload = {
             "version": 1,
+            "reason_codes_version": REASON_CODES_VERSION,
             "root": self.root,
             "files_scanned": self.files_scanned,
             "skipped_directories": self.skipped_directories[:10],
@@ -855,8 +863,13 @@ class PreflightChecker:
                 if site in seen_sites:
                     return
                 seen_sites.add(site)
+                reasons = list(inventory.rejection_reasons(module, file_info.module_name))
+                reason = reasons[0]
+                explanation = " ".join(describe(r) for r in reasons)
                 report.risks.append(
                     Risk(
+                        reason=reason,
+                        reasons=reasons,
                         category=CAT_COMPAT_ADVISORY,
                         severity=SEVERITY_MEDIUM,
                         file=str(file_info.path),
@@ -865,10 +878,12 @@ class PreflightChecker:
                         message=(
                             f"{unparse(node)} accesses {module}.{node.attr}; "
                             "directory builds do not rename attribute access through a module "
-                            "object; this raises AttributeError at runtime."
+                            "object; this raises AttributeError at runtime. Reason: " + explanation
                             if not config.crossfile_module_attributes
                             else f"{unparse(node)} accesses {module}.{node.attr}; attribute access through a module "
                             "object is not proved safe for rewriting and may cause AttributeError at runtime."
+                            + " Reason: "
+                            + explanation
                         ),
                         suggestion=(
                             f"Resolve the duplicate file/package import roots for {module}; "
@@ -899,7 +914,11 @@ class PreflightChecker:
                             "module identity cannot be proved because its import binding has competing "
                             "stores/deletes, assignment aliases, a dynamic import result or an imported "
                             "module member chain. Renamed exports may "
-                            "cause AttributeError at runtime."
+                            "cause AttributeError at runtime. Reason: "
+                            + " ".join(
+                                describe(r)
+                                for r in report.risks[-1].reasons or ["module_attribute.other"]
+                            )
                         )
 
             groups: Dict[int, List[ModuleHazard]] = {}
@@ -941,11 +960,13 @@ class PreflightChecker:
                 report.risks.append(
                     Risk(
                         category=CAT_COMPAT_ADVISORY,
+                        reason="module_attribute.module_hazard",
+                        reasons=["module_attribute.module_hazard"],
                         severity=SEVERITY_MEDIUM if changed else SEVERITY_INFO,
                         file=str(file_info.path),
                         line=position[0],
                         col=position[1],
-                        message=message,
+                        message=message + " Reason: " + describe("module_attribute.module_hazard"),
                         suggestion=f"Affected names: {listed}. Add the affected names to "
                         "exclude_names. "
                         + (

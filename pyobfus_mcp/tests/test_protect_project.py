@@ -266,3 +266,15 @@ def test_protect_project_trace_marker_can_be_disabled(tmp_path: Path) -> None:
 
     assert result["obfuscation"]["trace_marker_id"] is None
     assert "# pyobfus:obfuscated" not in (out / "calc.py").read_text(encoding="utf-8")
+
+
+def test_protect_project_retains_unproved_attribute_count(tmp_path: Path) -> None:
+    src = tmp_path / "src"
+    _write(src, "pkg/__init__.py", "import os\n")
+    _write(src, "pkg/mod.py", "LIMIT = 7\n")
+    _write(src, "app.py", "from pkg import mod\nprint(mod.LIMIT)\n")
+    result = protect_project(str(src), output_dir=str(tmp_path / "dist"), verify=False)
+    assert result["status"] == "success"
+    assert result["obfuscation"]["module_attribute_accesses_unproved"] == 1
+    assert "check_obfuscation_risks" in result["ai_hint"]
+    assert "tool" in result["next_tool"]

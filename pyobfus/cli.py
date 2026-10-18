@@ -193,7 +193,8 @@ def _echo_pro_import_hint() -> None:
     default=None,
     help="Rewrite proved module reads/calls through unconditional imports, including "
     "dotted/relative imports and static package re-exports (default: enabled). "
-    "Unsupported/dynamic accesses require exclude_names.",
+    "Unsupported/dynamic accesses require exclude_names. "
+    "Unproved project accesses are counted; run --check for refusal reasons.",
 )
 @click.option(
     "--crossfile-local-names/--no-crossfile-local-names",
@@ -1153,6 +1154,7 @@ def main(
 
         # Initialize statistics
         obfuscation_stats: dict = {
+            "module_attribute_accesses_unproved": 0,
             "files_processed": 0,
             "files_skipped": 0,
             "total_names_obfuscated": 0,
@@ -1242,6 +1244,10 @@ def main(
                 )
                 obfuscation_stats["files_processed"] = 0
                 obfuscation_stats["files_skipped"] = len(cached_outputs or [])
+                obfuscation_stats["module_attribute_accesses_unproved"] = (
+                    cache.load_manifest() or {}
+                ).get("module_attribute_accesses_unproved", 0)
+                _warn_unproved_module_attributes(obfuscation_stats)
                 # Short-circuit to summary
                 if verify_syntax:
                     verification = _verify_output_syntax(input_path_obj, output_path_obj)
@@ -1367,7 +1373,13 @@ def main(
                         continue
                     output_files.append(str(output_path_obj / rel))
                 final_sig = cache.build_signature(input_path_obj, final_inputs, config)
-                cache.save_manifest(final_sig, output_files)
+                cache.save_manifest(
+                    final_sig,
+                    output_files,
+                    module_attribute_accesses_unproved=obfuscation_stats.get(
+                        "module_attribute_accesses_unproved", 0
+                    ),
+                )
         else:
             click.echo(f"Error: {input_path} is neither a file nor a directory", err=True)
             sys.exit(1)
@@ -1933,6 +1945,11 @@ def _obfuscate_directory_crossfile(
                 click.echo(f"Warning: {warning}", err=True)
 
         stats = orchestrator.get_statistics()
+        dir_stats["module_attribute_accesses_unproved"] = stats[
+            "module_attribute_accesses_unproved"
+        ]
+        _warn_unproved_module_attributes(dir_stats)
+
         dir_stats["files_processed"] = stats.get("files_discovered", 0)
         dir_stats["total_names_obfuscated"] = stats.get("total_exports", 0) + stats.get(
             "total_local_names", 0
@@ -2310,6 +2327,15 @@ def _apply_trace_markers(output_path: Path, mapping_path: str) -> Optional[str]:
     return marker_id
 
 
+def _warn_unproved_module_attributes(stats: dict) -> None:
+    count = stats.get("module_attribute_accesses_unproved", 0)
+    if count:
+        click.echo(
+            f"Warning: {count} module attribute access(es) could not be proved safe for rewriting; run pyobfus --check on the input before shipping.",
+            err=True,
+        )
+
+
 def _emit_obfuscate_success_json(
     input_path: str,
     output_path: str,
@@ -2350,6 +2376,11 @@ def _emit_obfuscate_success_json(
         ai_hint += (
             f" {skipped_files} file(s) kept their function-local names because lexical "
             "planning failed; see stats.warnings."
+        )
+
+    if stats.get("module_attribute_accesses_unproved", 0):
+        ai_hint += (
+            " Run pyobfus --check on the input to inspect unproved module attribute accesses."
         )
 
     payload: Dict[str, Any] = {
