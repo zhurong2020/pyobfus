@@ -382,3 +382,25 @@ Check JSON adds `skipped_directories` (up to 10 sorted relative POSIX paths) and
 directories and files inside a pruned subtree are not enumerated or included in
 `files_excluded` / `excluded_findings`; those fields continue to describe
 configured file-pattern exclusions among discovered files.
+
+### F-string build compatibility
+
+CPython 3.12.0–3.12.8 builders use a local backport of CPython 3.13 f-string
+quote selection throughout Core and Pro source generation. Other builder
+versions retain their native unparser and historical quote post-processing.
+The older subscript quote fixer remains to preserve existing output bytes on
+those builders.
+
+Single-file and directory builds reject newly introduced PEP 701 f-string
+syntax when the source did not use it. JSON failures use
+`error_type: "FStringCompatibilityError"` and include the source file and
+generated line/column in the error message. This check uses tokens, because
+`ast.parse(feature_version=(3, 9))` on 3.12 does not enforce the older f-string
+lexer. It does not certify compatibility for unrelated language features.
+
+Community `--check` reports "output requires Python >= 3.12" when source uses
+PEP 701 syntax (quote reuse, field backslashes/comments, deeper format-spec nesting, or newlines requiring
+the new lexer). The advisory is informational, or medium if either
+`requires_python_min` or the nearest project's `requires-python` lower bound
+is below 3.12. Existing check exit-code rules apply. Rewrite such source or
+ship it with Python >= 3.12; the build does not lower PEP 701 source syntax.

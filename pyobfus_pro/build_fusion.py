@@ -50,6 +50,7 @@ Data Files" / PyArmor ``--bind-data`` gap in pure Python.
 from __future__ import annotations
 
 import ast
+from pyobfus.core.unparse import unparse
 import base64
 import hashlib
 import os
@@ -195,7 +196,7 @@ def _substitute_layer_key_provider(source: str, env_name: str) -> str:
     )
     tree.body[idx:idx] = [imp]
     ast.fix_missing_locations(tree)
-    return ast.unparse(tree)
+    return unparse(tree)
 
 
 def _substitute_layer_key_binding(source: str, salt: bytes) -> str:
@@ -249,7 +250,7 @@ def _substitute_layer_key_binding(source: str, salt: bytes) -> str:
     tree.body[idx:idx] = [imp, salt_assign]
 
     ast.fix_missing_locations(tree)
-    return ast.unparse(tree)
+    return unparse(tree)
 
 
 _VAULT_KEY_PREFIX = "_VAULT_KEY_"
@@ -345,7 +346,7 @@ def _substitute_vault_key_bindings(source: str, salts: dict) -> str:
     tree.body = new_body
     _ensure_bind_device_import(tree)
     ast.fix_missing_locations(tree)
-    return ast.unparse(tree)
+    return unparse(tree)
 
 
 def _ensure_bind_device_import(tree: ast.Module) -> None:
@@ -473,7 +474,7 @@ def _apply_opacity_config_prepass(source: str, config, module_qualname: str) -> 
 
     _ensure_opacity_imports(tree)
     ast.fix_missing_locations(tree)
-    return ast.unparse(tree)
+    return unparse(tree)
 
 
 def _ensure_opacity_imports(tree: ast.Module) -> None:
@@ -626,7 +627,7 @@ def _strip_consumed_pro_markers(source: str, marker_names: set[str]) -> str:
             )
         ]
     ast.fix_missing_locations(tree)
-    return ast.unparse(tree)
+    return unparse(tree)
 
 
 def _inject_expire_check(source: str, expire_iso: str, warn_days: Optional[int] = None) -> str:

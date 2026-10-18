@@ -64,3 +64,7 @@ class LimitExceededError(PyObfusError):
             f"  Limit: {max_allowed}\n\n"
             "Raise or remove the corresponding max_files/max_total_loc setting."
         )
+
+
+class FStringCompatibilityError(PyObfusError):
+    """Generated source introduced a PEP 701 syntax requirement."""

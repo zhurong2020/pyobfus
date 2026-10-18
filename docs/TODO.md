@@ -223,10 +223,17 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       preserve module export spellings when module-level `__getattr__` prevents H proofs, and conservatively preserve non-static enum modules with a planning warning.
       Artifact regressions cover references, `__all__`, imports, module attributes, dynamic enums, exclude_names and standard-library `calendar` / `re`.
 - [ ] **缺陷 N · 在 CPython 3.12.0–3.12.8 上构建，兼容 3.9 的 f-string 被改成同引号复用，产物在 3.9–3.11 上 SyntaxError**（10-18 复现，Community 正确性）：
+      PR #102 待审 (`fix/fstring-quote-312`); regression coverage and compatibility guard implemented.
       根因是这些补丁版的 `ast.unparse` 选引号不避开内层引号（3.12.9 / 3.13 已修；Ubuntu 24.04 自带 3.12.3，CI 用最新补丁版所以测不到）。
       最小复现 `python3.12 -c "import ast;print(ast.unparse(ast.parse('''f\"{f'{x}'}\"''')))"` → `f'{f'{x}'}'`。
       `generator.py` 的 `_fix_fstring_quotes` 只修 `['k']` 下标；`--verify-syntax` 只用构建解释器 compile，均兜不住。运行语义不变，只是语法层。
       建议：子类化 unparser，在 <3.12.9 时用 3.13 的引号选择；源码未用 PEP 701 专属写法时断言产物也不用（tokenize 检测）；测试与补丁版本无关；3.13+ 产物逐字节不变。10-18 维护者批准实现（含 `--check` 提示），14:05 后交 Codex、Claude 审；发版另批。
+- [ ] **缺陷 P · `sys.modules.update()/setdefault()/pop()` 换掉项目模块时不被识别**（10-18 审核 PR #103 时发现，main 同样存在）：
+      `sys.modules.update({'pkg.core': m})` 后 `core.f` 仍被改写，产物运行 AttributeError，构建与 `--check` 都无提示；下标写入形式已正确识别。
+      修法：把 `sys.modules` 上的变更方法调用并入 `discover_modules_stores`。未批准实现。
+- [ ] **缺陷 O · 下标里的带星号元组丢括号，产物需 Python ≥3.11**（10-18 审核 PR #102 时发现，所有构建版本都有，与 N 无关）：
+      源码 `Annotated[(x, *y)]`（3.9/3.10 合法）经 `ast.unparse` 变成 `Annotated[x, *y]`（PEP 646，3.11+ 才合法）；3.12/3.13/3.14 一致。
+      实测 pydantic 3 个文件中招。修法同 N：在共享 unparser 里给含 `Starred` 的下标元组保留括号，并让兼容自检覆盖这一类。未批准实现。
 - [ ] **候选 · 3.12 嵌套 f-string 的 `--check` 提示**（低优先级，10-11 登记；可随缺陷 N 一起做：源码用了 PEP 701 专属写法时提示产物需 ≥3.12）：3.12 起允许 f-string 内复用同种引号/嵌套，
       产物在 3.9–3.11 上无法解析；目录/单文件构建若面向旧解释器分发，`--check` 可提示目标版本不兼容。先确认 `--verify-syntax`
       与 `target_python` 现有行为再定是否需要。

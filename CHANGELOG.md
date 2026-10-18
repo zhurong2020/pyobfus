@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Preserve pre-3.12 f-string syntax when building on CPython 3.12.0–3.12.8
+  (defect N), including nested expressions and format specifications. Core and
+  Pro source generation share the CPython 3.13 quote selector on these builders.
+  Other builders retain their existing output bytes. Builds reject newly
+  introduced PEP 701 syntax with `FStringCompatibilityError` and a file/line.
 - Ordinary object and local `.modules[...]` writes/deletes no longer disable
   module attribute rewriting for an entire project. Resolved `sys.modules`
   stores (including import aliases and from-imports) and uncertain imported or
@@ -16,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Community `--check` reports "output requires Python >= 3.12" for source
+  using PEP 701 f-string syntax. The advisory is medium when the declared
+  minimum or project `requires-python` lower bound is below 3.12, otherwise
+  informational; check exit-code rules are unchanged.
 - Module attribute compatibility advisories include stable `reason` codes and
   readable refusal explanations. Cross-file build stats and build reports expose
   `module_attribute_accesses_unproved`; positive counts produce a stderr warning
