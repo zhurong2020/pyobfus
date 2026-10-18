@@ -14,9 +14,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### 2026-10-15 — 本 session 收尾；下一轮先读当前计划/TODO 顶部
+### 2026-10-18 — 本 session 收尾；下一轮先读当前计划/TODO 顶部
 
-Core 0.7.2（缺陷 I，PR #99）与 0.7.3（缺陷 C #100、M #101）均经 Codex 实现 + Claude 审核、维护者批准后发布并全渠道核实；缺陷 D 已由 0.7.2 修好；Glama 源码 pin 已收尾；微信付款未完成买家已发跟进邮件。下游医院版候选 cand4（0.7.3 构建）待维护者 Windows 闸门。代码修改先交无头 Codex、Claude 审核；H PR 4 与参数改名需维护者先定范围。交接见 `../workspace-meta/archives/SESSION_CLOSEOUT_20261015_PYOBFUS_073_DEFECTS.md`。不要自动发布。
+同日发布 Core 0.7.4（缺陷 N #102、H PR 4 选项 1 #103）与 0.7.5（缺陷 O #104、P #105），均 Codex 实现 + Claude 审核、全渠道核实。医院版 cand4 闸门等现场 Win7→Win10 答复；参数改名暂缓，B2/B3 等触发；DEV 第 2 篇 10-27 发。代码修改先交无头 Codex（注意 5 小时额度，沙箱 `.git` 只读时由 Claude 提交/推送）；合并与发版各需维护者明确批准。交接见 `../workspace-meta/archives/SESSION_CLOSEOUT_20261018_PYOBFUS_074_075.md`。
 
 ### 🟢 2026-10-12 — Core 0.7.0 + runtime 0.1.1 已发布；路线图复核修复随发（冷启动先读 `docs/CURRENT_PLAN_ZH.md` 顶部 10-12 段、路线图 §13、`docs/TODO.md`「增强路线复核」）
 
