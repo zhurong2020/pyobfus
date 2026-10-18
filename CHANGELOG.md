@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Ordinary object and local `.modules[...]` writes/deletes no longer disable
+  module attribute rewriting for an entire project. Resolved `sys.modules`
+  stores (including import aliases and from-imports) and uncertain imported or
+  possible-sys receivers retain the conservative project-wide guard.
+
+### Added
+
+- Module attribute compatibility advisories include stable `reason` codes and
+  readable refusal explanations. Cross-file build stats and build reports expose
+  `module_attribute_accesses_unproved`; positive counts produce a stderr warning
+  and an AI hint to run `--check`, including on incremental cache hits. Package
+  initializer and import-cycle proof rules remain unchanged.
+
 ## [0.7.3] - 2026-10-15
 
 ### Fixed

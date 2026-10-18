@@ -17,6 +17,8 @@ from typing import Callable, Dict, List, Optional, Set, Tuple
 from pyobfus.core.global_table import GlobalSymbolTable
 from pyobfus.core.import_resolution import (
     ImportedAccessVisitor,
+    _UncertainAccessVisitor,
+    discover_uncertain_accesses,
     _Bindings,
     discover_accesses,
     discover_module_bindings,
@@ -250,6 +252,8 @@ class ModuleInventory:
             stdlib.update(p.name.split(".")[0] for p in (root / "lib-dynload").glob("*"))
         self.stdlib_roots = set(stdlib) | set(sys.builtin_module_names)
         self.unsafe: Set[str] = set()
+        self.modules_stores: Dict[str, Tuple[Tuple[int, int, str], ...]] = {}
+        self.nested_reimports: Set[str] = set()
         self.edges: Dict[str, Set[str]] = {module: set() for module in self.trees}
         for module, tree in self.trees.items():
             bindings = _Bindings(lambda n: resolve_from(module, n))
@@ -277,6 +281,7 @@ class ModuleInventory:
                     )
                 ):
                     self.unsafe.add(module)
+                    self.nested_reimports.add(module)
             for node in ast.walk(tree):
                 if isinstance(node, ast.Import):
                     self.edges[module].update(
@@ -321,14 +326,37 @@ class ModuleInventory:
             events = discover_module_hazards(tree, module, self)
             self.hazards[module] = events
             self.unsafe.update(self.canonical(e.module) for e in events)
-            if any(
-                isinstance(n, ast.Subscript)
-                and not isinstance(n.ctx, ast.Load)
-                and isinstance(n.value, ast.Attribute)
-                and n.value.attr == "modules"
-                for n in ast.walk(tree)
-            ):
+            stores = discover_modules_stores(tree, lambda n: resolve_from(module, n))
+            if stores:
+                self.modules_stores[module] = stores
                 self.unsafe.update(self.trees)
+
+    def rejection_reasons(self, module: str, importer: str) -> Tuple[str, ...]:
+        """All observed blockers, ordered without granting a proof or relaxing B2/B3."""
+        if self.modules_stores:
+            return ("module_attribute.modules_store",)
+        direct = [self.canonical(module), importer]
+        parts = module.removesuffix(".__init__").split(".")
+        packages = [".".join(parts[:i]) for i in range(1, len(parts))]
+        if module in self.packages:
+            packages.append(module)
+        owners = direct + [self.canonical(p) for p in packages]
+        reasons = []
+        if any(m in self.nested_reimports for m in owners):
+            reasons.append("module_attribute.nested_reimport")
+        if any(m in self.unsafe for m in owners):
+            reasons.append("module_attribute.module_hazard")
+        if any(m in self.cyclic for m in direct):
+            reasons.append("module_attribute.import_cycle")
+        if any(p in self.packages and not self._static_package(p) for p in packages):
+            reasons.append("module_attribute.package_init_not_static")
+        if any(m in self.cyclic for m in owners) and "module_attribute.import_cycle" not in reasons:
+            reasons.append("module_attribute.import_cycle")
+        return tuple(reasons) or ("module_attribute.other",)
+
+    def rejection_reason(self, module: str, importer: str) -> str:
+        """Primary refusal reason for the existing per-access result model."""
+        return self.rejection_reasons(module, importer)[0]
 
     def canonical(self, module: str) -> str:
         return f"{module}.__init__" if module in self.packages else module
@@ -579,6 +607,124 @@ class ModuleHazard:
     module: str
     names: Tuple[str, ...]
     kind: str
+
+
+def discover_modules_stores(
+    tree: ast.AST, resolve_from: Callable[[ast.ImportFrom], Optional[str]]
+) -> Tuple[Tuple[int, int, str], ...]:
+    """Use lexical resolution, retaining uncertain imported/possible-sys receivers.
+
+    Candidate propagation is diagnostic only. It can close proofs, never open
+    them. Ordinary object parameters and locals have no imported candidate.
+    """
+    stores: List[Tuple[int, int, str]] = []
+
+    class Stores(_UncertainAccessVisitor):
+        def __init__(self, *args) -> None:
+            super().__init__(*args)
+            self.competing: Dict[int, Set[str]] = {}
+            self.imported_roots: Dict[int, Set[str]] = {}
+
+        def _candidate_scope(
+            self, body: List[ast.stmt], bindings: _Bindings
+        ) -> Dict[str, Optional[str]]:
+            scope = super()._candidate_scope(body, bindings)
+            self.competing[id(scope)] = bindings.shadowed
+            self.imported_roots[id(scope)] = {
+                alias.asname or alias.name.split(".")[0]
+                for statement in _scope_nodes(body)
+                if isinstance(statement, (ast.Import, ast.ImportFrom))
+                for alias in statement.names
+                if alias.name != "*"
+            }
+            return scope
+
+        def resolve(self, node: ast.expr) -> Optional[str]:
+            path = _expression_binding(node)
+            if path:
+                root = path.split(".")[0]
+                for scope in reversed(self.scopes):
+                    if root in scope:
+                        if root in self.competing.get(id(scope), set()):
+                            return None
+                        break
+            return super().resolve(node)
+
+        def visit_FunctionDef(self, node) -> None:
+            super().visit_FunctionDef(node)
+            # Type parameter bounds/defaults can also contain comprehension
+            # assignment targets. Observation must not omit these stores.
+            for parameter in getattr(node, "type_params", []):
+                self.visit(parameter)
+
+        visit_AsyncFunctionDef = visit_FunctionDef
+
+        def visit_ClassDef(self, node: ast.ClassDef) -> None:
+            super().visit_ClassDef(node)
+            for parameter in getattr(node, "type_params", []):
+                self.visit(parameter)
+
+        def visit_ListComp(self, node) -> None:
+            # The shared access observer omits assignment targets. Registry
+            # stores in a comprehension target still invalidate every proof.
+            self.visit(node.generators[0].iter)
+            names = {
+                n.id
+                for g in node.generators
+                for n in ast.walk(g.target)
+                if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Store)
+            }
+            previous_scopes, previous_kinds = self.scopes, self.scope_kinds
+            self.scopes = [s for s, k in zip(previous_scopes, previous_kinds) if k != "class"]
+            self.scope_kinds = [k for k in previous_kinds if k != "class"]
+            self.scopes.append({name: None for name in names})
+            self.scope_kinds.append("function")
+            for index, generator in enumerate(node.generators):
+                if index:
+                    self.visit(generator.iter)
+                self.visit(generator.target)
+                for condition in generator.ifs:
+                    self.visit(condition)
+            if isinstance(node, ast.DictComp):
+                self.visit(node.key)
+                self.visit(node.value)
+            else:
+                self.visit(node.elt)
+            self.scopes, self.scope_kinds = previous_scopes, previous_kinds
+
+        visit_SetComp = visit_ListComp
+        visit_DictComp = visit_ListComp
+        visit_GeneratorExp = visit_ListComp
+
+        def visit_Subscript(self, node: ast.Subscript) -> None:
+            if not isinstance(node.ctx, ast.Load):
+                resolved = self.resolve(node.value)
+                candidates = self._resolve_candidates(node.value)
+                path = _expression_binding(node.value)
+                reason = None
+                if resolved == "sys.modules":
+                    reason = "resolved sys.modules store/delete"
+                elif "sys.modules" in candidates:
+                    reason = "possible sys.modules alias with competing or indirect binding"
+                elif resolved is None:
+                    root = path.split(".")[0] if path else None
+                    imported = False
+                    for scope in reversed(self.scopes):
+                        if root in scope:
+                            imported = root in self.imported_roots.get(id(scope), set())
+                            break
+                    if (
+                        isinstance(node.value, ast.Attribute)
+                        and node.value.attr == "modules"
+                        and (candidates or imported or path == "sys.modules")
+                    ) or (isinstance(node.value, ast.Name) and imported):
+                        reason = "unresolved imported or possible sys receiver"
+                if reason:
+                    stores.append((node.lineno, node.col_offset, reason))
+            self.generic_visit(node)
+
+    Stores(resolve_from, lambda n, m: None, lambda n: None).visit(tree)
+    return tuple(stores)
 
 
 def discover_module_hazards(
@@ -969,7 +1115,7 @@ def prove_accesses(
         visitor.resolutions.get(
             span(node),
             AccessResolution(
-                span(node), candidate, None, "module identity, scope or execution order not proved"
+                span(node), candidate, None, inventory.rejection_reason(candidate, module)
             ),
         )
         for node, candidate in discover_accesses(
@@ -989,3 +1135,57 @@ def plan_attributes(
     return AttributePlan(
         relative_file, source_hash(source), tuple(r.edit for r in resolutions if r.edit is not None)
     )
+
+
+def count_unproved_accesses(
+    sources: Dict[str, str],
+    inventory: ModuleInventory,
+    table: GlobalSymbolTable,
+    plans: Dict[str, AttributePlan],
+) -> int:
+    """Count distinct retained access sites with changed project export mappings.
+
+    Candidates never authorize edits. Counts include stores/deletes and dynamic
+    hazard accesses, but exclude already-preserved exports and module escapes
+    without an attribute access. Multiple candidate identities count once.
+    """
+    sites: Set[Tuple[str, Span]] = set()
+    for importer, source in sources.items():
+        tree = ast.parse(source)
+        edits = {e.location for e in plans.get(importer, AttributePlan("", "")).edits}
+        candidates = discover_uncertain_accesses(
+            tree, lambda n: inventory.resolve_from(importer, n), inventory.candidate_member
+        )
+        attribute_nodes = [n for n in ast.walk(tree) if isinstance(n, ast.Attribute)]
+        for hazard in inventory.hazards[importer]:
+            for node in attribute_nodes:
+                if (
+                    isinstance(node, ast.Attribute)
+                    and (node.lineno, node.col_offset) == hazard.location
+                ):
+                    candidates.append((node, hazard.module))
+        for node, target in candidates:
+            changed = table.get_obfuscated_import(target, node.attr)
+            if target in inventory.packages and target in inventory.trees:
+                changed = changed or table.get_obfuscated_import(
+                    inventory.canonical(target), node.attr
+                )
+            package = inventory.packages.get(target)
+            if package is not None and not changed:
+                changed = next(
+                    (
+                        table.get_obfuscated_import(
+                            inventory.resolve_from(inventory.canonical(target), n) or "", node.attr
+                        )
+                        for n in ast.walk(package)
+                        if isinstance(n, ast.ImportFrom)
+                        and any(a.name == "*" for a in n.names)
+                        and table.get_obfuscated_import(
+                            inventory.resolve_from(inventory.canonical(target), n) or "", node.attr
+                        )
+                    ),
+                    None,
+                )
+            if changed and span(node) not in edits:
+                sites.add((importer, span(node)))
+    return len(sites)

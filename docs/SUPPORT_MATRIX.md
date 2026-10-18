@@ -142,6 +142,20 @@ dynamic-access sites. A with-as target alone is not a module escape. If any proj
 file fails to parse, the export plan is unavailable and
 this advisory is skipped; fix parse errors and re-run `--check`.
 
+Cross-file build stats and build reports include
+`module_attribute_accesses_unproved`, the number of distinct retained attribute
+sites with renamed project exports. A positive count emits one stderr warning
+and an AI hint to run `--check`; zero emits no warning. Incremental cache hits
+retain the count, and builds invalidate pre-H4 analysis signatures. This local
+correctness diagnostic is available in Community and Pro. H findings expose a
+primary `reason`, all observed `reasons`, and readable explanations; see the
+[reason-code catalog](REASON_CODES.md).
+Ordinary object/local `.modules[...]` writes and deletes do not close project
+proofs. Resolved `sys.modules` stores (including import aliases and from-imports)
+and unresolved imported or possible-sys receivers still do. Non-static package
+initializers and import cycles remain unproved; the new warning does not repair
+these cases.
+
 ### Upgrading: module attribute rewrites
 
 After upgrading, rebuild the **complete project** and regenerate both artifacts

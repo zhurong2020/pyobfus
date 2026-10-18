@@ -145,6 +145,7 @@ class BuildCache:
 
         return {
             "source_metadata_version": 1,
+            "module_attribute_analysis_version": 2,
             "executable_bits": executable_bits,
             "pyobfus_version": PYOBFUS_VERSION,
             "input_dir": str(input_dir),
@@ -165,7 +166,13 @@ class BuildCache:
             return None
         return cast(Dict[str, Any], data)
 
-    def save_manifest(self, signature: Dict, output_files: List[str]) -> None:
+    def save_manifest(
+        self,
+        signature: Dict,
+        output_files: List[str],
+        *,
+        module_attribute_accesses_unproved: int = 0,
+    ) -> None:
         """Persist the manifest after a successful full build."""
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         payload = {
@@ -173,6 +180,7 @@ class BuildCache:
             "created_at": datetime.now(timezone.utc).isoformat(),
             "signature": signature,
             "output_files": sorted(output_files),
+            "module_attribute_accesses_unproved": module_attribute_accesses_unproved,
         }
         self.manifest_path.write_text(
             json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True),
