@@ -24,11 +24,11 @@
 
 | 顺序 | 待办 | 验收 / 下一步 |
 |---|---|---|
-| 1 | **私有下游候选 Windows 闸门（维护者）** | 10-15 已用 0.7.3 重建候选 `2.6.2-20261015-e7e96fb`（`build/release-v2.6.2-cand4`，取代 0.7.2 的 cand3）：SHA256、名字检查 59/63（4 处星号转发：3 处外部 wheel，`nifti_loader` 为项目内转发但被转发模块导出不可静态确定→保守保留）、交付检查 0 发现。剩：发布机授权续签 → 装机评分、M2 升级、生命周期、向导目视。 |
+| 1 | **私有下游候选 Windows 闸门（维护者）** | **10-18 维护者定：暂停，等现场答复能否从 Windows 7 升级到 Windows 10**（不能升级则先做下游向下兼容改造，闸门随之重排）。10-15 已用 0.7.3 重建候选 `2.6.2-20261015-e7e96fb`（`build/release-v2.6.2-cand4`，取代 0.7.2 的 cand3）：SHA256、名字检查 59/63（4 处星号转发：3 处外部 wheel，`nifti_loader` 为项目内转发但被转发模块导出不可静态确定→保守保留）、交付检查 0 发现。剩：发布机授权续签 → 装机评分、M2 升级、生命周期、向导目视。 |
 | 2 | **10-19 周一巡检** | 下载安静日（0.7.2 发布日与次日不计）、客户反馈/调研回答、微信付款跟进线程（`/pyobfus-inbox`）、Stripe Alipay 审批状态、CI、许可证监控、KV 备份、Anthropic 插件解锁消息；仅留决策摘要。 |
 | 3 | **10-25 复盘** | 区分发布/次日/内容流量，综合下载、trial、客户回答和 DEV 来源，决定下轮优先级与发布节奏；评估一周两笔微信付款未完成是否需要更多动作（Alipay、弃单提醒需 Stripe restricted key）。 |
 
-后续代码候选为 H 包初始化限制（PR 4）与参数改名（均需维护者先定范围）；Pro 扩展等真实需求信号，详见各条目。本次没有授权额外部署或客户邮件发送。
+10-18 维护者批准两项代码任务（14:05 后交 Codex、Claude 审，顺序：缺陷 N → H PR 4 选项 1；发版另批）；参数改名暂缓；Pro 扩展等真实需求信号，详见各条目。本次没有授权额外部署或客户邮件发送。
 
 ## 发布后观察与下次发版
 
@@ -214,19 +214,27 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       退路 `--no-crossfile-module-attributes` 与 main 旧默认产物逐字节一致。发版说明须写「升级后完整重新构建、重新生成 mapping」。
       私有验证：动机项目副本 127 处 `config.X` 全部改写、`--check` 无剩余提示。审核与提示词私有 `docs/internal/codex-2026-10/H_IMPL_PR*`。
       后续（不阻塞）：canary 在 N-1 也支持后可加模块属性用例；`__init__` 含带体类/执行默认参数、导入循环等仍拒绝并提示。
-- [ ] **H PR 4 候选 · 放宽无关包初始化语句**：包 `__init__` 里 `try: __version__ = version(...)` 会阻止整个包的子模块属性改写（pyobfus 自身可复现）；评估仅绑定与子模块名无关的语句能否安全放宽。需单独确认范围，不阻塞已发布版本。
+- [ ] **H PR 4 · 10-18 维护者定选项 1（批准实现，14:05 后交 Codex、Claude 审；发版另批）**：10-18 实测 0.7.3 自混淆构建无告警、运行即 AttributeError，三个独立阻断：
+      B1 `module_attributes.py` 对任何 `x.modules[k] = v` 写入（不论是否 `sys`）把全项目标为不安全（`core/mapping.py` 一处即关掉 61 个模块）；
+      B2 包 `__init__` 的 try/外部导入；B3 再导出子模块回导包内 `__version__` 的导入环。本 PR 只做：修 B1 误判、`--check` 写明拒绝原因、构建时提示未证明安全的属性访问数。
+      B2/B3 等用户触发。范围备忘与 Codex 提示词私有 `docs/internal/codex-2026-10/SCOPE_H4_PARAMS_2026-10-18.md`。原登记：包 `__init__` 里 `try: __version__ = version(...)` 会阻止整个包的子模块属性改写（pyobfus 自身可复现）；评估仅绑定与子模块名无关的语句能否安全放宽。需单独确认范围，不阻塞已发布版本。
 - [x] **既有缺陷 C · 运行时注入的模块级名字** — **10-15 合并 PR #100（`bde110c`），随 0.7.3 发布**。
       Community correctness fix: automatically preserve static `enum.global_enum` members in single-file and directory builds;
       preserve module export spellings when module-level `__getattr__` prevents H proofs, and conservatively preserve non-static enum modules with a planning warning.
       Artifact regressions cover references, `__all__`, imports, module attributes, dynamic enums, exclude_names and standard-library `calendar` / `re`.
-- [ ] **候选 · 3.12 嵌套 f-string 的 `--check` 提示**（低优先级，10-11 登记）：3.12 起允许 f-string 内复用同种引号/嵌套，
+- [ ] **缺陷 N · 在 CPython 3.12.0–3.12.8 上构建，兼容 3.9 的 f-string 被改成同引号复用，产物在 3.9–3.11 上 SyntaxError**（10-18 复现，Community 正确性）：
+      根因是这些补丁版的 `ast.unparse` 选引号不避开内层引号（3.12.9 / 3.13 已修；Ubuntu 24.04 自带 3.12.3，CI 用最新补丁版所以测不到）。
+      最小复现 `python3.12 -c "import ast;print(ast.unparse(ast.parse('''f\"{f'{x}'}\"''')))"` → `f'{f'{x}'}'`。
+      `generator.py` 的 `_fix_fstring_quotes` 只修 `['k']` 下标；`--verify-syntax` 只用构建解释器 compile，均兜不住。运行语义不变，只是语法层。
+      建议：子类化 unparser，在 <3.12.9 时用 3.13 的引号选择；源码未用 PEP 701 专属写法时断言产物也不用（tokenize 检测）；测试与补丁版本无关；3.13+ 产物逐字节不变。10-18 维护者批准实现（含 `--check` 提示），14:05 后交 Codex、Claude 审；发版另批。
+- [ ] **候选 · 3.12 嵌套 f-string 的 `--check` 提示**（低优先级，10-11 登记；可随缺陷 N 一起做：源码用了 PEP 701 专属写法时提示产物需 ≥3.12）：3.12 起允许 f-string 内复用同种引号/嵌套，
       产物在 3.9–3.11 上无法解析；目录/单文件构建若面向旧解释器分发，`--check` 可提示目标版本不兼容。先确认 `--verify-syntax`
       与 `target_python` 现有行为再定是否需要。
 - [x] **新缺陷 M · 项目内星号转发后再从转发模块导入**（10-14 Claude 用 PyPI 0.7.2 复现）：`pkg/shim.py` 写 `from pkg.core import *`，`app.py` 写 `from pkg.shim import helper` → 产物 ImportError（开/关局部改名一样）。兼容转发模块常见；外部模块的星号导入不受影响（私有下游 4 处均转发外部 wheel 或显式列名）。**10-15 已合并 PR #101（`b6c06b2`），随 0.7.3 发布**。
 - [x] **既有缺陷 D · `global` 重新绑定导入名** — fixed by 0.7.2 (PR #99).
       PR #100 adds artifact regressions for assignment and re-import after `global helper`, printing before and after rebinding,
       with local renaming and name verification both enabled and disabled.
-- [ ] **第 2 步：参数改名**：设计文档 `docs/CROSSFILE_PARAMETER_RENAMING_DESIGN.md`（PR #65，Codex 起草、Claude 审核通过）。
+- [ ] **第 2 步：参数改名 — 10-18 维护者定暂缓**（无实现、无用户需求；可能受益参数 pyobfus 自身约 18%、下游约 3%；有触发再议，届时可先做 mapping 读取端）：设计文档 `docs/CROSSFILE_PARAMETER_RENAMING_DESIGN.md`（PR #65，Codex 起草、Claude 审核通过）。
       分 5 个 PR：F 的方案 A → mapping 读取端与分析（观察模式）→ 同文件私有函数 → 跨文件 → 扩展；默认关闭。
       文末 6 个问题已于 10-10 由维护者拍板（PR #65）；后续实现范围仍需确认。Claude 的建议在私有 `docs/internal/geo-2026-10/PR65_REVIEW_2026-10-08.md`。
 - 规则：本条属于「真实转换问题」，优先于下面所有推广项（GEO 计划 §16）。
