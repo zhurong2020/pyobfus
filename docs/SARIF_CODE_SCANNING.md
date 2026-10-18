@@ -120,7 +120,7 @@ jobs:
           fail-on: never        # let the upload run first
           offline: "true"
 
-      - uses: github/codeql-action/upload-sarif@v3
+      - uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: ${{ steps.scan.outputs.sarif-file }}
           category: pyobfus-preflight
@@ -145,7 +145,7 @@ Without the action, the same workflow needs a workaround:
       # `|| true` keeps a high-severity finding (exit 1) from failing the job
       # before the SARIF is uploaded.
       - run: pyobfus --check src/ --sarif pyobfus.sarif --offline || true
-      - uses: github/codeql-action/upload-sarif@v3
+      - uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: pyobfus.sarif
           category: pyobfus-preflight
