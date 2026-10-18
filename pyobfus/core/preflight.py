@@ -980,8 +980,12 @@ class PreflightChecker:
         from pyobfus.core.fstring_compat import pep701_locations
         from pyobfus.core.source_prologue import read_python_source
         from pyobfus.core.dependency_advisory import _load_toml
-        from packaging.specifiers import InvalidSpecifier, SpecifierSet
-        from packaging.version import InvalidVersion, Version
+
+        try:  # optional: only refines the severity from pyproject requires-python
+            from packaging.specifiers import InvalidSpecifier, SpecifierSet
+            from packaging.version import InvalidVersion, Version
+        except ImportError:  # pragma: no cover - packaging is present in most environments
+            SpecifierSet = None  # type: ignore[assignment,misc]
 
         sites = pep701_locations(read_python_source(file_path))
         if sites:
@@ -991,6 +995,8 @@ class PreflightChecker:
             project_root = root.parent if root.is_file() else root
             # The nearest project metadata also applies to single-file scans.
             for directory in (project_root, *project_root.parents):
+                if SpecifierSet is None:
+                    break
                 metadata = directory / "pyproject.toml"
                 if not metadata.is_file():
                     continue

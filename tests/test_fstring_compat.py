@@ -208,6 +208,23 @@ def test_preflight_pep701(tmp_path, floor, metadata, severity):
     assert report.exit_code() == 0
 
 
+@pytest.mark.skipif(__import__("sys").version_info < (3, 12), reason="PEP 701 parser")
+def test_preflight_pep701_without_packaging(tmp_path, monkeypatch):
+    """packaging is optional: without it requires-python is ignored, the hint stays."""
+    import sys
+
+    from pyobfus.core.preflight import PreflightChecker
+
+    monkeypatch.setitem(sys.modules, "packaging.specifiers", None)
+    source = tmp_path / "app.py"
+    source.write_text("d = {'k': 1}\nprint(f'{d['k']}')\n")
+    (tmp_path / "pyproject.toml").write_text('[project]\nrequires-python = ">=3.9"\n')
+    report = PreflightChecker().check_path(source)
+    risks = [risk for risk in report.risks if "output requires Python >= 3.12" in risk.message]
+    assert [risk.severity for risk in risks] == ["info"]
+    assert PreflightChecker(target_python_min="3.9").check_path(source).risks
+
+
 @pytest.mark.skipif(__import__("sys").version_info < (3, 12), reason="PEP 701 tokenizer")
 @pytest.mark.parametrize("mode", ["file", "directory", "legacy"])
 @pytest.mark.parametrize("attributes", [False, True])
