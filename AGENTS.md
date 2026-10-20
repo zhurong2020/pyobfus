@@ -105,11 +105,12 @@ CI runs this as a separate, path-filtered workflow
 `${{ env.pythonLocation }}/bin/python`), not as part of the Python
 `ci.yml` jobs above.
 
-**Python 3.15 compatibility (P0, 2026-10-20)** is implemented on the support
-branch, pending independent review and release. See
+**Python 3.15 compatibility** shipped in Core 0.8.0 (2026-10-20, PR #108):
+lazy imports (PEP 810) and comprehension unpacking (PEP 798) are preserved,
+and CI runs 3.15 on all three platforms. See
 [`docs/PYTHON315_SUPPORT_PLAN.md`](docs/PYTHON315_SUPPORT_PLAN.md) and
 [`docs/PYTHON315_VALIDATION.md`](docs/PYTHON315_VALIDATION.md) for scope,
-validation evidence and limitations. This does not authorize a release.
+validation evidence and known limitations.
 
 Targets: Python **3.9–3.15** must all pass. (Python 3.8 was dropped in 0.5.0 —
 EOL 2024-10 — which removed the old `astunparse`/`@requires_py39` flakiness;

@@ -89,7 +89,7 @@ PR #108（PY315-1 惰性导入保留、PY315-2 推导式解包、3.15 新内建�
   10-25 复盘用 09-27→10-06 窗口）**：静默 4 周（10-25 前不发 Core）→ 每月一版
   → 只做有触发的事 → 每周一巡检；全文 `docs/TODO.md`「节奏」段。**查进度固定动作：进度 + 下载量
   （`python scripts/download_snapshot.py`）+ Gmail（`/pyobfus-inbox`），三样一起给**，缺一样不算查过。
-- 「当前状态一句话」：Core 0.8.0（Python 3.15 支持 #108，PY315-1/2，Codex 实现 + Claude 审核）于 10-20 发布；此前 Core 0.7.5（缺陷 O 星号下标括号 #104、P sys.modules 变更方法 #105）与 0.7.4（缺陷 N #102、H PR 4 选项 1 #103）均于 10-18 发布；0.7.3 为缺陷 C/M、0.7.2 为缺陷 I；MCP 0.3.13 / runtime 0.1.1 不变，MCP 9 工具；发布核验见 `docs/CURRENT_PLAN_ZH.md` 顶部。下游医院应用整体暂停，等待现场后续回复；微信付款未完成买家已于 10-14 发跟进邮件、被动等待。以后 runtime 源码改动仍必须先升版本、先发 runtime。
+- 「当前状态一句话」：Core 0.8.0（Python 3.15 支持 #108，PY315-1/2，Codex 实现 + Claude 审核）于 10-20 发布；此前 Core 0.7.5（缺陷 O 星号下标括号 #104、P sys.modules 变更方法 #105）与 0.7.4（缺陷 N #102、H PR 4 选项 1 #103）均于 10-18 发布；0.7.3 为缺陷 C/M、0.7.2 为缺陷 I；同晚 MCP 0.3.14（3.15 分类器 + #103 提示），runtime 0.1.1 不变，MCP 9 工具；发布核验见 `docs/CURRENT_PLAN_ZH.md` 顶部。下游医院应用整体暂停，等待现场后续回复；微信付款未完成买家已于 10-14 发跟进邮件、被动等待。以后 runtime 源码改动仍必须先升版本、先发 runtime。
 
 
 ## 历史进展（已下沉）
@@ -125,7 +125,7 @@ PR #108（PY315-1 惰性导入保留、PY315-2 推导式解包、3.15 新内建�
 ## 项目概述
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
-- **技术栈**: Python 3.9-3.14, AST, setuptools
+- **技术栈**: Python 3.9-3.15, AST, setuptools
 - **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.8.0，2026-10-20 发布，新增 Python 3.15 支持**；完整版本历史见 `CHANGELOG.md`)
 - **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.3，2026-09-10 发布**；Marketplace 与 Open VSX 两边同版本，均已 `curl` 独立复核；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`。**发版必须两个 registry 都发**：Marketplace 手工上传 + `ovsx publish`，runbook 见 `docs/OPEN_VSX_PUBLISH_PLAN.md`)
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.14，2026-10-20 发布，加 3.15 分类器 + #103 未证明访问提示**；9 tools: 7 community + 2 pro_funnel · dep `pyobfus>=0.5.18` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
@@ -217,7 +217,7 @@ vX.Y.Z"横幅），跟徽标是两回事。
 ## 注意事项
 
 - **公开仓库**: 不要提交 Pro 许可密钥或 Stripe Webhook Secret
-- **跨版本兼容**: 确保 Python 3.9-3.14 全部通过测试
+- **跨版本兼容**: 确保 Python 3.9-3.15 全部通过测试
 - **双许可模型**: Free (pyobfus/) 和 Pro (pyobfus_pro/) 代码分离管理
 
 ## 跨 Workspace 关联
