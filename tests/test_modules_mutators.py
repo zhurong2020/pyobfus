@@ -206,7 +206,8 @@ def test_mutator_uncertain_receiver_boundary(mutation, setup, receiver, expected
     assert bool(stores) is expected
 
 
-def test_mutator_incremental_invalidation(tmp_path):
+@pytest.mark.parametrize("analysis_version", [2, 3, 4])
+def test_mutator_incremental_invalidation(tmp_path, analysis_version):
     from pyobfus.core.cache import BuildCache
 
     src = project(
@@ -223,7 +224,7 @@ def test_mutator_incremental_invalidation(tmp_path):
         assert "--check" in result.stderr
     cache = BuildCache(out)
     manifest = cache.load_manifest()
-    manifest["signature"]["module_attribute_analysis_version"] = 2
+    manifest["signature"]["module_attribute_analysis_version"] = analysis_version
     cache.manifest_path.write_text(json.dumps(manifest))
     result = runner().invoke(main, args)
     assert json.loads(result.stdout)["stats"]["files_processed"] == 3

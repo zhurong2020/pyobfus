@@ -31,15 +31,15 @@ seal, opacity, vault, scrub, string AES, string encoding and import
 obfuscation. Only `ImportRewriter` reconstructs a source import; the other
 constructors inject new helpers. Existing nodes mutated in place retain their
 fields. Seal/opacity/vault helper coalescing skips lazy imports. Pro importlib
-rewriting leaves explicit lazy imports intact; if `__lazy_modules__` is
-referenced, it conservatively leaves all imports in that module intact because
-the control list may be dynamic.
+rewriting leaves explicit lazy imports intact. If the module binds
+`__lazy_modules__` on an interpreter supporting lazy imports, it conservatively
+leaves all imports in that module intact because the control list may be dynamic.
 
 Import/export analyzers record lexical bindings without executing imports;
 a lazy binding still identifies its declared module/symbol on first use.
 They do not promise eager initialization. Package attribute proofs reject
-packages containing lazy imports or `__lazy_modules__`; lazy dotted imports
-cannot prove eager child initialization for unrelated reads. Direct lazy
+packages containing lazy imports or an active module `__lazy_modules__` binding.
+Lazy dotted imports cannot prove eager child initialization for unrelated reads. Direct lazy
 aliases resolve when used. Unproved accesses retain the existing warning and
 preservation guidance; this is a conservative limitation, not a timing repair.
 Incremental module-attribute analysis invalidates the previous cache signature.
@@ -63,14 +63,31 @@ f-strings, starred tuple subscripts, Unicode and cross-file imported symbols.
 
 ## Verification record
 
+The final source rerun collected the same 4,455 Core cases on every local
+interpreter (skips depend on interpreter capabilities):
+
+| Interpreter | Core passed | Core skipped |
+|---|---:|---:|
+| 3.10 | 4,131 | 324 |
+| 3.12 | 4,401 | 54 |
+| 3.13 | 4,397 | 58 |
+| 3.14 | 4,397 | 58 |
+| 3.15 | 4,366 | 89 |
+
+Separate test-root runs also pass: 3.12 CLI integration 350 passed/12 skipped,
+3.15 CLI integration 356 passed/6 skipped, runtime 24 passed on each, and
+3.12 MCP 152 passed. A supplemental 3.15 MCP run also passes all 152 tests.
+`scripts/check.sh` passes after the final source changes. Tests use Click 8.1.8
+and normal caller HOME with isolated per-test state.
+
 [Draft PR #108](https://github.com/zhurong2020/pyobfus/pull/108) records the exact
 head, CI runs, separated test-root
 results, full standard-library diff inventory and clean-install results.
-Implementation commit `6136232` passed all **34 CI jobs**, including every
+Earlier implementation commit `6136232` passed all **34 CI jobs**, including every
 3.9–3.15/three-OS Core/runtime combination:
 [CI run 39394672644](https://github.com/zhurong2020/pyobfus/actions/runs/39394672644).
 CodeQL, Packaging, Dogfood and VS Code workflows also passed. The PR records
-checks for the final documentation-only head separately.
+checks for the final compatibility-boundary head separately.
 Local raw evidence is retained under the ignored
 `docs/internal/codex-2026-10/py315-evidence/` directory, including
 `main-regressions.log`, `main-traceback.txt`, `ast-delta.json`,
@@ -107,7 +124,13 @@ listed in the PR rather than counted as successful execution.
 Python 3.9 and 3.11 are unavailable locally; hosted CI covers them. Windows
 and macOS depend on hosted CI rather than local testing. Free-threaded 3.15,
 compiled/frozen 3.15 packages and exhaustive third-party frameworks are not
-validated by this change. Independent review, merge and release remain pending.
+validated by this change. Claude independently checked native 3.15 lazy-import
+timing, aliases, relative imports, deferred missing-module errors,
+`__lazy_modules__`, and all PEP 798 forms including class bodies and async
+comprehensions. Directory, single-file and `--no-crossfile-local-names` outputs
+matched the originals; no new defect was found. Maintainer merge/release review
+remains pending. Cross-module import failures with `--no-cross-file` also occur
+on main with ordinary imports on 3.14 and are outside this change.
 
 ## Standard-library and adversarial probes
 
@@ -151,3 +174,11 @@ One existing scrub test used prose with discarded punctuation as invalid
 base64. Python 3.15 decodes that input and correctly rejects the resulting
 short encrypted blob. The fixture now uses a single sextet, an invalid base64
 length on every supported interpreter; runtime decoding behavior is unchanged.
+
+`tests/test_python315_legacy.py` additionally executes eager module-attribute
+programs with the control spelling on old interpreters and with a same-named
+function local on 3.15. Module/class/function binding cases distinguish a real
+3.15 control from ordinary local names. The shared control detector is active
+only when the interpreter's import AST supports `is_lazy`; older interpreters
+retain their eager proofs and Pro import rewrites. This avoids regressing code
+that uses the PEP 810 compatibility spelling before 3.15.

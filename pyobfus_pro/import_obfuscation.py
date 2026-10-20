@@ -11,6 +11,8 @@ from __future__ import annotations
 import ast
 from typing import Dict, List, Optional
 
+from pyobfus.core.import_resolution import has_lazy_module_control
+
 
 class ImportObfuscator(ast.NodeTransformer):
     """Rewrite module-level imports into importlib-based assignments."""
@@ -30,7 +32,7 @@ class ImportObfuscator(ast.NodeTransformer):
     def visit_Module(self, node: ast.Module) -> ast.Module:
         # The control list may be computed dynamically. Preserve imports rather
         # than attempting to predict which bindings will be lazy at runtime.
-        if any(isinstance(n, ast.Name) and n.id == "__lazy_modules__" for n in ast.walk(node)):
+        if has_lazy_module_control(node):
             return node
         new_body: List[ast.stmt] = []
         for stmt in node.body:

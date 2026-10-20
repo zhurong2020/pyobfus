@@ -145,7 +145,7 @@ class BuildCache:
 
         return {
             "source_metadata_version": 1,
-            "module_attribute_analysis_version": 4,
+            "module_attribute_analysis_version": 5,
             "executable_bits": executable_bits,
             "pyobfus_version": PYOBFUS_VERSION,
             "input_dir": str(input_dir),

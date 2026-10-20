@@ -50,16 +50,16 @@
 实施 PR：[#108](https://github.com/zhurong2020/pyobfus/pull/108)（draft，待审）。
 实现提交 `6136232` 的 [CI 39394672644](https://github.com/zhurong2020/pyobfus/actions/runs/39394672644)
 **34/34 通过**，包含 Core/runtime 3.9–3.15 三平台、3.15 CLI/MCP 与独立 runtime wheel。
-CodeQL、Packaging、Dogfood、VS Code CI 同样通过；最终文档提交的精确 head/CI 见 PR。
-独立审核仍未完成，不勾选审核项，不授权合并或发布。
+CodeQL、Packaging、Dogfood、VS Code CI 同样通过；后续兼容边界修复提交的精确 head/CI 见 PR。
+Claude 已独立验证原生 3.15 语义样例，未发现新缺陷；最终 PR 审核仍待完成，不授权合并或发布。
 
 本轮证据：`docs/internal/codex-2026-10/py315-evidence/`（本地忽略）。
 最小失败：`main-regressions.log`、`main-traceback.txt`、`published075-regressions.log`；
 修复：`regressions.log`、`315-extra-regressions.log`；AST：`ast-delta.json`、`ast-source-audit.txt`；
 反向兼容：`portable315-to310.json`；完整检查：`check.log`；安装与 runtime：
 `core-clean-install.log`、`core-clean-canary.log`、`runtime-clean-tests.log`、`mcp-clean-install.log`。
-标准库与 H/I 对照见验证记录及 PR；`tests-315-tests-final.log` 是修复后完整 Core 结果，
-`regressions-final.log` 追加验证最终 50 项原生回归；四根均独立运行。
+标准库与 H/I 对照见验证记录及 PR；`final-source-*-*.log` 是最终边界修复后的完整测试结果，
+五个本地解释器均收集 4,455 项 Core 用例（含 50 项原生 3.15 回归）；四根均独立运行。
 VS Code：`vscode-tests315-final.log`（53 项，原生 3.15 CLI）；Action：`action315-smoke.json`
 （本地 driver check/build 合同，不能替代其 hosted composite 三平台验收）。
 未验证项不得由本地 Linux 冒烟替代。

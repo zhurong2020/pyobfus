@@ -82,6 +82,23 @@ class _Bindings(ast.NodeVisitor):
     visit_GeneratorExp = visit_ListComp
 
 
+def has_lazy_module_control(tree: ast.Module) -> bool:
+    """Whether this interpreter can apply a module's lazy-import control.
+
+    Local/class bindings do not enable PEP 810. A declared global write in a
+    callable may update the control dynamically, so keep that case conservative.
+    Older interpreters ignore the control spelling and retain eager proofs.
+    """
+    if "is_lazy" not in ast.Import._fields:
+        return False
+    bindings = _Bindings(lambda node: None)
+    for statement in tree.body:
+        bindings.visit(statement)
+    return "__lazy_modules__" in (bindings.shadowed | set(bindings.imports)) or any(
+        isinstance(node, ast.Global) and "__lazy_modules__" in node.names for node in ast.walk(tree)
+    )
+
+
 class ImportedAccessVisitor(ast.NodeVisitor):
     """Resolve dotted expressions through explicit imports in lexical scopes."""
 
