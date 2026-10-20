@@ -14,11 +14,11 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### 2026-10-20 — 下一独立 session 首要任务：Python 3.15 兼容（P0）
+### 2026-10-20 — Core 0.8.0 已发布：Python 3.15 支持（冷启动先读 `docs/CURRENT_PLAN_ZH.md` 顶部）
 
-维护者明确要求抓住 3.15 发布窗口，尽快补齐支持；优先于 MCP 2.x、mapping 扩展、目录 fusion 与参数改名。**本轮只同步规划，之后另选 session 实现、审核和发版；当前 0.7.5 不宣称支持 3.15。** 冷启动先读 [`docs/PYTHON315_SUPPORT_PLAN.md`](docs/PYTHON315_SUPPORT_PLAN.md)，再读当前计划/TODO 顶部。已复现 PY315-1（lazy from 导入提前）和 PY315-2（字典推导式解包构建失败），证据覆盖原生 3.15 与 PyPI 0.7.5 wheel。目标包括现有 3.9–3.14 不回退、3.15 多平台 CI、四测试根、runtime/发布包安装与支持声明同步；通过后另行确认发布，不绑定其他新功能或月度攒版。医院应用整体暂停，等待现场后续回复。
+PR #108（PY315-1 惰性导入保留、PY315-2 推导式解包、3.15 新内建名保留、3.15 三平台 CI）由无头 Codex 实现、Claude 独立审核后合并并发布；PyPI/PEP 740/全新 3.15 与 3.10 安装/GitHub Release/Zenodo `23500657`/CFF 均已核。MCP 0.3.13、runtime 0.1.1、VS Code 不发。遗留（3.15 标准库 json/unittest 冒烟、free-threaded 未验证、black py315 告警、Glama pin）见 `docs/TODO.md` 10-20 段。医院应用仍暂停。
 
-### 2026-10-18 — 历史 session 收尾（当前优先级以上文 10-20 为准）
+### 2026-10-18 — 历史 session 收尾
 
 同日发布 Core 0.7.4（缺陷 N #102、H PR 4 选项 1 #103）与 0.7.5（缺陷 O #104、P #105），均 Codex 实现 + Claude 审核、全渠道核实。医院版 cand4 闸门等现场 Win7→Win10 答复；参数改名暂缓，B2/B3 等触发；DEV 第 2 篇 10-27 发。代码修改先交无头 Codex（注意 5 小时额度，沙箱 `.git` 只读时由 Claude 提交/推送）；合并与发版各需维护者明确批准。交接见 `../workspace-meta/archives/SESSION_CLOSEOUT_20261018_PYOBFUS_074_075.md`。
 

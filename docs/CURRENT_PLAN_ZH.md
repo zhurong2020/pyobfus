@@ -1,6 +1,8 @@
 # pyobfus 当前计划
 
-**2026-10-20 Python 3.15 P0 实现进入审核交接**：支持分支修复 PY315-1/PY315-2、3.15 匿名 symtable 名称与 Pro 惰性导入路径，增加 3.15 三平台 CI；验收范围与限制见 [验证记录](PYTHON315_VALIDATION.md)，清单见 [支持计划](PYTHON315_SUPPORT_PLAN.md)。PR #108 待 Claude 独立审核；本轮不合并、不改版本号、不发版。医院应用继续暂停。
+**2026-10-20 夜 Core 0.8.0 已发布（Python 3.15 支持，维护者当日要求推进至发版）**：Codex 无头实现 PR #108（中途 5 小时额度用尽，19:50 续跑收尾），Claude 用自建原生 3.15 对抗样例（惰性导入时机/别名/相对/缺失模块延迟报错、`__lazy_modules__`、PEP 798 全形态含类体与 async）独立审核：目录、`--no-crossfile-local-names`、单文件均与原文一致；`--no-cross-file` 与关闭模块属性改写下的差异在 main+3.14 普通导入同样出现，属既有限制。squash 合并 `baae6ee`，发版提交 `4cead89` CI 34/34 + CodeQL/Packaging 通过后打 `v0.8.0`。Release workflow 首次因 sigstore Fulcio 502 失败（未上传），重跑成功；PyPI wheel/sdist PEP 740 publisher=release.yml，3.15 分类器已上；全新 3.15 与 3.10 venv 从 PyPI 安装、pip check 通过，3.15 上三组样例产物一致，3.15 构建的普通源码在 3.10 运行一致。GitHub Release 已建。MCP 0.3.13 / runtime 0.1.1 / VS Code 不发（MCP、runtime 仅分类器在仓库更新）。Zenodo record `23500657`（v0.8.0）已核，CFF 已同步。遗留见 `TODO.md` 10-20 段。
+
+**2026-10-20 Python 3.15 P0 实现进入审核交接（已由上段 0.8.0 发布取代）**：支持分支修复 PY315-1/PY315-2、3.15 匿名 symtable 名称与 Pro 惰性导入路径，增加 3.15 三平台 CI；验收范围与限制见 [验证记录](PYTHON315_VALIDATION.md)，清单见 [支持计划](PYTHON315_SUPPORT_PLAN.md)。PR #108 待 Claude 独立审核；本轮不合并、不改版本号、不发版。医院应用继续暂停。
 
 **2026-10-20 最新功能调研（未授权实现）**：医院应用整体暂停，等待现场后续反馈；本轮仅研究 pyobfus。新报告 `FEATURE_EXPANSION_RESEARCH_2026-10-20.md`：原生 Python 3.15.0 在 checkout 与 PyPI 0.7.5 wheel 复现两项 Community 兼容性缺口（PY315-1 lazy from 丢惰性标记、导入提前；PY315-2 字典推导式解包构建失败）；普通导入对照正常，未宣称全面支持 3.15。MCP SDK 2.3.0 已在 10-19 CI 过 152 项，本轮真实 stdio 在 legacy/auto 分别协商 `2025-11-25`/`2026-07-28`，9 工具及只读调用通过，旧「stdio 没收益」结论需撤销；依赖上限未改。建议先兼容性与 MCP 发布条件复审，再推进独立文件 mapping／目录 L3 设计。小型证据私有 `docs/internal/research-2026-10-20/`。本轮未修改产品代码、未提交或发布。
 
