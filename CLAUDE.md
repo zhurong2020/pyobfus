@@ -16,7 +16,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ### 2026-10-20 — Core 0.8.0 已发布：Python 3.15 支持（冷启动先读 `docs/CURRENT_PLAN_ZH.md` 顶部）
 
-PR #108（PY315-1 惰性导入保留、PY315-2 推导式解包、3.15 新内建名保留、3.15 三平台 CI）由无头 Codex 实现、Claude 独立审核后合并并发布；PyPI/PEP 740/全新 3.15 与 3.10 安装/GitHub Release/Zenodo `23500657`/CFF 均已核。同晚维护者批准发 MCP 0.3.14（3.15 分类器 + #103 提示）：PyPI/PEP 740、全新 3.15 安装握手 0.3.14/9 tools、MCP Registry active/isLatest 均已核；runtime 0.1.1、VS Code 不发。遗留（3.15 标准库 json/unittest 冒烟、free-threaded 未验证、black py315 告警、Glama pin）见 `docs/TODO.md` 10-20 段。医院应用仍暂停。
+PR #108（PY315-1 惰性导入保留、PY315-2 推导式解包、3.15 新内建名保留、3.15 三平台 CI）由无头 Codex 实现、Claude 独立审核后合并并发布；PyPI/PEP 740/全新 3.15 与 3.10 安装/GitHub Release/Zenodo `23500657`/CFF 均已核。同晚维护者批准发 MCP 0.3.14（3.15 分类器 + #103 提示）：PyPI/PEP 740、全新 3.15 安装握手 0.3.14/9 tools、MCP Registry active/isLatest 均已核；runtime 0.1.1、VS Code 不发。Glama 10-21 已改装 0.3.14/0.8.0 并测试通过（9 tools）。遗留（3.15 标准库 json/unittest 冒烟、free-threaded 未验证、black py315 告警）见 `docs/TODO.md` 10-20 段。医院应用仍暂停。
 
 ### 2026-10-18 — 历史 session 收尾
 
@@ -131,7 +131,7 @@ PR #108（PY315-1 惰性导入保留、PY315-2 推导式解包、3.15 新内建�
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.14，2026-10-20 发布，加 3.15 分类器 + #103 未证明访问提示**；9 tools: 7 community + 2 pro_funnel · dep `pyobfus>=0.5.18` · `uvx pyobfus-mcp` 零安装；完整版本历史见 `pyobfus_mcp/CHANGELOG.md`)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp`（**0.3.14** 2026-10-20 发布并核实 `active` / `isLatest=true`）
 - **Smithery (Skill)**: https://smithery.ai/skills/zhurong2020/pyobfus-protect (2026-06-22 上线 · 本地工具走 Skill 渠道非 MCP 渠道) · **mcp.so**: 已收录
-- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus — 已上架；2026-10-14 维护者曾将 Build steps 固定为 `pyobfus-mcp==0.3.13 pyobfus==0.7.1`，启动/握手 0.3.13 / 9 tools 测试成功，12:33 渠道 release 0.7.1 已明确发布。10-17 Build steps 已改为 `pyobfus-mcp==0.3.13 pyobfus==0.7.3`，测试 `01a14684` 通过（Core 0.7.3、9 tools，渠道 release 0.7.5）；构建检出 `964b248`（仅文档后代，不影响所装包）。下次发 MCP 同步更新包版本与 pin。详细历史与验收条件见 `docs/DISTRIBUTION_CHANNELS.md` / `docs/TODO.md`。
+- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus — 已上架；2026-10-14 维护者曾将 Build steps 固定为 `pyobfus-mcp==0.3.13 pyobfus==0.7.1`，启动/握手 0.3.13 / 9 tools 测试成功，12:33 渠道 release 0.7.1 已明确发布。10-17 Build steps 已改为 `pyobfus-mcp==0.3.13 pyobfus==0.7.3`，测试 `01a14684` 通过（Core 0.7.3、9 tools，渠道 release 0.7.5）；构建检出 `964b248`（仅文档后代，不影响所装包）。10-21 Build steps 改为 `pyobfus-mcp==0.3.14 pyobfus==0.8.0`，测试 `01a15a11` 通过（9 tools，渠道 release 0.7.7）。下次发 MCP 或 Core 同步更新包版本。详细历史与验收条件见 `docs/DISTRIBUTION_CHANNELS.md` / `docs/TODO.md`。
 
 - **GitHub Action**: https://github.com/zhurong2020/pyobfus-action (**v1.0.1**，2026-09-10 建仓发版并上架 Marketplace：<https://github.com/marketplace/actions/pyobfus-scan-and-build>)。独立仓库**是硬性要求**——Marketplace 要求 `action.yml` 在仓库根目录且一仓一 action；另外 action 的移动 `v1` tag 会与 Core 的 `v*` 命名空间冲突并重新触发 `release.yml`。⚠️ 两个只会在上架页面才暴露的限制：**listing 名不能与已有 GitHub 用户重名**（`github.com/pyobfus` 是第三方账号，故名为 `pyobfus scan and build`；GitHub **不因不活跃释放用户名**，只受理商标投诉，此事已定论），以及 **description 上限 125 字符**（首版 151 被拒 → v1.0.1）。两条现均由该仓库 CI 断言拦截。**归因查询**（本 action 存在的理由，周期性复盘时与下载量一起看）：<https://github.com/search?q=%22zhurong2020%2Fpyobfus-action%22+path%3A.github%2Fworkflows&type=code>
 - **GitHub**: https://github.com/zhurong2020/pyobfus (public)

@@ -67,6 +67,17 @@ build spec shows `pinnedCommit: null`, yet the build still checked out
 3.13.5 environment although the spec says 3.12; neither affects the
 PyPI-installed server. At the next MCP or Core release, update the Build
 steps package pins again.
+**2026-10-21 00:07 (Asia/Shanghai), after MCP 0.3.14 / Core 0.8.0:** the
+maintainer changed Build steps to `pyobfus-mcp==0.3.14 pyobfus==0.8.0`. Test
+`01a15a11-855f-7c40-ad0e-7e8c11261da3` succeeded in 8.5s: the install log shows
+`pyobfus==0.8.0`, `pyobfus-mcp==0.3.14`, `pyobfus-runtime==0.1.1` and
+`mcp==1.30.0`; the handshake reports server version 0.3.14 and protocol
+`2025-11-25`, and `ListToolsRequest` returns all 9 tools. Glama created
+channel release `0.7.7` from this build (a channel label, not a PyPI version).
+The build checked out `e167182` (#107, an ancestor of the 0.8.0 release
+commit) with `pinnedCommit: null`, and uv again used system Python 3.13.5;
+neither affects the PyPI-installed server. At the next MCP or Core release,
+update the Build steps package pins again.
 
 Periodic checks retain only decision summaries, not full stdout or separate
 CSV/JSON snapshots. During the quiet-period experiment, retain the Core/MCP
