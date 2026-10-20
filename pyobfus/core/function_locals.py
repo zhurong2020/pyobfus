@@ -147,7 +147,22 @@ def plan_locals(
                 (
                     c
                     for c in parent.get_children()
-                    if c.get_name() == name
+                    if (
+                        c.get_name() == name
+                        or (
+                            isinstance(
+                                node,
+                                (
+                                    ast.Lambda,
+                                    ast.ListComp,
+                                    ast.SetComp,
+                                    ast.DictComp,
+                                    ast.GeneratorExp,
+                                ),
+                            )
+                            and c.get_name() == f"<{name}>"
+                        )
+                    )
                     and c.get_lineno() == getattr(node, "lineno", -1)
                     and c.get_id() not in used
                 ),
@@ -255,8 +270,10 @@ def plan_locals(
                 if isinstance(node, ast.DictComp):
                     # CPython symbol-table traversal visits the value first.
                     # Same-line lambdas must consume their matching child table.
-                    self.visit(node.value)
-                    self.visit(node.key)
+                    if node.value is not None:
+                        self.visit(node.value)
+                    if node.key is not None:
+                        self.visit(node.key)
                 else:
                     self.visit(node.elt)
 

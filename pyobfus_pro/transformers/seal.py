@@ -375,7 +375,11 @@ def _ensure_runtime_import(tree: ast.Module) -> None:
     import is inserted after any leading imports.
     """
     for stmt in tree.body:
-        if isinstance(stmt, ast.ImportFrom) and stmt.module == _RUNTIME_MODULE:
+        if (
+            isinstance(stmt, ast.ImportFrom)
+            and stmt.module == _RUNTIME_MODULE
+            and not getattr(stmt, "is_lazy", False)
+        ):
             if not any(alias.name == _RUNTIME_VERIFIER for alias in stmt.names):
                 stmt.names.append(ast.alias(name=_RUNTIME_VERIFIER))
             return

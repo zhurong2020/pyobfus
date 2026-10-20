@@ -9,7 +9,7 @@ title: pyobfus documentation
   <p style="font-size:1.2em;max-width:680px;margin:0 auto">Protect Python before shipping, verify what was produced, and keep production failures diagnosable.</p>
 </div>
 
-pyobfus is a local-first, AST-based Python obfuscator for Python 3.9–3.14.
+pyobfus is a local-first, AST-based Python obfuscator for Python 3.9–3.15.
 It obfuscates multi-file projects and packages as a whole: names are renamed
 consistently across modules and imports are rewritten to match, so the output
 is still ordinary `.py` that runs without pyobfus installed (Community output).
@@ -19,7 +19,7 @@ Community is Apache-2.0, has no file or line limits, and requires no trial.
 
 [简体中文概览](https://github.com/zhurong2020/pyobfus/blob/main/README.zh-CN.md)
 
-> **Python 3.15 is the next P0 compatibility target.** Released support remains 3.9–3.14 until the [implementation and acceptance plan](PYTHON315_SUPPORT_PLAN.md) passes.
+> **Python 3.15 support is added in the next release.** See the [validation scope and limitations](PYTHON315_VALIDATION.md); published Core 0.7.5 still supports 3.9–3.14.
 
 ## Start here
 

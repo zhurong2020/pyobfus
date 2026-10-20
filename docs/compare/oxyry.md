@@ -41,7 +41,7 @@ Oxyry is an online Python obfuscation service.
 
 3. **Benefits**:
    - Code stays on your machine
-   - Modern Python 3.9-3.14 support
+   - Modern Python 3.9-3.15 support
    - Batch processing for directories
 
 ---

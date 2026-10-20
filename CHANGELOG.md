@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Python 3.15 support, including native lazy imports and comprehension
+  unpacking, with three-platform Core/runtime CI and 3.15 CLI/MCP checks.
+  Preserve the four new builtins and verify clean Core/runtime/MCP installs.
+  See [validation scope](docs/PYTHON315_VALIDATION.md) for target restrictions.
+
+### Fixed
+
+- PY315-1: retain lazy import fields when rewriting imported symbols. Pro
+  import obfuscation preserves lazy imports and modules using
+  `__lazy_modules__`; injected runtime helpers do not merge into lazy imports.
+- PY315-2: accept missing dictionary-comprehension values throughout import,
+  module-attribute and lexical binding analysis for PEP 798 unpacking.
+- Match Python 3.15's `<lambda>` and `<genexpr>` symbol-table names in both
+  lexical planners, preserving local and imported references.
+
+
 ## [0.7.5] - 2026-10-18
 
 ### Fixed

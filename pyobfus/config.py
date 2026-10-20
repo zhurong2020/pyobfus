@@ -47,6 +47,11 @@ class ObfuscationConfig:
             "type",
             "object",
             "Exception",
+            # Python 3.15 builtins; reserve on older builders too.
+            "ImportCycleError",
+            "__lazy_import__",
+            "frozendict",
+            "sentinel",
             # Magic methods
             "__init__",
             "__str__",

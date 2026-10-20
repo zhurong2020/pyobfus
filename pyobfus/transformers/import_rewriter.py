@@ -6,6 +6,7 @@ to use obfuscated names from the GlobalSymbolTable.
 """
 
 import ast
+import copy
 from typing import Optional, Set, Tuple, Dict
 
 from pyobfus.transformers.scoped_imports import ImportKey, key
@@ -131,11 +132,9 @@ class ImportRewriter(ast.NodeTransformer):
 
         # Create new ImportFrom node with rewritten names
         if any_rewritten:
-            new_node = ast.ImportFrom(
-                module=node.module,  # Keep original module (including relative level)
-                names=new_names,
-                level=node.level,
-            )
+            # Preserve every original field, including Python 3.15 is_lazy.
+            new_node = copy.copy(node)
+            new_node.names = new_names
             # Copy location info
             ast.copy_location(new_node, node)
             return new_node

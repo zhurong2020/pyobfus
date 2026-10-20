@@ -18,6 +18,11 @@ import subprocess
 import sys
 from pathlib import Path
 
+try:
+    import tomllib
+except ImportError:
+    import tomli as tomllib  # type: ignore[no-redef]
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 RUNTIME_DIR = "pyobfus_runtime"
 # Files whose content is what users install; tests and docs may change freely.
@@ -52,6 +57,18 @@ def main() -> int:
         print(diff.stderr.strip())
         return 2
     changed = [line for line in diff.stdout.splitlines() if line.strip()]
+    metadata_path = f"{RUNTIME_DIR}/pyproject.toml"
+    if metadata_path in changed:
+        previous = _git("show", f"{tag}:{metadata_path}")
+        if previous.returncode == 0:
+            old = tomllib.loads(previous.stdout)
+            new = tomllib.loads((REPO_ROOT / metadata_path).read_text(encoding="utf-8"))
+            # Classifiers describe tested interpreters; they do not change the
+            # runtime API or dependencies required by generated artifacts.
+            old.get("project", {}).pop("classifiers", None)
+            new.get("project", {}).pop("classifiers", None)
+            if old == new:
+                changed.remove(metadata_path)
     if changed:
         print(
             f"check_runtime_version: {RUNTIME_DIR} differs from {tag} but still "
@@ -62,7 +79,7 @@ def main() -> int:
         for name in changed:
             print(f"  {name}")
         return 1
-    print(f"check_runtime_version: {RUNTIME_DIR} matches {tag}; OK.")
+    print(f"check_runtime_version: {RUNTIME_DIR} matches {tag} (except classifiers); OK.")
     return 0
 
 

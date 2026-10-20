@@ -1,6 +1,6 @@
 # pyobfus — agent guide
 
-> Local-first AST-based Python obfuscation for Python 3.9–3.14. Community is Apache-2.0 with no file/line limit. pyobfus keeps shipped failures diagnosable through private reverse mappings and exposes stable JSON and MCP interfaces.
+> Local-first AST-based Python obfuscation for Python 3.9–3.15. Community is Apache-2.0 with no file/line limit. pyobfus keeps shipped failures diagnosable through private reverse mappings and exposes stable JSON and MCP interfaces.
 
 ## Use pyobfus when
 

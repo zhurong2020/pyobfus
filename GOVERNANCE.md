@@ -39,7 +39,7 @@ kept separate from the core).
 ## How decisions are made
 
 - **Routine changes** (bug fixes, docs, tests): reviewed and merged by the
-  maintainer. CI (tests + CodeQL, across the Python 3.9–3.14 matrix and the
+  maintainer. CI (tests + CodeQL, across the Python 3.9–3.15 matrix and the
   extension) must be green.
 - **Feature and design decisions**: recorded in `docs/` as dated planning /
   decision documents (the current plan lives in

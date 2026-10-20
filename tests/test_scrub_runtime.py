@@ -107,7 +107,9 @@ class TestFailureModes:
     def test_invalid_base64_fails(self, keypair):
         priv, _pub = keypair
         with pytest.raises(ScrubError, match="not valid base64"):
-            unscrub_error_id("!!! not valid base64 !!!", priv)
+            # A single sextet cannot encode any bytes. Python 3.15 tolerates
+            # more discarded punctuation/padding in the former prose sample.
+            unscrub_error_id("A", priv)
 
     def test_too_short_blob_fails(self, keypair):
         priv, _pub = keypair

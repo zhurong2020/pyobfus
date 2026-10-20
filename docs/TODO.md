@@ -24,19 +24,19 @@
 
 | 顺序 | 待办 | 验收 / 下一步 |
 |---|---|---|
-| **P0 / 首位** | **Python 3.15 兼容支持（维护者 10-20 确认）** | 抓发布窗口，后续独立 session 先做；修 PY315-1/PY315-2，完成 AST/作用域审计、3.15 多平台 CI、四测试根、干净安装/runtime 验证，保持 3.9–3.14；支持声明仅在验收后扩展。详见 [实施交接](PYTHON315_SUPPORT_PLAN.md)。本轮只同步文档，未开始实现；发布另行确认，不捆绑新功能或等待月度攒版。 |
+| **P0 / 首位** | **Python 3.15 兼容支持（维护者 10-20 确认）** | 抓发布窗口，后续独立 session 先做；修 PY315-1/PY315-2，完成 AST/作用域审计、3.15 多平台 CI、四测试根、干净安装/runtime 验证，保持 3.9–3.14；支持声明仅在验收后扩展。详见 [实施交接](PYTHON315_SUPPORT_PLAN.md)。支持分支已实现，draft PR 待审；发布另行确认，不捆绑新功能或等待月度攒版。 |
 | 暂停 | **私有下游候选 Windows 闸门（维护者）** | **10-20 维护者确认：现场准备升级 Win10，Win7 兼容性改造暂停**。下游安装器前置版本防护源码已修（Setup 最低 Win10，直接安装脚本在读取组件和写入前拦截）；尚未进入新介质；**维护者随后决定医院应用整体暂停，等待现场后续回复，本轮不继续重封或验收**。10-15 已用 0.7.3 重建候选 `2.6.2-20261015-e7e96fb`（`build/release-v2.6.2-cand4`，取代 0.7.2 的 cand3）：SHA256、名字检查 59/63（4 处星号转发：3 处外部 wheel，`nifti_loader` 为项目内转发但被转发模块导出不可静态确定→保守保留）、交付检查 0 发现。剩：发布机授权续签 → 装机评分、M2 升级、生命周期、向导目视。 |
 | 2 | **10-19 周一巡检** | 下载安静日（0.7.2 发布日与次日不计）、客户反馈/调研回答、微信付款跟进线程（`/pyobfus-inbox`）、Stripe Alipay 审批状态、CI、许可证监控、KV 备份、Anthropic 插件解锁消息；仅留决策摘要。 |
 | 3 | **10-25 复盘** | 区分发布/次日/内容流量，综合下载、trial、客户回答和 DEV 来源，决定下轮优先级与发布节奏；评估一周两笔微信付款未完成是否需要更多动作（Alipay、弃单提醒需 Stripe restricted key）。 |
 
 缺陷 N、H PR 4 选项 1 随 Core 0.7.4，缺陷 O、P 随 0.7.5（均 10-18）发布；参数改名暂缓；Pro 扩展等真实需求信号，详见各条目。本次没有授权额外部署或客户邮件发送。
 
-## 10-20 功能路线（3.15 优先级已确认，待后续 session 实施）
+## 10-20 功能路线（3.15 实现进入 PR 审核）
 
-完整证据：[10-20 路线复核](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)。维护者已将 Python 3.15 设为 P0，其他功能候选排在其后；本轮不实现，后续独立 session 以 [3.15 支持计划](PYTHON315_SUPPORT_PLAN.md) 接手。医院应用暂停。
+完整证据：[10-20 路线复核](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)。维护者已将 Python 3.15 设为 P0，其他功能候选排在其后；3.15 实现与验收见 [支持计划](PYTHON315_SUPPORT_PLAN.md) 和 [验证记录](PYTHON315_VALIDATION.md)，待独立审核。医院应用暂停。
 
-- [ ] **PY315-1：惰性 from 导入被提前执行**。原生 Python 3.15.0、当前 checkout 与 PyPI Core 0.7.5 wheel 均复现：`lazy from calculator import Calculator` 改写后丢 `is_lazy`，构建成功但导入副作用时序变化。最小输入与输出见调研 §5.1。Community 兼容性，尚未实现；不扩大到现有 3.9–3.14 支持范围的回归。
-- [ ] **PY315-2：新字典推导式解包构建失败**。`{**row for row in rows}` 原文在 3.15 可运行，checkout／0.7.5 wheel 构建均报 `NoneType ... _fields`；根因尚待定位。Community 兼容性，尚未实现。
+- [ ] **PY315-1：惰性 from 导入被提前执行**。原生 Python 3.15.0、当前 checkout 与 PyPI Core 0.7.5 wheel 均复现：`lazy from calculator import Calculator` 改写后丢 `is_lazy`，构建成功但导入副作用时序变化。最小输入与输出见调研 §5.1。Community 兼容性，支持分支已修复并补原生回归；draft PR 待审。
+- [ ] **PY315-2：新字典推导式解包构建失败**。`{**row for row in rows}` 原文在 3.15 可运行，checkout／0.7.5 wheel 构建均报 `NoneType ... _fields`；根因为自定义推导式 visitor 访问 None，六处路径已修复并补原生回归；draft PR 待审。
 - [ ] **MCP 2.x 发布条件复审**。10-19 CI 已用 2.3.0 过 152 项；10-20 Linux 真实 stdio 验证 legacy 为 `2025-11-25`、auto 为 `2026-07-28`，均列出 9 工具并成功调用只读工具。旧「stdio 无新协议收益」结论不再适用；依赖上限未改，仍需 Python 3.10／Windows／干净解析与全工具合同。
 - 之后建议：`--no-cross-file` mapping（Community）与目录 L3 + 应用 key provider 的单项设计（Pro），按下一真实需求决定先后；不一次接入全部 fusion 字段。
 - 参数改名、H B2/B3、资源 key provider 与 L3 方法覆盖继续保持原 gate；未授权改实现／合并／发布。

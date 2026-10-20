@@ -2,12 +2,12 @@
 
 **优先级：P0，维护者于 2026-10-20 明确确认。** 利用 Python 3.15 发布窗口，尽快完成兼容支持；优先于 MCP SDK 升级、mapping 扩展、目录 fusion、参数改名及其他新增功能。
 
-**执行状态：待后续独立 session 开始。** 本轮只调整优先级和同步文档，不修改实现、依赖、CI 或版本号，不打 tag、不发布。具体实施时间和发布决定留待维护者在后续会话确认。医院应用整体暂停，等待现场后续回复，不作为本任务的前置条件。
+**执行状态：支持分支已实现，正在完成验收与 draft PR 交接。** 本轮仅实现与 PR，不合并、不改版本号、不打 tag、不发布；合并及发布由 Claude 独立审核后执行。见 [2026-10-20 验证记录](PYTHON315_VALIDATION.md)。医院应用继续暂停。
 
 ## 1. 当前事实与入口
 
 - 已发布版本：Core 0.7.5 / MCP 0.3.13 / runtime 0.1.1。
-- 当前正式支持与 Core CI 范围仍为 **Python 3.9–3.14**。3.15 尚未完成验收，不能提前写成已支持。
+- 已发布 Core 0.7.5 的支持范围为 **Python 3.9–3.14**；支持分支增加 **3.15**，具体 CI head 与验收结论写入实施 PR。
 - 10-20 已用原生 Linux x86_64 CPython 3.15.0，对 checkout 和 PyPI Core 0.7.5 wheel 复现两项缺口；原文与产物均用独立 Python 子进程比较。
 - 最小输入、解释器／wheel 哈希、结果与限制见 [10-20 调研 §5](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)。小型证据和探针位于本地忽略目录 `docs/internal/research-2026-10-20/`。临时解释器路径只作复跑便利，不作为其他机器的环境前提。
 - 工作规则以 [AGENTS.md](https://github.com/zhurong2020/pyobfus/blob/main/AGENTS.md) 为准；实际进度写回 [当前计划](CURRENT_PLAN_ZH.md)，待办写回 [TODO](TODO.md)。
@@ -33,19 +33,30 @@
 
 ## 4. 支持声明前的验收清单
 
-- [ ] PY315-1／PY315-2 在 0.7.5 基线失败、修订版通过；原生 3.15 回归持续执行。
-- [ ] 普通源码与 3.15 新语法分别验收；语法合法但无法安全处理的情况必须明确报告，不得静默改变语义。
-- [ ] 审计 AST 必需字段、惰性标记、`DictComp.value=None`、新增内建名、默认编码及源码生成行为；有代表性的反向对照。
+- [x] PY315-1／PY315-2 在 0.7.5 基线失败、修订版通过；原生 3.15 回归持续执行。
+- [x] 普通源码与 3.15 新语法分别验收；语法合法但无法安全处理的情况必须明确报告，不得静默改变语义。
+- [x] 审计 AST 必需字段、惰性标记、`DictComp.value=None`、新增内建名、默认编码及源码生成行为；有代表性的反向对照。
 - [ ] Core 3.15 在 Linux、Windows、macOS 持续 CI 通过；原有 3.9–3.14 矩阵保持通过。任何未验证平台须明确收窄声明，不可把 Linux 冒烟扩大为三平台支持。
-- [ ] 按 AGENTS.md 将 `tests/`、`pyobfus_mcp/tests/`、`integration_tests/`、`pyobfus_runtime/tests/` **分开运行**；确认 3.15 对四测试根的影响。测试使用各自 tmp_path，保持调用者正常 HOME 下隔离。
-- [ ] 完整 `scripts/check.sh` 通过；必要时核对格式／类型工具对 3.15 的兼容，但不借机无关升级依赖。
-- [ ] 新解释器构建的普通源码在仍承诺的旧目标版本上解析／运行；3.15 专属语法明确保留目标下限，不要求把语言新特性自动降级。
-- [ ] Core、runtime 候选 wheel 在全新 3.15 环境安装、`pip check` 与代表性运行通过；检查 runtime 及 cryptography 等实际依赖的目标可用性。
-- [ ] Pro 验证仅使用合成样例与隔离许可状态；分别核对源码变换与 L3 bytecode/marshal 的构建／目标版本约束，不承诺加密字节码跨 Python minor 可移植。
-- [ ] MCP／VS Code／Action 的 Python 解析、基础合同与必要集成检查无退步；MCP 2.x 上限调整仍是独立任务，不捆绑进 3.15 支持。
+- [x] 按 AGENTS.md 将 `tests/`、`pyobfus_mcp/tests/`、`integration_tests/`、`pyobfus_runtime/tests/` **分开运行**；确认 3.15 对四测试根的影响。测试使用各自 tmp_path，保持调用者正常 HOME 下隔离。
+- [x] 完整 `scripts/check.sh` 通过；必要时核对格式／类型工具对 3.15 的兼容，但不借机无关升级依赖。
+- [x] 新解释器构建的普通源码在仍承诺的旧目标版本上解析／运行；3.15 专属语法明确保留目标下限，不要求把语言新特性自动降级。
+- [x] Core、runtime 候选 wheel 在全新 3.15 环境安装、`pip check` 与代表性运行通过；检查 runtime 及 cryptography 等实际依赖的目标可用性。
+- [x] Pro 验证仅使用合成样例与隔离许可状态；分别核对源码变换与 L3 bytecode/marshal 的构建／目标版本约束，不承诺加密字节码跨 Python minor 可移植。
+- [x] MCP／VS Code／Action 的 Python 解析、基础合同与必要集成检查无退步；MCP 2.x 上限调整仍是独立任务，不捆绑进 3.15 支持。
 - [ ] 独立审核通过；支持矩阵的每项结论能指向测试、CI 或带日期的记录。
 
 四测试根通过和多平台证据是支持声明的组成部分，不用单个最小修复替代整体验收；无需为未触及的重型框架或冻结包宣称全面支持。
+
+本轮证据：`docs/internal/codex-2026-10/py315-evidence/`（本地忽略）。
+最小失败：`main-regressions.log`、`main-traceback.txt`、`published075-regressions.log`；
+修复：`regressions.log`、`315-extra-regressions.log`；AST：`ast-delta.json`、`ast-source-audit.txt`；
+反向兼容：`portable315-to310.json`；完整检查：`check.log`；安装与 runtime：
+`core-clean-install.log`、`core-clean-canary.log`、`runtime-clean-tests.log`、`mcp-clean-install.log`。
+标准库与 H/I 对照见验证记录及 PR；`tests-315-tests-final.log` 是修复后完整 Core 结果，
+`regressions-final.log` 追加验证最终 50 项原生回归；四根均独立运行。
+VS Code：`vscode-tests315-final.log`（53 项，原生 3.15 CLI）；Action：`action315-smoke.json`
+（本地 driver check/build 合同，不能替代其 hosted composite 三平台验收）。
+未验证项不得由本地 Linux 冒烟替代。
 
 ## 5. 同步与发布顺序
 
