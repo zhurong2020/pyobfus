@@ -1,6 +1,6 @@
 # pyobfus 当前计划
 
-**2026-10-20 Python 3.15 P0 实现进入审核交接**：支持分支修复 PY315-1/PY315-2、3.15 匿名 symtable 名称与 Pro 惰性导入路径，增加 3.15 三平台 CI；验收范围与限制见 [验证记录](PYTHON315_VALIDATION.md)，清单见 [支持计划](PYTHON315_SUPPORT_PLAN.md)。待 draft PR 独立审核；本轮不合并、不改版本号、不发版。医院应用继续暂停。
+**2026-10-20 Python 3.15 P0 实现进入审核交接**：支持分支修复 PY315-1/PY315-2、3.15 匿名 symtable 名称与 Pro 惰性导入路径，增加 3.15 三平台 CI；验收范围与限制见 [验证记录](PYTHON315_VALIDATION.md)，清单见 [支持计划](PYTHON315_SUPPORT_PLAN.md)。PR #108 待 Claude 独立审核；本轮不合并、不改版本号、不发版。医院应用继续暂停。
 
 **2026-10-20 最新功能调研（未授权实现）**：医院应用整体暂停，等待现场后续反馈；本轮仅研究 pyobfus。新报告 `FEATURE_EXPANSION_RESEARCH_2026-10-20.md`：原生 Python 3.15.0 在 checkout 与 PyPI 0.7.5 wheel 复现两项 Community 兼容性缺口（PY315-1 lazy from 丢惰性标记、导入提前；PY315-2 字典推导式解包构建失败）；普通导入对照正常，未宣称全面支持 3.15。MCP SDK 2.3.0 已在 10-19 CI 过 152 项，本轮真实 stdio 在 legacy/auto 分别协商 `2025-11-25`/`2026-07-28`，9 工具及只读调用通过，旧「stdio 没收益」结论需撤销；依赖上限未改。建议先兼容性与 MCP 发布条件复审，再推进独立文件 mapping／目录 L3 设计。小型证据私有 `docs/internal/research-2026-10-20/`。本轮未修改产品代码、未提交或发布。
 

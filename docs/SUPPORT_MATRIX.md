@@ -1,8 +1,8 @@
 # Support matrix
 
-What is actually verified, by what, as of 2026-10-12 (`pyobfus` 0.7.0 /
-`pyobfus-mcp` 0.3.12 / `pyobfus-runtime` 0.1.1 / VS Code extension 0.4.3 /
-`pyobfus-action` 1.0.1).
+What is actually verified, by what, as of 2026-10-20 (`pyobfus` 0.7.5 plus
+unreleased 3.15 support / `pyobfus-mcp` 0.3.13 / `pyobfus-runtime` 0.1.1 /
+VS Code extension 0.4.3 / `pyobfus-action` 1.0.1).
 
 Four labels, used strictly:
 
@@ -33,7 +33,7 @@ existing compatibility contract. L3 bytecode requires the builder's minor.
 | Surface | Linux | macOS | Windows | Evidence |
 |---|---|---|---|---|
 | Core obfuscator, 3.9–3.15 | tested | tested | tested | `ci.yml` job `test`, 3 OS × 7 versions |
-| `pyobfus-runtime`, 3.9–3.15 | tested | tested | tested | PyPI `0.1.0` clean install passed; local boundary suite 2/2; CI run [`35931303008`](https://github.com/zhurong2020/pyobfus/actions/runs/35931303008) and release run [`35931605485`](https://github.com/zhurong2020/pyobfus/actions/runs/35931605485) built, inspected, and published the standalone wheel |
+| `pyobfus-runtime`, 3.9–3.15 | tested | tested | tested | `ci.yml` job `test` runs boundary tests across 3 OS × 7 versions; `runtime-wheel` installs standalone wheels on 3.12/3.15. Linux 3.15 installed-wheel boundary: 24/24; see [dated validation](PYTHON315_VALIDATION.md). |
 | End-to-end CLI (obfuscate, execute output) | tested (3.11, 3.15) | advisory-only | tested (3.11, 3.15) | `ci.yml` job `integration` runs `integration_tests/` on Ubuntu and Windows (3.11/3.15); single-file and cross-file outputs are executed and compared with the originals |
 | `pyobfus-mcp` server | tested (3.11, 3.13, 3.15) | advisory-only | advisory-only | `ci.yml` jobs `mcp-tests` (3.11/3.15), `mcp-sdk-latest` and `mcp-sdk-2x` (3.13) |
 | VS Code extension | tested (Node 22, Python 3.12) | advisory-only | advisory-only | `vscode-extension-ci.yml`, headless xvfb |

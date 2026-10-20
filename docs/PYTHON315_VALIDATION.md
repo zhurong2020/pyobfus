@@ -63,8 +63,14 @@ f-strings, starred tuple subscripts, Unicode and cross-file imported symbols.
 
 ## Verification record
 
-The implementation PR records the exact head, CI runs, separated test-root
+[Draft PR #108](https://github.com/zhurong2020/pyobfus/pull/108) records the exact
+head, CI runs, separated test-root
 results, full standard-library diff inventory and clean-install results.
+Implementation commit `6136232` passed all **34 CI jobs**, including every
+3.9–3.15/three-OS Core/runtime combination:
+[CI run 39394672644](https://github.com/zhurong2020/pyobfus/actions/runs/39394672644).
+CodeQL, Packaging, Dogfood and VS Code workflows also passed. The PR records
+checks for the final documentation-only head separately.
 Local raw evidence is retained under the ignored
 `docs/internal/codex-2026-10/py315-evidence/` directory, including
 `main-regressions.log`, `main-traceback.txt`, `ast-delta.json`,
