@@ -22,16 +22,14 @@ mapping file from the build private, and `pyobfus --unmap` turns a production
 traceback back into your original names, for you or an AI coding agent.
 Community is Apache-2.0, has no file or line limits, and requires no trial.
 
-> **What's new in v0.7.5:** builds keep the parentheses in subscripts such as
-> `Annotated[(x, *extras)]`, so Python 3.9/3.10-compatible source no longer comes
-> out needing Python 3.11 (this affected pydantic, among others). Directory builds
-> also recognise `sys.modules.update()`, `setdefault()`, `pop()` and `|=` as
-> replacing modules, instead of producing output that fails with
-> `AttributeError`. 0.7.4 fixed f-strings built on CPython 3.12.0–3.12.8. Rebuild
-> and rerun your tests; see the
-> [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
-
-> **Next release:** Python 3.15 support is implemented on this branch; published Core 0.7.5 still supports 3.9–3.14. See the [validation scope and limitations](https://github.com/zhurong2020/pyobfus/blob/main/docs/PYTHON315_VALIDATION.md).
+> **What's new in v0.8.0:** Python 3.15 support. Builds keep `lazy import` and
+> `lazy from ... import` lazy, accept the new comprehension unpacking
+> (`{**row for row in rows}`, `[*chunk for chunk in rows]`), and never rename the
+> new builtins (`frozendict`, `sentinel`, ...). Core CI now runs 3.9–3.15 on Linux,
+> Windows and macOS. Output that uses 3.15-only syntax needs Python 3.15 to run;
+> ordinary source built on 3.15 still runs on older versions. See the
+> [validation scope](https://github.com/zhurong2020/pyobfus/blob/main/docs/PYTHON315_VALIDATION.md)
+> and the [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
 
 ## Why pyobfus
 

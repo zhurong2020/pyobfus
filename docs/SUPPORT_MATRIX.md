@@ -1,7 +1,7 @@
 # Support matrix
 
-What is actually verified, by what, as of 2026-10-20 (`pyobfus` 0.7.5 plus
-unreleased 3.15 support / `pyobfus-mcp` 0.3.13 / `pyobfus-runtime` 0.1.1 /
+What is actually verified, by what, as of 2026-10-20 (`pyobfus` 0.8.0, adds
+Python 3.15 / `pyobfus-mcp` 0.3.13 / `pyobfus-runtime` 0.1.1 /
 VS Code extension 0.4.3 / `pyobfus-action` 1.0.1).
 
 Four labels, used strictly:

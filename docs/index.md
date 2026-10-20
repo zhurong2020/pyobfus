@@ -19,7 +19,7 @@ Community is Apache-2.0, has no file or line limits, and requires no trial.
 
 [简体中文概览](https://github.com/zhurong2020/pyobfus/blob/main/README.zh-CN.md)
 
-> **Python 3.15 support is added in the next release.** See the [validation scope and limitations](PYTHON315_VALIDATION.md); published Core 0.7.5 still supports 3.9–3.14.
+> **New in 0.8.0: Python 3.15 support.** See the [validation scope and limitations](PYTHON315_VALIDATION.md).
 
 ## Start here
 

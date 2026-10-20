@@ -12,7 +12,7 @@ pyobfus 的普通 `.py` 文件。它不仅转换源码，还提供构建前检�
 
 Community 版本采用 Apache-2.0，不限制文件数和代码行数，也不需要试用。
 
-> **下一版本**：支持分支已实现 Python 3.15 兼容，待审核及发版；已发布 Core 0.7.5 的支持范围仍为 3.9–3.14。见[验收范围与限制](https://github.com/zhurong2020/pyobfus/blob/main/docs/PYTHON315_VALIDATION.md)。
+> **v0.8.0 新增**：支持 Python 3.15——保留 `lazy` 惰性导入、支持推导式解包（`{**row for row in rows}`），不改名新内建名；Core CI 覆盖 Linux／Windows／macOS 上的 3.9–3.15。使用 3.15 专属语法的产物需在 3.15 运行。见[验收范围与限制](https://github.com/zhurong2020/pyobfus/blob/main/docs/PYTHON315_VALIDATION.md)。
 
 ## 主要优势
 

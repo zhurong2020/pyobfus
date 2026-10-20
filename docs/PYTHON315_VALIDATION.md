@@ -1,8 +1,8 @@
 # Python 3.15 validation
 
-Scope: the next Core release, runtime metadata and MCP metadata; CPython
-3.15.0 on Linux x86_64, tested on 2026-10-20. Core 0.7.5 remains the released
-baseline. This work does not publish a release or change edition boundaries.
+Scope: Core 0.8.0, runtime metadata and MCP metadata; CPython
+3.15.0 on Linux x86_64, tested on 2026-10-20 against Core 0.7.5 as the
+baseline. This work does not change edition boundaries.
 Compatibility and local verification remain Community capabilities.
 
 ## Defects and audit
