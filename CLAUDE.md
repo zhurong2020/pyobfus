@@ -16,7 +16,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ### 2026-10-20 — Core 0.8.0 已发布：Python 3.15 支持（冷启动先读 `docs/CURRENT_PLAN_ZH.md` 顶部）
 
-PR #108（PY315-1 惰性导入保留、PY315-2 推导式解包、3.15 新内建名保留、3.15 三平台 CI）由无头 Codex 实现、Claude 独立审核后合并并发布；PyPI/PEP 740/全新 3.15 与 3.10 安装/GitHub Release/Zenodo `23500657`/CFF 均已核。同晚维护者批准发 MCP 0.3.14（3.15 分类器 + #103 提示）：PyPI/PEP 740、全新 3.15 安装握手 0.3.14/9 tools、MCP Registry active/isLatest 均已核；runtime 0.1.1、VS Code 不发。Glama 10-21 已改装 0.3.14/0.8.0 并测试通过（9 tools）。遗留（3.15 标准库 json/unittest 冒烟、free-threaded 未验证、black py315 告警）见 `docs/TODO.md` 10-20 段。医院应用仍暂停。
+PR #108（PY315-1 惰性导入保留、PY315-2 推导式解包、3.15 新内建名保留、3.15 三平台 CI）由无头 Codex 实现、Claude 独立审核后合并并发布；PyPI/PEP 740/全新 3.15 与 3.10 安装/GitHub Release/Zenodo `23500657`/CFF 均已核。同晚维护者批准发 MCP 0.3.14（3.15 分类器 + #103 提示）：PyPI/PEP 740、全新 3.15 安装握手 0.3.14/9 tools、MCP Registry active/isLatest 均已核；runtime 0.1.1、VS Code 不发。Glama 10-21 已改装 0.3.14/0.8.0 并测试通过（9 tools）。本机跑 3.15 用工作区登记的 `~/venvs/py315_20261020`（路由见 `../workspace-meta/VENV_INDEX.md` §0，按需 `pip install -e .`），不要再建新 venv；10-20 审核用的源码编译 3.15 在 `/tmp`，已不可依赖。遗留（3.15 标准库 json/unittest 冒烟、free-threaded 未验证、black py315 告警）见 `docs/TODO.md` 10-20 段。医院应用仍暂停。
 
 ### 2026-10-18 — 历史 session 收尾
 
