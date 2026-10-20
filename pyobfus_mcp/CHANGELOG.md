@@ -6,6 +6,22 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+## [0.3.14] - 2026-10-20
+
+### Added
+
+- Python 3.15 classifier. The server installs and passes its full test suite
+  on CPython 3.15.0; hosted CI now runs the MCP tests on 3.11 and 3.15. With
+  Core 0.8.0 (resolved automatically through `pyobfus>=0.5.18`), builds keep
+  lazy imports lazy and accept 3.15 comprehension unpacking.
+- `protect_project` returns `stats.module_attribute_accesses_unproved` and,
+  when it is non-zero, adds a hint to run `check_obfuscation_risks` before
+  shipping. Requires Core >=0.7.4; older Core reports 0.
+
+### Unchanged
+
+- 9 tools (7 Community and 2 tier/trial guidance tools); `mcp>=1.27.0,<2.0.0`.
+
 ## [0.3.13] - 2026-10-14
 
 ### Added

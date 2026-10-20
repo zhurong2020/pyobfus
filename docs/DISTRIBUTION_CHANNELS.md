@@ -15,7 +15,7 @@ Marketplace reports `14 installs`; Open VSX reports `682 downloads` (fetches,
 not unique installs). Action attribution remains `0` visible repositories.
 GitHub rolling 14-day traffic is `182 views / 106 unique visitors`; Google is
 first (`23 / 20`) and DEV/Reddit do not appear in the referrers.
-Current public versions are Core `0.8.0`, MCP `0.3.13`, runtime `0.1.1`,
+Current public versions are Core `0.8.0`, MCP `0.3.14`, runtime `0.1.1`,
 and VS Code/Open VSX `0.4.3`. Core/MCP were published on October 14 with
 verified PEP 740 attestations for both wheel and sdist; fresh Python 3.10/3.14
 installations and contract smoke checks passed. The official MCP Registry
@@ -154,7 +154,7 @@ re-runnable source of truth for the calculation is
 
 ### PyPI — `pyobfus-mcp`
 - URL: https://pypi.org/project/pyobfus-mcp/
-- Current version: **0.3.13** (released 2026-10-14) · ships with PEP 740 attestations via OIDC trusted publishing
+- Current version: **0.3.14** (released 2026-10-20; Python 3.15 classifier + unproved-access hint) · ships with PEP 740 attestations via OIDC trusted publishing
 - 0.3.12 contents: fixes a startup-crash regression introduced hours earlier in
   0.3.11. That release resolved its version through a module-level
   `from pyobfus_mcp import __version__`, which raises `ImportError` when the cwd
@@ -308,7 +308,7 @@ re-runnable source of truth for the calculation is
   prior is not evidence of an actual review. Continue tracking installs and
   real reviews, not raw update/download count alone.
 - Wiki: disabled · Discussions: enabled · Issues: open
-- Releases: latest Core `v0.8.0`, runtime `runtime-v0.1.1`, MCP `mcp-v0.3.13`, and VS Code
+- Releases: latest Core `v0.8.0`, runtime `runtime-v0.1.1`, MCP `mcp-v0.3.14`, and VS Code
   `vscode-v0.4.3`; MCP releases attach wheel+sdist.
 
 ### Open VSX — `zhurong2020.pyobfus` 🟢 LIVE

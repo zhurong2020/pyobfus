@@ -12,7 +12,7 @@ and the agent will autonomously call `check_obfuscation_risks` and `generate_pyo
 
 ## Tools exposed
 
-Version 0.3.13 exposes 9 tools: 7 Community tools and 2 tier/trial guidance tools.
+Version 0.3.14 exposes 9 tools: 7 Community tools and 2 tier/trial guidance tools.
 
 | Tool | What it does |
 |---|---|
