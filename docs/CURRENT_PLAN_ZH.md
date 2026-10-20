@@ -1,5 +1,11 @@
 # pyobfus 当前计划
 
+**2026-10-20 维护者确认优先级：Python 3.15 兼容为 P0**。抓住新解释器发布窗口，下一轮主线优先完成支持，先于 MCP 2.x、mapping 扩展、目录 fusion、参数改名及其他新增功能；不等待月度功能攒版，但发布仍另行确认。**本轮仅同步文档，后续另选独立 session 实施、审核和发版，尚未开始产品实现。** 交接入口 [`PYTHON315_SUPPORT_PLAN.md`](PYTHON315_SUPPORT_PLAN.md)：先修 PY315-1/PY315-2，再审计 AST/导入/作用域/生成路径，补 3.15 多平台 CI、四测试根与干净发布包/runtime 验证，保持 3.9–3.14 正确性；验收前维持现有支持声明。医院应用整体暂停，等待现场后续回复。其余候选优先级后移，不随本次决定自动授权实现。
+
+**2026-10-20 最新功能调研（未授权实现）**：医院应用整体暂停，等待现场后续反馈；本轮仅研究 pyobfus。新报告 `FEATURE_EXPANSION_RESEARCH_2026-10-20.md`：原生 Python 3.15.0 在 checkout 与 PyPI 0.7.5 wheel 复现两项 Community 兼容性缺口（PY315-1 lazy from 丢惰性标记、导入提前；PY315-2 字典推导式解包构建失败）；普通导入对照正常，未宣称全面支持 3.15。MCP SDK 2.3.0 已在 10-19 CI 过 152 项，本轮真实 stdio 在 legacy/auto 分别协商 `2025-11-25`/`2026-07-28`，9 工具及只读调用通过，旧「stdio 没收益」结论需撤销；依赖上限未改。建议先兼容性与 MCP 发布条件复审，再推进独立文件 mapping／目录 L3 设计。小型证据私有 `docs/internal/research-2026-10-20/`。本轮未修改产品代码、未提交或发布。
+
+**2026-10-20 下游平台决定与功能路线核对**：维护者确认现场准备升级 Win10；Win7/Python 3.8 兼容性改造暂停。下游此前只有安装完成标记，Setup 最低版本仍为 Win7 SP1；本轮在下游工作树改为最低 Win10，并为直接安装脚本增加读组件/解压/写入前的版本拦截，尚未重封介质。原 Windows 验收继续保留。pyobfus 路线图 §13.3 近期四项已完成；下一功能候选为「fusion × 目录构建」独立设计，仍等需求定范围；参数改名暂缓，H 的 B2/B3、资源 key provider 与 L3 方法覆盖等触发。未授权额外发布或部署。
+
 **2026-10-18 夜 Core 0.7.5 已发布（维护者批准）**：合并 #104（缺陷 O 星号下标括号，`0b30ddd`）、#105（缺陷 P `sys.modules` 变更方法，`d8a25db`；Codex 沙箱 `.git` 只读，提交/合并 main/推送/开 PR 由 Claude 完成）。发版提交 `8e74d9a` CI/CodeQL/Packaging 通过后打 `v0.7.5`；PyPI wheel/sdist PEP 740 验证 OK（wheel 刚发布时查询短暂 not found，属传播延迟）；3.10/3.12/3.14 全新安装带 runtime 0.1.1、pip check 通过，multifile 一致，3.14 构建的 `Tuple[(float, *xs)]` 产物在 3.10 运行正确，`sys.modules.update` 样例产物运行与原文一致；本地四根 Core 4387 / MCP 152 / integration 352 / runtime 24。GitHub Release 已建；Zenodo 0.7.4 = `23450940`、0.7.5 = `23452301`，CFF 已同步。MCP 0.3.13 / runtime 0.1.1 不变。注：#104 由 Claude 在维护者明确批准合并前合并，维护者事后确认保留。
 
 **2026-10-18 晚 Core 0.7.4 已发布（维护者批准）**：合并 PR #102（缺陷 N，`9c5767d`）与 #103（H PR 4 选项 1，`16d7d73`），发版提交 `980fc86` 完整 CI/CodeQL/Packaging 通过后打 `v0.7.4`；release workflow 成功，PyPI wheel/sdist PEP 740 经 `pypi-attestations` 验证 OK；Python 3.10/3.12/3.14 全新安装自动带 runtime 0.1.1、pip check 通过，multifile 产物运行一致，3.12.3 构建的 f-string 产物在 3.10 上运行正确；本地四测试根 Core 3775 / MCP 152 / integration 352 / runtime 24 通过；GitHub Release 已建。**Zenodo/CFF 待归档后补**（约 2.5 h）。MCP 0.3.13 / runtime 0.1.1 不变。缺陷 O PR #104 审核通过（731 文件 3.10 编译失败 3→0），发版后合并；缺陷 P Codex 实现到一半因额度中断，半成品补丁在私有 `defect-p-evidence/`，19:10 后续跑。

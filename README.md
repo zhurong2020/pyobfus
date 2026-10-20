@@ -31,6 +31,8 @@ Community is Apache-2.0, has no file or line limits, and requires no trial.
 > and rerun your tests; see the
 > [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
 
+> **Next compatibility priority:** Python 3.15 support is planned as P0. It is not yet supported by the released version; see the [implementation and acceptance plan](https://github.com/zhurong2020/pyobfus/blob/main/docs/PYTHON315_SUPPORT_PLAN.md).
+
 ## Why pyobfus
 
 | Advantage | What it means in practice |

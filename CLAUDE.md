@@ -14,7 +14,11 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
-### 2026-10-18 — 本 session 收尾；下一轮先读当前计划/TODO 顶部
+### 2026-10-20 — 下一独立 session 首要任务：Python 3.15 兼容（P0）
+
+维护者明确要求抓住 3.15 发布窗口，尽快补齐支持；优先于 MCP 2.x、mapping 扩展、目录 fusion 与参数改名。**本轮只同步规划，之后另选 session 实现、审核和发版；当前 0.7.5 不宣称支持 3.15。** 冷启动先读 [`docs/PYTHON315_SUPPORT_PLAN.md`](docs/PYTHON315_SUPPORT_PLAN.md)，再读当前计划/TODO 顶部。已复现 PY315-1（lazy from 导入提前）和 PY315-2（字典推导式解包构建失败），证据覆盖原生 3.15 与 PyPI 0.7.5 wheel。目标包括现有 3.9–3.14 不回退、3.15 多平台 CI、四测试根、runtime/发布包安装与支持声明同步；通过后另行确认发布，不绑定其他新功能或月度攒版。医院应用整体暂停，等待现场后续回复。
+
+### 2026-10-18 — 历史 session 收尾（当前优先级以上文 10-20 为准）
 
 同日发布 Core 0.7.4（缺陷 N #102、H PR 4 选项 1 #103）与 0.7.5（缺陷 O #104、P #105），均 Codex 实现 + Claude 审核、全渠道核实。医院版 cand4 闸门等现场 Win7→Win10 答复；参数改名暂缓，B2/B3 等触发；DEV 第 2 篇 10-27 发。代码修改先交无头 Codex（注意 5 小时额度，沙箱 `.git` 只读时由 Claude 提交/推送）；合并与发版各需维护者明确批准。交接见 `../workspace-meta/archives/SESSION_CLOSEOUT_20261018_PYOBFUS_074_075.md`。
 
@@ -37,7 +41,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   三个 PR squash 合并：Worker CI `f65be9a`、打包 lane `26337d8`、目录构建局部变量改名 `81df698`；main CI 全绿。
   报告私有 `docs/internal/geo-2026-10/CROSS_REVIEW_2026-10-08.md`。下一步与两个既有缺陷见 `docs/TODO.md` P0 段。
 
-### 🟢 2026-10-07 — Core 0.5.32 已发布（同日 0.5.31 + 0.5.32，提前结束静默期）+ GEO 第一轮 + 目录构建改名深度 P0（最新 · 冷启动先读这段）
+### 🟢 2026-10-07 — Core 0.5.32 已发布（同日 0.5.31 + 0.5.32，提前结束静默期）+ GEO 第一轮 + 目录构建改名深度 P0（历史记录，当前入口见 10-20 段）
 
 - **10-07 第二版 `0.5.32`**：修复自 0.5.10 起目录构建里同模块装饰器/基类/元类/lambda 引用 NameError（#58），
   PyPI/PEP 740/Release/Zenodo `23212358`/CFF 已核。PR #57 审核意见：私有 `docs/internal/geo-2026-10/PR57_REVIEW.md`。
@@ -85,7 +89,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
   10-25 复盘用 09-27→10-06 窗口）**：静默 4 周（10-25 前不发 Core）→ 每月一版
   → 只做有触发的事 → 每周一巡检；全文 `docs/TODO.md`「节奏」段。**查进度固定动作：进度 + 下载量
   （`python scripts/download_snapshot.py`）+ Gmail（`/pyobfus-inbox`），三样一起给**，缺一样不算查过。
-- 「当前状态一句话」：Core 0.7.5（缺陷 O 星号下标括号 #104、P sys.modules 变更方法 #105）与 0.7.4（缺陷 N #102、H PR 4 选项 1 #103）均于 10-18 发布；0.7.3 为缺陷 C/M、0.7.2 为缺陷 I；MCP 0.3.13 / runtime 0.1.1 不变，MCP 9 工具；发布核验见 `docs/CURRENT_PLAN_ZH.md` 顶部。下游医院版候选 `2.6.2-20261015-e7e96fb`（cand4，基于 0.7.3）待 Windows 闸门；微信付款未完成买家已于 10-14 发跟进邮件、被动等待。以后 runtime 源码改动仍必须先升版本、先发 runtime。
+- 「当前状态一句话」：Core 0.7.5（缺陷 O 星号下标括号 #104、P sys.modules 变更方法 #105）与 0.7.4（缺陷 N #102、H PR 4 选项 1 #103）均于 10-18 发布；0.7.3 为缺陷 C/M、0.7.2 为缺陷 I；MCP 0.3.13 / runtime 0.1.1 不变，MCP 9 工具；发布核验见 `docs/CURRENT_PLAN_ZH.md` 顶部。**下一主线为 Python 3.15 兼容 P0（后续独立 session）**；下游医院应用整体暂停，等待现场后续回复；微信付款未完成买家已于 10-14 发跟进邮件、被动等待。以后 runtime 源码改动仍必须先升版本、先发 runtime。
 
 
 ## 历史进展（已下沉）

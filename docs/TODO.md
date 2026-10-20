@@ -2,10 +2,10 @@
 
 排期中的任务清单。**当前计划与状态仍以
 [`CURRENT_PLAN_ZH.md`](CURRENT_PLAN_ZH.md) 为准**；本文件只回答「接下来按什么
-顺序做」，不记录历史。依据与实测证据见
-[`FEATURE_EXPANSION_RESEARCH_2026-09-12.md`](FEATURE_EXPANSION_RESEARCH_2026-09-12.md)。
+顺序做」，不记录历史。最新依据见
+[`FEATURE_EXPANSION_RESEARCH_2026-10-20.md`](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)；Python 3.15 的 P0 范围与验收见 [`PYTHON315_SUPPORT_PLAN.md`](PYTHON315_SUPPORT_PLAN.md)。
 
-最后更新：2026-10-18。Core 0.7.5（缺陷 O #104、P #105）与 0.7.4（缺陷 N #102、H PR 4 选项 1 #103）已发布；此前 Core 0.7.3（缺陷 C #100、M #101）/ MCP 0.3.13 已发布（0.7.2 为缺陷 I），runtime 0.1.1 保持不变；Core/MCP Unreleased 均为空。发布前完整 CI 与本地四测试根通过，PyPI 发布包和 PEP 740 已独立验证，Registry 与 Zenodo/CFF 已同步。私有历史库 CI 已定性，Glama 502 已恢复；Glama 安装/握手/9 工具测试、渠道记录与源码 pin（`22ecd62`）均已完成。
+最后更新：2026-10-20。Core 0.7.5（缺陷 O #104、P #105）与 0.7.4（缺陷 N #102、H PR 4 选项 1 #103）已发布；此前 Core 0.7.3（缺陷 C #100、M #101）/ MCP 0.3.13 已发布（0.7.2 为缺陷 I），runtime 0.1.1 保持不变；Core/MCP Unreleased 均为空。发布前完整 CI 与本地四测试根通过，PyPI 发布包和 PEP 740 已独立验证，Registry 与 Zenodo/CFF 已同步。私有历史库 CI 已定性，Glama 502 已恢复；Glama 安装/握手/9 工具测试、渠道记录与源码 pin（`22ecd62`）均已完成。
 
 ## 状态口径
 
@@ -18,23 +18,35 @@
   下游是否选择混淆自己的代码由其分发边界决定；公开第三方依赖不因被打包而自动成为
   pyobfus 的处理目标。
 
-## 后续任务顺序（2026-10-17 更新）
+## 后续任务顺序（2026-10-20 更新）
 
 缺陷 I 随 Core 0.7.2 发布（PR #99），缺陷 C/M 随 0.7.3 发布（PR #100/#101），D 由 0.7.2 修好；Glama 源码 pin 已收尾，10-17 Build steps 已改装 Core 0.7.3 并测试通过。
 
 | 顺序 | 待办 | 验收 / 下一步 |
 |---|---|---|
-| 1 | **私有下游候选 Windows 闸门（维护者）** | **10-18 维护者定：暂停，等现场答复能否从 Windows 7 升级到 Windows 10**（不能升级则先做下游向下兼容改造，闸门随之重排）。10-15 已用 0.7.3 重建候选 `2.6.2-20261015-e7e96fb`（`build/release-v2.6.2-cand4`，取代 0.7.2 的 cand3）：SHA256、名字检查 59/63（4 处星号转发：3 处外部 wheel，`nifti_loader` 为项目内转发但被转发模块导出不可静态确定→保守保留）、交付检查 0 发现。剩：发布机授权续签 → 装机评分、M2 升级、生命周期、向导目视。 |
+| **P0 / 首位** | **Python 3.15 兼容支持（维护者 10-20 确认）** | 抓发布窗口，后续独立 session 先做；修 PY315-1/PY315-2，完成 AST/作用域审计、3.15 多平台 CI、四测试根、干净安装/runtime 验证，保持 3.9–3.14；支持声明仅在验收后扩展。详见 [实施交接](PYTHON315_SUPPORT_PLAN.md)。本轮只同步文档，未开始实现；发布另行确认，不捆绑新功能或等待月度攒版。 |
+| 暂停 | **私有下游候选 Windows 闸门（维护者）** | **10-20 维护者确认：现场准备升级 Win10，Win7 兼容性改造暂停**。下游安装器前置版本防护源码已修（Setup 最低 Win10，直接安装脚本在读取组件和写入前拦截）；尚未进入新介质；**维护者随后决定医院应用整体暂停，等待现场后续回复，本轮不继续重封或验收**。10-15 已用 0.7.3 重建候选 `2.6.2-20261015-e7e96fb`（`build/release-v2.6.2-cand4`，取代 0.7.2 的 cand3）：SHA256、名字检查 59/63（4 处星号转发：3 处外部 wheel，`nifti_loader` 为项目内转发但被转发模块导出不可静态确定→保守保留）、交付检查 0 发现。剩：发布机授权续签 → 装机评分、M2 升级、生命周期、向导目视。 |
 | 2 | **10-19 周一巡检** | 下载安静日（0.7.2 发布日与次日不计）、客户反馈/调研回答、微信付款跟进线程（`/pyobfus-inbox`）、Stripe Alipay 审批状态、CI、许可证监控、KV 备份、Anthropic 插件解锁消息；仅留决策摘要。 |
 | 3 | **10-25 复盘** | 区分发布/次日/内容流量，综合下载、trial、客户回答和 DEV 来源，决定下轮优先级与发布节奏；评估一周两笔微信付款未完成是否需要更多动作（Alipay、弃单提醒需 Stripe restricted key）。 |
 
 缺陷 N、H PR 4 选项 1 随 Core 0.7.4，缺陷 O、P 随 0.7.5（均 10-18）发布；参数改名暂缓；Pro 扩展等真实需求信号，详见各条目。本次没有授权额外部署或客户邮件发送。
+
+## 10-20 功能路线（3.15 优先级已确认，待后续 session 实施）
+
+完整证据：[10-20 路线复核](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)。维护者已将 Python 3.15 设为 P0，其他功能候选排在其后；本轮不实现，后续独立 session 以 [3.15 支持计划](PYTHON315_SUPPORT_PLAN.md) 接手。医院应用暂停。
+
+- [ ] **PY315-1：惰性 from 导入被提前执行**。原生 Python 3.15.0、当前 checkout 与 PyPI Core 0.7.5 wheel 均复现：`lazy from calculator import Calculator` 改写后丢 `is_lazy`，构建成功但导入副作用时序变化。最小输入与输出见调研 §5.1。Community 兼容性，尚未实现；不扩大到现有 3.9–3.14 支持范围的回归。
+- [ ] **PY315-2：新字典推导式解包构建失败**。`{**row for row in rows}` 原文在 3.15 可运行，checkout／0.7.5 wheel 构建均报 `NoneType ... _fields`；根因尚待定位。Community 兼容性，尚未实现。
+- [ ] **MCP 2.x 发布条件复审**。10-19 CI 已用 2.3.0 过 152 项；10-20 Linux 真实 stdio 验证 legacy 为 `2025-11-25`、auto 为 `2026-07-28`，均列出 9 工具并成功调用只读工具。旧「stdio 无新协议收益」结论不再适用；依赖上限未改，仍需 Python 3.10／Windows／干净解析与全工具合同。
+- 之后建议：`--no-cross-file` mapping（Community）与目录 L3 + 应用 key provider 的单项设计（Pro），按下一真实需求决定先后；不一次接入全部 fusion 字段。
+- 参数改名、H B2/B3、资源 key provider 与 L3 方法覆盖继续保持原 gate；未授权改实现／合并／发布。
 
 ## 发布后观察与下次发版
 
 - 每周一巡检继续观察 Core 0.7.3 / MCP 0.3.13 反馈、下载安静日、客户调研回答、CI 与备份。无新缺陷时不重复全量测试、不主动增加功能。
 - **10-25 复盘**照原计划；发布日、次日与内容投放流量分开记录，据客户回答调整后续优先级。
 - 下次发布按实际新增改动与维护者授权确定，不恢复此前 10-15 的等待通知状态。
+- **3.15 兼容 P0 不受月度攒功能节奏拖延**：后续 session 验收／审核完成后单独确认发版；不等待 MCP 2.x、mapping 或 Pro 新功能，不提前宣称 3.15 已支持。
 - runtime 源码若有改动必须先升版本、先发 runtime（`scripts/check_runtime_version.py`）；改版本号后先刷新 editable 元数据，再按发布清单验证。
 - VS Code schema 随插件下次发版，不因本次 Core/MCP 发布自动发插件。
 
@@ -217,7 +229,7 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 - [x] **H PR 4 选项 1 — PR #103 合并，随 Core 0.7.4（10-18）发布；B2/B3 未做（等用户触发）**：10-18 实测 0.7.3 自混淆构建无告警、运行即 AttributeError，三个独立阻断：
       B1 `module_attributes.py` 对任何 `x.modules[k] = v` 写入（不论是否 `sys`）把全项目标为不安全（`core/mapping.py` 一处即关掉 61 个模块）；
       B2 包 `__init__` 的 try/外部导入；B3 再导出子模块回导包内 `__version__` 的导入环。本 PR 只做：修 B1 误判、`--check` 写明拒绝原因、构建时提示未证明安全的属性访问数。
-      选项 1 PR #103 待审，B2/B3 未做（等用户触发）。范围备忘与 Codex 提示词私有 `docs/internal/codex-2026-10/SCOPE_H4_PARAMS_2026-10-18.md`。原登记：包 `__init__` 里 `try: __version__ = version(...)` 会阻止整个包的子模块属性改写（pyobfus 自身可复现）；评估仅绑定与子模块名无关的语句能否安全放宽。需单独确认范围，不阻塞已发布版本。
+      选项 1 已随 0.7.4 发布，B2/B3 未做（等用户触发）。范围备忘与 Codex 提示词私有 `docs/internal/codex-2026-10/SCOPE_H4_PARAMS_2026-10-18.md`。原登记：包 `__init__` 里 `try: __version__ = version(...)` 会阻止整个包的子模块属性改写（pyobfus 自身可复现）；评估仅绑定与子模块名无关的语句能否安全放宽。需单独确认范围，不阻塞已发布版本。
 - [x] **既有缺陷 C · 运行时注入的模块级名字** — **10-15 合并 PR #100（`bde110c`），随 0.7.3 发布**。
       Community correctness fix: automatically preserve static `enum.global_enum` members in single-file and directory builds;
       preserve module export spellings when module-level `__getattr__` prevents H proofs, and conservatively preserve non-static enum modules with a planning warning.
@@ -233,10 +245,8 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
       Detect registry mutators and `|=` with the existing conservative receiver rules; retain build warnings and check reasons.
 - [x] **缺陷 O — PR #104，随 Core 0.7.5（10-18）发布 · 下标里的带星号元组丢括号，产物需 Python ≥3.11**（10-18 审核 PR #102 时发现，所有构建版本都有，与 N 无关）：
       源码 `Annotated[(x, *y)]`（3.9/3.10 合法）经 `ast.unparse` 变成 `Annotated[x, *y]`（PEP 646，3.11+ 才合法）；3.12/3.13/3.14 一致。
-      实测 pydantic 3 个文件中招。修法同 N：在共享 unparser 里给含 `Starred` 的下标元组保留括号，并让兼容自检覆盖这一类。PR #104 待审 (`fix/starred-subscript-parens`); shared unparser fix and compatibility regressions implemented.
-- [ ] **候选 · 3.12 嵌套 f-string 的 `--check` 提示**（低优先级，10-11 登记；可随缺陷 N 一起做：源码用了 PEP 701 专属写法时提示产物需 ≥3.12）：3.12 起允许 f-string 内复用同种引号/嵌套，
-      产物在 3.9–3.11 上无法解析；目录/单文件构建若面向旧解释器分发，`--check` 可提示目标版本不兼容。先确认 `--verify-syntax`
-      与 `target_python` 现有行为再定是否需要。
+      实测 pydantic 3 个文件中招。修法同 N：在共享 unparser 里给含 `Starred` 的下标元组保留括号，并让兼容自检覆盖这一类。PR #104 已合并发布；共享 unparser 修复与兼容回归已完成。
+- [x] **3.12 PEP 701 f-string 的 `--check` 提示**：已随缺陷 N（PR #102、Core 0.7.4）实现；`preflight.py` 检测源码、提示产物需 Python ≥3.12；声明较低目标版本时提高提示级别。10-20 核对源码与 `tests/test_fstring_compat.py`，原候选条目不再待做。
 - [x] **新缺陷 M · 项目内星号转发后再从转发模块导入**（10-14 Claude 用 PyPI 0.7.2 复现）：`pkg/shim.py` 写 `from pkg.core import *`，`app.py` 写 `from pkg.shim import helper` → 产物 ImportError（开/关局部改名一样）。兼容转发模块常见；外部模块的星号导入不受影响（私有下游 4 处均转发外部 wheel 或显式列名）。**10-15 已合并 PR #101（`b6c06b2`），随 0.7.3 发布**。
 - [x] **既有缺陷 D · `global` 重新绑定导入名** — fixed by 0.7.2 (PR #99).
       PR #100 adds artifact regressions for assignment and re-import after `global helper`, printing before and after rebinding,

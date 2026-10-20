@@ -17,6 +17,22 @@ The rule this table is written under: **a cell that cannot point at a specific
 CI job, test file or dated record is advisory-only**, regardless of how
 confident anyone feels about it.
 
+## Python 3.15: P0 development target, not yet supported
+
+On 2026-10-20 the maintainer made Python 3.15 compatibility the next P0
+priority, ahead of MCP upgrades and new protection features. Implementation
+and release are deferred to a separate session. The released support range
+remains **3.9–3.14** until the [3.15 acceptance plan](PYTHON315_SUPPORT_PLAN.md)
+is completed.
+
+A dated Linux x86_64 probe reproduced two failures in both the checkout and
+the published 0.7.5 wheel: lazy `from` imports become eager, and dictionary
+comprehension unpacking fails to build. These are recorded findings, not a
+3.15 support certification. See the [research evidence](FEATURE_EXPANSION_RESEARCH_2026-10-20.md).
+Windows/macOS 3.15, full test roots and clean target installations remain
+pending; do not mark the existing matrix as tested on 3.15 before those pass.
+The older matrix below retains its dated evidence.
+
 ## Python versions and operating systems
 
 | Surface | Linux | macOS | Windows | Evidence |

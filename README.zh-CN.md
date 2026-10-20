@@ -12,6 +12,8 @@ pyobfus 的普通 `.py` 文件。它不仅转换源码，还提供构建前检�
 
 Community 版本采用 Apache-2.0，不限制文件数和代码行数，也不需要试用。
 
+> **下一兼容性重点：Python 3.15（P0）**。当前发布版尚未完成 3.15 支持；后续独立会话实施并验收后再更新支持声明，见[支持计划](https://github.com/zhurong2020/pyobfus/blob/main/docs/PYTHON315_SUPPORT_PLAN.md)。
+
 ## 主要优势
 
 - **不是限规模演示版**：免费版可以处理真实多文件项目。

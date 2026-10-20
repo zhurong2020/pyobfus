@@ -19,6 +19,8 @@ Community is Apache-2.0, has no file or line limits, and requires no trial.
 
 [简体中文概览](https://github.com/zhurong2020/pyobfus/blob/main/README.zh-CN.md)
 
+> **Python 3.15 is the next P0 compatibility target.** Released support remains 3.9–3.14 until the [implementation and acceptance plan](PYTHON315_SUPPORT_PLAN.md) passes.
+
 ## Start here
 
 | Task | Go to |
