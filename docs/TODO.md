@@ -37,7 +37,7 @@
 
 - [x] **PY315-1：惰性 from 导入被提前执行**。原生 Python 3.15.0、当前 checkout 与 PyPI Core 0.7.5 wheel 均复现：`lazy from calculator import Calculator` 改写后丢 `is_lazy`，构建成功但导入副作用时序变化。最小输入与输出见调研 §5.1。Community 兼容性，已修复并补原生回归；0.8.0 发布（#108）。
 - [x] **PY315-2：新字典推导式解包构建失败**。`{**row for row in rows}` 原文在 3.15 可运行，checkout／0.7.5 wheel 构建均报 `NoneType ... _fields`；根因为自定义推导式 visitor 访问 None，六处路径已修复并补原生回归；0.8.0 发布（#108）。
-- [ ] **3.15 后续（0.8.0 发布后登记，均未授权实现）**：① 3.15 标准库冒烟中 `json`（`scanner.make_scanner`）与 `unittest`（`util.three_way_cmp`/`case.TestCase`）目录构建产物导入失败，main 同样失败，属模块属性证明既有限制，待定是否单列缺陷；② free-threaded 3.15、3.15 上冻结/编译打包未验证；③ `pyproject` black `target-version` 加了 `py315` 后，`scripts/check.sh` 在 3.12 上跑 black 会警告“无法解析为 3.15 格式化的代码”（仍通过），需决定 lint 改用 3.15 解释器还是去掉 `py315`；④ 可选：Glama Build steps 的 Core pin 由 0.7.3 改为 0.8.0（下次发 MCP 时一起做亦可）。
+- [ ] **3.15 后续（0.8.0 发布后登记，均未授权实现）**：① 3.15 标准库冒烟中 `json`（`scanner.make_scanner`）与 `unittest`（`util.three_way_cmp`/`case.TestCase`）目录构建产物导入失败，main 同样失败，属模块属性证明既有限制，待定是否单列缺陷；② free-threaded 3.15、3.15 上冻结/编译打包未验证；③ `pyproject` black `target-version` 加了 `py315` 后，`scripts/check.sh` 在 3.12 上跑 black 会警告“无法解析为 3.15 格式化的代码”（仍通过），需决定 lint 改用 3.15 解释器还是去掉 `py315`；④ **维护者**：Glama Build steps 改为 `pyobfus-mcp==0.3.14 pyobfus==0.8.0` 并跑测试（MCP 0.3.14 已于 10-20 发布）。
 - [ ] **MCP 2.x 发布条件复审**。10-19 CI 已用 2.3.0 过 152 项；10-20 Linux 真实 stdio 验证 legacy 为 `2025-11-25`、auto 为 `2026-07-28`，均列出 9 工具并成功调用只读工具。旧「stdio 无新协议收益」结论不再适用；依赖上限未改，仍需 Python 3.10／Windows／干净解析与全工具合同。
 - 之后建议：`--no-cross-file` mapping（Community）与目录 L3 + 应用 key provider 的单项设计（Pro），按下一真实需求决定先后；不一次接入全部 fusion 字段。
 - 参数改名、H B2/B3、资源 key provider 与 L3 方法覆盖继续保持原 gate；未授权改实现／合并／发布。

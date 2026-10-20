@@ -1,5 +1,7 @@
 # pyobfus 当前计划
 
+**2026-10-20 深夜 MCP 0.3.14 已发布（维护者批准）**：只加 Python 3.15 分类器，并补记 #103 已合未发的 `protect_project` 未证明访问计数/提示（需 Core ≥0.7.4）；不升 MCP SDK 2.x。发版提交 `16654ff` CI 34/34 + CodeQL 通过后打 `mcp-v0.3.14`；PyPI wheel/sdist PEP 740 publisher=release.yml；全新 3.15 venv 安装自动带 Core 0.8.0 / runtime 0.1.1、pip check 通过，真实 stdio 握手 0.3.14、协议 `2025-11-25`、9 tools、`list_presets` 成功；MCP Registry 0.3.14 `active`/`isLatest=true`。MCP 不建 GitHub Release（避免 Zenodo 误归档）。**待维护者**：Glama Build steps 改为 `pyobfus-mcp==0.3.14 pyobfus==0.8.0` 并跑测试。
+
 **2026-10-20 夜 Core 0.8.0 已发布（Python 3.15 支持，维护者当日要求推进至发版）**：Codex 无头实现 PR #108（中途 5 小时额度用尽，19:50 续跑收尾），Claude 用自建原生 3.15 对抗样例（惰性导入时机/别名/相对/缺失模块延迟报错、`__lazy_modules__`、PEP 798 全形态含类体与 async）独立审核：目录、`--no-crossfile-local-names`、单文件均与原文一致；`--no-cross-file` 与关闭模块属性改写下的差异在 main+3.14 普通导入同样出现，属既有限制。squash 合并 `baae6ee`，发版提交 `4cead89` CI 34/34 + CodeQL/Packaging 通过后打 `v0.8.0`。Release workflow 首次因 sigstore Fulcio 502 失败（未上传），重跑成功；PyPI wheel/sdist PEP 740 publisher=release.yml，3.15 分类器已上；全新 3.15 与 3.10 venv 从 PyPI 安装、pip check 通过，3.15 上三组样例产物一致，3.15 构建的普通源码在 3.10 运行一致。GitHub Release 已建。MCP 0.3.13 / runtime 0.1.1 / VS Code 不发（MCP、runtime 仅分类器在仓库更新）。Zenodo record `23500657`（v0.8.0）已核，CFF 已同步。遗留见 `TODO.md` 10-20 段。
 
 **2026-10-20 Python 3.15 P0 实现进入审核交接（已由上段 0.8.0 发布取代）**：支持分支修复 PY315-1/PY315-2、3.15 匿名 symtable 名称与 Pro 惰性导入路径，增加 3.15 三平台 CI；验收范围与限制见 [验证记录](PYTHON315_VALIDATION.md)，清单见 [支持计划](PYTHON315_SUPPORT_PLAN.md)。PR #108 待 Claude 独立审核；本轮不合并、不改版本号、不发版。医院应用继续暂停。

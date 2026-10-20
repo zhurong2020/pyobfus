@@ -19,7 +19,7 @@ Current public versions are Core `0.8.0`, MCP `0.3.14`, runtime `0.1.1`,
 and VS Code/Open VSX `0.4.3`. Core/MCP were published on October 14 with
 verified PEP 740 attestations for both wheel and sdist; fresh Python 3.10/3.14
 installations and contract smoke checks passed. The official MCP Registry
-reports version `0.3.13`, `active`, and `isLatest=true` (9 tools).
+reports version `0.3.14`, `active`, and `isLatest=true` (9 tools; published 2026-10-20).
 
 Glama's October 12 notifications confirm a successful build at 22:14 UTC
 (test `01a1322c-b3ff-7825-86c1-f27005b90423`) and a channel release labelled
