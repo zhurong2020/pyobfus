@@ -80,14 +80,28 @@ Separate test-root runs also pass: 3.12 CLI integration 350 passed/12 skipped,
 `scripts/check.sh` passes after the final source changes. Tests use Click 8.1.8
 and normal caller HOME with isolated per-test state.
 
-[Draft PR #108](https://github.com/zhurong2020/pyobfus/pull/108) records the exact
-head, CI runs, separated test-root
-results, full standard-library diff inventory and clean-install results.
-Earlier implementation commit `6136232` passed all **34 CI jobs**, including every
-3.9–3.15/three-OS Core/runtime combination:
-[CI run 39394672644](https://github.com/zhurong2020/pyobfus/actions/runs/39394672644).
-CodeQL, Packaging, Dogfood and VS Code workflows also passed. The PR records
-checks for the final compatibility-boundary head separately.
+Final implementation head: `4f4f5c7d436ca330b47822e9d5072fb08f2593a5`.
+The subsequent validation-documentation commit changes no implementation or
+tests. The [final PR head and workflow conclusions](https://github.com/zhurong2020/pyobfus/pull/108)
+are recorded in the PR's final validation table, including its full SHA and
+follow-up run IDs (a commit cannot embed its own SHA).
+
+The exact implementation-head validation runs are:
+
+| Workflow | Run ID |
+|---|---|
+| CI, including 3.15 on all three platforms | [39419748754](https://github.com/zhurong2020/pyobfus/actions/runs/39419748754) |
+| Dogfood | [39419748704](https://github.com/zhurong2020/pyobfus/actions/runs/39419748704) |
+| Packaging lane | [39419748440](https://github.com/zhurong2020/pyobfus/actions/runs/39419748440) |
+| CodeQL | [39419748531](https://github.com/zhurong2020/pyobfus/actions/runs/39419748531) |
+| VSCode Extension CI | [39419748477](https://github.com/zhurong2020/pyobfus/actions/runs/39419748477) |
+
+These links identify the runs rather than predicting their outcomes; the PR
+records their completed conclusions and the documentation-head reruns.
+Earlier implementation `6136232` passed all 34 jobs in
+[CI 39394672644](https://github.com/zhurong2020/pyobfus/actions/runs/39394672644).
+The intermediate `260fe07` CI was canceled before this final source fix and
+is not final validation evidence.
 Local raw evidence is retained under the ignored
 `docs/internal/codex-2026-10/py315-evidence/` directory, including
 `main-regressions.log`, `main-traceback.txt`, `ast-delta.json`,

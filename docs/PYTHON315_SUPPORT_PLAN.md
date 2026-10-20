@@ -48,9 +48,10 @@
 四测试根通过和多平台证据是支持声明的组成部分，不用单个最小修复替代整体验收；无需为未触及的重型框架或冻结包宣称全面支持。
 
 实施 PR：[#108](https://github.com/zhurong2020/pyobfus/pull/108)（draft，待审）。
-实现提交 `6136232` 的 [CI 39394672644](https://github.com/zhurong2020/pyobfus/actions/runs/39394672644)
-**34/34 通过**，包含 Core/runtime 3.9–3.15 三平台、3.15 CLI/MCP 与独立 runtime wheel。
-CodeQL、Packaging、Dogfood、VS Code CI 同样通过；后续兼容边界修复提交的精确 head/CI 见 PR。
+最终实现提交 `4f4f5c7d436ca330b47822e9d5072fb08f2593a5` 的
+[CI 39419748754](https://github.com/zhurong2020/pyobfus/actions/runs/39419748754)
+覆盖 Core/runtime 3.9–3.15 三平台、3.15 CLI/MCP 与独立 runtime wheel。
+完整 workflow run id 见 [验证记录](PYTHON315_VALIDATION.md)；各 run 的完成结论及后续纯文档 head/CI 见 PR。
 Claude 已独立验证原生 3.15 语义样例，未发现新缺陷；最终 PR 审核仍待完成，不授权合并或发布。
 
 本轮证据：`docs/internal/codex-2026-10/py315-evidence/`（本地忽略）。
