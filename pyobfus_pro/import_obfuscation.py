@@ -11,6 +11,8 @@ from __future__ import annotations
 import ast
 from typing import Dict, List, Optional
 
+from pyobfus.core.import_resolution import has_lazy_module_control
+
 
 class ImportObfuscator(ast.NodeTransformer):
     """Rewrite module-level imports into importlib-based assignments."""
@@ -28,6 +30,10 @@ class ImportObfuscator(ast.NodeTransformer):
         return transformed
 
     def visit_Module(self, node: ast.Module) -> ast.Module:
+        # The control list may be computed dynamically. Preserve imports rather
+        # than attempting to predict which bindings will be lazy at runtime.
+        if has_lazy_module_control(node):
+            return node
         new_body: List[ast.stmt] = []
         for stmt in node.body:
             replacement = self._rewrite_top_level_import(stmt)
@@ -39,6 +45,9 @@ class ImportObfuscator(ast.NodeTransformer):
         return node
 
     def _rewrite_top_level_import(self, stmt: ast.stmt) -> Optional[List[ast.stmt]]:
+        # Runtime importlib calls would force a lazy binding too early.
+        if getattr(stmt, "is_lazy", False):
+            return None
         if isinstance(stmt, ast.Import):
             rewritten: List[ast.stmt] = []
             for alias in stmt.names:

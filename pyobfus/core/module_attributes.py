@@ -17,6 +17,7 @@ from typing import Callable, Dict, List, Optional, Set, Tuple
 from pyobfus.core.global_table import GlobalSymbolTable
 from pyobfus.core.import_resolution import (
     ImportedAccessVisitor,
+    has_lazy_module_control,
     _UncertainAccessVisitor,
     discover_uncertain_accesses,
     _Bindings,
@@ -477,6 +478,8 @@ class ModuleInventory:
         tree = self.packages.get(package)
         if tree is None:
             return False
+        if has_lazy_module_control(tree):
+            return False
         bindings = _Bindings(lambda n: self.resolve_from(f"{package}.__init__", n))
         for statement in tree.body:
             bindings.visit(statement)
@@ -497,6 +500,9 @@ class ModuleInventory:
                 return False
             writes.update(names)
         for statement in tree.body:
+            # A lazy package binding does not prove child initialization.
+            if getattr(statement, "is_lazy", False):
+                return False
             if _inert(statement):
                 continue
             if isinstance(statement, ast.ImportFrom):
@@ -686,8 +692,10 @@ def discover_modules_stores(
                 for condition in generator.ifs:
                     self.visit(condition)
             if isinstance(node, ast.DictComp):
-                self.visit(node.key)
-                self.visit(node.value)
+                if node.key is not None:
+                    self.visit(node.key)
+                if node.value is not None:
+                    self.visit(node.value)
             else:
                 self.visit(node.elt)
             self.scopes, self.scope_kinds = previous_scopes, previous_kinds
@@ -917,6 +925,7 @@ class _ProofVisitor(ImportedAccessVisitor):
             lambda node: inventory.resolve_from(module, node), self._attribute, lambda n: None
         )
         self.module = module
+        self.lazy_module_control = has_lazy_module_control(tree)
         self.inventory = inventory
         self.table = table
         self.details: Dict[Tuple[int, str], _Binding] = {}
@@ -1018,6 +1027,8 @@ class _ProofVisitor(ImportedAccessVisitor):
                         (a.name, (n.lineno, n.col_offset))
                         for n in competing
                         if isinstance(n, ast.Import)
+                        and not getattr(n, "is_lazy", False)
+                        and not self.lazy_module_control
                         for a in n.names
                         if a.asname is None and a.name.split(".")[0] == name
                     )

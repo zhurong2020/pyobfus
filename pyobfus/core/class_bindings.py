@@ -121,8 +121,10 @@ def mark_class_bindings(tree: ast.AST) -> None:
                 for condition in generator.ifs:
                     self.visit(condition)
             if isinstance(node, ast.DictComp):
-                self.visit(node.key)
-                self.visit(node.value)
+                if node.key is not None:
+                    self.visit(node.key)
+                if node.value is not None:
+                    self.visit(node.value)
             else:
                 self.visit(node.elt)
             self.bound = saved

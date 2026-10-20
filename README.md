@@ -10,11 +10,11 @@
 [![PyPI downloads](https://img.shields.io/pypi/dm/pyobfus.svg)](https://pypi.org/project/pyobfus/)
 [![Documentation Status](https://readthedocs.org/projects/pyobfus/badge/?version=latest)](https://pyobfus.readthedocs.io/en/latest/)
 [![License](https://img.shields.io/badge/License-Dual%20(Apache%202.0%20%2B%20Proprietary)-blue.svg)](https://github.com/zhurong2020/pyobfus/blob/main/LICENSE)
-[![Python](https://img.shields.io/badge/python-3.9--3.14-blue.svg)](https://www.python.org/downloads/)
+[![Python](https://img.shields.io/badge/python-3.9--3.15-blue.svg)](https://www.python.org/downloads/)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/12788/badge)](https://www.bestpractices.dev/projects/12788)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20846053.svg)](https://doi.org/10.5281/zenodo.20846053)
 
-pyobfus is a local-first, AST-based Python obfuscator for Python 3.9–3.14. It
+pyobfus is a local-first, AST-based Python obfuscator for Python 3.9–3.15. It
 obfuscates multi-file projects and packages as a whole: names are renamed
 consistently across modules and imports are rewritten to match, so Community
 output is still ordinary `.py` that runs without pyobfus installed. Keep the
@@ -31,7 +31,7 @@ Community is Apache-2.0, has no file or line limits, and requires no trial.
 > and rerun your tests; see the
 > [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
 
-> **Next compatibility priority:** Python 3.15 support is planned as P0. It is not yet supported by the released version; see the [implementation and acceptance plan](https://github.com/zhurong2020/pyobfus/blob/main/docs/PYTHON315_SUPPORT_PLAN.md).
+> **Next release:** Python 3.15 support is implemented on this branch; published Core 0.7.5 still supports 3.9–3.14. See the [validation scope and limitations](https://github.com/zhurong2020/pyobfus/blob/main/docs/PYTHON315_VALIDATION.md).
 
 ## Why pyobfus
 

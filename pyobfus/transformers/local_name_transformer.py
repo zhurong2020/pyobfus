@@ -351,8 +351,10 @@ class LocalNameTransformer(ast.NodeTransformer):
                 generator.iter = self.visit(generator.iter)
             generator.ifs = [self.visit(condition) for condition in generator.ifs]
         if isinstance(node, ast.DictComp):
-            node.key = self.visit(node.key)
-            node.value = self.visit(node.value)
+            if node.key is not None:
+                node.key = self.visit(node.key)
+            if node.value is not None:
+                node.value = self.visit(node.value)
         else:
             node.elt = self.visit(node.elt)
         self._local_scopes.pop()

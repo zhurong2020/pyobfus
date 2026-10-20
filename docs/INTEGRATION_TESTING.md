@@ -176,7 +176,7 @@ pip uninstall pyobfus && pip install -e ".[dev]"
 ## 📚 相关文档
 
 - [integration_tests/test_cli_end_to_end.py](https://github.com/zhurong2020/pyobfus/blob/main/integration_tests/test_cli_end_to_end.py) - 仓库内的端到端 CLI 集成测试
-- [AGENTS.md](https://github.com/zhurong2020/pyobfus/blob/main/AGENTS.md) - build/test/lint 约定（三个 pytest 根、Python 3.9–3.14 目标等）
+- [AGENTS.md](https://github.com/zhurong2020/pyobfus/blob/main/AGENTS.md) - build/test/lint 约定（四个 pytest 根、Python 3.9–3.15 目标等）
 - [CURRENT_PLAN_ZH.md](CURRENT_PLAN_ZH.md) - 当前计划与冷启动入口
 
 

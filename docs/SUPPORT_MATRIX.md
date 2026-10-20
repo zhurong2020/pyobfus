@@ -1,8 +1,8 @@
 # Support matrix
 
-What is actually verified, by what, as of 2026-10-12 (`pyobfus` 0.7.0 /
-`pyobfus-mcp` 0.3.12 / `pyobfus-runtime` 0.1.1 / VS Code extension 0.4.3 /
-`pyobfus-action` 1.0.1).
+What is actually verified, by what, as of 2026-10-20 (`pyobfus` 0.7.5 plus
+unreleased 3.15 support / `pyobfus-mcp` 0.3.13 / `pyobfus-runtime` 0.1.1 /
+VS Code extension 0.4.3 / `pyobfus-action` 1.0.1).
 
 Four labels, used strictly:
 
@@ -17,30 +17,25 @@ The rule this table is written under: **a cell that cannot point at a specific
 CI job, test file or dated record is advisory-only**, regardless of how
 confident anyone feels about it.
 
-## Python 3.15: P0 development target, not yet supported
+## Python 3.15: next-release support
 
-On 2026-10-20 the maintainer made Python 3.15 compatibility the next P0
-priority, ahead of MCP upgrades and new protection features. Implementation
-and release are deferred to a separate session. The released support range
-remains **3.9–3.14** until the [3.15 acceptance plan](PYTHON315_SUPPORT_PLAN.md)
-is completed.
-
-A dated Linux x86_64 probe reproduced two failures in both the checkout and
-the published 0.7.5 wheel: lazy `from` imports become eager, and dictionary
-comprehension unpacking fails to build. These are recorded findings, not a
-3.15 support certification. See the [research evidence](FEATURE_EXPANSION_RESEARCH_2026-10-20.md).
-Windows/macOS 3.15, full test roots and clean target installations remain
-pending; do not mark the existing matrix as tested on 3.15 before those pass.
-The older matrix below retains its dated evidence.
+The support branch adds native 3.15 lazy-import and comprehension-unpacking
+compatibility, plus three-platform Core/runtime CI. Published Core 0.7.5
+remains a 3.9–3.14 baseline. See [dated validation scope](PYTHON315_VALIDATION.md)
+and the [acceptance checklist](PYTHON315_SUPPORT_PLAN.md); the implementation
+PR records the exact CI head and results. Linux clean Core/runtime/MCP installs
+and native syntax tests are separate from hosted Windows/macOS verification.
+New syntax requires 3.15 at runtime; ordinary generated source retains its
+existing compatibility contract. L3 bytecode requires the builder's minor.
 
 ## Python versions and operating systems
 
 | Surface | Linux | macOS | Windows | Evidence |
 |---|---|---|---|---|
-| Core obfuscator, 3.9–3.14 | tested | tested | tested | `ci.yml` job `test`, 3 OS × 6 versions |
-| `pyobfus-runtime`, 3.9–3.14 | tested | tested | tested | PyPI `0.1.0` clean install passed; local boundary suite 2/2; CI run [`35931303008`](https://github.com/zhurong2020/pyobfus/actions/runs/35931303008) and release run [`35931605485`](https://github.com/zhurong2020/pyobfus/actions/runs/35931605485) built, inspected, and published the standalone wheel |
-| End-to-end CLI (obfuscate, execute output) | tested (3.11) | advisory-only | tested (3.11) | `ci.yml` job `integration` runs `integration_tests/` on Ubuntu and Windows; single-file and cross-file outputs are executed and compared with the originals |
-| `pyobfus-mcp` server | tested (3.11, 3.13) | advisory-only | advisory-only | `ci.yml` jobs `mcp-tests` (3.11), `mcp-sdk-latest` and `mcp-sdk-2x` (3.13) |
+| Core obfuscator, 3.9–3.15 | tested | tested | tested | `ci.yml` job `test`, 3 OS × 7 versions |
+| `pyobfus-runtime`, 3.9–3.15 | tested | tested | tested | `ci.yml` job `test` runs boundary tests across 3 OS × 7 versions; `runtime-wheel` installs standalone wheels on 3.12/3.15. Linux 3.15 installed-wheel boundary: 24/24; see [dated validation](PYTHON315_VALIDATION.md). |
+| End-to-end CLI (obfuscate, execute output) | tested (3.11, 3.15) | advisory-only | tested (3.11, 3.15) | `ci.yml` job `integration` runs `integration_tests/` on Ubuntu and Windows (3.11/3.15); single-file and cross-file outputs are executed and compared with the originals |
+| `pyobfus-mcp` server | tested (3.11, 3.13, 3.15) | advisory-only | advisory-only | `ci.yml` jobs `mcp-tests` (3.11/3.15), `mcp-sdk-latest` and `mcp-sdk-2x` (3.13) |
 | VS Code extension | tested (Node 22, Python 3.12) | advisory-only | advisory-only | `vscode-extension-ci.yml`, headless xvfb |
 | `pyobfus-action` composite wrapper | tested | tested | tested | External `zhurong2020/pyobfus-action` CI runs the local action against real clean/risky fixtures on all three hosted-runner OS families; Action release 1.0.1 |
 | Free-threaded 3.14 (`--disable-gil`) | verified once, 2026-08-20 | advisory-only | advisory-only | Manual run of the full core suite plus an end-to-end smoke on a downloaded free-threaded build; not in CI. See [`PYTHON314_FREETHREADING.md`](PYTHON314_FREETHREADING.md) |

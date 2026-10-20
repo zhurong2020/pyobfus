@@ -105,14 +105,13 @@ CI runs this as a separate, path-filtered workflow
 `${{ env.pythonLocation }}/bin/python`), not as part of the Python
 `ci.yml` jobs above.
 
-**Next development priority (maintainer decision, 2026-10-20): Python 3.15
-compatibility is P0**, ahead of MCP dependency upgrades and new protection
-features. Implementation is scheduled for a separate session; this decision
-sets priority and does not claim released support or authorize a release.
-Start with [`docs/PYTHON315_SUPPORT_PLAN.md`](docs/PYTHON315_SUPPORT_PLAN.md)
-for the reproduced defects, audit scope, CI/install gates and handoff.
+**Python 3.15 compatibility (P0, 2026-10-20)** is implemented on the support
+branch, pending independent review and release. See
+[`docs/PYTHON315_SUPPORT_PLAN.md`](docs/PYTHON315_SUPPORT_PLAN.md) and
+[`docs/PYTHON315_VALIDATION.md`](docs/PYTHON315_VALIDATION.md) for scope,
+validation evidence and limitations. This does not authorize a release.
 
-Targets: Python **3.9–3.14** must all pass. (Python 3.8 was dropped in 0.5.0 —
+Targets: Python **3.9–3.15** must all pass. (Python 3.8 was dropped in 0.5.0 —
 EOL 2024-10 — which removed the old `astunparse`/`@requires_py39` flakiness;
 `docs/PYTHON38_COMPATIBILITY.md` is retained only as historical record.)
 

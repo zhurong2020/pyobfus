@@ -167,7 +167,7 @@ layer rather than the only tool in the toolbox.
 - Open-source trust and auditability
 - Pure Python output without native dependencies
 - Cross-platform compatibility from a single build
-- Modern Python 3.9-3.14 support
+- Modern Python 3.9-3.15 support
 
 **Get started:**
 ```bash

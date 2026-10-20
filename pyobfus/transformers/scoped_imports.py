@@ -155,7 +155,22 @@ def import_plan(
                 (
                     c
                     for c in parent.get_children()
-                    if c.get_name() == name
+                    if (
+                        c.get_name() == name
+                        or (
+                            isinstance(
+                                node,
+                                (
+                                    ast.Lambda,
+                                    ast.ListComp,
+                                    ast.SetComp,
+                                    ast.DictComp,
+                                    ast.GeneratorExp,
+                                ),
+                            )
+                            and c.get_name() == f"<{name}>"
+                        )
+                    )
                     and c.get_lineno() == node.lineno
                     and c.get_id() not in used
                 ),
@@ -354,8 +369,10 @@ def import_plan(
                     for cond in gen.ifs:
                         self.visit(cond)
                 if isinstance(node, ast.DictComp):
-                    self.visit(node.value)
-                    self.visit(node.key)
+                    if node.value is not None:
+                        self.visit(node.value)
+                    if node.key is not None:
+                        self.visit(node.key)
                 else:
                     self.visit(node.elt)
 

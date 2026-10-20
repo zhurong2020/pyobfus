@@ -330,7 +330,11 @@ def _ensure_vault_class_import(tree: ast.Module) -> None:
     opacity.py.
     """
     for stmt in tree.body:
-        if isinstance(stmt, ast.ImportFrom) and stmt.module == _RUNTIME_MODULE:
+        if (
+            isinstance(stmt, ast.ImportFrom)
+            and stmt.module == _RUNTIME_MODULE
+            and not getattr(stmt, "is_lazy", False)
+        ):
             if not any(alias.name == _RUNTIME_VAULT_CLASS for alias in stmt.names):
                 stmt.names.append(ast.alias(name=_RUNTIME_VAULT_CLASS))
             return

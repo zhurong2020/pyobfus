@@ -5,7 +5,7 @@ abstract: >-
   pyobfus is an open-source, source-to-source obfuscator for Python built on the
   standard-library abstract syntax tree (ast). It renames identifiers, encodes
   string and numeric literals, and rewrites imports consistently across a
-  multi-file project, emitting ordinary .py files that run on CPython 3.9-3.14
+  multi-file project, emitting ordinary .py files that run on CPython 3.9-3.15
   without a native runtime or bytecode VM. Its distinguishing feature is a
   reverse mapping workflow that translates an obfuscated production stack trace
   back to the original names, so a developer or an AI coding assistant can debug
