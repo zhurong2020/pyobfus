@@ -32,8 +32,8 @@ existing compatibility contract. L3 bytecode requires the builder's minor.
 
 | Surface | Linux | macOS | Windows | Evidence |
 |---|---|---|---|---|
-| Core obfuscator, 3.9–3.15 | tested | tested | tested | `ci.yml` job `test`, 3 OS × 7 versions |
-| `pyobfus-runtime`, 3.9–3.15 | tested | tested | tested | `ci.yml` job `test` runs boundary tests across 3 OS × 7 versions; `runtime-wheel` installs standalone wheels on 3.12/3.15. Linux 3.15 installed-wheel boundary: 24/24; see [dated validation](PYTHON315_VALIDATION.md). |
+| Core obfuscator, 3.9–3.15 | tested | tested | tested | `ci.yml` job `test`: Ubuntu 3.9–3.15; Windows/macOS 3.9, 3.14, 3.15 on ordinary code runs; all 3 OS × 7 versions on schedule/manual runs |
+| `pyobfus-runtime`, 3.9–3.15 | tested | tested | tested | `ci.yml` job `test` runs boundary tests on the same 13 ordinary / 21 scheduled/manual cells as Core; `runtime-wheel` installs standalone wheels on 3.12/3.15. Linux 3.15 installed-wheel boundary: 24/24; see [dated validation](PYTHON315_VALIDATION.md). |
 | End-to-end CLI (obfuscate, execute output) | tested (3.11, 3.15) | advisory-only | tested (3.11, 3.15) | `ci.yml` job `integration` runs `integration_tests/` on Ubuntu and Windows (3.11/3.15); single-file and cross-file outputs are executed and compared with the originals |
 | `pyobfus-mcp` server | tested (3.11, 3.13, 3.15) | advisory-only | advisory-only | `ci.yml` jobs `mcp-tests` (3.11/3.15), `mcp-sdk-latest` and `mcp-sdk-2x` (3.13) |
 | VS Code extension | tested (Node 22, Python 3.12) | advisory-only | advisory-only | `vscode-extension-ci.yml`, headless xvfb |
@@ -352,7 +352,8 @@ examples require a license and are not part of these Community packaging checks.
 ## How to change a cell
 
 Move a cell up by adding the check, not by gaining confidence. A cell becomes
-**tested** when a named CI job runs it on every push; it becomes **verified
+**tested** when a named CI job runs it on relevant code changes or on the
+documented scheduled matrix; it becomes **verified
 once** when someone records the run and the date in a document that this table
 links to. Downgrade a cell the moment its evidence stops running.
 
