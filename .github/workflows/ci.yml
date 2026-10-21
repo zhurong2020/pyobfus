@@ -23,6 +23,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       code: ${{ steps.paths.outputs.code }}
+      matrix: ${{ steps.matrix.outputs.matrix }}
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
       with:
@@ -53,17 +54,21 @@ jobs:
         fi
         echo "code=$code" >> "$GITHUB_OUTPUT"
 
+    - name: Select core test matrix
+      id: matrix
+      env:
+        EVENT: ${{ github.event_name }}
+      run: echo "matrix=$(python scripts/ci_changed_paths.py --matrix "$EVENT")" >> "$GITHUB_OUTPUT"
+
   test:
     needs: changes
     if: needs.changes.outputs.code == 'true'
-    name: Test Python ${{ matrix.python-version }}
+    name: Test (${{ matrix.os }}, Python ${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14', '3.15']
+      matrix: ${{ fromJSON(needs.changes.outputs.matrix) }}
 
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)

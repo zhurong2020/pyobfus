@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from scripts.ci_changed_paths import code_changed
+from scripts.ci_changed_paths import code_changed, test_matrix as build_matrix
 
 
 @pytest.mark.parametrize("path", ["docs/TODO.md", "docs/guide/usage.md"])
@@ -55,3 +55,16 @@ def test_cli_handles_nul_separated_paths():
         check=True,
     )
     assert result.stdout == b"code=false\n"
+
+
+@pytest.mark.parametrize("event", ["push", "pull_request", "schedule", "workflow_dispatch"])
+def test_matrix_versions(event):
+    cells = build_matrix(event)["include"]
+    assert len(cells) == (21 if event in ("schedule", "workflow_dispatch") else 13)
+    assert len({(cell["os"], cell["python-version"]) for cell in cells}) == len(cells)
+    for os_name in ("ubuntu-latest", "windows-latest", "macos-latest"):
+        versions = {cell["python-version"] for cell in cells if cell["os"] == os_name}
+        expected = {"3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.15"}
+        if event not in ("schedule", "workflow_dispatch") and os_name != "ubuntu-latest":
+            expected = {"3.9", "3.14", "3.15"}
+        assert versions == expected

@@ -1,5 +1,7 @@
 """Conservatively classify NUL-separated git paths for the CI heavy-job gate."""
 
+import argparse
+import json
 import sys
 from pathlib import PurePosixPath
 from typing import Iterable
@@ -31,7 +33,27 @@ def code_changed(paths: Iterable[str]) -> bool:
     return any(not docs_only(path) for path in paths)
 
 
+def test_matrix(event: str) -> dict:
+    """Keep the full grid on scheduled/manual runs; otherwise cover OS edge versions."""
+    versions = ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
+    full = event in ("schedule", "workflow_dispatch")
+    return {
+        "include": [
+            {"os": os_name, "python-version": version}
+            for os_name in ("ubuntu-latest", "windows-latest", "macos-latest")
+            for version in versions
+            if full or os_name == "ubuntu-latest" or version in ("3.9", "3.14", "3.15")
+        ]
+    }
+
+
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--matrix", metavar="EVENT", help="emit the core test matrix as JSON")
+    args = parser.parse_args()
+    if args.matrix is not None:
+        print(json.dumps(test_matrix(args.matrix), separators=(",", ":")))
+        return
     paths = sys.stdin.buffer.read().decode("utf-8", errors="surrogateescape").split("\0")
     # git terminates every path with NUL. Empty input means no changed files.
     if paths[-1] == "":
