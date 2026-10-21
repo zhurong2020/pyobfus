@@ -129,7 +129,7 @@ CI runs core and integration suites with `-n auto` (pytest-xdist is in the
 `dev` extra); the serial commands above remain valid. On code pushes and PRs,
 Core/runtime tests cover Ubuntu 3.9–3.15 and Windows/macOS 3.9, 3.14 and 3.15.
 Scheduled and manual CI covers all three OSes on every supported Python.
-Only Ubuntu 3.11 collects core coverage. Non-hidden Markdown files below
+Only Ubuntu 3.11 collects core coverage, printed in that job's log. Non-hidden Markdown files below
 `docs/` can skip heavy jobs; lint and docs still run. All other paths trigger
 full CI. `CI result` aggregates the workflow, including intentionally skipped
 jobs; branch protection requires `CI result` plus `CodeQL`.

@@ -116,7 +116,7 @@ Core CI (`.github/workflows/ci.yml`) runs Ubuntu 3.9–3.15 and Windows/macOS
 3.9, 3.14 and 3.15 on ordinary code pushes/PRs (13 cells). Scheduled and
 manual runs cover all 21 OS/version cells. Core and CLI integration use
 `pytest-xdist -n auto`; serial local pytest commands remain supported. Only
-Ubuntu 3.11 collects coverage. Non-hidden `docs/**/*.md` prose changes skip
+Ubuntu 3.11 collects coverage (printed in the job log; no external upload). Non-hidden `docs/**/*.md` prose changes skip
 heavy jobs; lint and docs always run, and unknown paths trigger full CI.
 `CI result` aggregates all CI jobs, accepting success/skipped and rejecting
 failure/cancellation; the `protect-main` ruleset requires only `CI result` and

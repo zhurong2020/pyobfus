@@ -97,22 +97,18 @@ jobs:
 
     - name: Run tests
       env:
+        # One cell prints the coverage table to the job log. There is no external
+        # upload: Codecov never accepted a tokenless push upload and nobody read it
+        # (removed 2026-10-21).
         COLLECT_COVERAGE: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11' }}
       shell: bash
       run: |
         if [[ "$COLLECT_COVERAGE" == true ]]; then
-          pytest tests/ -n auto -q -ra --durations=15 -o addopts='' --cov=pyobfus --cov-report=xml
+          pytest tests/ -n auto -q -ra --durations=15 -o addopts='' --cov=pyobfus --cov-report=term
         else
           pytest tests/ -n auto -q -ra -o addopts='' --durations=15 --no-cov
         fi
         pytest pyobfus_runtime/tests/ -q -ra -o addopts='' --no-cov
-
-    - name: Upload coverage to Codecov
-      if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
-      uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5  # v5 (pinned 2026-05-09)
-      with:
-        files: ./coverage.xml
-        fail_ci_if_error: false
 
   lint:
     name: Lint and Type Check
