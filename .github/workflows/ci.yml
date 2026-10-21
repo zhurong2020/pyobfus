@@ -18,7 +18,44 @@ permissions:
   contents: read
 
 jobs:
+  changes:
+    name: Classify changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.paths.outputs.code }}
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
+      with:
+        fetch-depth: 0
+    - name: Classify changed paths (fail open)
+      id: paths
+      shell: bash
+      env:
+        EVENT: ${{ github.event_name }}
+        BEFORE: ${{ github.event.before }}
+        BASE: ${{ github.event.pull_request.base.sha }}
+        HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+      run: |
+        code=true
+        if [[ "$EVENT" == pull_request ]]; then
+          base="$BASE"
+        elif [[ "$EVENT" == push ]]; then
+          base="$BEFORE"
+        else
+          base=""
+        fi
+        if [[ -n "$base" && ! "$base" =~ ^0+$ ]]; then
+          if git diff --name-only --no-renames -z "$base" "$HEAD" > "$RUNNER_TEMP/changed-paths"; then
+            if output=$(python scripts/ci_changed_paths.py < "$RUNNER_TEMP/changed-paths"); then
+              if [[ "$output" == code=false ]]; then code=false; fi
+            fi
+          fi
+        fi
+        echo "code=$code" >> "$GITHUB_OUTPUT"
+
   test:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     name: Test Python ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
 
@@ -81,6 +118,8 @@ jobs:
       run: scripts/check.sh lint
 
   mcp-tests:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     # The MCP package has its own pytest root (AGENTS.md documents three roots).
     # Before 2026-07-19 CI only *instantiated* the server (see mcp-sdk-latest
     # below) and never ran pyobfus_mcp/tests/, so 73 tests were unenforced.
@@ -112,6 +151,8 @@ jobs:
         pytest pyobfus_mcp/tests/ -v --no-cov
 
   integration:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     # Drives the installed CLI as a subprocess and executes the obfuscated
     # output. Was a set of inline `run:` smoke steps until 2026-07-19; the
     # integration_tests/ directory existed but was empty, so the documented
@@ -145,6 +186,8 @@ jobs:
         pytest integration_tests/ -v --no-cov
 
   runtime-wheel:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     name: Redistributable runtime wheel boundary
     runs-on: ubuntu-latest
 
@@ -178,6 +221,8 @@ jobs:
         pytest pyobfus_runtime/tests/ -v
 
   benchmark-smoke:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     # Offline, deterministic validation of the P2-18 corpus -> obfuscate ->
     # recover -> functional-score -> report pipeline. Real model measurements
     # remain credentialed/manual; stub output is never published as evidence.
@@ -204,6 +249,8 @@ jobs:
         pytest benchmarks/llm_resistance/test_smoke.py benchmarks/llm_resistance/test_key_exposure.py -v --no-cov
 
   mcp-sdk-latest:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     # Catches mcp SDK API drift against pyobfus-mcp (e.g. the FastMCP version=
     # kwarg removal that shipped silently in mcp 1.20+ and forced the 0.1.2
     # emergency release on 2026-05-07). Pins the floor at the version we
@@ -239,6 +286,8 @@ jobs:
         python -c "from pyobfus_mcp.server import _build_server; _build_server()"
 
   mcp-sdk-2x:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     # pyobfus-mcp still ships `mcp<2.0.0`, so nothing in the normal matrix ever
     # runs against the 2.x line. The server adapter is written to work on both
     # majors (FastMCP -> MCPServer, `version=` now a real kwarg), and this job
@@ -298,3 +347,15 @@ jobs:
     # scripts/check.sh so a local run checks exactly what CI checks.
     - name: README links + mkdocs --strict (scripts/check.sh docs)
       run: scripts/check.sh docs
+
+  result:
+    name: CI result
+    needs: [changes, test, lint, mcp-tests, integration, runtime-wheel, benchmark-smoke, mcp-sdk-latest, mcp-sdk-2x, docs]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check all job results
+      env:
+        RESULTS: ${{ toJSON(needs) }}
+      run: |
+        echo "$RESULTS" | jq -e 'all(.[]; .result == "success" or .result == "skipped")'
