@@ -1,5 +1,17 @@
 # pyobfus 当前计划
 
+**2026-10-21 CI 提速（实现待 PR 全绿与 Claude 审核，只改 CI、不发版）**：
+普通代码运行改为 Ubuntu 3.9–3.15 + Windows/macOS 3.9/3.14/3.15（13 单元），
+定时/手动仍全 21 单元；核心与 CLI 集成 `-n auto`，仅 Ubuntu 3.11 覆盖率；
+非隐藏 `docs/**/*.md` 文档改动跳过重任务，lint/docs 照跑；`CI result` 汇总所有结果。
+新增任务超时（核心 30、集成 15、其余 10 分钟）、PR 旧运行取消、docs pip cache。
+基线 run `39458762844` 为 34 jobs、33m47s，最慢 Windows 3.13 为 16m36s；
+本地测试计数/计时与 PR 实测保存在 gitignored
+`docs/internal/codex-2026-10/ci-speed-evidence/` 并随 PR 正文汇报。
+Claude 在首轮全绿审核后、合并前将必需检查改为 `CI result` + `CodeQL`；
+旧 `Test Python X` 缺失不做 workaround。Codex 不改规则、不合并、不发版。
+
+
 **2026-10-21 上午状态核查（只读 + 文档补记）**：main `7cf923a` 干净、与远端一致，CI 34/34、CodeQL 通过；10-20 晚 `10e8dcb`（仅文档）的 Windows 3.11 集成测试卡约 40 分钟，普通 cancel 不生效后 force-cancel，其余 33 项通过，后续 `9596565`、`7cf923a` 两轮同一任务正常，判为运行器偶发。0 open PR/issue，许可证端点监控 10-20 21:19 UTC 正常；PyPI Core 0.8.0 / MCP 0.3.14 / runtime 0.1.1。本地旧分支 `feat/verify-names`（#98 已 squash 合并）已删本地与远端。下载（pypistats 截至 10-19，0.8.0 发布日数据未到）：Core 30 天安静日中位数 35/天（9 月 31），近 7 天仅 1 个安静日（78），不下结论；MCP 30 天安静日中位数 6/天、近 7 天 10/天；runtime 约 50/天（主要为本仓 CI）；Marketplace 安装 14；GitHub 两周 148 浏览 / 89 独立访客（Google 9、github.com 8、pypi.org 5）；Action 引用 0。Gmail：无待回复的人——Pro 客户对 10-12 的 0.7.0 重建通知均未回信，10-14 微信付款跟进无回复；新邮件只有 Glama 自动通知（渠道 release 0.7.6/0.7.7）和 10-19 一封陌生仓库推广推销（不回）。许可 KV 6 条许可，无新购买，trial 登记仍为 0。下一步不变：10-25 复盘前不发版；复盘时 0.8.0 发布日后的安静日数据要 10-26 起才完整；10-27 那周 DEV 第 2 篇。
 
 **2026-10-20 深夜 MCP 0.3.14 已发布（维护者批准）**：只加 Python 3.15 分类器，并补记 #103 已合未发的 `protect_project` 未证明访问计数/提示（需 Core ≥0.7.4）；不升 MCP SDK 2.x。发版提交 `16654ff` CI 34/34 + CodeQL 通过后打 `mcp-v0.3.14`；PyPI wheel/sdist PEP 740 publisher=release.yml；全新 3.15 venv 安装自动带 Core 0.8.0 / runtime 0.1.1、pip check 通过，真实 stdio 握手 0.3.14、协议 `2025-11-25`、9 tools、`list_presets` 成功；MCP Registry 0.3.14 `active`/`isLatest=true`。MCP 不建 GitHub Release（避免 Zenodo 误归档）。**Glama 已同步（10-21 00:07）**：维护者把 Build steps 改为 `pyobfus-mcp==0.3.14 pyobfus==0.8.0`，测试 `01a15a11-855f-7c40-ad0e-7e8c11261da3` success / 8.5s，安装日志 Core 0.8.0 / MCP 0.3.14 / runtime 0.1.1，握手 0.3.14、协议 `2025-11-25`、9 tools，渠道 release `0.7.7`；检出 `e167182`（发布提交的祖先，pinnedCommit=null），不影响 PyPI 安装的服务。

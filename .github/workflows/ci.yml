@@ -17,16 +17,68 @@ on:
 permissions:
   contents: read
 
+# Only pull requests share a group: a newer push to a PR cancels the older run.
+# Every other event gets its own group (run_id), because GitHub also drops a
+# *pending* run when a newer one queues in the same group, even with
+# cancel-in-progress false -- that would leave some main commits untested.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
+  changes:
+    name: Classify changed paths
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      code: ${{ steps.paths.outputs.code }}
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
+      with:
+        fetch-depth: 0
+    - name: Classify changed paths (fail open)
+      id: paths
+      shell: bash
+      env:
+        EVENT: ${{ github.event_name }}
+        BEFORE: ${{ github.event.before }}
+        BASE: ${{ github.event.pull_request.base.sha }}
+        HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+      run: |
+        code=true
+        if [[ "$EVENT" == pull_request ]]; then
+          base="$BASE"
+        elif [[ "$EVENT" == push ]]; then
+          base="$BEFORE"
+        else
+          base=""
+        fi
+        if [[ -n "$base" && ! "$base" =~ ^0+$ ]]; then
+          if git diff --name-only --no-renames -z "$base" "$HEAD" > "$RUNNER_TEMP/changed-paths"; then
+            if output=$(python scripts/ci_changed_paths.py < "$RUNNER_TEMP/changed-paths"); then
+              if [[ "$output" == code=false ]]; then code=false; fi
+            fi
+          fi
+        fi
+        echo "code=$code" >> "$GITHUB_OUTPUT"
+
+    - name: Select core test matrix
+      id: matrix
+      env:
+        EVENT: ${{ github.event_name }}
+      run: echo "matrix=$(python scripts/ci_changed_paths.py --matrix "$EVENT")" >> "$GITHUB_OUTPUT"
+
   test:
-    name: Test Python ${{ matrix.python-version }}
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    name: Test (${{ matrix.os }}, Python ${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
 
     strategy:
       fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ['3.9', '3.10', '3.11', '3.12', '3.13', '3.14', '3.15']
+      matrix: ${{ fromJSON(needs.changes.outputs.matrix) }}
 
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
@@ -44,9 +96,16 @@ jobs:
         pip install -e ".[dev]"
 
     - name: Run tests
+      env:
+        COLLECT_COVERAGE: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11' }}
+      shell: bash
       run: |
-        pytest tests/ -v --cov=pyobfus --cov-report=xml --cov-report=term
-        pytest pyobfus_runtime/tests/ -v --no-cov
+        if [[ "$COLLECT_COVERAGE" == true ]]; then
+          pytest tests/ -n auto -q -ra --durations=15 -o addopts='' --cov=pyobfus --cov-report=xml
+        else
+          pytest tests/ -n auto -q -ra -o addopts='' --durations=15 --no-cov
+        fi
+        pytest pyobfus_runtime/tests/ -q -ra -o addopts='' --no-cov
 
     - name: Upload coverage to Codecov
       if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
@@ -58,6 +117,7 @@ jobs:
   lint:
     name: Lint and Type Check
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
@@ -81,11 +141,14 @@ jobs:
       run: scripts/check.sh lint
 
   mcp-tests:
-    # The MCP package has its own pytest root (AGENTS.md documents three roots).
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    # The MCP package has its own pytest root (AGENTS.md documents four pytest roots).
     # Before 2026-07-19 CI only *instantiated* the server (see mcp-sdk-latest
     # below) and never ran pyobfus_mcp/tests/, so 73 tests were unenforced.
     name: MCP Tests (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     strategy:
       matrix:
@@ -109,15 +172,18 @@ jobs:
 
     - name: Run MCP test suite
       run: |
-        pytest pyobfus_mcp/tests/ -v --no-cov
+        pytest pyobfus_mcp/tests/ -q -ra -o addopts='' --no-cov
 
   integration:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     # Drives the installed CLI as a subprocess and executes the obfuscated
     # output. Was a set of inline `run:` smoke steps until 2026-07-19; the
     # integration_tests/ directory existed but was empty, so the documented
     # `pytest integration_tests/` root collected zero tests.
     name: Integration Tests (${{ matrix.os }}, Python ${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
 
     strategy:
       fail-fast: false
@@ -142,11 +208,14 @@ jobs:
 
     - name: Run end-to-end test suite
       run: |
-        pytest integration_tests/ -v --no-cov
+        pytest integration_tests/ -n auto -q -ra -o addopts='' --no-cov
 
   runtime-wheel:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     name: Redistributable runtime wheel boundary
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     strategy:
       matrix:
@@ -174,15 +243,18 @@ jobs:
 
     - name: Install only the runtime wheel and test its boundary
       run: |
-        pip install pytest pyobfus_runtime/dist/*.whl
-        pytest pyobfus_runtime/tests/ -v
+        pip install pytest pytest-cov pyobfus_runtime/dist/*.whl
+        pytest pyobfus_runtime/tests/ -q -ra -o addopts='' --no-cov
 
   benchmark-smoke:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     # Offline, deterministic validation of the P2-18 corpus -> obfuscate ->
     # recover -> functional-score -> report pipeline. Real model measurements
     # remain credentialed/manual; stub output is never published as evidence.
     name: LLM resistance benchmark smoke test
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
@@ -201,9 +273,11 @@ jobs:
 
     - name: Run offline benchmark smoke suite
       run: |
-        pytest benchmarks/llm_resistance/test_smoke.py benchmarks/llm_resistance/test_key_exposure.py -v --no-cov
+        pytest benchmarks/llm_resistance/test_smoke.py benchmarks/llm_resistance/test_key_exposure.py -q -ra -o addopts='' --no-cov
 
   mcp-sdk-latest:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     # Catches mcp SDK API drift against pyobfus-mcp (e.g. the FastMCP version=
     # kwarg removal that shipped silently in mcp 1.20+ and forced the 0.1.2
     # emergency release on 2026-05-07). Pins the floor at the version we
@@ -216,6 +290,7 @@ jobs:
     # which read as though it covered 2.x — it never did.
     name: pyobfus-mcp build smoke test (mcp SDK 1.x)
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
@@ -239,6 +314,8 @@ jobs:
         python -c "from pyobfus_mcp.server import _build_server; _build_server()"
 
   mcp-sdk-2x:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     # pyobfus-mcp still ships `mcp<2.0.0`, so nothing in the normal matrix ever
     # runs against the 2.x line. The server adapter is written to work on both
     # majors (FastMCP -> MCPServer, `version=` now a real kwarg), and this job
@@ -246,6 +323,7 @@ jobs:
     # is deliberate: pip warns about the conflict and installs anyway.
     name: pyobfus-mcp against mcp SDK 2.x
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
@@ -277,11 +355,12 @@ jobs:
 
     - name: Run the MCP test suite
       run: |
-        pytest pyobfus_mcp/tests/ -q --no-cov
+        pytest pyobfus_mcp/tests/ -q -ra -o addopts='' --no-cov
 
   docs:
     name: Docs build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
 
@@ -289,6 +368,8 @@ jobs:
       uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5 (pinned 2026-05-09)
       with:
         python-version: '3.12'
+        cache: 'pip'
+        cache-dependency-path: docs/requirements.txt
 
     - name: Install docs dependencies
       run: pip install -r docs/requirements.txt
@@ -298,3 +379,16 @@ jobs:
     # scripts/check.sh so a local run checks exactly what CI checks.
     - name: README links + mkdocs --strict (scripts/check.sh docs)
       run: scripts/check.sh docs
+
+  result:
+    name: CI result
+    needs: [changes, test, lint, mcp-tests, integration, runtime-wheel, benchmark-smoke, mcp-sdk-latest, mcp-sdk-2x, docs]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+    - name: Check all job results
+      env:
+        RESULTS: ${{ toJSON(needs) }}
+      run: |
+        echo "$RESULTS" | jq -e 'all(.[]; .result == "success" or .result == "skipped")'

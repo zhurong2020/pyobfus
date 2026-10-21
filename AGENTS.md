@@ -112,6 +112,18 @@ and CI runs 3.15 on all three platforms. See
 [`docs/PYTHON315_VALIDATION.md`](docs/PYTHON315_VALIDATION.md) for scope,
 validation evidence and known limitations.
 
+Core CI (`.github/workflows/ci.yml`) runs Ubuntu 3.9–3.15 and Windows/macOS
+3.9, 3.14 and 3.15 on ordinary code pushes/PRs (13 cells). Scheduled and
+manual runs cover all 21 OS/version cells. Core and CLI integration use
+`pytest-xdist -n auto`; serial local pytest commands remain supported. Only
+Ubuntu 3.11 collects coverage. Non-hidden `docs/**/*.md` prose changes skip
+heavy jobs; lint and docs always run, and unknown paths trigger full CI.
+`CI result` aggregates all CI jobs, accepting success/skipped and rejecting
+failure/cancellation. The reviewer must switch required checks to `CI result`
+and `CodeQL` before merging the CI speed-up PR; agents must not edit rulesets.
+Core jobs time out after 30 minutes, integration after 15, others after 10.
+New PR pushes cancel superseded runs; main runs are never cancelled by this policy.
+
 Targets: Python **3.9–3.15** must all pass. (Python 3.8 was dropped in 0.5.0 —
 EOL 2024-10 — which removed the old `astunparse`/`@requires_py39` flakiness;
 `docs/PYTHON38_COMPATIBILITY.md` is retained only as historical record.)

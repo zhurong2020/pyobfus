@@ -108,7 +108,10 @@ Local raw evidence is retained under the ignored
 `ast-source-audit.txt`, `version-enumeration-audit.txt`, `tests-*.log`,
 `stdlib-*.json`, `portable315-to310.json`, `adversarial-*`, and clean-wheel logs.
 
-The Core CI matrix retains 3.9–3.14 and adds 3.15 on Linux, Windows and macOS.
+At release validation the Core CI matrix retained 3.9–3.14 and added 3.15 on
+Linux, Windows and macOS. Since the 2026-10-21 CI speed-up, ordinary code runs
+cover Ubuntu 3.9–3.15 plus Windows/macOS 3.9, 3.14 and 3.15; scheduled/manual
+runs retain the full grid (see [support matrix](SUPPORT_MATRIX.md)).
 CLI integration and MCP checks also include 3.15; standalone runtime wheels
 are installed and tested on 3.12 and 3.15. Stable 3.15 is requested directly;
 `allow-prereleases` is unnecessary. Black 26.10.1 recognizes `py315`; its

@@ -92,7 +92,7 @@ def test_latin1_is_decoded_and_cookie_dropped(build, tmp_path, mode, shebang, ma
 @pytest.mark.parametrize("mode", ["single", "directory", "legacy"])
 def test_utf8_bom(build, mode):
     _, output, _ = build(mode, '# coding: utf-8\nprint("ok")\n', encoding="utf-8-sig")
-    assert subprocess.check_output([sys.executable, str(output)]) == b"ok\n"
+    assert subprocess.check_output([sys.executable, str(output)], text=True) == "ok\n"
 
 
 @pytest.mark.skipif(os.name == "nt", reason="POSIX executable bits")
@@ -197,7 +197,7 @@ def test_pro_output_preserves_prologue(build, mode, monkeypatch):
         mode, SHEBANG + '\n# coding: utf-8\nprint("ok")\n', ["--level", "pro", "--dead-code"]
     )
     assert output.read_text().startswith(SHEBANG + "\n# coding: utf-8\n")
-    assert subprocess.check_output([sys.executable, str(output)]) == b"ok\n"
+    assert subprocess.check_output([sys.executable, str(output)], text=True) == "ok\n"
 
 
 def test_pro_fusion_restores_prologue_after_text_passes(build, monkeypatch):
@@ -211,7 +211,7 @@ def test_pro_fusion_restores_prologue_after_text_passes(build, monkeypatch):
     )
     assert output.read_text().startswith(SHEBANG + "\n# coding: utf-8\n")
     assert "_pyobfus_expire_check" in output.read_text()
-    assert subprocess.check_output([sys.executable, str(output)]) == b"ok\n"
+    assert subprocess.check_output([sys.executable, str(output)], text=True) == "ok\n"
 
 
 def test_single_file_invalid_encoding_is_a_parse_error(tmp_path):
