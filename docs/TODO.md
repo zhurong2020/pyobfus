@@ -18,17 +18,17 @@
   下游是否选择混淆自己的代码由其分发边界决定；公开第三方依赖不因被打包而自动成为
   pyobfus 的处理目标。
 
-## CI 提速（2026-10-21，待 PR 验证与独立审核；不发版）
+## CI 提速（2026-10-21 完成：PR #109 合并 `a2859f7`；只改 CI，不发版）
 
-实现采用 5 个独立 `ci:` 提交：文档分类与汇总检查、单点覆盖率、xdist、
-13/21 单元矩阵、超时/并发/缓存与文档同步。详见
-[`CURRENT_PLAN_ZH.md`](CURRENT_PLAN_ZH.md) 顶部；原始基线为 CI run
-`39458762844`（34 jobs、33m47s）。
-
-剩余 gate：PR 首轮全绿后由 Claude 独立审核；由 Claude 将 ruleset
-`protect-main`（23728645）的必需检查改为 `CI result` + `CodeQL`，再由维护者
-决定合并。新测试名含 OS，旧 `Test Python X` contexts 缺失属预期；Codex 不改
-ruleset、不合并、不发版。纯文档路径只允许非隐藏 `docs/**/*.md`；其他路径保守全跑。
+- [x] **1 只改文档不跑重任务**：`changes` 作业 + `scripts/ci_changed_paths.py`（只放行非隐藏 `docs/**/*.md`，其余一律全跑，算不出差异也全跑）；`CI result` 汇总作业。
+- [x] **2 覆盖率只在 ubuntu + 3.11**（仅 XML）。
+- [x] **3 pytest-xdist**：核心与集成 `-n auto`；修了集成测试共用源码树构建 wheel 的隔离问题。
+- [x] **4 矩阵**：普通运行 13 单元（Ubuntu 3.9–3.15 + Win/mac 3.9/3.14/3.15），定时/手动 21 单元。
+- [x] 超时（核心 30 / 集成 15 / 其余 10 分钟）、PR 新推送取消旧运行（非 PR 运行按 run_id 分组，main 不会丢运行）、docs pip 缓存。
+- [x] ruleset `protect-main`（23728645）必需检查改为 `CI result` + `CodeQL`（10-21，合并前）。
+- 实测：PR 运行 28 jobs、墙钟 33m47s → 8m56s；手动全矩阵 36/36 通过。
+- **审核中发现的既有问题（已修）**：旧 Windows 测试步骤用 PowerShell 连跑两条 pytest，第二条的退出码掩盖了第一条失败——基线 Windows 3.9 有 14 个、3.14 有 98 个核心测试失败，作业却显示绿色（自 3.14 加入起至少如此，含 0.8.0 发版时）。失败全是测试本身对换行/路径分隔符的假设，产品代码未改；现测试步骤统一用 bash（首个失败即失败）。
+- 待办：Codecov 上传一直被拒（无 token，`fail_ci_if_error: false` 所以不红）——要么配 `CODECOV_TOKEN`，要么去掉上传步骤，待维护者定。
 
 ## 后续任务顺序（2026-10-20 更新）
 
