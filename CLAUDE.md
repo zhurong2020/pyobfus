@@ -107,6 +107,7 @@ PR #108（PY315-1 惰性导入保留、PY315-2 推导式解包、3.15 新内建�
 - **许可系统顺序硬约束：先部署 Worker，再发客户端**（`pyobfus-license deactivate` 等新路由）。
   已装客户机器 Pro 激活仍需 `pyobfus-license register <KEY> --no-verify`（0.5.26 修复只救新安装）。
 - **发布后查完整 CI 矩阵**，不只 Release/CodeQL workflow。
+- **CI 任务绿 ≠ 测试通过（10-21）**：旧 Windows 步骤用 PowerShell 连跑两条 pytest，只看末条退出码，3.9/3.14 及 0.8.0 发版 run 的核心失败都显示绿；已改 bash（PR #109）。必需检查现为 `CI result` + `CodeQL`；普通推送 13 个核心组合，全 21 组合只在每日定时/手动跑——要全矩阵就 `gh workflow run ci.yml --ref <分支>`。详见 `docs/TODO.md`「CI 提速」。
 - **Stripe / 许可 Worker（10-05）**：Worker 只对 `payment_status=paid` 发号、序列号由 HMAC(webhook secret, session id) 派生——
   **别 Roll webhook signing secret**（验签全挂、派生也会变）；Payment Link 是 API 创建，Dashboard 不能编辑；
   Dashboard 首页「Blocked」先点开看时间线再判断是否流失客户。详见 `docs/TODO.md` 维护者清单。
@@ -174,6 +175,7 @@ git config core.hooksPath .githooks
 ```bash
 pytest tests/ -v
 pytest tests/ -v --cov=pyobfus --cov-report=html
+pytest tests/ -n auto --no-cov     # 并行（pytest-xdist 在 dev extra 里），约快 3 倍
 pytest integration_tests/ -v
 ```
 
