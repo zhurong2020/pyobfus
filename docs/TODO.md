@@ -5,7 +5,7 @@
 顺序做」，不记录历史。最新依据见
 [`FEATURE_EXPANSION_RESEARCH_2026-10-20.md`](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)；Python 3.15 的 P0 范围与验收见 [`PYTHON315_SUPPORT_PLAN.md`](PYTHON315_SUPPORT_PLAN.md)。
 
-最后更新：2026-10-20。Core 0.7.5（缺陷 O #104、P #105）与 0.7.4（缺陷 N #102、H PR 4 选项 1 #103）已发布；此前 Core 0.7.3（缺陷 C #100、M #101）/ MCP 0.3.13 已发布（0.7.2 为缺陷 I），runtime 0.1.1 保持不变；Core/MCP Unreleased 均为空。发布前完整 CI 与本地四测试根通过，PyPI 发布包和 PEP 740 已独立验证，Registry 与 Zenodo/CFF 已同步。私有历史库 CI 已定性，Glama 502 已恢复；Glama 安装/握手/9 工具测试、渠道记录与源码 pin（`22ecd62`）均已完成。
+最后更新：2026-10-21。Core 0.8.0（Python 3.15 支持，#108）与 MCP 0.3.14（3.15 分类器 + #103 提示）已于 10-20 发布，runtime 0.1.1 不变；Core/MCP Unreleased 均为空。PyPI/PEP 740、全新安装、Release、Zenodo `23500657`/CFF、MCP Registry 与 Glama（测试 `01a15a11`）均已核。10-21 状态核查无待回复客户，下一节点 10-25 复盘（见 `CURRENT_PLAN_ZH.md` 顶部）。
 
 ## 状态口径
 
