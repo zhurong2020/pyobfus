@@ -18,6 +18,7 @@ from __future__ import annotations
 import base64
 import datetime as _dt
 import os
+import shutil
 import subprocess
 import sys
 import venv
@@ -85,6 +86,14 @@ def target_python(tmp_path_factory) -> Path:
     """A fresh venv with only the runtime wheel installed, offline."""
     root = tmp_path_factory.mktemp("offline_target")
     wheelhouse = root / "wheelhouse"
+    # A module fixture runs once per xdist worker. setuptools writes build/
+    # and egg-info into its source tree, so each worker needs its own copy.
+    runtime_source = root / "runtime-source"
+    shutil.copytree(
+        REPO_ROOT / "pyobfus_runtime",
+        runtime_source,
+        ignore=shutil.ignore_patterns("build", "dist", "*.egg-info", "__pycache__"),
+    )
     # Build with isolation so the runtime's declared build requirements are
     # used, not whatever setuptools the test environment happens to have.
     built = subprocess.run(
@@ -96,7 +105,7 @@ def target_python(tmp_path_factory) -> Path:
             "--no-deps",
             "-w",
             str(wheelhouse),
-            str(REPO_ROOT / "pyobfus_runtime"),
+            str(runtime_source),
         ],
         capture_output=True,
         text=True,

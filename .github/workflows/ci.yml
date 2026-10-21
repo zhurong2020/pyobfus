@@ -86,11 +86,11 @@ jobs:
       shell: bash
       run: |
         if [[ "$COLLECT_COVERAGE" == true ]]; then
-          pytest tests/ -q -ra --durations=15 -o addopts='' --cov=pyobfus --cov-report=xml
+          pytest tests/ -n auto -q -ra --durations=15 -o addopts='' --cov=pyobfus --cov-report=xml
         else
-          pytest tests/ -q -ra --durations=15 --no-cov
+          pytest tests/ -n auto -q -ra -o addopts='' --durations=15 --no-cov
         fi
-        pytest pyobfus_runtime/tests/ -q -ra --no-cov
+        pytest pyobfus_runtime/tests/ -q -ra -o addopts='' --no-cov
 
     - name: Upload coverage to Codecov
       if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
@@ -155,7 +155,7 @@ jobs:
 
     - name: Run MCP test suite
       run: |
-        pytest pyobfus_mcp/tests/ -q -ra --no-cov
+        pytest pyobfus_mcp/tests/ -q -ra -o addopts='' --no-cov
 
   integration:
     needs: changes
@@ -190,7 +190,7 @@ jobs:
 
     - name: Run end-to-end test suite
       run: |
-        pytest integration_tests/ -q -ra --no-cov
+        pytest integration_tests/ -n auto -q -ra -o addopts='' --no-cov
 
   runtime-wheel:
     needs: changes
@@ -225,7 +225,7 @@ jobs:
     - name: Install only the runtime wheel and test its boundary
       run: |
         pip install pytest pytest-cov pyobfus_runtime/dist/*.whl
-        pytest pyobfus_runtime/tests/ -q -ra --no-cov
+        pytest pyobfus_runtime/tests/ -q -ra -o addopts='' --no-cov
 
   benchmark-smoke:
     needs: changes
@@ -253,7 +253,7 @@ jobs:
 
     - name: Run offline benchmark smoke suite
       run: |
-        pytest benchmarks/llm_resistance/test_smoke.py benchmarks/llm_resistance/test_key_exposure.py -q -ra --no-cov
+        pytest benchmarks/llm_resistance/test_smoke.py benchmarks/llm_resistance/test_key_exposure.py -q -ra -o addopts='' --no-cov
 
   mcp-sdk-latest:
     needs: changes
@@ -333,7 +333,7 @@ jobs:
 
     - name: Run the MCP test suite
       run: |
-        pytest pyobfus_mcp/tests/ -q -ra --no-cov
+        pytest pyobfus_mcp/tests/ -q -ra -o addopts='' --no-cov
 
   docs:
     name: Docs build
