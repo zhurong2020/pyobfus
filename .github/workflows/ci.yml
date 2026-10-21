@@ -17,8 +17,12 @@ on:
 permissions:
   contents: read
 
+# Only pull requests share a group: a newer push to a PR cancels the older run.
+# Every other event gets its own group (run_id), because GitHub also drops a
+# *pending* run when a newer one queues in the same group, even with
+# cancel-in-progress false -- that would leave some main commits untested.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.run_id }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
