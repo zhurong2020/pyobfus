@@ -81,9 +81,16 @@ jobs:
         pip install -e ".[dev]"
 
     - name: Run tests
+      env:
+        COLLECT_COVERAGE: ${{ matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11' }}
+      shell: bash
       run: |
-        pytest tests/ -v --cov=pyobfus --cov-report=xml --cov-report=term
-        pytest pyobfus_runtime/tests/ -v --no-cov
+        if [[ "$COLLECT_COVERAGE" == true ]]; then
+          pytest tests/ -q -ra --durations=15 -o addopts='' --cov=pyobfus --cov-report=xml
+        else
+          pytest tests/ -q -ra --durations=15 --no-cov
+        fi
+        pytest pyobfus_runtime/tests/ -q -ra --no-cov
 
     - name: Upload coverage to Codecov
       if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
@@ -148,7 +155,7 @@ jobs:
 
     - name: Run MCP test suite
       run: |
-        pytest pyobfus_mcp/tests/ -v --no-cov
+        pytest pyobfus_mcp/tests/ -q -ra --no-cov
 
   integration:
     needs: changes
@@ -183,7 +190,7 @@ jobs:
 
     - name: Run end-to-end test suite
       run: |
-        pytest integration_tests/ -v --no-cov
+        pytest integration_tests/ -q -ra --no-cov
 
   runtime-wheel:
     needs: changes
@@ -217,8 +224,8 @@ jobs:
 
     - name: Install only the runtime wheel and test its boundary
       run: |
-        pip install pytest pyobfus_runtime/dist/*.whl
-        pytest pyobfus_runtime/tests/ -v
+        pip install pytest pytest-cov pyobfus_runtime/dist/*.whl
+        pytest pyobfus_runtime/tests/ -q -ra --no-cov
 
   benchmark-smoke:
     needs: changes
@@ -246,7 +253,7 @@ jobs:
 
     - name: Run offline benchmark smoke suite
       run: |
-        pytest benchmarks/llm_resistance/test_smoke.py benchmarks/llm_resistance/test_key_exposure.py -v --no-cov
+        pytest benchmarks/llm_resistance/test_smoke.py benchmarks/llm_resistance/test_key_exposure.py -q -ra --no-cov
 
   mcp-sdk-latest:
     needs: changes
@@ -326,7 +333,7 @@ jobs:
 
     - name: Run the MCP test suite
       run: |
-        pytest pyobfus_mcp/tests/ -q --no-cov
+        pytest pyobfus_mcp/tests/ -q -ra --no-cov
 
   docs:
     name: Docs build
