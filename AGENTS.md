@@ -119,8 +119,9 @@ manual runs cover all 21 OS/version cells. Core and CLI integration use
 Ubuntu 3.11 collects coverage. Non-hidden `docs/**/*.md` prose changes skip
 heavy jobs; lint and docs always run, and unknown paths trigger full CI.
 `CI result` aggregates all CI jobs, accepting success/skipped and rejecting
-failure/cancellation. The reviewer must switch required checks to `CI result`
-and `CodeQL` before merging the CI speed-up PR; agents must not edit rulesets.
+failure/cancellation; the `protect-main` ruleset requires only `CI result` and
+`CodeQL` (since 2026-10-21). Agents must not edit rulesets. Multi-command test
+steps run under bash so the first failing pytest fails the job.
 Core jobs time out after 30 minutes, integration after 15, others after 10.
 New PR pushes cancel superseded runs; main runs are never cancelled by this policy.
 

@@ -132,8 +132,7 @@ Scheduled and manual CI covers all three OSes on every supported Python.
 Only Ubuntu 3.11 collects core coverage. Non-hidden Markdown files below
 `docs/` can skip heavy jobs; lint and docs still run. All other paths trigger
 full CI. `CI result` aggregates the workflow, including intentionally skipped
-jobs. The CI speed-up reviewer must update the required-check ruleset to
-`CI result` plus `CodeQL` before merge; implementation does not edit it.
+jobs; branch protection requires `CI result` plus `CodeQL`.
 
 ## Coding Standards
 
