@@ -54,7 +54,7 @@ def test_cli_handles_nul_separated_paths():
         capture_output=True,
         check=True,
     )
-    assert result.stdout == b"code=false\n"
+    assert result.stdout.replace(b"\r\n", b"\n") == b"code=false\n"
 
 
 @pytest.mark.parametrize("event", ["push", "pull_request", "schedule", "workflow_dispatch"])

@@ -532,9 +532,15 @@ def test_direct_package_json_crash(tmp_path):
         "core.py",
         4,
     )
-    foreign = [line for line in crash.stderr.splitlines() if 'File "' in line and "/json/" in line]
+    foreign = [
+        line
+        for line in crash.stderr.splitlines()
+        if 'File "' in line and "/json/" in line.replace("\\", "/")
+    ]
     assert len(foreign) >= 3
     assert all(line in result["unmapped_trace"] for line in foreign)
     assert all(
-        f["status"] == "unmapped" for f in result["frames"] if "/json/" in f["obfuscated_file"]
+        f["status"] == "unmapped"
+        for f in result["frames"]
+        if "/json/" in f["obfuscated_file"].replace("\\", "/")
     )

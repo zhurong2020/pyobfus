@@ -3,6 +3,7 @@
 import ast
 import dataclasses
 import json
+from pathlib import Path
 
 import pytest
 
@@ -141,7 +142,7 @@ def test_relative_value_shadowing(tmp_path, statement):
     ob = build(src, tmp_path / "out")
     assert not ob.attribute_plans[path[:-3].replace("/", ".")].edits
     assert "LIMIT" in attrs(tmp_path / "out" / path)
-    assert any(r.file.endswith(path) and r.line == 2 for r in risks(src))
+    assert any(Path(r.file).as_posix().endswith(path) and r.line == 2 for r in risks(src))
 
 
 ESCAPES = [
@@ -358,7 +359,7 @@ def test_i_d_interactions_reject_instead_of_fixing(tmp_path, statement, mutation
         results.append((result.returncode, result.stdout, result.stderr.splitlines()[-1:]))
     assert results[0] == results[1]
     assert any(
-        r.file.endswith(path) and "attribute access through a module" in r.message
+        Path(r.file).as_posix().endswith(path) and "attribute access through a module" in r.message
         for r in risks(src)
     )
 
