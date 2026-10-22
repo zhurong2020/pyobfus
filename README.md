@@ -56,6 +56,13 @@ pyobfus src/ -o dist/ --save-mapping mapping.json --verify-syntax
 pyobfus --unmap --trace error.log --mapping mapping.json
 ```
 
+In the next release, independent-file directory builds (`--no-cross-file`)
+also support `--save-mapping`. Their version-2 mapping resolves each traceback
+frame against its own file; names in excerpts and unframed logs stay unchanged.
+Use the new reader for these mappings; existing single-file and cross-file
+builds keep version 1. See the
+[debugging guide](https://github.com/zhurong2020/pyobfus/blob/main/docs/guides/debug-obfuscated-python.md#independent-file-directory-builds-next-release).
+
 Since 0.7.1, add opt-in `--verify-names` to check newly unbound globals
 without execution. Success JSON reports partial coverage explicitly; see
 [name verification](https://pyobfus.readthedocs.io/en/latest/NAME_VERIFICATION/)

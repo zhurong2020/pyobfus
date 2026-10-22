@@ -29,6 +29,9 @@ File format (version 1):
         ...
       }
     }
+
+Independent directory builds use version 2 with file-scoped ``file_names``
+and no global reverse table. See docs/INDEPENDENT_DIRECTORY_MAPPING_DESIGN.md.
 """
 
 from __future__ import annotations
@@ -36,10 +39,11 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import unicodedata
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, Iterator, List, Optional, Tuple, Union
 
 from pyobfus import __version__ as PYOBFUS_VERSION
 from pyobfus.core.line_map import Location
@@ -49,6 +53,7 @@ from pyobfus.core.line_map import Location
 _IDENT_RE = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*)\b")
 
 MAPPING_FORMAT_VERSION = 1
+INDEPENDENT_MAPPING_FORMAT_VERSION = 2
 
 
 @dataclass
@@ -71,6 +76,10 @@ class ObfuscationMapping:
     locals: Dict[str, Dict[str, str]] = field(default_factory=dict)
 
     files: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+
+    # Independent files reuse short names; no project-wide reverse lookup is safe.
+    file_names: Dict[str, Dict[str, List[str]]] = field(default_factory=dict)
+    unmapped_files: Dict[str, str] = field(default_factory=dict)
 
     # ---- construction ------------------------------------------------
 
@@ -126,6 +135,8 @@ class ObfuscationMapping:
         merged = cls(created_at=datetime.now(timezone.utc).isoformat())
         mode_seen: set = set()
         for other in mappings:
+            if other.mode == "independent_files":
+                raise ValueError("File-scoped mappings cannot be merged as global name tables")
             mode_seen.add(other.mode)
             for module, module_map in other.modules.items():
                 merged.modules.setdefault(module, {})
@@ -146,6 +157,32 @@ class ObfuscationMapping:
         )
         return merged
 
+    def add_independent_file(
+        self,
+        output_key: str,
+        name_map: Dict[str, str],
+        line_record: Dict[str, Any],
+        original_source: str,
+        output_code: str,
+    ) -> None:
+        """Collect one successful output, without collapsing names across files."""
+        if self.mode != "independent_files":
+            raise ValueError("Independent mapping requires an output-relative file key")
+        if not _relative_path(output_key):
+            self.unmapped_files[output_key] = "Output filename is not portable in a mapping"
+            return
+        names: Dict[str, List[str]] = {}
+        for original, obfuscated in name_map.items():
+            if original.isidentifier() and obfuscated.isidentifier():
+                names.setdefault(unicodedata.normalize("NFKC", obfuscated), []).append(original)
+        self.file_names[output_key] = {name: sorted(set(values)) for name, values in names.items()}
+        self.modules[output_key] = dict(name_map)
+        self.files[output_key] = {
+            **line_record,
+            "source_sha256": hashlib.sha256(original_source.encode("utf-8")).hexdigest(),
+            "output_sha256": hashlib.sha256(output_code.encode("utf-8")).hexdigest(),
+        }
+
     # ---- I/O ---------------------------------------------------------
 
     def save(self, path: Union[str, Path]) -> None:
@@ -163,13 +200,31 @@ class ObfuscationMapping:
         marker in an obfuscated traceback can confirm it matches the mapping
         it holds before trusting an `--unmap`.
         """
+        if self.mode == "independent_files":
+            identity = {
+                "file_names": self.file_names,
+                "unmapped_files": self.unmapped_files,
+                "files": {
+                    path: {
+                        key: record.get(key)
+                        for key in ("source", "module", "source_sha256", "output_sha256")
+                    }
+                    for path, record in self.files.items()
+                },
+            }
+            encoded = json.dumps(identity, sort_keys=True, ensure_ascii=False).encode("utf-8")
+            return hashlib.sha256(encoded).hexdigest()[:8]
         items = sorted(f"{obf}:{mod}.{orig}" for obf, (mod, orig) in self.global_map.items())
         digest = hashlib.sha256("\n".join(items).encode("utf-8")).hexdigest()
         return digest[:8]
 
     def to_json(self, indent: int = 2) -> str:
         payload = {
-            "version": MAPPING_FORMAT_VERSION,
+            "version": (
+                INDEPENDENT_MAPPING_FORMAT_VERSION
+                if self.mode == "independent_files"
+                else MAPPING_FORMAT_VERSION
+            ),
             "pyobfus_version": self.pyobfus_version,
             "created_at": self.created_at,
             "marker_id": self.marker_id(),
@@ -182,8 +237,11 @@ class ObfuscationMapping:
                 for obf, (mod, orig) in self.global_map.items()
             },
         }
-        if self.files:
+        if self.files or self.mode == "independent_files":
             payload["files"] = {"line_map_version": 1, "entries": self.files}
+        if self.mode == "independent_files":
+            payload["file_names"] = self.file_names
+            payload["unmapped_files"] = self.unmapped_files
         return json.dumps(payload, indent=indent, ensure_ascii=False, sort_keys=True)
 
     @classmethod
@@ -195,38 +253,116 @@ class ObfuscationMapping:
 
         data = json.loads(path.read_text(encoding="utf-8"))
         version = data.get("version")
-        if version != MAPPING_FORMAT_VERSION:
+        if type(version) is not int or version not in (
+            MAPPING_FORMAT_VERSION,
+            INDEPENDENT_MAPPING_FORMAT_VERSION,
+        ):
             raise ValueError(
                 f"Unsupported mapping version {version!r}. "
-                f"This pyobfus expects version {MAPPING_FORMAT_VERSION}."
+                "This pyobfus supports mapping versions 1 and 2."
             )
+        independent = version == INDEPENDENT_MAPPING_FORMAT_VERSION
+        if independent != (data.get("mode") == "independent_files"):
+            raise ValueError("Mapping version 2 requires independent_files mode")
 
         m = cls(
             root=data.get("root", ""),
             mode=data.get("mode", "single_file"),
             pyobfus_version=data.get("pyobfus_version", ""),
             created_at=data.get("created_at", ""),
-            modules={mod: dict(exports) for mod, exports in data.get("modules", {}).items()},
-            locals={mod: dict(names) for mod, names in data.get("locals", {}).items()},
+            modules=(
+                {}
+                if independent
+                else {mod: dict(exports) for mod, exports in data.get("modules", {}).items()}
+            ),
+            locals=(
+                {}
+                if independent
+                else {mod: dict(names) for mod, names in data.get("locals", {}).items()}
+            ),
         )
-        for obf, info in data.get("global", {}).items():
-            m.global_map[obf] = (info.get("module", ""), info.get("original", ""))
+        if not independent:
+            for obf, info in data.get("global", {}).items():
+                m.global_map[obf] = (info.get("module", ""), info.get("original", ""))
+        else:
+            unavailable = data.get("unmapped_files", {})
+            if not isinstance(unavailable, dict):
+                raise ValueError("Independent unmapped_files must be an object")
+            m.unmapped_files = {
+                key: reason
+                for key, reason in unavailable.items()
+                if isinstance(key, str)
+                and key
+                and not key.startswith("/")
+                and ".." not in key.replace("\\", "/").split("/")
+                and isinstance(reason, str)
+            }
+            tables = data.get("file_names", {})
+            if not isinstance(tables, dict):
+                raise ValueError("Independent file_names must be an object")
+            for file_key, names in tables.items():
+                if not _relative_path(file_key) or not isinstance(names, dict):
+                    continue
+                validated: Dict[str, List[str]] = {}
+                for name, candidates in names.items():
+                    if (
+                        isinstance(name, str)
+                        and name.isidentifier()
+                        and isinstance(candidates, list)
+                        and candidates
+                        and all(
+                            isinstance(item, str) and item.isidentifier() for item in candidates
+                        )
+                    ):
+                        canonical = unicodedata.normalize("NFKC", name)
+                        validated.setdefault(canonical, []).extend(candidates)
+                m.file_names[file_key] = {
+                    name: sorted(set(values)) for name, values in validated.items()
+                }
 
         files = data.get("files", {})
+        if independent and (
+            not isinstance(files, dict)
+            or files.get("line_map_version") != 1
+            or not isinstance(files.get("entries"), dict)
+        ):
+            raise ValueError("Independent mapping requires files.entries with line_map_version 1")
         if isinstance(files, dict) and files.get("line_map_version") == 1:
             entries = files.get("entries", {})
             if isinstance(entries, dict):
-                m.files = {key: value for key, value in entries.items() if _valid_file(key, value)}
+                if independent:
+                    for key, value in entries.items():
+                        if not _valid_file_identity(key, value):
+                            continue
+                        record = dict(value)
+                        if not _valid_file(key, value):
+                            record["lines"] = None
+                            record["reason"] = "Invalid optional line table"
+                        m.files[key] = record
+                    m.file_names = {key: m.file_names.get(key, {}) for key in m.files}
+                    m.modules = {
+                        key: {
+                            original: name
+                            for name, candidates in names.items()
+                            for original in candidates
+                        }
+                        for key, names in m.file_names.items()
+                    }
+                else:
+                    m.files = {
+                        key: value for key, value in entries.items() if _valid_file(key, value)
+                    }
 
         # Backfill global_map if it was not present (forward-only format)
-        if not m.global_map:
+        if not independent and not m.global_map:
             for mod, exports in m.modules.items():
                 for original, obfuscated in exports.items():
                     m.global_map.setdefault(obfuscated, (mod, original))
 
-        for mod, names in m.locals.items():
-            for obfuscated, original in names.items():
-                m.global_map.setdefault(obfuscated, (mod, original))
+        if not independent:
+            for mod, names in m.locals.items():
+                for obfuscated, original in names.items():
+                    m.global_map.setdefault(obfuscated, (mod, original))
 
         return m
 
@@ -243,7 +379,13 @@ class ObfuscationMapping:
         path = self._match_file_path(trace_path)
         if path is None:
             return None
-        record = self.files[path]
+        return self.resolve_file_location(path, line)
+
+    def resolve_file_location(self, path: str, line: int) -> Optional[Location]:
+        """Resolve an already selected exact output key, without suffix fallback."""
+        record = self.files.get(path)
+        if record is None or line < 1 or path in self.unmapped_files:
+            return None
         runs = record.get("lines")
         if runs is None or line > record["line_count"]:
             return None
@@ -263,11 +405,17 @@ class ObfuscationMapping:
         """Match all file-key components, choosing the unique longest key."""
         trace = _path_parts(trace_path)
         candidates = []
-        for path in self.files:
+        paths = set(self.files)
+        if self.mode == "independent_files":
+            paths.update(self.file_names)
+            paths.update(self.unmapped_files)
+        for path in paths:
             parts = _path_parts(path)
             if parts and len(trace) >= len(parts) and trace[-len(parts) :] == parts:
                 candidates.append((len(parts), path))
         if not candidates:
+            return None
+        if self.mode == "independent_files" and len(candidates) > 1:
             return None
         longest = max(score for score, _ in candidates)
         matches = [path for score, path in candidates if score == longest]
@@ -275,6 +423,8 @@ class ObfuscationMapping:
 
     def reverse(self, obfuscated_name: str) -> Optional[str]:
         """Look up an obfuscated identifier and return the original name, or None."""
+        if self.mode == "independent_files":
+            return None
         info = self.global_map.get(obfuscated_name)
         if info is None:
             return None
@@ -296,7 +446,7 @@ class ObfuscationMapping:
         Substitution is token-boundary aware (uses \\b identifier matches),
         so e.g. "I1" inside "MyI1Thing" is NOT replaced.
         """
-        if not self.global_map:
+        if self.mode == "independent_files" or not self.global_map:
             return text
 
         def _sub(match: "re.Match[str]") -> str:
@@ -305,6 +455,20 @@ class ObfuscationMapping:
             return original if original else tok
 
         return _IDENT_RE.sub(_sub, text)
+
+    def unmap_file_text(self, text: str, path: str) -> str:
+        """Restore unique spellings in one known output file; never guess a scope."""
+        names = self.file_names.get(path, {})
+
+        output = []
+        previous = 0
+        for start, end, name in _unicode_identifiers(text):
+            candidates = names.get(unicodedata.normalize("NFKC", name), [])
+            output.append(text[previous:start])
+            output.append(candidates[0] if len(candidates) == 1 else name)
+            previous = end
+        output.append(text[previous:])
+        return "".join(output)
 
     def unmap_trace(self, text: str) -> Dict[str, Any]:
         """Restore names and statement locations in standard CPython tracebacks."""
@@ -321,16 +485,39 @@ class ObfuscationMapping:
         from the mapping usually means the trace came from a different build,
         so a reversal with this mapping would be incomplete or wrong.
         """
+        known = set(self.global_map)
+        if self.mode == "independent_files":
+            known = {name for names in self.file_names.values() for name in names}
+            prefixes = {
+                match.group(1)
+                for name in known
+                for match in [re.fullmatch(r"(.+?)[0-9]+", name)]
+                if match is not None
+            }
+            tokens = {
+                unicodedata.normalize("NFKC", name) for _, _, name in _unicode_identifiers(text)
+            }
+            return sorted(
+                {
+                    name
+                    for name in tokens - known
+                    if any(
+                        name.startswith(prefix)
+                        and name[len(prefix) :].isascii()
+                        and name[len(prefix) :].isdigit()
+                        for prefix in prefixes
+                    )
+                },
+                key=lambda name: (len(name), name),
+            )
         prefixes = {
-            m.group(1)
-            for m in (re.fullmatch(r"([A-Za-z_]+)\d+", obf) for obf in self.global_map)
-            if m
+            m.group(1) for m in (re.fullmatch(r"([A-Za-z_]+)\d+", obf) for obf in known) if m
         }
         if not prefixes:
             return []
         shape = re.compile(r"\b(?:" + "|".join(re.escape(p) for p in sorted(prefixes)) + r")\d+\b")
         return sorted(
-            {tok for tok in shape.findall(text) if tok not in self.global_map},
+            {tok for tok in shape.findall(text) if tok not in known},
             key=lambda t: (len(t), t),
         )
 
@@ -338,7 +525,11 @@ class ObfuscationMapping:
         return {
             "modules": len(self.modules),
             "original_names": sum(len(m) for m in self.modules.values()),
-            "unique_obfuscated": len(self.global_map),
+            "unique_obfuscated": (
+                len({name for names in self.file_names.values() for name in names})
+                if self.mode == "independent_files"
+                else len(self.global_map)
+            ),
         }
 
 
@@ -354,6 +545,20 @@ def _path_parts(path: str) -> List[str]:
     return parts
 
 
+def _unicode_identifiers(text: str) -> Iterator[Tuple[int, int, str]]:
+    """Scan Python identifier spellings, including combining continuation marks."""
+    index = 0
+    while index < len(text):
+        if not text[index].isidentifier():
+            index += 1
+            continue
+        end = index + 1
+        while end < len(text) and ("_" + text[end]).isidentifier():
+            end += 1
+        yield index, end, text[index:end]
+        index = end
+
+
 def _relative_path(value: object) -> bool:
     return (
         isinstance(value, str)
@@ -367,13 +572,10 @@ def _relative_path(value: object) -> bool:
 
 def _valid_file(path: object, record: object) -> bool:
     """Ignore malformed optional metadata without losing legacy name tables."""
-    if not _relative_path(path) or not isinstance(record, dict):
+    if not _valid_file_identity(path, record):
         return False
-    if not _relative_path(record.get("source")) or not isinstance(record.get("module"), str):
-        return False
-    count = record.get("line_count")
-    if type(count) is not int or count < 0:
-        return False
+    assert isinstance(record, dict)
+    count = record["line_count"]
     runs = record.get("lines")
     if runs is None:
         return True
@@ -391,4 +593,16 @@ def _valid_file(path: object, record: object) -> bool:
         if source is not None and (type(source) is not int or source < 1):
             return False
         previous = start
+    return True
+
+
+def _valid_file_identity(path: object, record: object) -> bool:
+    """Keep v2 path/name identity usable when only optional line runs are bad."""
+    if not _relative_path(path) or not isinstance(record, dict):
+        return False
+    if not _relative_path(record.get("source")) or not isinstance(record.get("module"), str):
+        return False
+    count = record.get("line_count")
+    if type(count) is not int or count < 0:
+        return False
     return True

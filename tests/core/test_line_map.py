@@ -319,22 +319,15 @@ def test_mapping_save_modes(tmp_path, json_output, mode):
         flags.append("--json")
     result = run(["-m", "pyobfus", input_path, "-o", out, "--save-mapping", path, *flags], tmp_path)
     assert result.returncode == 0, result.stderr + result.stdout
-    warning = (
-        "--save-mapping is not supported for --no-cross-file directory builds: "
-        "each file is renamed independently, so names collide; no mapping was written."
-    )
-    assert (warning in result.stderr) == independent
-    assert path.exists() != independent
+    assert "--save-mapping is not supported" not in result.stderr
+    assert path.exists()
     if json_output:
         payload = json.loads(result.stdout)
         assert payload["status"] == "success"
-        if independent:
-            assert payload["warning"] == warning
-            assert warning in payload["stats"]["warnings"]
-            assert payload["mapping"] is None
-        else:
-            assert "warning" not in payload
-            assert payload["mapping"] == str(path)
+        assert "warning" not in payload
+        assert payload["mapping"] == str(path)
+    mapping = ObfuscationMapping.load(path)
+    assert set(mapping.files) == ({"out.py"} if single else set(fixture))
     if independent:
         # Show the actual collision which makes a combined name table unsafe.
         names = []
@@ -342,14 +335,13 @@ def test_mapping_save_modes(tmp_path, json_output, mode):
             tree = ast.parse((out / name).read_text())
             names.append(next(node.name for node in tree.body if isinstance(node, ast.FunctionDef)))
         assert names == ["I0", "I0", "I0"]
-    else:
-        mapping = ObfuscationMapping.load(path)
-        assert set(mapping.files) == ({"out.py"} if single else set(fixture))
+        assert mapping.mode == "independent_files"
+        assert set(mapping.file_names) == set(fixture)
+        assert mapping.reverse("I0") is None
     # Both directory modes and the single-file mode still produce runnable output.
     trace = frames(run([out if single else out / "main.py"], tmp_path))
     assert len(trace) == 2
-    if not independent:
-        assert mapping.resolve_location(trace[-1][0], trace[-1][1]).line == 2
+    assert mapping.resolve_location(trace[-1][0], trace[-1][1]).line == 2
 
 
 def test_alignment_unavailable_and_legacy(tmp_path):

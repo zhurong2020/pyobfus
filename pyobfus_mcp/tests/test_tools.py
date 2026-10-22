@@ -259,6 +259,34 @@ def test_unmap_stack_trace_accepts_local_mapping_section(tmp_path: Path) -> None
     assert "next_tool" in result
 
 
+def test_unmap_independent_file_collisions_and_marker_mismatch(tmp_path: Path) -> None:
+    from pyobfus.core.mapping import ObfuscationMapping
+
+    mapping = ObfuscationMapping(mode="independent_files")
+    for file, original in (("a.py", "calculate_invoice"), ("b.py", "validate_receipt")):
+        mapping.add_independent_file(
+            file,
+            {original: "I0"},
+            {"source": file, "module": file, "line_count": 5, "lines": [[1, 2]]},
+            original,
+            "def I0(): pass",
+        )
+    path = tmp_path / "mapping.json"
+    mapping.save(path)
+    trace = '  File "/app/a.py", line 3, in I0\n  File "/app/b.py", line 3, in I0\n'
+    result = unmap_stack_trace(trace, str(path))
+    assert result["status"] == "success"
+    assert "in calculate_invoice" in result["unmapped_trace"]
+    assert "in validate_receipt" in result["unmapped_trace"]
+    assert result["mapping_stats"]["unique_obfuscated"] == 1
+    assert result["line_map"] == "available"
+    wrong = "# pyobfus:obfuscated id=00000000\n" + trace
+    result = unmap_stack_trace(wrong, str(path))
+    assert result["unmapped_trace"] == wrong
+    assert "marker mismatch" in result["ai_hint"]
+    _assert_next_tool_shape(result)
+
+
 def test_unmap_stack_trace_missing_mapping(tmp_path: Path) -> None:
     nonexistent = tmp_path / "does_not_exist.json"
     result = unmap_stack_trace("foo", str(nonexistent))
