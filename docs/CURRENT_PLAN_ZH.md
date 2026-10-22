@@ -1,5 +1,7 @@
 # pyobfus 当前计划
 
+**10-22 最终交接**：[Session 收尾](SESSION_CLOSEOUT_2026-10-22.md)。本地分类提交已完成，保留 `feat/adoption-debugging-workflow`；尚未 push／合并／发布。
+
 **2026-10-22 四阶段本地工作完成（已授权分类提交，未合并／发布）**：公开 0.8.0 干净环境用户流程审计完成；Community 独立文件目录 mapping 已实现并经多引擎反例修订，Core 4467 passed / 54 skipped、MCP 153、集成 352 / 10 skipped、runtime 24；Python 3.15 专项 157。隔离工作 wheel 的新 reader 接受旧 v1，旧公开 reader 对 v2 明确拒绝。L3 + 应用 key provider 限定设计经两路独立复核，只有设计，未修改 Pro/runtime；加密帧只恢复名字、同模块普通函数的恢复限制已写明。DEV 第二篇保留 SARIF 主题，公开 0.8.0 三类输入和 Ruff/Bandit 特例已复现，草稿、动态报告目录示例及采用观察已准备；未执行 GitHub 上传或投稿。结果入口见 [推进计划](ADOPTION_WORKFLOW_PLAN_2026-10-22.md)、[mapping 验收](INDEPENDENT_DIRECTORY_MAPPING_VALIDATION.md)、[L3 设计](CROSSFILE_OPACITY_DESIGN.md)与 [文章验证](ADOPTION_CONTENT_VALIDATION_2026-10-22.md)。独立发现 Pro opacity 纯转换 API 的 future prologue 问题已单独列 TODO，CLI 影响未验证。最终 `scripts/check.sh` 全部通过（296 文件格式检查、113 源文件类型检查及严格文档构建），`git diff --check` 通过。
 
 **2026-10-22 AI / Agent 采用引导建议（维护者要求仅登记）**：后续在现有 llms 镜像、README／文档首页、Agent 集成模板和能力元数据说明直接采用已维护工具的价值，以迭代、兼容／验证／反向调试证据为主、代码规模为辅。入口、建议文案、统计口径及验收见 [采用引导计划](AGENT_ADOPTION_GUIDANCE_PLAN.md)。不改变当前四阶段顺序，本轮未修改对外入口／技能／元数据。
