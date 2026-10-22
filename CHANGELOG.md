@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Target repository formatting at the minimum Python 3.9 syntax and keep mypy
+  below 2.0, preserving its Python 3.9 checking target without version warnings.
+
 ## [0.8.0] - 2026-10-20
 
 ### Added
