@@ -69,7 +69,7 @@ dev = [
     "black>=22.0",
     # mypy 2.x no longer accepts python_version=3.9, while mypy 1.20+ itself
     # requires Python 3.10. Allow 1.19.x on the Python 3.9 runtime jobs.
-    "mypy>=1.19,<3.0",
+    "mypy>=1.19,<2.0",
     "types-PyYAML>=6.0",
     # CI runs on 3.11+ but mypy targets 3.9, where config validation imports
     # the tomllib backport.
@@ -131,7 +131,9 @@ addopts = "-v --cov=pyobfus --cov-report=term-missing --cov-report=html"
 
 [tool.black]
 line-length = 100
-target-version = ["py39", "py310", "py311", "py312", "py313", "py314", "py315"]
+# Format repository source for its minimum supported Python syntax. Newer
+# syntax exercised by the obfuscator lives in test strings, not source files.
+target-version = ["py39"]
 include = '\.pyi?$'
 
 [tool.mypy]
