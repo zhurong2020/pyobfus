@@ -8,15 +8,17 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ## ⚡ Current pending work (cold-start 必读)
 
+**2026-10-22 本轮状态**：四阶段本地工作已完成：公开发布包用户流程审计、独立文件目录 mapping 实现与验证、多模块 L3/key provider 设计与两路复核、DEV 草稿与可复现案例。详细验收见 `docs/ADOPTION_WORKFLOW_PLAN_2026-10-22.md`；不再以静默等待为主要任务，旧候选未授权记录以本次单项授权为准。AI / Agent 采用引导仅登记后续计划，未改对外入口。维护者已授权同步文档并分类 commit；合并、发布和对外发送另行决定。
+
 **Single source of truth for current plan**: [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md) — 重启 session 第一份必读
 
-**下一步做什么**: [`docs/TODO.md`](docs/TODO.md) — 排期清单（顺序 + 验收标准 + 周期性任务），依据见 `docs/FEATURE_EXPANSION_RESEARCH_2026-09-12.md`
+**下一步做什么**: [`docs/TODO.md`](docs/TODO.md) — 排期清单（顺序 + 验收标准 + 周期性任务），依据见 `docs/FEATURE_EXPANSION_RESEARCH_2026-10-20.md`
 
 `docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
 
 ### 2026-10-20 — Core 0.8.0 已发布：Python 3.15 支持（冷启动先读 `docs/CURRENT_PLAN_ZH.md` 顶部）
 
-PR #108（PY315-1 惰性导入保留、PY315-2 推导式解包、3.15 新内建名保留、3.15 三平台 CI）由无头 Codex 实现、Claude 独立审核后合并并发布；PyPI/PEP 740/全新 3.15 与 3.10 安装/GitHub Release/Zenodo `23500657`/CFF 均已核。同晚维护者批准发 MCP 0.3.14（3.15 分类器 + #103 提示）：PyPI/PEP 740、全新 3.15 安装握手 0.3.14/9 tools、MCP Registry active/isLatest 均已核；runtime 0.1.1、VS Code 不发。Glama 10-21 已改装 0.3.14/0.8.0 并测试通过（9 tools）。本机跑 3.15 用工作区登记的 `~/venvs/py315_20261020`（路由见 `../workspace-meta/VENV_INDEX.md` §0，按需 `pip install -e .`），不要再建新 venv；10-20 审核用的源码编译 3.15 在 `/tmp`，已不可依赖。遗留（3.15 标准库 json/unittest 冒烟、free-threaded 未验证、black py315 告警）见 `docs/TODO.md` 10-20 段。医院应用仍暂停。
+PR #108（PY315-1 惰性导入保留、PY315-2 推导式解包、3.15 新内建名保留、3.15 三平台 CI）由无头 Codex 实现、Claude 独立审核后合并并发布；PyPI/PEP 740/全新 3.15 与 3.10 安装/GitHub Release/Zenodo `23500657`/CFF 均已核。同晚维护者批准发 MCP 0.3.14（3.15 分类器 + #103 提示）：PyPI/PEP 740、全新 3.15 安装握手 0.3.14/9 tools、MCP Registry active/isLatest 均已核；runtime 0.1.1、VS Code 不发。Glama 10-21 已改装 0.3.14/0.8.0 并测试通过（9 tools）。本机跑 3.15 用工作区登记的 `~/venvs/py315_20261020`（路由见 `../workspace-meta/VENV_INDEX.md` §0，按需 `pip install -e .`），不要再建新 venv；10-20 审核用的源码编译 3.15 在 `/tmp`，已不可依赖。遗留（3.15 标准库 json/unittest 冒烟、free-threaded 未验证）见 `docs/TODO.md` 10-20 段。医院应用仍暂停。
 
 ### 2026-10-18 — 历史 session 收尾
 

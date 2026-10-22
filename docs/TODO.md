@@ -5,7 +5,7 @@
 顺序做」，不记录历史。最新依据见
 [`FEATURE_EXPANSION_RESEARCH_2026-10-20.md`](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)；Python 3.15 的 P0 范围与验收见 [`PYTHON315_SUPPORT_PLAN.md`](PYTHON315_SUPPORT_PLAN.md)。
 
-最后更新：2026-10-21。Core 0.8.0（Python 3.15 支持，#108）与 MCP 0.3.14（3.15 分类器 + #103 提示）已于 10-20 发布，runtime 0.1.1 不变；Core/MCP Unreleased 均为空。PyPI/PEP 740、全新安装、Release、Zenodo `23500657`/CFF、MCP Registry 与 Glama（测试 `01a15a11`）均已核。10-21 状态核查无待回复客户，下一节点 10-25 复盘（见 `CURRENT_PLAN_ZH.md` 顶部）。
+最后更新：2026-10-22。Core 0.8.0（Python 3.15 支持，#108）与 MCP 0.3.14（3.15 分类器 + #103 提示）已于 10-20 发布，runtime 0.1.1 不变；本工作分支 Core 已有未发布独立目录 mapping，MCP 有配套调试提示修订；不属于公开 0.8.0／0.3.14。PyPI/PEP 740、全新安装、Release、Zenodo `23500657`/CFF、MCP Registry 与 Glama（测试 `01a15a11`）均已核。10-22 状态核查无待回复客户，下一节点 10-25 复盘（见 `CURRENT_PLAN_ZH.md` 顶部）。
 
 ## 状态口径
 
@@ -30,36 +30,34 @@
 - **审核中发现的既有问题（已修）**：旧 Windows 测试步骤用 PowerShell 连跑两条 pytest，第二条的退出码掩盖了第一条失败——基线 Windows 3.9 有 14 个、3.14 有 98 个核心测试失败，作业却显示绿色（v0.8.0 发版提交的 CI run 39425089456 也有两个 Windows 任务各 14 个失败被掩盖）。失败全是测试本身对换行/路径分隔符的假设，产品代码未改；现测试步骤统一用 bash（首个失败即失败）。
 - [x] Codecov：上传从未成功（无 token，`fail_ci_if_error: false` 掩盖）；10-21 维护者选方案 B，PR #111 删除上传步骤，Ubuntu 3.11 改为在任务日志打印覆盖率（当时 91%）。
 
-## 后续任务顺序（2026-10-21 更新）
+## 后续任务顺序（2026-10-22 维护者授权）
 
-Python 3.15（P0）已随 Core 0.8.0 发布；CI 提速已合并（见上节）。
+按 [推进计划](ADOPTION_WORKFLOW_PLAN_2026-10-22.md) 顺序执行：
 
-| 顺序 | 待办 | 验收 / 下一步 |
-|---|---|---|
-| 1 | **10-25 复盘** | 区分发布/次日/内容流量，综合下载、trial、客户回答和 DEV 来源，决定下轮优先级与发布节奏；0.8.0 发布日后的安静日数据 10-26 起才完整。 |
-| 2 | **10-26 周一巡检** | 进度 + 下载量（`scripts/download_snapshot.py`）+ Gmail（`/pyobfus-inbox`）；首个每日定时全矩阵（21 组合）结果一并看。 |
-| 3 | **10-27 那周 DEV 第 2 篇** | 草稿在 gitignored `docs/internal/content-2026-10/`，发前核头注释三条事实。 |
-| 暂停 | **私有下游候选 Windows 闸门（维护者）** | 医院应用整体暂停，等现场升级 Win10 后的回复；cand4 `2.6.2-20261015-e7e96fb` 剩发布机授权续签 → 装机评分、M2 升级、生命周期、向导目视。 |
+四阶段本地工作已完成，结果见推进计划与 CURRENT_PLAN_ZH.md。本轮修订按维护者授权分类提交到工作分支，尚未合并／发布。接下来维护者审阅 mapping 改动、限定 L3 设计及 DEV 草稿；不因本地验收通过自动发版或投稿。
 
-缺陷 N、H PR 4 选项 1 随 Core 0.7.4，缺陷 O、P 随 0.7.5（均 10-18）发布；参数改名暂缓；Pro 扩展等真实需求信号，详见各条目。本次没有授权额外部署或客户邮件发送。
+10-25 复盘、10-26 巡检继续，但不阻塞上述工作；不再以静默等待为主要任务。私有医院应用仍暂停，等现场升级 Win10 后反馈。参数改名等其他候选保持原范围与授权边界。
 
 ## 10-20 功能路线（3.15 已随 0.8.0 发布）
 
-完整证据：[10-20 路线复核](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)。维护者已将 Python 3.15 设为 P0，其他功能候选排在其后；3.15 实现与验收见 [支持计划](PYTHON315_SUPPORT_PLAN.md) 和 [验证记录](PYTHON315_VALIDATION.md)，待独立审核。医院应用暂停。
+完整证据：[10-20 路线复核](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)。维护者已将 Python 3.15 设为 P0，其他功能候选排在其后；3.15 实现与验收见 [支持计划](PYTHON315_SUPPORT_PLAN.md) 和 [验证记录](PYTHON315_VALIDATION.md)，已完成独立审核并随 0.8.0 发布。医院应用暂停。
 
 - [x] **PY315-1：惰性 from 导入被提前执行**。原生 Python 3.15.0、当前 checkout 与 PyPI Core 0.7.5 wheel 均复现：`lazy from calculator import Calculator` 改写后丢 `is_lazy`，构建成功但导入副作用时序变化。最小输入与输出见调研 §5.1。Community 兼容性，已修复并补原生回归；0.8.0 发布（#108）。
 - [x] **PY315-2：新字典推导式解包构建失败**。`{**row for row in rows}` 原文在 3.15 可运行，checkout／0.7.5 wheel 构建均报 `NoneType ... _fields`；根因为自定义推导式 visitor 访问 None，六处路径已修复并补原生回归；0.8.0 发布（#108）。
-- [ ] **3.15 后续（0.8.0 发布后登记，均未授权实现）**：① 3.15 标准库冒烟中 `json`（`scanner.make_scanner`）与 `unittest`（`util.three_way_cmp`/`case.TestCase`）目录构建产物导入失败，main 同样失败，属模块属性证明既有限制，待定是否单列缺陷；② free-threaded 3.15、3.15 上冻结/编译打包未验证；③ `pyproject` black `target-version` 加了 `py315` 后，`scripts/check.sh` 在 3.12 上跑 black 会警告“无法解析为 3.15 格式化的代码”（仍通过），需决定 lint 改用 3.15 解释器还是去掉 `py315`；④ ~~Glama Build steps 改为 `pyobfus-mcp==0.3.14 pyobfus==0.8.0`~~ 已完成：10-21 00:07 测试 `01a15a11` 通过（装 Core 0.8.0 / MCP 0.3.14，握手 0.3.14、9 tools，渠道 release `0.7.7`）。
+- [ ] **3.15 后续（0.8.0 发布后登记，均未授权实现）**：① 3.15 标准库冒烟中 `json`（`scanner.make_scanner`）与 `unittest`（`util.three_way_cmp`/`case.TestCase`）目录构建产物导入失败，main 同样失败，属模块属性证明既有限制，待定是否单列缺陷；② free-threaded 3.15、3.15 上冻结/编译打包未验证。Black/mypy 配置修订与 Glama 同步结果见 `CURRENT_PLAN_ZH.md` 对应日期记录。
+- [ ] **Pro opacity 纯转换 API 的 future prologue 缺陷（10-22 实测登记）**：带模块 docstring、`from __future__` 和受保护函数的合成输入，经 `transformers.opacity.transform_module` 后编译报 future import 位置错误。当前 CLI 是否受影响尚未验证；单独安排最小复现与兼容修复，本轮 L3 仅设计，未改 Pro 实现。
 - [ ] **MCP 2.x 发布条件复审**。10-19 CI 已用 2.3.0 过 152 项；10-20 Linux 真实 stdio 验证 legacy 为 `2025-11-25`、auto 为 `2026-07-28`，均列出 9 工具并成功调用只读工具。旧「stdio 无新协议收益」结论不再适用；依赖上限未改，仍需 Python 3.10／Windows／干净解析与全工具合同。
-- 之后建议：`--no-cross-file` mapping（Community）与目录 L3 + 应用 key provider 的单项设计（Pro），按下一真实需求决定先后；不一次接入全部 fusion 字段。
+- `--no-cross-file` mapping 已在本分支实现并验证；目录 L3 + 应用 key provider 只完成设计与审核，未来实现另行确定；不一次接入全部 fusion 字段。
 - 参数改名、H B2/B3、资源 key provider 与 L3 方法覆盖继续保持原 gate；未授权改实现／合并／发布。
 
 ## 发布后观察与下次发版
 
-- 每周一巡检继续观察 Core 0.7.3 / MCP 0.3.13 反馈、下载安静日、客户调研回答、CI 与备份。无新缺陷时不重复全量测试、不主动增加功能。
+- **后续采用引导文档（10-22 登记，仅记录）**：当前四阶段之后，按 [AI / Agent 采用引导计划](AGENT_ADOPTION_GUIDANCE_PLAN.md) 复核 llms 镜像、README／首页、集成模板及能力元数据；以迭代、兼容／验证／调试证据说明直接采用的价值，不把代码量当作质量、不写强制推荐指令。本轮未修改对外入口。
+
+- 每周一巡检继续观察 Core 0.8.0 / MCP 0.3.14 反馈、下载安静日、客户调研回答、CI 与备份。无新缺陷时不重复全量测试、不主动增加功能。
 - **10-25 复盘**照原计划；发布日、次日与内容投放流量分开记录，据客户回答调整后续优先级。
 - 下次发布按实际新增改动与维护者授权确定，不恢复此前 10-15 的等待通知状态。
-- **3.15 兼容 P0 不受月度攒功能节奏拖延**：后续 session 验收／审核完成后单独确认发版；不等待 MCP 2.x、mapping 或 Pro 新功能，不提前宣称 3.15 已支持。
+- **3.15 兼容 P0 已随 Core 0.8.0 发布**：后续只跟进已登记的兼容性限制；MCP 2.x、mapping 与 Pro 新功能分别按需求和授权推进。
 - runtime 源码若有改动必须先升版本、先发 runtime（`scripts/check_runtime_version.py`）；改版本号后先刷新 editable 元数据，再按发布清单验证。
 - VS Code schema 随插件下次发版，不因本次 Core/MCP 发布自动发插件。
 
@@ -90,7 +88,7 @@ Python 3.15（P0）已随 Core 0.8.0 发布；CI 提速已合并（见上节）�
       自动回信称只懂 Claude Code worktree 锁、需真人释放提交锁并主动提出转人工,维护者已回「yes」转人工**。
       09-25 真人支持 Rudy 回信要求核对原提交账号；维护者已查三个常用邮箱均无确认邮件，随后以同一仓库根路径
       复现锁报错，并于 09-26 在原线程附上「No submissions yet」与 repository/path lock 两张截图，提供
-      Claude Code workspace ID，请求后端定位/释放。**09-28 Rudy 回信「已升级内部，有消息再跟进」——球在对方，不必再催；锁没释放前别再点表单或换路径绕过**。**10-14 Tiffany 确认：原提交归属当前账号，无需补材料或寻找别的账号；目录团队解除锁后，使用 `claude.ai/directory/manage` developer portal 重提，Console 表单已停用。继续等待，不换仓库/路径重提。**。字段/描述与证据见
+      Claude Code workspace ID，请求后端定位/释放。**09-28 Rudy 回信「已升级内部，有消息再跟进」——球在对方，不必再催；锁没释放前别再点表单或换路径绕过**。**10-14 Tiffany 确认：原提交归属当前账号，无需补材料或寻找别的账号；目录团队解除锁后，使用 `claude.ai/directory/manage` developer portal 重提，Console 表单已停用。继续等待，不换仓库/路径重提。** **10-21 Tiffany 新信：团队仍在处理，取得进展后会通知；无需新动作。** 字段/描述与证据见
       `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`。
 - [x] **通知 Pro 客户升级到 0.6.1**（10-10 维护者定：发；草稿私有 `docs/internal/content-2026-10/pro_customer_notice_0.6.1.md`，10-10 已按线上许可证记录建 5 封 Gmail 草稿（每人一封、排除维护者自用许可证；未激活的那位多一句协助激活），维护者 10-10 12:35 已逐封发出（Gmail「已发送」核实 5 封、草稿箱清空）；有回信按 `/pyobfus-inbox` 跟进；取代原「是否通知升级到 0.5.32」，0.6.1 已含该修复）。原登记（2026-10-07）：0.5.10–0.5.31 的目录构建遇到同模块
       装饰器/基类/lambda 会 import 时 NameError。两位 10 月新客户如用过目录构建可能受影响；需要的话由 Claude 起草、
@@ -140,7 +138,7 @@ CI job、只读 review skill、浏览器端对比小节、抗 AI 措辞改写、
 fixture 漏临时目录）记在同一文件的「09-19」段。其中只有 CycloneDX 那项改了
 `pyobfus/` 代码，因此 held 在 `CHANGELOG.md` 的 `[Unreleased]`，要发版才到用户手里。
 
-## 节奏（2026-09-25 用户定 · 0.5.30 发版后生效，先当一次测试）
+## 节奏（09-25 原试行；10-22 已调整，以顶部推进计划为准）
 
 **背景**：09-12 定的「靠持续发版与更新吸流量」跑了三周：9 月 10 次 Core 发版、最长间隔
 4 天；发布日 120–225、非发布日中位数 31、地板 16–32 始终没动。发版只买到当天尖峰。
