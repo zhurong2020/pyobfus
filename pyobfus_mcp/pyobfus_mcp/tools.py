@@ -623,7 +623,13 @@ def unmap_stack_trace(trace: str, mapping_path: str) -> Dict[str, Any]:
         "mapping_stats": mapping.stats(),
         "ai_hint": ai_hint,
         "next_tool": _next_tool(
-            None, "trace is de-obfuscated; read the unmapped_trace and continue debugging"
+            None,
+            (
+                "Only resolved_file frames were attributed; inspect ai_hint for unresolved "
+                "frames and unverified build identity before continuing."
+                if mapping.mode == "independent_files"
+                else "trace is de-obfuscated; read the unmapped_trace and continue debugging"
+            ),
         ),
     }
 

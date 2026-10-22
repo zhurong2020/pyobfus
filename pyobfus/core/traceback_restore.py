@@ -16,6 +16,10 @@ _FRAME = re.compile(
 
 def restore_trace(mapping: ObfuscationMapping, trace: str) -> Dict[str, Any]:
     """Restore names and frames belonging to the inferred deployment root."""
+    if mapping.mode == "independent_files":
+        from pyobfus.core.independent_traceback import restore_independent_trace
+
+        return restore_independent_trace(mapping, trace)
     from pyobfus.core.mapping import _path_parts
 
     def deployment_root(path: str, key: str) -> Tuple[bool, Tuple[str, ...]]:

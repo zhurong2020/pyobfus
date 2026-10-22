@@ -8,7 +8,7 @@ import io
 import json
 import sys
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
 import click
 
@@ -46,6 +46,9 @@ from pyobfus.exceptions import (
 from pyobfus.transformers.name_mangler import NameMangler
 from pyobfus.utils import filter_python_files, format_skipped_directories
 from pyobfus.trial import is_trial_active, get_trial_expiry_message
+
+if TYPE_CHECKING:
+    from pyobfus.core.mapping import ObfuscationMapping
 
 # Check if Pro edition is available. pyobfus_pro ships inside this very wheel,
 # so an ImportError here is a broken environment rather than a missing
@@ -444,7 +447,8 @@ def _echo_pro_import_hint() -> None:
     "save_mapping_path",
     type=click.Path(),
     help="Write original-to-obfuscated name mapping to a JSON file. "
-    "Use with `pyobfus --unmap` to reverse obfuscated stack traces.",
+    "Use with `pyobfus --unmap` to reverse obfuscated stack traces. "
+    "Independent directory builds write file-scoped v2 mappings requiring a v2-capable reader.",
 )
 @click.option(
     "--provenance-manifest",
@@ -1179,14 +1183,6 @@ def main(
             obfuscation_stats["warnings"] = [warning]
             click.echo(f"Warning: {warning}", err=True)
         mapping_warning: Optional[str] = None
-        if save_mapping_path and input_path_obj.is_dir() and not cross_file:
-            mapping_warning = (
-                "--save-mapping is not supported for --no-cross-file directory builds: "
-                "each file is renamed independently, so names collide; no mapping was written."
-            )
-            obfuscation_stats.setdefault("warnings", []).append(mapping_warning)
-            click.echo(f"Warning: {mapping_warning}", err=True)
-            save_mapping_path = None
         verification: Optional[Dict[str, Any]] = None
         name_verification: Optional[Dict[str, Any]] = None
         # --verify-names: take the source baseline now, before anything is
@@ -1230,6 +1226,9 @@ def main(
             )
             current_sig = cache.build_signature(input_path_obj, input_files_for_sig, config)
             hit, reason, cached_outputs = cache.can_reuse(current_sig)
+            if not cross_file and save_mapping_path:
+                hit = False
+                reason = "independent mapping requested; rebuild to ensure current mapping metadata"
             if hit:
                 from pyobfus.core.fstring_compat import ensure_fstring_compatibility
 
@@ -1300,7 +1299,7 @@ def main(
                 # flagging that we have nothing more to do
                 click.echo("\nObfuscation completed successfully! (cache hit)")
                 return
-            elif verbose:
+            elif verbose or (not cross_file and save_mapping_path):
                 click.echo(f"\nIncremental: rebuilding — {reason}")
 
         if input_path_obj.is_file():
@@ -1347,6 +1346,7 @@ def main(
                     config,
                     verbose,
                     dry_run,
+                    save_mapping_path=save_mapping_path,
                 )
                 if dir_stats:
                     if "warnings" in dir_stats:
@@ -1577,6 +1577,8 @@ def _obfuscate_file(
     dry_run: bool = False,
     save_mapping_path: Optional[str] = None,
     source_root: Optional[Path] = None,
+    mapping_collector: Optional["ObfuscationMapping"] = None,
+    mapping_key: Optional[str] = None,
 ) -> dict:
     """
     Obfuscate a single Python file.
@@ -1590,6 +1592,9 @@ def _obfuscate_file(
         source_root: Project root the build marker's source label is made
             relative to. Defaults to the input file's own directory, which
             yields a bare basename.
+        mapping_collector: Aggregate successful independent directory outputs
+            without saving a separate mapping for each file.
+        mapping_key: Output-relative POSIX path identifying this file in the collector.
 
     Returns:
         Dictionary with obfuscation statistics
@@ -1764,25 +1769,51 @@ def _obfuscate_file(
             for line in lines:
                 click.echo(f"    {line}")
 
-    # Save single-file mapping if requested
-    if save_mapping_path and not dry_run:
+    # Collect directory metadata in memory, or retain the single-file save path.
+    if (save_mapping_path or mapping_collector is not None) and not dry_run:
         from pyobfus.core.mapping import ObfuscationMapping
 
-        mapping = ObfuscationMapping.from_single_file(
-            mangler.get_name_mapping(),
-            root=str(input_file.parent),
-            module=input_file.stem,
-        )
         source = input_file.relative_to(source_root).as_posix() if source_root else input_file.name
-        record = build_line_map(
-            transformed_tree,
-            obfuscated_code,
-            source,
-            input_file.stem,
-            "Pro fusion text passes enabled" if _fusion else None,
-        )
-        mapping.files[output_file.name] = record
-        mapping.save(save_mapping_path)
+        try:
+            record = build_line_map(
+                transformed_tree,
+                obfuscated_code,
+                source,
+                input_file.stem,
+                "Pro fusion text passes enabled" if _fusion else None,
+            )
+        except Exception as exc:
+            if mapping_collector is None:
+                raise
+            record = {
+                "source": source,
+                "module": input_file.stem,
+                "line_count": len(obfuscated_code.splitlines()),
+                "lines": None,
+                "reason": f"Optional line map unavailable: {type(exc).__name__}",
+            }
+            warning = f"{source}: line mapping unavailable; retaining file-scoped names only"
+            file_stats.setdefault("warnings", []).append(warning)
+            click.echo(f"Warning: {warning}", err=True)
+        if mapping_collector is not None:
+            assert mapping_key is not None
+            mapping_collector.add_independent_file(
+                mapping_key, mangler.get_name_mapping(), record, original_source, obfuscated_code
+            )
+            if mapping_key in mapping_collector.unmapped_files:
+                warning = (
+                    f"{source}: output path cannot be represented in portable mapping metadata"
+                )
+                file_stats.setdefault("warnings", []).append(warning)
+                click.echo(f"Warning: {warning}", err=True)
+        elif save_mapping_path:
+            mapping = ObfuscationMapping.from_single_file(
+                mangler.get_name_mapping(),
+                root=str(input_file.parent),
+                module=input_file.stem,
+            )
+            mapping.files[output_file.name] = record
+            mapping.save(save_mapping_path)
         if verbose and record.get("reason"):
             click.echo(f"  Line map unavailable: {record['reason']}")
         if verbose and save_mapping_path:
@@ -1797,6 +1828,7 @@ def _obfuscate_directory(
     config: ObfuscationConfig,
     verbose: bool,
     dry_run: bool = False,
+    save_mapping_path: Optional[str] = None,
 ) -> dict:
     """
     Obfuscate all Python files in a directory (legacy single-file mode).
@@ -1807,6 +1839,7 @@ def _obfuscate_directory(
         config: Obfuscation configuration
         verbose: Verbose output
         dry_run: Preview mode without writing files
+        save_mapping_path: Save one file-scoped mapping after processing the directory.
 
     Returns:
         Dictionary with aggregated obfuscation statistics
@@ -1821,6 +1854,12 @@ def _obfuscate_directory(
         "anti_debug_checks": 0,
     }
 
+    mapping_collector = None
+    if save_mapping_path and not dry_run:
+        from pyobfus.core.mapping import ObfuscationMapping
+
+        mapping_collector = ObfuscationMapping(mode="independent_files", root=str(input_dir))
+
     # Find all Python files, excluding patterns from config
     python_files = filter_python_files(
         input_dir, config.exclude_patterns, skip_environment_dirs=config.skip_environment_dirs
@@ -1828,6 +1867,9 @@ def _obfuscate_directory(
 
     if not python_files:
         click.echo(f"No Python files found in {input_dir}")
+        if mapping_collector is not None:
+            assert save_mapping_path is not None
+            mapping_collector.save(save_mapping_path)
         return dir_stats
 
     if verbose and config.exclude_patterns:
@@ -1870,6 +1912,8 @@ def _obfuscate_directory(
                 verbose,
                 dry_run,
                 source_root=input_dir,
+                mapping_collector=mapping_collector,
+                mapping_key=rel_path.as_posix(),
             )
             dir_stats["files_processed"] += 1
             for key, value in file_stats.items():
@@ -1883,9 +1927,30 @@ def _obfuscate_directory(
             raise
         except PyObfusError as e:
             click.echo(f"  Warning: Failed to obfuscate {python_file}: {e}", err=True)
+            if mapping_collector is not None:
+                mapping_collector.unmapped_files[rel_path.as_posix()] = "File transformation failed"
 
     if not verbose and total > 1:
         click.echo()  # newline after progress
+
+    if mapping_collector is not None:
+        assert save_mapping_path is not None
+        for existing in output_dir.rglob("*.py"):
+            key = existing.relative_to(output_dir).as_posix()
+            if key not in mapping_collector.files:
+                mapping_collector.unmapped_files.setdefault(
+                    key, "Output not produced in this build"
+                )
+        if mapping_collector.unmapped_files:
+            warning = (
+                f"Mapping excludes {len(mapping_collector.unmapped_files)} failed, stale or "
+                "nonportable output path(s); do not treat partial output as a verified delivery."
+            )
+            dir_stats.setdefault("warnings", []).append(warning)
+            click.echo(f"Warning: {warning}", err=True)
+        mapping_collector.save(save_mapping_path)
+        if verbose:
+            click.echo(f"  Wrote mapping: {save_mapping_path}")
 
     return dir_stats
 
@@ -2293,7 +2358,10 @@ def _insert_after_prologue(text: str, marker_block: str) -> str:
 
 
 def _apply_trace_markers(output_path: Path, mapping_path: str) -> Optional[str]:
-    """Stamp every obfuscated `.py` file under `output_path` with the trace marker.
+    """Stamp generated files with the trace marker.
+
+    Independent mappings restrict targets to the current successful file keys,
+    leaving stale or excluded files under the output directory untouched.
 
     Returns the mapping's `marker_id` (read from the saved mapping JSON), or
     None if the mapping can't be read. Idempotent: files that already carry the
@@ -2309,9 +2377,16 @@ def _apply_trace_markers(output_path: Path, mapping_path: str) -> Optional[str]:
         return None
 
     block = _trace_marker_block(marker_id, mp.name)
-    targets: List[Path] = (
-        [output_path] if output_path.is_file() else sorted(output_path.rglob("*.py"))
-    )
+    if mapping_data.get("mode") == "independent_files":
+        from pyobfus.core.mapping import _relative_path
+
+        targets = [
+            output_path / key
+            for key in sorted(mapping_data.get("file_names", {}))
+            if _relative_path(key)
+        ]
+    else:
+        targets = [output_path] if output_path.is_file() else sorted(output_path.rglob("*.py"))
     for f in targets:
         try:
             txt = f.read_text(encoding="utf-8")

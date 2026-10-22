@@ -126,6 +126,54 @@ easier to hand to a script or an agent.
   the shipped file. Values printed in the traceback (like `'discount_rate'`
   above) are runtime values and already readable.
 
+## Independent-file directory builds (next release)
+
+The working tree also supports private mapping for independently transformed
+files. This is not in the public 0.8.0 release yet:
+
+```bash
+pyobfus scripts/ -o dist/ --no-cross-file \
+  --save-mapping private/scripts.map.json --trace-marker --verify-syntax
+pyobfus --unmap --trace error.log --mapping private/scripts.map.json --json
+```
+
+Each file may reuse `I0` for a different original name. The version-2 mapping
+keeps separate output-relative file tables; it never merges those names into
+one global dictionary. Use a reader with version-2 support. Existing single-file
+and cross-file builds continue writing version 1, and the new reader accepts it.
+Independent transformation still does not rewrite imports consistently between
+files; this feature adds debugging, not cross-file import compatibility.
+
+Only recognized frame headers, including CPython ExceptionGroup tree headers,
+have their names restored. Source excerpts, exception messages, unframed logs
+and caret columns retain artifact text. Repeated original spellings do not
+recover a unique qualified scope. Ambiguous name candidates stay unchanged.
+
+Paths must match complete output-relative keys. Windows separators and moved
+deployment roots are accepted. A single root must fit all matching path evidence and file-specific name
+evidence; conflicting external paths can leave the entire trace unresolved.
+With no renamed-name evidence, restoration requires a matching marker or at
+least two distinct mapped file keys. A deployment
+directory named like a nested package may match multiple files: another frame
+can resolve the root, but a single ambiguous frame is not guessed. No source
+files are needed on the machine doing the reversal. An out-of-range line is
+never used to retry a different file. With Pro fusion, names can still be
+restored when line tables are unavailable; positions remain artifact positions.
+
+For this format, an explicit `# pyobfus:obfuscated id=...` header pasted with
+the trace must match the mapping; mixed or mismatching ids disable restoration.
+Without a supplied marker, identity remains unverified. The marker is a
+consistency hint, not a signature or proof of authenticity.
+
+Keep mapping and build reports outside the shipped output. Dry-run writes no
+mapping; partial builds include only successful files and do not stamp stale
+outputs. Failed, excluded and residual paths are recorded only as negative
+identity evidence, and the CLI warns about incomplete coverage. JSON frames
+also include `resolved_file` when file/name attribution is usable but line
+tables are absent. These builds deliberately rebuild when both `--incremental` and
+`--save-mapping` are requested, because cached code cannot recover current
+private mapping metadata.
+
 ## Using the wrong mapping
 
 If you pass a mapping from a different build, names it does not know are

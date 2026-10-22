@@ -6,6 +6,12 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+### Changed
+
+- `unmap_stack_trace` guidance explains unresolved frames and unverified build
+  identity for independent-file mappings. Requires a Core reader supporting
+  mapping format 2; tool names and response keys remain unchanged.
+
 ## [0.3.14] - 2026-10-20
 
 ### Added

@@ -59,7 +59,7 @@ def test_cli_preserves_prologue(build, tmp_path, mode, marker, trace, prefix):
     assert text.startswith(prefix.replace("\r\n", "\n"))
     assert "Module docs." in text
     assert ("# pyobfus:generated" in text) == marker
-    assert ("# pyobfus:obfuscated" in text) == (trace and mode != "legacy")
+    assert ("# pyobfus:obfuscated" in text) == trace
     product = subprocess.run([sys.executable, str(output)], capture_output=True, text=True)
     assert product.returncode == 0, product.stderr
     assert product.stdout == "héllo\n"
@@ -116,7 +116,7 @@ def test_direct_execution_and_exact_execute_bits(build, mode, tmp_path):
     assert subprocess.check_output([str(output)]) == subprocess.check_output([str(script)])
 
 
-@pytest.mark.parametrize("mode", ["single", "directory"])
+@pytest.mark.parametrize("mode", ["single", "directory", "legacy"])
 @pytest.mark.parametrize("trace", [False, True])
 def test_real_traceback_unmap_json(build, tmp_path, mode, trace):
     mapping = tmp_path / "map.json"

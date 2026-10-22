@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Community file-scoped mapping for `--no-cross-file` directory builds.
+  Version-2 mappings restore per-frame names and available statement locations
+  without conflating short names reused by different files. Supports Windows
+  paths and ExceptionGroup frame headers; ambiguous roots/names, external frames,
+  and out-of-range lines remain unresolved. Excerpts and unframed messages stay
+  artifact text. Explicit marker mismatch disables restoration; absent markers
+  leave build identity unverified. Version-1 readers/writers remain supported
+  for existing build modes. Independent builds requesting mapping rebuild even
+  with `--incremental`, retaining only current successful outputs in the mapping
+  and trace-marker target list.
+
 ### Fixed
 
 - Target repository formatting at the minimum Python 3.9 syntax and keep mypy
