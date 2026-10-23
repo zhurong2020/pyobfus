@@ -84,7 +84,12 @@ Build steps to `pyobfus-mcp==0.3.14 pyobfus==0.9.0`. Test
 `pyobfus==0.9.0`, `pyobfus-mcp==0.3.14` and `pyobfus-runtime==0.1.1`; the
 handshake reports 0.3.14 and `ListToolsRequest` returns all 9 tools. The build
 still checked out `e167182` with `pinnedCommit: null`. MCP 0.3.15 follows the
-same day, so the pins need one more bump to `pyobfus-mcp==0.3.15`.
+same day; at 12:00 the maintainer changed Build steps to
+`pyobfus-mcp==0.3.15 pyobfus==0.9.0`. Test `01a166ea-e2c4-7dcd-b266-b888265f6b52`
+succeeded in 8.4s: the install log shows `pyobfus-mcp==0.3.15`, `pyobfus==0.9.0`
+and `pyobfus-runtime==0.1.1`; the handshake reports 0.3.15 and all 9 tools are
+listed. The checkout is still `e167182` (`pinnedCommit: null`), which does not
+affect the PyPI-installed server.
 
 Periodic checks retain only decision summaries, not full stdout or separate
 CSV/JSON snapshots. During the quiet-period experiment, retain the Core/MCP
