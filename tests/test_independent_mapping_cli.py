@@ -1,5 +1,6 @@
 """Independent mappings follow actual successful CLI outputs and builds."""
 
+import inspect
 import json
 import os
 import subprocess
@@ -15,7 +16,10 @@ from pyobfus.core.mapping import ObfuscationMapping
 
 
 def invoke(source, output, *flags):
-    result = CliRunner().invoke(
+    runner = CliRunner(
+        **({"mix_stderr": False} if "mix_stderr" in inspect.signature(CliRunner).parameters else {})
+    )
+    result = runner.invoke(
         main, [str(source), "-o", str(output), "--no-cross-file", *map(str, flags)]
     )
     assert result.exit_code == 0, result.output
@@ -53,7 +57,7 @@ def test_dry_run_writes_no_independent_artifacts(tmp_path):
     output = tmp_path / "out"
     path = tmp_path / "mapping.json"
     result = invoke(source, output, "--dry-run", "--save-mapping", path, "--trace-marker", "--json")
-    assert json.loads(result.output)["status"] == "success"
+    assert json.loads(result.stdout)["status"] == "success"
     assert not path.exists()
     assert not output.exists()
 
@@ -70,7 +74,7 @@ def test_partial_build_stamps_only_current_successes(tmp_path):
         (output / name).write_text(text)
     path = tmp_path / "mapping.json"
     result = invoke(source, output, "--save-mapping", path, "--trace-marker")
-    assert "Failed to obfuscate" in result.output
+    assert "Failed to obfuscate" in result.stderr
     mapping = ObfuscationMapping.load(path)
     assert set(mapping.file_names) == set(mapping.files) == {"good.py"}
     assert TRACE_MARKER_PREFIX in (output / "good.py").read_text()
@@ -125,7 +129,7 @@ def test_optional_metadata_failure_preserves_successful_output(tmp_path, monkeyp
     output = tmp_path / "out"
     path = tmp_path / "mapping.json"
     result = invoke(source, output, "--save-mapping", path)
-    assert "line mapping unavailable" in result.output
+    assert "line mapping unavailable" in result.stderr
     mapping = ObfuscationMapping.load(path)
     assert mapping.files["app.py"]["lines"] is None
     trace = f'  File "{output / "app.py"}", line 3, in I0\n'
@@ -144,7 +148,7 @@ def test_nonportable_posix_filename_does_not_fail_build(tmp_path, filename):
     path = tmp_path / "mapping.json"
     result = invoke(source, output, "--save-mapping", path)
     assert (output / filename).exists()
-    assert "portable mapping" in result.output
+    assert "portable mapping" in result.stderr
     mapping = ObfuscationMapping.load(path)
     assert filename in mapping.unmapped_files
 
@@ -168,20 +172,27 @@ def test_colliding_names_restore_from_real_traceback(tmp_path, prefix):
     env = dict(os.environ, HOME=str(tmp_path), USERPROFILE=str(tmp_path))
     for rel, function in (("a/util.py", "calculate_total"), ("b/util.py", "parse_amount")):
         crashed = subprocess.run(
-            [sys.executable, "-I", str(output / rel)],
+            [sys.executable, "-X", "utf8", "-I", str(output / rel)],
             env=env,
-            text=True,
+            encoding="utf-8",
             capture_output=True,
         )
         assert crashed.returncode != 0
         assert f"in {obfuscated}" in crashed.stderr
         trace = tmp_path / "trace.txt"
-        trace.write_text(crashed.stderr)
-        result = CliRunner().invoke(
+        trace.write_text(crashed.stderr, encoding="utf-8")
+        runner = CliRunner(
+            **(
+                {"mix_stderr": False}
+                if "mix_stderr" in inspect.signature(CliRunner).parameters
+                else {}
+            )
+        )
+        result = runner.invoke(
             main, ["--unmap", "--trace", str(trace), "--mapping", str(path), "--json"]
         )
         assert result.exit_code == 0, result.output
-        restored = json.loads(result.output)
+        restored = json.loads(result.stdout)
         assert f"in {function}" in restored["unmapped_trace"]
         assert restored["frames"][-1]["original_file"] == rel
         assert restored["frames"][-1]["original_line"] == 2
