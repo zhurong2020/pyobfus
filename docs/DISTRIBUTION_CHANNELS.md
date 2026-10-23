@@ -15,7 +15,7 @@ Marketplace reports `14 installs`; Open VSX reports `682 downloads` (fetches,
 not unique installs). Action attribution remains `0` visible repositories.
 GitHub rolling 14-day traffic is `182 views / 106 unique visitors`; Google is
 first (`23 / 20`) and DEV/Reddit do not appear in the referrers.
-Current public versions are Core `0.9.0`, MCP `0.3.14`, runtime `0.1.1`,
+Current public versions are Core `0.9.0`, MCP `0.3.15`, runtime `0.1.1`,
 and VS Code/Open VSX `0.4.3`. Core/MCP were published on October 14 with
 verified PEP 740 attestations for both wheel and sdist; fresh Python 3.10/3.14
 installations and contract smoke checks passed. The official MCP Registry
@@ -78,6 +78,13 @@ The build checked out `e167182` (#107, an ancestor of the 0.8.0 release
 commit) with `pinnedCommit: null`, and uv again used system Python 3.13.5;
 neither affects the PyPI-installed server. At the next MCP or Core release,
 update the Build steps package pins again.
+**2026-10-23 11:31 (Asia/Shanghai), after Core 0.9.0:** the maintainer changed
+Build steps to `pyobfus-mcp==0.3.14 pyobfus==0.9.0`. Test
+`01a166d0-c013-76ae-a4fd-e0202ac577a3` succeeded in 10.6s: the install log shows
+`pyobfus==0.9.0`, `pyobfus-mcp==0.3.14` and `pyobfus-runtime==0.1.1`; the
+handshake reports 0.3.14 and `ListToolsRequest` returns all 9 tools. The build
+still checked out `e167182` with `pinnedCommit: null`. MCP 0.3.15 follows the
+same day, so the pins need one more bump to `pyobfus-mcp==0.3.15`.
 
 Periodic checks retain only decision summaries, not full stdout or separate
 CSV/JSON snapshots. During the quiet-period experiment, retain the Core/MCP
@@ -166,7 +173,7 @@ re-runnable source of truth for the calculation is
 
 ### PyPI — `pyobfus-mcp`
 - URL: https://pypi.org/project/pyobfus-mcp/
-- Current version: **0.3.14** (released 2026-10-20; Python 3.15 classifier + unproved-access hint) · ships with PEP 740 attestations via OIDC trusted publishing
+- Current version: **0.3.15** (released 2026-10-23; `unmap_stack_trace` guidance for independent-file mappings, Core 0.9.0) · ships with PEP 740 attestations via OIDC trusted publishing
 - 0.3.12 contents: fixes a startup-crash regression introduced hours earlier in
   0.3.11. That release resolved its version through a module-level
   `from pyobfus_mcp import __version__`, which raises `ImportError` when the cwd
@@ -320,7 +327,7 @@ re-runnable source of truth for the calculation is
   prior is not evidence of an actual review. Continue tracking installs and
   real reviews, not raw update/download count alone.
 - Wiki: disabled · Discussions: enabled · Issues: open
-- Releases: latest Core `v0.9.0`, runtime `runtime-v0.1.1`, MCP `mcp-v0.3.14`, and VS Code
+- Releases: latest Core `v0.9.0`, runtime `runtime-v0.1.1`, MCP `mcp-v0.3.15`, and VS Code
   `vscode-v0.4.3`; MCP releases attach wheel+sdist.
 
 ### Open VSX — `zhurong2020.pyobfus` 🟢 LIVE

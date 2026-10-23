@@ -1,7 +1,7 @@
 # Support matrix
 
 What is actually verified, by what, as of 2026-10-23 (`pyobfus` 0.9.0, adds
-independent-build mapping; 0.8.0 added Python 3.15 / `pyobfus-mcp` 0.3.14 / `pyobfus-runtime` 0.1.1 /
+independent-build mapping; 0.8.0 added Python 3.15 / `pyobfus-mcp` 0.3.15 / `pyobfus-runtime` 0.1.1 /
 VS Code extension 0.4.3 / `pyobfus-action` 1.0.1).
 
 Four labels, used strictly:
