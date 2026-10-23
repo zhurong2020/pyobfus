@@ -5,7 +5,7 @@
 顺序做」，不记录历史。最新依据见
 [`FEATURE_EXPANSION_RESEARCH_2026-10-20.md`](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)；Python 3.15 的 P0 范围与验收见 [`PYTHON315_SUPPORT_PLAN.md`](PYTHON315_SUPPORT_PLAN.md)。
 
-最后更新：2026-10-23（PR #112 已合并进 main，未发版）。Core 0.8.0（Python 3.15 支持，#108）与 MCP 0.3.14（3.15 分类器 + #103 提示）已于 10-20 发布，runtime 0.1.1 不变；main 已含未发布的独立目录 mapping（PR #112），MCP 有配套调试提示修订；不属于公开 0.8.0／0.3.14。PyPI/PEP 740、全新安装、Release、Zenodo `23500657`/CFF、MCP Registry 与 Glama（测试 `01a15a11`）均已核。10-22 状态核查无待回复客户，下一节点 10-25 复盘（见 `CURRENT_PLAN_ZH.md` 顶部）。
+最后更新：2026-10-23。Core 0.9.0（独立目录构建 mapping v2，#112）与 MCP 0.3.15（`unmap_stack_trace` 提示）已于 10-23 发布，runtime 0.1.1 不变；PyPI/PEP 740、全新安装、GitHub Release、Zenodo `23585299`/CFF、MCP Registry 与 Glama（测试 `01a166ea`）均已核。发版节奏见「节奏」段（10-23 起按自然进度）。
 
 ## 状态口径
 
@@ -34,7 +34,7 @@
 
 按 [推进计划](ADOPTION_WORKFLOW_PLAN_2026-10-22.md) 顺序执行：
 
-四阶段本地工作已完成，结果见推进计划与 CURRENT_PLAN_ZH.md。本轮修订已于 10-23 经 PR #112 合并进 main（hosted CI 全绿），未发布。接下来：决定 mapping 何时随下一版发布、限定 L3 设计范围、审 DEV 草稿；不因本地验收通过自动发版或投稿。
+四阶段本地工作已完成，结果见推进计划与 CURRENT_PLAN_ZH.md。本轮修订已于 10-23 经 PR #112 合并，并随 Core 0.9.0 / MCP 0.3.15 发布。接下来：`--unmap` 非 UTF-8 输入、Pro opacity future prologue、限定 L3 设计范围、审 DEV 草稿；不因本地验收通过自动发版或投稿。
 
 10-25 复盘、10-26 巡检继续，但不阻塞上述工作；不再以静默等待为主要任务。私有医院应用仍暂停，等现场升级 Win10 后反馈。参数改名等其他候选保持原范围与授权边界。
 
