@@ -46,6 +46,7 @@
 - [x] **PY315-2：新字典推导式解包构建失败**。`{**row for row in rows}` 原文在 3.15 可运行，checkout／0.7.5 wheel 构建均报 `NoneType ... _fields`；根因为自定义推导式 visitor 访问 None，六处路径已修复并补原生回归；0.8.0 发布（#108）。
 - [ ] **3.15 后续（0.8.0 发布后登记，均未授权实现）**：① 3.15 标准库冒烟中 `json`（`scanner.make_scanner`）与 `unittest`（`util.three_way_cmp`/`case.TestCase`）目录构建产物导入失败，main 同样失败，属模块属性证明既有限制，待定是否单列缺陷；② free-threaded 3.15、3.15 上冻结/编译打包未验证。Black/mypy 配置修订与 Glama 同步结果见 `CURRENT_PLAN_ZH.md` 对应日期记录。
 - [ ] **Pro opacity 纯转换 API 的 future prologue 缺陷（10-22 实测登记）**：带模块 docstring、`from __future__` 和受保护函数的合成输入，经 `transformers.opacity.transform_module` 后编译报 future import 位置错误。当前 CLI 是否受影响尚未验证；单独安排最小复现与兼容修复，本轮 L3 仅设计，未改 Pro 实现。
+- [ ] **`--unmap` 读非 UTF-8 trace 直接崩溃（10-23 实测登记，未授权实现）**：`pyobfus/cli.py` 固定按 UTF-8 读 `--trace` 文件（stdin 同样），Windows 上 cp1252 等本地编码保存的 traceback（如含 `á` 的混淆名）触发未捕获的 `UnicodeDecodeError`，exit 1、无友好提示；用 0.8.0 checkout 以文件和 stdin 两条路径复现。PR #112 的 CI 在 Windows 暴露此问题，当时只改测试（子进程 `-X utf8`）。候选修复：UTF-8 失败时回退 locale 编码或 `errors="replace"` 并提示；验收须覆盖文件／stdin、Windows cp1252 与 UTF-8 BOM。
 - [ ] **MCP 2.x 发布条件复审**。10-19 CI 已用 2.3.0 过 152 项；10-20 Linux 真实 stdio 验证 legacy 为 `2025-11-25`、auto 为 `2026-07-28`，均列出 9 工具并成功调用只读工具。旧「stdio 无新协议收益」结论不再适用；依赖上限未改，仍需 Python 3.10／Windows／干净解析与全工具合同。
 - `--no-cross-file` mapping 已在本分支实现并验证；目录 L3 + 应用 key provider 只完成设计与审核，未来实现另行确定；不一次接入全部 fusion 字段。
 - 参数改名、H B2/B3、资源 key provider 与 L3 方法覆盖继续保持原 gate；未授权改实现／合并／发布。
