@@ -8,7 +8,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ## ⚡ Current pending work (cold-start 必读)
 
-**本轮交接**：[`docs/SESSION_CLOSEOUT_2026-10-22.md`](docs/SESSION_CLOSEOUT_2026-10-22.md) — 工作分支、本地 commit、验证范围与续接顺序；尚未 push／合并／发布。
+**本轮交接**：[`docs/SESSION_CLOSEOUT_2026-10-22.md`](docs/SESSION_CLOSEOUT_2026-10-22.md) — 工作分支、本地 commit、验证范围与续接顺序。**10-23 更新**：已作为 PR #112 rebase 合并进 main（`b01c7ad`，hosted CI 全绿），未发版；`--unmap` 非 UTF-8 trace 崩溃已登记 TODO。
 
 **2026-10-22 本轮状态**：四阶段本地工作已完成：公开发布包用户流程审计、独立文件目录 mapping 实现与验证、多模块 L3/key provider 设计与两路复核、DEV 草稿与可复现案例。详细验收见 `docs/ADOPTION_WORKFLOW_PLAN_2026-10-22.md`；不再以静默等待为主要任务，旧候选未授权记录以本次单项授权为准。AI / Agent 采用引导仅登记后续计划，未改对外入口。维护者已授权同步文档并分类 commit；合并、发布和对外发送另行决定。
 
