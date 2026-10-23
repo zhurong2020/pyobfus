@@ -1,5 +1,7 @@
 # pyobfus 当前计划
 
+**2026-10-23 Core 0.9.0 已发布（维护者批准）**：独立目录构建（`--no-cross-file`）的文件级 mapping（格式 2），`--unmap` 逐帧还原同名短名（PR #112）。发版准备 PR #114 → main `a418d90`，CI/CodeQL/Packaging 通过后打 `v0.9.0`；release.yml 成功，PyPI wheel/sdist PEP 740 publisher=release.yml；Python 3.10 与 3.15 全新 PyPI 安装自动带 runtime 0.1.1、pip check 通过，独立构建冒烟还原 `calculate_total`/`parse_amount`；GitHub Release 手工创建（说明私有存 `docs/internal/release-0.9.0/`）；Zenodo `23585299` 已归档、`CITATION.cff` 同步。MCP 0.3.14（`unmap_stack_trace` 提示修订仍在 `[Unreleased]`，是否发 0.3.15 待维护者定）/ runtime 0.1.1 不变。Glama Build steps 需维护者改为 `pyobfus==0.9.0`。**同日维护者定发版节奏**：不再为观察下载设静默期，按功能扩展与错误修订的自然进度发版（每次仍需批准），见 `TODO.md`「节奏」。
+
 **2026-10-23 PR #112 已合并（维护者批准，未发版）**：10-22 的分类提交推送为 PR #112。首轮 hosted CI 暴露两处仅测试问题——Python 3.9 只能用 Click 8.1，`CliRunner` 默认把 stderr 混进 stdout；Windows 子进程按 cp1252 输出 traceback——由 Codex 修测试（`5498330`，子进程 `-X utf8`、显式 UTF-8、`mix_stderr=False`），Claude 审核；33 项检查全绿后 rebase 合并进 main `b01c7ad`，合并后 main 的 CI/CodeQL/Packaging/Dogfood 均通过，工作分支已删除。同时登记 `--unmap` 读非 UTF-8 trace（文件与 stdin）未捕获 `UnicodeDecodeError` 的 TODO。main 现含未发布的独立目录 mapping v2；公开版本仍为 Core 0.8.0 / MCP 0.3.14 / runtime 0.1.1，发版另行授权。公开仓库的 Actions 不计分钟额度，10 月额度用尽只影响私有仓库。
 
 **10-22 最终交接**：[Session 收尾](SESSION_CLOSEOUT_2026-10-22.md)。（10-23 已合并，见上段。）
