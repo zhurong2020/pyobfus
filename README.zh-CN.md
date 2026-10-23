@@ -12,7 +12,7 @@ pyobfus 的普通 `.py` 文件。它不仅转换源码，还提供构建前检�
 
 Community 版本采用 Apache-2.0，不限制文件数和代码行数，也不需要试用。
 
-> **v0.8.0 新增**：支持 Python 3.15——保留 `lazy` 惰性导入、支持推导式解包（`{**row for row in rows}`），不改名新内建名；Core CI 覆盖 Linux／Windows／macOS 上的 3.9–3.15。使用 3.15 专属语法的产物需在 3.15 运行。见[验收范围与限制](https://github.com/zhurong2020/pyobfus/blob/main/docs/PYTHON315_VALIDATION.md)。
+> **v0.9.0 新增**：独立目录构建（`--no-cross-file`）也能用 `--unmap` 还原 traceback。mapping 按文件记录名字，不同文件复用同一个短名也能逐帧还原到正确的原名；旧 mapping 照常可用，旧版 pyobfus 遇到新格式会明确拒绝而不是猜。见[调试指南](https://github.com/zhurong2020/pyobfus/blob/main/docs/guides/debug-obfuscated-python.md)。
 
 ## 主要优势
 

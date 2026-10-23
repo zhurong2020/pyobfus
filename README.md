@@ -22,13 +22,12 @@ mapping file from the build private, and `pyobfus --unmap` turns a production
 traceback back into your original names, for you or an AI coding agent.
 Community is Apache-2.0, has no file or line limits, and requires no trial.
 
-> **What's new in v0.8.0:** Python 3.15 support. Builds keep `lazy import` and
-> `lazy from ... import` lazy, accept the new comprehension unpacking
-> (`{**row for row in rows}`, `[*chunk for chunk in rows]`), and never rename the
-> new builtins (`frozendict`, `sentinel`, ...). Core CI now runs 3.9–3.15 on Linux,
-> Windows and macOS. Output that uses 3.15-only syntax needs Python 3.15 to run;
-> ordinary source built on 3.15 still runs on older versions. See the
-> [validation scope](https://github.com/zhurong2020/pyobfus/blob/main/docs/PYTHON315_VALIDATION.md)
+> **What's new in v0.9.0:** `--unmap` now works for independent directory builds
+> (`--no-cross-file`). The mapping records names per file, so two files that reuse
+> the same short name restore to the right originals, frame by frame. Older
+> mappings keep working; older pyobfus versions reject the new mapping format
+> instead of guessing. See the
+> [debugging guide](https://github.com/zhurong2020/pyobfus/blob/main/docs/guides/debug-obfuscated-python.md)
 > and the [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
 
 ## Why pyobfus
