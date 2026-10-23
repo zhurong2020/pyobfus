@@ -6,6 +6,8 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+## [0.3.15] - 2026-10-23
+
 ### Changed
 
 - `unmap_stack_trace` guidance explains unresolved frames and unverified build
