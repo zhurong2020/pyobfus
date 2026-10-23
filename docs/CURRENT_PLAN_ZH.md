@@ -1,6 +1,8 @@
 # pyobfus 当前计划
 
-**10-22 最终交接**：[Session 收尾](SESSION_CLOSEOUT_2026-10-22.md)。本地分类提交已完成，保留 `feat/adoption-debugging-workflow`；尚未 push／合并／发布。
+**2026-10-23 PR #112 已合并（维护者批准，未发版）**：10-22 的分类提交推送为 PR #112。首轮 hosted CI 暴露两处仅测试问题——Python 3.9 只能用 Click 8.1，`CliRunner` 默认把 stderr 混进 stdout；Windows 子进程按 cp1252 输出 traceback——由 Codex 修测试（`5498330`，子进程 `-X utf8`、显式 UTF-8、`mix_stderr=False`），Claude 审核；33 项检查全绿后 rebase 合并进 main `b01c7ad`，合并后 main 的 CI/CodeQL/Packaging/Dogfood 均通过，工作分支已删除。同时登记 `--unmap` 读非 UTF-8 trace（文件与 stdin）未捕获 `UnicodeDecodeError` 的 TODO。main 现含未发布的独立目录 mapping v2；公开版本仍为 Core 0.8.0 / MCP 0.3.14 / runtime 0.1.1，发版另行授权。公开仓库的 Actions 不计分钟额度，10 月额度用尽只影响私有仓库。
+
+**10-22 最终交接**：[Session 收尾](SESSION_CLOSEOUT_2026-10-22.md)。（10-23 已合并，见上段。）
 
 **2026-10-22 四阶段本地工作完成（已授权分类提交，未合并／发布）**：公开 0.8.0 干净环境用户流程审计完成；Community 独立文件目录 mapping 已实现并经多引擎反例修订，Core 4467 passed / 54 skipped、MCP 153、集成 352 / 10 skipped、runtime 24；Python 3.15 专项 157。隔离工作 wheel 的新 reader 接受旧 v1，旧公开 reader 对 v2 明确拒绝。L3 + 应用 key provider 限定设计经两路独立复核，只有设计，未修改 Pro/runtime；加密帧只恢复名字、同模块普通函数的恢复限制已写明。DEV 第二篇保留 SARIF 主题，公开 0.8.0 三类输入和 Ruff/Bandit 特例已复现，草稿、动态报告目录示例及采用观察已准备；未执行 GitHub 上传或投稿。结果入口见 [推进计划](ADOPTION_WORKFLOW_PLAN_2026-10-22.md)、[mapping 验收](INDEPENDENT_DIRECTORY_MAPPING_VALIDATION.md)、[L3 设计](CROSSFILE_OPACITY_DESIGN.md)与 [文章验证](ADOPTION_CONTENT_VALIDATION_2026-10-22.md)。独立发现 Pro opacity 纯转换 API 的 future prologue 问题已单独列 TODO，CLI 影响未验证。最终 `scripts/check.sh` 全部通过（296 文件格式检查、113 源文件类型检查及严格文档构建），`git diff --check` 通过。
 
