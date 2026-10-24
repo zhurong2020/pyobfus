@@ -873,3 +873,29 @@ class TestBindKeyEnv:
             assert m.run() == 26
         finally:
             set_key_provider(None)
+
+
+@requires_pro
+@pytest.mark.parametrize("keep_docstrings", [False, True])
+def test_opacity_cli_docstring_future_prologue(runner, tmp_path, keep_docstrings):
+    src = tmp_path / "prologue.py"
+    src.write_text(
+        '"""Module café."""\n'
+        "from __future__ import annotations\n"
+        "from pyobfus_pro import opacity, Layer\n"
+        "@opacity(Layer.ENCRYPTED)\n"
+        "def compute(value: int = 4) -> int:\n"
+        "    return value + 3\n"
+        "print(compute())\n",
+        encoding="utf-8",
+    )
+    out = tmp_path / "protected.py"
+    flags = ["--selective-opacity"]
+    if keep_docstrings:
+        flags.append("--keep-docstrings")
+    result = _invoke(runner, src, out, *flags)
+    assert result.exit_code == 0, result.output
+    assert _compiles(out)
+    module = _load_module(out, "prologue_fixture")
+    if keep_docstrings:
+        assert module.__doc__ == "Module café."

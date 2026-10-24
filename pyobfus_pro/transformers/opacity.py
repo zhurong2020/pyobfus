@@ -427,10 +427,25 @@ def _stub_body(original_body: list[ast.stmt]) -> list[ast.stmt]:
     return [ast.Pass()]
 
 
-def _ensure_runtime_import(tree: ast.Module) -> None:
-    """Inject ``from pyobfus_pro.runtime import _l3_dispatch`` once.
+def _after_leading_imports(tree: ast.Module) -> int:
+    """Keep the module docstring and future-import prologue ahead of helpers."""
+    index = 0
+    if (
+        tree.body
+        and isinstance(tree.body[0], ast.Expr)
+        and isinstance(tree.body[0].value, ast.Constant)
+        and isinstance(tree.body[0].value.value, str)
+    ):
+        index = 1
+    while index < len(tree.body) and isinstance(tree.body[index], (ast.Import, ast.ImportFrom)):
+        index += 1
+    return index
 
-    If the module already imports from ``pyobfus_pro.runtime``, the
+
+def _ensure_runtime_import(tree: ast.Module) -> None:
+    """Inject ``from pyobfus_runtime import _l3_dispatch`` once.
+
+    If the module already imports from ``pyobfus_runtime``, the
     function appends ``_l3_dispatch`` to the existing alias list (so seal /
     scrub / opacity imports collapse into one line). Otherwise a new import
     is inserted after any leading import block.
@@ -450,12 +465,7 @@ def _ensure_runtime_import(tree: ast.Module) -> None:
         names=[ast.alias(name=_RUNTIME_DISPATCH)],
         level=0,
     )
-    insert_at = 0
-    for i, stmt in enumerate(tree.body):
-        if isinstance(stmt, (ast.Import, ast.ImportFrom)):
-            insert_at = i + 1
-        else:
-            break
+    insert_at = _after_leading_imports(tree)
     tree.body.insert(insert_at, new_import)
 
 
@@ -481,12 +491,7 @@ def _ensure_layer_key_constant(tree: ast.Module, layer_key: bytes) -> None:
         targets=[ast.Name(id=_LAYER_KEY_NAME, ctx=ast.Store())],
         value=ast.Constant(value=bytes(layer_key)),
     )
-    insert_at = 0
-    for i, stmt in enumerate(tree.body):
-        if isinstance(stmt, (ast.Import, ast.ImportFrom)):
-            insert_at = i + 1
-        else:
-            break
+    insert_at = _after_leading_imports(tree)
     tree.body.insert(insert_at, key_assign)
 
 
