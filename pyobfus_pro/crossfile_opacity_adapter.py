@@ -32,6 +32,7 @@ import types
 from dataclasses import dataclass, field
 from typing import Iterable, List, Tuple
 
+from pyobfus.core.crossfile_opacity import plan_module_targets
 from pyobfus.core.unparse import unparse
 from pyobfus_runtime.opacity import _decrypt_code, _encrypt_code
 
@@ -104,16 +105,23 @@ def encrypt_targets(
         raise CrossfileOpacityAdapterError("no targets requested")
 
     tree = ast.parse(final_source, filename)
-    top_level = _top_level_function_index(tree)
-    module_bindings = _module_level_binding_counts(tree)
 
+    # Re-run the slice-A planner on the FINAL (renamed) source and require each
+    # requested target to be a stable, selectable top-level function there. This
+    # reuses the full stability contract (no async / generator / decorated /
+    # type-params / nested-def / duplicate / rebound-in-control-flow /
+    # deleted / import-shadowed / global-written binding) rather than a weaker
+    # adapter-local check, so a target that would be unprotected or break
+    # runtime semantics is rejected before any encryption.
+    plan = plan_module_targets("<adapter>", final_source, filename=filename)
+    selectable = {b.name for b in plan.selected}
+    rejected_reasons = {r.name: r.reason for r in plan.rejected}
     for name in targets:
-        defs = top_level.get(name, [])
-        if len(defs) != 1 or module_bindings.get(name, 0) != 1:
+        if name not in selectable:
+            reason = rejected_reasons.get(name, "not a stable top-level function")
             raise CrossfileOpacityAdapterError(
-                f"target {name!r} must resolve to exactly one top-level function "
-                f"with no other module-level binding of that name "
-                f"(found {len(defs)} top-level defs, {module_bindings.get(name, 0)} bindings)"
+                f"target {name!r} is not a supported stable top-level function "
+                f"in the final source ({reason})"
             )
 
     # Compile the unmodified tree once to extract each target's CodeType.
@@ -155,7 +163,7 @@ def encrypt_targets(
     out_source = unparse(transformed)
 
     # Confirm the emitted module compiles and no longer carries the plaintext.
-    _verify_emitted(out_source, filename, targets, original_codes)
+    _verify_emitted(out_source, filename, targets, dispatch_alias, cipher_names)
     _assert_no_key_leak(out_source, key)
 
     return AdapterResult(
@@ -171,57 +179,6 @@ def encrypt_targets(
 # ---------------------------------------------------------------------------
 # AST inspection
 # ---------------------------------------------------------------------------
-
-
-def _top_level_function_index(tree: ast.Module) -> dict[str, List[ast.stmt]]:
-    index: dict[str, List[ast.stmt]] = {}
-    for stmt in tree.body:
-        if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            index.setdefault(stmt.name, []).append(stmt)
-    return index
-
-
-def _module_level_binding_counts(tree: ast.Module) -> dict[str, int]:
-    """Count every module-level binding of each name (defs, classes, assigns,
-    imports, deletes), so a target that is also, say, imported or reassigned at
-    module level is rejected as ambiguous."""
-    counts: dict[str, int] = {}
-
-    def bump(name: str) -> None:
-        counts[name] = counts.get(name, 0) + 1
-
-    for stmt in tree.body:
-        if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
-            bump(stmt.name)
-        elif isinstance(stmt, ast.Assign):
-            for target in stmt.targets:
-                for n in _names_in_target(target):
-                    bump(n)
-        elif isinstance(stmt, ast.AnnAssign):
-            if stmt.value is not None:
-                for n in _names_in_target(stmt.target):
-                    bump(n)
-        elif isinstance(stmt, ast.AugAssign):
-            for n in _names_in_target(stmt.target):
-                bump(n)
-        elif isinstance(stmt, (ast.Import, ast.ImportFrom)):
-            for alias in stmt.names:
-                bump(alias.asname or alias.name.split(".")[0])
-        elif isinstance(stmt, ast.Delete):
-            for target in stmt.targets:
-                for n in _names_in_target(target):
-                    bump(n)
-    return counts
-
-
-def _names_in_target(target: ast.AST) -> Iterable[str]:
-    if isinstance(target, ast.Name):
-        yield target.id
-    elif isinstance(target, (ast.Tuple, ast.List)):
-        for elt in target.elts:
-            yield from _names_in_target(elt)
-    elif isinstance(target, ast.Starred):
-        yield from _names_in_target(target.value)
 
 
 def _extract_target_codes(
@@ -258,6 +215,19 @@ def _used_identifiers(tree: ast.Module) -> set[str]:
                 names.add(alias.asname or alias.name.split(".")[0])
         elif isinstance(node, ast.Attribute):
             names.add(node.attr)
+        elif isinstance(node, ast.ExceptHandler) and node.name:
+            # `except E as name:` binds and then deletes `name`; a helper reusing
+            # it would be deleted out from under the module.
+            names.add(node.name)
+        elif isinstance(node, ast.alias) and node.asname:
+            names.add(node.asname)
+        else:
+            # Structural pattern-match captures (MatchAs/MatchStar/MatchMapping
+            # rest) bind names that are not Name nodes.
+            for attr in ("name", "rest"):
+                captured = getattr(node, attr, None)
+                if isinstance(captured, str):
+                    names.add(captured)
     return names
 
 
@@ -403,31 +373,73 @@ def _verify_emitted(
     out_source: str,
     filename: str,
     targets: Iterable[str],
-    original_codes: dict[str, types.CodeType],
+    dispatch_alias: str,
+    cipher_names: dict[str, str],
 ) -> None:
-    """Compile the emitted module and confirm each target now has a stub body
-    (its shipped code object is no longer the plaintext)."""
-    emitted_code = compile(out_source, filename, "exec", dont_inherit=True)
-    emitted = {
-        const.co_name: const
-        for const in emitted_code.co_consts
-        if isinstance(const, types.CodeType)
+    """Confirm the emitted module compiles and each target became an L3 stub.
+
+    Checked structurally on the re-parsed source (not by comparing co_code,
+    which would mis-fire for a trivial function whose stub happens to compile to
+    the same bytecode): each target's top-level def must have a stub body
+    (optional docstring then nothing else that runs) and carry the dispatch
+    decorator ``<alias>(<cipher>, <key>)``. This proves the original body was
+    replaced -- the real bytecode ships only inside the encrypted blob.
+    """
+    compile(out_source, filename, "exec", dont_inherit=True)  # must be valid
+    reparsed = ast.parse(out_source, filename)
+    defs = {
+        stmt.name: stmt
+        for stmt in reparsed.body
+        if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef))
     }
     for name in targets:
-        shipped = emitted.get(name)
-        if shipped is None:
+        func = defs.get(name)
+        if func is None:
             raise CrossfileOpacityAdapterError(f"emitted module lost target {name!r}")
-        if shipped.co_code == original_codes[name].co_code:
+        if not _is_stub_body(func.body):
             raise CrossfileOpacityAdapterError(
-                f"emitted module still contains the plaintext code for {name!r}"
+                f"emitted target {name!r} still has a real body; expected a stub"
             )
+        if not _has_dispatch_decorator(func, dispatch_alias, cipher_names[name]):
+            raise CrossfileOpacityAdapterError(
+                f"emitted target {name!r} is missing its L3 dispatch decorator"
+            )
+
+
+def _is_stub_body(body: List[ast.stmt]) -> bool:
+    stmts = list(body)
+    if (
+        stmts
+        and isinstance(stmts[0], ast.Expr)
+        and isinstance(stmts[0].value, ast.Constant)
+        and isinstance(stmts[0].value.value, str)
+    ):
+        stmts = stmts[1:]  # leading docstring is allowed
+    return len(stmts) == 1 and isinstance(stmts[0], ast.Pass)
+
+
+def _has_dispatch_decorator(func: ast.stmt, dispatch_alias: str, cipher_const: str) -> bool:
+    for dec in getattr(func, "decorator_list", []):
+        if (
+            isinstance(dec, ast.Call)
+            and isinstance(dec.func, ast.Name)
+            and dec.func.id == dispatch_alias
+            and dec.args
+            and isinstance(dec.args[0], ast.Name)
+            and dec.args[0].id == cipher_const
+        ):
+            return True
+    return False
 
 
 def _assert_no_key_leak(out_source: str, key: bytes) -> None:
     """Fail if the raw key appears in the emitted source in any common form.
 
-    A regression guard, not a proof against arbitrary steganography: it checks
-    the raw byte literal, base64, and hex spellings.
+    A regression guard on what the adapter itself emits -- byte literal, base64,
+    hex, and (when decodable) the key's text spelling. It is not a scrubber for
+    secrets the user put in their own source (e.g. a docstring that happens to
+    equal the key); such content is the caller's responsibility and the design
+    does not promise to remove it.
     """
     text = out_source
     representations = [
@@ -436,6 +448,11 @@ def _assert_no_key_leak(out_source: str, key: bytes) -> None:
         base64.b64encode(key).decode("ascii"),
         key.hex(),
     ]
+    for codec in ("ascii", "utf-8", "latin-1"):
+        try:
+            representations.append(key.decode(codec))
+        except UnicodeDecodeError:
+            continue
     for rep in representations:
         if rep and rep in text:
             raise CrossfileOpacityAdapterError("the application key leaked into the emitted source")

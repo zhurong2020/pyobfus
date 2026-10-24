@@ -67,6 +67,14 @@ def test_wrong_key_fails_at_first_call_not_import():
         pyobfus_runtime.set_key_provider(None)
 
 
+def test_defaults_kwonly_and_annotations_survive():
+    src = "def f(a, b=5, *, c=10):\n" "    return a + b + c\n"
+    key, res = _build(src, ["f"])
+    ns = _exec_with_provider(res.source, key)
+    assert ns["f"](1) == 16  # defaults b=5, c=10 applied
+    assert ns["f"](1, 2, c=3) == 6
+
+
 def test_multiple_targets_each_materialize():
     src = "def a(n):\n    return n - 1\ndef b(n):\n    return n * n\ndef c(n):\n    return n\n"
     key, res = _build(src, ["a", "b"])
@@ -187,3 +195,49 @@ def test_does_not_run_user_module_at_build_time():
     src = "undefined_name_at_runtime\ndef f(x):\n    return x\n"
     key, res = _build(src, ["f"])
     assert res.targets[0].final_name == "f"
+
+
+# --------------------------------------------------------------------------
+# Regressions for the slice-C review findings
+# --------------------------------------------------------------------------
+
+
+def test_target_rebound_in_module_control_flow_rejected():
+    # f is rebound inside module-level control flow -> unstable -> must reject.
+    src = "def f():\n    return 1\nif True:\n    f = lambda: 2\n"
+    with pytest.raises(CrossfileOpacityAdapterError):
+        _build(src, ["f"])
+
+
+def test_generator_target_rejected():
+    with pytest.raises(CrossfileOpacityAdapterError):
+        _build("def f():\n    yield 1\n", ["f"])
+
+
+def test_decorated_target_rejected():
+    src = "import functools\n@functools.cache\ndef f():\n    return 1\n"
+    with pytest.raises(CrossfileOpacityAdapterError):
+        _build(src, ["f"])
+
+
+def test_trivial_function_bodies_are_accepted():
+    # A stub can compile to the same bytecode as a trivial original; that must
+    # not be mistaken for "plaintext still shipped".
+    for src in ("def f():\n    return None\n", 'def f():\n    """d"""\n    return 123\n'):
+        key, res = _build(src, ["f"])
+        ns = _exec_with_provider(res.source, key)
+        # Runs correctly after decryption.
+        assert ns["f"]() in (None, 123)
+
+
+def test_fresh_names_avoid_except_handler_binding():
+    # An except handler binds (then deletes) its name at module scope; a helper
+    # reusing it would be deleted out from under the module and NameError.
+    src = (
+        "try:\n    raise ValueError()\nexcept ValueError as _pyobfus_l3_key:\n    pass\n"
+        "def f(x):\n    return x + 1\n"
+    )
+    key, res = _build(src, ["f"])
+    assert res.key_name != "_pyobfus_l3_key"
+    ns = _exec_with_provider(res.source, key)  # imports without NameError
+    assert ns["f"](1) == 2
