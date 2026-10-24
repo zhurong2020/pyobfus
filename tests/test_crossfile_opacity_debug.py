@@ -180,3 +180,31 @@ def test_interpreter_tuple_shape():
     t = interpreter_tuple()
     assert t["implementation"] == "cpython"
     assert isinstance(t["gil_disabled"], bool)
+
+
+# --------------------------------------------------------------------------
+# Regressions for the slice-D review findings
+# --------------------------------------------------------------------------
+
+
+def test_restore_exception_group_frame():
+    # ExceptionGroup tracebacks prefix frames with '|' and extra indent.
+    cf = l3_co_filename("aid", "a.py")
+    table = build_encrypted_code_table([(cf, "I0", "alpha")])
+    trace = f'    | File "{cf}", line 2, in I0\n'
+    out = restore_l3_names(trace, table)
+    assert "in alpha" in out["restored_trace"]
+    assert out["restored_trace"].startswith("    | File ")  # EG prefix preserved
+    assert out["frames"][0]["status"] == "name_only"
+
+
+@pytest.mark.parametrize("artifact,file", [("", "a.py"), ("aid", "")])
+def test_empty_components_rejected(artifact, file):
+    with pytest.raises(ValueError):
+        l3_co_filename(artifact, file)
+
+
+@pytest.mark.parametrize("bad", ['pkg/qu"ote.py', "pkg/new\nline.py", "pkg/a>b.py"])
+def test_relative_file_with_frame_breaking_chars_rejected(bad):
+    with pytest.raises(ValueError):
+        l3_co_filename("aid", bad)
