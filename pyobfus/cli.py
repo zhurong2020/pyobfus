@@ -210,6 +210,13 @@ def _echo_pro_import_hint() -> None:
     help="Enable cross-file import mapping (default: enabled)",
 )
 @click.option(
+    "--crossfile-opacity",
+    is_flag=True,
+    help="(Pro, preview) Opt in to multi-module L3 + application-key mode. "
+    "First release is planning/preflight only; enabling it reports whether the "
+    "configuration is supported and then stops (no protected build yet).",
+)
+@click.option(
     "--upgrade",
     is_flag=True,
     help="Show Pro edition features and purchase information",
@@ -544,6 +551,7 @@ def main(
     verify_syntax: bool,
     verify_names: bool,
     cross_file: bool,
+    crossfile_opacity: bool,
     crossfile_local_names: Optional[bool],
     crossfile_module_attributes: Optional[bool],
     upgrade: bool,
@@ -944,6 +952,8 @@ def main(
             config.crossfile_module_attributes = crossfile_module_attributes
         if crossfile_local_names is not None:
             config.crossfile_local_names = crossfile_local_names
+        if crossfile_opacity:
+            config.crossfile_opacity = True
         if remove_docstrings is not None:
             config.remove_docstrings = remove_docstrings
         if remove_comments is not None:
@@ -1220,6 +1230,33 @@ def main(
                 skipped_directories=skipped_directories,
             )
             click.echo(format_skipped_directories(skipped_directories))
+
+        # Opt-in multi-module L3 + application-key mode (slice A: planning and
+        # preflight only). Validate the configuration and then stop: the Pro
+        # adapter that produces the protected build does not exist yet, so we
+        # must never fall back to an ordinary build.
+        if getattr(config, "crossfile_opacity", False):
+            from pyobfus.core.crossfile_opacity import CrossfileOpacityError, preflight
+
+            try:
+                preflight(
+                    config,
+                    cross_file=cross_file,
+                    input_is_dir=input_path_obj.is_dir(),
+                    incremental=incremental,
+                )
+            except CrossfileOpacityError as exc:
+                click.echo("Error: --crossfile-opacity configuration is not supported:", err=True)
+                for reason in exc.reasons:
+                    click.echo(f"  - {reason}", err=True)
+                sys.exit(2)
+            click.echo(
+                "crossfile-opacity preflight passed. This mode is preview-only: the "
+                "protected multi-module build is not implemented yet, so no output was "
+                "written. See docs/CROSSFILE_OPACITY_DESIGN.md.",
+                err=True,
+            )
+            sys.exit(3)
 
         # Incremental short-circuit: directory mode only (single-file
         # rebuilds are cheap enough to skip this machinery)

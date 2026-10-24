@@ -93,6 +93,11 @@
           "default": true,
           "description": "Rename function local bindings in directory builds (parameters preserved)."
         },
+        "crossfile_opacity": {
+          "type": "boolean",
+          "default": false,
+          "description": "crossfile_opacity (see pyobfus.config.ObfuscationConfig)."
+        },
         "remove_docstrings": {
           "type": "boolean",
           "default": true,
