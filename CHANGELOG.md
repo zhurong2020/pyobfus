@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `--trace-encoding` selects the encoding of traceback files and piped stdin
+  for `--unmap`; the default UTF-8 reader also accepts a UTF-8 BOM.
+  Piped stdin now defaults to UTF-8 rather than the Python stream's encoding;
+  use `--trace-encoding` explicitly for locale-encoded pipes. Interactive
+  console input remains decoded by Python.
+
+### Fixed
+
+- `--unmap` reports unreadable or incorrectly encoded trace input with exit 2
+  and encoding guidance instead of an uncaught decoding exception. Legacy
+  Windows logs can be restored with `--trace-encoding cp1252`.
+- Pro selective opacity preserves module docstrings and keeps injected helpers
+  after future imports, so docstring-plus-future modules compile correctly
+  through the pure transformer API.
+
 ## [0.9.0] - 2026-10-23
 
 ### Added
