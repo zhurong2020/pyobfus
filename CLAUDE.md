@@ -105,6 +105,8 @@ PR #108（PY315-1 惰性导入保留、PY315-2 推导式解包、3.15 新内建�
 
 ## 反复踩过的坑（仍然生效）
 
+- **AI 安全分类器误判（dual-use）**：本仓是正规的开源 + 商用混淆器（专利 `202610712171X`），源码里本就含 `obfuscate`/`encrypt`/`anti_debug`/`license`/`string_enc` 等词；对自己源码的只读检索或编辑有时会被模型 `[cyber]` 误判并中断当轮（回退到弱模型）。**这不是错误也不是违规**：重跑同一条命令通常即过，或用 `/config` 换回强模型重试，并用 `/feedback` 反馈。减少误判的习惯与反馈模板见 [`docs/DUAL_USE_CONTEXT_AND_SAFETY_FLAGS.md`](docs/DUAL_USE_CONTEXT_AND_SAFETY_FLAGS.md)：优先用 Grep/Read 工具而非长管道 shell、单条命令别堆砌多个安全敏感词、在描述里写清是「保护自有源码」的良性意图。
+
 - **注册表传播延迟不是发布失败**：PyPI JSON 已显示新版后 pip 仍可能短时间 `No matching distribution`；
   Open VSX 上传后约 160 s 版本端点才不 404；Zenodo webhook 202 后约 2.5 h 才归档。等，别重试。
 - **本地 editable 元数据会过期**：核验「输出里的版本号」前先 `pip install -e .`，否则 marker/report 写旧版本。

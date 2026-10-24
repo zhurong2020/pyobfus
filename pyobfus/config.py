@@ -81,6 +81,11 @@ class ObfuscationConfig:
     name_prefix: str = "I"
     crossfile_module_attributes: bool = True
     crossfile_local_names: bool = True
+    # Opt-in multi-module L3 + application-key mode (Pro). First release is
+    # planning/preflight only (slice A); enabling it fails after preflight
+    # because the Pro adapter does not exist yet. See
+    # docs/CROSSFILE_OPACITY_DESIGN.md.
+    crossfile_opacity: bool = False
     remove_docstrings: bool = True
     remove_comments: bool = True
     string_encoding: bool = False

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Preview `--crossfile-opacity` (Pro): opt-in multi-module L3 + application-key
+  mode, first-release planning only. Its Core preflight validates the supported
+  envelope (Pro level, cross-file directory input, TOML-only selection via
+  `--opacity-config`, an application key source via `--bind-key-env`, `--jobs 1`,
+  all other build-fusion fields at defaults, CPython build interpreter) and a
+  stable top-level-function binding plan; enabling the flag reports whether the
+  configuration is supported and then stops without writing a protected build,
+  since the Pro adapter does not exist yet. See docs/CROSSFILE_OPACITY_DESIGN.md.
+
 ## [0.9.1] - 2026-10-24
 
 ### Added
