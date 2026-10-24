@@ -702,3 +702,23 @@ class TestRuntimeTamperDetection:
 
         with pytest.raises(OpacityRuntimeError):
             critical_tampered(1)
+
+
+@pytest.mark.parametrize("future", [False, True])
+@pytest.mark.parametrize("existing_runtime", [None, "_l3_dispatch", "provided_key"])
+def test_l3_preserves_module_docstring_and_future_prologue(future, existing_runtime):
+    source = '#!/usr/bin/env python3\n# coding: utf-8\n"""Module café."""\n'
+    if future:
+        source += "from __future__ import annotations\n"
+    if existing_runtime:
+        source += f"from pyobfus_runtime import {existing_runtime}\n"
+    source += "def calculate(value: int = 4) -> int:\n    return value + 3\n"
+    config = OpacityConfig(default_layer=Layer.ENCRYPTED)
+    transformed, assignments = transform_module(source, config)
+    namespace = {}
+    exec(compile(transformed, "<prologue-test>", "exec", dont_inherit=True), namespace)
+    assert namespace["__doc__"] == "Module café."
+    assert namespace["calculate"]() == 7
+    assert namespace["calculate"](8) == 11
+    assert namespace["calculate"].__annotations__["value"] == ("int" if future else int)
+    assert assignments == {"calculate": Layer.ENCRYPTED}
