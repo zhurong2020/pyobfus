@@ -1,6 +1,14 @@
 # pyobfus 当前计划
 
-**10-23 最终交接**：[Session 收尾](SESSION_CLOSEOUT_2026-10-23.md)。Core 0.9.0 / MCP 0.3.15 已发布并全渠道核实；只剩 `main`，无未提交改动。
+**2026-10-24 Core 0.9.1 已发布（维护者批准合并与发版）**：合并前无头 Codex 只读复核 PR #120 结论 NO BLOCKERS（另跑 20 项内存检查，原文 gitignored `docs/internal/release-0.9.1/`）。PR #120 rebase 合并（`73685ef`/`8fc0685`/`1449718`），main CI/CodeQL 通过；发布提交 `7bbd400`（版本号、CHANGELOG、README 中英/首页横幅、SUPPORT_MATRIX、DISTRIBUTION_CHANNELS），本地 Core 4491/54 skipped、MCP 153、integration 352/10、runtime 24、`scripts/check.sh` 通过；CI/CodeQL/Packaging 通过后打 `v0.9.1`，release.yml 成功。PyPI wheel/sdist PEP 740 publisher=release.yml；全新 venv 安装 0.9.1、`pip check` 通过，真实 cp1252 traceback 默认 exit 2、`--trace-encoding cp1252` 文件与管道均还原。GitHub Release「v0.9.1 — traceback encoding for --unmap」已建。MCP 0.3.15、runtime 0.1.1 不变。Zenodo `23608360`（v0.9.1）已归档，`CITATION.cff` 已同步并推送。Glama 由维护者改为 `pyobfus-mcp==0.3.15 pyobfus==0.9.1`，测试 `01a16bdc` 通过（40.5 s，握手 0.3.15、9 tools）。全 21 组合 CI 手动 run `40055228574` 36/36 作业通过。下载快照（数据至 10-23）安静日中位数 7 天 54、30 天 40，无异常。
+
+**2026-10-24 审核与 PR（维护者要求继续）**：两轮 Claude 无工具独立静态审核均无阻断，编码/TTY/BOM/提示与实际 runtime import 测试反馈已落实；Core 4490、MCP 153、integration 352、runtime 24 passed，最终专项 142，静态/文档/钩子检查通过。分类提交推送至 `fix/trace-encoding-opacity-prologue`，已开 [PR #120](https://github.com/zhurong2020/pyobfus/pull/120)，仅七份修复相关文件。远端 33 项通过 / 2 项按配置跳过（CI result、CodeQL 成功），PR 无冲突；尚未合并或发布；视频/L3/计划文档仍本地未提交。详见 [本轮进度](PRIORITY_PROGRESS_2026-10-24.md)。
+
+**2026-10-24 按优先级推进（本地，未发布）**：维护者授权依次推进。`--unmap` 编码处理与 Pro opacity prologue 已修并补回归（Core 4481 / MCP 153 / integration 352 / runtime 24 passed，最终专项 136；静态与严格文档检查通过）；L3 + 应用密钥范围已整理为五个实施切片，未接入新目录能力；DEV 第二篇已审订并重建固定版本复现环境。详细验收以 [本轮记录](PRIORITY_PROGRESS_2026-10-24.md) 为准；原有五份视频研究文档改动保留。
+
+**2026-10-23 视频原创保护方向登记（维护者认可后续规划）**：需求限定为公开视频上传 YouTube／B 站后的防搬运。完成官方资料调研与讨论，结论是来源材料、水印／内容匹配和平台处置；不承诺搬运副本自动失效。维护者同意将「独立的视频原创保护辅助工具」列入团队后续候选，探索母版／发布记录、水印、疑似片段比对及人工审核材料。完整结论、竞品版本／证据限制和下一轮验收见 [调研记录](VIDEO_ORIGINALITY_PROTECTION_RESEARCH_2026-10-23.md)，待办见 [TODO](TODO.md)。本次只改文档，未授权实现、采购或发布，不改变现有 Python 工作顺序。
+
+**10-23 发版后交接快照**：[Session 收尾](SESSION_CLOSEOUT_2026-10-23.md)。Core 0.9.0 / MCP 0.3.15 已发布并全渠道核实；该次交接时只剩 `main`、无未提交改动，后续文档登记见上段。
 
 **2026-10-23 MCP 0.3.15 已发布（维护者批准）**：只含 `unmap_stack_trace` 独立构建 mapping 提示修订，依赖下限仍 `pyobfus>=0.5.18`。PR #116 → main `887026c`，CI/CodeQL 通过后打 `mcp-v0.3.15`；release.yml 成功，PyPI wheel/sdist PEP 740 publisher=release.yml（JSON 先更新、pip 约 1 分钟后才可装，属索引传播延迟）；全新 Python 3.15 venv 自动带 Core 0.9.0 / runtime 0.1.1 / mcp 1.30.0、pip check 通过，stdio 握手 0.3.15 / 协议 `2025-11-25` / 9 tools；`mcp-publisher` 发布后 Registry `active` / `isLatest=true`。Glama 同日测试 `01a166d0`（MCP 0.3.14 + Core 0.9.0，9 tools）通过；维护者 12:00 已改为 `pyobfus-mcp==0.3.15 pyobfus==0.9.0`，测试 `01a166ea` 通过（安装 MCP 0.3.15 / Core 0.9.0 / runtime 0.1.1，握手 0.3.15，9 tools）。
 

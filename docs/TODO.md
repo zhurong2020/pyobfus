@@ -5,7 +5,7 @@
 顺序做」，不记录历史。最新依据见
 [`FEATURE_EXPANSION_RESEARCH_2026-10-20.md`](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)；Python 3.15 的 P0 范围与验收见 [`PYTHON315_SUPPORT_PLAN.md`](PYTHON315_SUPPORT_PLAN.md)。
 
-最后更新：2026-10-23。Core 0.9.0（独立目录构建 mapping v2，#112）与 MCP 0.3.15（`unmap_stack_trace` 提示）已于 10-23 发布，runtime 0.1.1 不变；PyPI/PEP 740、全新安装、GitHub Release、Zenodo `23585299`/CFF、MCP Registry 与 Glama（测试 `01a166ea`）均已核。发版节奏见「节奏」段（10-23 起按自然进度）。
+最后更新：2026-10-24。Core 0.9.1（`--trace-encoding` 与 Pro opacity prologue，PR #120）已发布，PyPI/PEP 740、全新安装、GitHub Release、Zenodo `23608360`/CFF、全 21 组合 CI 与 Glama（测试 `01a16bdc`）均已核；本轮修复、范围清单与内容审阅见 [推进记录](PRIORITY_PROGRESS_2026-10-24.md)。此前 Core 0.9.0（独立目录构建 mapping v2，#112）与 MCP 0.3.15（`unmap_stack_trace` 提示）已于 10-23 发布，runtime 0.1.1 不变；PyPI/PEP 740、全新安装、GitHub Release、Zenodo `23585299`/CFF、MCP Registry 与 Glama（测试 `01a166ea`）均已核。发版节奏见「节奏」段（10-23 起按自然进度）。
 
 ## 状态口径
 
@@ -34,7 +34,7 @@
 
 按 [推进计划](ADOPTION_WORKFLOW_PLAN_2026-10-22.md) 顺序执行：
 
-四阶段本地工作已完成，结果见推进计划与 CURRENT_PLAN_ZH.md。本轮修订已于 10-23 经 PR #112 合并，并随 Core 0.9.0 / MCP 0.3.15 发布。接下来：`--unmap` 非 UTF-8 输入、Pro opacity future prologue、限定 L3 设计范围、审 DEV 草稿；不因本地验收通过自动发版或投稿。
+四阶段本地工作已完成，结果见推进计划与 CURRENT_PLAN_ZH.md。本轮修订已于 10-23 经 PR #112 合并，并随 Core 0.9.0 / MCP 0.3.15 发布。10-24 前两项已完成两轮独立审核并推送 PR #120，33 项检查通过 / 2 项跳过；L3 范围与 DEV 草稿已审订，见推进记录。PR #120 已于 10-24 合并并随 Core 0.9.1 发布（见 CURRENT_PLAN 顶部）；接下来 L3 切片 A 实施；不因本地验收通过自动发版或投稿。
 
 10-25 复盘、10-26 巡检继续，但不阻塞上述工作；不再以静默等待为主要任务。私有医院应用仍暂停，等现场升级 Win10 后反馈。参数改名等其他候选保持原范围与授权边界。
 
@@ -45,17 +45,24 @@
 - [x] **PY315-1：惰性 from 导入被提前执行**。原生 Python 3.15.0、当前 checkout 与 PyPI Core 0.7.5 wheel 均复现：`lazy from calculator import Calculator` 改写后丢 `is_lazy`，构建成功但导入副作用时序变化。最小输入与输出见调研 §5.1。Community 兼容性，已修复并补原生回归；0.8.0 发布（#108）。
 - [x] **PY315-2：新字典推导式解包构建失败**。`{**row for row in rows}` 原文在 3.15 可运行，checkout／0.7.5 wheel 构建均报 `NoneType ... _fields`；根因为自定义推导式 visitor 访问 None，六处路径已修复并补原生回归；0.8.0 发布（#108）。
 - [ ] **3.15 后续（0.8.0 发布后登记，均未授权实现）**：① 3.15 标准库冒烟中 `json`（`scanner.make_scanner`）与 `unittest`（`util.three_way_cmp`/`case.TestCase`）目录构建产物导入失败，main 同样失败，属模块属性证明既有限制，待定是否单列缺陷；② free-threaded 3.15、3.15 上冻结/编译打包未验证。Black/mypy 配置修订与 Glama 同步结果见 `CURRENT_PLAN_ZH.md` 对应日期记录。
-- [ ] **Pro opacity 纯转换 API 的 future prologue 缺陷（10-22 实测登记）**：带模块 docstring、`from __future__` 和受保护函数的合成输入，经 `transformers.opacity.transform_module` 后编译报 future import 位置错误。当前 CLI 是否受影响尚未验证；单独安排最小复现与兼容修复，本轮 L3 仅设计，未改 Pro 实现。
-- [ ] **`--unmap` 读非 UTF-8 trace 直接崩溃（10-23 实测登记，未授权实现）**：`pyobfus/cli.py` 固定按 UTF-8 读 `--trace` 文件（stdin 同样），Windows 上 cp1252 等本地编码保存的 traceback（如含 `á` 的混淆名）触发未捕获的 `UnicodeDecodeError`，exit 1、无友好提示；用 0.8.0 checkout 以文件和 stdin 两条路径复现。PR #112 的 CI 在 Windows 暴露此问题，当时只改测试（子进程 `-X utf8`）。候选修复：UTF-8 失败时回退 locale 编码或 `errors="replace"` 并提示；验收须覆盖文件／stdin、Windows cp1252 与 UTF-8 BOM。
 - [ ] **MCP 2.x 发布条件复审**。10-19 CI 已用 2.3.0 过 152 项；10-20 Linux 真实 stdio 验证 legacy 为 `2025-11-25`、auto 为 `2026-07-28`，均列出 9 工具并成功调用只读工具。旧「stdio 无新协议收益」结论不再适用；依赖上限未改，仍需 Python 3.10／Windows／干净解析与全工具合同。
 - `--no-cross-file` mapping 已在本分支实现并验证；目录 L3 + 应用 key provider 只完成设计与审核，未来实现另行确定；不一次接入全部 fusion 字段。
 - 参数改名、H B2/B3、资源 key provider 与 L3 方法覆盖继续保持原 gate；未授权改实现／合并／发布。
+
+- [ ] **v1 mapping 的非 ASCII 名字还原限制（10-24 反例）**：合成 v1 mapping 的 `foo → á` 能读取，但 `unmap_text` 的 ASCII identifier 正则不替换 `in á`；后续真实 CLI 用 `--name-prefix á` 构建崩溃函数 `calculate_total`，mapping v1 中记录非 ASCII 短名，但实际 traceback 经 unmap 后仍保留该短名，确认不只手写 mapping 受影响；编码正确解码后仍保持短名。此项独立于本轮输入编码修复；待比较 v1 兼容合同与 v2 Unicode token 逻辑后安排修订，不能把成功解码宣传为所有 Unicode 名字均能恢复。
+
+- [ ] **opacity 既有 runtime import 晚于函数时加载失败（10-24 审核反例）**：纯转换 API 默认 encrypted 模块中，用户在函数之后才 `from pyobfus_runtime import _l3_dispatch`，现有合并扫描复用晚导入，产物装饰器执行时 NameError。此路径在本轮 prologue 修复前已存在；应按首次使用位置而非全模块名字出现判断是否需要前导注入。
+- [ ] **CLI 输出流无法编码 trace Unicode 时崩溃（10-24 审核反例）**：`PYTHONIOENCODING=cp1252:strict` 下，UTF-8 文件含中文，`--unmap --json` 在 `click.echo` 阶段 UnicodeEncodeError、exit 1。独立于输入解码；后续定义 JSON/text 输出编码与兼容策略，并用真实 subprocess 验收。MCP unmap 直接处理 Unicode 字符串，不经 CLI stdin。
+
+## 后续团队候选：独立的视频原创保护辅助工具（2026-10-23）
+
+- [ ] **待需求验证与单项范围确认**：维护者同意列入后续规划，面向公开发布到 YouTube／B 站的原创视频；探索母版／发布记录、水印、疑似搬运片段比对和人工审核材料整理。调研、竞品官方资料快照、技术边界及后续验收见 [视频原创保护调研](VIDEO_ORIGINALITY_PROTECTION_RESEARCH_2026-10-23.md)。下一步先验证外部创作者需求与平台实际权益，再决定原型范围；不改变现有任务顺序，不承诺搬运副本自动失效。独立产品倾向，仓库／许可／收费未定；本次仅授权记录规划，未授权实现、采购或发布。
 
 ## 发布后观察与下次发版
 
 - **后续采用引导文档（10-22 登记，仅记录）**：当前四阶段之后，按 [AI / Agent 采用引导计划](AGENT_ADOPTION_GUIDANCE_PLAN.md) 复核 llms 镜像、README／首页、集成模板及能力元数据；以迭代、兼容／验证／调试证据说明直接采用的价值，不把代码量当作质量、不写强制推荐指令。本轮未修改对外入口。
 
-- 每周一巡检继续观察 Core 0.8.0 / MCP 0.3.14 反馈、下载安静日、客户调研回答、CI 与备份。无新缺陷时不重复全量测试、不主动增加功能。
+- 每周一巡检继续观察 Core 0.9.0 / MCP 0.3.15 反馈、下载安静日、客户调研回答、CI 与备份。无新缺陷时不重复全量测试、不主动增加功能。
 - **10-25 复盘**照原计划；发布日、次日与内容投放流量分开记录，据客户回答调整后续优先级。
 - 下次发布按实际新增改动与维护者授权确定，不恢复此前 10-15 的等待通知状态。
 - **3.15 兼容 P0 已随 Core 0.8.0 发布**：后续只跟进已登记的兼容性限制；MCP 2.x、mapping 与 Pro 新功能分别按需求和授权推进。
