@@ -149,3 +149,21 @@ shareable build report 只新增模式、合格／加密／拒绝计数、原因
 - __init__ 提前导入、-m 与 console-script、晚 provider 与 env fallback、每模块多次 provider 和 fresh spawn。
 - 不同 module 的共享 key／cipher swap 不被宣称为认证；混合 build id 由交付检查报告；wrapper 反射、递归与并发首次调用的限制明确。
 - 任一步骤失败旧发布保持完好；全新路径的完成 manifest 和 metadata id 一致；不通过日志或异常泄漏 key。
+
+## 11. 2026-10-24 范围收敛与实施切片
+
+维护者要求按交接顺序推进。本项交付是将现有设计收敛为可执行清单；下列新能力仍未实现，不能使用上述拟议 CLI 命令作为现有功能。前置的纯转换 API prologue 修复独立处理，不接入新目录模式。
+
+首批沿用 §2–§8 的完整约束：Pro opt-in、TOML-only、稳定绑定的同步顶层函数、`jobs=1`、应用密钥、全量重建、全新输出及 metadata 路径、同解释器字节码。方法、async/generator、手写 marker、其他 fusion 组合和冻结包不进入首批。加密帧只恢复名字；含 L3 模块的普通函数帧可能保持原样，这一限制必须在配置帮助和报告中可见。
+
+| 切片 | 交付与验收 | 依赖 |
+|---|---|---|
+| A：预检与绑定计划 | 原 AST 的稳定目标集合、14 项 fusion 字段及依赖 allowlist、配置/路径/解释器拒绝原因；不读取真实许可状态的合成测试 | 本设计 |
+| B：Core 对应表 | 原 binding id 到 final name 的显式对应；两模块同名、相对导入、重导出、循环导入及创建顺序反例；Community 默认产物不变 | A |
+| C：Pro adapter | 只消费显式目标；key-expression 直接生成，无 raw-key 中间文本；compile/decrypt 往返、名字冲突、future/docstring/lazy 反例 | A、B |
+| D：调试与报告 | 精确 encrypted-code 身份匹配、错误 build id、全 L3/混合 trace；私有 mapping 详细计划与可分享 counts-only 报告；明确 reader 最低版本 | B、C |
+| E：发布目录与交付验证 | 私有 staging、新路径提交、完成 manifest、失败恢复及混合构建检查；runtime-only 干净安装验证 | C、D |
+
+切片不是可绕过的验收阶段：A/B 完成不能宣传保护已经生效，C 完成不能忽略 D/E 直接交付。runtime 0.1.1 是否足够必须在 C 的接口核对后确定，若需要扩展先独立升级并发布 runtime。Linux/Windows 与 3.10/3.12/3.15 的实际结果应逐格登记；本轮 Python 3.12/Linux 的已有修复回归不能代替该矩阵。
+
+实施时按切片准备审核材料，每一块记录支持与拒绝实例；合并、版本号和发布仍按维护者批准执行。本轮未增加开关、planner、adapter 或 runtime API。
