@@ -77,6 +77,15 @@ Save it to a file, for example `error.log`.
 pyobfus --unmap --trace error.log --mapping private/pricing.map.json
 ```
 
+In the next release (currently unreleased), trace files and piped stdin default
+to UTF-8, accepting an optional BOM. Piped stdin previously used Python's
+stream encoding; specify `--trace-encoding` for pipes using a different
+encoding. Interactive console input is already decoded by Python and does
+not use this option. For a Windows log saved as cp1252, add
+`--trace-encoding cp1252`. Invalid bytes or an unknown encoding fail with exit 2
+and a decoding hint; bytes are not silently replaced or guessed. Re-save the
+log as UTF-8 when using Core 0.9.0 or earlier.
+
 ```
 Traceback (most recent call last):
   File "pricing.py", line 19, in <module>  [obfuscated: .../dist/pricing.py:22]

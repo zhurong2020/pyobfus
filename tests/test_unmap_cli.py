@@ -544,3 +544,132 @@ def test_direct_package_json_crash(tmp_path):
         for f in result["frames"]
         if "/json/" in f["obfuscated_file"].replace("\\", "/")
     )
+
+
+@pytest.mark.parametrize("stdin", [False, True])
+@pytest.mark.parametrize("encoding", ["utf-8", "utf-8-sig", "cp1252"])
+def test_unmap_trace_encodings(tmp_path, stdin, encoding):
+    mapping = _write_minimal_mapping(tmp_path)
+    trace = '  File "café.py", line 3, in I0\nValueError: á\n'
+    raw = trace.encode(encoding)
+    args = ["--unmap", "--mapping", str(mapping), "--json"]
+    if encoding == "cp1252":
+        args += ["--trace-encoding", encoding]
+    if stdin:
+        args += ["--trace", "-"]
+    else:
+        path = tmp_path / "trace.log"
+        path.write_bytes(raw)
+        args += ["--trace", str(path)]
+    result = CliRunner().invoke(main, args, input=raw if stdin else None)
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.stdout)
+    assert payload["original_trace"] == trace
+    assert '"café.py", line 3, in foo' in payload["unmapped_trace"]
+
+
+@pytest.mark.parametrize("stdin", [False, True])
+@pytest.mark.parametrize("encoding", ["utf-8-sig", "no-such-codec"])
+def test_unmap_encoding_error_is_actionable(tmp_path, stdin, encoding):
+    mapping = _write_minimal_mapping(tmp_path)
+    raw = b"in I0 caf\xe9\n"
+    path = tmp_path / "trace.log"
+    path.write_bytes(raw)
+    result = CliRunner().invoke(
+        main,
+        [
+            "--unmap",
+            "--mapping",
+            str(mapping),
+            "--trace",
+            "-" if stdin else str(path),
+            "--trace-encoding",
+            encoding,
+            "--json",
+        ],
+        input=raw if stdin else None,
+    )
+    assert result.exit_code == 2
+    assert "--trace-encoding" in result.output
+    assert "Traceback (most recent call last)" not in result.output
+    assert not isinstance(result.exception, (UnicodeError, LookupError))
+
+
+def test_unmap_cp1252_pipe_ignores_python_stdin_encoding(tmp_path):
+    import os
+    import subprocess
+    import sys
+
+    mapping = _write_minimal_mapping(tmp_path)
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pyobfus",
+            "--unmap",
+            "--trace",
+            "-",
+            "--mapping",
+            str(mapping),
+            "--trace-encoding",
+            "cp1252",
+            "--json",
+        ],
+        input='  File "café.py", line 3, in I0\nValueError: á\n'.encode("cp1252"),
+        capture_output=True,
+        env=dict(
+            os.environ, HOME=str(tmp_path), USERPROFILE=str(tmp_path), PYTHONIOENCODING="utf-8"
+        ),
+    )
+    assert result.returncode == 0, result.stderr
+    assert "in foo" in json.loads(result.stdout)["unmapped_trace"]
+
+
+def test_unmap_text_only_stdin(tmp_path, monkeypatch, capsys):
+    mapping = _write_minimal_mapping(tmp_path)
+    monkeypatch.setattr("sys.stdin", io.StringIO("in I0\n"))
+    _handle_unmap("-", str(mapping), json_output=True)
+    assert json.loads(capsys.readouterr().out)["unmapped_trace"] == "in foo\n"
+
+
+@pytest.mark.parametrize("text", ["in I0\n", "\ufeffin I0\n"])
+def test_unmap_text_only_stdin_optional_bom(tmp_path, monkeypatch, capsys, text):
+    mapping = _write_minimal_mapping(tmp_path)
+    monkeypatch.setattr("sys.stdin", io.StringIO(text))
+    _handle_unmap("-", str(mapping), json_output=True)
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["original_trace"] == "in I0\n"
+    assert payload["unmapped_trace"] == "in foo\n"
+
+
+def test_unmap_console_uses_decoded_text(tmp_path, monkeypatch, capsys):
+    mapping = _write_minimal_mapping(tmp_path)
+
+    class Console(io.StringIO):
+        def isatty(self):
+            return True
+
+        @property
+        def buffer(self):
+            raise AssertionError("A console must not be re-decoded as a file or pipe")
+
+    monkeypatch.setattr("sys.stdin", Console('  File "café.py", line 3, in I0\n'))
+    _handle_unmap("-", str(mapping), json_output=True, trace_encoding="cp1252")
+    assert '"café.py", line 3, in foo' in json.loads(capsys.readouterr().out)["unmapped_trace"]
+
+
+def test_unmap_text_stream_decode_error_has_stream_guidance(tmp_path, monkeypatch, capsys):
+    mapping = _write_minimal_mapping(tmp_path)
+
+    class BrokenText(io.StringIO):
+        def read(self, *args, **kwargs):
+            raise UnicodeDecodeError("utf-8", b"\xe9", 0, 1, "invalid continuation byte")
+
+    monkeypatch.setattr("sys.stdin", BrokenText())
+    with pytest.raises(SystemExit) as exc:
+        _handle_unmap("-", str(mapping), trace_encoding="cp1252")
+    assert exc.value.code == 2
+    error = capsys.readouterr().err
+    assert "Python could not decode text stdin" in error
+    assert "pipe raw bytes" in error
+    assert "using 'cp1252'" not in error

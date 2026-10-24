@@ -498,6 +498,12 @@ def _echo_pro_import_hint() -> None:
     "Pass '-' to read from stdin.",
 )
 @click.option(
+    "--trace-encoding",
+    default="utf-8-sig",
+    show_default=True,
+    help="Encoding of trace files or piped stdin for --unmap (e.g. cp1252).",
+)
+@click.option(
     "--mapping",
     "mapping_path",
     type=click.Path(),
@@ -582,6 +588,7 @@ def main(
     community_marker: Optional[bool],
     unmap_mode: bool,
     trace_path: Optional[str],
+    trace_encoding: str,
     mapping_path: Optional[str],
     init_mode: bool,
     incremental: bool,
@@ -682,6 +689,7 @@ def main(
             sys.exit(2)
         _handle_unmap(
             trace_path=trace_path or input_path,
+            trace_encoding=trace_encoding,
             mapping_path=mapping_path,
             json_output=json_output,
         )
@@ -2849,6 +2857,7 @@ def _handle_unmap(
     trace_path: Optional[str],
     mapping_path: Optional[str],
     json_output: bool = False,
+    trace_encoding: str = "utf-8-sig",
 ) -> None:
     """
     Restore identifiers and available statement locations in a stack trace / error log.
@@ -2873,21 +2882,56 @@ def _handle_unmap(
         click.echo(f"Error: invalid mapping file: {e}", err=True)
         sys.exit(2)
 
-    if trace_path in (None, "-"):
-        if trace_path is None and sys.stdin.isatty():
-            # Nothing piped in: reading stdin would just wait silently.
-            click.echo("Error: --unmap needs a trace: --trace FILE, a path, or stdin.", err=True)
-            click.echo(
-                "Example: pyobfus --unmap --trace error.log --mapping mapping.json", err=True
-            )
-            sys.exit(2)
-        trace_text = sys.stdin.read()
-    else:
-        trace_file = Path(trace_path)  # type: ignore[arg-type]
-        if not trace_file.exists():
-            click.echo(f"Error: trace file not found: {trace_path}", err=True)
-            sys.exit(2)
-        trace_text = trace_file.read_text(encoding="utf-8")
+    try:
+        # Validate even when stdin is an already-decoded text-only stream.
+        import codecs
+
+        codec = codecs.lookup(trace_encoding)
+        if trace_path in (None, "-"):
+            if trace_path is None and sys.stdin.isatty():
+                click.echo(
+                    "Error: --unmap needs a trace: --trace FILE, a path, or stdin.", err=True
+                )
+                click.echo(
+                    "Example: pyobfus --unmap --trace error.log --mapping mapping.json", err=True
+                )
+                sys.exit(2)
+            binary_stdin = None if sys.stdin.isatty() else getattr(sys.stdin, "buffer", None)
+            if binary_stdin is not None:
+                trace_text = binary_stdin.read().decode(trace_encoding)
+            else:
+                # Consoles and embedding hosts already supply decoded text.
+                try:
+                    trace_text = sys.stdin.read()
+                except UnicodeError:
+                    click.echo(
+                        "Error: Python could not decode text stdin. Save the trace to a file "
+                        "or pipe raw bytes, then select their encoding with --trace-encoding.",
+                        err=True,
+                    )
+                    sys.exit(2)
+                if codec.name == "utf-8-sig" and trace_text.startswith("\ufeff"):
+                    trace_text = trace_text[1:]
+        else:
+            assert trace_path is not None
+            trace_text = Path(trace_path).read_text(encoding=trace_encoding)
+    except FileNotFoundError:
+        click.echo(f"Error: trace file not found: {trace_path}", err=True)
+        sys.exit(2)
+    except (UnicodeError, LookupError):
+        click.echo(
+            f"Error: cannot decode trace using {trace_encoding!r}. "
+            "Use --trace-encoding with the log's encoding (e.g. cp1252), "
+            "or save the trace as UTF-8.",
+            err=True,
+        )
+        sys.exit(2)
+    except OSError as exc:
+        click.echo(f"Error: cannot read trace: {exc}", err=True)
+        sys.exit(2)
+
+    # Match text-mode universal-newline handling for binary stdin too.
+    trace_text = trace_text.replace("\r\n", "\n").replace("\r", "\n")
 
     if not trace_text.strip():
         click.echo("Error: no trace input (empty file or stdin).", err=True)
