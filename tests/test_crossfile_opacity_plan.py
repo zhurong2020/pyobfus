@@ -359,3 +359,120 @@ def test_cli_crossfile_opacity_rejects_and_writes_nothing(tmp_path):
     assert "not supported" in result.output
     assert "Pro" in result.output
     assert not out.exists()
+
+
+# --------------------------------------------------------------------------
+# Slice B: original-binding-id -> final-name correspondence
+# --------------------------------------------------------------------------
+
+from pyobfus.core.crossfile_opacity import resolve_correspondence  # noqa: E402
+
+
+class _MappingStub:
+    def __init__(self, modules):
+        self.modules = modules
+
+
+def _plan_from_source(module, src):
+    return plan_module_targets(module, src)
+
+
+def test_correspondence_resolves_renamed_and_preserved():
+    src = "def pub(x):\n    return x + 1\ndef _priv(y):\n    return y * 2\n"
+    plan = _plan_from_source("pkg.util", src)
+    mapping = _MappingStub({"pkg.util": {"pub": "I2"}})  # _priv left unchanged
+    corr = resolve_correspondence(plan, mapping)
+    finals = {bf.binding.name: (bf.final_name, bf.renamed) for bf in corr.resolved}
+    assert finals["pub"] == ("I2", True)
+    assert finals["_priv"] == ("_priv", False)
+
+
+def test_correspondence_is_file_scoped_for_same_name():
+    # Two modules both define f; each resolves to its own final name.
+    plan_a = _plan_from_source("a", "def f(x):\n    return x\n")
+    plan_b = _plan_from_source("b", "def f(x):\n    return x\n")
+    mapping = _MappingStub({"a": {"f": "I0"}, "b": {"f": "I9"}})
+    assert resolve_correspondence(plan_a, mapping).resolved[0].final_name == "I0"
+    assert resolve_correspondence(plan_b, mapping).resolved[0].final_name == "I9"
+
+
+def test_correspondence_ignores_local_variable_tables():
+    # Only mapping.modules is consulted; a locals table must not leak in.
+    src = "def f(x):\n    return x\n"
+    plan = _plan_from_source("m", src)
+    mapping = _MappingStub({"m": {}})
+    mapping.locals = {"m": {"Q9": "f"}}  # function-local reuse of the name
+    corr = resolve_correspondence(plan, mapping)
+    assert corr.resolved[0].final_name == "f"  # preserved, not Q9
+
+
+def _phase1_mapping(tmp_path, files):
+    from pyobfus.config import ObfuscationConfig
+    from pyobfus.core.mapping import ObfuscationMapping
+    from pyobfus.core.orchestrator import CrossFileOrchestrator
+
+    src = tmp_path / "src"
+    src.mkdir(parents=True)
+    for rel, text in files.items():
+        p = src / rel
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(text, encoding="utf-8")
+    orch = CrossFileOrchestrator(ObfuscationConfig(level="community", max_workers=1))
+    orch.phase1_scan(src)
+    return orch, ObfuscationMapping.from_global_table(orch.global_table, root=str(src))
+
+
+def test_correspondence_against_real_reexport_and_relative_import(tmp_path):
+    # pkg.core defines helper; pkg.__init__ re-exports it; main imports via pkg.
+    orch, mapping = _phase1_mapping(
+        tmp_path,
+        {
+            "pkg/__init__.py": "from .core import helper\n__all__ = ['helper']\n",
+            "pkg/core.py": "def helper(v):\n    return v + 1\n",
+            "main.py": "from pkg import helper\n\n\ndef run():\n    return helper(1)\n",
+        },
+    )
+    plan = plan_module_targets("pkg.core", (tmp_path / "src" / "pkg" / "core.py").read_text())
+    corr = resolve_correspondence(plan, mapping)
+    helper = {bf.binding.name: bf.final_name for bf in corr.resolved}["helper"]
+    # The definition's final name comes from pkg.core, matching Core's table.
+    assert helper == mapping.modules.get("pkg.core", {}).get("helper", "helper")
+    # run() in main resolves to main's own final name, not pkg.core's helper.
+    run_plan = plan_module_targets("main", (tmp_path / "src" / "main.py").read_text())
+    run_final = {
+        bf.binding.name: bf.final_name for bf in resolve_correspondence(run_plan, mapping).resolved
+    }
+    assert "helper" not in run_final  # main does not define helper
+    assert run_final["run"] == mapping.modules.get("main", {}).get("run", "run")
+
+
+def test_correspondence_against_circular_import(tmp_path):
+    orch, mapping = _phase1_mapping(
+        tmp_path,
+        {
+            "a.py": "import b\n\n\ndef a_fn():\n    return b.b_fn()\n",
+            "b.py": "import a\n\n\ndef b_fn():\n    return 7\n",
+        },
+    )
+    for mod, fn in (("a", "a_fn"), ("b", "b_fn")):
+        plan = plan_module_targets(mod, (tmp_path / "src" / f"{mod}.py").read_text())
+        corr = resolve_correspondence(plan, mapping)
+        final = {bf.binding.name: bf.final_name for bf in corr.resolved}[fn]
+        assert final == mapping.modules.get(mod, {}).get(fn, fn)
+
+
+def test_correspondence_is_stable_regardless_of_file_creation_order(tmp_path):
+    files = {
+        "a.py": "def f():\n    return 1\n",
+        "b.py": "def f():\n    return 2\n",
+        "c.py": "def f():\n    return 3\n",
+    }
+    _, m1 = _phase1_mapping(tmp_path / "one", files)
+    _, m2 = _phase1_mapping(tmp_path / "two", {k: files[k] for k in reversed(list(files))})
+    for mod in ("a", "b", "c"):
+        plan = plan_module_targets(mod, files[f"{mod}.py"])
+        f1 = resolve_correspondence(plan, m1).resolved[0].final_name
+        f2 = resolve_correspondence(plan, m2).resolved[0].final_name
+        # Each module's own f resolves to that module's recorded final name.
+        assert f1 == m1.modules.get(mod, {}).get("f", "f")
+        assert f2 == m2.modules.get(mod, {}).get("f", "f")

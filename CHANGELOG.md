@@ -17,6 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   stable top-level-function binding plan; enabling the flag reports whether the
   configuration is supported and then stops without writing a protected build,
   since the Pro adapter does not exist yet. See docs/CROSSFILE_OPACITY_DESIGN.md.
+- Crossfile-opacity planning (slice B): a Core correspondence table mapping each
+  original top-level-function binding id to the final name Core emitted for it,
+  derived from the finished cross-file name mapping (not AST node identity) and
+  scoped to each definition module, so same-named functions in different modules
+  and re-exports resolve correctly. Preview-only planning metadata; no build
+  output or protection yet.
 
 ## [0.9.1] - 2026-10-24
 

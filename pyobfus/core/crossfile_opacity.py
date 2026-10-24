@@ -104,6 +104,62 @@ class ModulePlan:
     rejected: Tuple[TargetRejection, ...] = field(default_factory=tuple)
 
 
+@dataclass(frozen=True)
+class BindingFinalName:
+    """An original binding id paired with the final name Core emitted for it."""
+
+    binding: BindingId
+    final_name: str
+
+    @property
+    def renamed(self) -> bool:
+        return self.final_name != self.binding.name
+
+
+@dataclass(frozen=True)
+class ModuleCorrespondence:
+    """Slice B: the explicit original-binding-id -> final-name table for a module.
+
+    Derived from Core's finished name mapping, not from AST node identity, so it
+    survives unparse/reparse. A selected binding whose definition module does not
+    record a rename resolves to its own name (Core left it unchanged, e.g. a
+    private top-level function in a directory build).
+    """
+
+    module: str
+    resolved: Tuple[BindingFinalName, ...] = field(default_factory=tuple)
+
+
+def resolve_correspondence(plan: ModulePlan, mapping: Any) -> ModuleCorrespondence:
+    """Map each selected binding to its final name using Core's mapping.
+
+    ``mapping`` is duck-typed: it must expose ``modules`` as
+    ``{module -> {original_name -> final_name}}`` (an ``ObfuscationMapping`` from
+    a cross-file build, or any object with the same shape). Resolution is
+    file-scoped to the binding's own definition module, so two modules that both
+    define ``f`` resolve to their own final names and a re-export in a third
+    module is never mistaken for the definition.
+    """
+    forward = _final_name_table(mapping, plan.module)
+    resolved = [
+        BindingFinalName(binding=b, final_name=forward.get(b.name, b.name)) for b in plan.selected
+    ]
+    return ModuleCorrespondence(module=plan.module, resolved=tuple(resolved))
+
+
+def _final_name_table(mapping: Any, module: str) -> dict[str, str]:
+    """Return ``{original_name -> final_name}`` for one module's module-level names.
+
+    Only ``mapping.modules`` is consulted: a top-level function's final name is a
+    module-level binding recorded there. Function-local rename tables are
+    deliberately ignored -- a local variable can reuse a top-level name, and its
+    obfuscated spelling is not the definition's final name.
+    """
+    modules = getattr(mapping, "modules", None) or {}
+    entry = modules.get(module, {})
+    return dict(entry) if isinstance(entry, dict) else {}
+
+
 def import_identity(module_name: str) -> str:
     """Return the runtime import path for a Core module name.
 
