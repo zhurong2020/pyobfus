@@ -1,5 +1,13 @@
 # pyobfus 当前计划
 
+**2026-10-24 crossfile-opacity（多模块 L3 + 应用密钥）切片 A–D 进度（预览、未发版，维护者授权逐片推进）**：按设计 §11 五切片推进；维护者已确认首批限制（`--jobs 1` 串行、仅模块顶层同步普通函数、TOML-only 选择、全新输出路径、相同 CPython 实现/minor/GIL、加密函数不还原原始行号）。每片均经无头 Codex 只读复核、问题逐项修复、`check.sh` 绿、全量测试通过。
+- **切片 A**（预检 + 稳定绑定计划，Community）：`pyobfus/core/crossfile_opacity.py`，`--crossfile-opacity` 开关启用后只跑预检即停、绝不回退普通构建。**已合并 PR #121**（含 Codex 查出的 6 项修复）。
+- **切片 B**（Core 绑定对应表）：`resolve_correspondence()` 从已完成跨文件名映射求「原绑定→最终名」，文件级定位。**已合并 PR #122**（Codex NO BLOCKERS，另在内存驱动真实转换器核对 38 绑定）。
+- **切片 C**（Pro 加密适配器）：`pyobfus_pro/crossfile_opacity_adapter.py`，只消费显式目标、直接 `provided_key("ENV")` key-expression（无 raw-key 常量）、往返+泄漏验证、仅编译不执行。**已合并 PR #123**（含 Codex 5 项修复）。
+- **切片 D**（调试 + counts-only 报告）：`pyobfus/core/crossfile_opacity_debug.py` + 适配器 `code_filename` 专用帧身份 `<pyobfus-l3:…>`；名字级还原器、无原始行号、不猜未知帧。**PR #126 已开、CI 全绿（CI result+CodeQL SUCCESS，MERGEABLE/CLEAN）、尚未合并**（含 Codex 3 项修复）。
+- **切片 E（未开始，下一步）**：把 `encrypted_code`/`opacity_plan` 落盘 mapping、接 CLI `--unmap`、运行期解释器 guard、私有 staging + 全新路径提交 + 失败恢复 + 混合构建交付检查、runtime-only 干净安装验证。这是端到端收尾，仍在 `--crossfile-opacity` 预览开关后。
+- **发版**：A–E 全绿前整条链路对外不构成「保护已生效」，不发版；今日已发 0.9.1，本轮切片暂不随发。各片审核原文/解决记录在 gitignored `docs/internal/crossfile-opacity-2026-10-24/`；设计 SoT `docs/CROSSFILE_OPACITY_DESIGN.md`。**本次 session 在此暂停**：main 已含 A/B/C，slice D 在 PR #126 待合并，slice E 未动。
+
 **2026-10-24 Core 0.9.1 已发布（维护者批准合并与发版）**：合并前无头 Codex 只读复核 PR #120 结论 NO BLOCKERS（另跑 20 项内存检查，原文 gitignored `docs/internal/release-0.9.1/`）。PR #120 rebase 合并（`73685ef`/`8fc0685`/`1449718`），main CI/CodeQL 通过；发布提交 `7bbd400`（版本号、CHANGELOG、README 中英/首页横幅、SUPPORT_MATRIX、DISTRIBUTION_CHANNELS），本地 Core 4491/54 skipped、MCP 153、integration 352/10、runtime 24、`scripts/check.sh` 通过；CI/CodeQL/Packaging 通过后打 `v0.9.1`，release.yml 成功。PyPI wheel/sdist PEP 740 publisher=release.yml；全新 venv 安装 0.9.1、`pip check` 通过，真实 cp1252 traceback 默认 exit 2、`--trace-encoding cp1252` 文件与管道均还原。GitHub Release「v0.9.1 — traceback encoding for --unmap」已建。MCP 0.3.15、runtime 0.1.1 不变。Zenodo `23608360`（v0.9.1）已归档，`CITATION.cff` 已同步并推送。Glama 由维护者改为 `pyobfus-mcp==0.3.15 pyobfus==0.9.1`，测试 `01a16bdc` 通过（40.5 s，握手 0.3.15、9 tools）。全 21 组合 CI 手动 run `40055228574` 36/36 作业通过。下载快照（数据至 10-23）安静日中位数 7 天 54、30 天 40，无异常。
 
 **2026-10-24 审核与 PR（维护者要求继续）**：两轮 Claude 无工具独立静态审核均无阻断，编码/TTY/BOM/提示与实际 runtime import 测试反馈已落实；Core 4490、MCP 153、integration 352、runtime 24 passed，最终专项 142，静态/文档/钩子检查通过。分类提交推送至 `fix/trace-encoding-opacity-prologue`，已开 [PR #120](https://github.com/zhurong2020/pyobfus/pull/120)，仅七份修复相关文件。远端 33 项通过 / 2 项按配置跳过（CI result、CodeQL 成功），PR 无冲突；尚未合并或发布；视频/L3/计划文档仍本地未提交。详见 [本轮进度](PRIORITY_PROGRESS_2026-10-24.md)。
