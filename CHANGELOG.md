@@ -23,6 +23,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   scoped to each definition module, so same-named functions in different modules
   and re-exports resolve correctly. Preview-only planning metadata; no build
   output or protection yet.
+- Crossfile-opacity Pro adapter (slice C): encrypts an explicit set of final
+  (renamed) top-level functions and rewrites each into an L3 stub keyed by the
+  application-provided runtime key. The runtime key is referenced directly as
+  `provided_key("<ENV>")` -- the raw key is used only in-process for build-time
+  encryption and never appears as a module constant. Helper, cipher-constant and
+  import-alias names are allocated to avoid collisions; the module docstring and
+  `__future__` prologue stay ahead of injected code; every target is round-trip
+  verified in the build process and the emitted source is scanned for key leaks.
+  Compile-only (never executes the user module); not yet wired into an
+  end-to-end build.
 
 ## [0.9.1] - 2026-10-24
 
