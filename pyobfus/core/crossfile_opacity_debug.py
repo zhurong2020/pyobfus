@@ -41,18 +41,36 @@ _L3_PREFIX = "<pyobfus-l3:"
 # to the closing ">".
 _L3_CO_FILENAME = re.compile(r"^<pyobfus-l3:(?P<artifact>[^:>]+):(?P<file>.+)>$")
 
+# The indent may include ExceptionGroup rendering prefixes (``|`` and ``+``),
+# which Python 3.11+ adds to sub-exception frames.
 _FRAME = re.compile(
-    r'^(?P<indent>[ \t]*)File "(?P<path>[^"\r\n]+)", line (?P<line>[0-9]+), in (?P<name>[^\r\n]+)$'
+    r'^(?P<indent>[ \t|+]*)File "(?P<path>[^"\r\n]+)", line (?P<line>[0-9]+), in (?P<name>[^\r\n]+)$'
 )
+
+# Characters that would break the frame identity's filename when it is rendered
+# into a traceback (``"`` closes the frame path; the others break the line).
+_UNSAFE_IN_RELATIVE_FILE = ('"', ">", "\r", "\n")
 
 # ``encrypted_code`` table: co_filename -> {final_name: original_name}.
 EncryptedCodeTable = Dict[str, Dict[str, str]]
 
 
 def l3_co_filename(artifact_id: str, relative_file: str) -> str:
-    """Build the dedicated co_filename for an encrypted module's code objects."""
+    """Build the dedicated co_filename for an encrypted module's code objects.
+
+    Rejects components that would make the identity unparseable or break the
+    traceback frame it renders into, so construction and :func:`parse_l3_co_filename`
+    round-trip consistently.
+    """
+    if not artifact_id:
+        raise ValueError("artifact_id must be non-empty")
     if ":" in artifact_id or ">" in artifact_id:
         raise ValueError("artifact_id must not contain ':' or '>'")
+    if not relative_file:
+        raise ValueError("relative_file must be non-empty")
+    bad = [c for c in _UNSAFE_IN_RELATIVE_FILE if c in relative_file]
+    if bad:
+        raise ValueError(f"relative_file must not contain {bad!r}")
     return f"{_L3_PREFIX}{artifact_id}:{relative_file}>"
 
 
