@@ -151,6 +151,18 @@ def test_preflight_rejects_dependency_fields(field):
     assert any(field in r for r in exc.value.reasons)
 
 
+@pytest.mark.parametrize(
+    "field,value",
+    [("period_max_runs", 0), ("fingerprint", ""), ("requires_os", "")],
+)
+def test_preflight_rejects_nondefault_falsy_fields(field, value):
+    # Falsy but non-default (all three default to None) must not slip through
+    # the truthiness gap.
+    with pytest.raises(CrossfileOpacityError) as exc:
+        _run_preflight(_valid_config(**{field: value}))
+    assert any(field in r for r in exc.value.reasons)
+
+
 def test_preflight_rejects_import_identity_collision():
     with pytest.raises(CrossfileOpacityError) as exc:
         _run_preflight(_valid_config(), module_names=["pkg", "pkg.__init__", "pkg.a"])
@@ -274,6 +286,45 @@ def test_source_digest_is_stable_and_content_sensitive():
     b = plan_module_targets("m", "def f(x):\n    return x + 2\n").selected[0]
     assert a.source_digest == a2.source_digest
     assert a.source_digest != b.source_digest
+
+
+def test_reject_rebinding_in_module_control_flow():
+    # Rebinding inside module-level control flow still shadows the function.
+    assert _reason_for("def f():\n    return 1\nif True:\n    f = 0\n", "f") == REASON_REASSIGNED
+
+
+def test_reject_duplicate_definition_in_control_flow():
+    src = "def f():\n    return 1\nif True:\n    def f():\n        return 2\n"
+    assert _reason_for(src, "f") == REASON_DUPLICATE_BINDING
+
+
+def test_reject_yield_in_comprehension_iterable():
+    # yield in the comprehension's outer iterable makes f a generator.
+    src = "def f():\n    return [x for x in (yield [1])]\n"
+    assert _reason_for(src, "f") == REASON_GENERATOR
+
+
+def test_reject_nested_def_inside_control_flow():
+    src = "def f():\n    if True:\n        def g():\n            return 1\n    return 1\n"
+    assert _reason_for(src, "f") == REASON_NESTED_DEFINITION
+
+
+def test_reject_global_write_through_import():
+    src = "def f():\n    return 1\ndef g():\n    global f\n    import math as f\n"
+    assert (
+        _reason_for(src, "f") == REASON_SHADOWED_BY_IMPORT
+        or _reason_for(src, "f") == REASON_GLOBAL_WRITE
+    )
+
+
+def test_nested_local_assignment_is_not_a_global_write():
+    # f=2 belongs to h's frame, not g's; g's `global f` must not implicate it.
+    src = (
+        "def f():\n    return 1\n"
+        "def g():\n    global f\n    def h():\n        f = 2\n    return h\n"
+    )
+    plan = plan_module_targets("m", src)
+    assert "f" in {b.name for b in plan.selected}
 
 
 def test_module_level_only_nested_functions_are_not_targets():

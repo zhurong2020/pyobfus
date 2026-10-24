@@ -28,7 +28,9 @@ from __future__ import annotations
 
 import ast
 import hashlib
+import inspect
 import sys
+import types
 from dataclasses import dataclass, field
 from typing import Any, Iterable, List, Optional, Tuple
 
@@ -170,14 +172,16 @@ def preflight(
             "crossfile_opacity rebuilds fully and cannot be combined with --incremental."
         )
 
-    # Allowlist over every fusion field + its dependency fields. Anything set
-    # that is not explicitly allowed is rejected rather than silently ignored.
+    # Allowlist over every fusion field + its dependency fields. Anything whose
+    # value differs from its ObfuscationConfig default is rejected rather than
+    # silently ignored -- compared against the real default (not truthiness) so
+    # that e.g. period_max_runs=0 or fingerprint="" is caught, not waved through.
+    defaults = _config_field_defaults()
+    checked = [name for name in FUSION_FIELDS if name not in _ALLOWED_FUSION_FIELDS]
+    checked += list(_DEPENDENCY_FIELDS)
     disallowed = [
-        name
-        for name in FUSION_FIELDS
-        if name not in _ALLOWED_FUSION_FIELDS and getattr(config, name, None)
+        name for name in checked if getattr(config, name, defaults.get(name)) != defaults.get(name)
     ]
-    disallowed += [name for name in _DEPENDENCY_FIELDS if getattr(config, name, None) is not None]
     if disallowed:
         reasons.append(
             "crossfile_opacity does not support these options in the first release: "
@@ -198,6 +202,26 @@ def preflight(
 
     if reasons:
         raise CrossfileOpacityError(reasons)
+
+
+def _config_field_defaults() -> dict[str, Any]:
+    """Return ObfuscationConfig's declared defaults for the checked fields.
+
+    Read from the dataclass definition (not an instance), so a config stub in a
+    test that omits a field is compared against the same default the real build
+    would use. Falls back to ``None`` for any field not on the dataclass.
+    """
+    import dataclasses
+
+    from pyobfus.config import ObfuscationConfig
+
+    out: dict[str, Any] = {}
+    for f in dataclasses.fields(ObfuscationConfig):
+        if f.default is not dataclasses.MISSING:
+            out[f.name] = f.default
+        elif f.default_factory is not dataclasses.MISSING:  # type: ignore[misc]
+            out[f.name] = f.default_factory()  # type: ignore[misc]
+    return out
 
 
 def _identity_collisions(module_names: Iterable[str]) -> List[str]:
@@ -228,10 +252,8 @@ def plan_module_targets(module_name: str, source: str, *, filename: str = "<modu
     """
     tree = ast.parse(source, filename)
 
-    counts = _module_level_name_counts(tree)
-    reassigned = _rebound_names(tree)
-    deleted = _deleted_names(tree)
-    imported = _imported_names(tree)
+    counts = _module_scope_definition_counts(tree)
+    reassigned, deleted, imported = _module_scope_bindings(tree)
     global_writes = _global_write_names(tree)
 
     selected: List[BindingId] = []
@@ -243,7 +265,9 @@ def plan_module_targets(module_name: str, source: str, *, filename: str = "<modu
         name = stmt.name
         lineno = getattr(stmt, "lineno", 0)
 
-        reason = _reject_reason(stmt, name, counts, reassigned, deleted, imported, global_writes)
+        reason = _reject_reason(
+            stmt, name, counts, reassigned, deleted, imported, global_writes, filename
+        )
         if reason is not None:
             rejected.append(TargetRejection(module_name, name, lineno, reason))
             continue
@@ -273,6 +297,7 @@ def _reject_reason(
     deleted: set[str],
     imported: set[str],
     global_writes: set[str],
+    filename: str,
 ) -> Optional[str]:
     if isinstance(stmt, ast.AsyncFunctionDef):
         return REASON_ASYNC
@@ -280,7 +305,7 @@ def _reject_reason(
         return REASON_DECORATED
     if getattr(stmt, "type_params", []):
         return REASON_TYPE_PARAMS
-    if _has_own_yield(stmt):
+    if _is_generator(stmt, filename):
         return REASON_GENERATOR
     if _has_nested_definition(stmt):
         return REASON_NESTED_DEFINITION
@@ -297,131 +322,116 @@ def _reject_reason(
     return None
 
 
-def _has_own_yield(func: "ast.FunctionDef | ast.AsyncFunctionDef") -> bool:
-    """True if the function's own scope contains yield / yield-from.
+def _is_generator(func: "ast.FunctionDef | ast.AsyncFunctionDef", filename: str) -> bool:
+    """True if the function is a generator (has ``yield`` in its own frame).
 
-    Nested function and lambda scopes are not descended into; a generator
-    expression is its own scope and does not make the enclosing function a
-    generator, so neither counts here.
+    Compiled in isolation and read from ``co_flags`` so the answer matches
+    ``inspect.isgeneratorfunction`` exactly, including the awkward case where a
+    ``yield`` hides in a comprehension's outermost iterable (evaluated in the
+    enclosing scope). A function that cannot be compiled standalone is treated
+    as a generator so it is conservatively rejected rather than selected.
     """
-    for child in func.body:
-        for node in _walk_own_scope(child):
-            if isinstance(node, (ast.Yield, ast.YieldFrom)):
-                return True
+    module = ast.Module(body=[func], type_ignores=[])
+    ast.fix_missing_locations(module)
+    try:
+        code = compile(module, filename, "exec", dont_inherit=True)
+    except SyntaxError:
+        return True
+    gen_flags = inspect.CO_GENERATOR | inspect.CO_COROUTINE | inspect.CO_ASYNC_GENERATOR
+    for const in code.co_consts:
+        if isinstance(const, types.CodeType) and const.co_name == func.name:
+            return bool(const.co_flags & gen_flags)
     return False
 
 
-def _walk_own_scope(node: ast.AST) -> Iterable[ast.AST]:
-    """Yield ``node`` and descendants that share its (function) scope.
-
-    Stops at nested scope boundaries: ``def`` / ``async def`` / ``lambda`` and
-    the comprehension forms, which each introduce their own scope.
-    """
-    yield node
-    for child in ast.iter_child_nodes(node):
-        if isinstance(
-            child,
-            (
-                ast.FunctionDef,
-                ast.AsyncFunctionDef,
-                ast.Lambda,
-                ast.ListComp,
-                ast.SetComp,
-                ast.DictComp,
-                ast.GeneratorExp,
-            ),
-        ):
-            continue
-        yield from _walk_own_scope(child)
-
-
 def _has_nested_definition(func: "ast.FunctionDef | ast.AsyncFunctionDef") -> bool:
+    """True if the function's body contains any nested def / async def / class.
+
+    ``ast.walk`` descends through control flow (so a def hidden in ``if:`` is
+    found) and into nested scopes (which only adds more definitions), so a
+    plain scan of every statement in the body is sufficient and correct.
+    """
     for child in func.body:
-        for node in _walk_own_scope(child):
-            if node is func:
-                continue
+        for node in ast.walk(child):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
                 return True
     return False
 
 
-def _module_level_name_counts(tree: ast.Module) -> dict[str, int]:
+def _iter_scope(root: ast.AST) -> Iterable[ast.AST]:
+    """Yield every node reachable from ``root`` without entering a nested
+    function or class *body* (a separate scope). The nested def / class node
+    itself is yielded (so its name counts as a binding in this scope), but its
+    internals are not. Comprehensions and lambdas are descended into, because a
+    walrus (``:=``) inside them binds in this enclosing scope."""
+    for child in ast.iter_child_nodes(root):
+        yield child
+        if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            continue
+        yield from _iter_scope(child)
+
+
+def _module_scope_definition_counts(tree: ast.Module) -> dict[str, int]:
+    """Count def / async def / class bindings anywhere in module scope.
+
+    Includes definitions nested inside module-level control flow (``if`` /
+    ``try`` / ...), so a second same-named definition makes the top-level one a
+    non-unique binding.
+    """
     counts: dict[str, int] = {}
-    for stmt in tree.body:
-        if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
-            counts[stmt.name] = counts.get(stmt.name, 0) + 1
+    for node in _iter_scope(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            counts[node.name] = counts.get(node.name, 0) + 1
     return counts
 
 
-def _rebound_names(tree: ast.Module) -> set[str]:
-    """Module-level names bound by assignment (any kind), which are not stable."""
-    names: set[str] = set()
-    for stmt in tree.body:
-        if isinstance(stmt, ast.Assign):
-            for target in stmt.targets:
-                names.update(_assigned_names(target))
-        elif isinstance(stmt, (ast.AugAssign, ast.AnnAssign)):
-            if stmt.value is not None or isinstance(stmt, ast.AugAssign):
-                names.update(_assigned_names(stmt.target))
-    return names
-
-
-def _assigned_names(target: ast.AST) -> set[str]:
-    names: set[str] = set()
-    if isinstance(target, ast.Name):
-        names.add(target.id)
-    elif isinstance(target, (ast.Tuple, ast.List)):
-        for elt in target.elts:
-            names.update(_assigned_names(elt))
-    elif isinstance(target, ast.Starred):
-        names.update(_assigned_names(target.value))
-    return names
-
-
-def _deleted_names(tree: ast.Module) -> set[str]:
-    names: set[str] = set()
-    for stmt in tree.body:
-        if isinstance(stmt, ast.Delete):
-            for target in stmt.targets:
-                if isinstance(target, ast.Name):
-                    names.add(target.id)
-    return names
-
-
-def _imported_names(tree: ast.Module) -> set[str]:
-    names: set[str] = set()
-    for stmt in tree.body:
-        if isinstance(stmt, (ast.Import, ast.ImportFrom)):
-            for alias in stmt.names:
-                bound = alias.asname or alias.name.split(".")[0]
-                names.add(bound)
-    return names
+def _module_scope_bindings(tree: ast.Module) -> Tuple[set[str], set[str], set[str]]:
+    """Return (reassigned, deleted, imported) names bound anywhere in module
+    scope, including inside module-level control flow but not inside nested
+    function / class bodies. Over-approximates (e.g. may include comprehension
+    loop variables), which can only cause a stable function to be skipped, not
+    an unstable one to be selected."""
+    reassigned: set[str] = set()
+    deleted: set[str] = set()
+    imported: set[str] = set()
+    for node in _iter_scope(tree):
+        if isinstance(node, ast.Name):
+            if isinstance(node.ctx, ast.Store):
+                reassigned.add(node.id)
+            elif isinstance(node.ctx, ast.Del):
+                deleted.add(node.id)
+        elif isinstance(node, (ast.Import, ast.ImportFrom)):
+            for alias in node.names:
+                imported.add(alias.asname or alias.name.split(".")[0])
+    return reassigned, deleted, imported
 
 
 def _global_write_names(tree: ast.Module) -> set[str]:
-    """Names declared ``global`` inside any function that then assigns them.
+    """Names a function writes to the module global namespace via ``global``.
 
-    Conservative: a ``global x`` paired with any binding of ``x`` in the same
-    function marks ``x`` as written from elsewhere, so a module-level function
-    of that name is not a stable target.
+    For each function (at any nesting) the ``global`` declarations and the
+    bindings are matched *within the same frame only*: a ``global x`` in one
+    function paired with an ``x = ...`` that actually belongs to a nested
+    function is not a global write. Bindings counted are assignments,
+    deletions, imports, nested definitions, and walrus targets in that frame.
     """
     names: set[str] = set()
     for func in ast.walk(tree):
         if not isinstance(func, (ast.FunctionDef, ast.AsyncFunctionDef)):
             continue
         declared: set[str] = set()
-        for node in ast.walk(func):
+        bound: set[str] = set()
+        for node in _iter_scope(func):
             if isinstance(node, ast.Global):
                 declared.update(node.names)
-        if not declared:
-            continue
-        for node in ast.walk(func):
-            if isinstance(node, ast.Name) and isinstance(node.ctx, (ast.Store, ast.Del)):
-                if node.id in declared:
-                    names.add(node.id)
+            elif isinstance(node, ast.Name) and isinstance(node.ctx, (ast.Store, ast.Del)):
+                bound.add(node.id)
+            elif isinstance(node, (ast.Import, ast.ImportFrom)):
+                for alias in node.names:
+                    bound.add(alias.asname or alias.name.split(".")[0])
             elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
-                if node is not func and node.name in declared:
-                    names.add(node.name)
+                bound.add(node.name)
+        names.update(declared & bound)
     return names
 
 
