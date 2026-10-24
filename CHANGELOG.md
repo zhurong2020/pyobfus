@@ -33,6 +33,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   verified in the build process and the emitted source is scanned for key leaks.
   Compile-only (never executes the user module); not yet wired into an
   end-to-end build.
+- Crossfile-opacity debugging + report (slice D): each encrypted function's
+  code is stamped with a dedicated `<pyobfus-l3:<build-id>:<file>>` frame
+  identity (no source line is shown for it), and a Community name-only restorer
+  resolves those frames to the original function name via a private
+  `encrypted_code` table -- matched exactly, with no reconstructed original line
+  and no guessing for unknown build ids/names. Adds a counts-only shareable
+  report (mode, eligible/encrypted/rejected counts, reason histogram, runtime
+  and interpreter requirements, key-source type + env name, non-secret build id)
+  that carries no original names. Preview-only planning/debug metadata.
 
 ## [0.9.1] - 2026-10-24
 
