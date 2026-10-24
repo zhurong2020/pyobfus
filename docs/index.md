@@ -19,6 +19,8 @@ Community is Apache-2.0, has no file or line limits, and requires no trial.
 
 [简体中文概览](https://github.com/zhurong2020/pyobfus/blob/main/README.zh-CN.md)
 
+> **0.9.1:** `--unmap --trace-encoding` reads legacy-encoded tracebacks (e.g. cp1252) and reports undecodable input instead of crashing.
+
 > **New in 0.9.0: `--unmap` for independent directory builds (`--no-cross-file`).** See the [debugging guide](guides/debug-obfuscated-python.md).
 
 ## Start here

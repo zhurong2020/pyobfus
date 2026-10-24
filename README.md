@@ -22,6 +22,10 @@ mapping file from the build private, and `pyobfus --unmap` turns a production
 traceback back into your original names, for you or an AI coding agent.
 Community is Apache-2.0, has no file or line limits, and requires no trial.
 
+> **v0.9.1:** `--unmap --trace-encoding` reads tracebacks saved in legacy
+> encodings such as cp1252 and reports undecodable input with exit 2 instead of
+> crashing; piped stdin now defaults to UTF-8.
+>
 > **What's new in v0.9.0:** `--unmap` now works for independent directory builds
 > (`--no-cross-file`). The mapping records names per file, so two files that reuse
 > the same short name restore to the right originals, frame by frame. Older
