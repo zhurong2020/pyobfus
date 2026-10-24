@@ -30,7 +30,7 @@ import base64
 import marshal
 import types
 from dataclasses import dataclass, field
-from typing import Iterable, List, Tuple
+from typing import Iterable, List, Optional, Tuple
 
 from pyobfus.core.crossfile_opacity import plan_module_targets
 from pyobfus.core.unparse import unparse
@@ -69,6 +69,7 @@ def encrypt_targets(
     key: bytes,
     env_name: str,
     filename: str = "<crossfile-opacity>",
+    code_filename: Optional[str] = None,
 ) -> AdapterResult:
     """Encrypt an explicit set of top-level functions in already-renamed source.
 
@@ -82,6 +83,11 @@ def encrypt_targets(
         env_name: the environment-variable name the runtime key expression
             reads (``provided_key("<env_name>")``).
         filename: used for ``compile`` diagnostics only.
+        code_filename: when given, each encrypted target's code object (and its
+            nested code) is stamped with this ``co_filename`` before encryption,
+            so a traceback from the materialized function carries a dedicated
+            frame identity (slice D's ``<pyobfus-l3:...>`` identity). Defaults to
+            ``filename``.
 
     Returns:
         An :class:`AdapterResult` with the transformed source and the names it
@@ -134,6 +140,13 @@ def encrypt_targets(
                 f"release only supports self-contained top-level functions"
             )
 
+    # Stamp the dedicated frame identity before encryption, so the running
+    # (decrypted) function reports it in tracebacks (slice D).
+    if code_filename is not None:
+        original_codes = {
+            name: _restamp_co_filename(code, code_filename) for name, code in original_codes.items()
+        }
+
     # Allocate names that do not collide with anything the module already uses.
     used = _used_identifiers(tree)
     gen = _FreshNames(used)
@@ -179,6 +192,19 @@ def encrypt_targets(
 # ---------------------------------------------------------------------------
 # AST inspection
 # ---------------------------------------------------------------------------
+
+
+def _restamp_co_filename(code: types.CodeType, co_filename: str) -> types.CodeType:
+    """Return ``code`` with ``co_filename`` set, recursively on nested code.
+
+    Nested code (comprehensions, lambdas) is restamped too so no frame from the
+    protected function reveals the build-time filename.
+    """
+    new_consts = tuple(
+        _restamp_co_filename(const, co_filename) if isinstance(const, types.CodeType) else const
+        for const in code.co_consts
+    )
+    return code.replace(co_filename=co_filename, co_consts=new_consts)
 
 
 def _extract_target_codes(
