@@ -77,7 +77,7 @@ Save it to a file, for example `error.log`.
 pyobfus --unmap --trace error.log --mapping private/pricing.map.json
 ```
 
-In the next release (currently unreleased), trace files and piped stdin default
+Since Core 0.9.1, trace files and piped stdin default
 to UTF-8, accepting an optional BOM. Piped stdin previously used Python's
 stream encoding; specify `--trace-encoding` for pipes using a different
 encoding. Interactive console input is already decoded by Python and does
@@ -85,6 +85,13 @@ not use this option. For a Windows log saved as cp1252, add
 `--trace-encoding cp1252`. Invalid bytes or an unknown encoding fail with exit 2
 and a decoding hint; bytes are not silently replaced or guessed. Re-save the
 log as UTF-8 when using Core 0.9.0 or earlier.
+
+In the unreleased development checkout, v1 mappings also restore non-ASCII
+identifier spellings (including Python's NFKC normalization). Ambiguous
+normalized names remain unchanged. JSON output uses ASCII Unicode escapes,
+which decode back to the exact Unicode trace even on a narrow Windows output
+stream. For text output, a stream that cannot encode the trace fails with exit
+2 before printing it; set `PYTHONIOENCODING=utf-8` or use `--json`.
 
 ```
 Traceback (most recent call last):

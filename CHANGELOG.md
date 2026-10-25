@@ -53,6 +53,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   module attributes and unsupported auxiliary writers are rejected. The
   existing runtime 0.1.1 contract is sufficient; no runtime API changes.
 
+### Fixed
+
+- Selective opacity now binds runtime dispatch before the first encrypted
+  decorator even when an existing runtime import appears later in the module
+  or imports dispatch only under an alias. Module docstrings/future imports
+  remain ahead of injected helpers.
+- v1 mapping restoration uses Python Unicode identifier tokens and NFKC
+  normalization, with ambiguous normalized aliases left unchanged. Non-ASCII
+  name prefixes now restore in real generated traceback frames.
+- `--unmap --json` preserves Unicode via ASCII JSON escapes on narrow output
+  streams. Plain text that cannot be encoded fails with exit 2 and guidance
+  before writing the trace, instead of crashing with UnicodeEncodeError.
+
 ## [0.9.1] - 2026-10-24
 
 ### Added
