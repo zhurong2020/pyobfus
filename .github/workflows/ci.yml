@@ -84,7 +84,7 @@ jobs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5 (pinned 2026-05-09)
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v5 (pinned 2026-05-09)
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
@@ -123,7 +123,7 @@ jobs:
         python-version: ['3.10', '3.12', '3.15']
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5
-    - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5
+    - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install builder and independent public runtime
@@ -153,7 +153,7 @@ jobs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
 
     - name: Set up Python
-      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5 (pinned 2026-05-09)
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v5 (pinned 2026-05-09)
       with:
         python-version: '3.11'
         cache: 'pip'
@@ -188,7 +188,7 @@ jobs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
 
     - name: Set up Python
-      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5 (pinned 2026-05-09)
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v5 (pinned 2026-05-09)
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
@@ -225,7 +225,7 @@ jobs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
 
     - name: Set up Python
-      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5 (pinned 2026-05-09)
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v5 (pinned 2026-05-09)
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
@@ -260,7 +260,7 @@ jobs:
       run: python scripts/check_runtime_version.py
 
     - name: Set up Python
-      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5 (pinned 2026-05-09)
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v5 (pinned 2026-05-09)
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
@@ -290,7 +290,7 @@ jobs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
 
     - name: Set up Python
-      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5 (pinned 2026-05-09)
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v5 (pinned 2026-05-09)
       with:
         python-version: '3.11'
         cache: 'pip'
@@ -326,7 +326,7 @@ jobs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
 
     - name: Set up Python 3.13
-      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5 (pinned 2026-05-09)
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v5 (pinned 2026-05-09)
       with:
         python-version: '3.13'
         cache: 'pip'
@@ -359,7 +359,7 @@ jobs:
         python-version: ['3.10', '3.15']
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5
-    - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5
+    - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Resolve candidate wheel with public Core and SDK 2
@@ -390,7 +390,7 @@ jobs:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
 
     - name: Set up Python
-      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5 (pinned 2026-05-09)
+      uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v5 (pinned 2026-05-09)
       with:
         python-version: '3.12'
         cache: 'pip'

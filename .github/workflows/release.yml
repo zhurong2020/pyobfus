@@ -57,7 +57,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
 
       - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5 (pinned 2026-05-09)
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v5 (pinned 2026-05-09)
         with:
           python-version: '3.13'
 
@@ -68,7 +68,7 @@ jobs:
           ls -lh dist/
 
       - name: Publish to PyPI (with PEP 740 attestations)
-        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33  # release/v1 (pinned 2026-05-09 — refresh quarterly to pick up bug fixes)
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086  # release/v1 (pinned 2026-05-09 — refresh quarterly to pick up bug fixes)
         with:
           attestations: true
           print-hash: true
@@ -86,7 +86,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
 
       - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5 (pinned 2026-05-09)
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v5 (pinned 2026-05-09)
         with:
           python-version: '3.13'
 
@@ -98,7 +98,7 @@ jobs:
           ls -lh dist/
 
       - name: Publish to PyPI (with PEP 740 attestations)
-        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33  # release/v1 (pinned 2026-05-09 — refresh quarterly to pick up bug fixes)
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086  # release/v1 (pinned 2026-05-09 — refresh quarterly to pick up bug fixes)
         with:
           attestations: true
           print-hash: true
@@ -117,7 +117,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
 
       - name: Set up Python
-        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5 (pinned 2026-05-09)
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v5 (pinned 2026-05-09)
         with:
           python-version: '3.13'
 
@@ -129,7 +129,7 @@ jobs:
           ls -lh dist/
 
       - name: Publish to PyPI (with PEP 740 attestations)
-        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33  # release/v1 (pinned 2026-05-09 — refresh quarterly to pick up bug fixes)
+        uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086  # release/v1 (pinned 2026-05-09 — refresh quarterly to pick up bug fixes)
         with:
           attestations: true
           print-hash: true
