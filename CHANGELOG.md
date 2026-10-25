@@ -55,6 +55,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- L3 delivery checks require the completion manifest whenever artifact files
+  declare an L3 build, even when no private build report was supplied.
+
 - Selective opacity now binds runtime dispatch before the first encrypted
   decorator even when an existing runtime import appears later in the module
   or imports dispatch only under an alias. Module docstrings/future imports
