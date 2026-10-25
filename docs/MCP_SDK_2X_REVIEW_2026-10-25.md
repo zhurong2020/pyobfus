@@ -46,9 +46,11 @@ wheel。SDK 1.x 的 CI 保留，工具的输入/输出和 shipped manifest 不�
 | Linux | PR #129 hosted passed | PR #129 hosted passed |
 | Windows | PR #129 hosted passed | PR #129 hosted passed |
 
-## 复审结论（专项验证已补齐，待总 CI/合并）
+## 复审结论（已合并 PR #129）
 
 现有证据支持继续双 major 兼容；此前“stdio 没有新协议收益”的历史结论已失效。
-四格专项已通过，生产上限保持原样。总 CI/合并收尾后可单独准备放宽上限
+四格专项和总 CI/CodeQL 已通过，PR #129 合并为 `d28ee31`。生产上限保持原样；后续可单独准备放宽上限
 与 MCP 发版，届时记录确切依赖范围和回退方案；本次不把候选解析结果冒称已升级。
 不新增远程 MCP 服务或 HTTP 传输。
+
+最终 head `3fff016`：39 检查成功 / 1 按配置跳过；[CI run 40176818313](https://github.com/zhurong2020/pyobfus/actions/runs/40176818313)。
