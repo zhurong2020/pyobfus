@@ -5,9 +5,9 @@
 - **PR #128 已合并（main `a0882a4`）**：晚 runtime import、v1 Unicode 名字、strict cp1252 输出三缺陷及 L3 manifest 缺失的交付检查补充。最后源码全量 Core 4637 / MCP153 / integration352 / runtime24 passed，64 skipped；后补 UTF-8/cp1252 日志参数化专项通过。最终 39 检查成功 / 2 跳过；未发布。
 - **PR #129 已合并（main `d28ee31`）**：MCP 2.x 复审（验收 head `3fff016`，总 CI/CodeQL 通过）。正常解析候选 wheel + 公开 Core 0.9.1 + SDK 2.3.0，pip check/153 测试/legacy-auto 各九工具真实调用通过；Linux/Windows × 3.10/3.15 四格已绿。生产依赖上限未改，无新 MCP 发版。
 - **运营**：10-25 复盘、现时巡检与 DEV 第二篇准备完成；固定公开版本七例重现。Core 30 天安静日中位数 40，7 天仅一个安静日；没有充分自然增长证据。新增邮件未见客户问题或目录解锁。许可端点健康。本机备份为 10-25，云端最后完整镜像为 10-24；正常 WSL user bus 当前不可访问，10-26 优先核实当天云端成功记录。DEV 仍私有草稿、未投稿。
-- **文档（交付 PR #130）**：已整理过期 TODO、分发渠道日期、旧“adapter 不存在/无未发布内容”等措辞；历史记录保留并明确日期。未改参数改名、L3 方法/资源 provider、医院应用、视频工具或 Affiliate 的延后范围。
+- **文档（PR #130 已合并，main `9345de3`）**：已整理过期 TODO、分发渠道日期、旧“adapter 不存在/无未发布内容”等措辞；历史记录保留并明确日期。未改参数改名、L3 方法/资源 provider、医院应用、视频工具或 Affiliate 的延后范围。
 
-恢复工作先看 [完整进度](PROGRESS_2026-10-25.md)、[L3 验证](CROSSFILE_OPACITY_VALIDATION.md)、[MCP 复审](MCP_SDK_2X_REVIEW_2026-10-25.md) 和 [运营复盘](OPS_REVIEW_2026-10-25.md)。下列 10-24 及更早条目是历史快照，不作为当前待办。
+关闭前交接与入口同步见 [Session 收尾](SESSION_CLOSEOUT_2026-10-25.md)。恢复工作先看 [完整进度](PROGRESS_2026-10-25.md)、[L3 验证](CROSSFILE_OPACITY_VALIDATION.md)、[MCP 复审](MCP_SDK_2X_REVIEW_2026-10-25.md) 和 [运营复盘](OPS_REVIEW_2026-10-25.md)。下列 10-24 及更早条目是历史快照，不作为当前待办。
 
 **2026-10-24 crossfile-opacity（多模块 L3 + 应用密钥）切片 A–D 进度（预览、未发版，维护者授权逐片推进）**：按设计 §11 五切片推进；维护者已确认首批限制（`--jobs 1` 串行、仅模块顶层同步普通函数、TOML-only 选择、全新输出路径、相同 CPython 实现/minor/GIL、加密函数不还原原始行号）。每片均经无头 Codex 只读复核、问题逐项修复、`check.sh` 绿、全量测试通过。
 - **切片 A**（预检 + 稳定绑定计划，Community）：`pyobfus/core/crossfile_opacity.py`，`--crossfile-opacity` 开关启用后只跑预检即停、绝不回退普通构建。**已合并 PR #121**（含 Codex 查出的 6 项修复）。

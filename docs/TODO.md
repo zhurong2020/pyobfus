@@ -6,7 +6,7 @@
 [`FEATURE_EXPANSION_RESEARCH_2026-10-20.md`](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)；Python 3.15 的 P0 范围与验收见 [`PYTHON315_SUPPORT_PLAN.md`](PYTHON315_SUPPORT_PLAN.md)。
 
 最后更新：2026-10-25。公开版本仍为 Core 0.9.1、MCP 0.3.15、runtime 0.1.1；
-最新推进见 [Codex 进度](PROGRESS_2026-10-25.md)，运营与待办日期见
+最终交接见 [Session 收尾](SESSION_CLOSEOUT_2026-10-25.md)，最新推进见 [Codex 进度](PROGRESS_2026-10-25.md)，运营与待办日期见
 [复盘/巡检准备](OPS_REVIEW_2026-10-25.md)。实现、合并与对外发布分别记录，
 不把已合并的预览代码当成已发布包。
 

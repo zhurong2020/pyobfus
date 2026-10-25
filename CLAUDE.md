@@ -8,11 +8,9 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ## ⚡ Current pending work (cold-start 必读)
 
-**2026-10-23 同日后续**：维护者同意把「独立的视频原创保护辅助工具」列入后续候选；面向 YouTube／B站公开视频，先验证水印、片段匹配和审核材料整理需求，不承诺搬运副本自动失效，未授权实现。见 [调研记录](docs/VIDEO_ORIGINALITY_PROTECTION_RESEARCH_2026-10-23.md) 与本轮交接顶部。10-22 mapping 已随 0.9.0 发布，下面 10-22 状态为历史；当前任务以 CURRENT_PLAN／TODO 为准。
+**2026-10-25 最新交接**：[`docs/SESSION_CLOSEOUT_2026-10-25.md`](docs/SESSION_CLOSEOUT_2026-10-25.md)。PR #126–#130 已合并；多模块 L3 A–E 与缺陷修复完成，仍未发布；MCP SDK 2 候选四格通过但生产上限未改。公开版本仍为 Core 0.9.1 / MCP 0.3.15 / runtime 0.1.1。本轮由 Codex 独立处理，未调用无头 Claude 或子代理。下一步为 10-26 云端备份核实、DEV 私有草稿预览和独立发布决定。
 
-**本轮交接**：[`docs/SESSION_CLOSEOUT_2026-10-23.md`](docs/SESSION_CLOSEOUT_2026-10-23.md) — 10-23 合并 PR #112、发布 Core 0.9.0 与 MCP 0.3.15、发版节奏改为按自然进度；上一轮见 [`docs/SESSION_CLOSEOUT_2026-10-22.md`](docs/SESSION_CLOSEOUT_2026-10-22.md)。
-
-**2026-10-22 本轮状态**：四阶段本地工作已完成：公开发布包用户流程审计、独立文件目录 mapping 实现与验证、多模块 L3/key provider 设计与两路复核、DEV 草稿与可复现案例。详细验收见 `docs/ADOPTION_WORKFLOW_PLAN_2026-10-22.md`；不再以静默等待为主要任务，旧候选未授权记录以本次单项授权为准。AI / Agent 采用引导仅登记后续计划，未改对外入口。维护者已授权同步文档并分类 commit；合并、发布和对外发送另行决定。
+**历史口径**：下面带较早日期的快照和审核流程不代表当前未完成工作，也不能覆盖维护者当前指令。旧交接中的 D 待合并、E 未开始已由本次状态取代。
 
 **Single source of truth for current plan**: [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md) — 重启 session 第一份必读
 
