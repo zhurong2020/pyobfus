@@ -346,46 +346,41 @@ jobs:
   mcp-sdk-2x:
     needs: changes
     if: needs.changes.outputs.code == 'true'
-    # pyobfus-mcp still ships `mcp<2.0.0`, so nothing in the normal matrix ever
-    # runs against the 2.x line. The server adapter is written to work on both
-    # majors (FastMCP -> MCPServer, `version=` now a real kwarg), and this job
-    # is the only thing that proves it stays that way. Installing over the cap
-    # is deliberate: pip warns about the conflict and installs anyway.
-    name: pyobfus-mcp against mcp SDK 2.x
-    runs-on: ubuntu-latest
+    # Production still caps SDK <2. This private wheel changes only that cap;
+    # the clean target must resolve normally, pass pip check, then exercise all
+    # nine tools against public Core rather than source-shadowing the checkout.
+    name: MCP SDK 2 candidate (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 10
-
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ['3.10', '3.15']
     steps:
-    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5 (pinned 2026-05-09 for Socket supply-chain score)
-
-    - name: Set up Python 3.13
-      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5 (pinned 2026-05-09)
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5
+    - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5
       with:
-        python-version: '3.13'
-        cache: 'pip'
-
-    - name: Install pyobfus-mcp, then force the 2.x SDK over the cap
+        python-version: ${{ matrix.python-version }}
+    - name: Resolve candidate wheel with public Core and SDK 2
+      shell: bash
       run: |
-        python -m pip install --upgrade pip
-        pip install -e ./pyobfus_runtime -e ".[dev]" -e ./pyobfus_mcp
-        pip install 'mcp>=2,<3'
-        pip show mcp | grep -E '^(Name|Version):'
-
-    - name: Build the server and list its tools
+        python -m pip install build
+        python scripts/build_mcp_sdk2_candidate.py "$RUNNER_TEMP/mcp2-candidate"
+        python -m venv "$RUNNER_TEMP/sdk2-target"
+        if [[ "$RUNNER_OS" == Windows ]]; then
+          candidate_python="$RUNNER_TEMP/sdk2-target/Scripts/python.exe"
+        else
+          candidate_python="$RUNNER_TEMP/sdk2-target/bin/python"
+        fi
+        "$candidate_python" -m pip install 'pyobfus==0.9.1' 'mcp>=2,<3' pytest "$RUNNER_TEMP/mcp2-candidate/dist/"*.whl
+        "$candidate_python" -m pip check
+        echo "PYOBFUS_MCP2_PYTHON=$candidate_python" >> "$GITHUB_ENV"
+    - name: Full MCP tests and real legacy/auto stdio contracts
+      shell: bash
       run: |
-        python -c "
-        import asyncio
-        from pyobfus_mcp.server import _build_server
-        app = _build_server()
-        tools = asyncio.run(app.list_tools())
-        names = sorted(t.name for t in tools)
-        assert len(names) == 9, names
-        print('tools:', names)
-        "
-
-    - name: Run the MCP test suite
-      run: |
-        pytest pyobfus_mcp/tests/ -q -ra -o addopts='' --no-cov
+        "$PYOBFUS_MCP2_PYTHON" -I -m pytest -c pyobfus_mcp/pyproject.toml pyobfus_mcp/tests/ --import-mode=importlib -q
+        "$PYOBFUS_MCP2_PYTHON" -I scripts/validate_mcp_sdk2.py
 
   docs:
     name: Docs build
