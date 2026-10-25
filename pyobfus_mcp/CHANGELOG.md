@@ -6,6 +6,13 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+### Changed
+
+- Allow MCP Python SDK 2.x in the package dependency range while retaining
+  1.x support. The built wheel is tested through normal dependency
+  resolution against the SDK 1.27 floor, SDK 2.0 floor, and newest 2.x;
+  legacy and auto stdio sessions exercise all nine tools.
+
 ## [0.3.15] - 2026-10-23
 
 ### Changed

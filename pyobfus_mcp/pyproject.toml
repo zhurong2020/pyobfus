@@ -40,12 +40,10 @@ dependencies = [
     # --scrub-traceback / @seal_code), which land in pyobfus 0.5.1. Publish
     # pyobfus 0.5.1 before this MCP release.
     "pyobfus>=0.5.18",
-    # Pin to mcp >=1.27 because that's the SDK we develop and test against
-    # (the same version that surfaced the 0.1.1 FastMCP API drift). The 1.27
-    # API has the `meta=` kwarg on @app.tool() that we use for tool versioning
-    # and tier metadata. Cap at <2.0 to keep the next major version from
-    # silently re-introducing a breaking change.
-    "mcp>=1.27.0,<2.0.0",
+    # SDK 1.27 is the tested floor; both 1.x and 2.x are supported by the
+    # server adapter and exercised by the release compatibility matrix.
+    # Keep the next major outside the declared range until it is validated.
+    "mcp>=1.27.0,<3.0.0",
 ]
 
 [project.optional-dependencies]

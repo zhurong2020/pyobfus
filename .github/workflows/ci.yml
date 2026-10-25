@@ -313,11 +313,8 @@ jobs:
     # emergency release on 2026-05-07). Pins the floor at the version we
     # currently require; CI fails the day a future floor breaks _build_server().
     #
-    # This job tests the 1.x line only: pyobfus-mcp caps `mcp<2.0.0`, so the
-    # resolver pulls the newest 1.x no matter how high the floor here is. The
-    # 2.x line is exercised by the separate job below, which installs over the
-    # cap on purpose. Before 2026-09-12 this job was named "latest mcp SDK",
-    # which read as though it covered 2.x — it never did.
+    # Explicitly select the newest 1.x now that package metadata also allows
+    # 2.x. The separate compatibility job tests the 1.27 floor and 2.x.
     name: pyobfus-mcp build smoke test (mcp SDK 1.x)
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -336,51 +333,62 @@ jobs:
         python -m pip install --upgrade pip
         # Install both packages from this checkout so a release-candidate MCP
         # dependency floor can be tested before that Core version reaches PyPI.
-        pip install -e ./pyobfus_runtime -e . -e ./pyobfus_mcp 'mcp>=1.20'
+        pip install -e ./pyobfus_runtime -e . -e ./pyobfus_mcp 'mcp>=1.27,<2'
         pip show mcp | grep -E '^(Name|Version):'
 
     - name: Instantiate FastMCP server
       run: |
         python -c "from pyobfus_mcp.server import _build_server; _build_server()"
 
-  mcp-sdk-2x:
+  mcp-sdk-compat:
     needs: changes
     if: needs.changes.outputs.code == 'true'
-    # Production still caps SDK <2. This private wheel changes only that cap;
-    # the clean target must resolve normally, pass pip check, then exercise all
-    # nine tools against public Core rather than source-shadowing the checkout.
-    name: MCP SDK 2 candidate (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    # Build the actual distributable, resolve its declared dependencies in a
+    # clean target, and exercise installed code against public Core.
+    name: MCP SDK compatibility (${{ matrix.os }}, Python ${{ matrix.python-version }}, SDK ${{ matrix.sdk }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        python-version: ['3.10', '3.15']
+        include:
+          - {os: ubuntu-latest, python-version: '3.10', sdk: '1.27.0'}
+          - {os: ubuntu-latest, python-version: '3.10', sdk: '2.0.0'}
+          - {os: ubuntu-latest, python-version: '3.10', sdk: latest}
+          - {os: ubuntu-latest, python-version: '3.15', sdk: latest}
+          - {os: windows-latest, python-version: '3.10', sdk: latest}
+          - {os: windows-latest, python-version: '3.15', sdk: latest}
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5
     - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v5
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Resolve candidate wheel with public Core and SDK 2
+    - name: Resolve release wheel with public Core and selected SDK
       shell: bash
       run: |
         python -m pip install build
-        python scripts/build_mcp_sdk2_candidate.py "$RUNNER_TEMP/mcp2-candidate"
-        python -m venv "$RUNNER_TEMP/sdk2-target"
+        python -m build --wheel --outdir "$RUNNER_TEMP/mcp-dist" pyobfus_mcp
+        python -m venv "$RUNNER_TEMP/mcp-target"
         if [[ "$RUNNER_OS" == Windows ]]; then
-          candidate_python="$RUNNER_TEMP/sdk2-target/Scripts/python.exe"
+          target_python="$RUNNER_TEMP/mcp-target/Scripts/python.exe"
         else
-          candidate_python="$RUNNER_TEMP/sdk2-target/bin/python"
+          target_python="$RUNNER_TEMP/mcp-target/bin/python"
         fi
-        "$candidate_python" -m pip install 'pyobfus==0.9.1' 'mcp>=2,<3' pytest "$RUNNER_TEMP/mcp2-candidate/dist/"*.whl
-        "$candidate_python" -m pip check
-        echo "PYOBFUS_MCP2_PYTHON=$candidate_python" >> "$GITHUB_ENV"
-    - name: Full MCP tests and real legacy/auto stdio contracts
+        if [[ '${{ matrix.sdk }}' == latest ]]; then
+          sdk_requirement='mcp>=2,<3'
+        else
+          sdk_requirement='mcp==${{ matrix.sdk }}'
+        fi
+        "$target_python" -m pip install 'pyobfus==0.9.1' "$sdk_requirement" pytest "$RUNNER_TEMP/mcp-dist/"*.whl
+        "$target_python" -m pip check
+        echo "PYOBFUS_MCP_TARGET_PYTHON=$target_python" >> "$GITHUB_ENV"
+    - name: Full MCP tests and real stdio contracts
       shell: bash
       run: |
-        "$PYOBFUS_MCP2_PYTHON" -I -m pytest -c pyobfus_mcp/pyproject.toml pyobfus_mcp/tests/ --import-mode=importlib -q
-        "$PYOBFUS_MCP2_PYTHON" -I scripts/validate_mcp_sdk2.py
+        "$PYOBFUS_MCP_TARGET_PYTHON" -I -m pytest -c pyobfus_mcp/pyproject.toml pyobfus_mcp/tests/ --import-mode=importlib -q
+        if [[ '${{ matrix.sdk }}' != '1.27.0' ]]; then
+          "$PYOBFUS_MCP_TARGET_PYTHON" -I scripts/validate_mcp_sdk2.py
+        fi
 
   docs:
     name: Docs build
@@ -407,7 +415,7 @@ jobs:
 
   result:
     name: CI result
-    needs: [changes, test, crossfile-opacity, lint, mcp-tests, integration, runtime-wheel, benchmark-smoke, mcp-sdk-latest, mcp-sdk-2x, docs]
+    needs: [changes, test, crossfile-opacity, lint, mcp-tests, integration, runtime-wheel, benchmark-smoke, mcp-sdk-latest, mcp-sdk-compat, docs]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 10
