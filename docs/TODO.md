@@ -5,7 +5,10 @@
 顺序做」，不记录历史。最新依据见
 [`FEATURE_EXPANSION_RESEARCH_2026-10-20.md`](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)；Python 3.15 的 P0 范围与验收见 [`PYTHON315_SUPPORT_PLAN.md`](PYTHON315_SUPPORT_PLAN.md)。
 
-最后更新：2026-10-24。Core 0.9.1（`--trace-encoding` 与 Pro opacity prologue，PR #120）已发布，PyPI/PEP 740、全新安装、GitHub Release、Zenodo `23608360`/CFF、全 21 组合 CI 与 Glama（测试 `01a16bdc`）均已核；本轮修复、范围清单与内容审阅见 [推进记录](PRIORITY_PROGRESS_2026-10-24.md)。此前 Core 0.9.0（独立目录构建 mapping v2，#112）与 MCP 0.3.15（`unmap_stack_trace` 提示）已于 10-23 发布，runtime 0.1.1 不变；PyPI/PEP 740、全新安装、GitHub Release、Zenodo `23585299`/CFF、MCP Registry 与 Glama（测试 `01a166ea`）均已核。发版节奏见「节奏」段（10-23 起按自然进度）。
+最后更新：2026-10-25。公开版本仍为 Core 0.9.1、MCP 0.3.15、runtime 0.1.1；
+最新推进见 [Codex 进度](PROGRESS_2026-10-25.md)，运营与待办日期见
+[复盘/巡检准备](OPS_REVIEW_2026-10-25.md)。实现、合并与对外发布分别记录，
+不把已合并的预览代码当成已发布包。
 
 ## 状态口径
 
@@ -18,17 +21,11 @@
   下游是否选择混淆自己的代码由其分发边界决定；公开第三方依赖不因被打包而自动成为
   pyobfus 的处理目标。
 
-## CI 提速（2026-10-21 完成：PR #109 合并 `a2859f7`；只改 CI，不发版）
+## CI 基础状态
 
-- [x] **1 只改文档不跑重任务**：`changes` 作业 + `scripts/ci_changed_paths.py`（只放行非隐藏 `docs/**/*.md`，其余一律全跑，算不出差异也全跑）；`CI result` 汇总作业。
-- [x] **2 覆盖率只在 ubuntu + 3.11**（仅 XML）。
-- [x] **3 pytest-xdist**：核心与集成 `-n auto`；修了集成测试共用源码树构建 wheel 的隔离问题。
-- [x] **4 矩阵**：普通运行 13 单元（Ubuntu 3.9–3.15 + Win/mac 3.9/3.14/3.15），定时/手动 21 单元。
-- [x] 超时（核心 30 / 集成 15 / 其余 10 分钟）、PR 新推送取消旧运行（非 PR 运行按 run_id 分组，main 不会丢运行）、docs pip 缓存。
-- [x] ruleset `protect-main`（23728645）必需检查改为 `CI result` + `CodeQL`（10-21，合并前）。
-- 实测：PR 运行 28 jobs、墙钟 33m47s → 8m56s；手动全矩阵 36/36 通过。
-- **审核中发现的既有问题（已修）**：旧 Windows 测试步骤用 PowerShell 连跑两条 pytest，第二条的退出码掩盖了第一条失败——基线 Windows 3.9 有 14 个、3.14 有 98 个核心测试失败，作业却显示绿色（v0.8.0 发版提交的 CI run 39425089456 也有两个 Windows 任务各 14 个失败被掩盖）。失败全是测试本身对换行/路径分隔符的假设，产品代码未改；现测试步骤统一用 bash（首个失败即失败）。
-- [x] Codecov：上传从未成功（无 token，`fail_ci_if_error: false` 掩盖）；10-21 维护者选方案 B，PR #111 删除上传步骤，Ubuntu 3.11 改为在任务日志打印覆盖率（当时 91%）。
+10-21 CI 提速与 Codecov 清理已经完成（#109/#111），历史证据在 CURRENT_PLAN。
+普通 13 单元、手动/定时 21 单元不变；10-25 新增独立 L3 六格与 MCP SDK 2 候选四格
+验证，以对应 PR 状态为准。必需检查仍为 CI result + CodeQL，不改 ruleset。
 
 ## 后续任务顺序（2026-10-22 维护者授权）
 
@@ -36,31 +33,37 @@
 
 四阶段本地工作已完成，结果见推进计划与 CURRENT_PLAN_ZH.md。本轮修订已于 10-23 经 PR #112 合并，并随 Core 0.9.0 / MCP 0.3.15 发布。PR #120 已于 10-24 合并并随 Core 0.9.1 发布（见 CURRENT_PLAN 顶部）。
 
-**crossfile-opacity（多模块 L3 + 应用密钥）五切片（设计 §11，预览、未发版，逐片 Codex 审核）**：
-- [x] 切片 A 预检 + 稳定绑定计划（PR #121 已合并）
-- [x] 切片 B Core 绑定对应表（PR #122 已合并）
-- [x] 切片 C Pro 加密适配器（PR #123 已合并）
-- [x] 切片 D 调试 + counts-only 报告（**PR #126 已于 10-25 合并，main `dd36c9e`**）
-- [ ] 切片 E（10-25 正在实现与验证；见 [推进记录](PROGRESS_2026-10-25.md)）落盘 mapping 的 `encrypted_code`/`opacity_plan` + CLI `--unmap` 接入 + 运行期解释器 guard + 私有 staging/全新路径提交/失败恢复/混合构建交付检查 + runtime-only 干净安装验证（端到端收尾，仍在预览开关后）
-A–E 全绿前整条链路对外不构成「保护已生效」，不随发版；不因本地验收通过自动发版或投稿。10-25 已恢复，按 E、三项既有缺陷、MCP 2.x 复审、运营与文档整理顺序推进。
+**本轮实现收尾**：A–D 已合并，E 已经 PR #127 合并（main `db634c6`），
+Linux/Windows × 3.10/3.12/3.15 六格和总 CI 均通过。具体能力与边界见
+[CROSSFILE_OPACITY_VALIDATION.md](CROSSFILE_OPACITY_VALIDATION.md)，仍未发布。
 
-10-25 复盘、10-26 巡检继续，但不阻塞上述工作；不再以静默等待为主要任务。私有医院应用仍暂停，等现场升级 Win10 后反馈。参数改名等其他候选保持原范围与授权边界。
+当前顺序：
+
+1. PR #128：三项已复现缺陷修复，已在最新 main 上重放，等待独立 CI/合并。
+2. PR #129：MCP 2.x 条件复审与正常解析候选 CI；四格已通过，等待总 CI/顺序合并。
+3. 本次文档同步；下一次 Core/MCP 发布需单独确定版本和发布授权。
+4. 10-26 增量巡检：优先核实正常 WSL 会话的当天云端镜像；10-27 DEV 第二篇署名/预览。
+
+10-25 复盘和当前可执行巡检已完成，见运营记录；不把未来日期状态写成已检查。
+私有医院应用仍暂停，参数改名等候选保持原范围，不自动扩张功能。
 
 ## 10-20 功能路线（3.15 已随 0.8.0 发布）
 
 完整证据：[10-20 路线复核](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)。维护者已将 Python 3.15 设为 P0，其他功能候选排在其后；3.15 实现与验收见 [支持计划](PYTHON315_SUPPORT_PLAN.md) 和 [验证记录](PYTHON315_VALIDATION.md)，已完成独立审核并随 0.8.0 发布。医院应用暂停。
 
-- [x] **PY315-1：惰性 from 导入被提前执行**。原生 Python 3.15.0、当前 checkout 与 PyPI Core 0.7.5 wheel 均复现：`lazy from calculator import Calculator` 改写后丢 `is_lazy`，构建成功但导入副作用时序变化。最小输入与输出见调研 §5.1。Community 兼容性，已修复并补原生回归；0.8.0 发布（#108）。
-- [x] **PY315-2：新字典推导式解包构建失败**。`{**row for row in rows}` 原文在 3.15 可运行，checkout／0.7.5 wheel 构建均报 `NoneType ... _fields`；根因为自定义推导式 visitor 访问 None，六处路径已修复并补原生回归；0.8.0 发布（#108）。
+- **已发布参考 PY315-1：惰性 from 导入被提前执行**。原生 Python 3.15.0、当前 checkout 与 PyPI Core 0.7.5 wheel 均复现：`lazy from calculator import Calculator` 改写后丢 `is_lazy`，构建成功但导入副作用时序变化。最小输入与输出见调研 §5.1。Community 兼容性，已修复并补原生回归；0.8.0 发布（#108）。
+- **已发布参考 PY315-2：新字典推导式解包构建失败**。`{**row for row in rows}` 原文在 3.15 可运行，checkout／0.7.5 wheel 构建均报 `NoneType ... _fields`；根因为自定义推导式 visitor 访问 None，六处路径已修复并补原生回归；0.8.0 发布（#108）。
 - [ ] **3.15 后续（0.8.0 发布后登记，均未授权实现）**：① 3.15 标准库冒烟中 `json`（`scanner.make_scanner`）与 `unittest`（`util.three_way_cmp`/`case.TestCase`）目录构建产物导入失败，main 同样失败，属模块属性证明既有限制，待定是否单列缺陷；② free-threaded 3.15、3.15 上冻结/编译打包未验证。Black/mypy 配置修订与 Glama 同步结果见 `CURRENT_PLAN_ZH.md` 对应日期记录。
-- [ ] **MCP 2.x 发布条件复审**。10-19 CI 已用 2.3.0 过 152 项；10-20 Linux 真实 stdio 验证 legacy 为 `2025-11-25`、auto 为 `2026-07-28`，均列出 9 工具并成功调用只读工具。旧「stdio 无新协议收益」结论不再适用；依赖上限未改，仍需 Python 3.10／Windows／干净解析与全工具合同。
-- `--no-cross-file` mapping 已实现并发布；目录 L3 + 应用 key provider 自 10-24 起按上面五切片推进（A/B/C/D 已合并、E 验证中），仍不一次接入全部 fusion 字段。
+- **MCP 2.x 复审已完成本地与四格专项验证，PR #129 待总 CI/合并**：正常解析候选
+  wheel、公开 Core 0.9.1、SDK 2.3.0，pip check 与完整九工具合同通过；生产上限未改。
+  结果见 [本次复审](MCP_SDK_2X_REVIEW_2026-10-25.md)。后续是否放宽上限与发版
+  单列决定，不再把“缺少 3.10/Windows 验证”当作当前事实。
+- `--no-cross-file` mapping 已随 0.9.0 发布；目录 L3 预览 A–E 已合并但未发布，
+  未一次接入其他 fusion 字段。
 - 参数改名、H B2/B3、资源 key provider 与 L3 方法覆盖继续保持原 gate；未授权改实现／合并／发布。
 
-- [ ] **v1 mapping 的非 ASCII 名字还原限制（10-24 反例）**：合成 v1 mapping 的 `foo → á` 能读取，但 `unmap_text` 的 ASCII identifier 正则不替换 `in á`；后续真实 CLI 用 `--name-prefix á` 构建崩溃函数 `calculate_total`，mapping v1 中记录非 ASCII 短名，但实际 traceback 经 unmap 后仍保留该短名，确认不只手写 mapping 受影响；编码正确解码后仍保持短名。此项独立于本轮输入编码修复；待比较 v1 兼容合同与 v2 Unicode token 逻辑后安排修订，不能把成功解码宣传为所有 Unicode 名字均能恢复。
-
-- [ ] **opacity 既有 runtime import 晚于函数时加载失败（10-24 审核反例）**：纯转换 API 默认 encrypted 模块中，用户在函数之后才 `from pyobfus_runtime import _l3_dispatch`，现有合并扫描复用晚导入，产物装饰器执行时 NameError。此路径在本轮 prologue 修复前已存在；应按首次使用位置而非全模块名字出现判断是否需要前导注入。
-- [ ] **CLI 输出流无法编码 trace Unicode 时崩溃（10-24 审核反例）**：`PYTHONIOENCODING=cp1252:strict` 下，UTF-8 文件含中文，`--unmap --json` 在 `click.echo` 阶段 UnicodeEncodeError、exit 1。独立于输入解码；后续定义 JSON/text 输出编码与兼容策略，并用真实 subprocess 验收。MCP unmap 直接处理 Unicode 字符串，不经 CLI stdin。
+三项 10-24 反例（v1 Unicode 名字、晚 runtime import、strict cp1252 stdout）已在
+PR #128 修复并通过本地回归；合并前仍跟踪该 PR，不重复排为未实现功能。
 
 ## 后续团队候选：独立的视频原创保护辅助工具（2026-10-23）
 
@@ -70,8 +73,8 @@ A–E 全绿前整条链路对外不构成「保护已生效」，不随发版�
 
 - **后续采用引导文档（10-22 登记，仅记录）**：当前四阶段之后，按 [AI / Agent 采用引导计划](AGENT_ADOPTION_GUIDANCE_PLAN.md) 复核 llms 镜像、README／首页、集成模板及能力元数据；以迭代、兼容／验证／调试证据说明直接采用的价值，不把代码量当作质量、不写强制推荐指令。本轮未修改对外入口。
 
-- 每周一巡检继续观察 Core 0.9.0 / MCP 0.3.15 反馈、下载安静日、客户调研回答、CI 与备份。无新缺陷时不重复全量测试、不主动增加功能。
-- **10-25 复盘**照原计划；发布日、次日与内容投放流量分开记录，据客户回答调整后续优先级。
+- 每周一巡检继续观察 Core 0.9.1 / MCP 0.3.15 反馈、下载安静日、客户调研回答、CI 与备份。无新缺陷时不重复全量测试、不主动增加功能。
+- **10-25 复盘已完成**；数据与结论见运营记录，继续分开发版日、次日与内容流量。
 - 下次发布按实际新增改动与维护者授权确定，不恢复此前 10-15 的等待通知状态。
 - **3.15 兼容 P0 已随 Core 0.8.0 发布**：后续只跟进已登记的兼容性限制；MCP 2.x、mapping 与 Pro 新功能分别按需求和授权推进。
 - runtime 源码若有改动必须先升版本、先发 runtime（`scripts/check_runtime_version.py`）；改版本号后先刷新 editable 元数据，再按发布清单验证。
@@ -402,7 +405,8 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 
 ## 待发内容
 
-- Core 有 crossfile-opacity A–D 与 E 开发中的未发布内容；尚未发布。MCP 当前没有未发布 changelog 内容。
+- Core 有 crossfile-opacity A–E 和三项既有缺陷修复的未发布内容；后两项 PR 状态见顶部。
+- MCP 生产源码/依赖范围未改；候选兼容验证只改维护者脚本和 CI。
 - VS Code schema 已同步 `preserve_param_names` 默认值，随插件自己的后续版本发布。
 
 ## IP 相关（2026-09-28 登记 · 待维护者拍板，未执行）
