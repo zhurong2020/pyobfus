@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import re
 from collections import Counter
-from typing import TYPE_CHECKING, Any, Dict, List, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Tuple, cast
 
 if TYPE_CHECKING:
     from pyobfus.core.mapping import ObfuscationMapping
@@ -52,6 +52,15 @@ def restore_trace(mapping: ObfuscationMapping, trace: str) -> Dict[str, Any]:
     for text in trace.splitlines(keepends=True):
         body = text.rstrip("\r\n")
         ending = text[len(body) :]
+        # Dedicated L3 identities never enter root voting or the global name
+        # table. Even an unknown build/name must remain unchanged.
+        if "<pyobfus-l3:" in body:
+            from pyobfus.core.crossfile_opacity_debug import restore_l3_names
+
+            restored = restore_l3_names(text, mapping.encrypted_code)
+            output.append(str(restored["restored_trace"]))
+            frames.extend(cast(List[Dict[str, Any]], restored["frames"]))
+            continue
         match = _FRAME.fullmatch(body)
         if match is None:
             # Name restoration retains the 0.6.1 whole-text behavior. Indicator
@@ -61,6 +70,18 @@ def restore_trace(mapping: ObfuscationMapping, trace: str) -> Dict[str, Any]:
         path = match["path"]
         line = int(match["line"])
         key = mapping._match_file_path(path)
+        if key is not None and mapping.files[key].get("reason") == "crossfile_l3_no_line_table":
+            output.append(text)
+            frames.append(
+                {
+                    "obfuscated_file": path,
+                    "obfuscated_line": line,
+                    "original_file": None,
+                    "original_line": None,
+                    "status": "unmapped",
+                }
+            )
+            continue
         rejected = key is not None and (root is None or deployment_root(path, key) != root)
         location = None if rejected else mapping.resolve_location(path, line)
         status = location.status if location else "unmapped"
@@ -115,6 +136,11 @@ def restore_trace(mapping: ObfuscationMapping, trace: str) -> Dict[str, Any]:
         " Code excerpts are artifact code with names restored; column positions and caret "
         "indicators follow the artifact text and do not correspond to original source."
     )
+    if mapping.encrypted_code:
+        hint += (
+            " Encrypted frames restore names only, never original lines. Ordinary frames "
+            "in L3 modules may remain unchanged. Unknown L3 identities are never guessed."
+        )
     return {
         "unmapped_trace": "".join(output),
         "frames": frames,

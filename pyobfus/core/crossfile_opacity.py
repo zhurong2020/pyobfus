@@ -18,10 +18,9 @@ nothing more:
    top-level plain synchronous functions eligible to be selected later, plus a
    reason for every rejected function.
 
-No ciphertext, no key material, no TOML layer resolution, and no new directory
-protection happens here. The Pro adapter that consumes this plan (slices C-E)
-does not exist yet; enabling the mode therefore fails after preflight rather
-than silently falling back to an ordinary build.
+No ciphertext, key material or TOML layer resolution lives here. The Pro
+adapter and staged build consume this crypto-free metadata; rejected preview
+requests never fall back to ordinary builds.
 """
 
 from __future__ import annotations
@@ -30,6 +29,7 @@ import ast
 import hashlib
 import inspect
 import sys
+import sysconfig
 import types
 from dataclasses import dataclass, field
 from typing import Any, Iterable, List, Optional, Tuple
@@ -43,7 +43,13 @@ from pyobfus.core.fusion_options import FUSION_FIELDS
 _ALLOWED_FUSION_FIELDS = frozenset({"selective_opacity", "opacity_config", "bind_key_env"})
 
 # Dependency fields outside FUSION_FIELDS that must also stay at their defaults.
-_DEPENDENCY_FIELDS: Tuple[str, ...] = ("bind_device_id", "expire_warn_days")
+_DEPENDENCY_FIELDS: Tuple[str, ...] = (
+    "bind_device_id",
+    "expire_warn_days",
+    "license_expire",
+    "license_bind_machine",
+    "license_max_runs",
+)
 
 _FuncDef = (ast.FunctionDef, ast.AsyncFunctionDef)
 
@@ -252,6 +258,9 @@ def preflight(
             "crossfile_opacity builds are supported on CPython only in the first "
             f"release (build interpreter is {sys.implementation.name!r})."
         )
+
+    if str(sysconfig.get_config_var("Py_GIL_DISABLED")).lower() in ("1", "true"):
+        reasons.append("crossfile_opacity does not yet support free-threaded CPython builds.")
 
     if module_names is not None:
         reasons.extend(_identity_collisions(module_names))

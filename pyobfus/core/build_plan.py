@@ -172,7 +172,7 @@ def _disabled_transforms(config: ObfuscationConfig, mode: str) -> List[Dict[str,
     for mech in _FUSION_MECHANISMS:
         if not getattr(config, mech, False):
             continue
-        if is_cross_file_dir:
+        if is_cross_file_dir and not config.crossfile_opacity:
             disabled.append({"transform": mech, "reason": reason_codes.DISABLED_CROSS_FILE_MODE})
         elif level != "pro":
             disabled.append({"transform": mech, "reason": reason_codes.DISABLED_REQUIRES_PRO})

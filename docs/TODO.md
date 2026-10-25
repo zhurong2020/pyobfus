@@ -40,9 +40,9 @@
 - [x] 切片 A 预检 + 稳定绑定计划（PR #121 已合并）
 - [x] 切片 B Core 绑定对应表（PR #122 已合并）
 - [x] 切片 C Pro 加密适配器（PR #123 已合并）
-- [ ] 切片 D 调试 + counts-only 报告（**PR #126 已开、CI 全绿、待合并**）
-- [ ] 切片 E（下一步）落盘 mapping 的 `encrypted_code`/`opacity_plan` + CLI `--unmap` 接入 + 运行期解释器 guard + 私有 staging/全新路径提交/失败恢复/混合构建交付检查 + runtime-only 干净安装验证（端到端收尾，仍在预览开关后）
-A–E 全绿前整条链路对外不构成「保护已生效」，不随发版；不因本地验收通过自动发版或投稿。本次 session 在切片 D 后暂停。
+- [x] 切片 D 调试 + counts-only 报告（**PR #126 已于 10-25 合并，main `dd36c9e`**）
+- [ ] 切片 E（10-25 正在实现与验证；见 [推进记录](PROGRESS_2026-10-25.md)）落盘 mapping 的 `encrypted_code`/`opacity_plan` + CLI `--unmap` 接入 + 运行期解释器 guard + 私有 staging/全新路径提交/失败恢复/混合构建交付检查 + runtime-only 干净安装验证（端到端收尾，仍在预览开关后）
+A–E 全绿前整条链路对外不构成「保护已生效」，不随发版；不因本地验收通过自动发版或投稿。10-25 已恢复，按 E、三项既有缺陷、MCP 2.x 复审、运营与文档整理顺序推进。
 
 10-25 复盘、10-26 巡检继续，但不阻塞上述工作；不再以静默等待为主要任务。私有医院应用仍暂停，等现场升级 Win10 后反馈。参数改名等其他候选保持原范围与授权边界。
 
@@ -54,7 +54,7 @@ A–E 全绿前整条链路对外不构成「保护已生效」，不随发版�
 - [x] **PY315-2：新字典推导式解包构建失败**。`{**row for row in rows}` 原文在 3.15 可运行，checkout／0.7.5 wheel 构建均报 `NoneType ... _fields`；根因为自定义推导式 visitor 访问 None，六处路径已修复并补原生回归；0.8.0 发布（#108）。
 - [ ] **3.15 后续（0.8.0 发布后登记，均未授权实现）**：① 3.15 标准库冒烟中 `json`（`scanner.make_scanner`）与 `unittest`（`util.three_way_cmp`/`case.TestCase`）目录构建产物导入失败，main 同样失败，属模块属性证明既有限制，待定是否单列缺陷；② free-threaded 3.15、3.15 上冻结/编译打包未验证。Black/mypy 配置修订与 Glama 同步结果见 `CURRENT_PLAN_ZH.md` 对应日期记录。
 - [ ] **MCP 2.x 发布条件复审**。10-19 CI 已用 2.3.0 过 152 项；10-20 Linux 真实 stdio 验证 legacy 为 `2025-11-25`、auto 为 `2026-07-28`，均列出 9 工具并成功调用只读工具。旧「stdio 无新协议收益」结论不再适用；依赖上限未改，仍需 Python 3.10／Windows／干净解析与全工具合同。
-- `--no-cross-file` mapping 已实现并发布；目录 L3 + 应用 key provider 自 10-24 起按上面五切片推进（A/B/C 已合并、D 待合并、E 未开始），仍不一次接入全部 fusion 字段。
+- `--no-cross-file` mapping 已实现并发布；目录 L3 + 应用 key provider 自 10-24 起按上面五切片推进（A/B/C/D 已合并、E 验证中），仍不一次接入全部 fusion 字段。
 - 参数改名、H B2/B3、资源 key provider 与 L3 方法覆盖继续保持原 gate；未授权改实现／合并／发布。
 
 - [ ] **v1 mapping 的非 ASCII 名字还原限制（10-24 反例）**：合成 v1 mapping 的 `foo → á` 能读取，但 `unmap_text` 的 ASCII identifier 正则不替换 `in á`；后续真实 CLI 用 `--name-prefix á` 构建崩溃函数 `calculate_total`，mapping v1 中记录非 ASCII 短名，但实际 traceback 经 unmap 后仍保留该短名，确认不只手写 mapping 受影响；编码正确解码后仍保持短名。此项独立于本轮输入编码修复；待比较 v1 兼容合同与 v2 Unicode token 逻辑后安排修订，不能把成功解码宣传为所有 Unicode 名字均能恢复。
@@ -402,7 +402,7 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 
 ## 待发内容
 
-- Core/MCP 当前没有未发布 changelog 内容。
+- Core 有 crossfile-opacity A–D 与 E 开发中的未发布内容；尚未发布。MCP 当前没有未发布 changelog 内容。
 - VS Code schema 已同步 `preserve_param_names` 默认值，随插件自己的后续版本发布。
 
 ## IP 相关（2026-09-28 登记 · 待维护者拍板，未执行）

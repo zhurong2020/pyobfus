@@ -38,6 +38,7 @@ MISSING_OUTPUT = "delivery.missing_output"
 FUSION_SKIPPED = "delivery.fusion_skipped"
 L3_PARTIAL = "delivery.l3_partial"
 BYTECODE_PRESENT = "delivery.bytecode_present"
+L3_BUILD_MISMATCH = "delivery.l3_build_mismatch"
 
 _MAX_JSON_BYTES = 20 * 1024 * 1024
 _PEM_PRIVATE_MARKER = b"PRIVATE KEY-----"  # PKCS#8, RSA, EC, OPENSSH
@@ -142,11 +143,28 @@ def check_delivery(
     matched_outputs = 0
     bytecode: List[str] = []
     file_count = 0
+    l3_manifest: Optional[Dict[str, Any]] = None
+    observed: Dict[str, Tuple[str, bytes]] = {}
     for entry in entries:
         file_count += 1
         if kind == "wheel" and entry.path.endswith(_WHEEL_METADATA_SUFFIXES):
             continue
         digest = hashlib.sha256(entry.data).hexdigest()
+        if entry.path == ".pyobfus-release.json":
+            try:
+                decoded = json.loads(entry.data)
+                if not isinstance(decoded, dict):
+                    raise ValueError("Release manifest must be an object")
+                l3_manifest = decoded
+            except (ValueError, UnicodeDecodeError):
+                findings.append(
+                    Finding(
+                        L3_BUILD_MISMATCH, "high", entry.path, "Unreadable L3 release manifest."
+                    )
+                )
+            continue
+        if entry.path.endswith(".py"):
+            observed[entry.path] = (digest, entry.data[:2048])
         if _is_mapping(entry):
             findings.append(
                 Finding(
@@ -200,6 +218,49 @@ def check_delivery(
                         "unprotected, modified after the build, or from another build.",
                     )
                 )
+
+    needs_l3 = report is not None and isinstance(report.get("opacity"), dict)
+    if l3_manifest is not None or needs_l3:
+        try:
+            if l3_manifest is None:
+                raise ValueError("L3 release completion manifest is missing")
+            build_id = l3_manifest["build_id"]
+            if (
+                l3_manifest.get("format") != "pyobfus-l3-release"
+                or l3_manifest.get("version") != 1
+                or l3_manifest.get("state") != "completed"
+                or not isinstance(build_id, str)
+                or not build_id
+            ):
+                raise ValueError("L3 release completion identity is invalid")
+            if (
+                report is not None
+                and needs_l3
+                and (report["build_id"] != build_id or report["opacity"]["build_id"] != build_id)
+            ):
+                raise ValueError("L3 build report and delivery identities differ")
+            records = l3_manifest["files"]
+            expected = {r["path"]: r["sha256"] for r in records}
+            if len(expected) != len(records) or set(expected) != set(observed):
+                raise ValueError("L3 release contains missing, duplicate or unrecorded files")
+            marker = f"# pyobfus:l3-build {build_id}".encode("ascii")
+            for path, (digest, header) in observed.items():
+                if digest != expected[path] or marker not in header.splitlines():
+                    raise ValueError("L3 delivery contains modified or mixed-build files")
+            if report is not None and needs_l3:
+                recorded = {r["path"]: r["sha256"] for r in report["outputs"]["files"]}
+                if recorded != expected:
+                    raise ValueError("L3 build report and release file digests differ")
+        except (KeyError, TypeError, ValueError, UnicodeError):
+            findings.append(
+                Finding(
+                    L3_BUILD_MISMATCH,
+                    "high",
+                    ".pyobfus-release.json",
+                    "L3 completion identity, file membership or content digests do not match. "
+                    "Rebuild and deliver one complete application; labels are not signatures.",
+                )
+            )
 
     if bytecode:
         findings.append(

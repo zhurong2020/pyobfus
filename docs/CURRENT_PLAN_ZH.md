@@ -1,5 +1,8 @@
 # pyobfus 当前计划
 
+**2026-10-25 Codex 顺序推进（维护者授权、独立执行、不调用无头 Claude）**：PR #126 已经复核四个成功 workflow 并通过 `gh` rebase 合并到 main `dd36c9e`（连接器合并权限 403）；切片 D 收口。切片 E 在 `feat/crossfile-opacity-completion` 实现并验证中：私有 mapping 扩展与 CLI unmap、解释器 guard、私有 staging/no-clobber 提交/恢复、混合交付检查已接线。Linux CPython 3.12.3 的 30 项构建测试通过，包含仅装公开 runtime 0.1.1 的干净 target；完整回归与六格 hosted 验证仍待完成。完整进度、后续三缺陷/MCP 2.x/运营/文档任务以 [推进记录](PROGRESS_2026-10-25.md) 为准。以下 10-24 快照保留作历史，不代表当前 D 仍待合并。
+
+
 **2026-10-24 crossfile-opacity（多模块 L3 + 应用密钥）切片 A–D 进度（预览、未发版，维护者授权逐片推进）**：按设计 §11 五切片推进；维护者已确认首批限制（`--jobs 1` 串行、仅模块顶层同步普通函数、TOML-only 选择、全新输出路径、相同 CPython 实现/minor/GIL、加密函数不还原原始行号）。每片均经无头 Codex 只读复核、问题逐项修复、`check.sh` 绿、全量测试通过。
 - **切片 A**（预检 + 稳定绑定计划，Community）：`pyobfus/core/crossfile_opacity.py`，`--crossfile-opacity` 开关启用后只跑预检即停、绝不回退普通构建。**已合并 PR #121**（含 Codex 查出的 6 项修复）。
 - **切片 B**（Core 绑定对应表）：`resolve_correspondence()` 从已完成跨文件名映射求「原绑定→最终名」，文件级定位。**已合并 PR #122**（Codex NO BLOCKERS，另在内存驱动真实转换器核对 38 绑定）。

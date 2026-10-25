@@ -77,3 +77,70 @@ The build fails for malformed TOML, unknown layer names, missing or empty
 patterns, non-string values, or a `rules` value that is not a list of TOML
 tables. Overlapping patterns are resolved by first-match precedence, so order
 rules from most specific to most general.
+
+## Cross-file L3 preview (unreleased checkout)
+
+The default cross-file behavior described above remains the released behavior.
+The development checkout adds explicit `--crossfile-opacity` for directory L3
+with application-provided keys. This is not included in Core 0.9.1.
+
+```bash
+# Set APP_L3_KEY securely to a base64-encoded 32-byte application key.
+# Create the metadata parent first; all destination paths must be new.
+pyobfus src/ -o protected-v1/ --level pro --crossfile-opacity \
+  --opacity-config opacity.toml --bind-key-env APP_L3_KEY --jobs 1 \
+  --save-mapping private/mapping-v1.json --build-report private/report-v1.json
+```
+
+Only unconditional, stable, undecorated, synchronous module-top functions can
+be encrypted. Matching unsupported methods, nested/async/generator functions
+or rebound definitions fails the build. Other layer values retain the normal
+Core transformations. Rules use the original module path relative to `src/`;
+for `src/pkg/algorithm.py`, use `pkg.algorithm.function_name`.
+
+All destination parents must already exist on one filesystem, outside the
+source tree. Output, mapping and report must be distinct fresh paths; mapping
+and report stay outside delivery. Incremental builds, handwritten Pro markers,
+other fusion mechanisms, free-threaded builds, and unproved project module
+attribute accesses are refused. Use `--check` and `exclude_names` to resolve
+uncertain module accesses. `--trace-marker`, `--provenance-manifest`, and
+`--verify-names` are not supported by this preview transaction; syntax is always
+compiled in staging without executing user code. `--dry-run` validates without
+writing a release.
+
+Register the provider **outside** the protected package and before importing
+it. `python -m package`, console scripts and spawn workers can execute package
+`__init__` too early; each spawned child needs its own bootstrap/initializer:
+
+```python
+from pyobfus_runtime import set_key_provider
+
+set_key_provider(load_authorized_application_key)  # stable 32-byte key
+from protected_app import main
+```
+
+Environment fallback is also supported. Missing or invalid-length keys fail at
+import; a wrong 32-byte key fails on the first encrypted call. Registering a
+provider later does not revoke or change keys already held by modules.
+
+Artifacts require the build's CPython minor, bytecode magic and GIL build mode.
+The guard runs before runtime/provider initialization. Encrypted frames restore
+only original function names; their original line is unavailable. Ordinary
+functions in an L3 module may retain their obfuscated names and locations.
+Unknown encrypted frame identities remain unchanged, including when supplied
+the wrong mapping. Keep the private mapping; readers need Core 0.10.0 or later
+(the development checkout implements that reader).
+
+Deliver the completed directory including `.pyobfus-release.json`, then run
+`pyobfus --check-delivery protected-v1/ --build-report private/report-v1.json`.
+The completion manifest and file digests detect accidental mixing and edits;
+they are not signatures. Keep mappings and staging ownership journals private.
+A failed build removes only metadata hard-linked to its own stage. After an
+interruption, inspect the known private `.pyobfus-release-*` stage and use the
+Community Python API `pyobfus.core.staged_release.recover_staging(stage_path)`;
+it never deletes an existing application directory or replaced metadata.
+This is not a crash-durable multi-path transaction.
+
+Runtime-only delivery uses the public `pyobfus-runtime==0.1.1` API. Validation
+results and platform scope are recorded in
+[CROSSFILE_OPACITY_VALIDATION.md](CROSSFILE_OPACITY_VALIDATION.md).

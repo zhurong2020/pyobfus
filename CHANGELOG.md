@@ -10,13 +10,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Preview `--crossfile-opacity` (Pro): opt-in multi-module L3 + application-key
-  mode, first-release planning only. Its Core preflight validates the supported
+  mode. Its Core preflight validates the supported
   envelope (Pro level, cross-file directory input, TOML-only selection via
   `--opacity-config`, an application key source via `--bind-key-env`, `--jobs 1`,
   all other build-fusion fields at defaults, CPython build interpreter) and a
-  stable top-level-function binding plan; enabling the flag reports whether the
-  configuration is supported and then stops without writing a protected build,
-  since the Pro adapter does not exist yet. See docs/CROSSFILE_OPACITY_DESIGN.md.
+  stable top-level-function binding plan. See docs/CROSSFILE_OPACITY_DESIGN.md.
 - Crossfile-opacity planning (slice B): a Core correspondence table mapping each
   original top-level-function binding id to the final name Core emitted for it,
   derived from the finished cross-file name mapping (not AST node identity) and
@@ -31,8 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   import-alias names are allocated to avoid collisions; the module docstring and
   `__future__` prologue stay ahead of injected code; every target is round-trip
   verified in the build process and the emitted source is scanned for key leaks.
-  Compile-only (never executes the user module); not yet wired into an
-  end-to-end build.
+  Compile-only (never executes the user module).
 - Crossfile-opacity debugging + report (slice D): each encrypted function's
   code is stamped with a dedicated `<pyobfus-l3:<build-id>:<file>>` frame
   identity (no source line is shown for it), and a Community name-only restorer
@@ -42,6 +39,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   report (mode, eligible/encrypted/rejected counts, reason histogram, runtime
   and interpreter requirements, key-source type + env name, non-secret build id)
   that carries no original names. Preview-only planning/debug metadata.
+
+- Crossfile-opacity end-to-end preview (slice E): explicit TOML-selected
+  top-level functions run through Core rename and the Pro adapter; a stdlib-only
+  interpreter/magic/GIL guard precedes runtime/provider initialization. The
+  private v1 mapping persists encrypted frame names and selection metadata;
+  Community `--unmap` restores names only for exact L3 frame identities.
+  Private staging publishes metadata before a no-clobber completed directory,
+  with inode-based interrupted-build recovery. Delivery checking detects
+  incomplete, modified and mixed builds via completion identity and digests.
+  Requires fresh destinations, existing parents on the same filesystem,
+  `--save-mapping`, `--jobs 1`, and a valid Pro license/trial. Unproved project
+  module attributes and unsupported auxiliary writers are rejected. The
+  existing runtime 0.1.1 contract is sufficient; no runtime API changes.
 
 ## [0.9.1] - 2026-10-24
 
