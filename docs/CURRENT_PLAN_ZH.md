@@ -1,5 +1,11 @@
 # pyobfus 当前计划
 
+**2026-10-26 MCP SDK 2.x 生产范围**：PR #134 已合并（main `18b346b`），
+源码依赖范围为 `mcp>=1.27.0,<3.0.0`，正式 wheel 的六格兼容矩阵、
+总 CI 与 CodeQL 在 PR head 通过。已发布的 MCP 0.3.15 元数据仍限制 `<2`；
+0.3.16 发版准备单独审核，不把源码合并视为已发版。范围、各 SDK 版本
+本地验证和回退方案见 [发布准备](MCP_SDK_2X_RELEASE_PREP_2026-10-26.md)。
+
 **2026-10-25 最新状态（Codex 独立推进，维护者授权，不调用无头 Claude）**：
 - **已合并**：切片 D（PR #126 / `dd36c9e`）、切片 E（PR #127 / `db634c6`）。A–E 完整接线，Linux/Windows × Python 3.10/3.12/3.15 六格全部通过，CI result + CodeQL 成功；仍为未发布预览，公开 Core 仍 0.9.1。
 - **PR #128 已合并（main `a0882a4`）**：晚 runtime import、v1 Unicode 名字、strict cp1252 输出三缺陷及 L3 manifest 缺失的交付检查补充。最后源码全量 Core 4637 / MCP153 / integration352 / runtime24 passed，64 skipped；后补 UTF-8/cp1252 日志参数化专项通过。最终 39 检查成功 / 2 跳过；未发布。

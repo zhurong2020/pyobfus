@@ -5,10 +5,14 @@
 顺序做」，不记录历史。最新依据见
 [`FEATURE_EXPANSION_RESEARCH_2026-10-20.md`](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)；Python 3.15 的 P0 范围与验收见 [`PYTHON315_SUPPORT_PLAN.md`](PYTHON315_SUPPORT_PLAN.md)。
 
-最后更新：2026-10-25。公开版本仍为 Core 0.9.1、MCP 0.3.15、runtime 0.1.1；
+最后更新：2026-10-26。公开版本仍为 Core 0.9.1、MCP 0.3.15、runtime 0.1.1；
 最终交接见 [Session 收尾](SESSION_CLOSEOUT_2026-10-25.md)，最新推进见 [Codex 进度](PROGRESS_2026-10-25.md)，运营与待办日期见
 [复盘/巡检准备](OPS_REVIEW_2026-10-25.md)。实现、合并与对外发布分别记录，
 不把已合并的预览代码当成已发布包。
+
+2026-10-26 增量：MCP SDK 1.x/2.x 的源码依赖范围已由 PR #134 合并，
+已发布 0.3.15 仍限制 `<2`。下一步为 0.3.16 发版准备审查与单独发布决定；
+证据见 [发布准备](MCP_SDK_2X_RELEASE_PREP_2026-10-26.md)。
 
 ## 状态口径
 
@@ -40,7 +44,7 @@ Linux/Windows × 3.10/3.12/3.15 六格和总 CI 均通过。具体能力与边�
 当前顺序：
 
 1. 决定下一次 Core 发布版本与授权；L3 预览与修复均已合并，尚未发布。
-2. MCP SDK 2.x 复审已由 PR #129 合并（`d28ee31`），总 CI/四格验证通过；是否放宽生产上限与发布另行决定。
+2. MCP SDK 2.x 的源码依赖范围已由 PR #134 放宽；0.3.16 发布准备与授权单独处理。
 3. 10-26 增量巡检：优先核实正常 WSL 会话的当天云端镜像；10-27 DEV 第二篇署名/预览。
 
 10-25 复盘和当前可执行巡检已完成，见运营记录；不把未来日期状态写成已检查。
@@ -53,10 +57,6 @@ Linux/Windows × 3.10/3.12/3.15 六格和总 CI 均通过。具体能力与边�
 - **已发布参考 PY315-1：惰性 from 导入被提前执行**。原生 Python 3.15.0、当前 checkout 与 PyPI Core 0.7.5 wheel 均复现：`lazy from calculator import Calculator` 改写后丢 `is_lazy`，构建成功但导入副作用时序变化。最小输入与输出见调研 §5.1。Community 兼容性，已修复并补原生回归；0.8.0 发布（#108）。
 - **已发布参考 PY315-2：新字典推导式解包构建失败**。`{**row for row in rows}` 原文在 3.15 可运行，checkout／0.7.5 wheel 构建均报 `NoneType ... _fields`；根因为自定义推导式 visitor 访问 None，六处路径已修复并补原生回归；0.8.0 发布（#108）。
 - [ ] **3.15 后续（0.8.0 发布后登记，均未授权实现）**：① 3.15 标准库冒烟中 `json`（`scanner.make_scanner`）与 `unittest`（`util.three_way_cmp`/`case.TestCase`）目录构建产物导入失败，main 同样失败，属模块属性证明既有限制，待定是否单列缺陷；② free-threaded 3.15、3.15 上冻结/编译打包未验证。Black/mypy 配置修订与 Glama 同步结果见 `CURRENT_PLAN_ZH.md` 对应日期记录。
-- **MCP 2.x 复审已完成，PR #129 已合并，总 CI/四格专项通过**：正常解析候选
-  wheel、公开 Core 0.9.1、SDK 2.3.0，pip check 与完整九工具合同通过；生产上限未改。
-  结果见 [本次复审](MCP_SDK_2X_REVIEW_2026-10-25.md)。后续是否放宽上限与发版
-  单列决定，不再把“缺少 3.10/Windows 验证”当作当前事实。
 - `--no-cross-file` mapping 已随 0.9.0 发布；目录 L3 预览 A–E 已合并但未发布，
   未一次接入其他 fusion 字段。
 - 参数改名、H B2/B3、资源 key provider 与 L3 方法覆盖继续保持原 gate；未授权改实现／合并／发布。
@@ -555,7 +555,6 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
 |---|---|---|
 | ~~self-dogfooding 四条 lane 落地~~ ✅ 2026-09-25 | `SELF_DOGFOODING_BEST_PRACTICES.md` | 已落地为观察模式：`scripts/dogfood/run.py` + `dogfood/canary/` + 非阻塞 `Dogfood` workflow（不是必需检查）。Phase A3 升为 PR gate 仍是单独 reviewed 步骤 |
 | MCP Resources / Prompts 原语拆分 | `MCP_PRIMITIVES_DESIGN.md` | 等真实 MCP 用户反馈 |
-| 放开 `mcp<2.0.0` 上限 | `MCP_SDK_2X_SPIKE.md` §5 | `mcp-sdk-2x` job 连绿数周 / 有人明确要 2.x / 1.x 停止维护，三者任一 |
 | `--output-pyc` 可行性 spike | `CURRENT_PLAN_ZH.md` P3-1 | 只做 spike，不承诺产品化 |
 | hosted / remote MCP endpoint | 同上 P3-2 | 明确不做；stdio 的新协议协商已由 SDK 2.3.0 auto 实测证明，不与远程传输混为一谈 |
 | `dependency_advisory` 是否拆成独立工具 | `SEO_AND_COMPETITOR_SCAN_2026-08-31.md` §1.2 | 独立赛道已拥挤，**倾向不拆**，除非出现明确差异点 |
