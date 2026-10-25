@@ -6,6 +6,8 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+## [0.3.16] - 2026-10-26
+
 ### Changed
 
 - Allow MCP Python SDK 2.x in the package dependency range while retaining
