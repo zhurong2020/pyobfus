@@ -81,6 +81,10 @@ class ObfuscationMapping:
     file_names: Dict[str, Dict[str, List[str]]] = field(default_factory=dict)
     unmapped_files: Dict[str, str] = field(default_factory=dict)
 
+    # Optional v1 extensions for exact, name-only encrypted frame restoration.
+    encrypted_code: Dict[str, Dict[str, str]] = field(default_factory=dict)
+    opacity_plan: Dict[str, Any] = field(default_factory=dict)
+
     # ---- construction ------------------------------------------------
 
     @classmethod
@@ -242,6 +246,9 @@ class ObfuscationMapping:
         if self.mode == "independent_files":
             payload["file_names"] = self.file_names
             payload["unmapped_files"] = self.unmapped_files
+        if self.encrypted_code:
+            payload["encrypted_code"] = self.encrypted_code
+            payload["opacity_plan"] = self.opacity_plan
         return json.dumps(payload, indent=indent, ensure_ascii=False, sort_keys=True)
 
     @classmethod
@@ -284,6 +291,28 @@ class ObfuscationMapping:
         if not independent:
             for obf, info in data.get("global", {}).items():
                 m.global_map[obf] = (info.get("module", ""), info.get("original", ""))
+            encrypted = data.get("encrypted_code", {})
+            plan = data.get("opacity_plan", {})
+            if not isinstance(encrypted, dict) or not isinstance(plan, dict):
+                raise ValueError("Invalid encrypted-code mapping extension")
+            from pyobfus.core.crossfile_opacity_debug import parse_l3_co_filename
+
+            for filename, names in encrypted.items():
+                if (
+                    not isinstance(filename, str)
+                    or parse_l3_co_filename(filename) is None
+                    or not isinstance(names, dict)
+                    or not all(
+                        isinstance(name, str)
+                        and name.isidentifier()
+                        and isinstance(original, str)
+                        and original.isidentifier()
+                        for name, original in names.items()
+                    )
+                ):
+                    raise ValueError("Invalid encrypted-code name table")
+            m.encrypted_code = encrypted
+            m.opacity_plan = plan
         else:
             unavailable = data.get("unmapped_files", {})
             if not isinstance(unavailable, dict):

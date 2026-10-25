@@ -28,6 +28,9 @@ from __future__ import annotations
 import ast
 import base64
 import marshal
+import importlib.util
+import sys
+import sysconfig
 import types
 from dataclasses import dataclass, field
 from typing import Iterable, List, Optional, Tuple
@@ -70,6 +73,7 @@ def encrypt_targets(
     env_name: str,
     filename: str = "<crossfile-opacity>",
     code_filename: Optional[str] = None,
+    interpreter_guard: bool = False,
 ) -> AdapterResult:
     """Encrypt an explicit set of top-level functions in already-renamed source.
 
@@ -172,6 +176,8 @@ def encrypt_targets(
         key_name=key_name,
         env_name=env_name,
     )
+    if interpreter_guard:
+        _insert_interpreter_guard(transformed, gen)
     ast.fix_missing_locations(transformed)
     out_source = unparse(transformed)
 
@@ -192,6 +198,43 @@ def encrypt_targets(
 # ---------------------------------------------------------------------------
 # AST inspection
 # ---------------------------------------------------------------------------
+
+
+def _insert_interpreter_guard(tree: ast.Module, gen: _FreshNames) -> None:
+    """Check bytecode identity before any runtime/provider or user initializer."""
+    s, u, c, actual = (
+        gen.fresh(n)
+        for n in ("_pyobfus_sys", "_pyobfus_util", "_pyobfus_sysconfig", "_pyobfus_interpreter")
+    )
+    expected = (
+        sys.implementation.name,
+        sys.version_info[:2],
+        importlib.util.MAGIC_NUMBER,
+        str(sysconfig.get_config_var("Py_GIL_DISABLED")).lower() in ("1", "true"),
+    )
+    source = (
+        f"import sys as {s}\nimport importlib.util as {u}\nimport sysconfig as {c}\n"
+        f"{actual} = ({s}.implementation.name, {s}.version_info[:2], {u}.MAGIC_NUMBER, "
+        f"str({c}.get_config_var('Py_GIL_DISABLED')).lower() in ('1', 'true'))\n"
+        f"if {actual} != {expected!r}:\n"
+        f"    raise ImportError('pyobfus L3 requires interpreter ' + repr({expected!r}) "
+        f"+ '; target is ' + repr({actual}))\n"
+    )
+    index = 0
+    if (
+        tree.body
+        and isinstance(tree.body[0], ast.Expr)
+        and isinstance(tree.body[0].value, ast.Constant)
+        and isinstance(tree.body[0].value.value, str)
+    ):
+        index = 1
+    while (
+        index < len(tree.body)
+        and isinstance(tree.body[index], ast.ImportFrom)
+        and (getattr(tree.body[index], "module", None) == "__future__")
+    ):
+        index += 1
+    tree.body[index:index] = ast.parse(source).body
 
 
 def _restamp_co_filename(code: types.CodeType, co_filename: str) -> types.CodeType:

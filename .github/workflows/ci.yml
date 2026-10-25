@@ -110,6 +110,40 @@ jobs:
         fi
         pytest pyobfus_runtime/tests/ -q -ra -o addopts='' --no-cov
 
+  crossfile-opacity:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    name: L3 delivery (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ['3.10', '3.12', '3.15']
+    steps:
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5
+    - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install builder and independent public runtime
+      shell: bash
+      run: |
+        python -m pip install -e ".[dev]"
+        python -m venv "$RUNNER_TEMP/l3-runtime"
+        if [[ "$RUNNER_OS" == Windows ]]; then
+          runtime_python="$RUNNER_TEMP/l3-runtime/Scripts/python.exe"
+        else
+          runtime_python="$RUNNER_TEMP/l3-runtime/bin/python"
+        fi
+        "$runtime_python" -m pip install 'pyobfus-runtime==0.1.1'
+        "$runtime_python" -m pip check
+        echo "PYOBFUS_L3_RUNTIME_PYTHON=$runtime_python" >> "$GITHUB_ENV"
+    - name: Verify real builds, private publication and runtime-only execution
+      shell: bash
+      run: |
+        python -m pytest tests/test_crossfile_opacity_build.py tests/test_crossfile_opacity_adapter.py tests/test_crossfile_opacity_debug.py tests/test_crossfile_opacity_plan.py -q -o addopts='' --no-cov
+
   lint:
     name: Lint and Type Check
     runs-on: ubuntu-latest
@@ -378,7 +412,7 @@ jobs:
 
   result:
     name: CI result
-    needs: [changes, test, lint, mcp-tests, integration, runtime-wheel, benchmark-smoke, mcp-sdk-latest, mcp-sdk-2x, docs]
+    needs: [changes, test, crossfile-opacity, lint, mcp-tests, integration, runtime-wheel, benchmark-smoke, mcp-sdk-latest, mcp-sdk-2x, docs]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 10

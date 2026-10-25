@@ -213,8 +213,9 @@ def _echo_pro_import_hint() -> None:
     "--crossfile-opacity",
     is_flag=True,
     help="(Pro, preview) Opt in to multi-module L3 + application-key mode. "
-    "First release is planning/preflight only; enabling it reports whether the "
-    "configuration is supported and then stops (no protected build yet).",
+    "TOML-only top-level synchronous functions, --jobs 1, application key, "
+    "fresh output and private mapping paths. Same CPython minor/GIL; encrypted "
+    "frames restore names only. Register provider before package import.",
 )
 @click.option(
     "--upgrade",
@@ -1144,7 +1145,7 @@ def main(
         )
 
         build_plan: Optional[Dict[str, Any]] = None
-        if (dry_run and json_output) or build_report_path:
+        if (dry_run and json_output) or build_report_path or config.crossfile_opacity:
             from pyobfus.core.build_plan import build_obfuscation_plan
 
             if effective_config_path:
@@ -1231,11 +1232,9 @@ def main(
             )
             click.echo(format_skipped_directories(skipped_directories))
 
-        # Opt-in multi-module L3 + application-key mode (slice A: planning and
-        # preflight only). Validate the configuration and then stop: the Pro
-        # adapter that produces the protected build does not exist yet, so we
-        # must never fall back to an ordinary build.
-        if getattr(config, "crossfile_opacity", False):
+        # Opt-in Pro publication is a separate staged transaction. Ordinary
+        # post-build writers must not mutate a committed L3 completion manifest.
+        if config.crossfile_opacity:
             from pyobfus.core.crossfile_opacity import CrossfileOpacityError, preflight
 
             try:
@@ -1249,14 +1248,57 @@ def main(
                 click.echo("Error: --crossfile-opacity configuration is not supported:", err=True)
                 for reason in exc.reasons:
                     click.echo(f"  - {reason}", err=True)
+                sys.stdout = _saved_stdout
+                if json_output:
+                    _emit_error_json(
+                        "CrossfileOpacityError",
+                        str(exc),
+                        "Use the supported crossfile-opacity configuration.",
+                        "pyobfus --help",
+                        exit_code=2,
+                    )
                 sys.exit(2)
-            click.echo(
-                "crossfile-opacity preflight passed. This mode is preview-only: the "
-                "protected multi-module build is not implemented yet, so no output was "
-                "written. See docs/CROSSFILE_OPACITY_DESIGN.md.",
-                err=True,
+            if not save_mapping_path:
+                raise ValueError("Crossfile opacity requires --save-mapping outside output")
+            if provenance_manifest_path or trace_marker or verify_names:
+                raise ValueError(
+                    "Crossfile opacity preview does not support --provenance-manifest, "
+                    "--trace-marker or --verify-names; syntax is always verified in staging"
+                )
+            from pyobfus_pro.crossfile_opacity_build import build_directory
+
+            assert build_plan is not None
+            built = build_directory(
+                input_path_obj,
+                output_path_obj,
+                config,
+                mapping_path=Path(save_mapping_path),
+                report_path=Path(build_report_path) if build_report_path else None,
+                plan=build_plan,
+                dry_run=dry_run,
             )
-            sys.exit(3)
+            if json_output:
+                sys.stdout = _saved_stdout
+                _emit_obfuscate_success_json(
+                    input_path=input_path,
+                    output_path=output_path,
+                    preset=preset,
+                    level=config.level,
+                    dry_run=dry_run,
+                    stats=built["stats"],
+                    mapping_path=save_mapping_path,
+                    build_report_path=build_report_path if not dry_run else None,
+                    plan=build_plan,
+                )
+            else:
+                for warning in built["stats"].get("warnings", []):
+                    click.echo(f"Warning: {warning}", err=True)
+                click.echo(
+                    "Crossfile opacity preview validated (no files written)."
+                    if dry_run
+                    else "Crossfile opacity build completed; retain mapping privately."
+                )
+            return
 
         # Incremental short-circuit: directory mode only (single-file
         # rebuilds are cheap enough to skip this machinery)
@@ -2646,7 +2688,7 @@ def _report_fusion_options(
         sys.exit(1)
 
     requested = requested_fusion_fields(config)
-    skipped_in_directory_mode = cross_file and input_path.is_dir()
+    skipped_in_directory_mode = cross_file and input_path.is_dir() and not config.crossfile_opacity
     if requested and skipped_in_directory_mode:
         click.echo(
             "Warning: these Pro build-fusion options are NOT applied in cross-file "

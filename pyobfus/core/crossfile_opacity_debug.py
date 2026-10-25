@@ -27,6 +27,7 @@ private mapping, not in the shareable report. A reader needs at least
 from __future__ import annotations
 
 import re
+import importlib.util
 import sys
 import sysconfig
 from collections import Counter
@@ -64,8 +65,8 @@ def l3_co_filename(artifact_id: str, relative_file: str) -> str:
     """
     if not artifact_id:
         raise ValueError("artifact_id must be non-empty")
-    if ":" in artifact_id or ">" in artifact_id:
-        raise ValueError("artifact_id must not contain ':' or '>'")
+    if any(c in artifact_id for c in (":", *_UNSAFE_IN_RELATIVE_FILE)):
+        raise ValueError("artifact_id contains a frame delimiter")
     if not relative_file:
         raise ValueError("relative_file must be non-empty")
     bad = [c for c in _UNSAFE_IN_RELATIVE_FILE if c in relative_file]
@@ -76,8 +77,12 @@ def l3_co_filename(artifact_id: str, relative_file: str) -> str:
 
 def parse_l3_co_filename(path: str) -> Optional[Tuple[str, str]]:
     """Return ``(artifact_id, relative_file)`` for a dedicated frame path, else None."""
-    match = _L3_CO_FILENAME.match(path)
+    match = _L3_CO_FILENAME.fullmatch(path)
     if match is None:
+        return None
+    if any(c in match["artifact"] for c in _UNSAFE_IN_RELATIVE_FILE) or any(
+        c in match["file"] for c in _UNSAFE_IN_RELATIVE_FILE
+    ):
         return None
     return match["artifact"], match["file"]
 
@@ -163,7 +168,7 @@ def interpreter_tuple() -> Dict[str, object]:
     Recorded in the shareable report; the emitted runtime guard (elsewhere)
     enforces the match. ``gil_disabled`` reflects the free-threaded build flag.
     """
-    gil_disabled = bool(sysconfig.get_config_var("Py_GIL_DISABLED"))
+    gil_disabled = str(sysconfig.get_config_var("Py_GIL_DISABLED")).lower() in ("1", "true")
     return {
         "implementation": sys.implementation.name,
         "python_version": f"{sys.version_info.major}.{sys.version_info.minor}",
@@ -178,7 +183,7 @@ def build_opacity_report(
     eligible: int,
     encrypted: int,
     rejected_reasons: Iterable[str],
-    runtime_requirement: str = "pyobfus-runtime>=0.1,<1",
+    runtime_requirement: str = "pyobfus-runtime>=0.1.1,<1",
 ) -> Dict[str, object]:
     """Build the shareable, counts-only crossfile-opacity report.
 
@@ -198,6 +203,9 @@ def build_opacity_report(
         "rejection_histogram": dict(sorted(histogram.items())),
         "runtime_requirement": runtime_requirement,
         "interpreter": interpreter_tuple(),
+        "bytecode_magic": importlib.util.MAGIC_NUMBER.hex(),
+        "debug_limitations": "Encrypted frames restore names only; ordinary frames in L3 "
+        "modules may remain unchanged. No original encrypted-function lines are available.",
         "key_source": {"type": "application_provided_env", "env_name": env_name},
         "unmap_min_core_version": L3_UNMAP_MIN_CORE_VERSION,
     }
