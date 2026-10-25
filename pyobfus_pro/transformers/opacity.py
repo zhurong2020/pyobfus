@@ -450,13 +450,16 @@ def _ensure_runtime_import(tree: ast.Module) -> None:
     scrub / opacity imports collapse into one line). Otherwise a new import
     is inserted after any leading import block.
     """
-    for stmt in tree.body:
+    for stmt in tree.body[: _after_leading_imports(tree)]:
         if (
             isinstance(stmt, ast.ImportFrom)
             and stmt.module == _RUNTIME_MODULE
             and not getattr(stmt, "is_lazy", False)
         ):
-            if not any(alias.name == _RUNTIME_DISPATCH for alias in stmt.names):
+            if not any(
+                alias.name == _RUNTIME_DISPATCH and alias.asname in (None, _RUNTIME_DISPATCH)
+                for alias in stmt.names
+            ):
                 stmt.names.append(ast.alias(name=_RUNTIME_DISPATCH))
             return
 

@@ -3043,12 +3043,27 @@ def _handle_unmap(
         }
         if mismatch_warning:
             payload["warning"] = mismatch_warning
-        click.echo(json.dumps(payload, indent=2, ensure_ascii=False))
+        # ASCII JSON escapes preserve every Unicode code point on narrow streams.
+        click.echo(json.dumps(payload, indent=2, ensure_ascii=True))
     else:
+        stream = sys.stdout
+        try:
+            rewritten.encode(stream.encoding or "utf-8", "strict")
+        except (UnicodeError, LookupError):
+            click.echo(
+                "Error: stdout cannot encode the restored trace. Use --json (Unicode "
+                "escapes) or set PYTHONIOENCODING=utf-8 before running pyobfus.",
+                err=True,
+            )
+            sys.exit(2)
         click.echo(rewritten, nl=False)
         click.echo(restored["ai_hint"], err=True)
         if mismatch_warning:
-            click.echo(f"Warning: {mismatch_warning}", err=True)
+            # The warning can contain the obfuscated Unicode spelling too.
+            message = f"Warning: {mismatch_warning}"
+            error_stream = sys.stderr
+            encoding = error_stream.encoding or "utf-8"
+            click.echo(message.encode(encoding, "backslashreplace").decode(encoding), err=True)
 
 
 def _handle_check(

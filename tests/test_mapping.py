@@ -157,3 +157,26 @@ def test_stats_shape() -> None:
     m = ObfuscationMapping.from_single_file({"a": "I0", "b": "I1"}, module="m")
     s = m.stats()
     assert s == {"modules": 1, "original_names": 2, "unique_obfuscated": 2}
+
+
+@pytest.mark.parametrize(
+    "short,spelling",
+    [
+        ("á0", "á0"),
+        ("a\u03010", "á0"),
+        ("K0", "K0"),
+        ("名字0", "名字0"),
+    ],
+)
+def test_v1_unicode_identifiers_and_normalization(short, spelling):
+    mapping = ObfuscationMapping.from_single_file({"calculate_total": short})
+    trace = f"in {spelling}\n{spelling}(1)\nlong_{spelling}\n1{spelling}"
+    assert mapping.unmap_text(trace) == (
+        f"in calculate_total\ncalculate_total(1)\nlong_{spelling}\n1{spelling}"
+    )
+    assert mapping.unmatched_names(f"{spelling} {spelling[:-1]}99") == [f"{spelling[:-1]}99"]
+
+
+def test_v1_ambiguous_unicode_alias_stays_unchanged():
+    mapping = ObfuscationMapping.from_single_file({"first": "K0", "second": "K0"})
+    assert mapping.unmap_text("in K0; K0()") == "in K0; K0()"

@@ -722,3 +722,21 @@ def test_l3_preserves_module_docstring_and_future_prologue(future, existing_runt
     assert namespace["calculate"](8) == 11
     assert namespace["calculate"].__annotations__["value"] == ("int" if future else int)
     assert assignments == {"calculate": Layer.ENCRYPTED}
+
+
+@pytest.mark.parametrize(
+    "existing_import",
+    [
+        "from pyobfus_runtime import _l3_dispatch",
+        "from pyobfus_runtime import _l3_dispatch as dispatch_alias",
+        "from pyobfus_runtime import IntegrityError",
+    ],
+)
+@pytest.mark.parametrize("late", [False, True])
+def test_runtime_import_is_bound_before_first_encrypted_decorator(existing_import, late):
+    function = "def calculate(value=4):\n    return value + 3\n"
+    source = (function + existing_import + "\n") if late else (existing_import + "\n" + function)
+    transformed, _ = transform_module(source, OpacityConfig(default_layer=Layer.ENCRYPTED))
+    namespace = {}
+    exec(compile(transformed, "<runtime-import-order>", "exec", dont_inherit=True), namespace)
+    assert namespace["calculate"]() == 7

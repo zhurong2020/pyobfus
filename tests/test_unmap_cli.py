@@ -673,3 +673,65 @@ def test_unmap_text_stream_decode_error_has_stream_guidance(tmp_path, monkeypatc
     assert "Python could not decode text stdin" in error
     assert "pipe raw bytes" in error
     assert "using 'cp1252'" not in error
+
+
+def test_real_unicode_name_prefix_traceback_restores(tmp_path):
+    import subprocess
+    import sys
+
+    source = tmp_path / "source.py"
+    source.write_text("def calculate_total():\n    raise ValueError('boom')\ncalculate_total()\n")
+    output, private = tmp_path / "output.py", tmp_path / "mapping.json"
+    built = CliRunner().invoke(
+        main, [str(source), "-o", str(output), "--name-prefix", "á", "--save-mapping", str(private)]
+    )
+    assert built.exit_code == 0, built.output
+    failed = subprocess.run([sys.executable, str(output)], capture_output=True)
+    assert failed.returncode == 1
+    trace = tmp_path / "trace.txt"
+    trace.write_bytes(failed.stderr)
+    restored = CliRunner().invoke(
+        main, ["--unmap", str(trace), "--mapping", str(private), "--json"]
+    )
+    assert restored.exit_code == 0, restored.output
+    assert "in calculate_total" in json.loads(restored.output)["unmapped_trace"]
+
+
+@pytest.mark.parametrize("as_json", [False, True])
+def test_strict_cp1252_stdout_handles_unicode_without_traceback(tmp_path, monkeypatch, as_json):
+    import os
+    import subprocess
+    import sys
+
+    from pyobfus.core.mapping import ObfuscationMapping
+
+    private, trace = tmp_path / "mapping.json", tmp_path / "trace.txt"
+    ObfuscationMapping.from_single_file({"calculate": "I0"}).save(private)
+    original = '  File "中文.py", line 1, in I0\nValueError: 中文\n'
+    trace.write_text(original, encoding="utf-8")
+    env = dict(os.environ, PYTHONIOENCODING="cp1252:strict")
+    result = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pyobfus",
+            "--unmap",
+            str(trace),
+            "--mapping",
+            str(private),
+            *(["--json"] if as_json else []),
+        ],
+        env=env,
+        capture_output=True,
+    )
+    assert b"UnicodeEncodeError" not in result.stderr
+    if as_json:
+        assert result.returncode == 0, result.stderr
+        payload = json.loads(result.stdout.decode("ascii"))
+        assert payload["original_trace"] == original
+        assert "中文.py" in payload["unmapped_trace"]
+        assert "in calculate" in payload["unmapped_trace"]
+    else:
+        assert result.returncode == 2
+        assert result.stdout == b""
+        assert b"PYTHONIOENCODING=utf-8" in result.stderr

@@ -48,10 +48,6 @@ from typing import Any, Dict, Iterable, Iterator, List, Optional, Tuple, Union
 from pyobfus import __version__ as PYOBFUS_VERSION
 from pyobfus.core.line_map import Location
 
-# Identifier regex: Python 3 allows Unicode, but obfuscated names are always
-# ASCII-safe, so this simple pattern is enough for stack-trace rewriting.
-_IDENT_RE = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*)\b")
-
 MAPPING_FORMAT_VERSION = 1
 INDEPENDENT_MAPPING_FORMAT_VERSION = 2
 
@@ -478,26 +474,15 @@ class ObfuscationMapping:
         if self.mode == "independent_files" or not self.global_map:
             return text
 
-        def _sub(match: "re.Match[str]") -> str:
-            tok = match.group(1)
-            original = self.reverse(tok)
-            return original if original else tok
-
-        return _IDENT_RE.sub(_sub, text)
+        names: Dict[str, List[str]] = {}
+        for obfuscated, (_, original) in self.global_map.items():
+            canonical = unicodedata.normalize("NFKC", obfuscated)
+            names.setdefault(canonical, []).append(original)
+        return _substitute_names(text, names)
 
     def unmap_file_text(self, text: str, path: str) -> str:
         """Restore unique spellings in one known output file; never guess a scope."""
-        names = self.file_names.get(path, {})
-
-        output = []
-        previous = 0
-        for start, end, name in _unicode_identifiers(text):
-            candidates = names.get(unicodedata.normalize("NFKC", name), [])
-            output.append(text[previous:start])
-            output.append(candidates[0] if len(candidates) == 1 else name)
-            previous = end
-        output.append(text[previous:])
-        return "".join(output)
+        return _substitute_names(text, self.file_names.get(path, {}))
 
     def unmap_trace(self, text: str) -> Dict[str, Any]:
         """Restore names and statement locations in standard CPython tracebacks."""
@@ -517,37 +502,26 @@ class ObfuscationMapping:
         known = set(self.global_map)
         if self.mode == "independent_files":
             known = {name for names in self.file_names.values() for name in names}
-            prefixes = {
-                match.group(1)
-                for name in known
-                for match in [re.fullmatch(r"(.+?)[0-9]+", name)]
-                if match is not None
-            }
-            tokens = {
-                unicodedata.normalize("NFKC", name) for _, _, name in _unicode_identifiers(text)
-            }
-            return sorted(
-                {
-                    name
-                    for name in tokens - known
-                    if any(
-                        name.startswith(prefix)
-                        and name[len(prefix) :].isascii()
-                        and name[len(prefix) :].isdigit()
-                        for prefix in prefixes
-                    )
-                },
-                key=lambda name: (len(name), name),
-            )
+        known = {unicodedata.normalize("NFKC", name) for name in known}
         prefixes = {
-            m.group(1) for m in (re.fullmatch(r"([A-Za-z_]+)\d+", obf) for obf in known) if m
+            match.group(1)
+            for name in known
+            for match in [re.fullmatch(r"(.+?)[0-9]+", name)]
+            if match is not None
         }
-        if not prefixes:
-            return []
-        shape = re.compile(r"\b(?:" + "|".join(re.escape(p) for p in sorted(prefixes)) + r")\d+\b")
+        tokens = {unicodedata.normalize("NFKC", name) for _, _, name in _unicode_identifiers(text)}
         return sorted(
-            {tok for tok in shape.findall(text) if tok not in known},
-            key=lambda t: (len(t), t),
+            {
+                name
+                for name in tokens - known
+                if any(
+                    name.startswith(prefix)
+                    and name[len(prefix) :].isascii()
+                    and name[len(prefix) :].isdigit()
+                    for prefix in prefixes
+                )
+            },
+            key=lambda name: (len(name), name),
         )
 
     def stats(self) -> Dict[str, int]:
@@ -572,6 +546,22 @@ def _path_parts(path: str) -> List[str]:
         else:
             parts.append(part.lower() if re.fullmatch(r"[A-Za-z]:", part) else part)
     return parts
+
+
+def _substitute_names(text: str, names: Dict[str, List[str]]) -> str:
+    """Use Python Unicode tokens in both mapping formats; ambiguous aliases stay."""
+    output = []
+    previous = 0
+    for start, end, name in _unicode_identifiers(text):
+        # Do not replace the identifier-shaped suffix of a larger word/number.
+        if start and (text[start - 1].isalnum() or ("_" + text[start - 1]).isidentifier()):
+            continue
+        candidates = set(names.get(unicodedata.normalize("NFKC", name), []))
+        output.append(text[previous:start])
+        output.append(next(iter(candidates)) if len(candidates) == 1 else name)
+        previous = end
+    output.append(text[previous:])
+    return "".join(output)
 
 
 def _unicode_identifiers(text: str) -> Iterator[Tuple[int, int, str]]:
