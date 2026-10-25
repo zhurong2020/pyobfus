@@ -2,8 +2,8 @@
 
 **2026-10-25 最新状态（Codex 独立推进，维护者授权，不调用无头 Claude）**：
 - **已合并**：切片 D（PR #126 / `dd36c9e`）、切片 E（PR #127 / `db634c6`）。A–E 完整接线，Linux/Windows × Python 3.10/3.12/3.15 六格全部通过，CI result + CodeQL 成功；仍为未发布预览，公开 Core 仍 0.9.1。
-- **PR #128 等待独立 CI/合并**：晚 runtime import、v1 Unicode 名字、strict cp1252 输出三缺陷。最终本地 Core 4635 / MCP 153 / integration 352 / runtime 24 passed，64 skipped，静态/严格文档检查通过。已在最新 main 上重放（`8ba058b`）。
-- **PR #129 等待总 CI/顺序合并**：MCP 2.x 复审。正常解析候选 wheel + 公开 Core 0.9.1 + SDK 2.3.0，pip check/153 测试/legacy-auto 各九工具真实调用通过；Linux/Windows × 3.10/3.15 四格已绿。生产依赖上限未改，无新 MCP 发版。
+- **PR #128 已合并（main `a0882a4`）**：晚 runtime import、v1 Unicode 名字、strict cp1252 输出三缺陷及 L3 manifest 缺失的交付检查补充。最后源码全量 Core 4637 / MCP153 / integration352 / runtime24 passed，64 skipped；后补 UTF-8/cp1252 日志参数化专项通过。最终 39 检查成功 / 2 跳过；未发布。
+- **PR #129 等待总 CI/顺序合并**：MCP 2.x 复审（重放 head `3fff016`）。正常解析候选 wheel + 公开 Core 0.9.1 + SDK 2.3.0，pip check/153 测试/legacy-auto 各九工具真实调用通过；Linux/Windows × 3.10/3.15 四格已绿。生产依赖上限未改，无新 MCP 发版。
 - **运营**：10-25 复盘、现时巡检与 DEV 第二篇准备完成；固定公开版本七例重现。Core 30 天安静日中位数 40，7 天仅一个安静日；没有充分自然增长证据。新增邮件未见客户问题或目录解锁。许可端点健康。本机备份为 10-25，云端最后完整镜像为 10-24；正常 WSL user bus 当前不可访问，10-26 优先核实当天云端成功记录。DEV 仍私有草稿、未投稿。
 - **文档**：整理过期 TODO、分发渠道日期、旧“adapter 不存在/无未发布内容”等措辞；历史记录保留并明确日期。未改参数改名、L3 方法/资源 provider、医院应用、视频工具或 Affiliate 的延后范围。
 
