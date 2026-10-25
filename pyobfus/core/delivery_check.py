@@ -219,7 +219,10 @@ def check_delivery(
                     )
                 )
 
-    needs_l3 = report is not None and isinstance(report.get("opacity"), dict)
+    needs_l3 = (report is not None and isinstance(report.get("opacity"), dict)) or any(
+        any(line.startswith(b"# pyobfus:l3-build ") for line in header.splitlines())
+        for _, header in observed.values()
+    )
     if l3_manifest is not None or needs_l3:
         try:
             if l3_manifest is None:

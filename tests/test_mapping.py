@@ -180,3 +180,8 @@ def test_v1_unicode_identifiers_and_normalization(short, spelling):
 def test_v1_ambiguous_unicode_alias_stays_unchanged():
     mapping = ObfuscationMapping.from_single_file({"first": "K0", "second": "K0"})
     assert mapping.unmap_text("in K0; K0()") == "in K0; K0()"
+
+
+def test_v1_missing_original_name_does_not_erase_trace_tokens():
+    mapping = ObfuscationMapping(global_map={"I0": ("module", "")})
+    assert mapping.unmap_text("in I0") == "in I0"

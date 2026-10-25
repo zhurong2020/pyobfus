@@ -135,6 +135,14 @@ def test_provider_bootstrap_and_missing_wrong_key_stages(project):
     assert execute(project, f"import a; a.{name}(1)", env=env).returncode != 0
 
 
+def test_missing_completion_manifest_detected_without_private_report(project):
+    assert build(project).exit_code == 0
+    (project[1] / builder.RELEASE_MANIFEST).unlink()
+    checked = check_delivery(project[1])
+    assert checked["status"] == "fail"
+    assert any(f["code"] == "delivery.l3_build_mismatch" for f in checked["findings"])
+
+
 def test_guard_precedes_runtime_provider_and_user_imports(project):
     assert build(project).exit_code == 0
     # Change the interpreter magic seen by the guard; a provider side effect

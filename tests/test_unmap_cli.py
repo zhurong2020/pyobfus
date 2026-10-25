@@ -675,7 +675,9 @@ def test_unmap_text_stream_decode_error_has_stream_guidance(tmp_path, monkeypatc
     assert "using 'cp1252'" not in error
 
 
-def test_real_unicode_name_prefix_traceback_restores(tmp_path):
+@pytest.mark.parametrize("trace_codec", ["utf-8", "cp1252"])
+def test_real_unicode_name_prefix_traceback_restores(tmp_path, trace_codec):
+    import os
     import subprocess
     import sys
 
@@ -686,12 +688,25 @@ def test_real_unicode_name_prefix_traceback_restores(tmp_path):
         main, [str(source), "-o", str(output), "--name-prefix", "á", "--save-mapping", str(private)]
     )
     assert built.exit_code == 0, built.output
-    failed = subprocess.run([sys.executable, str(output)], capture_output=True)
+    failed = subprocess.run(
+        [sys.executable, str(output)],
+        capture_output=True,
+        env=dict(os.environ, PYTHONIOENCODING=trace_codec),
+    )
     assert failed.returncode == 1
     trace = tmp_path / "trace.txt"
     trace.write_bytes(failed.stderr)
     restored = CliRunner().invoke(
-        main, ["--unmap", str(trace), "--mapping", str(private), "--json"]
+        main,
+        [
+            "--unmap",
+            str(trace),
+            "--mapping",
+            str(private),
+            "--trace-encoding",
+            trace_codec,
+            "--json",
+        ],
     )
     assert restored.exit_code == 0, restored.output
     assert "in calculate_total" in json.loads(restored.output)["unmapped_trace"]

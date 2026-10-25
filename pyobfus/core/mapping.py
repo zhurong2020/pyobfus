@@ -476,6 +476,8 @@ class ObfuscationMapping:
 
         names: Dict[str, List[str]] = {}
         for obfuscated, (_, original) in self.global_map.items():
+            if not isinstance(original, str) or not original:
+                continue
             canonical = unicodedata.normalize("NFKC", obfuscated)
             names.setdefault(canonical, []).append(original)
         return _substitute_names(text, names)
