@@ -143,11 +143,11 @@ def test_guard_precedes_runtime_provider_and_user_imports(project):
         project,
         "import importlib.util; importlib.util.MAGIC_NUMBER = b'bad!'; "
         "from pyobfus_runtime import set_key_provider; "
-        "set_key_provider(lambda: (_ for _ in ()).throw(RuntimeError('PROVIDER CALLED'))); import a",
+        "set_key_provider(lambda: print('PROVIDER CALLED')); import a",
     )
     assert result.returncode != 0
     assert "pyobfus L3 requires interpreter" in result.stderr
-    assert "PROVIDER CALLED" not in result.stderr
+    assert result.stdout == ""
 
 
 @pytest.mark.parametrize("change", ["mixed", "modified", "missing", "extra", "manifest", "report"])
