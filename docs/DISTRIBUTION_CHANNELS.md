@@ -7,19 +7,31 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-**Last updated**: 2026-10-17 (PyPI data through 10-15).
-Core's 30-day quiet-day median is `30`; the latest seven days contain no quiet
-samples after excluding release days and the next day, so the printed `0` is
-not a measured baseline. MCP quiet-day medians are `10 / 6` (7 / 30 days).
-Marketplace reports `14 installs`; Open VSX reports `682 downloads` (fetches,
-not unique installs). Action attribution remains `0` visible repositories.
-GitHub rolling 14-day traffic is `182 views / 106 unique visitors`; Google is
-first (`23 / 20`) and DEV/Reddit do not appear in the referrers.
-Current public versions are Core `0.9.1`, MCP `0.3.15`, runtime `0.1.1`,
-and VS Code/Open VSX `0.4.3`. Core/MCP were published on October 14 with
-verified PEP 740 attestations for both wheel and sdist; fresh Python 3.10/3.14
-installations and contract smoke checks passed. The official MCP Registry
-reports version `0.3.14`, `active`, and `isLatest=true` (9 tools; published 2026-10-20).
+**Last updated**: 2026-10-25 (download data through October 24).
+Core's 30-day quiet-day median is `40` across 10 quiet days. The latest seven
+days have only one quiet day (`30`), so that window cannot establish growth.
+MCP quiet-day medians are `3 / 8` (7 / 30 days; 3 / 24 samples).
+Marketplace reports `15 installs`; Open VSX reports `762 downloads` (fetches,
+not unique installs). Action attribution is `0` visible repositories.
+GitHub rolling 14-day traffic is `107 views / 56 unique visitors`; DEV/Reddit
+are absent from referrers. Public DEV article reactions/comments are both zero;
+private author-dashboard reading counts were not available. Full context:
+[October 25 review](OPS_REVIEW_2026-10-25.md).
+
+Current public versions, verified from PyPI on October 25: Core `0.9.1`, MCP
+`0.3.15`, runtime `0.1.1`; VS Code/Open VSX `0.4.3`. Core 0.9.1 was published
+October 24 and MCP 0.3.15 October 23; release verification is recorded in
+CURRENT_PLAN. The official MCP Registry reports `0.3.15`, `active`,
+`isLatest=true`, published October 23. Unreleased crossfile-opacity and fixes
+are not new PyPI releases.
+
+Glama's October 24 21:32 UTC build notification points to test
+`01a16fd2-181a-7208-aab8-d84753dfec0e`; its 21:35 notification labels the
+channel release `0.9.2`. These emails do not establish a changed package pin or
+handshake, and the label is not the PyPI Core/MCP version. No rebuild or release
+was triggered during this review.
+
+### Historical channel snapshots (dates below are not current package versions)
 
 Glama's October 12 notifications confirm a successful build at 22:14 UTC
 (test `01a1322c-b3ff-7825-86c1-f27005b90423`) and a channel release labelled

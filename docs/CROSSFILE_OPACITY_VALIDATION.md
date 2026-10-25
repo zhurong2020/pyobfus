@@ -1,7 +1,7 @@
 # Cross-file L3 preview validation
 
 Status: 2026-10-25, unreleased development checkout. Slice D merged through
-PR #126; slice E is under validation. Core 0.9.1 does not include this complete
+PR #126; slice E merged through PR #127 (main `db634c6`). Core 0.9.1 does not include this complete
 workflow. Runtime source and version are unchanged.
 
 ## Scope and edition boundary
@@ -40,16 +40,22 @@ mapping/unmapping remain Community. This follows
 
 | Platform | Python 3.10 | Python 3.12 | Python 3.15 |
 |---|---|---|---|
-| Linux | pending hosted job | local 30 build tests passed | pending hosted job |
-| Windows | pending hosted job | pending hosted job | pending hosted job |
+| Linux | hosted passed | hosted passed + local 30 build tests | hosted passed |
+| Windows | hosted passed | hosted passed | hosted passed |
 
 The new `crossfile-opacity` CI job runs all four feature test modules in these
 six cells and installs public runtime 0.1.1 in an independent target venv.
 No Windows result, different-minor artifact portability, free-threading or
 frozen-package support is inferred from local Linux tests.
 
-## Remaining gate
+## Merge and release state
 
-Finish full-root regression, self-review and hosted matrix; inspect the PR
-checks before merging. Do not release automatically. Detailed continuing
-progress is in [PROGRESS_2026-10-25.md](PROGRESS_2026-10-25.md).
+PR #127 head `97b1258` passed all six feature cells, ordinary CI, CodeQL,
+Dogfood and Packaging. Required CI result and CodeQL succeeded; merged on
+2026-10-25 at 08:03 UTC. CI run: [40174436070](https://github.com/zhurong2020/pyobfus/actions/runs/40174436070).
+The first 3.15 runs exposed a test assertion matching source excerpts in the
+new traceback format; observing actual provider stdout side effects fixed the
+test. The guard itself already rejected the mismatched interpreter first.
+
+A–E are implemented and merged, while package release remains separate.
+Detailed continuing progress is in [PROGRESS_2026-10-25.md](PROGRESS_2026-10-25.md).
