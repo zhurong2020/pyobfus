@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Exercise all nine tools over real SDK 2.x legacy/auto stdio sessions.
 
-Run using a clean environment with a candidate MCP wheel, the public Core and
+Run using a clean environment with an installed MCP wheel, the public Core and
 SDK 2.x installed through normal dependency resolution. All tool writes and
 product state belong to a temporary synthetic project. No trial is activated,
 no user application runs, and no tool requests network access.
@@ -47,7 +47,7 @@ def _payload(result: Any) -> dict[str, Any]:
 
 async def validate() -> dict[str, Any]:
     from mcp import Client
-    from mcp.client.stdio import StdioServerParameters
+    from mcp.client.stdio import StdioServerParameters, stdio_client
 
     sdk = importlib.metadata.version("mcp")
     assert sdk.split(".")[0] == "2", "This validation requires mcp SDK 2.x"
@@ -84,7 +84,9 @@ async def validate() -> dict[str, Any]:
                 args=["-I", "-m", "pyobfus_mcp.server"],
                 env=env,
             )
-            async with Client(parameters, mode=mode, read_timeout_seconds=60) as client:
+            async with Client(
+                stdio_client(parameters), mode=mode, read_timeout_seconds=60
+            ) as client:
                 listed = await client.list_tools()
                 tools = listed.tools if hasattr(listed, "tools") else listed
                 names = {tool.name for tool in tools}
