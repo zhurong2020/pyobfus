@@ -67,8 +67,16 @@ PR #135 passed 41 checks with one configured skip, and its merge commit
 - The official MCP Registry versions endpoint reports 0.3.16 as `active`
   and `isLatest=true`. [GitHub Release](https://github.com/zhurong2020/pyobfus/releases/tag/mcp-v0.3.16)
   is published.
-- Glama Build steps pin and test are pending a maintainer's admin session.
-  The public listing alone cannot prove which package version its image uses.
+- The maintainer supplied Glama admin test
+  `01a17790-1545-7aef-8966-dcbb65b5c39b` (2026-10-26 17:34
+  Asia/Shanghai): `success` in 1m31.6s. Build steps pin
+  `pyobfus-mcp==0.3.16 pyobfus==0.9.1`; the install log confirms MCP SDK
+  2.3.0, MCP 0.3.16, Core 0.9.1 and runtime 0.1.1. Instance logs show
+  protocol `2025-11-25`, server version 0.3.16 and nine listed tools.
+  This is startup and discovery evidence, not nine individual tool calls.
+  Glama's build spec says Python 3.12, while uv installed into system Python
+  3.13.5. Its checkout remained at `7cf8302` with `pinnedCommit: null`;
+  the server itself came from the pinned PyPI package.
 
 ## Recovery
 
