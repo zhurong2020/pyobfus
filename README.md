@@ -22,9 +22,13 @@ mapping file from the build private, and `pyobfus --unmap` turns a production
 traceback back into your original names, for you or an AI coding agent.
 Community is Apache-2.0, has no file or line limits, and requires no trial.
 
-> **v0.9.1:** `--unmap --trace-encoding` reads tracebacks saved in legacy
-> encodings such as cp1252 and reports undecodable input with exit 2 instead of
-> crashing; piped stdin now defaults to UTF-8.
+> **What's new in v0.10.0:** Opt-in Pro `--crossfile-opacity` protects selected
+> top-level functions in a multi-module build using an application-provided
+> key. Builds require a fresh output directory and a private mapping;
+> `--unmap` restores encrypted frame names without claiming original line
+> numbers. This restricted preview has explicit interpreter and delivery
+> checks. See the [validation and limits](https://github.com/zhurong2020/pyobfus/blob/main/docs/CROSSFILE_OPACITY_VALIDATION.md)
+> and [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
 >
 > **What's new in v0.9.0:** `--unmap` now works for independent directory builds
 > (`--no-cross-file`). The mapping records names per file, so two files that reuse
@@ -59,12 +63,10 @@ pyobfus src/ -o dist/ --save-mapping mapping.json --verify-syntax
 pyobfus --unmap --trace error.log --mapping mapping.json
 ```
 
-In the next release, independent-file directory builds (`--no-cross-file`)
-also support `--save-mapping`. Their version-2 mapping resolves each traceback
-frame against its own file; names in excerpts and unframed logs stay unchanged.
-Use the new reader for these mappings; existing single-file and cross-file
-builds keep version 1. See the
-[debugging guide](https://github.com/zhurong2020/pyobfus/blob/main/docs/guides/debug-obfuscated-python.md#independent-file-directory-builds-next-release).
+Independent-file directory builds (`--no-cross-file`) support `--save-mapping`
+since 0.9.0. Their version-2 mapping resolves each traceback frame against its
+own file; names in excerpts and unframed logs stay unchanged. See the
+[debugging guide](https://github.com/zhurong2020/pyobfus/blob/main/docs/guides/debug-obfuscated-python.md).
 
 Since 0.7.1, add opt-in `--verify-names` to check newly unbound globals
 without execution. Success JSON reports partial coverage explicitly; see

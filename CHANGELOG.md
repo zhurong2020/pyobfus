@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-10-27
+
 ### Added
 
 - Preview `--crossfile-opacity` (Pro): opt-in multi-module L3 + application-key

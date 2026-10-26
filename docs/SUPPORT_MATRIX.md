@@ -1,7 +1,8 @@
 # Support matrix
 
-What is actually verified, by what, as of 2026-10-24 (`pyobfus` 0.9.1, adds `--trace-encoding`;
-0.9.0 added independent-build mapping; 0.8.0 added Python 3.15 / `pyobfus-mcp` 0.3.15 / `pyobfus-runtime` 0.1.1 /
+What is actually verified, by what, as of 2026-10-27 (`pyobfus` 0.10.0 adds an opt-in multi-module L3 preview;
+0.9.1 added `--trace-encoding`; 0.9.0 added independent-build mapping; 0.8.0 added Python 3.15 /
+`pyobfus-mcp` 0.3.16 / `pyobfus-runtime` 0.1.1 /
 VS Code extension 0.4.3 / `pyobfus-action` 1.0.1).
 
 Four labels, used strictly:
@@ -17,11 +18,10 @@ The rule this table is written under: **a cell that cannot point at a specific
 CI job, test file or dated record is advisory-only**, regardless of how
 confident anyone feels about it.
 
-## Python 3.15: next-release support
+## Python 3.15 support
 
-The support branch adds native 3.15 lazy-import and comprehension-unpacking
-compatibility, plus three-platform Core/runtime CI. Published Core 0.7.5
-remains a 3.9–3.14 baseline. See [dated validation scope](PYTHON315_VALIDATION.md)
+Core 0.8.0 added native 3.15 lazy-import and comprehension-unpacking
+compatibility, plus three-platform Core/runtime CI. See [dated validation scope](PYTHON315_VALIDATION.md)
 and the [acceptance checklist](PYTHON315_SUPPORT_PLAN.md); the implementation
 PR records the exact CI head and results. Linux clean Core/runtime/MCP installs
 and native syntax tests are separate from hosted Windows/macOS verification.
@@ -35,7 +35,8 @@ existing compatibility contract. L3 bytecode requires the builder's minor.
 | Core obfuscator, 3.9–3.15 | tested | tested | tested | `ci.yml` job `test`: Ubuntu 3.9–3.15; Windows/macOS 3.9, 3.14, 3.15 on ordinary code runs; all 3 OS × 7 versions on schedule/manual runs |
 | `pyobfus-runtime`, 3.9–3.15 | tested | tested | tested | `ci.yml` job `test` runs boundary tests on the same 13 ordinary / 21 scheduled/manual cells as Core; `runtime-wheel` installs standalone wheels on 3.12/3.15. Linux 3.15 installed-wheel boundary: 24/24; see [dated validation](PYTHON315_VALIDATION.md). |
 | End-to-end CLI (obfuscate, execute output) | tested (3.11, 3.15) | advisory-only | tested (3.11, 3.15) | `ci.yml` job `integration` runs `integration_tests/` on Ubuntu and Windows (3.11/3.15); single-file and cross-file outputs are executed and compared with the originals |
-| `pyobfus-mcp` server | tested (3.11, 3.13, 3.15) | advisory-only | advisory-only | `ci.yml` jobs `mcp-tests` (3.11/3.15), `mcp-sdk-latest` and `mcp-sdk-2x` (3.13) |
+| `pyobfus-mcp` server | tested (3.11, 3.13, 3.15) | advisory-only | advisory-only | `ci.yml` jobs `mcp-tests` (3.11/3.15), `mcp-sdk-latest` and `mcp-sdk-compat` (3.13) |
+| Opt-in cross-file L3 preview (3.10/3.12/3.15) | tested | advisory-only | tested | `ci.yml` job `crossfile-opacity` runs feature, mapping and delivery tests with the public runtime 0.1.1 wheel; see [restricted scope](CROSSFILE_OPACITY_VALIDATION.md). Artifacts require the same CPython implementation/minor and GIL mode as the builder. |
 | VS Code extension | tested (Node 22, Python 3.12) | advisory-only | advisory-only | `vscode-extension-ci.yml`, headless xvfb |
 | `pyobfus-action` composite wrapper | tested | tested | tested | External `zhurong2020/pyobfus-action` CI runs the local action against real clean/risky fixtures on all three hosted-runner OS families; Action release 1.0.1 |
 | Free-threaded 3.14 (`--disable-gil`) | verified once, 2026-08-20 | advisory-only | advisory-only | Manual run of the full core suite plus an end-to-end smoke on a downloaded free-threaded build; not in CI. See [`PYTHON314_FREETHREADING.md`](PYTHON314_FREETHREADING.md) |
@@ -343,8 +344,8 @@ examples require a license and are not part of these Community packaging checks.
 
 | Dependency | Range | Status | Evidence |
 |---|---|---|---|
-| `mcp` SDK 1.x | `>=1.27,<2.0` (shipped) | tested | `ci.yml` job `mcp-sdk-latest`, resolves to newest 1.x |
-| `mcp` SDK 2.x | not shipped; cap holds it back | tested anyway | `ci.yml` job `mcp-sdk-2x` installs over the cap and runs the whole MCP suite. See [`MCP_SDK_2X_SPIKE.md`](MCP_SDK_2X_SPIKE.md) |
+| `mcp` SDK 1.x | `>=1.27.0,<3.0.0` (shipped in MCP 0.3.16) | tested | `ci.yml` job `mcp-sdk-compat` covers the 1.27.0 floor; `mcp-sdk-latest` resolves the newest allowed SDK |
+| `mcp` SDK 2.x | `>=1.27.0,<3.0.0` (shipped in MCP 0.3.16) | tested | `ci.yml` job `mcp-sdk-compat` covers 2.0.0 and newest 2.x with all nine stdio tools; see [release verification](MCP_SDK_2X_RELEASE_PREP_2026-10-26.md) |
 | `pyobfus` floor for the MCP server | `>=0.5.18` | tested | MCP suite installs the local Core checkout |
 | `pyobfus-runtime` for the builder/artifacts | `>=0.1.1,<1` | tested | Declared by Core metadata; runtime boundary suite and clean-wheel install verify the current 0.x contract |
 | `pyobfus-action` → `pyobfus` | latest by default; exact `pyobfus-version` supported | tested | External Action CI covers default install and version pinning. Action and Core versions are independent; pin for reproducible CI. |
