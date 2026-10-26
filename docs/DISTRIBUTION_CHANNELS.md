@@ -7,7 +7,7 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-**Last updated**: 2026-10-25 (download data through October 24).
+**Last updated**: 2026-10-26 (download data through October 24).
 Core's 30-day quiet-day median is `40` across 10 quiet days. The latest seven
 days have only one quiet day (`30`), so that window cannot establish growth.
 MCP quiet-day medians are `3 / 8` (7 / 30 days; 3 / 24 samples).
@@ -18,12 +18,18 @@ are absent from referrers. Public DEV article reactions/comments are both zero;
 private author-dashboard reading counts were not available. Full context:
 [October 25 review](OPS_REVIEW_2026-10-25.md).
 
-Current public versions, verified from PyPI on October 25: Core `0.9.1`, MCP
-`0.3.15`, runtime `0.1.1`; VS Code/Open VSX `0.4.3`. Core 0.9.1 was published
-October 24 and MCP 0.3.15 October 23; release verification is recorded in
-CURRENT_PLAN. The official MCP Registry reports `0.3.15`, `active`,
-`isLatest=true`, published October 23. Unreleased crossfile-opacity and fixes
-are not new PyPI releases.
+**2026-10-26 MCP release update:** MCP 0.3.16 is live on PyPI (wheel/sdist
+provenance verified) and in the official MCP Registry (`active`,
+`isLatest=true`). Core remains 0.9.1; runtime remains 0.1.1. Clean Python
+3.10/3.15 installations resolved MCP SDK 2.3.0 and passed the nine-tool
+stdio contract. Glama's administrator Build steps pin and new test have not
+been verified; the existing October 24 test still proves only MCP 0.3.15.
+See [release evidence](MCP_SDK_2X_RELEASE_PREP_2026-10-26.md).
+
+October 25 snapshot: Core `0.9.1`, MCP `0.3.15`, runtime `0.1.1`,
+VS Code/Open VSX `0.4.3`. The official MCP Registry then reported 0.3.15
+as `active` / `isLatest=true`; this was superseded on October 26. Unreleased
+crossfile-opacity and fixes remain outside the published Core package.
 
 Glama's October 24 21:32 UTC build notification points to test
 `01a16fd2-181a-7208-aab8-d84753dfec0e`; its 21:35 notification labels the

@@ -1,8 +1,10 @@
-# MCP SDK 2.x dependency release preparation (2026-10-26)
+# MCP SDK 2.x dependency release and verification (2026-10-26)
 
 PR #134 merged the source dependency range `mcp>=1.27.0,<3.0.0` into main
-(`18b346b`). The published 0.3.15 wheel still caps SDK 1.x. The release
-branch prepares 0.3.16; no 0.3.16 package has been published.
+(`18b346b`). PR #135 merged the 0.3.16 release files (`04985d4`), and
+`mcp-v0.3.16` published the wheel and sdist to PyPI through Trusted
+Publishing. This is an MCP-only release; Core remains 0.9.1 and runtime
+remains 0.1.1.
 
 ## Compatibility evidence
 
@@ -38,27 +40,42 @@ to 2.3.0, passed `pip check`, 153 tests and both stdio sessions. The
 on Linux/Python 3.10, plus newest 2.x on Linux/Windows × Python 3.10/3.15.
 The separate newest-1.x job remains pinned to `<2` so it continues to test
 that line. PR #134 passed all six compatibility jobs, CI result and CodeQL:
-41 successful checks and one configured skip. Main CI for `18b346b` is a
-separate post-merge check.
+41 successful checks and one configured skip. Main CI for `18b346b` passed
+39/39 jobs, with CodeQL successful.
 
 The 0.3.16 release candidate builds as wheel and sdist. Both artifacts
 declare the intended version and SDK range. Clean installs of the wheel
 with SDK 1.27.0 and with no SDK pin passed `pip check`; the latter resolved
 SDK 2.3.0. Both clean installs passed 153 MCP tests, and the default 2.3.0
 install passed both real nine-tool stdio sessions with server version 0.3.16.
-Hosted checks for this exact version must pass before publication.
+PR #135 passed 41 checks with one configured skip, and its merge commit
+`04985d4` passed 39/39 main CI jobs and CodeQL.
 
-## Release sequence and recovery
+## Published artifact and channel verification
 
-1. Review the 0.3.16 release PR and its hosted checks. The PR updates package
-   version, changelog, README, Registry manifest and repository Dockerfile pin.
-2. With maintainer release approval, merge the release PR, verify main checks,
-   and tag `mcp-v0.3.16`. Verify PyPI provenance, a fresh install, nine real
-   tools, and the MCP Registry and Glama pins after publication.
-3. If the new default resolver choice causes a host regression, release a new
-   MCP patch version restoring `<2.0.0` while the problem is investigated.
-   Published PyPI metadata cannot be edited in place. Affected users can pin
-   the previous MCP release until the patch is available.
+- Release workflow [40248147241](https://github.com/zhurong2020/pyobfus/actions/runs/40248147241)
+  successfully built and published the MCP wheel and sdist. The Core and
+  runtime publish jobs were skipped.
+- PyPI JSON lists both 0.3.16 files. The downloaded wheel SHA-256 matches
+  PyPI's digest: `69603cc66265910f07a32954ae45c6c18e231cd6f19734d83e944f9c4ef430b1`.
+- PyPI Integrity API returned provenance for both files. Independent
+  `pypi-attestations verify pypi --repository https://github.com/zhurong2020/pyobfus`
+  succeeded for each exact PyPI artifact URL.
+- Fresh PyPI installs on Python 3.10 and 3.15 resolved MCP 0.3.16,
+  Core 0.9.1 and SDK 2.3.0. Both passed `pip check`, 153 MCP tests, and
+  all nine real tools over legacy/auto stdio; the handshake reported 0.3.16.
+- The official MCP Registry versions endpoint reports 0.3.16 as `active`
+  and `isLatest=true`. [GitHub Release](https://github.com/zhurong2020/pyobfus/releases/tag/mcp-v0.3.16)
+  is published.
+- Glama Build steps pin and test are pending a maintainer's admin session.
+  The public listing alone cannot prove which package version its image uses.
+
+## Recovery
+
+If the new default resolver choice causes a host regression, release a new
+MCP patch version restoring `<2.0.0` while the problem is investigated.
+Published PyPI metadata cannot be edited in place. Affected users can pin
+0.3.15 until the patch is available.
 
 The release changes MCP package metadata and release-facing version files.
 Core, runtime, the nine tool contracts and transport support are unchanged.

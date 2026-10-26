@@ -1,5 +1,15 @@
 # pyobfus 当前计划
 
+**2026-10-26 MCP 0.3.16 已发布**：PR #135 合并 main `04985d4`，合并后
+39/39 CI 作业与 CodeQL 成功，标签 `mcp-v0.3.16` 的 Trusted Publishing
+工作流成功。PyPI wheel/sdist 的 PEP 740 证明分别通过完整密码学验证；
+Python 3.10、3.15 从 PyPI 全新安装均解析 Core 0.9.1 / SDK 2.3.0，
+`pip check`、153 项 MCP 测试和 legacy/auto 两种 stdio 模式的九工具
+真实调用通过。官方 MCP Registry 0.3.16 为 `active` / `isLatest=true`。
+Glama 后台 Build steps 固定版本及真实测试待维护者操作，不能把公开页面
+当作镜像安装版本证明。发布证据与回退见
+[MCP SDK 2 发布记录](MCP_SDK_2X_RELEASE_PREP_2026-10-26.md)。
+
 **2026-10-26 MCP SDK 2.x 生产范围**：PR #134 已合并（main `18b346b`），
 源码依赖范围为 `mcp>=1.27.0,<3.0.0`，正式 wheel 的六格兼容矩阵、
 总 CI 与 CodeQL 在 PR head 通过。已发布的 MCP 0.3.15 元数据仍限制 `<2`；
