@@ -208,14 +208,15 @@ re-runnable source of truth for the calculation is
 
 ### PyPI — `pyobfus-runtime` 🟢 LIVE
 - URL: https://pypi.org/project/pyobfus-runtime/
-- Current version: **0.1.0** (published 2026-09-24) · OIDC trusted publishing with PEP 740 attestations
+- Current version: **0.1.1** · OIDC trusted publishing with PEP 740 attestations
 - The wheel and sdist use the custom `LicenseRef-pyobfus-Runtime-1.0` licence.
   A clean PyPI installation was verified with `pyobfus_pro` absent.
-- Release evidence: [workflow 35931605485](https://github.com/zhurong2020/pyobfus/actions/runs/35931605485)
+- Historical 0.1.0 release evidence: [workflow 35931605485](https://github.com/zhurong2020/pyobfus/actions/runs/35931605485). The current 0.1.1 release is recorded in [the current plan](CURRENT_PLAN_ZH.md).
 
 ### PyPI — `pyobfus-mcp`
 - URL: https://pypi.org/project/pyobfus-mcp/
-- Current version: **0.3.15** (released 2026-10-23; `unmap_stack_trace` guidance for independent-file mappings, Core 0.9.0) · ships with PEP 740 attestations via OIDC trusted publishing
+- Current version: **0.3.16** (released 2026-10-26; supports MCP SDK 1.27+ and released 2.x versions below 3.0) · ships with PEP 740 attestations via OIDC trusted publishing. See [release verification](MCP_SDK_2X_RELEASE_PREP_2026-10-26.md).
+- Prior version 0.3.15 (2026-10-23) added `unmap_stack_trace` guidance for independent-file mappings.
 - 0.3.12 contents: fixes a startup-crash regression introduced hours earlier in
   0.3.11. That release resolved its version through a module-level
   `from pyobfus_mcp import __version__`, which raises `ImportError` when the cwd
@@ -369,7 +370,7 @@ re-runnable source of truth for the calculation is
   prior is not evidence of an actual review. Continue tracking installs and
   real reviews, not raw update/download count alone.
 - Wiki: disabled · Discussions: enabled · Issues: open
-- Releases: latest Core `v0.9.1`, runtime `runtime-v0.1.1`, MCP `mcp-v0.3.15`, and VS Code
+- Releases: latest Core `v0.9.1`, runtime `runtime-v0.1.1`, MCP `mcp-v0.3.16`, and VS Code
   `vscode-v0.4.3`; MCP releases attach wheel+sdist.
 
 ### Open VSX — `zhurong2020.pyobfus` 🟢 LIVE
