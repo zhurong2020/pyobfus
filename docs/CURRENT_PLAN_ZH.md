@@ -6,8 +6,11 @@
 Python 3.10、3.15 从 PyPI 全新安装均解析 Core 0.9.1 / SDK 2.3.0，
 `pip check`、153 项 MCP 测试和 legacy/auto 两种 stdio 模式的九工具
 真实调用通过。官方 MCP Registry 0.3.16 为 `active` / `isLatest=true`。
-Glama 后台 Build steps 固定版本及真实测试待维护者操作，不能把公开页面
-当作镜像安装版本证明。发布证据与回退见
+Glama 维护者提供的后台测试 `01a17790-1545-7aef-8966-dcbb65b5c39b`
+于 17:34（北京时间）成功：Build steps 固定 MCP 0.3.16 / Core 0.9.1，
+安装日志确认 SDK 2.3.0、MCP 0.3.16、Core 0.9.1、runtime 0.1.1；
+实例握手报告 0.3.16，列出九个工具。此证据未覆盖九工具逐个调用。
+发布证据与回退见
 [MCP SDK 2 发布记录](MCP_SDK_2X_RELEASE_PREP_2026-10-26.md)。
 
 **2026-10-26 MCP SDK 2.x 生产范围**：PR #134 已合并（main `18b346b`），

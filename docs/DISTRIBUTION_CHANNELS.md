@@ -22,8 +22,9 @@ private author-dashboard reading counts were not available. Full context:
 provenance verified) and in the official MCP Registry (`active`,
 `isLatest=true`). Core remains 0.9.1; runtime remains 0.1.1. Clean Python
 3.10/3.15 installations resolved MCP SDK 2.3.0 and passed the nine-tool
-stdio contract. Glama's administrator Build steps pin and new test have not
-been verified; the existing October 24 test still proves only MCP 0.3.15.
+stdio contract. A maintainer-supplied Glama admin test on October 26 confirms
+the new package pins, successful image build, 0.3.16 handshake and nine listed
+tools; it does not exercise every tool inside that image.
 See [release evidence](MCP_SDK_2X_RELEASE_PREP_2026-10-26.md).
 
 October 25 snapshot: Core `0.9.1`, MCP `0.3.15`, runtime `0.1.1`,
@@ -115,6 +116,16 @@ resolved 33 packages (the log lines are interleaved, so the pins are taken from
 the build step), the handshake reports 0.3.15 with protocol `2025-11-25`, and
 `ListToolsRequest` returns all 9 tools. The build checked out `5dc956e`
 (`pinnedCommit: null`, docs-only), which does not affect the PyPI-installed server.
+
+**2026-10-26 17:34 (Asia/Shanghai), after MCP 0.3.16:** the maintainer supplied
+Glama admin test `01a17790-1545-7aef-8966-dcbb65b5c39b`, status `success`
+in 1m31.6s. Build steps pin `pyobfus-mcp==0.3.16 pyobfus==0.9.1`.
+The install log lists MCP SDK `2.3.0`, MCP `0.3.16`, Core `0.9.1` and runtime
+`0.1.1`. Instance logs report protocol `2025-11-25`, server version `0.3.16`,
+and all nine tools in `ListToolsRequest`. This proves startup and discovery,
+not individual tool execution. The build spec says Python 3.12, but uv installed
+into `/usr` Python 3.13.5; the log also shows checkout `7cf8302` despite
+`pinnedCommit: null`. The server is installed from pinned PyPI packages.
 
 Periodic checks retain only decision summaries, not full stdout or separate
 CSV/JSON snapshots. During the quiet-period experiment, retain the Core/MCP
