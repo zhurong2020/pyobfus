@@ -59,7 +59,18 @@ pypi-attestations verify pypi \
 Repeat for each wheel/sdist you intend to trust or mirror. Do not verify only
 one file and assume the whole release is covered.
 
-## Latest Verified Snapshot — 2026-10-14
+## Latest Verified Snapshot — 2026-10-26
+
+MCP 0.3.16 was verified on 2026-10-26 with `pypi-attestations verify pypi`
+against both exact PyPI URLs. Wheel and sdist both passed repository-bound
+cryptographic verification. PyPI's Integrity API returned provenance for both
+files, and the downloaded wheel SHA-256 matched the PyPI JSON digest
+`69603cc66265910f07a32954ae45c6c18e231cd6f19734d83e944f9c4ef430b1`.
+Fresh PyPI installs on Python 3.10 and 3.15 passed dependency checks, 153
+MCP tests and the nine-tool stdio contract. See
+[MCP release evidence](MCP_SDK_2X_RELEASE_PREP_2026-10-26.md).
+
+## Previous Verified Snapshot — 2026-10-14
 
 Core 0.7.1 and MCP 0.3.13 wheel/sdist were each verified with
 `pypi-attestations 0.0.30 verify pypi --repository https://github.com/zhurong2020/pyobfus`
