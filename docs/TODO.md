@@ -6,7 +6,7 @@
 [`FEATURE_EXPANSION_RESEARCH_2026-10-20.md`](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)；Python 3.15 的 P0 范围与验收见 [`PYTHON315_SUPPORT_PLAN.md`](PYTHON315_SUPPORT_PLAN.md)。
 
 最后更新：2026-10-26。公开版本为 Core 0.9.1、MCP 0.3.16、runtime 0.1.1；
-最终交接见 [Session 收尾](SESSION_CLOSEOUT_2026-10-25.md)，最新推进见 [Codex 进度](PROGRESS_2026-10-25.md)，运营与待办日期见
+最终交接见 [Session 收尾](SESSION_CLOSEOUT_2026-10-26.md)，前一阶段推进见 [Codex 进度](PROGRESS_2026-10-25.md)，运营与待办日期见
 [复盘/巡检准备](OPS_REVIEW_2026-10-25.md)。实现、合并与对外发布分别记录，
 不把已合并的预览代码当成已发布包。
 
@@ -73,7 +73,7 @@ Linux/Windows × 3.10/3.12/3.15 六格和总 CI 均通过。具体能力与边�
 - 每周一巡检继续观察 Core 0.9.1 / MCP 0.3.16 反馈、下载安静日、客户调研回答、CI 与备份。无新缺陷时不重复全量测试、不主动增加功能。
 - **10-25 复盘已完成**；数据与结论见运营记录，继续分开发版日、次日与内容流量。
 - 下次发布按实际新增改动与维护者授权确定，不恢复此前 10-15 的等待通知状态。
-- **3.15 兼容 P0 已随 Core 0.8.0 发布**：后续只跟进已登记的兼容性限制；MCP 2.x、mapping 与 Pro 新功能分别按需求和授权推进。
+- **3.15 兼容 P0 已随 Core 0.8.0 发布**：后续只跟进已登记的兼容性限制；MCP SDK 2.x 生产支持已随 MCP 0.3.16 发布，mapping 与 Pro 新功能仍分别按需求和授权推进。
 - runtime 源码若有改动必须先升版本、先发 runtime（`scripts/check_runtime_version.py`）；改版本号后先刷新 editable 元数据，再按发布清单验证。
 - VS Code schema 随插件下次发版，不因本次 Core/MCP 发布自动发插件。
 
