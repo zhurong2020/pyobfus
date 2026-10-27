@@ -7,7 +7,7 @@
 
 最后更新：2026-10-27。公开版本为 Core 0.10.0、MCP 0.3.16、runtime 0.1.1；
 Core 发版与 Zenodo 归档已完成，证据见 [当前计划](CURRENT_PLAN_ZH.md)。
-最终交接见 [Session 收尾](SESSION_CLOSEOUT_2026-10-26.md)，前一阶段推进见 [Codex 进度](PROGRESS_2026-10-25.md)，运营与待办日期见
+最终交接见 [10-27 Session 收尾](SESSION_CLOSEOUT_2026-10-27.md)，前一阶段推进见 [Codex 进度](PROGRESS_2026-10-25.md)，运营与待办日期见
 [复盘/巡检准备](OPS_REVIEW_2026-10-25.md)。实现、合并与对外发布分别记录，
 不把已合并的预览代码当成已发布包。
 
@@ -43,8 +43,11 @@ Linux/Windows × 3.10/3.12/3.15 六格和总 CI 均通过。具体能力与边�
 
 当前顺序：
 
-1. 10-26 增量巡检：优先核实正常 WSL 会话的当天云端镜像；10-27 DEV 第二篇署名/预览。
-2. 下一次 Core 发布以实际缺陷、需求和维护者授权为依据；观察 0.10.0 的使用反馈。
+1. 处理 `workspace-meta` Guard 的 GitHub Actions 账单限制并核查当天云端
+   镜像新鲜度；10-27
+   DEV 第二篇署名/预览及实际发布状态仍需核对。
+2. 待下载统计包含 10-27 后观察 Core 0.10.0 发版日与后续安静日；
+   下一次 Core 发布以实际缺陷、需求和维护者授权为依据。
 
 10-25 复盘和当前可执行巡检已完成，见运营记录；不把未来日期状态写成已检查。
 私有医院应用仍暂停，参数改名等候选保持原范围，不自动扩张功能。
@@ -406,9 +409,13 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 
 ## 待发内容
 
-- Core 有 crossfile-opacity A–E 和三项既有缺陷修复的未发布内容；对应 PR 状态见顶部。
-- MCP 生产源码/依赖范围未改；候选兼容验证只改维护者脚本和 CI。
-- VS Code schema 已同步 `preserve_param_names` 默认值，随插件自己的后续版本发布。
+- Core crossfile-opacity A–E 和三项既有缺陷修复已随 0.10.0 发布；
+  当前 `[Unreleased]` 无待发 Core 功能或修复。
+- MCP SDK 2.x 生产依赖范围已随 MCP 0.3.16 发布。
+- VS Code schema 和 README 的修订随插件自己的后续版本发布，
+  当前 Marketplace/Open VSX 仍为 0.4.3。
+- `pyobfus-action` README 修订在本地已提交分支 `docs/core-0.10.0-runtime-guide`
+  （`5c6fa1c`），尚未推送；该仓库要求用户明确授权推送。
 
 ## IP 相关（2026-09-28 登记 · 待维护者拍板，未执行）
 

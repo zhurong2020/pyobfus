@@ -8,7 +8,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ## ⚡ Current pending work (cold-start 必读)
 
-**2026-10-27 最新状态**：Core 0.10.0 已发布，多模块 L3 A–E 预览进入公开 Core 包；PyPI、PEP 740、全新 Python 3.10/3.15 安装、GitHub Release 和 Zenodo 归档均已核实，详见 [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md) 顶部。MCP 0.3.16 / runtime 0.1.1 不变；MCP SDK 生产范围为 `mcp>=1.27.0,<3.0.0`。上一份 session 交接是 [`docs/SESSION_CLOSEOUT_2026-10-26.md`](docs/SESSION_CLOSEOUT_2026-10-26.md)，属于发版前快照。下一步以 [`docs/TODO.md`](docs/TODO.md) 为准。
+**2026-10-27 最新交接**：先读 [`docs/SESSION_CLOSEOUT_2026-10-27.md`](docs/SESSION_CLOSEOUT_2026-10-27.md) → [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md) → [`docs/TODO.md`](docs/TODO.md)。Core 0.10.0 已发布，Glama 已安装 Core 0.10.0 / MCP 0.3.16 并发布渠道版本 0.10.1；runtime 0.1.1 不变。上份 [10-26 MCP 交接](docs/SESSION_CLOSEOUT_2026-10-26.md)属于 Core 发版前快照。下次优先处理 `workspace-meta` Guard 的 GitHub Actions 账单限制、核查云端备份与 DEV 第二篇实际状态，再观察发版后下载数据。
 
 **历史口径**：下面带较早日期的快照和审核流程不代表当前未完成工作，也不能覆盖维护者当前指令。旧交接中的 D 待合并、E 未开始已由本次状态取代。
 
@@ -92,7 +92,7 @@ PR #108（PY315-1 惰性导入保留、PY315-2 推导式解包、3.15 新内建�
 - **发版节奏（10-23 维护者定，取代 09-25 静默期／月度版）**：下载量已稳定在固定水平、没有特殊情况不会因发版增加，
   **不再为观察下载设静默期**；按功能扩展与错误修订的自然进度规划发版，每次发版仍须维护者明确批准。全文 `docs/TODO.md`「节奏」段。**查进度固定动作：进度 + 下载量
   （`python scripts/download_snapshot.py`）+ Gmail（`/pyobfus-inbox`），三样一起给**，缺一样不算查过。
-- 「2026-10-24 状态快照（已被 10-26 交接取代）」：10-24 另起 crossfile-opacity（多模块 L3 + 应用密钥）五切片（设计 §11，预览未发版）：切片 A/B/C 已合并（PR #121/#122/#123），切片 D 在 PR #126 待合并，切片 E 未开始；A–E 全绿前不发版，详见 `docs/CURRENT_PLAN_ZH.md` 顶部。此前 Core 0.9.1（`--trace-encoding`、Pro opacity prologue，PR #120）于 10-24 发布；Core 0.9.0（独立目录构建 mapping v2，PR #112）与 MCP 0.3.15（`unmap_stack_trace` 提示）于 10-23 发布；此前 Core 0.8.0（Python 3.15 支持 #108，PY315-1/2，Codex 实现 + Claude 审核）于 10-20 发布；此前 Core 0.7.5（缺陷 O 星号下标括号 #104、P sys.modules 变更方法 #105）与 0.7.4（缺陷 N #102、H PR 4 选项 1 #103）均于 10-18 发布；0.7.3 为缺陷 C/M、0.7.2 为缺陷 I；同晚 MCP 0.3.14（3.15 分类器 + #103 提示），runtime 0.1.1 不变，MCP 9 工具；发布核验见 `docs/CURRENT_PLAN_ZH.md` 顶部。下游医院应用整体暂停，等待现场后续回复；微信付款未完成买家已于 10-14 发跟进邮件、被动等待。以后 runtime 源码改动仍必须先升版本、先发 runtime。
+- 「2026-10-24 状态快照（已被 10-27 交接取代）」：10-24 另起 crossfile-opacity（多模块 L3 + 应用密钥）五切片（设计 §11，预览未发版）：切片 A/B/C 已合并（PR #121/#122/#123），切片 D 在 PR #126 待合并，切片 E 未开始；A–E 全绿前不发版，详见 `docs/CURRENT_PLAN_ZH.md` 顶部。此前 Core 0.9.1（`--trace-encoding`、Pro opacity prologue，PR #120）于 10-24 发布；Core 0.9.0（独立目录构建 mapping v2，PR #112）与 MCP 0.3.15（`unmap_stack_trace` 提示）于 10-23 发布；此前 Core 0.8.0（Python 3.15 支持 #108，PY315-1/2，Codex 实现 + Claude 审核）于 10-20 发布；此前 Core 0.7.5（缺陷 O 星号下标括号 #104、P sys.modules 变更方法 #105）与 0.7.4（缺陷 N #102、H PR 4 选项 1 #103）均于 10-18 发布；0.7.3 为缺陷 C/M、0.7.2 为缺陷 I；同晚 MCP 0.3.14（3.15 分类器 + #103 提示），runtime 0.1.1 不变，MCP 9 工具；发布核验见 `docs/CURRENT_PLAN_ZH.md` 顶部。下游医院应用整体暂停，等待现场后续回复；微信付款未完成买家已于 10-14 发跟进邮件、被动等待。以后 runtime 源码改动仍必须先升版本、先发 runtime。
 
 
 ## 历史进展（已下沉）
@@ -132,12 +132,12 @@ PR #108（PY315-1 惰性导入保留、PY315-2 推导式解包、3.15 新内建�
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.9-3.15, AST, setuptools
-- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.9.1，2026-10-24 发布，`--unmap --trace-encoding` + Pro opacity prologue 修复（PR #120）**；完整版本历史见 `CHANGELOG.md`)
+- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.10.0，2026-10-27 发布，多模块 L3 受限预览与后续修复**；完整版本历史见 `CHANGELOG.md`)
 - **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.3，2026-09-10 发布**；Marketplace 与 Open VSX 两边同版本，均已 `curl` 独立复核；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`。**发版必须两个 registry 都发**：Marketplace 手工上传 + `ovsx publish`，runbook 见 `docs/OPEN_VSX_PUBLISH_PLAN.md`)
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.16，2026-10-26 发布，MCP SDK `>=1.27.0,<3.0.0`**；9 tools: 7 community + 2 pro_funnel · dep `pyobfus>=0.5.18` · `uvx pyobfus-mcp` 零安装；发布验证见 `docs/MCP_SDK_2X_RELEASE_PREP_2026-10-26.md`)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp`（**0.3.16**，`active` / `isLatest=true`；见 `docs/CURRENT_PLAN_ZH.md`）
 - **Smithery (Skill)**: https://smithery.ai/skills/zhurong2020/pyobfus-protect (2026-06-22 上线 · 本地工具走 Skill 渠道非 MCP 渠道) · **mcp.so**: 已收录
-- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus — 已上架。2026-10-26 后台 Build steps 固定 `pyobfus-mcp==0.3.16 pyobfus==0.9.1`，测试 `01a17790-1545-7aef-8966-dcbb65b5c39b` 成功；安装日志含 MCP SDK 2.3.0，实例握手 0.3.16，列出 9 工具。该测试证明启动与发现，不等于九工具逐个调用。构建规范写 Python 3.12，uv 实际安装到系统 Python 3.13.5。下次发 MCP 或 Core 再同步 Build steps；历史与验收边界见 `docs/DISTRIBUTION_CHANNELS.md`。
+- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus — 已上架。2026-10-27 后台 Build steps 固定 `pyobfus-mcp==0.3.16 pyobfus==0.10.0`，测试 `01a17db0-eadf-78a5-b035-9f6c279cfd3d` 成功并发布 Glama 渠道版本 0.10.1；镜像安装 runtime 0.1.1，握手报告 MCP 0.3.16，列出 9 工具。该测试证明启动与发现，不等于九工具逐个调用；渠道编号也不是 PyPI 包版本。构建规范写 Python 3.12，`uv pip --system` 实际安装到 `/usr` Python 3.13.5。下次发 MCP 或 Core 再同步 Build steps；历史与验收边界见 `docs/DISTRIBUTION_CHANNELS.md`。
 
 - **GitHub Action**: https://github.com/zhurong2020/pyobfus-action (**v1.0.1**，2026-09-10 建仓发版并上架 Marketplace：<https://github.com/marketplace/actions/pyobfus-scan-and-build>)。独立仓库**是硬性要求**——Marketplace 要求 `action.yml` 在仓库根目录且一仓一 action；另外 action 的移动 `v1` tag 会与 Core 的 `v*` 命名空间冲突并重新触发 `release.yml`。⚠️ 两个只会在上架页面才暴露的限制：**listing 名不能与已有 GitHub 用户重名**（`github.com/pyobfus` 是第三方账号，故名为 `pyobfus scan and build`；GitHub **不因不活跃释放用户名**，只受理商标投诉，此事已定论），以及 **description 上限 125 字符**（首版 151 被拒 → v1.0.1）。两条现均由该仓库 CI 断言拦截。**归因查询**（本 action 存在的理由，周期性复盘时与下载量一起看）：<https://github.com/search?q=%22zhurong2020%2Fpyobfus-action%22+path%3A.github%2Fworkflows&type=code>
 - **GitHub**: https://github.com/zhurong2020/pyobfus (public)
