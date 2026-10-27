@@ -1,12 +1,18 @@
 # pyobfus 当前计划
 
-**2026-10-27 Core 0.10.0 发版准备（尚未发布）**：草稿 PR #139
-的初版（`c33d29f`）已包含版本号、CHANGELOG、README 中英与支持矩阵；
-本地 Core 4637/MCP 153/integration 352/runtime 24 项通过，候选 wheel/sdist
-构建与干净环境安装通过，初版 PR 的 CI 39/39、CodeQL、Packaging 均成功。
-本轮文档巡检继续修正用户指南、Agent 文件与相关项目说明；后续提交的检查结果
-以 PR 当前 head 为准。待复核完成后仍需
-维护者分别批准合并和发布。公开 Core 仍为 0.9.1，MCP 0.3.16、runtime 0.1.1 不变。
+**2026-10-27 Core 0.10.0 已发布**：PR #139 完成版本号、CHANGELOG、
+README、用户指南、Agent 文件与相关项目说明文档巡检，合并到 main
+`886b8c9`。合并后 [CI 39/39](https://github.com/zhurong2020/pyobfus/actions/runs/40482841143)、
+CodeQL、Packaging 均成功；本地四测试根 Core 4637/MCP 153/integration
+352/runtime 24 项通过。标签 `v0.10.0` 触发的
+[OIDC 发布工作流](https://github.com/zhurong2020/pyobfus/actions/runs/40484190827)
+成功，PyPI wheel/sdist 均通过仓库绑定的 PEP 740 密码学验证、下载
+SHA-256 与 PyPI 元数据核对、Integrity API 查询。Python 3.10/3.15
+从 PyPI 全新安装通过 `pip check`，并能运行生成代码。
+[GitHub Release](https://github.com/zhurong2020/pyobfus/releases/tag/v0.10.0)
+已建；Zenodo concept DOI 指向已核实的
+[v0.10.0 记录](https://doi.org/10.5281/zenodo.23687523)。
+Core 现为 0.10.0；MCP 0.3.16、runtime 0.1.1 不变。
 
 最新交接见 [2026-10-26 session 收尾](SESSION_CLOSEOUT_2026-10-26.md)。
 
