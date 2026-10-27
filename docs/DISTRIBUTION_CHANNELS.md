@@ -7,17 +7,16 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-**Last updated**: 2026-10-27 (download data through October 24).
-Core's 30-day quiet-day median is `40` across 10 quiet days. The latest seven
-days have only one quiet day (`30`), so that window cannot establish growth.
-MCP quiet-day medians are `3 / 8` (7 / 30 days; 3 / 24 samples).
-Marketplace reports `15 installs`; Open VSX reports `776 downloads` on
-2026-10-27 (fetches,
+**Last updated**: 2026-10-27 (PyPI download data through October 26).
+Core's 30-day quiet-day median is `40` across 11 quiet days. The latest seven
+days have only two quiet days (median `58`), so that window cannot establish
+growth. MCP quiet-day medians are `13 / 12` (7 / 30 days; 2 / 23 samples).
+Marketplace reports `15 installs`; Open VSX reports `776 downloads` (fetches,
 not unique installs). Action attribution is `0` visible repositories.
-GitHub rolling 14-day traffic is `107 views / 56 unique visitors`; DEV/Reddit
-are absent from referrers. Public DEV article reactions/comments are both zero;
-private author-dashboard reading counts were not available. Full context:
-[October 25 review](OPS_REVIEW_2026-10-25.md).
+GitHub rolling 14-day traffic is `110 views / 65 unique visitors`; DEV/Reddit
+are absent from referrers. The Core 0.10.0 release day is not yet in the PyPI
+series. Full context: [October 25 review](OPS_REVIEW_2026-10-25.md) and the
+[October 27 check](CURRENT_PLAN_ZH.md).
 
 **2026-10-26 MCP release update:** MCP 0.3.16 is live on PyPI (wheel/sdist
 provenance verified) and in the official MCP Registry (`active`,
@@ -36,6 +35,12 @@ SHA-256 and Integrity API checks. Clean Python 3.10/3.15 installs and generated
 code execution passed. The GitHub Release is live; Zenodo's concept DOI now
 points to record `23687523`, version `v0.10.0`. MCP/runtime remain
 0.3.16/0.1.1. See [release evidence](RELEASE_PROVENANCE_VERIFICATION.md).
+
+**2026-10-27 Glama update:** the maintainer synced the repository and changed
+the image install pins to MCP `0.3.16` and Core `0.10.0`. Admin test
+`01a17db0-eadf-78a5-b035-9f6c279cfd3d` succeeded; the resulting Glama
+channel release is `0.10.1`. The Glama release number is independent of the
+PyPI package versions. See the build evidence below.
 
 October 25 snapshot: Core `0.9.1`, MCP `0.3.15`, runtime `0.1.1`,
 VS Code/Open VSX `0.4.3`. The official MCP Registry then reported 0.3.15
@@ -136,6 +141,18 @@ and all nine tools in `ListToolsRequest`. This proves startup and discovery,
 not individual tool execution. The build spec says Python 3.12, but uv installed
 into `/usr` Python 3.13.5; the log also shows checkout `7cf8302` despite
 `pinnedCommit: null`. The server is installed from pinned PyPI packages.
+
+**2026-10-27 22:08 (Asia/Shanghai), after Core 0.10.0:** the maintainer
+supplied Glama admin test `01a17db0-eadf-78a5-b035-9f6c279cfd3d`, status
+`success` in 9.6s. Build steps pin `pyobfus-mcp==0.3.16 pyobfus==0.10.0`;
+the install log confirms MCP 0.3.16, Core 0.10.0 and runtime 0.1.1. With
+`pinnedCommit: null`, the build checked out synchronized main `b05e29e`.
+The instance reports protocol `2025-11-25`, server version `0.3.16` and all
+nine tools in its list response. Glama reports a release created from this
+build as channel version `0.10.1`. This verifies startup and tool discovery,
+not each tool's execution. The build spec says Python 3.12, while
+`uv pip --system` reports installing into `/usr` Python 3.13.5; do not claim
+this test exercised Python 3.12.
 
 Periodic checks retain only decision summaries, not full stdout or separate
 CSV/JSON snapshots. During the quiet-period experiment, retain the Core/MCP

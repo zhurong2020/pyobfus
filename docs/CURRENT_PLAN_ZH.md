@@ -1,5 +1,15 @@
 # pyobfus 当前计划
 
+**2026-10-27 22:08（北京时间）Glama 已更新并发布**：维护者同步 Repository，
+将 Build steps 固定为 `pyobfus-mcp==0.3.16 pyobfus==0.10.0`。
+Glama 后台测试 `01a17db0-eadf-78a5-b035-9f6c279cfd3d` 在 9.6 秒内
+成功，`pinnedCommit: null` 实际检出 main `b05e29e`。构建日志确认安装
+MCP 0.3.16、Core 0.10.0、runtime 0.1.1；实例以协议 `2025-11-25`
+握手并报告服务版本 0.3.16，列出九个工具。该构建随后以 Glama 渠道版本
+`0.10.1` 发布；渠道编号不是 PyPI 包版本。日志未覆盖九工具逐个调用。
+Build Spec 标为 Python 3.12，但 `uv pip --system` 显示安装目标为 `/usr`
+Python 3.13.5，因此不能把本次视为 3.12 环境的实测。
+
 **2026-10-27 18:36（北京时间）下载与邮件巡检**：运行
 `scripts/download_snapshot.py`，PyPI 非镜像数据截至 10-26，尚不含今天的 Core
 0.10.0 发版日。Core 30 天安静日中位数 40（11 天），近 7 天 58（仅 2 个安静日，
