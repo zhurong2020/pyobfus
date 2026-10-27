@@ -1,10 +1,10 @@
 # Cross-file L3 preview validation
 
 Validation baseline: 2026-10-25 development checkout. Slice D merged through
-PR #126; slice E merged through PR #127 (main `db634c6`). This workflow is
-targeted for Core 0.10.0; Core 0.9.1 does not include it. Runtime source and
-version are unchanged. See [distribution state](DISTRIBUTION_CHANNELS.md) for
-the actual published version.
+PR #126; slice E merged through PR #127 (main `db634c6`). The preview shipped
+in Core 0.10.0 on 2026-10-27; Core 0.9.1 does not include it. Runtime source
+and version are unchanged. See [distribution state](DISTRIBUTION_CHANNELS.md)
+for the published version.
 
 ## Scope and edition boundary
 
@@ -61,3 +61,6 @@ test. The guard itself already rejected the mismatched interpreter first.
 
 A–E were implemented and merged before the separate package-release step.
 Detailed continuing progress is in [PROGRESS_2026-10-25.md](PROGRESS_2026-10-25.md).
+The release-prep PR #139 merged as `886b8c9`; merged-main CI, CodeQL and
+Packaging passed. The [v0.10.0 release](https://github.com/zhurong2020/pyobfus/releases/tag/v0.10.0)
+and [Zenodo archive](https://doi.org/10.5281/zenodo.23687523) are published.

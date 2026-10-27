@@ -59,7 +59,24 @@ pypi-attestations verify pypi \
 Repeat for each wheel/sdist you intend to trust or mirror. Do not verify only
 one file and assume the whole release is covered.
 
-## Latest Verified Snapshot — 2026-10-26
+## Latest Verified Snapshot — 2026-10-27
+
+Core 0.10.0 was verified against both exact PyPI artifact URLs with
+`pypi-attestations` 0.0.30 using `verify pypi --repository`
+for `https://github.com/zhurong2020/pyobfus`. Wheel and sdist both passed
+repository-bound cryptographic verification. Downloaded SHA-256 matched
+PyPI JSON (`8b40bc9d71b7aa5ae31966edb35d374ec51d4f9d4f056b312b1b2125ea964d4b`
+for the wheel;
+`7365c9f1ede3c2484ef3ac0fb52a2a51ab1f460dcfb10ad6cb41483e1b7d2c06`
+for the sdist), and both Integrity API endpoints returned HTTP 200 with the
+expected content type. The tagged [OIDC release workflow](https://github.com/zhurong2020/pyobfus/actions/runs/40484190827)
+succeeded. Fresh Python 3.10 and 3.15 installs resolved runtime 0.1.1,
+passed `pip check` and executed generated code. The
+[GitHub Release](https://github.com/zhurong2020/pyobfus/releases/tag/v0.10.0)
+and [Zenodo v0.10.0 archive](https://doi.org/10.5281/zenodo.23687523)
+were independently checked.
+
+## Previous Verified Snapshot — 2026-10-26
 
 MCP 0.3.16 was verified on 2026-10-26 with `pypi-attestations verify pypi`
 against both exact PyPI URLs. Wheel and sdist both passed repository-bound
@@ -70,7 +87,7 @@ Fresh PyPI installs on Python 3.10 and 3.15 passed dependency checks, 153
 MCP tests and the nine-tool stdio contract. See
 [MCP release evidence](MCP_SDK_2X_RELEASE_PREP_2026-10-26.md).
 
-## Previous Verified Snapshot — 2026-10-14
+## Earlier Verified Snapshot — 2026-10-14
 
 Core 0.7.1 and MCP 0.3.13 wheel/sdist were each verified with
 `pypi-attestations 0.0.30 verify pypi --repository https://github.com/zhurong2020/pyobfus`

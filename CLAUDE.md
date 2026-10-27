@@ -8,7 +8,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ## ⚡ Current pending work (cold-start 必读)
 
-**2026-10-26 最新交接**：[`docs/SESSION_CLOSEOUT_2026-10-26.md`](docs/SESSION_CLOSEOUT_2026-10-26.md)。MCP SDK 生产范围现为 `mcp>=1.27.0,<3.0.0`；MCP 0.3.16 已发布，PyPI、官方 Registry 与 Glama 构建/发现验证完成。公开版本为 Core 0.9.1 / MCP 0.3.16 / runtime 0.1.1；多模块 L3 A–E 仍为未发布预览。下一步以 [`docs/TODO.md`](docs/TODO.md) 为准。
+**2026-10-27 最新状态**：Core 0.10.0 已发布，多模块 L3 A–E 预览进入公开 Core 包；PyPI、PEP 740、全新 Python 3.10/3.15 安装、GitHub Release 和 Zenodo 归档均已核实，详见 [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md) 顶部。MCP 0.3.16 / runtime 0.1.1 不变；MCP SDK 生产范围为 `mcp>=1.27.0,<3.0.0`。上一份 session 交接是 [`docs/SESSION_CLOSEOUT_2026-10-26.md`](docs/SESSION_CLOSEOUT_2026-10-26.md)，属于发版前快照。下一步以 [`docs/TODO.md`](docs/TODO.md) 为准。
 
 **历史口径**：下面带较早日期的快照和审核流程不代表当前未完成工作，也不能覆盖维护者当前指令。旧交接中的 D 待合并、E 未开始已由本次状态取代。
 

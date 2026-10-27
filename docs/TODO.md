@@ -5,8 +5,8 @@
 顺序做」，不记录历史。最新依据见
 [`FEATURE_EXPANSION_RESEARCH_2026-10-20.md`](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)；Python 3.15 的 P0 范围与验收见 [`PYTHON315_SUPPORT_PLAN.md`](PYTHON315_SUPPORT_PLAN.md)。
 
-最后更新：2026-10-27。公开版本为 Core 0.9.1、MCP 0.3.16、runtime 0.1.1；
-Core 0.10.0 草稿 PR #139 的初版已通过 CI/CodeQL/Packaging，文档巡检与最终批准仍在进行；以 PR 当前 head 的检查为准。
+最后更新：2026-10-27。公开版本为 Core 0.10.0、MCP 0.3.16、runtime 0.1.1；
+Core 发版与 Zenodo 归档已完成，证据见 [当前计划](CURRENT_PLAN_ZH.md)。
 最终交接见 [Session 收尾](SESSION_CLOSEOUT_2026-10-26.md)，前一阶段推进见 [Codex 进度](PROGRESS_2026-10-25.md)，运营与待办日期见
 [复盘/巡检准备](OPS_REVIEW_2026-10-25.md)。实现、合并与对外发布分别记录，
 不把已合并的预览代码当成已发布包。
@@ -37,15 +37,14 @@ Core 0.10.0 草稿 PR #139 的初版已通过 CI/CodeQL/Packaging，文档巡检
 
 四阶段本地工作已完成，结果见推进计划与 CURRENT_PLAN_ZH.md。本轮修订已于 10-23 经 PR #112 合并，并随 Core 0.9.0 / MCP 0.3.15 发布。PR #120 已于 10-24 合并并随 Core 0.9.1 发布（见 CURRENT_PLAN 顶部）。
 
-**本轮实现收尾**：A–D 已合并，E 已经 PR #127 合并（main `db634c6`），
+**本轮实现收尾**：A–E 已合并并随 Core 0.10.0 发布，
 Linux/Windows × 3.10/3.12/3.15 六格和总 CI 均通过。具体能力与边界见
-[CROSSFILE_OPACITY_VALIDATION.md](CROSSFILE_OPACITY_VALIDATION.md)，仍未发布。
+[CROSSFILE_OPACITY_VALIDATION.md](CROSSFILE_OPACITY_VALIDATION.md)。
 
 当前顺序：
 
-1. 复核 Core 0.10.0 草稿 PR #139 的文档巡检结果，并分别决定合并与发布；
-   L3 预览与修复已合并到源码，公开包尚未发布。
-2. 10-26 增量巡检：优先核实正常 WSL 会话的当天云端镜像；10-27 DEV 第二篇署名/预览。
+1. 10-26 增量巡检：优先核实正常 WSL 会话的当天云端镜像；10-27 DEV 第二篇署名/预览。
+2. 下一次 Core 发布以实际缺陷、需求和维护者授权为依据；观察 0.10.0 的使用反馈。
 
 10-25 复盘和当前可执行巡检已完成，见运营记录；不把未来日期状态写成已检查。
 私有医院应用仍暂停，参数改名等候选保持原范围，不自动扩张功能。
@@ -57,12 +56,12 @@ Linux/Windows × 3.10/3.12/3.15 六格和总 CI 均通过。具体能力与边�
 - **已发布参考 PY315-1：惰性 from 导入被提前执行**。原生 Python 3.15.0、当前 checkout 与 PyPI Core 0.7.5 wheel 均复现：`lazy from calculator import Calculator` 改写后丢 `is_lazy`，构建成功但导入副作用时序变化。最小输入与输出见调研 §5.1。Community 兼容性，已修复并补原生回归；0.8.0 发布（#108）。
 - **已发布参考 PY315-2：新字典推导式解包构建失败**。`{**row for row in rows}` 原文在 3.15 可运行，checkout／0.7.5 wheel 构建均报 `NoneType ... _fields`；根因为自定义推导式 visitor 访问 None，六处路径已修复并补原生回归；0.8.0 发布（#108）。
 - [ ] **3.15 后续（0.8.0 发布后登记，均未授权实现）**：① 3.15 标准库冒烟中 `json`（`scanner.make_scanner`）与 `unittest`（`util.three_way_cmp`/`case.TestCase`）目录构建产物导入失败，main 同样失败，属模块属性证明既有限制，待定是否单列缺陷；② free-threaded 3.15、3.15 上冻结/编译打包未验证。Black/mypy 配置修订与 Glama 同步结果见 `CURRENT_PLAN_ZH.md` 对应日期记录。
-- `--no-cross-file` mapping 已随 0.9.0 发布；目录 L3 预览 A–E 已合并但未发布，
+- `--no-cross-file` mapping 已随 0.9.0 发布；目录 L3 预览 A–E 已随 0.10.0 发布，
   未一次接入其他 fusion 字段。
 - 参数改名、H B2/B3、资源 key provider 与 L3 方法覆盖继续保持原 gate；未授权改实现／合并／发布。
 
 三项 10-24 反例及 L3 清单缺失后验修复已经 PR #128 合并（main `a0882a4`），
-最终 39 检查成功 / 2 按配置跳过；修复尚未发布，不重复排为未实现功能。
+最终 39 检查成功 / 2 按配置跳过；修复随 0.10.0 发布，不重复排为未实现功能。
 
 ## 后续团队候选：独立的视频原创保护辅助工具（2026-10-23）
 
@@ -72,7 +71,7 @@ Linux/Windows × 3.10/3.12/3.15 六格和总 CI 均通过。具体能力与边�
 
 - **后续采用引导文档（10-22 登记，仅记录）**：当前四阶段之后，按 [AI / Agent 采用引导计划](AGENT_ADOPTION_GUIDANCE_PLAN.md) 复核 llms 镜像、README／首页、集成模板及能力元数据；以迭代、兼容／验证／调试证据说明直接采用的价值，不把代码量当作质量、不写强制推荐指令。本轮未修改对外入口。
 
-- 每周一巡检继续观察 Core 0.9.1 / MCP 0.3.16 反馈、下载安静日、客户调研回答、CI 与备份。无新缺陷时不重复全量测试、不主动增加功能。
+- 每周一巡检继续观察 Core 0.10.0 / MCP 0.3.16 反馈、下载安静日、客户调研回答、CI 与备份。无新缺陷时不重复全量测试、不主动增加功能。
 - **10-25 复盘已完成**；数据与结论见运营记录，继续分开发版日、次日与内容流量。
 - 下次发布按实际新增改动与维护者授权确定，不恢复此前 10-15 的等待通知状态。
 - **3.15 兼容 P0 已随 Core 0.8.0 发布**：后续只跟进已登记的兼容性限制；MCP SDK 2.x 生产支持已随 MCP 0.3.16 发布，mapping 与 Pro 新功能仍分别按需求和授权推进。

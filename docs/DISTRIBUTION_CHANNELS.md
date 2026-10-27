@@ -11,7 +11,8 @@ For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 Core's 30-day quiet-day median is `40` across 10 quiet days. The latest seven
 days have only one quiet day (`30`), so that window cannot establish growth.
 MCP quiet-day medians are `3 / 8` (7 / 30 days; 3 / 24 samples).
-Marketplace reports `15 installs`; Open VSX reports `762 downloads` (fetches,
+Marketplace reports `15 installs`; Open VSX reports `776 downloads` on
+2026-10-27 (fetches,
 not unique installs). Action attribution is `0` visible repositories.
 GitHub rolling 14-day traffic is `107 views / 56 unique visitors`; DEV/Reddit
 are absent from referrers. Public DEV article reactions/comments are both zero;
@@ -27,18 +28,19 @@ the new package pins, successful image build, 0.3.16 handshake and nine listed
 tools; it does not exercise every tool inside that image.
 See [release evidence](MCP_SDK_2X_RELEASE_PREP_2026-10-26.md).
 
-**2026-10-27 Core release candidate:** Draft PR #139 prepares Core 0.10.0
-with the opt-in cross-file L3 preview and follow-up fixes. Its first revision
-passed local checks, CI 39/39, CodeQL and Packaging; follow-up docs changes
-require their own PR checks. This is a candidate only: PyPI Core
-remains 0.9.1 until a separately approved release; MCP/runtime remain
-0.3.16/0.1.1. Update the live Core entry and GitHub/Zenodo status below from
-observed release evidence after publication.
+**2026-10-27 Core release update:** Core 0.10.0 is live on PyPI with the
+opt-in cross-file L3 preview and follow-up fixes. PR #139 merged as
+`886b8c9`; merged-main CI, CodeQL and Packaging passed. The tagged OIDC
+workflow succeeded. Both PyPI files passed PEP 740 cryptographic verification,
+SHA-256 and Integrity API checks. Clean Python 3.10/3.15 installs and generated
+code execution passed. The GitHub Release is live; Zenodo's concept DOI now
+points to record `23687523`, version `v0.10.0`. MCP/runtime remain
+0.3.16/0.1.1. See [release evidence](RELEASE_PROVENANCE_VERIFICATION.md).
 
 October 25 snapshot: Core `0.9.1`, MCP `0.3.15`, runtime `0.1.1`,
 VS Code/Open VSX `0.4.3`. The official MCP Registry then reported 0.3.15
-as `active` / `isLatest=true`; this was superseded on October 26. Unreleased
-crossfile-opacity and fixes remain outside the published Core package.
+as `active` / `isLatest=true`; this was superseded on October 26. This
+snapshot predates the Core 0.10.0 release.
 
 Glama's October 24 21:32 UTC build notification points to test
 `01a16fd2-181a-7208-aab8-d84753dfec0e`; its 21:35 notification labels the
@@ -151,8 +153,9 @@ re-runnable source of truth for the calculation is
 
 ### PyPI — `pyobfus`
 - URL: https://pypi.org/project/pyobfus/
-- Current version: **0.9.1** (released 2026-10-24) · ships with PEP 740 attestations via OIDC trusted publishing
-- Current headline (0.9.1): `--unmap --trace-encoding` for legacy-encoded traces (exit 2 with guidance on decode errors); Pro opacity keeps module docstring/`__future__` prologue.
+- Current version: **0.10.0** (released 2026-10-27) · ships with PEP 740 attestations via OIDC trusted publishing
+- Current headline (0.10.0): opt-in Pro cross-file L3 preview with application key provider, staged multi-module builds, local name-only traceback restoration and delivery checks; see [validation and limits](CROSSFILE_OPACITY_VALIDATION.md).
+- Prior headline (0.9.1): `--unmap --trace-encoding` for legacy-encoded traces (exit 2 with guidance on decode errors); Pro opacity keeps module docstring/`__future__` prologue.
 - Prior headline (0.9.0): `--unmap` restores tracebacks from independent (`--no-cross-file`) directory builds via file-scoped mapping format 2; v1 mappings still supported.
 - Prior headline (0.8.0): Python 3.15 support — lazy imports stay lazy (PY315-1), comprehension unpacking builds (PY315-2), new builtins reserved; Core CI 3.9–3.15 on three platforms.
 - Prior headline (0.7.5): starred tuple subscripts keep their parentheses so 3.9/3.10 source stays 3.9/3.10 output (defect O); `sys.modules` mutator calls close module attribute proofs (defect P).
@@ -378,13 +381,15 @@ re-runnable source of truth for the calculation is
   prior is not evidence of an actual review. Continue tracking installs and
   real reviews, not raw update/download count alone.
 - Wiki: disabled · Discussions: enabled · Issues: open
-- Releases: latest Core `v0.9.1`, runtime `runtime-v0.1.1`, MCP `mcp-v0.3.16`, and VS Code
+- Releases: latest Core `v0.10.0`, runtime `runtime-v0.1.1`, MCP `mcp-v0.3.16`, and VS Code
   `vscode-v0.4.3`; MCP releases attach wheel+sdist.
 
 ### Open VSX — `zhurong2020.pyobfus` 🟢 LIVE
 - Public page: https://open-vsx.org/extension/zhurong2020/pyobfus
 - API: https://open-vsx.org/api/zhurong2020/pyobfus
-- **Published 2026-09-07**, version **0.4.2** (same VSIX as the Marketplace
+- Current version: **0.4.3**; the dated entries below retain the initial 0.4.2
+  publication evidence and subsequent 0.4.3 update.
+- **Initially published 2026-09-07**, version **0.4.2** (same VSIX as the Marketplace
   release, so the two registries are in sync). `ovsx` returned
   `Published zhurong2020.pyobfus v0.4.2`.
 - **Independently re-checked 2026-09-07**: both URLs HTTP 200; API reports
