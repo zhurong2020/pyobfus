@@ -180,6 +180,6 @@ pip uninstall pyobfus && pip install -e ".[dev]"
 - [CURRENT_PLAN_ZH.md](CURRENT_PLAN_ZH.md) - 当前计划与冷启动入口
 
 
-## 名字验证的补充边界（#98，未发版）
+## 名字验证的补充边界（Core 0.7.1 起）
 
-`--verify-names` 已合入 main，PyPI 0.7.0 尚不支持；它检查源码基线之外新增的未绑定全局名字，不能代替运行产物。成功 JSON 与报告保留 `name_verification`；检查 `coverage_complete` 和跳过原因，不能把部分覆盖当完整通过。单文件、原地构建和增量缓存均有回归覆盖。详细用法及限制见[名字验证](NAME_VERIFICATION.md)。本次未增加 MCP 工具，也未改变 `--verify-syntax` 默认行为。
+`--verify-names` 自 Core 0.7.1 起可用；它检查源码基线之外新增的未绑定全局名字，不能代替运行产物。成功 JSON 与报告保留 `name_verification`；检查 `coverage_complete` 和跳过原因，不能把部分覆盖当完整通过。单文件、原地构建和增量缓存均有回归覆盖。详细用法及限制见[名字验证](NAME_VERIFICATION.md)。此检查未增加 MCP 工具，也未改变 `--verify-syntax` 默认行为。

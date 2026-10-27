@@ -12,7 +12,7 @@ pyobfus 的普通 `.py` 文件。它不仅转换源码，还提供构建前检�
 
 Community 版本采用 Apache-2.0，不限制文件数和代码行数，也不需要试用。
 
-> **v0.10.0 新增**：Pro 可选的 `--crossfile-opacity` 预览模式可在多模块构建中加密明确选定的模块顶层函数，并使用应用提供的密钥。构建需要全新输出目录及私有 mapping；`--unmap` 只恢复加密帧的函数名，不还原原始行号。此模式有明确的解释器与交付限制，见[验证记录](https://github.com/zhurong2020/pyobfus/blob/main/docs/CROSSFILE_OPACITY_VALIDATION.md)。
+> **v0.10.0 新增**：Pro 可选的 `--crossfile-opacity` 预览模式可在多模块构建中加密明确选定的模块顶层函数，并使用应用提供的密钥。构建需要全新输出目录及私有 mapping；`--unmap` 只恢复加密帧的函数名，不还原原始行号。用法与限制见[配置指南](https://github.com/zhurong2020/pyobfus/blob/main/docs/OPACITY_CONFIG.md#cross-file-l3-preview-since-0100)和[验证记录](https://github.com/zhurong2020/pyobfus/blob/main/docs/CROSSFILE_OPACITY_VALIDATION.md)。
 
 > **v0.9.0 新增**：独立目录构建（`--no-cross-file`）也能用 `--unmap` 还原 traceback。mapping 按文件记录名字，不同文件复用同一个短名也能逐帧还原到正确的原名；旧 mapping 照常可用，旧版 pyobfus 遇到新格式会明确拒绝而不是猜。见[调试指南](https://github.com/zhurong2020/pyobfus/blob/main/docs/guides/debug-obfuscated-python.md)。
 

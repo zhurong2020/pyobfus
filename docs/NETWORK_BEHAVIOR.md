@@ -4,10 +4,10 @@ pyobfus does not upload your source code and has no telemetry. Obfuscating,
 previewing (`--dry-run`), verifying syntax, saving and reading mappings, and
 reversing tracebacks (`--unmap`) all run without a network connection.
 
-There are exactly three places where the code makes a network request. Each
-one is listed below with what it sends and how to avoid it. This page was
-checked against the source of pyobfus 0.6.1 on 2026-10-11; you can repeat the
-check yourself (see [How to verify this](#how-to-verify-this)).
+There are three request categories in the builder. Each one is listed below
+with what it sends and how to avoid it. This page was checked against the
+Core 0.10.0 release source on 2026-10-27; you can repeat the check yourself
+(see [How to verify this](#how-to-verify-this)).
 
 | When | Edition | Sends to | What is sent | How to avoid it |
 |---|---|---|---|---|
@@ -84,7 +84,7 @@ for pkg in ("pyobfus", "pyobfus_pro", "pyobfus_runtime"):
 EOF
 ```
 
-On 0.6.1 this prints the three modules above: `pyobfus/core/dependency_advisory.py`,
+On 0.10.0 this prints the three modules above: `pyobfus/core/dependency_advisory.py`,
 `pyobfus/trial.py` and `pyobfus_pro/license.py`. `pyobfus_runtime` is a separate
 package; if it is installed in the same environment, the script checks it too.
 For a runtime check, run a build with outbound traffic blocked (for example in

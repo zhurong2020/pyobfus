@@ -37,7 +37,7 @@ every claim below is independently checkable, not just asserted:
 - **Zero open CodeQL alerts** — static analysis runs on every push; check the current state yourself in the [Security tab](https://github.com/zhurong2020/pyobfus/security/code-scanning).
 - **SHA-pinned CI/CD** — every third-party GitHub Action in the build, test, and release workflows is pinned to a specific commit SHA, not a mutable tag, closing the exact supply-chain vector the Nx Console incident exploited elsewhere.
 - **A build-provenance manifest** (`--provenance-manifest`) and a **tool-description integrity manifest** (`pyobfus-mcp-verify`, for the companion MCP server) — both self-consistency-checkable, not just claimed.
-- **No telemetry, no network calls** beyond the explicit, user-initiated "Unlock Pro" link. This extension only ever shells out to your own locally-installed `pyobfus`.
+- **No extension telemetry or source upload**. The extension shells out to your locally installed `pyobfus`; its `--check` call can query PyPI with dependency names by default, and Pro builds can verify a licence. See the [network behavior](https://pyobfus.readthedocs.io/en/latest/NETWORK_BEHAVIOR/) for the exact requests and offline options.
 
 ## Features
 

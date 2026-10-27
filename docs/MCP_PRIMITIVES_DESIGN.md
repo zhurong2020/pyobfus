@@ -4,6 +4,10 @@
 **Recorded**: 2026-07-22  
 **Decision gate**: revisit after the launch wave produces real MCP-user feedback
 
+This is a dated design snapshot. MCP 0.3.16 exposes nine tools: the eight
+listed below plus `check_delivery`, added after this note. See the
+[current MCP README](https://github.com/zhurong2020/pyobfus/blob/main/pyobfus_mcp/README.md).
+
 This note records a possible evolution of `pyobfus-mcp` from a tools-only
 server toward a clearer separation between MCP Tools, Resources, and Prompts.
 It is inspired in part by the
@@ -39,7 +43,7 @@ user selects a Prompt
 playbook, including explanations and user decisions. `next_tool` is the
 machine-readable handoff after a Tool has executed.
 
-## Current Tool layer
+## Tool layer at the time of this note
 
 The existing eight Tools remain the executable surface:
 

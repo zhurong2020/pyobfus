@@ -19,7 +19,7 @@ Community is Apache-2.0, has no file or line limits, and requires no trial.
 
 [简体中文概览](https://github.com/zhurong2020/pyobfus/blob/main/README.zh-CN.md)
 
-> **New in 0.10.0:** Opt-in Pro `--crossfile-opacity` adds a restricted multi-module L3 preview with application-provided keys and name-only traceback restoration. See [validation and limits](CROSSFILE_OPACITY_VALIDATION.md).
+> **New in 0.10.0:** Opt-in Pro `--crossfile-opacity` adds a restricted multi-module L3 preview with application-provided keys and name-only traceback restoration. See the [configuration guide](OPACITY_CONFIG.md#cross-file-l3-preview-since-0100) and [validation and limits](CROSSFILE_OPACITY_VALIDATION.md).
 
 > **New in 0.9.0: `--unmap` for independent directory builds (`--no-cross-file`).** See the [debugging guide](guides/debug-obfuscated-python.md).
 

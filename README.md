@@ -27,7 +27,8 @@ Community is Apache-2.0, has no file or line limits, and requires no trial.
 > key. Builds require a fresh output directory and a private mapping;
 > `--unmap` restores encrypted frame names without claiming original line
 > numbers. This restricted preview has explicit interpreter and delivery
-> checks. See the [validation and limits](https://github.com/zhurong2020/pyobfus/blob/main/docs/CROSSFILE_OPACITY_VALIDATION.md)
+> checks. See the [configuration guide](https://github.com/zhurong2020/pyobfus/blob/main/docs/OPACITY_CONFIG.md#cross-file-l3-preview-since-0100),
+> [validation and limits](https://github.com/zhurong2020/pyobfus/blob/main/docs/CROSSFILE_OPACITY_VALIDATION.md),
 > and [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
 >
 > **What's new in v0.9.0:** `--unmap` now works for independent directory builds

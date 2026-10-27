@@ -5,11 +5,11 @@ cross-repository boundaries. Current priorities belong in
 [`CURRENT_PLAN_ZH.md`](CURRENT_PLAN_ZH.md); historical implementation detail
 belongs in dated design documents.
 
-## Name-verification ownership (PR #98, unreleased)
+## Name-verification ownership (since Core 0.7.1)
 
 The optional static `--verify-names` build check belongs to Core. Its successful
 CLI JSON and build report carry `name_verification` separately from syntax
-evidence. It is merged on main but absent from PyPI 0.7.0. No MCP tool or
+evidence. It has been published since Core 0.7.1. No MCP tool or
 build-option contract was added by #98, and the Action does not enable it
 through `verify-syntax`. See [name verification](NAME_VERIFICATION.md).
 
@@ -54,7 +54,7 @@ the runtime into generated output.
 | `pyobfus/` | Apache-2.0 CLI, library, AST engine, config, scan and reporting contracts | PyPI `pyobfus` (contains source-separated Pro builder too) |
 | `pyobfus_pro/` | Proprietary, licence-gated build-time transforms and orchestration | Versioned with the `pyobfus` builder; never part of the Apache-2.0 core |
 | `pyobfus_runtime/` | Minimal proprietary runtime imported by generated Pro artifacts | PyPI `pyobfus-runtime`, independently built and published |
-| `pyobfus_mcp/` | MCP server exposing eight agent tools | PyPI `pyobfus-mcp`, independent version |
+| `pyobfus_mcp/` | MCP server exposing nine agent tools | PyPI `pyobfus-mcp`, independent version |
 | `vscode-extension/` | VS Code UI and real CLI-contract integration | VS Code Marketplace + Open VSX, independent version |
 | `skills/` | Review/protection skills plus plugin metadata | Repository-distributed agent integration assets |
 | `cloudflare-worker/` | Licence/trial verification and Stripe fulfillment | Independently deployed Worker; not shipped in Python wheels |

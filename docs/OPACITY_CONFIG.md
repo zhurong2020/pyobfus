@@ -56,9 +56,9 @@ Only top-level functions and async functions are matched by the CLI pre-pass.
 Methods and nested functions are not currently encrypted even when an
 `opacity.toml` rule matches them; the build warns with how many were skipped,
 and `--build-report` records the counts (`l3_skipped_methods`,
-`l3_skipped_nested`). The pass also does
-not run in cross-file directory builds (the CLI warns and lists the skipped
-options); build single files or use `--no-cross-file`.
+`l3_skipped_nested`). The pass does not run in default cross-file directory
+builds (the CLI warns and lists the skipped options); build single files, use
+`--no-cross-file`, or opt into the restricted cross-file preview below.
 
 ## Delivery requirement
 
@@ -78,11 +78,11 @@ patterns, non-string values, or a `rules` value that is not a list of TOML
 tables. Overlapping patterns are resolved by first-match precedence, so order
 rules from most specific to most general.
 
-## Cross-file L3 preview (unreleased checkout)
+## Cross-file L3 preview (since 0.10.0)
 
-The default cross-file behavior described above remains the released behavior.
-The development checkout adds explicit `--crossfile-opacity` for directory L3
-with application-provided keys. This is not included in Core 0.9.1.
+The default cross-file behavior described above remains unchanged. Core 0.10.0
+adds explicit `--crossfile-opacity` for directory L3 with
+application-provided keys.
 
 ```bash
 # Set APP_L3_KEY securely to a base64-encoded 32-byte application key.
@@ -128,8 +128,7 @@ The guard runs before runtime/provider initialization. Encrypted frames restore
 only original function names; their original line is unavailable. Ordinary
 functions in an L3 module may retain their obfuscated names and locations.
 Unknown encrypted frame identities remain unchanged, including when supplied
-the wrong mapping. Keep the private mapping; readers need Core 0.10.0 or later
-(the development checkout implements that reader).
+the wrong mapping. Keep the private mapping; readers need Core 0.10.0 or later.
 
 Deliver the completed directory including `.pyobfus-release.json`, then run
 `pyobfus --check-delivery protected-v1/ --build-report private/report-v1.json`.
