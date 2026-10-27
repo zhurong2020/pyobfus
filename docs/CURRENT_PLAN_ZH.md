@@ -1,5 +1,18 @@
 # pyobfus 当前计划
 
+**2026-10-27 18:36（北京时间）下载与邮件巡检**：运行
+`scripts/download_snapshot.py`，PyPI 非镜像数据截至 10-26，尚不含今天的 Core
+0.10.0 发版日。Core 30 天安静日中位数 40（11 天），近 7 天 58（仅 2 个安静日，
+不足以判断增长）；MCP 分别为 12（23 天）和 13（2 天）。Marketplace
+0.4.3 安装数 15，Open VSX 0.4.3 下载数 776（抓取次数，非独立用户），
+Action 可见引用仓库 0；GitHub 近 14 天 110 次浏览／65 位独立访客。
+本次所查 Gmail 中未见新的 pyobfus 客户直接来信或 Anthropic、Stripe／Resend
+通知；Glama 于 15:31 报告构建成功，15:35 报告渠道版本 `0.9.4` 发布。
+该标签不是 PyPI MCP 版本，邮件也未证明镜像安装的 Core 版本。
+另有 `workspace-meta` 的 Guard 凭据扫描在
+[本次运行](https://github.com/zhurong2020/workspace-meta/actions/runs/40471016501)
+失败，需另行核查原因；不能从失败通知推定凭据已泄露。
+
 **2026-10-27 Core 0.10.0 已发布**：PR #139 完成版本号、CHANGELOG、
 README、用户指南、Agent 文件与相关项目说明文档巡检，合并到 main
 `886b8c9`。合并后 [CI 39/39](https://github.com/zhurong2020/pyobfus/actions/runs/40482841143)、
