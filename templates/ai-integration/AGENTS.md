@@ -23,8 +23,8 @@ specific rule-file format.
 | Scan | `pyobfus --check <path> --json` | Read `severity_counts.high`, `suggested_preset`, `frameworks`, `ai_hint` |
 | Init | `pyobfus --init <path> --json` | Writes pyobfus.yaml — prompt the user first in interactive mode |
 | Obfuscate | `pyobfus <path> -o dist/ -c pyobfus.yaml --save-mapping mapping.json --json` | Always save a mapping |
-| Unmap | `pyobfus --unmap --trace error.log --mapping mapping.json --json` | Reverses identifiers, not line numbers |
-| Discover | `pyobfus --list-presets` | 13 presets total, 3 tiers |
+| Unmap | `pyobfus --unmap --trace error.log --mapping mapping.json --json` | Restores names and supported original locations with a matching mapping; encrypted L3 frames restore names only |
+| Discover | `pyobfus --list-presets` | 14 presets total, 3 tiers |
 
 All commands return a stable JSON schema containing `status`, `ai_hint`,
 and `exit_code` (`0` = safe / `1` = warnings or error / `2` = parse error).

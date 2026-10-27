@@ -1,5 +1,9 @@
 # Open VSX 发布
 
+当前渠道状态（2026-10-27）：Marketplace 与 Open VSX 均为 0.4.3；以下
+0.4.2 的发布过程与结果是 2026-09-07 的历史记录。最新版本证据见
+[分发渠道记录](DISTRIBUTION_CHANNELS.md)。
+
 更新时间：2026-09-07（**已发布并经独立复核上线**；本文件由「发布准备」转为
 发布记录 + 后续版本的 runbook）
 
@@ -9,7 +13,7 @@
 （VSCodium、Gitpod、Eclipse Theia、code-server 等拿不到 Microsoft Marketplace
 的场景）。**`0.4.2` 已于 2026-09-07 发布上线**；本文件后续用作再发布 runbook。
 
-## 当前审计结果
+## 2026-09-07 审计结果
 
 - `package.json` 已有稳定的 `publisher`、`license`、`repository`、`homepage`、
   `bugs`、`icon` 和 Python/obfuscator 关键词。

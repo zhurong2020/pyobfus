@@ -43,10 +43,10 @@ whether the original names of module-level functions and classes, such as
 
 ## Results
 
-| Tool and version (PyPI) | Last release | Multi-module project | Python 3.12 module | Module-level names |
+| Tool and version tested | Release context | Multi-module project | Python 3.12 module | Module-level names |
 |---|---|---|---|---|
 | **pyobfus 0.6.1** | 2026-10-10 | Passed | **Failed:** `NameError` (directory build dropped `[T]` from `def first_of[T]`) | Renamed across modules |
-| pyobfus, current `main` | not released | Passed | Passed ([fix](https://github.com/zhurong2020/pyobfus/pull/78)) | Renamed across modules |
+| pyobfus pre-0.7.0 source (tested 2026-10-11) | Fix published in 0.7.0 on 2026-10-12 | Passed | Passed ([fix](https://github.com/zhurong2020/pyobfus/pull/78)) | Renamed across modules |
 | **Opy 1.1.28** | 2018-01-04 | Failed: `NameError` | Failed: `SyntaxError` | Renamed, including file and package names |
 | **pyminifier 2.1** | 2014-05-31 | Not run: install fails | Not run | — |
 | **python-minifier 3.4.0** | 2026-09-29 | Passed (default) | Passed (default) | Kept by default |

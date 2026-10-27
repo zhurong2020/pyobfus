@@ -181,15 +181,16 @@ for the version you installed.
 The published PyPI package (not a local build) has been scanned with
 [Cisco's open-source `mcp-scanner`](https://github.com/cisco-ai-defense/mcp-scanner)
 — a live `initialize` → `tools/list` handshake followed by YARA
-malware-signature and dependency-vulnerability analysis against all 8
-exposed tools. Result as of `pyobfus-mcp` 0.3.6 (2026-08-20): **8/8 tools
+malware-signature and dependency-vulnerability analysis against the eight
+tools exposed at that time. Result as of `pyobfus-mcp` 0.3.6 (2026-08-20): **8/8 tools
 SAFE, 0 findings**. Full reproducible command, raw output, and an honest
 statement of what this scan does and doesn't cover:
 [docs/MCP_SECURITY_SCAN.md](https://github.com/zhurong2020/pyobfus/blob/main/docs/MCP_SECURITY_SCAN.md).
 
 ## License
 
-Apache-2.0. Same as the main pyobfus package. The pyobfus Pro features remain license-gated; this MCP server only wraps the community-tier tools.
+Apache-2.0. Same as the main pyobfus package. The server exposes Community
+tools and tier/trial guidance; Pro build features remain licence-gated.
 
 ## Links
 

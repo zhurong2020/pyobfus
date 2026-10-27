@@ -1,5 +1,13 @@
 # pyobfus 当前计划
 
+**2026-10-27 Core 0.10.0 发版准备（尚未发布）**：草稿 PR #139
+的初版（`c33d29f`）已包含版本号、CHANGELOG、README 中英与支持矩阵；
+本地 Core 4637/MCP 153/integration 352/runtime 24 项通过，候选 wheel/sdist
+构建与干净环境安装通过，初版 PR 的 CI 39/39、CodeQL、Packaging 均成功。
+本轮文档巡检继续修正用户指南、Agent 文件与相关项目说明；后续提交的检查结果
+以 PR 当前 head 为准。待复核完成后仍需
+维护者分别批准合并和发布。公开 Core 仍为 0.9.1，MCP 0.3.16、runtime 0.1.1 不变。
+
 最新交接见 [2026-10-26 session 收尾](SESSION_CLOSEOUT_2026-10-26.md)。
 
 **2026-10-26 MCP 0.3.16 已发布**：PR #135 合并 main `04985d4`，合并后

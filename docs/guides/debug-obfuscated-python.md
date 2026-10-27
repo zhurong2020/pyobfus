@@ -16,8 +16,9 @@ run `pyobfus --unmap` on the traceback with the mapping from that same build.
 
 ## Before you start
 
-- pyobfus installed (`pip install pyobfus`). Everything on this page works in
-  the free Community Edition.
+- pyobfus installed (`pip install pyobfus`). Mapping inspection and
+  `--unmap` work in the free Community Edition; creating encrypted L3
+  artifacts requires Pro.
 - You need the mapping file **from the build the customer is running**.
   Without it, the names cannot be recovered; that is the point of
   obfuscating.
@@ -86,7 +87,7 @@ not use this option. For a Windows log saved as cp1252, add
 and a decoding hint; bytes are not silently replaced or guessed. Re-save the
 log as UTF-8 when using Core 0.9.0 or earlier.
 
-In the unreleased development checkout, v1 mappings also restore non-ASCII
+Since Core 0.10.0, v1 mappings also restore non-ASCII
 identifier spellings (including Python's NFKC normalization). Ambiguous
 normalized names remain unchanged. JSON output uses ASCII Unicode escapes,
 which decode back to the exact Unicode trace even on a narrow Windows output
@@ -142,10 +143,9 @@ easier to hand to a script or an agent.
   the shipped file. Values printed in the traceback (like `'discount_rate'`
   above) are runtime values and already readable.
 
-## Independent-file directory builds (next release)
+## Independent-file directory builds (since 0.9.0)
 
-The working tree also supports private mapping for independently transformed
-files. This is not in the public 0.8.0 release yet:
+Core 0.9.0 added private mapping for independently transformed files:
 
 ```bash
 pyobfus scripts/ -o dist/ --no-cross-file \
@@ -189,6 +189,16 @@ also include `resolved_file` when file/name attribution is usable but line
 tables are absent. These builds deliberately rebuild when both `--incremental` and
 `--save-mapping` are requested, because cached code cannot recover current
 private mapping metadata.
+
+## Encrypted frames in the cross-file L3 preview (since 0.10.0)
+
+The opt-in Pro `--crossfile-opacity` build writes encrypted frame identities
+to a private version-1 mapping. Community `--unmap` reads that mapping and
+restores a function name only when the L3 frame identity matches exactly.
+The original line number of an encrypted function is unavailable; ordinary
+frames retain the usual mapping behavior. Keep this mapping outside the
+shipped output and use the one from the same build. See the
+[selection, interpreter and delivery limits](../OPACITY_CONFIG.md#cross-file-l3-preview-since-0100).
 
 ## Using the wrong mapping
 

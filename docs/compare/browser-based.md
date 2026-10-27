@@ -29,9 +29,10 @@ often the answer that ends the discussion, independent of what the service does
 with it afterwards. This document makes no claim about any particular service's
 retention or handling; the point is that a local tool removes the question.
 
-pyobfus obfuscates locally: the transformation itself makes no network call,
-and the only outbound request anywhere in the package is the PyPI lookup in
-`--check`'s dependency-hallucination advisory, which `--offline` disables. That
+pyobfus obfuscates locally: the transformation itself makes no network call.
+`--check` can query PyPI with dependency names unless `--offline` is set;
+optional trial registration and Pro licence verification also contact the
+licence server. See the [network behavior](../NETWORK_BEHAVIOR.md). That
 is verifiable rather than promised, because the source is Apache-2.0 and the
 published artifacts carry PEP 740 attestations. Your code is never uploaded
 either way.

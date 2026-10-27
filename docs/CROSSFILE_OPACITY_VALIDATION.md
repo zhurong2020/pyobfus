@@ -1,8 +1,10 @@
 # Cross-file L3 preview validation
 
-Status: 2026-10-25, unreleased development checkout. Slice D merged through
-PR #126; slice E merged through PR #127 (main `db634c6`). Core 0.9.1 does not include this complete
-workflow. Runtime source and version are unchanged.
+Validation baseline: 2026-10-25 development checkout. Slice D merged through
+PR #126; slice E merged through PR #127 (main `db634c6`). This workflow is
+targeted for Core 0.10.0; Core 0.9.1 does not include it. Runtime source and
+version are unchanged. See [distribution state](DISTRIBUTION_CHANNELS.md) for
+the actual published version.
 
 ## Scope and edition boundary
 
@@ -57,5 +59,5 @@ The first 3.15 runs exposed a test assertion matching source excerpts in the
 new traceback format; observing actual provider stdout side effects fixed the
 test. The guard itself already rejected the mismatched interpreter first.
 
-A–E are implemented and merged, while package release remains separate.
+A–E were implemented and merged before the separate package-release step.
 Detailed continuing progress is in [PROGRESS_2026-10-25.md](PROGRESS_2026-10-25.md).

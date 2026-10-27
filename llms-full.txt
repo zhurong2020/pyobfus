@@ -1,8 +1,8 @@
 # pyobfus — the Python obfuscator (full reference)
 
-> Extended version of /llms.txt. Contains the full JSON schemas, every
-> CLI flag, and concrete workflow recipes suitable for LLM-driven code
-> generation and agent tool-use.
+> Extended version of /llms.txt with representative JSON shapes and workflow
+> recipes for agent tool use. Run `pyobfus --help` for the current CLI flags
+> and consult the linked product docs for option-specific limits.
 
 pyobfus is a modern Python obfuscator (python-obfuscator / code-obfuscator) built on AST transformations. It ships as the `pyobfus` PyPI package with a companion `pyobfus-mcp` package that exposes the same capabilities over Model Context Protocol for Claude Desktop, Claude Code, Cursor, Windsurf, and Zed.
 
@@ -207,10 +207,10 @@ Identifier rewriting is token-boundary aware: `I1` inside `XI1Y` is NOT rewritte
 pyobfus --list-presets
 ```
 
-13 presets total:
+14 presets total:
 
 - Community (3): `safe`, `balanced`, `aggressive`
-- Framework-aware (6, free): `fastapi`, `django`, `flask`, `pydantic`, `click`, `sqlalchemy`
+- Framework-aware (7, free): `fastapi`, `django`, `flask`, `pydantic`, `click`, `sqlalchemy`, `ml`
 - Pro (4): `trial`, `commercial`, `library`, `maximum`
 
 ## YAML config reference
@@ -270,6 +270,7 @@ Tools exposed:
 | `list_presets` | `()` | List every preset, grouped by tier |
 | `explain_preset` | `(name: str)` | Describe a preset's effects vs. balanced |
 | `protect_project` | `(path: str, output_dir="dist", preset?: str, verify=True, verify_cmd?: str, save_mapping=True, trace_marker=True, timeout=120)` | Obfuscate + verify end-to-end in one call |
+| `check_delivery` | `(path: str, build_report?: str, provenance_manifest?: str)` | Inspect generated output or a wheel before shipping; read-only |
 | `recommend_tier` | `(path: str)` | Recommend community vs Pro with reasoning (`pro_funnel` tier) |
 | `start_pro_trial` | `()` | Structured guidance for the 5-day Pro trial (does not start it) |
 
@@ -278,7 +279,10 @@ also returns a `next_tool` field naming the next MCP tool to call.
 
 ## Known limitations
 
-- String encryption uses a key embedded in the output — treat as a deterrent, not cryptographic.
+- Some Pro string-encryption modes embed recoverable key material in the output;
+  treat those as deterrents. The opt-in 0.10.0 cross-file L3 preview instead
+  requires an application-provided runtime key and has strict interpreter and
+  delivery limits (see `docs/OPACITY_CONFIG.md`).
 - `eval()` / `exec()` with obfuscated code may need manual exclusions.
 - Debugging obfuscated code without a mapping.json is intentionally harder; keep mapping files for any build you might need to support later.
 - Cython-style native compilation is out of scope — use Nuitka for that layer.
@@ -307,7 +311,16 @@ also returns a `next_tool` field naming the next MCP tool to call.
 
 ## Versioning
 
-pyobfus follows semver. AI-native features (preflight, init, unmap, JSON CLI, MCP server) are baseline. v0.5 adds composable Pro flags (`--selective-opacity --seal-code --vault --scrub-traceback --fingerprint --expire-hard`, plus `--period --opacity-config --bind-device`/`--bind-device-id` in 0.5.3, device-lock extended to Vault keys in 0.5.4, and `--import-obfuscation` in 0.5.7) to the normal `pyobfus SRC -o OUT --level pro --<flag>` command. Community-side additions since: `--provenance-manifest` (0.5.5), config-aware `--check` with an excluded-file bucket and a dependency-hallucination advisory (0.5.18), and `--dry-run --json` structured plans plus `--verify-syntax` (0.5.19), SARIF 2.1.0 export of `--check` findings via `--sarif` (0.5.21), a Python 3.14 remote-debug hardening advisory in `--check` for builds that request anti-debug protection and targets Python 3.14+ (0.5.22), a versioned `# pyobfus:generated` build marker with `--community-marker/--no-community-marker` plus the `community_marker` config key (0.5.23, which also stopped generated output from embedding the input file's absolute path), the `--build-report` completed-build fact model (0.5.24), and reproducible output bytes for identical input and config, excluding the deliberately randomised `--numeric-obfuscation` and string encryption (0.5.25, which also fixed packages that re-export through `__init__.py` and modules bound by a plain `import`). A licence can be released from a machine with `pyobfus-license deactivate` (0.5.26, which also fixed activation failing for every customer, made revocation take effect, stopped an operating-system update from invalidating a registered licence, and had the server retire the least recently used device instead of refusing a fourth). The 0.5.27 release fixes cross-file local-scope shadowing, eager annotations/defaults after class renaming, and control-flow fallthrough paths with an uninitialized return slot; Windows CI now executes generated output. Released 2026-09-16. There is no `build` subcommand. Breaking changes to JSON schemas are flagged with a `version` field bump.
+The Core package and companion packages are versioned independently. Current
+milestones: Core 0.7.1 added local name verification and delivery checks;
+0.8.0 added Python 3.15 syntax support; 0.9.0 added per-file traceback mapping
+for `--no-cross-file` directory builds; 0.9.1 added traceback input-encoding
+control; and 0.10.0 adds the opt-in Pro cross-file L3 preview and name-only
+restoration for its encrypted frames. MCP 0.3.16 supports Python MCP SDK 1.27+
+and 2.x below 3.0, exposing nine tools. Runtime 0.1.1 is the builder's
+minimum declared runtime. There is no `build` subcommand. Breaking changes to
+JSON schemas are flagged with a `version` field bump. See `CHANGELOG.md` and
+`docs/SUPPORT_MATRIX.md` for detail and tested scope.
 
 ## Common selection questions
 
