@@ -1,5 +1,8 @@
 # pyobfus 当前计划
 
+最新冷启动交接见 [2026-10-27 session 收尾](SESSION_CLOSEOUT_2026-10-27.md)；
+下列更早日期段落保留当时状态，不作为当前版本或待办。
+
 **2026-10-27 22:08（北京时间）Glama 已更新并发布**：维护者同步 Repository，
 将 Build steps 固定为 `pyobfus-mcp==0.3.16 pyobfus==0.10.0`。
 Glama 后台测试 `01a17db0-eadf-78a5-b035-9f6c279cfd3d` 在 9.6 秒内
@@ -37,7 +40,8 @@ SHA-256 与 PyPI 元数据核对、Integrity API 查询。Python 3.10/3.15
 [v0.10.0 记录](https://doi.org/10.5281/zenodo.23687523)。
 Core 现为 0.10.0；MCP 0.3.16、runtime 0.1.1 不变。
 
-最新交接见 [2026-10-26 session 收尾](SESSION_CLOSEOUT_2026-10-26.md)。
+上一份 [2026-10-26 session 收尾](SESSION_CLOSEOUT_2026-10-26.md)
+是 Core 0.10.0 发版前快照。
 
 **2026-10-26 MCP 0.3.16 已发布**：PR #135 合并 main `04985d4`，合并后
 39/39 CI 作业与 CodeQL 成功，标签 `mcp-v0.3.16` 的 Trusted Publishing
