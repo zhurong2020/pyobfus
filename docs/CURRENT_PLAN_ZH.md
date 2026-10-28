@@ -1,5 +1,16 @@
 # pyobfus 当前计划
 
+**2026-10-28 P0 合并、P1 最小验收完成**：P0 包根诊断与显式保守模式经
+[PR #154](https://github.com/zhurong2020/pyobfus/pull/154) 合并；PR 的
+47 项检查成功、2 项按配置跳过，`main` 已同步。该功能尚未发布新 Core
+版本，公开包仍为 0.10.0。P1 用公开 0.10.0 wheel 在 Linux/Windows
+完成小型多模块资源应用的 PyInstaller onedir/onefile，Linux 另完成
+Nuitka onefile；异常 mapping 与独立运行均通过。受限 L3 在只装 runtime
+的目标环境完成应用密钥、缺失/错误密钥及 `name_only` traceback 验证。
+详细边界见 [P1 记录](P1_PACKAGING_VALIDATION_2026-10-28.md)。
+本阶段没有需实施的打包产品代码；后续按路线图进入 P2 交付诊断，
+冻结包内部解析与 `.pyc` 来源判断尚无结论。
+
 **2026-10-28 功能实施启动**：维护者授权依次推进 P0 及后续优先级。
 P0 已复现包根目录漏判和默认产物运行失败，开发分支实现包名规划修正、
 明确警告及显式保守模式；Python 3.15 `json`/`unittest` 冒烟通过，
