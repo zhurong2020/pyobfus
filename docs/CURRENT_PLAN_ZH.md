@@ -1,5 +1,11 @@
 # pyobfus 当前计划
 
+**2026-10-28 下一版 Core 准备**：公开版本仍为 0.10.0；P0 #154 与 P2
+#156 的变更已合并但未发布。根目录 `[Unreleased]` 已补 P2 诊断条目；
+[下一版验收范围](CORE_NEXT_RELEASE_READINESS_2026-10-28.md)建议 0.11.0，
+明确默认模块属性风险、冻结包内部未检及 3.15t/L3 边界。版本、时间和
+对外发布仍需维护者单独批准；准备阶段不触发 private 仓库 CI。
+
 **2026-10-28 Python 3.15t 有界验证**：重试下载后从 APT 校验并隔离解包
 Python 3.15.2 no-GIL，确认 `Py_GIL_DISABLED=1`、运行中 GIL 关闭；
 使用 3.15t 专用 cryptography/cffi wheels。当前 `main` 的 Community 多文件
