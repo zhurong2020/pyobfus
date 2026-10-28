@@ -9,7 +9,10 @@ import pytest
 from scripts.ci_changed_paths import code_changed, test_matrix as build_matrix
 
 
-@pytest.mark.parametrize("path", ["docs/TODO.md", "docs/guide/usage.md"])
+@pytest.mark.parametrize(
+    "path",
+    ["docs/TODO.md", "docs/guide/usage.md", "docs/assets/dev-sarif-workflow-cover.png"],
+)
 def test_docs_only(path):
     assert not code_changed([path])
 
@@ -29,6 +32,13 @@ def test_docs_only(path):
         "docs/.well-known/readme.md",
         "docs/example.py",
         "docs/assets/image.png",
+        "docs/assets/social-preview.png",
+        "docs/assets/logo.jpeg",
+        "docs/assets/dev-cover.svg",
+        "docs/assets/dev-cover.png.py",
+        "docs/assets/nested/dev-cover.png",
+        "docs/.assets/dev-cover.png",
+        "docs/assets/../dev-cover.png",
         "docs/requirements.txt",
         ".github/workflows/ci.yml",
         "scripts/guide.md",
@@ -44,6 +54,10 @@ def test_code_or_unknown(path):
 
 def test_empty_diff():
     assert not code_changed([])
+
+
+def test_article_cover_and_prose_skip_heavy_jobs_together():
+    assert not code_changed(["docs/assets/dev-sarif-workflow-cover.png", "docs/CURRENT_PLAN_ZH.md"])
 
 
 def test_cli_handles_nul_separated_paths():

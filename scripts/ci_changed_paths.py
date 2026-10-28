@@ -12,20 +12,31 @@ from typing import Iterable
 # scripts/check.sh reads docs/llms.txt and docs/.well-known/ai-catalog.json;
 # check_readme_links.py reads README.md and resolves linked repository paths;
 # MCP metadata tests read server.json. Keep these, AGENTS.md, CITATION.cff,
-# llms.txt, skills/, templates/, assets and every unknown path as code.
-# Allowlist: only non-hidden docs/**/*.md prose (including docs/*.md).
+# llms.txt, skills/, templates/, code-facing assets and every unknown path as
+# code. Published DEV cover images named docs/assets/dev-*.png are not read by
+# the Python packages, tests, or build scripts; the docs build still checks
+# their links. Keep logo.jpeg and generated social-preview.png as code-facing.
+# Allowlist: non-hidden docs/**/*.md prose and published DEV cover images.
 # All .py, scripts/**, .github/** and pyproject.toml paths stay code.
 # Full grep evidence: maintainer's gitignored ci-speed-evidence/path-read-audit.txt.
 
 
 def docs_only(path: str) -> bool:
     parts = PurePosixPath(path).parts
+    if (
+        len(parts) < 2
+        or parts[0] != "docs"
+        or any(part.startswith(".") or part == ".." for part in parts)
+        or "\\" in path
+    ):
+        return False
+    if path.endswith(".md"):
+        return True
     return (
-        len(parts) >= 2
-        and parts[0] == "docs"
-        and all(not part.startswith(".") and part != ".." for part in parts)
-        and path.endswith(".md")
-        and "\\" not in path
+        len(parts) == 3
+        and parts[1] == "assets"
+        and parts[2].startswith("dev-")
+        and parts[2].endswith(".png")
     )
 
 
