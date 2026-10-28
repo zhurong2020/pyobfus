@@ -4,7 +4,10 @@
 
 2026-10-28 后续：第 4 阶段的 DEV 第二篇已由维护者
 [发布](https://dev.to/zhurong2020/stop-writing-true-before-your-sarif-upload-16ih)；
-下表保留 10-22 的阶段验收快照。后续内容发布步骤见
+正式正文使用公开 Core 0.10.0，已补
+[封面](assets/dev-sarif-workflow-cover.png)并由维护者在
+[X 分享](https://x.com/zhurong0525/status/2115269885244944746)。
+下表的验收描述保留 10-22 快照，状态列更新为当前完成状态。后续内容发布步骤见
 [DEV 发布清单](DEV_PUBLISHING_CHECKLIST.md)。
 
 ## 决策
@@ -16,9 +19,9 @@
 | 阶段 | 工作 | 验收结果 | 状态 |
 |---|---|---|---|
 | 1 | 从新用户视角走发现、安装、多模块混淆、运行、异常反向定位和 Pro 选择 | 从公开发布包装入干净构建环境；产物在未装 builder 的目标环境运行；正常输出和异常定位与原文对照；列出实际卡点及复现 | 已完成，见 `ADOPTION_WORKFLOW_AUDIT_2026-10-22.md` |
-| 2 | 为 `--no-cross-file` 目录模式补 mapping | 逐文件区分碰撞名字、路径匹配、多帧和未知帧、错误 Build ID、旧格式兼容；不猜测歧义；维护报告／CLI／文档／回归 | 已实现并完成本地验收；未发布 |
+| 2 | 为 `--no-cross-file` 目录模式补 mapping | 逐文件区分碰撞名字、路径匹配、多帧和未知帧、错误 Build ID、旧格式兼容；不猜测歧义；维护报告／CLI／文档／回归 | 已随 Core 0.9.0 发布 |
 | 3 | 多模块 L3 + 应用提供密钥的设计 | 明确顶层函数子集、循环导入、runtime 注入、key provider、调试契约、跳过范围与差分验收；只交设计，不默认实现 | 设计与两路独立复核完成；仅设计，见 `CROSSFILE_OPACITY_DESIGN.md` |
-| 4 | DEV 第二篇内容与可复现案例 | 先核对已有 SARIF 草稿，决定保留或调整；保留对非用户的实用价值；补可复现步骤和采用观察口径，草稿交维护者审阅 | 已保留原主题并补公开 0.8.0 复现；待维护者审稿，见 `ADOPTION_CONTENT_VALIDATION_2026-10-22.md` |
+| 4 | DEV 第二篇内容与可复现案例 | 先核对已有 SARIF 草稿，决定保留或调整；保留对非用户的实用价值；补可复现步骤和采用观察口径，草稿交维护者审阅 | 已于 10-28 发布，正式稿使用公开 Core 0.10.0；10-22 的 0.8.0 验证保留为历史，见 `ADOPTION_CONTENT_VALIDATION_2026-10-22.md` |
 
 Community 保留基本构建、验证和反向调试；Pro 设计依照 `EDITION_BOUNDARY_POLICY.md`，不新增社区版规模限制或付费调试门槛。
 
