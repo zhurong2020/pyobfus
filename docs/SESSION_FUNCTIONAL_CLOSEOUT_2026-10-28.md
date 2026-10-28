@@ -20,12 +20,13 @@ backup. The public versions remain Core **0.10.0**, MCP **0.3.16** and runtime
 
 ## State at closeout
 
-- Public `pyobfus` `main` is synchronized with `origin/main` at `e1a52ff`;
-  no open PR or uncommitted change was found before this closeout edit. This
-  closeout itself will be merged and the resulting head recorded after CI.
+- Public `pyobfus` `main` is synchronized with `origin/main` at `e9d40ce`
+  after [closeout PR #160](https://github.com/zhurong2020/pyobfus/pull/160)
+  merged. Required CI result and CodeQL passed; no PR remained open or
+  uncommitted change was found at that final audit.
 - No private GitHub Actions run or `workspace-meta` push was made. That
-  private `main` has four previously queued local documentation commits; wait
-  until the account billing limit clears after 2026-11-01, then inspect
+  private `main` has five queued local documentation commits after this session.
+  Wait until the account billing limit clears after 2026-11-01, then inspect
   duplicate triggers, timeout and cost before a necessary Guard run and push.
 - `pyobfus-action` is on clean, unpushed branch
   `docs/core-0.10.0-runtime-guide` (`5c6fa1c`); its repository-specific push
