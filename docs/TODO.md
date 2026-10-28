@@ -3,7 +3,7 @@
 排期中的任务清单。**当前计划与状态仍以
 [`CURRENT_PLAN_ZH.md`](CURRENT_PLAN_ZH.md) 为准**；本文件只回答「接下来按什么
 顺序做」，不记录历史。最新依据见
-[`FEATURE_EXPANSION_RESEARCH_2026-10-20.md`](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)；Python 3.15 的 P0 范围与验收见 [`PYTHON315_SUPPORT_PLAN.md`](PYTHON315_SUPPORT_PLAN.md)。
+[`FEATURE_EXPANSION_RESEARCH_2026-10-28.md`](FEATURE_EXPANSION_RESEARCH_2026-10-28.md)；旧版决策快照见[10-20 调研](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)，Python 3.15 的已发布基础范围见 [`PYTHON315_SUPPORT_PLAN.md`](PYTHON315_SUPPORT_PLAN.md)。
 
 最后更新：2026-10-28。公开版本为 Core 0.10.0、MCP 0.3.16、runtime 0.1.1；
 Core 发版与 Zenodo 归档已完成，证据见 [当前计划](CURRENT_PLAN_ZH.md)。
@@ -56,6 +56,13 @@ Linux/Windows × 3.10/3.12/3.15 六格和总 CI 均通过。具体能力与边�
 3. Core 0.10.0 发版日 10-27 的非镜像下载数已核为 208；继续观察
    10-28 起的安静日与来源，区分发版尖峰和 DEV 文章发布。下一次 Core
    发布以实际缺陷、需求和维护者授权为依据。
+
+**功能扩展候选顺序（2026-10-28，提案，尚未进入上述已授权执行队列）**：
+P0 先缩小 `json`/`unittest` 模块属性证明导致的生成产物失败；P1 做
+PyInstaller/Nuitka 受限交付矩阵与 L3 预览的离线应用验证；P2 在样本和需求
+支持下扩展 `.pyc`/冻结包交付诊断、L3 方法与其他覆盖；free-threaded 3.15
+另设验证 gate。详细验收见 [功能调研](FEATURE_EXPANSION_RESEARCH_2026-10-28.md)
+及 [roadmap](ROADMAP.md)。账单限制期间不增设高成本远端矩阵。
 
 10-25 复盘和当前可执行巡检已完成，见运营记录；不把未来日期状态写成已检查。
 私有医院应用仍暂停，参数改名等候选保持原范围，不自动扩张功能。
