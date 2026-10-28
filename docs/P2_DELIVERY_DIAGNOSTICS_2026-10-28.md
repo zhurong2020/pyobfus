@@ -1,6 +1,8 @@
 # P2 delivery diagnostics: bounded bytecode evidence and frozen packages
 
-Status: implemented on the development branch; **not released in Core 0.10.0**.
+Status: merged via [PR #156](https://github.com/zhurong2020/pyobfus/pull/156)
+as `5b26085` after 44 successful and 2 skipped checks; **not released in Core
+0.10.0**.
 
 `--check-delivery` now accepts a directory, wheel, or a file with PE, ELF, or
 Mach-O magic. It still checks ordinary delivered files for the known mapping,
@@ -56,6 +58,14 @@ workflow was added.
   deserialization.
 - PE, ELF and Mach-O outer files, plus an onedir executable, return
   `frozen_uninspected` and `warn` without claiming to inspect inner code.
+- P1's real Linux PyInstaller onedir/onefile and Nuitka onefile artifacts
+  returned `warn` with `frozen_uninspected`.
+
+Local full-suite results: Core 4,652 passed/55 skipped; MCP 153 passed;
+integration 352 passed/10 skipped; runtime 24 passed; `scripts/check.sh`
+passed. After tightening PE/ELF header validation, 19 targeted delivery
+tests and `scripts/check.sh` passed again. The PR's required CI result and
+CodeQL both passed.
 
 Sources for the safety boundary:
 [Python `marshal` documentation](https://docs.python.org/3/library/marshal.html),

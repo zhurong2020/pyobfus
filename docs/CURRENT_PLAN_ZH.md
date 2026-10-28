@@ -1,10 +1,13 @@
 # pyobfus 当前计划
 
-**2026-10-28 P2 开发中**：`--check-delivery` 增加有界 `.pyc` 来源比对与
+**2026-10-28 P2 交付诊断已合并**：`--check-delivery` 增加有界 `.pyc` 来源比对与
 冻结包外壳诊断；`unknown` 与未解析的可执行文件明确警告，不推断内部安全。
 设计、样本与边界见 [P2 记录](P2_DELIVERY_DIAGNOSTICS_2026-10-28.md)。
-目前仅在开发分支，尚待全套检查、公开 PR/CI 与合并；Core 公开版本
-仍为 0.10.0，不能把此功能写成已发布。
+[PR #156](https://github.com/zhurong2020/pyobfus/pull/156) 的 CI/CodeQL
+通过并以 `5b26085` 合并；Core 公开版本仍为 0.10.0，不能把此功能写成
+已发布。后续条件覆盖和 3.15 free-threaded gate 见
+[P2 决策](P2_CONDITIONAL_COVERAGE_GATE_2026-10-28.md)：现有 P1 样本未出现
+需扩大 L3/API 的新阻塞，缺少真正的 3.15t 解释器，普通 3.15 验证不能替代。
 
 **2026-10-28 P0 合并、P1 最小验收完成**：P0 包根诊断与显式保守模式经
 [PR #154](https://github.com/zhurong2020/pyobfus/pull/154) 合并；PR 的
