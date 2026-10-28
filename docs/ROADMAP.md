@@ -48,7 +48,7 @@ are not new backlog items.
 | **P1 — L3 usability** | Exercise the shipped multi-module L3 preview in one representative offline application and document the application's key-injection contract | Confirm clean-target runtime, wrong/missing key behavior, traceback recovery, and coverage report before designing a key-provider API |
 | **P2 — delivery diagnostics** | Conservative inspection of `.pyc` and frozen artifacts for `--check-delivery` | Merged in PR #156, not released: bounded bytecode-body comparison and outer frozen-container warnings; no embedded-payload claim ([record](P2_DELIVERY_DIAGNOSTICS_2026-10-28.md)) |
 | **P2 — conditional coverage** | L3 method/nested coverage, resource key provider, parameter renaming, and complex import cycles | No new P1 blocker; implement separately only with a real minimized case and compatibility contract ([gate](P2_CONDITIONAL_COVERAGE_GATE_2026-10-28.md)) |
-| **Research gate** | Free-threaded Python 3.15 | 3.15t not installed locally; obtain actual interpreter, verify GIL disabled, then bounded Core/runtime smoke before advertising support ([gate](P2_CONDITIONAL_COVERAGE_GATE_2026-10-28.md)) |
+| **Research gate** | Free-threaded Python 3.15 | Linux 3.15t bounded Core/runtime smoke verified once; cross-file L3 explicitly rejects this mode, and clean public-wheel/other-OS validation remains open ([record](PYTHON315_FREETHREADING_VALIDATION_2026-10-28.md)) |
 
 Keep packaging checks small and manual/scheduled while GitHub billing is
 restricted and until measured runtime justifies CI expansion. Avoid a full

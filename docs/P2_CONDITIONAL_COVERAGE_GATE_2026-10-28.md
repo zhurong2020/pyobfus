@@ -18,18 +18,12 @@ support channel; no outbound message is required for this gate.
 
 ## Free-threaded Python 3.15
 
-The WSL `python3.15` installed here reports `Py_GIL_DISABLED=0`; Windows
-`py -0p` lists no 3.15 free-threaded interpreter. Ordinary 3.15 CI does not
-establish free-threaded compatibility. An isolated attempt to obtain `uv`
-for a standalone 3.15t interpreter was stopped when its 17.3 MiB wheel was
-downloading at about 6.7 KiB/s. No repository dependency or CI workflow was
-changed.
-
-When a 3.15t interpreter is available, verify
-`sysconfig.get_config_var("Py_GIL_DISABLED") == 1` and
-`sys._is_gil_enabled() is False`, then run a bounded build/execute/traceback
-smoke on Core and L3 runtime. Add a two-thread repeated import/key-provider
-case and check that no extension silently re-enables the GIL. Record OS,
-interpreter version, packages and exact outcomes. Only expand the matrix or
-advertise support after that evidence. This distinction follows the
+The original WSL `python3.15` reports `Py_GIL_DISABLED=0`, and Windows
+`py -0p` lists no 3.15 free-threaded interpreter. A matching Linux 3.15.2
+no-GIL build was subsequently obtained into `/tmp` and verified with the
+GIL disabled. The bounded Core, runtime, traceback and two-thread provider
+results are recorded in [the 3.15t validation](PYTHON315_FREETHREADING_VALIDATION_2026-10-28.md).
+Cross-file L3 still rejects free-threaded builds by design; do not advertise
+it as supported. A clean public-wheel target and another OS remain unverified.
+Ordinary 3.15 CI cannot substitute for these distinct checks. This follows the
 [Python free-threading guide](https://docs.python.org/3.15/howto/free-threading-python.html).

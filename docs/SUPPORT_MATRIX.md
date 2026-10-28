@@ -40,6 +40,7 @@ existing compatibility contract. L3 bytecode requires the builder's minor.
 | VS Code extension | tested (Node 22, Python 3.12) | advisory-only | advisory-only | `vscode-extension-ci.yml`, headless xvfb |
 | `pyobfus-action` composite wrapper | tested | tested | tested | External `zhurong2020/pyobfus-action` CI runs the local action against real clean/risky fixtures on all three hosted-runner OS families; Action release 1.0.1 |
 | Free-threaded 3.14 (`--disable-gil`) | verified once, 2026-08-20 | advisory-only | advisory-only | Manual run of the full core suite plus an end-to-end smoke on a downloaded free-threaded build; not in CI. See [`PYTHON314_FREETHREADING.md`](PYTHON314_FREETHREADING.md) |
+| Free-threaded 3.15 (`--disable-gil`), Community/Core and selected runtime paths | verified once, 2026-10-28 | advisory-only | advisory-only | Local 3.15.2 no-GIL build, bounded build/execute/traceback, 44 targeted Core/runtime tests plus 68 selected runtime tests and a two-thread provider probe; current checkout, not a public-wheel or full-suite claim. Cross-file L3 preflight still rejects this mode. See [dated validation](PYTHON315_FREETHREADING_VALIDATION_2026-10-28.md). |
 
 Reading this honestly: the **transformation** is broadly tested, and basic
 generated-code execution is now enforced on Linux and Windows. macOS output
