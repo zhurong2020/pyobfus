@@ -7,7 +7,14 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-**Last updated**: 2026-10-27 (PyPI download data through October 26).
+**Last updated**: 2026-10-28. Core 0.10.0's October 27 release day recorded
+208 non-mirror downloads; this predates the October 28 DEV SARIF article and
+does not measure its effect. The next quiet-day and referral review is pending.
+The fourth DEV post is live with a custom cover, and the maintainer shared it
+on [X](https://x.com/zhurong0525/status/2115269885244944746). Full current
+status: [October 28 closeout](SESSION_CLOSEOUT_2026-10-28.md).
+
+**October 27 channel snapshot (historical):**
 Core's 30-day quiet-day median is `40` across 11 quiet days. The latest seven
 days have only two quiet days (median `58`), so that window cannot establish
 growth. MCP quiet-day medians are `13 / 12` (7 / 30 days; 2 / 23 samples).
@@ -458,10 +465,11 @@ re-runnable source of truth for the calculation is
 - Rationale: SO's site-wide AI-content ban + low per-question traffic + low-rep account = bad risk/reward
 - Re-evaluation trigger: pyobfus stars > 300 OR 6 months elapsed (whichever first)
 
-### dev.to — `@zhurong2020` 🟢 FIRST POST LIVE
+### dev.to — `@zhurong2020` 🟢 FOUR POSTS LIVE
 - URL: https://dev.to/zhurong2020
 - Created: 2026-04-22
 - Profile: Rong Zhu · `#f59e08` brand color · bio + 4 "Coding" fields + Work + Pronouns filled
+- **2026-10-28:** Fourth post, [*Stop writing || true before your SARIF upload*](https://dev.to/zhurong2020/stop-writing-true-before-your-sarif-upload-16ih), published at 01:43 UTC using Core 0.10.0 examples; AI disclosure set to `some_ai`. The maintainer added a [custom cover](assets/dev-sarif-workflow-cover.png) at 02:53 UTC and shared the post on [X](https://x.com/zhurong0525/status/2115269885244944746). See [publishing checklist](DEV_PUBLISHING_CHECKLIST.md) and [closeout](SESSION_CLOSEOUT_2026-10-28.md). Audience results await the 24-hour and seven-day reviews.
 - Current metrics (start of 2026-05-07 evening · post-publish baseline):
   - **Posts: 1** · Comments: 0 · Followers: 0
   - Following users: 28 (dev.to auto-suggestions from signup flow)

@@ -7,6 +7,9 @@
 正式正文使用公开 Core 0.10.0；七个案例在隔离环境重跑，证据保存于
 `docs/internal/adoption-2026-10-28/`。本页以下 0.8.0 结果是 10-22
 的历史验证，不冒充正式正文版本；发布记录见 `CURRENT_PLAN_ZH.md`。
+同日维护者补上[封面](assets/dev-sarif-workflow-cover.png)，
+并在 [X 分享](https://x.com/zhurong0525/status/2115269885244944746)；
+素材归档与后续观察见[10-28 会话收尾](SESSION_CLOSEOUT_2026-10-28.md)。
 
 ## 实测范围
 
