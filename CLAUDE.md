@@ -8,7 +8,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ## ⚡ Current pending work (cold-start 必读)
 
-**2026-10-27 最新交接**：先读 [`docs/SESSION_CLOSEOUT_2026-10-27.md`](docs/SESSION_CLOSEOUT_2026-10-27.md) → [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md) → [`docs/TODO.md`](docs/TODO.md)。Core 0.10.0 已发布，Glama 已安装 Core 0.10.0 / MCP 0.3.16 并发布渠道版本 0.10.1；runtime 0.1.1 不变。上份 [10-26 MCP 交接](docs/SESSION_CLOSEOUT_2026-10-26.md)属于 Core 发版前快照。下次优先处理 `workspace-meta` Guard 的 GitHub Actions 账单限制、核查云端备份与 DEV 第二篇实际状态，再观察发版后下载数据。
+**2026-10-28 最新交接**：先读 [`docs/SESSION_CLOSEOUT_2026-10-28.md`](docs/SESSION_CLOSEOUT_2026-10-28.md) → [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md) → [`docs/TODO.md`](docs/TODO.md)。Core 0.10.0 / MCP 0.3.16 / runtime 0.1.1 不变；DEV 第二篇、X 分享和封面已发布，VS Code 两条开发依赖告警已修，CI 封面路径已收窄，归档的本地素材已校验云备份。下一步先做 10-29 文章 24 小时观察；`workspace-meta` private Guard 与待推送文档须等 11-01 后账单限制自然解除，再检查工作流成本。上份 [10-27 交接](docs/SESSION_CLOSEOUT_2026-10-27.md)是发稿前快照。
 
 **历史口径**：下面带较早日期的快照和审核流程不代表当前未完成工作，也不能覆盖维护者当前指令。旧交接中的 D 待合并、E 未开始已由本次状态取代。
 

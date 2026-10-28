@@ -206,7 +206,7 @@ patent/release context.
 
 - **Architecture / repository ownership**: [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md).
 - **Community / Pro product boundary**: [`docs/EDITION_BOUNDARY_POLICY.md`](docs/EDITION_BOUNDARY_POLICY.md).
-- **Latest session handoff (2026-10-27, Core 0.10.0)**: [`docs/SESSION_CLOSEOUT_2026-10-27.md`](docs/SESSION_CLOSEOUT_2026-10-27.md). Read current plan and TODO next; the [2026-10-26 handoff](docs/SESSION_CLOSEOUT_2026-10-26.md) is a pre-release snapshot.
+- **Latest session handoff (2026-10-28)**: [`docs/SESSION_CLOSEOUT_2026-10-28.md`](docs/SESSION_CLOSEOUT_2026-10-28.md). Read current plan and TODO next. Core 0.10.0 / MCP 0.3.16 / runtime 0.1.1 remain public; the second DEV article, X share and cover are live. The private `workspace-meta` Guard remains deferred until the GitHub billing limit clears after November 1. The [2026-10-27 handoff](docs/SESSION_CLOSEOUT_2026-10-27.md) is an earlier snapshot.
 - **Current plan / daily source of truth**: [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md).
 - **What to pick up next**: [`docs/TODO.md`](docs/TODO.md), ordered, with acceptance criteria.
 - **Historical detail**: [`docs/POST_V0.4_TODO.md`](docs/POST_V0.4_TODO.md) and [`docs/ROADMAP.md`](docs/ROADMAP.md) are archived context, not the primary cold-start entry.
