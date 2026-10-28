@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Directory input that unambiguously imports itself as a Python package now
+  retains its package name during cross-file planning. Absolute imports within it are included
+  in module-attribute compatibility diagnostics instead of being mistaken for
+  external imports. The new opt-in `--preserve-unproved-module-attributes` mode
+  retains project export spellings at these sites instead of emitting a known
+  mismatched access; it can reduce name obfuscation. The default build warning
+  now calls out the runtime risk.
+
 ## [0.10.0] - 2026-10-27
 
 ### Added

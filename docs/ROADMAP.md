@@ -26,7 +26,10 @@ This document outlines **future plans** for pyobfus. For released version histor
 
 ## Functional expansion supplement — 2026-10-28
 
-This is a **proposed priority order**, not approval to implement or release.
+The maintainer authorized sequential work from P0 on 2026-10-28. Each item
+still needs its own evidence and release gate. P0's current implementation and
+limits are recorded in
+[`P0_MODULE_ATTRIBUTE_COMPAT_2026-10-28.md`](P0_MODULE_ATTRIBUTE_COMPAT_2026-10-28.md).
 The evidence, competitor scope, acceptance gates and sources are in
 [`FEATURE_EXPANSION_RESEARCH_2026-10-28.md`](FEATURE_EXPANSION_RESEARCH_2026-10-28.md).
 Core 0.10.0 already ships Python 3.15 baseline support, per-file directory
