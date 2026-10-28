@@ -2,6 +2,12 @@
 
 日期：2026-10-22。状态：已准备、未投稿。保留原主题 **Stop writing `|| true` before your SARIF upload**，不改成未发布功能宣传；对不采用 pyobfus 的读者，退出码、报告新鲜度和先上传后 gate 的通用模式仍有用。稿件与发布清单存于本地忽略目录 `docs/internal/content-2026-10/`，由维护者最终审阅。
 
+2026-10-28 后续：维护者已将标题改为无反引号形式，并在
+[DEV 发布](https://dev.to/zhurong2020/stop-writing-true-before-your-sarif-upload-16ih)。
+正式正文使用公开 Core 0.10.0；七个案例在隔离环境重跑，证据保存于
+`docs/internal/adoption-2026-10-28/`。本页以下 0.8.0 结果是 10-22
+的历史验证，不冒充正式正文版本；发布记录见 `CURRENT_PLAN_ZH.md`。
+
 ## 实测范围
 
 Python 3.12 / Linux；隔离 HOME；构建环境使用公开 PyPI **pyobfus 0.8.0**，不是本轮工作树 wheel。每次使用新报告目录。另建环境安装 Ruff 0.17.1 和 `bandit[sarif]==1.9.4`。没有扫描用户源码，没有启动 Pro 试用。

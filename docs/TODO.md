@@ -5,7 +5,7 @@
 顺序做」，不记录历史。最新依据见
 [`FEATURE_EXPANSION_RESEARCH_2026-10-20.md`](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)；Python 3.15 的 P0 范围与验收见 [`PYTHON315_SUPPORT_PLAN.md`](PYTHON315_SUPPORT_PLAN.md)。
 
-最后更新：2026-10-27。公开版本为 Core 0.10.0、MCP 0.3.16、runtime 0.1.1；
+最后更新：2026-10-28。公开版本为 Core 0.10.0、MCP 0.3.16、runtime 0.1.1；
 Core 发版与 Zenodo 归档已完成，证据见 [当前计划](CURRENT_PLAN_ZH.md)。
 最终交接见 [10-27 Session 收尾](SESSION_CLOSEOUT_2026-10-27.md)，前一阶段推进见 [Codex 进度](PROGRESS_2026-10-25.md)，运营与待办日期见
 [复盘/巡检准备](OPS_REVIEW_2026-10-25.md)。实现、合并与对外发布分别记录，
@@ -43,10 +43,15 @@ Linux/Windows × 3.10/3.12/3.15 六格和总 CI 均通过。具体能力与边�
 
 当前顺序：
 
-1. 处理 `workspace-meta` Guard 的 GitHub Actions 账单限制并核查当天云端
-   镜像新鲜度；10-27
-   DEV 第二篇署名/预览及实际发布状态仍需核对。
-2. 待下载统计包含 10-27 后观察 Core 0.10.0 发版日与后续安静日；
+1. 11-01 后待 GitHub 账单限制自然解除，再重跑 `workspace-meta` Guard
+   远端凭据扫描；恢复前不主动重跑。以后 private 仓库先审核工作流触发、
+   重复运行、超时和测试成本。10-28 的日备份仍在运行，完成后核查
+   当天云端镜像。
+2. DEV 第二篇已于 10-28 09:43（北京时间）由维护者发布；10-29
+   09:43 后及 11-04 09:43 后核对后台阅读数、互动与具体问题，X 分享
+   目前未核实。后续文章复用
+   [DEV 发布清单](DEV_PUBLISHING_CHECKLIST.md)。
+3. 待下载统计包含 10-27 后观察 Core 0.10.0 发版日与后续安静日；
    下一次 Core 发布以实际缺陷、需求和维护者授权为依据。
 
 10-25 复盘和当前可执行巡检已完成，见运营记录；不把未来日期状态写成已检查。
@@ -461,8 +466,9 @@ V2EX 仍卡在账号激活（要邀请码）；Stack Overflow 按 2026-04-22 的
 1. Cloudflare 拦 `Python-urllib` UA（403 / error code 1010），全体付费客户两个月激活不了
    —— **10-11 已发布 DEV，下一步观察来源与反响**，放在 gitignored 的 `docs/internal/content-2026-10/01-urllib-user-agent-postmortem.md`
    （`published: false`；维护者 09-27 定：发稿前不进公开仓库）
-2. SARIF 上传前别再 `|| true`（带出 `pyobfus-action`）—— **草稿已写 09-28**，
-   `docs/internal/content-2026-10/02-sarif-or-true.md`（`published: false`，待维护者审）
+2. SARIF 上传前别再 `|| true`（带出 `pyobfus-action`）—— **10-28 已发布**：
+   [DEV 正文](https://dev.to/zhurong2020/stop-writing-true-before-your-sarif-upload-16ih)，
+   本地定稿 `docs/internal/content-2026-10/02-sarif-or-true.md`；后续按上文观察。
 3. PyInstaller / Nuitka 打包前先混淆（已有 cookbook）
 4. 2026 年 PyArmor 替代品的诚实对比（`docs/compare/` 已有搜索流量）
 5. Claude / Codex 能不能还原混淆过的 Python（08-01 基准，写明只有 5 个样本）
@@ -481,7 +487,7 @@ V2EX 仍卡在账号激活（要邀请码）；Stack Overflow 按 2026-04-22 的
 | 09-28 → 10-11 | 只写不发：维护者审第 1 篇、Claude 起草第 2 篇；DEV 个人资料链 GitHub；X 简介加一句 pyobfus maintainer |
 | 10-13 那周（周二/三美东上午） | **10-11 已提前发**：DEV 第 1 篇 <https://dev.to/zhurong2020/cloudflare-blocked-urllibs-default-user-agent-and-it-took-me-two-months-to-notice-3k8e>（05:58 UTC；标签已由维护者改回 `cloudflare`；描述取正文首段）+ X 一条（10-11 已发）；1–3 天后（10-14 前后）看反响，决定是否由维护者本人投一次 HN |
 | 10-25 | 复盘已完成；来源未见 DEV，公开互动 0/0，阅读数需作者后台；不恢复静默期 |
-| 10-27 那周 | DEV 发第 2 篇 + X |
+| 10-27 那周 | DEV 第 2 篇已于 10-28 发布；X 分享尚未核实，不按排期自动视为完成 |
 | 11-02 → 11-06 | 月度版本（`[Unreleased]` 非空才发）+ r/Python showcase + WP 中文第 4 篇（1+2 合并）+ 知乎（若届时开动） |
 | 11-10 / 11-24 | DEV 第 4、7 篇（第 7 篇 09-28 加入，接在第 5 篇之前先讲「可调试」） |
 | 12 月 | 第 5、3 篇 + 12 月 WP 月度篇；第 6 篇顺延到 1 月 |

@@ -1,5 +1,43 @@
 # pyobfus 当前计划
 
+**2026-10-28 09:43（北京时间）DEV 第二篇已发布**：维护者发布
+[Stop writing || true before your SARIF upload](https://dev.to/zhurong2020/stop-writing-true-before-your-sarif-upload-16ih)。
+公开 DEV API 记录 `id=4931489`、`published_at=2026-10-28T01:43:42Z`、
+四个标签 `githubactions/security/python/devops`、阅读时间 6 分钟；
+AI disclosure 为 `some_ai` / `AI-assisted`，正文保留简短披露及本地验证
+边界。页面没有自定义封面，DEV 提供默认社交图。当前公开互动数为 0，
+不代表阅读数；X 分享尚未核实。实际发布正文已回存本地忽略目录。
+以后 DEV 文章复用 [发布清单](DEV_PUBLISHING_CHECKLIST.md)：封面、
+相关互链、具体评论问题、AI 披露和发布后核验均在预览阶段检查。
+后续于发布后约 24 小时、一周及月度复盘观察文章后台数据、项目
+来源与下载安静日；不从单次波动推断因果。
+
+**2026-10-28 DEV 第二篇发稿前草稿更新**：维护者要求复核旧版本并允许无头
+Claude 交叉审核。隔离环境用公开 Core 0.10.0 重跑 pyobfus 三例及
+Ruff 0.17.1 / Bandit 1.9.4 四例，结果与既有证据一致；草稿与发布清单
+已更新到 0.10.0，并按审核意见修正 GitHub Actions 表述、private 仓库
+权限与复现输出。未执行 GitHub SARIF 上传，文章仍为私有草稿、未发布。
+同日复核 DEV 编辑器说明：封面可选，推荐尺寸 1000 × 420；新 AI disclosure
+字段应由维护者选 AI-Assisted，并保留正文披露。后台三篇旧文浏览数分别
+44、62、62，不据此推断封面或互链的效果。草稿描述和发布清单已同步。
+
+**2026-10-28 08:21（北京时间）恢复巡检**：`main` 与 `origin/main` 一致，
+工作区干净，公开版本仍为 Core 0.10.0 / MCP 0.3.16 / runtime 0.1.1。
+下载快照的数据仍只到 10-26，Core 近 30 天安静日中位数 40（11 天），
+近 7 天为 58（仅 2 天）；尚不能观察 10-27 发版日及其后安静日。
+本次 Gmail 查询未见新的客户求助或 Anthropic、Stripe、Resend 通知；
+有一封针对仓库的泛营销邀约，无需作为产品需求处理。DEV 公开 API
+仍只有三篇旧文，第二篇本地草稿保持 `published: false`，未确认维护者署名、
+预览或发布。`workspace-meta` Guard 最新运行仍被 GitHub 账单限制挡在作业
+启动前；本地 `scripts/scan_credentials.sh` 通过，远端扫描待账单恢复后重跑。
+今日 KV 导出已完成（license 6、trial 0）；日备份服务正在运行，
+截至此时云端完整镜像标记仍为 10-27 07:59:51，不能称 10-28 云端已完成。
+维护者确认 GitHub 账号账单限制预计 11-01 后自然解除；在此之前不重跑
+Guard。以后操作 private 仓库时，先检查工作流触发条件、并发/重复运行、
+超时与测试规模，避免脚本故障或不必要测试消耗 Actions 分钟。10-28
+复核 `workspace-meta` Guard 只运行凭据扫描，超时 15 分钟；push 与 PR
+同时触发，PR 分支推送可能产生重复运行，恢复后应核对这一点。
+
 最新冷启动交接见 [2026-10-27 session 收尾](SESSION_CLOSEOUT_2026-10-27.md)；
 下列更早日期段落保留当时状态，不作为当前版本或待办。
 
