@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `--check-delivery` now reports bounded `.pyc` origin evidence by comparing
+  delivered bytecode bodies with adjacent source and, when supplied, the build
+  report. Unconfirmed bytecode origin produces a `warn` finding. It also
+  recognizes PE, ELF and Mach-O executable containers and warns that embedded
+  frozen payloads were not inspected. Delivered bytecode is never unmarshalled;
+  warning results retain the existing CLI exit-code-0 contract.
+
 ### Fixed
 
 - Directory input that unambiguously imports itself as a Python package now

@@ -81,6 +81,10 @@ free-threaded 3.15 已有一次 Linux 3.15t 有界 Core/runtime 验证，
 跨文件 L3 仍明确拒绝此模式。后续只有实际 3.15t L3 交付需求出现，才
 单独验证加密产物与并发、决定是否放开守卫；干净公开 wheel 和其他 OS
 仍待验收。
+**下一步发布 gate**：P0/P2 已合并且 Core 0.10.0 未包含它们；
+[下一版准备](CORE_NEXT_RELEASE_READINESS_2026-10-28.md)建议 0.11.0，
+但版本、时间、tag/PyPI/Zenodo 均待维护者单独批准。先审核 release
+候选与全部现有检查，不因候选覆盖无新用户案例就扩大 L3 范围。
 
 10-25 复盘和当前可执行巡检已完成，见运营记录；不把未来日期状态写成已检查。
 私有医院应用仍暂停，参数改名等候选保持原范围，不自动扩张功能。
@@ -91,10 +95,10 @@ free-threaded 3.15 已有一次 Linux 3.15t 有界 Core/runtime 验证，
 
 - **已发布参考 PY315-1：惰性 from 导入被提前执行**。原生 Python 3.15.0、当前 checkout 与 PyPI Core 0.7.5 wheel 均复现：`lazy from calculator import Calculator` 改写后丢 `is_lazy`，构建成功但导入副作用时序变化。最小输入与输出见调研 §5.1。Community 兼容性，已修复并补原生回归；0.8.0 发布（#108）。
 - **已发布参考 PY315-2：新字典推导式解包构建失败**。`{**row for row in rows}` 原文在 3.15 可运行，checkout／0.7.5 wheel 构建均报 `NoneType ... _fields`；根因为自定义推导式 visitor 访问 None，六处路径已修复并补原生回归；0.8.0 发布（#108）。
-- [ ] **3.15 后续（0.8.0 发布后登记，均未授权实现）**：① 3.15 标准库冒烟中 `json`（`scanner.make_scanner`）与 `unittest`（`util.three_way_cmp`/`case.TestCase`）目录构建产物导入失败，main 同样失败，属模块属性证明既有限制，待定是否单列缺陷；② free-threaded 3.15、3.15 上冻结/编译打包未验证。Black/mypy 配置修订与 Glama 同步结果见 `CURRENT_PLAN_ZH.md` 对应日期记录。
+- **3.15 后续（原 0.8.0 发布后登记）**：`json`/`unittest` 模块属性缺陷已有 P0 修复并合并、待发版；free-threaded 3.15 已做一次 Linux Core/runtime 有界验证，但跨文件 L3 仍拒绝；3.15 上冻结/编译打包未验证。证据分别见 [P0](P0_MODULE_ATTRIBUTE_COMPAT_2026-10-28.md)、[3.15t](PYTHON315_FREETHREADING_VALIDATION_2026-10-28.md)。Black/mypy 配置与 Glama 同步的历史结果见 `CURRENT_PLAN_ZH.md`。
 - `--no-cross-file` mapping 已随 0.9.0 发布；目录 L3 预览 A–E 已随 0.10.0 发布，
   未一次接入其他 fusion 字段。
-- 参数改名、H B2/B3、资源 key provider 与 L3 方法覆盖继续保持原 gate；未授权改实现／合并／发布。
+- 参数改名、H B2/B3、资源 key provider 与 L3 方法覆盖继续保持各自真实案例和兼容验收 gate；本轮授权按优先级推进，不等于这些条件已满足或授权对外发布。
 
 三项 10-24 反例及 L3 清单缺失后验修复已经 PR #128 合并（main `a0882a4`），
 最终 39 检查成功 / 2 按配置跳过；修复随 0.10.0 发布，不重复排为未实现功能。
