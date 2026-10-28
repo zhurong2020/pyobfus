@@ -20,10 +20,13 @@ Use credential scanners (gitleaks, TruffleHog) and wheel linters
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import json
+import marshal
+import re
 import zipfile
 from dataclasses import asdict, dataclass
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 DELIVERY_CHECK_FORMAT = "pyobfus-delivery-check"
@@ -38,17 +41,23 @@ MISSING_OUTPUT = "delivery.missing_output"
 FUSION_SKIPPED = "delivery.fusion_skipped"
 L3_PARTIAL = "delivery.l3_partial"
 BYTECODE_PRESENT = "delivery.bytecode_present"
+BYTECODE_ORIGIN_UNKNOWN = "delivery.bytecode_origin_unknown"
+FROZEN_UNINSPECTED = "delivery.frozen_uninspected"
 L3_BUILD_MISMATCH = "delivery.l3_build_mismatch"
 
 _MAX_JSON_BYTES = 20 * 1024 * 1024
 _PEM_PRIVATE_MARKER = b"PRIVATE KEY-----"  # PKCS#8, RSA, EC, OPENSSH
 _WHEEL_METADATA_SUFFIXES = (".dist-info/RECORD", ".dist-info/WHEEL", ".dist-info/METADATA")
+_MAX_BYTECODE_COMPARE = 64
+_MAX_SOURCE_COMPARE_BYTES = 1024 * 1024
+_CACHE_PYC = re.compile(r"^(.+)\.cpython-\d+(?:\.opt-\d+)?\.pyc$")
 
 LIMITATIONS = (
     "Finds known pyobfus mistakes only; an empty result does not mean the delivery is safe.",
     "Does not look for credentials in strings; use gitleaks or TruffleHog.",
     "Original source is recognised only by exact hash, and only with --provenance-manifest.",
     "Files are read and hashed, never imported or executed.",
+    "Frozen executable payloads are not unpacked; bytecode comparisons never unmarshal input.",
 )
 
 
@@ -112,6 +121,128 @@ def _load_json(path: Optional[Path]) -> Optional[Dict[str, Any]]:
     return loaded
 
 
+def _executable_kind(header: bytes) -> Optional[str]:
+    if header.startswith(b"MZ") and len(header) >= 64:
+        pe_offset = int.from_bytes(header[60:64], "little")
+        if (
+            64 <= pe_offset <= len(header) - 4
+            and header[pe_offset : pe_offset + 4] == b"PE\x00\x00"
+        ):
+            return "PE"
+    if (
+        header.startswith(b"\x7fELF")
+        and len(header) >= 16
+        and header[4] in (1, 2)
+        and header[5] in (1, 2)
+    ):
+        return "ELF"
+    if header[:4] in {
+        b"\xfe\xed\xfa\xce",
+        b"\xce\xfa\xed\xfe",
+        b"\xfe\xed\xfa\xcf",
+        b"\xcf\xfa\xed\xfe",
+    }:
+        return "Mach-O"
+    return None
+
+
+def _bytecode_source_path(path: str) -> Optional[str]:
+    item = PurePosixPath(path)
+    if ".." in item.parts or item.is_absolute():
+        return None
+    if item.parent.name == "__pycache__":
+        match = _CACHE_PYC.fullmatch(item.name)
+        return str(item.parent.parent / f"{match.group(1)}.py") if match else None
+    if item.suffix in {".pyc", ".pyo"}:
+        return str(item.with_suffix(".py"))
+    return None
+
+
+def _read_delivery_source(target: Path, kind: str, relative: str) -> Optional[bytes]:
+    if kind == "wheel":
+        with zipfile.ZipFile(target) as archive:
+            try:
+                return archive.read(relative)
+            except KeyError:
+                return None
+    root = target.resolve()
+    source = (root / relative).resolve()
+    if not source.is_relative_to(root) or not source.is_file():
+        return None
+    return source.read_bytes()
+
+
+def _inspect_bytecode(
+    entry: _Entry, target: Path, kind: str, output_hashes: Dict[str, str]
+) -> Tuple[str, str]:
+    """Compare bytes with freshly compiled output; never unmarshal delivered data."""
+    if len(entry.data) < 16:
+        return "unknown", "truncated_header"
+    if entry.data[:4] != importlib.util.MAGIC_NUMBER:
+        return "unknown", "different_interpreter_or_invalid_magic"
+    relative = _bytecode_source_path(entry.path)
+    if relative is None:
+        return "unknown", "source_path_unresolved"
+    source = _read_delivery_source(target, kind, relative)
+    if source is None:
+        return "unknown", "source_not_in_delivery"
+    if len(source) > _MAX_SOURCE_COMPARE_BYTES:
+        return "unknown", "source_too_large_for_bounded_comparison"
+    filenames = [relative]
+    if kind == "directory":
+        filenames.insert(0, str((target / relative).resolve()))
+    for filename in filenames:
+        for optimize in (0, 1, 2):
+            try:
+                compiled = compile(source, filename, "exec", dont_inherit=True, optimize=optimize)
+            except (SyntaxError, ValueError, TypeError, UnicodeError):
+                return "unknown", "adjacent_source_not_compilable"
+            if marshal.dumps(compiled) == entry.data[16:]:
+                digest = hashlib.sha256(source).hexdigest()
+                if digest in output_hashes:
+                    return "matched_recorded_output", "exact_bytecode_body_match"
+                return "matched_adjacent_source", "source_not_in_build_report"
+    return "unknown", "bytecode_body_differs_or_build_path_unknown"
+
+
+def _frozen_file_result(
+    target: Path, binary_kind: str, report: bool, manifest: bool
+) -> Dict[str, Any]:
+    finding = Finding(
+        FROZEN_UNINSPECTED,
+        "medium",
+        target.name,
+        f"{binary_kind} executable detected; embedded code and data were not inspected.",
+    )
+    return {
+        "format": DELIVERY_CHECK_FORMAT,
+        "version": DELIVERY_CHECK_VERSION,
+        "status": "warn",
+        "ai_hint": "Use the packager's archive inspector and keep mapping, keys and original source outside the executable; this result cannot verify embedded contents.",
+        "target": {"name": target.name, "kind": "executable", "files": 1},
+        "inputs": {"build_report": report, "provenance_manifest": manifest},
+        "summary": {
+            "python_files": 0,
+            "matched_build_outputs": 0,
+            "bytecode_files": 0,
+            "high": 0,
+            "medium": 1,
+            "info": 0,
+        },
+        "findings": [asdict(finding)],
+        "inspection": {
+            "bytecode": {
+                "matched_recorded_output": 0,
+                "matched_adjacent_source": 0,
+                "unknown": 0,
+                "sample": [],
+            },
+            "frozen_executables": {"found": 1, "inspected": 0},
+        },
+        "limitations": list(LIMITATIONS),
+    }
+
+
 def check_delivery(
     target: Path,
     *,
@@ -119,9 +250,20 @@ def check_delivery(
     provenance_manifest: Optional[Path] = None,
 ) -> Dict[str, Any]:
     """Return the delivery-check result as a JSON-serialisable dict."""
+    if target.is_file() and target.suffix != ".whl":
+        with target.open("rb") as stream:
+            binary_kind = _executable_kind(stream.read(4096))
+        if binary_kind is None:
+            raise ValueError(f"{target.name}: expected a directory, .whl or executable file")
+        return _frozen_file_result(
+            target,
+            binary_kind,
+            _load_json(build_report) is not None,
+            _load_json(provenance_manifest) is not None,
+        )
     kind = "wheel" if target.is_file() and target.suffix == ".whl" else "directory"
     if kind == "directory" and not target.is_dir():
-        raise ValueError(f"{target.name}: expected a directory or a .whl file")
+        raise ValueError(f"{target.name}: expected a directory, .whl or executable file")
     entries = _iter_wheel(target) if kind == "wheel" else _iter_directory(target)
     report = _load_json(build_report)
     manifest = _load_json(provenance_manifest)
@@ -141,12 +283,17 @@ def check_delivery(
     seen_outputs: set = set()
     python_files = 0
     matched_outputs = 0
-    bytecode: List[str] = []
+    bytecode: List[_Entry] = []
+    frozen: List[Tuple[str, str]] = []
     file_count = 0
     l3_manifest: Optional[Dict[str, Any]] = None
     observed: Dict[str, Tuple[str, bytes]] = {}
     for entry in entries:
         file_count += 1
+        if kind == "directory" and "/" not in entry.path:
+            binary_kind = _executable_kind(entry.data[:4096])
+            if binary_kind and not entry.path.endswith((".so", ".dll", ".dylib")):
+                frozen.append((entry.path, binary_kind))
         if kind == "wheel" and entry.path.endswith(_WHEEL_METADATA_SUFFIXES):
             continue
         digest = hashlib.sha256(entry.data).hexdigest()
@@ -201,7 +348,7 @@ def check_delivery(
             )
             continue
         if entry.path.endswith((".pyc", ".pyo")):
-            bytecode.append(entry.path)
+            bytecode.append(entry)
             continue
         if entry.path.endswith(".py"):
             python_files += 1
@@ -270,9 +417,48 @@ def check_delivery(
             Finding(
                 BYTECODE_PRESENT,
                 "info",
-                bytecode[0],
+                bytecode[0].path,
                 f"{len(bytecode)} bytecode file(s). Bytecode decompiles to readable source; "
-                "make sure it was compiled from the protected output, not the original.",
+                "see inspection coverage for the bounded source comparison.",
+            )
+        )
+    bytecode_inspection: Dict[str, Any] = {
+        "matched_recorded_output": 0,
+        "matched_adjacent_source": 0,
+        "unknown": 0,
+        "sample": [],
+    }
+    first_unknown = ""
+    for index, entry in enumerate(bytecode):
+        status, reason = (
+            _inspect_bytecode(entry, target, kind, output_hashes)
+            if index < _MAX_BYTECODE_COMPARE
+            else ("unknown", "comparison_limit_reached")
+        )
+        bytecode_inspection[status] += 1
+        if status == "unknown" and not first_unknown:
+            first_unknown = entry.path
+        if len(bytecode_inspection["sample"]) < 10:
+            bytecode_inspection["sample"].append(
+                {"path": entry.path, "status": status, "reason": reason}
+            )
+    if bytecode_inspection["unknown"]:
+        findings.append(
+            Finding(
+                BYTECODE_ORIGIN_UNKNOWN,
+                "medium",
+                first_unknown,
+                f"Origin of {bytecode_inspection['unknown']} bytecode file(s) could not be confirmed; inspect the packaging inputs and embedded payloads.",
+            )
+        )
+    if frozen:
+        path, binary_kind = frozen[0]
+        findings.append(
+            Finding(
+                FROZEN_UNINSPECTED,
+                "medium",
+                path,
+                f"{len(frozen)} top-level executable payload(s) detected (first is {binary_kind}); embedded code and data were not inspected.",
             )
         )
 
@@ -341,6 +527,10 @@ def check_delivery(
             **counts,
         },
         "findings": [asdict(finding) for finding in findings],
+        "inspection": {
+            "bytecode": bytecode_inspection,
+            "frozen_executables": {"found": len(frozen), "inspected": 0},
+        },
         "limitations": list(LIMITATIONS),
     }
 
