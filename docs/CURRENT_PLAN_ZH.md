@@ -10,9 +10,11 @@ runtime 下载受本仓 CI 安装影响。后续观察 10-28 起的安静日与�
 [Stop writing || true before your SARIF upload](https://dev.to/zhurong2020/stop-writing-true-before-your-sarif-upload-16ih)。
 公开 DEV API 记录 `id=4931489`、`published_at=2026-10-28T01:43:42Z`、
 四个标签 `githubactions/security/python/devops`、阅读时间 6 分钟；
-AI disclosure 为 `some_ai` / `AI-assisted`，正文保留简短披露及本地验证
-边界。页面没有自定义封面，DEV 提供默认社交图。当前公开互动数为 0，
-不代表阅读数；X 分享尚未核实。实际发布正文已回存本地忽略目录。
+AI disclosure 为 `some_ai` / `AI-assisted`；正文保留本地验证边界，
+未另写 AI 披露句。页面没有自定义封面，DEV 提供默认社交图。发布时
+公开互动数为 0，不代表阅读数。维护者已在 X 分享：
+[原帖](https://x.com/zhurong0525/status/2115269885244944746)。实际发布正文
+已回存本地忽略目录。
 以后 DEV 文章复用 [发布清单](DEV_PUBLISHING_CHECKLIST.md)：封面、
 相关互链、具体评论问题、AI 披露和发布后核验均在预览阶段检查。
 后续于发布后约 24 小时、一周及月度复盘观察文章后台数据、项目
