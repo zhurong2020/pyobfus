@@ -1,5 +1,11 @@
 # pyobfus 当前计划
 
+**2026-10-28 09:54（北京时间）下载快照**：PyPI 非镜像数据已覆盖
+10-27。Core 0.10.0 发版日为 208 次下载；近 30 天安静日中位数仍为
+40（11 天），近 7 天为 58（仅 2 天），不足以判断自然增长。该日早于
+10-28 的 DEV 第二篇发布，不能归因于文章。MCP 10-27 为 20（发版次日）；
+runtime 下载受本仓 CI 安装影响。后续观察 10-28 起的安静日与来源。
+
 **2026-10-28 09:43（北京时间）DEV 第二篇已发布**：维护者发布
 [Stop writing || true before your SARIF upload](https://dev.to/zhurong2020/stop-writing-true-before-your-sarif-upload-16ih)。
 公开 DEV API 记录 `id=4931489`、`published_at=2026-10-28T01:43:42Z`、
