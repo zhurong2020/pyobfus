@@ -11,10 +11,18 @@ runtime 下载受本仓 CI 安装影响。后续观察 10-28 起的安静日与�
 公开 DEV API 记录 `id=4931489`、`published_at=2026-10-28T01:43:42Z`、
 四个标签 `githubactions/security/python/devops`、阅读时间 6 分钟；
 AI disclosure 为 `some_ai` / `AI-assisted`；正文保留本地验证边界，
-未另写 AI 披露句。页面没有自定义封面，DEV 提供默认社交图。发布时
-公开互动数为 0，不代表阅读数。维护者已在 X 分享：
+未另写 AI 披露句。发布时没有自定义封面，公开互动数为 0，
+不代表阅读数。维护者已在 X 分享：
 [原帖](https://x.com/zhurong0525/status/2115269885244944746)。实际发布正文
 已回存本地忽略目录。
+**同日 10:53（北京时间）维护者补上封面**：公开 DEV API 的
+`edited_at=2026-10-28T02:53:51Z`；封面为
+[扫描 → SARIF 上传 → 最终 gate 示意图](assets/dev-sarif-workflow-cover.png)，
+原图 2000 × 840，DEV 公开预览为 1000 × 420，已目视确认完整显示。
+`cover_image` 与 `social_image` 已更新，具体 URL 留存在本地发布元数据。
+另一张 AI 候选图和四张 PyPI 对照截图归档于本地忽略目录
+`docs/internal/content-2026-10/02-cover-candidates/`；源图已归档，
+下载目录和桌面临时副本可由维护者手动清理。
 以后 DEV 文章复用 [发布清单](DEV_PUBLISHING_CHECKLIST.md)：封面、
 相关互链、具体评论问题、AI 披露和发布后核验均在预览阶段检查。
 后续于发布后约 24 小时、一周及月度复盘观察文章后台数据、项目
