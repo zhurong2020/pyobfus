@@ -21,7 +21,7 @@ from pyobfus.core.function_locals import LocalPlan, plan_locals, apply_local_pla
 from pyobfus.core import content_transforms
 from pyobfus.core.module_attributes import (
     AttributePlan,
-    count_unproved_accesses,
+    inspect_unproved_accesses,
     ModuleInventory,
     plan_attributes,
     apply_attribute_plan,
@@ -277,6 +277,7 @@ class CrossFileOrchestrator:
         self.local_plans: Dict[str, LocalPlan] = {}
         self._reserved_names: Set[str] = set()
         self._planning_warnings: List[str] = []
+        self._preserved_unproved_names: Set[str] = set()
 
     @property
     def planning_warnings(self) -> List[str]:
@@ -298,6 +299,7 @@ class CrossFileOrchestrator:
         errors: List[str] = []
 
         try:
+            self._preserved_unproved_names = set()
             # Phase 1: Scan
             self.phase1_scan(input_dir)
             warnings.extend(self._planning_warnings)
@@ -328,7 +330,7 @@ class CrossFileOrchestrator:
             errors=errors,
         )
 
-    def phase1_scan(self, input_dir: Path) -> GlobalSymbolTable:
+    def phase1_scan(self, input_dir: Path, _preservation_pass: bool = False) -> GlobalSymbolTable:
         """
         Phase 1: Build global symbol table.
 
@@ -352,6 +354,7 @@ class CrossFileOrchestrator:
         self.attribute_inventory = None
         self._planning_warnings = []
         self._reserved_names = set()
+        self._reserved_names.update(self._preserved_unproved_names)
 
         # 1. Discover files
         self.files = self._discover_files(input_dir)
@@ -598,9 +601,19 @@ class CrossFileOrchestrator:
             if self.config.crossfile_module_attributes
             else {}
         )
-        self.module_attribute_accesses_unproved = count_unproved_accesses(
+        self.module_attribute_accesses_unproved, unproved_names = inspect_unproved_accesses(
             sources, inventory, self.global_table, self.attribute_plans
         )
+        if self.config.preserve_unproved_module_attributes and unproved_names:
+            if _preservation_pass:
+                raise ValueError("Unproved module attribute preservation did not stabilize")
+            self._preserved_unproved_names.update(unproved_names)
+            return self.phase1_scan(input_dir, _preservation_pass=True)
+        if self._preserved_unproved_names:
+            self._planning_warnings.append(
+                "Preserved unproved module attribute names: "
+                + ", ".join(sorted(self._preserved_unproved_names))
+            )
 
         return self.global_table
 
@@ -800,12 +813,38 @@ class CrossFileOrchestrator:
         )
 
         file_infos = []
+        # A package supplied as the input directory may be imported by its
+        # package name or used as a flat script root. An __init__.py alone is
+        # insufficient: examples/multifile has one, but its main script uses
+        # flat sibling imports. Prefix only the unambiguous package form.
+        package_root = None
+        if (input_dir / "__init__.py").is_file():
+            siblings = {
+                path.stem
+                for path in python_files
+                if path.parent == input_dir and path.stem != "__init__"
+            }
+            package_import = False
+            flat_import = False
+            for path in python_files:
+                for node in ast.walk(ASTParser.parse_file(path)):
+                    if isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+                        package_import |= node.module.split(".")[0] == input_dir.name
+                        flat_import |= node.module.split(".")[0] in siblings
+                    elif isinstance(node, ast.Import):
+                        for alias in node.names:
+                            package_import |= alias.name.split(".")[0] == input_dir.name
+                            flat_import |= alias.name.split(".")[0] in siblings
+            if package_import and not flat_import:
+                package_root = input_dir.name
         for file_path in python_files:
             # Calculate relative path
             relative_path = file_path.relative_to(input_dir)
 
             # Calculate module name (e.g., "utils/helpers.py" -> "utils.helpers")
             module_name = self._path_to_module_name(relative_path)
+            if package_root:
+                module_name = f"{package_root}.{module_name}"
 
             file_info = FileInfo(
                 path=file_path,
@@ -873,7 +912,11 @@ class CrossFileOrchestrator:
             True if name should be preserved, False otherwise
         """
         # Check against exclude_names in config
-        if getattr(self, "_preserve_star_globals", False) or name in self.config.exclude_names:
+        if (
+            getattr(self, "_preserve_star_globals", False)
+            or name in self.config.exclude_names
+            or name in self._preserved_unproved_names
+        ):
             return True
 
         # Check against preserve_patterns (if implemented)

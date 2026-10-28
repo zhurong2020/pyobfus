@@ -44,6 +44,7 @@ _FIELD_DESCRIPTIONS: Dict[str, str] = {
     "infrastructure, ...). Extends the preset's baseline.",
     "name_prefix": "Prefix for obfuscated identifier names.",
     "crossfile_module_attributes": "Rewrite proved module reads/calls through unconditional imports, including dotted/relative imports and static package re-exports. Unsupported accesses require exclude_names; false restores legacy output (default: true).",
+    "preserve_unproved_module_attributes": "Preserve project export names used by unproved module-attribute accesses in directory builds. Reduces name obfuscation; explicit opt-in (default: false).",
     "crossfile_local_names": "Rename function local bindings in directory builds (parameters preserved).",
     "remove_docstrings": "Strip docstrings from the output.",
     "remove_comments": "Strip comments from the output.",

@@ -80,6 +80,7 @@ class ObfuscationConfig:
     )
     name_prefix: str = "I"
     crossfile_module_attributes: bool = True
+    preserve_unproved_module_attributes: bool = False
     crossfile_local_names: bool = True
     # Opt-in multi-module L3 + application-key preview (Pro): TOML-selected
     # stable top-level functions, serial build and fresh private destinations.

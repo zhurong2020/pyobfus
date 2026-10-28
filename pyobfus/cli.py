@@ -200,6 +200,11 @@ def _echo_pro_import_hint() -> None:
     "Unproved project accesses are counted; run --check for refusal reasons.",
 )
 @click.option(
+    "--preserve-unproved-module-attributes/--no-preserve-unproved-module-attributes",
+    default=None,
+    help="Opt in to preserving project export names used by unproved module-attribute accesses; reduces name obfuscation (default: disabled)",
+)
+@click.option(
     "--crossfile-local-names/--no-crossfile-local-names",
     default=None,
     help="Rename function locals in cross-file builds (default: enabled; parameters preserved)",
@@ -555,6 +560,7 @@ def main(
     crossfile_opacity: bool,
     crossfile_local_names: Optional[bool],
     crossfile_module_attributes: Optional[bool],
+    preserve_unproved_module_attributes: Optional[bool],
     upgrade: bool,
     control_flow: bool,
     string_encryption: bool,
@@ -683,6 +689,7 @@ def main(
             preserve_param_names=preserve_param_names,
             cross_file=cross_file,
             crossfile_module_attributes=crossfile_module_attributes,
+            preserve_unproved_module_attributes=preserve_unproved_module_attributes,
         )
         return
 
@@ -951,6 +958,8 @@ def main(
             config.level = level
         if crossfile_module_attributes is not None:
             config.crossfile_module_attributes = crossfile_module_attributes
+        if preserve_unproved_module_attributes is not None:
+            config.preserve_unproved_module_attributes = preserve_unproved_module_attributes
         if crossfile_local_names is not None:
             config.crossfile_local_names = crossfile_local_names
         if crossfile_opacity:
@@ -2501,7 +2510,7 @@ def _warn_unproved_module_attributes(stats: dict) -> None:
     count = stats.get("module_attribute_accesses_unproved", 0)
     if count:
         click.echo(
-            f"Warning: {count} module attribute access(es) could not be proved safe for rewriting; run pyobfus --check on the input before shipping.",
+            f"Warning: {count} module attribute access(es) could not be proved safe for rewriting; generated code may fail at runtime. Run pyobfus --check on the input and preserve reported names before shipping.",
             err=True,
         )
 
@@ -3078,6 +3087,7 @@ def _handle_check(
     preserve_param_names: Optional[bool] = None,
     cross_file: bool = True,
     crossfile_module_attributes: Optional[bool] = None,
+    preserve_unproved_module_attributes: Optional[bool] = None,
 ) -> None:
     """
     Run pre-flight risk scan and print report.
@@ -3106,6 +3116,8 @@ def _handle_check(
         config.preserve_param_names = preserve_param_names
     if crossfile_module_attributes is not None:
         config.crossfile_module_attributes = crossfile_module_attributes
+    if preserve_unproved_module_attributes is not None:
+        config.preserve_unproved_module_attributes = preserve_unproved_module_attributes
     if not cross_file:
         config.crossfile_module_attributes = False
     checker = PreflightChecker(
