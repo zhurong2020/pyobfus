@@ -76,8 +76,11 @@ Windows 打包和 L3 离线应用验证已完成，见
 其后 L3 方法/嵌套覆盖、resource key provider、参数改名与复杂导入环
 以真实最小化用户场景和兼容约定为入口；当前 P1 样本没有新的阻塞案例，
 条件见 [P2 覆盖 gate](P2_CONDITIONAL_COVERAGE_GATE_2026-10-28.md)。
-free-threaded 3.15 仍待真正的 3.15t 解释器验证，不能沿用普通 3.15
-的 CI 结论。
+free-threaded 3.15 已有一次 Linux 3.15t 有界 Core/runtime 验证，
+见 [3.15t 记录](PYTHON315_FREETHREADING_VALIDATION_2026-10-28.md)；
+跨文件 L3 仍明确拒绝此模式。后续只有实际 3.15t L3 交付需求出现，才
+单独验证加密产物与并发、决定是否放开守卫；干净公开 wheel 和其他 OS
+仍待验收。
 
 10-25 复盘和当前可执行巡检已完成，见运营记录；不把未来日期状态写成已检查。
 私有医院应用仍暂停，参数改名等候选保持原范围，不自动扩张功能。

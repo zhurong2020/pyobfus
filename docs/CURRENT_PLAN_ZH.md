@@ -1,5 +1,14 @@
 # pyobfus 当前计划
 
+**2026-10-28 Python 3.15t 有界验证**：重试下载后从 APT 校验并隔离解包
+Python 3.15.2 no-GIL，确认 `Py_GIL_DISABLED=1`、运行中 GIL 关闭；
+使用 3.15t 专用 cryptography/cffi wheels。当前 `main` 的 Community 多文件
+构建/运行、三帧 traceback 还原、五个 `.pyc` 来源比对均通过；定向测试
+44 + 68 项通过，双线程 key provider 400 次调用通过。**跨文件 L3
+仍按产品现有 preflight 明确拒绝 free-threaded 构建**，未验证加密产物；
+公开 wheel 的干净目标和其他 OS 也未验证。证据和边界见
+[3.15t 记录](PYTHON315_FREETHREADING_VALIDATION_2026-10-28.md)。
+
 **2026-10-28 P2 交付诊断已合并**：`--check-delivery` 增加有界 `.pyc` 来源比对与
 冻结包外壳诊断；`unknown` 与未解析的可执行文件明确警告，不推断内部安全。
 设计、样本与边界见 [P2 记录](P2_DELIVERY_DIAGNOSTICS_2026-10-28.md)。
