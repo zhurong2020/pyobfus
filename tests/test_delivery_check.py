@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import py_compile
 import zipfile
 from pathlib import Path
 
@@ -55,6 +56,18 @@ def _check(build_dir: Path, target: Path, **kwargs):
 
 def _codes(result):
     return sorted(f["code"] for f in result["findings"])
+
+
+def _binary_header(kind: str) -> bytes:
+    if kind == "PE":
+        header = bytearray(128)
+        header[:2] = b"MZ"
+        header[60:64] = (64).to_bytes(4, "little")
+        header[64:68] = b"PE\x00\x00"
+        return bytes(header)
+    if kind == "ELF":
+        return b"\x7fELF\x02\x01" + b"\x00" * 10
+    return b"\xfe\xed\xfa\xcf"
 
 
 def test_clean_delivery_is_ok(build):
@@ -144,10 +157,56 @@ def test_build_level_findings_from_report(build):
 
 
 def test_bytecode_is_info_only(build):
-    (build / "dist" / "shapes.cpython-312.pyc").write_bytes(b"\x00" * 16)
+    dist = build / "dist"
+    cache = dist / "__pycache__"
+    cache.mkdir()
+    py_compile.compile(
+        str(dist / "shapes.py"), cfile=str(cache / "shapes.cpython-312.pyc"), doraise=True
+    )
     result = _check(build, build / "dist")
     assert _codes(result) == [dc.BYTECODE_PRESENT]
     assert result["status"] == "ok"
+    assert result["inspection"]["bytecode"]["matched_recorded_output"] == 1
+
+
+def test_bytecode_unknown_warns_without_unmarshalling(build):
+    dist = build / "dist"
+    (dist / "shapes.pyc").write_bytes(b"\x00" * 16)
+    result = _check(build, dist)
+    assert result["status"] == "warn"
+    assert _codes(result) == [dc.BYTECODE_ORIGIN_UNKNOWN, dc.BYTECODE_PRESENT]
+    assert result["inspection"]["bytecode"]["unknown"] == 1
+    assert (
+        result["inspection"]["bytecode"]["sample"][0]["reason"]
+        == "different_interpreter_or_invalid_magic"
+    )
+
+
+@pytest.mark.parametrize("kind", ["PE", "ELF", "Mach-O"])
+def test_frozen_executable_is_explicitly_uninspected(tmp_path, kind):
+    binary = tmp_path / "app"
+    binary.write_bytes(_binary_header(kind) + b"not a real archive")
+    result = dc.check_delivery(binary)
+    assert result["status"] == "warn"
+    assert result["target"]["kind"] == "executable"
+    assert _codes(result) == [dc.FROZEN_UNINSPECTED]
+    assert result["inspection"]["frozen_executables"] == {"found": 1, "inspected": 0}
+
+
+def test_onedir_executable_does_not_claim_inner_payload_was_checked(tmp_path):
+    directory = tmp_path / "dist"
+    directory.mkdir()
+    (directory / "app").write_bytes(_binary_header("ELF") + b"not a real archive")
+    result = dc.check_delivery(directory)
+    assert result["status"] == "warn"
+    assert _codes(result) == [dc.FROZEN_UNINSPECTED]
+
+
+def test_executable_prefix_without_valid_header_is_rejected(tmp_path):
+    binary = tmp_path / "not-an-app"
+    binary.write_bytes(b"MZ only a text prefix")
+    with pytest.raises(ValueError, match="expected a directory"):
+        dc.check_delivery(binary)
 
 
 def test_wheel_is_checked_without_extracting(build, tmp_path):

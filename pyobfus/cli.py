@@ -422,9 +422,10 @@ def _echo_pro_import_hint() -> None:
     "--check-delivery",
     "check_delivery_path",
     type=click.Path(exists=True),
-    help="Check what you are about to ship (an output directory or a .whl): "
+    help="Check what you are about to ship (an output directory, .whl or executable): "
     "mapping files, private keys, original sources (with --provenance-manifest) "
-    "and files the build did not produce (with --build-report). Reads files only; "
+    "and files the build did not produce (with --build-report). Bytecode source "
+    "comparisons are bounded; frozen payloads are not unpacked. Reads files only; "
     "nothing is executed. Exit code 0=ok/warn, 1=high findings, 2=error.",
 )
 @click.option(
@@ -2638,7 +2639,7 @@ def _handle_check_delivery(
     provenance_manifest: Optional[str],
     json_output: bool,
 ) -> None:
-    """--check-delivery: inspect a delivery directory or wheel; exit 1 on high findings.
+    """--check-delivery: inspect a directory, wheel or executable; exit 1 on high findings.
 
     In this mode --build-report and --provenance-manifest name existing files
     from the build to compare against; nothing is written.
@@ -2659,7 +2660,7 @@ def _handle_check_delivery(
                 json.dumps(
                     {
                         "status": "error",
-                        "ai_hint": "Pass an output directory or a .whl, and readable JSON "
+                        "ai_hint": "Pass an output directory, .whl or executable, and readable JSON "
                         "build report / provenance manifest files.",
                         "error": str(exc),
                     }
