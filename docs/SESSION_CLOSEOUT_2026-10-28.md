@@ -28,3 +28,21 @@
 本次没有触发 private 仓库的 GitHub Actions。完整候选图 SHA-256 与归档说明见本地忽略文件
 `docs/internal/content-2026-10/02-cover-candidates/README.md`；平台图片 URL 与编辑时间见
 `docs/internal/content-2026-10/02-published-metadata.json`。
+
+## 关会话前最后审计
+
+2026-10-28 再查 54 个 Git worktree：唯一非 main 未提交内容在
+`cardiac-ai-cac/.worktrees/hospital` 的 `feat/hospital-edition-v2.6.0`，
+共 7 个此前已存在的医院版修改；已先告知维护者，本会话未触碰。
+`pyobfus-action` 的非 main 文档分支工作树干净，提交仍未推送。
+
+项目的 `AGENTS.md` 和 `CLAUDE.md` 已指向本交接；用户版根 README
+仍准确写明 Core 0.10.0，无会话状态需要加入。`workspace-meta` 的 README、
+`WORKSPACE_CLAUDE.md`、`WORK_LOG_INDEX.md` 与 `PYOBFUS_REPOSITORY_MAP.md`
+已同步交接路由；该 private 仓库本地 main 比远端多 4 笔文档提交，账单限制
+解除前不推送。Claude 项目与工作区 memory 索引、Codex 10-28 memory
+均已写入新入口；旧 memory 保留为带日期的历史记录。
+两处 Claude memory 目录随后定向补入当日快照和 Google Drive 当前镜像：
+项目 memory 110 个文件、工作区 memory 194 个文件，`rclone check --checksum`
+均为 0 差异。Codex 的 10-28 memory 文件在本机 `~/.codex/memories/`，
+其权威内容另见本仓已提交的本交接。
