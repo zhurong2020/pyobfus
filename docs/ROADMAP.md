@@ -30,6 +30,11 @@ The maintainer authorized sequential work from P0 on 2026-10-28. Each item
 still needs its own evidence and release gate. P0's current implementation and
 limits are recorded in
 [`P0_MODULE_ATTRIBUTE_COMPAT_2026-10-28.md`](P0_MODULE_ATTRIBUTE_COMPAT_2026-10-28.md).
+The bounded P1 packaging and L3 usability checks are recorded in
+[`P1_PACKAGING_VALIDATION_2026-10-28.md`](P1_PACKAGING_VALIDATION_2026-10-28.md).
+They found no need for packaging code changes in the tested configurations;
+P2 delivery diagnostics are next. The older rows below remain the decision
+criteria for new cases.
 The evidence, competitor scope, acceptance gates and sources are in
 [`FEATURE_EXPANSION_RESEARCH_2026-10-28.md`](FEATURE_EXPANSION_RESEARCH_2026-10-28.md).
 Core 0.10.0 already ships Python 3.15 baseline support, per-file directory

@@ -130,9 +130,8 @@ on top of this pipeline is a reasonable escalation. See
 
 ## Evidence and status
 
-- One manual run on the date and versions above, Linux only, single-module
-  example, Nuitka `--module` mode. Standalone/onefile executables, macOS,
-  Windows and multi-module projects were not part of it.
+- The 2026-10-07 manual run above was Linux-only, single-module, Nuitka
+  `--module`. Later standalone/onefile evidence is recorded separately below.
 - The compiled modules returned the same results as the pure-Python originals
   for the example's functions.
 - The 2026-10-07 manual measurements above remain historical evidence.
@@ -150,3 +149,14 @@ on top of this pipeline is a reasonable escalation. See
   three modules reversed through `--unmap --json`. Local execution passed on
   2026-10-11; the [hosted run](https://github.com/zhurong2020/pyobfus/actions/runs/38107417778) also passed. Nuitka onefile, Cython for
   a whole package, macOS and Windows remain outside this evidence.
+
+**2026-10-28 public-wheel follow-up:** [the bounded delivery validation](P1_PACKAGING_VALIDATION_2026-10-28.md)
+uses the released Core 0.10.0 wheel. A multi-module app with a data file ran
+under PyInstaller onedir/onefile on Linux and Windows, and Nuitka onefile on
+Linux; deliberate failures retained reverse-mappable project frames. The
+application had to copy the data file into staging and pass the packager's
+data-file option. These are dated small-fixture results. The Windows Nuitka
+combination, macOS, Python 3.15, and real plugin/dynamic-import applications
+remain unverified. `--check-delivery` currently checks the outer PyInstaller
+directory but does not inspect its embedded archive, and it does not accept a
+standalone executable file as input.
