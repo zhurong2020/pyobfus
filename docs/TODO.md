@@ -7,7 +7,7 @@
 
 最后更新：2026-10-28。公开版本为 Core 0.10.0、MCP 0.3.16、runtime 0.1.1；
 Core 发版与 Zenodo 归档已完成，证据见 [当前计划](CURRENT_PLAN_ZH.md)。
-最终交接见 [10-27 Session 收尾](SESSION_CLOSEOUT_2026-10-27.md)，前一阶段推进见 [Codex 进度](PROGRESS_2026-10-25.md)，运营与待办日期见
+最新功能交接见 [10-28 功能收尾](SESSION_FUNCTIONAL_CLOSEOUT_2026-10-28.md)；当日 DEV/运营交接见 [10-28 先前收尾](SESSION_CLOSEOUT_2026-10-28.md)，更早的阶段推进见 [Codex 进度](PROGRESS_2026-10-25.md)，运营与待办日期见
 [复盘/巡检准备](OPS_REVIEW_2026-10-25.md)。实现、合并与对外发布分别记录，
 不把已合并的预览代码当成已发布包。
 
