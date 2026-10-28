@@ -48,8 +48,9 @@ Linux/Windows × 3.10/3.12/3.15 六格和总 CI 均通过。具体能力与边�
    重复运行、超时和测试成本。10-28 的日备份与云端镜像已于 09:05
    完成，后续按日常节奏检查，不重复排为未完成。
 2. DEV 第二篇已于 10-28 09:43（北京时间）由维护者发布；10-29
-   09:43 后及 11-04 09:43 后核对后台阅读数、互动与具体问题，X 分享
-   目前未核实。后续文章复用
+   09:43 后及 11-04 09:43 后核对后台阅读数、互动与具体问题；
+   [X 分享](https://x.com/zhurong0525/status/2115269885244944746)已发布。
+   后续文章复用
    [DEV 发布清单](DEV_PUBLISHING_CHECKLIST.md)。
 3. Core 0.10.0 发版日 10-27 的非镜像下载数已核为 208；继续观察
    10-28 起的安静日与来源，区分发版尖峰和 DEV 文章发布。下一次 Core
@@ -469,6 +470,7 @@ V2EX 仍卡在账号激活（要邀请码）；Stack Overflow 按 2026-04-22 的
    （`published: false`；维护者 09-27 定：发稿前不进公开仓库）
 2. SARIF 上传前别再 `|| true`（带出 `pyobfus-action`）—— **10-28 已发布**：
    [DEV 正文](https://dev.to/zhurong2020/stop-writing-true-before-your-sarif-upload-16ih)，
+   [X 分享](https://x.com/zhurong0525/status/2115269885244944746)已发布，
    本地定稿 `docs/internal/content-2026-10/02-sarif-or-true.md`；后续按上文观察。
 3. PyInstaller / Nuitka 打包前先混淆（已有 cookbook）
 4. 2026 年 PyArmor 替代品的诚实对比（`docs/compare/` 已有搜索流量）
@@ -488,7 +490,7 @@ V2EX 仍卡在账号激活（要邀请码）；Stack Overflow 按 2026-04-22 的
 | 09-28 → 10-11 | 只写不发：维护者审第 1 篇、Claude 起草第 2 篇；DEV 个人资料链 GitHub；X 简介加一句 pyobfus maintainer |
 | 10-13 那周（周二/三美东上午） | **10-11 已提前发**：DEV 第 1 篇 <https://dev.to/zhurong2020/cloudflare-blocked-urllibs-default-user-agent-and-it-took-me-two-months-to-notice-3k8e>（05:58 UTC；标签已由维护者改回 `cloudflare`；描述取正文首段）+ X 一条（10-11 已发）；1–3 天后（10-14 前后）看反响，决定是否由维护者本人投一次 HN |
 | 10-25 | 复盘已完成；来源未见 DEV，公开互动 0/0，阅读数需作者后台；不恢复静默期 |
-| 10-27 那周 | DEV 第 2 篇已于 10-28 发布；X 分享尚未核实，不按排期自动视为完成 |
+| 10-27 那周 | DEV 第 2 篇已于 10-28 发布；[X 分享](https://x.com/zhurong0525/status/2115269885244944746)已发布 |
 | 11-02 → 11-06 | 月度版本（`[Unreleased]` 非空才发）+ r/Python showcase + WP 中文第 4 篇（1+2 合并）+ 知乎（若届时开动） |
 | 11-10 / 11-24 | DEV 第 4、7 篇（第 7 篇 09-28 加入，接在第 5 篇之前先讲「可调试」） |
 | 12 月 | 第 5、3 篇 + 12 月 WP 月度篇；第 6 篇顺延到 1 月 |
