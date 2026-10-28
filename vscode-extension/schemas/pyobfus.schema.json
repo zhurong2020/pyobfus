@@ -88,6 +88,11 @@
           "default": true,
           "description": "Rewrite proved module reads/calls through unconditional imports, including dotted/relative imports and static package re-exports. Unsupported accesses require exclude_names; false restores legacy output (default: true)."
         },
+        "preserve_unproved_module_attributes": {
+          "type": "boolean",
+          "default": false,
+          "description": "Preserve project export names used by unproved module-attribute accesses in directory builds. Reduces name obfuscation; explicit opt-in (default: false)."
+        },
         "crossfile_local_names": {
           "type": "boolean",
           "default": true,

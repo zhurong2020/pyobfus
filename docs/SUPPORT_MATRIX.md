@@ -157,7 +157,17 @@ this advisory is skipped; fix parse errors and re-run `--check`.
 Cross-file build stats and build reports include
 `module_attribute_accesses_unproved`, the number of distinct retained attribute
 sites with renamed project exports. A positive count emits one stderr warning
-and an AI hint to run `--check`; zero emits no warning. Incremental cache hits
+and an AI hint to run `--check`; zero emits no warning. The optional
+`--preserve-unproved-module-attributes` (or YAML
+`obfuscation.preserve_unproved_module_attributes: true`) re-plans directory
+output with the reported project export spellings preserved. It trades name
+obfuscation for compatibility at recognized sites; the warning lists the
+preserved names. It is opt-in, does not prove dynamic or unknown accesses safe,
+and should be followed by an original-versus-artifact runtime check. A package
+passed directly as the input directory keeps its package name in the
+module-attribute plan when its imports unambiguously use that name; directories
+with flat sibling imports retain the flat module interpretation.
+Incremental cache hits
 retain the count, and builds invalidate pre-H4 analysis signatures. This local
 correctness diagnostic is available in Community and Pro. H findings expose a
 primary `reason`, all observed `reasons`, and readable explanations; see the

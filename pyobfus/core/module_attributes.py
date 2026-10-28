@@ -1195,6 +1195,15 @@ def count_unproved_accesses(
     table: GlobalSymbolTable,
     plans: Dict[str, AttributePlan],
 ) -> int:
+    return inspect_unproved_accesses(sources, inventory, table, plans)[0]
+
+
+def inspect_unproved_accesses(
+    sources: Dict[str, str],
+    inventory: ModuleInventory,
+    table: GlobalSymbolTable,
+    plans: Dict[str, AttributePlan],
+) -> Tuple[int, Set[str]]:
     """Count distinct retained access sites with changed project export mappings.
 
     Candidates never authorize edits. Counts include stores/deletes and dynamic
@@ -1202,6 +1211,7 @@ def count_unproved_accesses(
     without an attribute access. Multiple candidate identities count once.
     """
     sites: Set[Tuple[str, Span]] = set()
+    names: Set[str] = set()
     for importer, source in sources.items():
         tree = ast.parse(source)
         edits = {e.location for e in plans.get(importer, AttributePlan("", "")).edits}
@@ -1240,4 +1250,6 @@ def count_unproved_accesses(
                 )
             if changed and span(node) not in edits:
                 sites.add((importer, span(node)))
-    return len(sites)
+                if changed != node.attr:
+                    names.add(node.attr)
+    return len(sites), names
