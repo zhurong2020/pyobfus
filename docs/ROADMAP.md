@@ -1,8 +1,9 @@
 # Development Roadmap
 
-> **Archived as of 2026-08-14.** The current project status and priority list now
-> live in [`CURRENT_PLAN_ZH.md`](CURRENT_PLAN_ZH.md). Keep this file only as
-> historical roadmap context unless a future cleanup deliberately removes it.
+> The sections dated before 2026-10-28 are historical roadmap context. The
+> functional expansion supplement below is a current proposal. Operational
+> status and approved work live in [`CURRENT_PLAN_ZH.md`](CURRENT_PLAN_ZH.md)
+> and [`TODO.md`](TODO.md).
 
 > ⚠️ **Superseded conclusions inside — do not quote this file on Glama.** Its
 > Glama passages predate the 2026-09-05 correction and state the opposite of
@@ -11,7 +12,8 @@
 > submission was **rejected and never approved**); that the admin Build-steps
 > pin follows new releases (it does **not** — it is manual every time); and
 > that Glama builds from the repo's `pyobfus_mcp/Dockerfile` (it synthesises
-> its own from the admin Build Spec). The MCP tool count is also 8, not 7.
+> its own from the admin Build Spec). The count was 8 at that correction;
+> the current tool count is 9. Do not use this historical section as a live count.
 > Current state: [`CURRENT_PLAN_ZH.md`](CURRENT_PLAN_ZH.md) and the Glama
 > section of [`DISTRIBUTION_CHANNELS.md`](DISTRIBUTION_CHANNELS.md).
 
@@ -19,6 +21,31 @@ This document outlines **future plans** for pyobfus. For released version histor
 
 **Target Users**: Individual developers and small teams shipping Python code in the AI-assisted development era
 **Positioning**: The AI-native Python obfuscator — MCP-ready, framework-aware, open-source alternative to PyArmor
+
+---
+
+## Functional expansion supplement — 2026-10-28
+
+This is a **proposed priority order**, not approval to implement or release.
+The evidence, competitor scope, acceptance gates and sources are in
+[`FEATURE_EXPANSION_RESEARCH_2026-10-28.md`](FEATURE_EXPANSION_RESEARCH_2026-10-28.md).
+Core 0.10.0 already ships Python 3.15 baseline support, per-file directory
+mapping, MCP SDK 2.x support, and a restricted multi-module L3 preview. They
+are not new backlog items.
+
+| Priority | Candidate | Smallest useful outcome / decision gate |
+|---|---|---|
+| **P0 — correctness** | Reproduce and classify the Python 3.15 `json` / `unittest` module-attribute proof failures; fix any generated-behavior defect and make unproved access fail or report clearly | Minimal cases, original-versus-output comparison, supported-interpreter regression; no silent weakening of name verification |
+| **P1 — delivery** | Validate protected packages with PyInstaller and Nuitka on a bounded set of Linux/Windows and Python versions | Start with one-folder/standalone, then onefile; run the built artifact in a clean target, check trace mapping and that source, mapping and keys stay outside deliverables; expand only on observed failures |
+| **P1 — L3 usability** | Exercise the shipped multi-module L3 preview in one representative offline application and document the application's key-injection contract | Confirm clean-target runtime, wrong/missing key behavior, traceback recovery, and coverage report before designing a key-provider API |
+| **P2 — delivery diagnostics** | Prototype conservative inspection of `.pyc` and frozen artifacts for `--check-delivery` | Fixture-backed findings with explicit `unknown` outcomes and false-positive limits; do not claim a clean artifact proves confidentiality |
+| **P2 — conditional coverage** | L3 method/nested coverage, resource key provider, parameter renaming, and complex import cycles | Separate proposals only when a real minimized user case and compatibility contract justify each one |
+| **Research gate** | Free-threaded Python 3.15 | Separate interpreter/runtime verification before advertising support; keep it out of the ordinary 3.15 support claim |
+
+Keep packaging checks small and manual/scheduled while GitHub billing is
+restricted and until measured runtime justifies CI expansion. Avoid a full
+matrix on every documentation or ordinary PR. Native VM, licensing cloud,
+and a new compiler backend remain outside this roadmap's current scope.
 
 ---
 
