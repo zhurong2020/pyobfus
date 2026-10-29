@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# commit-msg: apply the customer/business-data scan to the commit message.
+# Commit messages are as public and permanent as file content. Patterns are
+# shared with pre-commit scan 3 (customer-data-patterns.sh). Bypass once:
+#     PYOBFUS_ALLOW_CUSTOMER_DATA=1 git commit ...
+
+set -eu
+
+[[ "${PYOBFUS_ALLOW_CUSTOMER_DATA:-0}" == "1" ]] && exit 0
+
+# shellcheck source=customer-data-patterns.sh
+source "$(dirname "$0")/customer-data-patterns.sh"
+
+# Drop comment lines and everything below the scissors line, as git does.
+locs=$(sed -e '/^# -\{24\} >8 -\{24\}$/,$d' "$1" \
+         | awk '!/^#/{print "commit-message:" NR ":" $0}' \
+         | customer_candidate_filter | customer_scan_records 0)
+
+if [[ -n "$locs" ]]; then
+    cat >&2 <<EOF
+============================================================
+ERROR: commit-msg blocked — possible customer/business data in the message
+============================================================
+
+$locs
+
+Keep customer identities, e-mails and Stripe object IDs out of commit
+messages (AGENTS.md, "Public vs private records"). Reword, or for a
+reviewed false positive: PYOBFUS_ALLOW_CUSTOMER_DATA=1 git commit ...
+============================================================
+EOF
+    exit 1
+fi
+exit 0

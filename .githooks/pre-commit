@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # pre-commit: block PII patterns and credential material from entering commits.
 #
-# Two independent scans, each with its own allowlist and its own bypass:
+# Three independent scans, each with its own allowlist and its own bypass:
 #
 #   1. PII      — Origin: 2026-05-03 PII cleanup (V0.4_EXECUTION_LOG Sessions
 #                 13-15) removed CCPC software-copyright filing materials from
@@ -10,6 +10,9 @@
 #                 so a credential pasted into a file would have committed
 #                 cleanly to this PUBLIC repo. Added after an Open VSX publish
 #                 token was handled by hand and caught only by an ad-hoc grep.
+#   3. CUSTOMER — Origin: 2026-10-29. Stripe object IDs and e-mail addresses
+#                 outside an allowlist, in newly added lines only. Patterns
+#                 live in customer-data-patterns.sh (shared with commit-msg).
 #
 # Setup (one-time per clone):
 #     git config core.hooksPath .githooks
@@ -18,6 +21,7 @@
 # waving through a documented PII string must not also wave through a token):
 #     PYOBFUS_ALLOW_PII=1 git commit ...
 #     PYOBFUS_ALLOW_SECRET=1 git commit ...
+#     PYOBFUS_ALLOW_CUSTOMER_DATA=1 git commit ...
 
 set -eu
 
@@ -108,6 +112,50 @@ What to do:
   2. if it was ever real, ROTATE it — a local remove is not a rotation;
   3. only if this is a documented example, bypass once with:
      PYOBFUS_ALLOW_SECRET=1 git commit ...
+
+============================================================
+EOF
+            exit 1
+        fi
+    fi
+fi
+
+# --------------------------------------------------------- customer scan
+# Added lines only: existing tracked content is not re-litigated on every
+# edit, and the scan stays fast. Skipped: the hook files themselves and the
+# PII-cleanup log (already allowlisted by scan 1).
+CUSTOMER_ALLOWLIST_RE='\.githooks/.*|docs/V0\.4_EXECUTION_LOG\.md'
+if [[ "${PYOBFUS_ALLOW_CUSTOMER_DATA:-0}" != "1" ]]; then
+    # shellcheck source=customer-data-patterns.sh
+    source "$(dirname "$0")/customer-data-patterns.sh"
+    mapfile -t cust_staged < <(staged_files "$CUSTOMER_ALLOWLIST_RE")
+    if (( ${#cust_staged[@]} > 0 )); then
+        locs=$(git diff --cached -U0 --no-color --no-ext-diff -- "${cust_staged[@]}" \
+                 | awk '/^\+\+\+ b\//{f=substr($0,7);next}
+                        /^@@/{match($0,/\+[0-9]+/);ln=substr($0,RSTART+1,RLENGTH-1)+0;next}
+                        /^\+/{print f ":" ln ":" substr($0,2); ln++}' \
+                 | customer_candidate_filter | customer_scan_records 1)
+        if [[ -n "$locs" ]]; then
+            fail_banner
+            cat >&2 <<EOF
+ERROR: pre-commit blocked — possible customer/business data in added lines
+============================================================
+
+Locations (content deliberately not printed):
+
+$locs
+
+This is a PUBLIC repo. Customer names, e-mails, addresses, tax IDs and
+Stripe object IDs belong in git-ignored docs/internal/ or private memory;
+public docs keep one sentence plus a pointer (AGENTS.md, "Public vs
+private records").
+
+What to do:
+  1. move the detail to the private record and abstract the public text;
+  2. if an address is a legitimate public one, add it to
+     CUSTOMER_EMAIL_ALLOW_RE in .githooks/customer-data-patterns.sh;
+  3. only for a reviewed false positive, bypass once with:
+     PYOBFUS_ALLOW_CUSTOMER_DATA=1 git commit ...
 
 ============================================================
 EOF
