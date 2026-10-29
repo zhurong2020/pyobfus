@@ -11,7 +11,14 @@ from scripts.ci_changed_paths import code_changed, test_matrix as build_matrix
 
 @pytest.mark.parametrize(
     "path",
-    ["docs/TODO.md", "docs/guide/usage.md", "docs/assets/dev-sarif-workflow-cover.png"],
+    [
+        "docs/TODO.md",
+        "docs/guide/usage.md",
+        "docs/assets/dev-sarif-workflow-cover.png",
+        "AGENTS.md",
+        "CLAUDE.md",
+        "CITATION.cff",
+    ],
 )
 def test_docs_only(path):
     assert not code_changed([path])
@@ -22,8 +29,9 @@ def test_docs_only(path):
     [
         "README.md",
         "llms.txt",
-        "AGENTS.md",
-        "CITATION.cff",
+        "nested/AGENTS.md",
+        "CITATION.cff.py",
+        "./CITATION.cff",
         "server.json",
         "skills/review/SKILL.md",
         "templates/example.md",
@@ -82,3 +90,8 @@ def test_matrix_versions(event):
         if event not in ("schedule", "workflow_dispatch") and os_name != "ubuntu-latest":
             expected = {"3.9", "3.14", "3.15"}
         assert versions == expected
+
+
+def test_metadata_does_not_hide_code_change():
+    assert code_changed(["CITATION.cff", "AGENTS.md", "pyobfus/cli.py"])
+    assert code_changed(["CLAUDE.md", "pyproject.toml"])

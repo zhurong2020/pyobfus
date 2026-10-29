@@ -24,6 +24,12 @@ pyobfus --check-delivery dist/ --json   # since 0.7.1: check for mappings, keys 
 # success JSON includes name_verification; review skipped modules when coverage_complete is false
 ```
 
+Core 0.11.0 adds bounded bytecode-origin evidence to `--check-delivery`.
+Frozen executable payloads are not unpacked; inspect JSON warnings even when
+the command exits 0. For unproved project module accesses, the opt-in
+`--preserve-unproved-module-attributes` preserves recognized export names at
+an obfuscation cost; it is not a universal compatibility guarantee.
+
 Keep `mapping.json` private. To restore a traceback:
 
 ```bash

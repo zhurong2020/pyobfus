@@ -206,7 +206,7 @@ patent/release context.
 
 - **Architecture / repository ownership**: [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md).
 - **Community / Pro product boundary**: [`docs/EDITION_BOUNDARY_POLICY.md`](docs/EDITION_BOUNDARY_POLICY.md).
-- **Latest session handoff (2026-10-28)**: [`docs/SESSION_FUNCTIONAL_CLOSEOUT_2026-10-28.md`](docs/SESSION_FUNCTIONAL_CLOSEOUT_2026-10-28.md). Read current plan and TODO next. P0/P2 are merged but unreleased; the bounded 3.15t validation leaves cross-file L3 unsupported. Core 0.10.0 / MCP 0.3.16 / runtime 0.1.1 remain public. The earlier [content/operations closeout](docs/SESSION_CLOSEOUT_2026-10-28.md) retains the DEV, cover, backup and private billing-limit details.
+- **Current execution tracker (2026-10-29)**: [post-0.11.0 progress](docs/POST_011_PROGRESS_2026-10-29.md). Core 0.11.0 is published and verified; MCP 0.3.16/runtime 0.1.1 are unchanged. Update task status after each milestone. Earlier session records are historical.
 - **Current plan / daily source of truth**: [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md).
 - **What to pick up next**: [`docs/TODO.md`](docs/TODO.md), ordered, with acceptance criteria.
 - **Historical detail**: [`docs/POST_V0.4_TODO.md`](docs/POST_V0.4_TODO.md) and [`docs/ROADMAP.md`](docs/ROADMAP.md) are archived context, not the primary cold-start entry.

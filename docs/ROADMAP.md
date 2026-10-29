@@ -1,5 +1,9 @@
 # Development Roadmap
 
+> Current execution: [post-0.11.0 progress](POST_011_PROGRESS_2026-10-29.md).
+> P0 compatibility and bounded P2 diagnostics shipped in Core 0.11.0.
+> Earlier pending-release statements are historical; further coverage is conditional.
+
 > The sections dated before 2026-10-28 are historical roadmap context. The
 > functional expansion supplement below is a current proposal. Operational
 > status and approved work live in [`CURRENT_PLAN_ZH.md`](CURRENT_PLAN_ZH.md)

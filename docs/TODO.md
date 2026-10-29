@@ -10,14 +10,8 @@
 顺序做」，不记录历史。最新依据见
 [`FEATURE_EXPANSION_RESEARCH_2026-10-28.md`](FEATURE_EXPANSION_RESEARCH_2026-10-28.md)；旧版决策快照见[10-20 调研](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)，Python 3.15 的已发布基础范围见 [`PYTHON315_SUPPORT_PLAN.md`](PYTHON315_SUPPORT_PLAN.md)。
 
-最后更新：2026-10-28。公开版本为 Core 0.10.0、MCP 0.3.16、runtime 0.1.1；
-Core 发版与 Zenodo 归档已完成，证据见 [当前计划](CURRENT_PLAN_ZH.md)。
-最新功能交接见 [10-28 功能收尾](SESSION_FUNCTIONAL_CLOSEOUT_2026-10-28.md)；当日 DEV/运营交接见 [10-28 先前收尾](SESSION_CLOSEOUT_2026-10-28.md)，更早的阶段推进见 [Codex 进度](PROGRESS_2026-10-25.md)，运营与待办日期见
-[复盘/巡检准备](OPS_REVIEW_2026-10-25.md)。实现、合并与对外发布分别记录，
-不把已合并的预览代码当成已发布包。
-
-2026-10-26 增量：MCP 0.3.16 已发布，SDK 1.x/2.x 均可正常解析。
-发布证据见 [MCP SDK 2 发布记录](MCP_SDK_2X_RELEASE_PREP_2026-10-26.md)。
+当前版本：Core 0.11.0 / MCP 0.3.16 / runtime 0.1.1。
+任务状态以 [后续执行表](POST_011_PROGRESS_2026-10-29.md) 为入口。
 
 ## 状态口径
 
@@ -36,77 +30,20 @@ Core 发版与 Zenodo 归档已完成，证据见 [当前计划](CURRENT_PLAN_ZH
 普通 13 单元、手动/定时 21 单元不变；独立 L3 六格与 MCP SDK 六格
 兼容矩阵已纳入 CI。必需检查仍为 CI result + CodeQL，不改 ruleset。
 
-## 后续任务顺序（2026-10-22 维护者授权）
+## 当前执行顺序（2026-10-29 授权）
 
-按 [推进计划](ADOPTION_WORKFLOW_PLAN_2026-10-22.md) 顺序执行：
+按 [持续更新的执行表](POST_011_PROGRESS_2026-10-29.md) 推进：
 
-四阶段本地工作已完成，结果见推进计划与 CURRENT_PLAN_ZH.md。本轮修订已于 10-23 经 PR #112 合并，并随 Core 0.9.0 / MCP 0.3.15 发布。PR #120 已于 10-24 合并并随 Core 0.9.1 发布（见 CURRENT_PLAN 顶部）。
+1. P0：清理状态与冷启动入口；补齐公开包产物在目标解释器上的运行验证。
+2. P1：收窄纯文档 CI；核对采用入口与渠道；观察 DEV 与发布反馈。
+3. 11-01 后：先核查私有 CI 成本与账单状态，再同步本地提交。
+4. P2：有真实最小复现后，按正确性、L3 覆盖和资源密钥需求逐项推进。
+5. 3.15 打包／free-threaded 和较大扩展按目标需求单独验收。
 
-**本轮实现收尾**：A–E 已合并并随 Core 0.10.0 发布，
-Linux/Windows × 3.10/3.12/3.15 六格和总 CI 均通过。具体能力与边界见
-[CROSSFILE_OPACITY_VALIDATION.md](CROSSFILE_OPACITY_VALIDATION.md)。
-
-当前顺序：
-
-1. DEV 第二篇已于 10-28 09:43（北京时间）由维护者发布，10:53 补封面；
-   10-29 09:43 后及 11-04 09:43 后核对后台阅读数、互动与具体问题；
-   [X 分享](https://x.com/zhurong0525/status/2115269885244944746)已发布。
-   后续文章复用
-   [DEV 发布清单](DEV_PUBLISHING_CHECKLIST.md)。
-2. 11-01 后待 GitHub 账单限制自然解除，再重跑 `workspace-meta` Guard
-   远端凭据扫描；恢复前不主动重跑或推送该 private 仓库的待同步提交。
-   先审核工作流触发、重复运行、超时和测试成本。10-28 的日备份
-   09:05 完成；本轮新增文章素材于 12:06 补进当日快照和 Google Drive，
-   校验和核对 19 个文件无差异，不重复排为未完成。
-3. Core 0.10.0 发版日 10-27 的非镜像下载数已核为 208；继续观察
-   10-28 起的安静日与来源，区分发版尖峰和 DEV 文章发布。下一次 Core
-   发布以实际缺陷、需求和维护者授权为依据。
-
-**功能扩展顺序（2026-10-28，维护者已授权依次推进；发布另行验收）**：
-P0 先缩小 `json`/`unittest` 模块属性证明导致的生成产物失败；P1 做
-PyInstaller/Nuitka 受限交付矩阵与 L3 预览的离线应用验证；P2 在样本和需求
-支持下扩展 `.pyc`/冻结包交付诊断、L3 方法与其他覆盖；free-threaded 3.15
-另设验证 gate。详细验收见 [功能调研](FEATURE_EXPANSION_RESEARCH_2026-10-28.md)
-及 [roadmap](ROADMAP.md)。账单限制期间不增设高成本远端矩阵。
-
-**维护者随后授权从 P0 依次推进**。P0 包根目录漏判、明确警告和显式
-保守模式已由 PR #154 合并，仍未发布；复现与边界见
-[P0 记录](P0_MODULE_ATTRIBUTE_COMPAT_2026-10-28.md)。P1 的限定 Linux/
-Windows 打包和 L3 离线应用验证已完成，见
-[P1 记录](P1_PACKAGING_VALIDATION_2026-10-28.md)；没有观察到需新增的
-打包产品代码。**P2 交付诊断已由 PR #156 合并、尚未发布**：`.pyc`
-来源对比有界、不可识别时给 `warn`；PE/ELF/Mach-O 冻结包只识别外壳，
-内部未检查会明确警告。证据见
-[P2 诊断记录](P2_DELIVERY_DIAGNOSTICS_2026-10-28.md)。
-其后 L3 方法/嵌套覆盖、resource key provider、参数改名与复杂导入环
-以真实最小化用户场景和兼容约定为入口；当前 P1 样本没有新的阻塞案例，
-条件见 [P2 覆盖 gate](P2_CONDITIONAL_COVERAGE_GATE_2026-10-28.md)。
-free-threaded 3.15 已有一次 Linux 3.15t 有界 Core/runtime 验证，
-见 [3.15t 记录](PYTHON315_FREETHREADING_VALIDATION_2026-10-28.md)；
-跨文件 L3 仍明确拒绝此模式。后续只有实际 3.15t L3 交付需求出现，才
-单独验证加密产物与并发、决定是否放开守卫；干净公开 wheel 和其他 OS
-仍待验收。
-**下一步发布 gate**：P0/P2 已合并且 Core 0.10.0 未包含它们；
-[下一版准备](CORE_NEXT_RELEASE_READINESS_2026-10-28.md)建议 0.11.0，
-但版本、时间、tag/PyPI/Zenodo 均待维护者单独批准。先审核 release
-候选与全部现有检查，不因候选覆盖无新用户案例就扩大 L3 范围。
-
-10-25 复盘和当前可执行巡检已完成，见运营记录；不把未来日期状态写成已检查。
-私有医院应用仍暂停，参数改名等候选保持原范围，不自动扩张功能。
-
-## 10-20 功能路线（3.15 已随 0.8.0 发布）
-
-完整证据：[10-20 路线复核](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)。维护者已将 Python 3.15 设为 P0，其他功能候选排在其后；3.15 实现与验收见 [支持计划](PYTHON315_SUPPORT_PLAN.md) 和 [验证记录](PYTHON315_VALIDATION.md)，已完成独立审核并随 0.8.0 发布。医院应用暂停。
-
-- **已发布参考 PY315-1：惰性 from 导入被提前执行**。原生 Python 3.15.0、当前 checkout 与 PyPI Core 0.7.5 wheel 均复现：`lazy from calculator import Calculator` 改写后丢 `is_lazy`，构建成功但导入副作用时序变化。最小输入与输出见调研 §5.1。Community 兼容性，已修复并补原生回归；0.8.0 发布（#108）。
-- **已发布参考 PY315-2：新字典推导式解包构建失败**。`{**row for row in rows}` 原文在 3.15 可运行，checkout／0.7.5 wheel 构建均报 `NoneType ... _fields`；根因为自定义推导式 visitor 访问 None，六处路径已修复并补原生回归；0.8.0 发布（#108）。
-- **3.15 后续（原 0.8.0 发布后登记）**：`json`/`unittest` 模块属性缺陷已有 P0 修复并合并、待发版；free-threaded 3.15 已做一次 Linux Core/runtime 有界验证，但跨文件 L3 仍拒绝；3.15 上冻结/编译打包未验证。证据分别见 [P0](P0_MODULE_ATTRIBUTE_COMPAT_2026-10-28.md)、[3.15t](PYTHON315_FREETHREADING_VALIDATION_2026-10-28.md)。Black/mypy 配置与 Glama 同步的历史结果见 `CURRENT_PLAN_ZH.md`。
-- `--no-cross-file` mapping 已随 0.9.0 发布；目录 L3 预览 A–E 已随 0.10.0 发布，
-  未一次接入其他 fusion 字段。
-- 参数改名、H B2/B3、资源 key provider 与 L3 方法覆盖继续保持各自真实案例和兼容验收 gate；本轮授权按优先级推进，不等于这些条件已满足或授权对外发布。
-
-三项 10-24 反例及 L3 清单缺失后验修复已经 PR #128 合并（main `a0882a4`），
-最终 39 检查成功 / 2 按配置跳过；修复随 0.10.0 发布，不重复排为未实现功能。
+已发布 P0/P2、P1 有界验证及旧阶段历史见
+[功能交接](SESSION_FUNCTIONAL_CLOSEOUT_2026-10-28.md)和
+[0.11.0 发布核验](CORE_0_11_0_RELEASE_2026-10-29.md)。
+跨文件 L3 仍拒绝 free-threaded；医院应用仍暂停。
 
 ## 后续团队候选：独立的视频原创保护辅助工具（2026-10-23）
 
@@ -116,7 +53,7 @@ free-threaded 3.15 已有一次 Linux 3.15t 有界 Core/runtime 验证，
 
 - **后续采用引导文档（10-22 登记，仅记录）**：当前四阶段之后，按 [AI / Agent 采用引导计划](AGENT_ADOPTION_GUIDANCE_PLAN.md) 复核 llms 镜像、README／首页、集成模板及能力元数据；以迭代、兼容／验证／调试证据说明直接采用的价值，不把代码量当作质量、不写强制推荐指令。本轮未修改对外入口。
 
-- 每周一巡检继续观察 Core 0.10.0 / MCP 0.3.16 反馈、下载安静日、客户调研回答、CI 与备份。无新缺陷时不重复全量测试、不主动增加功能。
+- 每周一巡检继续观察 Core 0.11.0 / MCP 0.3.16 反馈、下载安静日、客户调研回答、CI 与备份。无新缺陷时不重复全量测试、不主动增加功能。
 - **10-25 复盘已完成**；数据与结论见运营记录，继续分开发版日、次日与内容流量。
 - 下次发布按实际新增改动与维护者授权确定，不恢复此前 10-15 的等待通知状态。
 - **3.15 兼容 P0 已随 Core 0.8.0 发布**：后续只跟进已登记的兼容性限制；MCP SDK 2.x 生产支持已随 MCP 0.3.16 发布，mapping 与 Pro 新功能仍分别按需求和授权推进。
