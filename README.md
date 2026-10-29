@@ -22,6 +22,15 @@ mapping file from the build private, and `pyobfus --unmap` turns a production
 traceback back into your original names, for you or an AI coding agent.
 Community is Apache-2.0, has no file or line limits, and requires no trial.
 
+> **What's new in v0.11.0:** `--check-delivery` now reports bounded `.pyc`
+> source evidence and warns when a frozen executable's internal payload has
+> not been inspected. Cross-file builds now recognize package-root absolute
+> imports in module-attribute diagnostics; the optional
+> `--preserve-unproved-module-attributes` keeps recognized export names when
+> compatibility matters more than renaming them. These checks do not prove a
+> delivered artifact safe. See the [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md)
+> and [delivery limits](https://github.com/zhurong2020/pyobfus/blob/main/docs/P2_DELIVERY_DIAGNOSTICS_2026-10-28.md).
+>
 > **What's new in v0.10.0:** Opt-in Pro `--crossfile-opacity` protects selected
 > top-level functions in a multi-module build using an application-provided
 > key. Builds require a fresh output directory and a private mapping;
