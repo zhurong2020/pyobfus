@@ -17,8 +17,8 @@ authors:
     given-names: Rong
     orcid: "https://orcid.org/0009-0008-6087-0581"
     affiliation: "Independent Researcher, Shanghai, China"
-version: 0.10.0
-date-released: "2026-10-27"
+version: 0.11.0
+date-released: "2026-10-29"
 license: Apache-2.0
 repository-code: "https://github.com/zhurong2020/pyobfus"
 url: "https://github.com/zhurong2020/pyobfus"
@@ -36,5 +36,6 @@ keywords:
 # Zenodo concept DOI (all versions — always resolves to the latest archive).
 # Zenodo archives each GitHub release automatically; verify the concept DOI
 # after indexing completes before recording a version-specific DOI here.
-# Verified v0.10.0 archive: 10.5281/zenodo.23687523 (2026-10-27).
+# Latest verified archive before v0.11.0 publication: v0.10.0,
+# 10.5281/zenodo.23687523. Verify the v0.11.0 record after indexing.
 doi: 10.5281/zenodo.20846053
