@@ -98,11 +98,11 @@
 - [ ] **MCP Trust Registry publish**：在其站点注册拿 API token 后
       `MCPTRUSTCHECKER_TOKEN=… npx --yes mcptrustchecker@1.14.0 publish pyobfus-mcp --registry pypi --online --category developer-tools`
       （wheel 已扫 A · 94/100，09-23 已用 CLI help 核对参数；不要把 token 写进 shell history、仓库或聊天）。
-- [ ] **下一笔真实 Pro 购买后核验新发号流程**（2026-10-05 登记，事件触发，由 AI 代理做）。Worker 10-05 起
-      只对已付款发号、序列号由 session 派生，这条路径未用真付款跑过。下次 Stripe 有成功付款时：只读 KV 确认
-      新记录的 `stripe_session_id` 与付款一致、key 格式 `PYOB-XXXX-XXXX-XXXX-XXXX`、只有一条；Stripe
-      Workbench → Event destinations 该次投递为 200；问买家或看 Gmail 确认许可邮件送达。任何一项不符先停下排查，
-      不要在 Dashboard 手工重放事件（Stripe 本身会按退避自动重投）。
+- [x] **下一笔真实 Pro 购买后核验新发号流程**（2026-10-05 登记；**2026-10-29 用一笔真实付款核过**）。
+      KV 只读：该付款对应且只有一条许可记录，`stripe_session_id` 与 Stripe 付款详情 Logs 中的 Checkout Session
+      一致，key 符合 `PYOB-XXXX-XXXX-XXXX-XXXX`；之后联网激活成功，说明许可邮件已送达。
+      Workbench 投递状态未单独打开看（发号与激活已证明 webhook 处理成功）。以后同类核验仍按原步骤：任何一项
+      不符先停下排查，不在 Dashboard 手工重放事件（Stripe 本身会按退避自动重投）。
 - [ ] **10-11 会话遗留的维护者小事**（2026-10-11 收尾登记）：
       ① ChatGPT 账号个性化：AI 回答基线测试时关闭了，测完可按需恢复（恢复后自己看到的推荐不可信，复测前再关）；
       ② Anthropic 目录支持（Tiffany 10-11 来信「仍在处理」）：可选致谢回信，草稿在 10-11 会话，未发；插件提交的是仓库+manifest 路径，
@@ -116,8 +116,12 @@
 - [ ] **Payment Link 开票设置**（2026-10-05 登记，维护者 + API，不急）。链接 `plink_1SSnVd1BxxEBSJisxqFMUKeA`
       由 API 创建，Dashboard 不能编辑。开 `customer_creation=always`（免费，根治访客结账没有 Customer、事后
       开票对不上）或 `invoice_creation`（每笔自动发票，可能另收 Invoicing 费，开前看说明）只能走 API；需先在
-      Dashboard 建只含 Payment Links 写权限的 restricted key 并存进 Vaultwarden。开票需求 10 个月 1 次，
-      等下一次真有人要发票时再做也可以。
+      Dashboard 建只含 Payment Links 写权限的 restricted key 并存进 Vaultwarden。
+      **2026-10-29 更新**：开票请求已不止一次。Dashboard 实看：该链接不收集地址、公司名或税号，
+      Post-payment invoice 关闭，Edit 禁用，买家均为 guest。现行做法是在 Stripe 外自开标明已付的发票，
+      不建 Stripe invoice、不关联付款。改链接仍待维护者决定：若改，优先收集公司名 + 税号（+ 地址）并
+      `customer_creation=always`；若新建链接替换，需同步全部购买入口并先核 Worker 能处理。流程见私有
+      `docs/internal/`（git 忽略）。
 - [ ] **开启任何延迟到账付款方式前的检查**（规则，长期有效）：Worker 与 webhook 订阅已支持
       `checkout.session.async_payment_succeeded`，但开 ACH / SEPA / 银行转账等之前先确认 endpoint 仍订阅该事件，
       开后的第一笔按上面「核验新发号流程」走一遍。Stripe 付款方式是账户级配置，会按它动态展示。
