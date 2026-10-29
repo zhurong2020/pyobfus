@@ -36,6 +36,5 @@ keywords:
 # Zenodo concept DOI (all versions — always resolves to the latest archive).
 # Zenodo archives each GitHub release automatically; verify the concept DOI
 # after indexing completes before recording a version-specific DOI here.
-# Latest verified archive before v0.11.0 publication: v0.10.0,
-# 10.5281/zenodo.23687523. Verify the v0.11.0 record after indexing.
+# Verified v0.11.0 archive: 10.5281/zenodo.23752498 (2026-10-29).
 doi: 10.5281/zenodo.20846053
