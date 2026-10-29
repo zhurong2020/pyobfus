@@ -11,17 +11,22 @@ from typing import Iterable
 # four packages for read_text/read_bytes/open/Path and named repo assets.
 # scripts/check.sh reads docs/llms.txt and docs/.well-known/ai-catalog.json;
 # check_readme_links.py reads README.md and resolves linked repository paths;
-# MCP metadata tests read server.json. Keep these, AGENTS.md, CITATION.cff,
+# MCP metadata tests read server.json. Keep these,
 # llms.txt, skills/, templates/, code-facing assets and every unknown path as
 # code. Published DEV cover images named docs/assets/dev-*.png are not read by
 # the Python packages, tests, or build scripts; the docs build still checks
 # their links. Keep logo.jpeg and generated social-preview.png as code-facing.
-# Allowlist: non-hidden docs/**/*.md prose and published DEV cover images.
+# Root AGENTS.md/CLAUDE.md and CITATION.cff are guidance/citation metadata,
+# not read by runtime or test/build logic (read-path audit 2026-10-29).
+# Lint/docs and CodeQL remain required. README and machine-facing metadata stay code.
+# Allowlist: these three root files, docs prose, and published DEV covers.
 # All .py, scripts/**, .github/** and pyproject.toml paths stay code.
 # Full grep evidence: maintainer's gitignored ci-speed-evidence/path-read-audit.txt.
 
 
 def docs_only(path: str) -> bool:
+    if path in {"AGENTS.md", "CLAUDE.md", "CITATION.cff"}:
+        return True
     parts = PurePosixPath(path).parts
     if (
         len(parts) < 2
