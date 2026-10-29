@@ -16,7 +16,7 @@ After that, every clone-local git operation will pick up the hooks here.
 
 ### `pre-commit`
 
-Two independent scans, each with its own allowlist and its own bypass.
+Three independent scans, each with its own allowlist and its own bypass.
 
 #### Scan 1 — PII
 
@@ -78,6 +78,49 @@ PYOBFUS_ALLOW_SECRET=1 git commit ...
 
 If a blocked credential was ever real, **rotate it**. Removing it from the
 file is not a rotation.
+
+#### Scan 3 — customer and business data
+
+Added 2026-10-29, after a plan entry nearly published a customer's payment
+and invoice details: scans 1 and 2 only know fixed personal words and
+credential prefixes, so a customer e-mail or a Stripe object ID passed both.
+
+Checks **newly added lines only** (existing tracked content does not block
+unrelated edits) for:
+
+- Stripe object IDs: `cs_live_`, `pi_`, `ch_`, `gcus_`, `cus_`, `po_`,
+  `plink_`, `in_`, `we_` and similar prefixes followed by 14+ alphanumerics.
+  Identifiers such as `pi_value` or `in_place_ops` do not match.
+- E-mail addresses not on `CUSTOMER_EMAIL_ALLOW_RE` (documentation/test
+  domains, the maintainer's public addresses, project and vendor support
+  addresses). Source files (`.py`, `.ts`, `.js` …) and lock files are skipped
+  for this check only: decorators like `x@enum.global_enum` look like
+  addresses.
+
+Patterns live in `.githooks/customer-data-patterns.sh`, shared with the
+`commit-msg` hook. Hits print `file:line` and the kind only. When added, a
+replay of every tracked line found one real Stripe ID (removed separately)
+and three false positives, which the allowlists now cover.
+
+This is a backstop, not the rule. What belongs in public docs is decided by
+the "Public vs private records" convention in `AGENTS.md`: amounts, dates
+and "company buyer" can identify a customer without any e-mail or ID.
+
+**Allowlisted files**: `.githooks/*` and `docs/V0.4_EXECUTION_LOG.md`
+(`CUSTOMER_ALLOWLIST_RE` in `pre-commit`). A legitimate public address goes
+into `CUSTOMER_EMAIL_ALLOW_RE`.
+
+**Bypass once**, for a reviewed false positive:
+
+```bash
+PYOBFUS_ALLOW_CUSTOMER_DATA=1 git commit ...
+```
+
+### `commit-msg`
+
+Added 2026-10-29. Applies scan 3 to the commit message (comment lines and
+the scissors section excluded): commit messages are as public and permanent
+as file content. Same bypass variable.
 
 ### `pre-push`
 
