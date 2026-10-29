@@ -173,7 +173,7 @@ pip install -e ".[dev]"
 git config core.hooksPath .githooks
 ```
 
-**pre-commit 防护钩子**：`.githooks/pre-commit` 有两道**互相独立**的扫描。① PII：拦截 `诸嵘 / 陈启稚 / qizhi_chen / 身份证 / /home/wuxia/` 5 个模式，源于 2026-05-03 的 git 历史改写（见 `docs/V0.4_EXECUTION_LOG.md` Sessions 13-15）。② 凭证（2026-09-07 加）：拦截 Open VSX/PyPI/GitHub/GitLab/npm/Anthropic/OpenAI/AWS/Slack/Google token 前缀与 PEM 私钥头，命中时**只打印 `file:line` 不打印内容**。两道各有独立旁路（`PYOBFUS_ALLOW_PII=1` / `PYOBFUS_ALLOW_SECRET=1`），放行 PII 不会顺带放行密钥。详见 `.githooks/README.md`。
+**pre-commit 防护钩子**：`.githooks/pre-commit` 有三道**互相独立**的扫描。① PII：拦截 `诸嵘 / 陈启稚 / qizhi_chen / 身份证 / /home/wuxia/` 5 个模式，源于 2026-05-03 的 git 历史改写（见 `docs/V0.4_EXECUTION_LOG.md` Sessions 13-15）。② 凭证（2026-09-07 加）：拦截 Open VSX/PyPI/GitHub/GitLab/npm/Anthropic/OpenAI/AWS/Slack/Google token 前缀与 PEM 私钥头，命中时**只打印 `file:line` 不打印内容**。③ 客户/经营数据（2026-10-29 加，只查新增行）：Stripe 对象 ID 与白名单外的邮箱，`commit-msg` 钩子对提交信息做同样检查。三道各有独立旁路（`PYOBFUS_ALLOW_PII=1` / `PYOBFUS_ALLOW_SECRET=1` / `PYOBFUS_ALLOW_CUSTOMER_DATA=1`），放行 PII 不会顺带放行密钥。详见 `.githooks/README.md`。
 
 ### 测试
 
