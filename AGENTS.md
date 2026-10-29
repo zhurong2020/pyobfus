@@ -184,6 +184,22 @@ cloudflare-worker/  # Pro license verification Worker
   historical price into a current claim. Link the central scope/disclaimer in
   `docs/COMPARISON.md`, acknowledge genuine competitor strengths, and recheck
   changeable facts before publishing.
+- **Public vs private records.** Plans, TODOs, changelogs and commit messages
+  in this repo are public and permanent. Sort every fact before writing it:
+  - *Personal data* (customer names, emails, addresses, tax IDs, card or bank
+    details, the maintainer's identity checks) — never here.
+  - *Business-confidential* (per-sale amounts, payouts, customer counts and
+    purchase dates, Stripe object IDs such as `cs_live_`/`pi_`/`gcus_`,
+    account review or fraud details, support-case narratives) — private by
+    default: git-ignored `docs/internal/` (backed up daily) or private memory.
+  - *Engineering facts* (a code path was verified by a real case, a
+    configuration gap needs a decision) — public, written abstractly: what
+    happened and what must be decided, not who, when or how much.
+
+  In a public doc, leave one sentence plus a pointer to the private record.
+  With few customers, a date plus country plus "company buyer" identifies
+  someone even without a name. The pre-commit hook catches some identifiers
+  and Stripe IDs, not judgment calls.
 
 ## 🟢 Patent gate — CLEARED 2026-06-17 (v0.5 Pro mechanisms now releasable)
 

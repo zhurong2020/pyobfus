@@ -123,7 +123,7 @@ Ruff 0.17.1 / Bandit 1.9.4 四例，结果与既有证据一致；草稿与发�
 仍只有三篇旧文，第二篇本地草稿保持 `published: false`，未确认维护者署名、
 预览或发布。`workspace-meta` Guard 最新运行仍被 GitHub 账单限制挡在作业
 启动前；本地 `scripts/scan_credentials.sh` 通过，远端扫描待账单恢复后重跑。
-今日 KV 导出已完成（license 6、trial 0）；日备份服务正在运行，
+今日 KV 导出已完成；日备份服务正在运行，
 截至此时云端完整镜像标记仍为 10-27 07:59:51，不能称 10-28 云端已完成。
 维护者确认 GitHub 账号账单限制预计 11-01 后自然解除；在此之前不重跑
 Guard。以后操作 private 仓库时，先检查工作流触发条件、并发/重复运行、
@@ -385,8 +385,7 @@ ChatGPT 不联网 0/12 且不认识 pyobfus；Gemini 因出口 IP 被 Google 定
 main CI / CodeQL / License Endpoint Monitor 全绿。Core 近 7 天安静日中位数 `34`（10-07/08 发版日 268/169，10-09 回落 73），
 近 30 天 `30`——与 9 月基线 31 持平，10-02/03 的苗头未延续；MCP 近 7 天中位数 `5`；Marketplace `13 installs`（+1），
 Open VSX `656`，Action 引用 `0`；GitHub 14 天浏览 `213`/独立 `121`，来源 Google/GitHub/Bing，chatgpt.com 2，内容渠道未出现。
-Gmail：无客户等回复，10-10 的 5 封 0.6.1 通知暂无回信。KV 实读：6 条许可、trial `0`；09-12 报障客户已于 10-05
-（我方去信约 1 小时后）联网激活成功，原「未激活」跟进结案；另有一位 8 月客户从未激活、一位 6 月客户无设备记录，均未来信。
+Gmail：无客户等回复，0.6.1 通知暂无回信；客户激活状态见私有记录。
 Glama 10-08、10-10 各报一次 `pyobfus-mcp` 构建失败（与两次 Core 发版同日）；干净 venv 实测 `pyobfus-mcp 0.3.12` +
 Core 0.6.1 + mcp 1.30.0 握手 8 工具正常，公开页与徽章 200，维护者随后看 admin 日志：10-10 test `01a12660-…` 状态 failure、耗时 11 ms、Docker build logs 为空，错误是 Glama 自家 docker-modem 调构建服务时 nginx 返回 `502 Bad Gateway`——构建根本没开始，与我们的包无关，结案；Build steps 仍为 `pyobfus-mcp==0.3.12`，无需改。（Glama 后台 10 月已改版，Tests 列表在 Dockerfile 页。）10-11 维护者重试一次（test `01a1281f-…`，6 ms）仍是同一 502；维护者定先等几天，不发信、不再点。
 结论：无代码动作，不触发发版。
@@ -466,10 +465,10 @@ lane（7 个 HTTP 场景逐字一致，周跑 + 手动）、Show and tell 表单
 10-04=26、10-05=40），近 30 天 `31`：首次在完整一周上高于 9 月基线 31，仍只记为苗头，10-25 用 4 周数据判定。MCP 近 7 天
 中位数 `4`（10-04 起回落到 4，10-01–03 的 21–26 按一次性处理，不再追查）。Marketplace `12 installs`，Open VSX `626`，
 Action 引用 `0`；GitHub 14 天浏览 `224`/独立 `113`，来源仍为 Google/GitHub/PyPI，内容渠道未出现。Gmail 无客户等待回复
-（09-12 报障客户与 10-01 新客户最后一封均为我方 10-05 来信；plugin 孤儿锁仍停在 Rudy 09-28「已升级内部」）。
+（plugin 孤儿锁仍停在 Rudy 09-28「已升级内部」）。
 结论：无需动作，不触发发版。
 
-**2026-10-05 补充（Pro 新购核对 + 下载量补读）**：Stripe 新增两笔 Pro 付款，KV 实读确认均有许可记录（webhook 正常）：10-01 那位 4 分钟内联网激活成功（新格式设备记录，即 0.5.26 修复后首个一次成功的新客户）；09-12 那位（即报出边缘拦截故障的客户）至今未联网激活，当时给的 `--no-verify` 不经服务器、KV 无从判断。10-05 已各发一封邮件（补兑「修复发布会通知」的承诺 / 欢迎信）。KV 无 trial 登记。补读 10-04 下载：Core 当日 26，近 7 天安静日中位数 `44`（6 个安静日），仍只算苗头；MCP 10-04 回落到 4，10-01–03 的放量暂按一次性处理。同日维护者在 Stripe Dashboard 完成税务设置（Tax Basic，只追踪门槛、未开启收税；产品类别Downloadable Software - business use）；首页「Blocked US$45」核实为 09-30 一次盗刷试卡（25 秒换 4 张卡、风险全 Highest，Radar 拦截，未扣款），近 4 周无真实买家流失；10-05 一笔 WeChat Pay 未完成付款，未发号属正常。随后完成：Stripe 产品描述/metadata 改为四类 Pro 价值口径；付款后确认页 `LICENSE_ACTIVATION_GUIDE.md` 按实际许可行为重写；Worker 改为只对已付款发号、处理延迟到账成功、按 session 派生序列号防重复（替换 `Math.random()`），许可邮件同步，经批准于 10-05 部署（`dfd8870`，冒烟与 Endpoint Monitor 通过）。维护者随后在 Stripe webhook endpoint（`we_1SSkvI…`）加订阅 `checkout.session.async_payment_succeeded`，现监听 2 个事件，本周投递 1 次 0 失败。余项见 `TODO.md`：Payment Link 开票设置（API 创建，需 restricted key）、Worker 测试接入 CI。客户身份只记在私有 memory，不进本仓库。
+**2026-10-05 补充（Stripe/Worker 整改 + 下载量补读）**：补读 10-04 下载：Core 当日 26，近 7 天安静日中位数 `44`（6 个安静日），仍只算苗头；MCP 10-04 回落到 4，10-01–03 的放量暂按一次性处理。Worker 改为只对已付款发号、处理延迟到账成功、按 session 派生序列号防重复（替换 `Math.random()`），许可邮件同步，经批准于 10-05 部署（`dfd8870`，冒烟与 Endpoint Monitor 通过）；webhook 增订 `checkout.session.async_payment_succeeded`；付款后确认页 `LICENSE_ACTIVATION_GUIDE.md` 按实际许可行为重写；Stripe 产品文案与税务设置更新。付款、客户与风控细节在私有记录。余项见 `TODO.md`。
 
 **2026-10-04 进度核查（静默期第 2 周，查询于 10-05 00:23 UTC，PyPI 数据截至 10-03）**：仓库与
 `origin/main` 同步（仅新增 Dependabot #56，typescript-eslint 8.70.1→8.71.0，33 项检查全绿后自动合并），
@@ -561,8 +560,7 @@ mypy 4 个包、元数据、README 链接、`mkdocs --strict`），CI 的 lint/d
 0 open issue/PR，Dependabot 自动合并 #50/#51。下载（不含镜像，数据截至 09-28）：Core 近 7 天安静日中位数 `21`
 （仅 3 个安静日）、近 30 天 `30`，09-28 为 0.5.30 后首个干净安静日 `26`；MCP `4/7`（续降，量太小先观察）；runtime
 继续以本仓库 CI 为主；Marketplace `11 installs`、Open VSX `598`、Action 可见引用 `0`。GitHub 14 天浏览 `301`/独立 `169`，
-来源仍是 github.com / pypi.org / 搜索引擎 / chatgpt.com，内容渠道未出现。KV：license 5 条（最新 09-12，**无新购买**），
-**trial 登记仍 0**（上线 8 天）。Gmail：无人在等我们；plugin 孤儿锁线程 **Rudy 09-28 回信已升级内部、有消息再跟进**，
+来源仍是 github.com / pypi.org / 搜索引擎 / chatgpt.com，内容渠道未出现。**trial 登记仍 0**（上线 8 天）。Gmail：无人在等我们；plugin 孤儿锁线程 **Rudy 09-28 回信已升级内部、有消息再跟进**，
 09-27 定的「09-30 前无回复则跟进」取消。免发版小改：GitHub 流量来源并进 `scripts/download_snapshot.py`；第 2 篇内容
 草稿（SARIF `|| true`）已写入 gitignored `docs/internal/content-2026-10/`。基线判断等 10-05 攒满一整周安静日再读。
 同日续：确认 AI/Agent 这一层（`llms.txt` 已到 0.5.30、`AGENTS.md`、skills、MCP 各渠道、08-31 SEO Wave A/B/C）
@@ -1020,14 +1018,12 @@ Cloudflare 边缘拦 `urllib` 默认的 `Python-urllib/*` User-Agent（403 +
 真正让一次 CDN 策略变更变成两个月收入损失的，是两件设计缺陷：许可系统对付费客户
 **fail closed**，而且**没有任何监控**。排查中又查出三件更早的缺陷，都比主故障更久：
 
-- **8 月那位企业客户其实也从未成功激活**（`devices: []` 且无 `last_verified`），
-  他只说了 "going well" 并转去问发票，没提激活。**空 devices 是「从未成功验证」的
-  指纹，不是无害默认值。**
-- **一封客户求助邮件躺了三个月未读未回**（2026-06-10）。他要求重置设备绑定，而
-  三个槽位已满被服务端直接拒绝，其中**一格是我们自己写的 `test-device`**。
+- **另有客户其实从未成功激活却没有报告**。**空 `devices` 且无 `last_verified`
+  是「从未成功验证」的指纹，不是无害默认值。**
+- **一封客户求助邮件长期未读未回**。重置设备绑定的请求因三个槽位已满被服务端
+  直接拒绝，其中**一格是我们自己写的 `test-device`**。
 - **设备指纹把 `platform.release()` 算进哈希**，OS 小版本升级就换身份、本地缓存
-  随之失效、CLI 报「没有许可证」、重新注册再烧一格。这正是他抱怨的
-  「it keeps thinking I'm different devices」。另外 `uuid.getnode()` 拿不到网卡
+  随之失效、CLI 报「没有许可证」、重新注册再烧一格，表现为同一台机器被当成新设备。另外 `uuid.getnode()` 拿不到网卡
   地址时 Python 返回随机数，那样每次运行都是新设备。
 
 还有一个反向缺陷：**吊销从来没生效过**。服务端说 revoked，客户端的离线缓存回退
@@ -1389,15 +1385,8 @@ A）——用户决定过几天再发，发版四步（版本号/CHANGELOG/READM
 通知，不自行发版。** 以下历史段保留 09-03 关账内容。）
 
 更新时间：2026-09-03（`pyobfus` 0.5.20 与 `pyobfus-mcp` 0.3.10 已发布；
-`vscode-extension` 最新仍为 0.4.1。既有付款
-现已成功关联，Dashboard 显示 Paid / US$0.00 remaining，且 Stripe 生成的收据
-正确。2026-09-01 Stripe Support 最终确认：`send invoice` 流程的 invoice PDF
-按设计永久保留原始应付金额和付款条款，付款关联后无法重生成零余额或 `Paid`
-样式；单独的 Invoice Receipt 才是该流程的正式付款证明。维护者已在原客户线程
-说明并纠正先前会补发 corrected paid-invoice PDF 的预期，附上正确 Stripe
-Invoice Receipt，重申无需付款或操作；未发送仍显示应付的 invoice PDF。
-该客户开票支持事项已完成，不得再开贷项通知单、退款、解除付款或重新扣款。
-客户回访改为被动等待客户邮件，不主动追发；长尾词/AI 搜索优化
+`vscode-extension` 最新仍为 0.4.1。08 月开票支持事项已结案
+（经过与教训在私有记录）。长尾词/AI 搜索优化
 Wave A/B/C 均已于 2026-09-01 完成。Wave C 经用户明确批准作为独立
 SEO 小版本发布：Core 0.5.20 / MCP 0.3.10 已在 PyPI、GitHub Release 与
 MCP Registry 全渠道核实；Registry 0.3.10 为 `active` / `isLatest=true`。
@@ -1408,11 +1397,6 @@ MCP Registry 全渠道核实；Registry 0.3.10 为 `active` / `isLatest=true`。
 HTTP 200，全新虚拟环境 `pip install pyobfus==0.5.19` 已核实带上两个新 flag，
 GitHub Release 已建，Release / CI 全矩阵 / CodeQL 均绿。后续正式发布仍须单独
 取得用户同意）
-
-**2026-09-03 12:41 客户回信确认**：客户在原邮件线程回复“Thanks for sharing
-the invoice. This should work.”，表示已接受此前发送的 Stripe Invoice Receipt，
-未提出替换 invoice PDF 或其他开票要求。开票支持事项继续保持已完成；不主动追发，
-除非客户提出新的具体需求。
 
 这份文档是当前项目状态和后续计划的中文单一入口，面向维护者日常查看。旧的
 `ROADMAP.md` 和 `POST_V0.4_TODO.md` 保留为历史归档和详细来源，但后续日常
@@ -1712,54 +1696,9 @@ suppression → 两个观察窗口 → new-finding gate，且不得为 dashboard
   unique`、`214 views / 85 unique`，仍有明显发布尖峰；6 stars、2 forks、0
   open issue/PR，Discussion 无新反馈。数据尚未覆盖 09-01 的 0.5.20/0.3.10，
   待至少覆盖 09-02 后再做该版本专项复查。
-- **2026-08-26 首个真实 Pro 客户售后信号（匿名记录）**：客户主动确认当前
-  使用“going well”，随后提出已完成购买的企业开票需求。已回复并请求确认
-  个人/公司收票主体、法定实体名称、账单地址、税号及 PO/reference；不提前
-  把一次开票需求解释为团队许可或企业功能需求。PII、支付编号与具体开票
-  资料只保存在 Git 忽略的本地运营记录，不进入公开仓库。
-- **2026-08-27 客户已回复开票资料**：收票主体为一家公司法律实体（某地区
-  子公司，与邮件签名里的美国母公司不同），需按客户书面确认的实体名/地址
-  开具，可选放一个联系人姓名；未提供单独税号，也未要求 PO 号。字面开票
-  信息只在邮件线程 + Git 忽略的 `docs/internal/CUSTOMER_SUPPORT_LOG.md`
-  + `docs/internal/STRIPE_POST_PURCHASE_INVOICE_RUNBOOK.md`，不进公开仓库。
-  **2026-09-01 已完成**：Stripe 最终确认 Invoice Receipt 是该流程的付款证明，
-  已向客户说明并交付正确 receipt，未发送仍显示应付的 invoice PDF。现按下方
-  “恢复工作清单”推进。客户回访仅等待客户自行来信，不主动追发；若收到回复，
-  再把实际使用功能及工作流需求作为排序证据，不推销预设功能。
-- **2026-08-27 发票遇 Stripe 侧 blocker，已联系 Support**：原始 Payment
-  Link 付款挂在 Stripe guest customer 下，发票建在 regular Customer 下，
-  Stripe「应用付款」报 400 customer 不匹配；作废重建两次无效。按 runbook
-  的 guest-customer 分支，已于 2026-08-27 通过认证 Dashboard 联系 Stripe
-  Support（诉求：把既有付款关联到发票、产出正确的已付发票 PDF、不二次
-  收款、抬头保持公司实体）。中途在 Dashboard AI 助手指引下用了「mark as
-  paid」，结果不一致：列表显示已付但 PDF 仍显示应付金额 + 未来到期日。
-  **等待 Support 回复期间**：不把发票/PDF 发给客户、不再作废重建、不再
-  「mark as paid」、不退款重扣。**2026-08-27：Stripe 自动开票通知邮件已发
-  到客户（显示应付金额 + ~30 天到期日）——不是新扣款；已同日手动给客户
-  回信（改编 runbook 进度更新模板，reply 到客户 08-27 邮件线程）：自动邮件
-  不是新扣款、购买已付清、正在把发票关联到既有付款、与 Stripe support
-  处理中、几个工作日内补正确的 US$0.00 PDF（抬头保持公司实体），未含任何
-  Stripe 标识符/PII。因此冷启动无需再发例行进度更新，除非 Support 往返
-  拖很久。** 字面开票信息与 Stripe 标识符只在邮件线程 +
-  `docs/internal/CUSTOMER_SUPPORT_LOG.md`（Git 忽略），不进公开仓库。
-- **2026-08-28 付款关联已成功，但 invoice PDF 仍未同步**：Dashboard 已显示
-  Paid、全额支付、余额为 US$0.00；同一账单通过「发送账单收据」产生的 receipt
-  PDF 也正确显示原购买日与全额已付，但无痕窗口中新下载的 invoice PDF 仍显示
-  全额应付和未来到期日。未照 Support 的早期通用建议开全额贷项通知单，因为
-  有效销售在付款后做贷记会错误表达退款/客户余额/外部贷记。已将互相矛盾的
-  两份 PDF 附在 Support 原线程，请 Billing/Invoicing 技术团队刷新；附件仅存
-  Git 忽略的内部归档。当前 hold：不向客户发送错误 invoice，不退款、不贷记、
-  不解除付款、不重新扣款；正确 receipt 只在交付紧急时作为临时证明，不能
-  默默替代客户要求的 paid invoice。
-- **2026-08-30 Dashboard 新下载仍错误，已要求工程升级处理**：Stripe Support
-  将矛盾归因于最长 24 小时的 CDN 缓存，并要求从实时 Dashboard 下载；实际
-  严格照做后，新生成文件在付款成功关联 84+ 小时后仍显示全额应付和未来到期
-  日。文件时间与 digest 均证明不是误开旧本地文件；同时保存的 Dashboard
-  截图明确显示 Paid、全额付款已应用、余额 US$0.00。已在原 Support 线程附上
-  新 PDF 与截图，请 Billing/Invoicing 工程团队重生成/失效错误 PDF asset，
-  hold 清单不变。客户确认未收到 Stripe 的错误自动邮件；已回复其购买全额付清、
-  无需付款或操作，待正确公司抬头 paid invoice 就绪后再发送，未向其发送错误
-  PDF 或 Stripe 内部细节。字面标识符与附件仍只在 Git 忽略的内部归档和邮件中。
+- **2026-08-26 至 09-03 首次开票支持（已结案）**：首个企业开票请求在 Stripe 侧遇到
+  guest customer 与 send-invoice PDF 限制，最终以 Invoice Receipt 交付并获客户接受；
+  不据此推断团队许可或企业功能需求。经过、教训与处理规则见私有 runbook 与支持日志。
 - **2026-08-24 发布后反馈全量审计**：GitHub 当前 0 open issue、0 open PR；
   Discussions 共 6 条，最新项目公告仍为 08-01 且 0 评论，尚无人提到
   `dependency_advisory` 或要求脱离混淆单独使用。仓库已有 6 stars / 2 forks；
@@ -2133,8 +2072,8 @@ bytecode 加密。
 （含 `--check`/MCP 共用的 `core/config_resolve.py` helper、`PreflightReport` 增量字段、JSON
 契约全文、测试清单、rollout）。调研+设计解决了技术依据，但不等于用户验证；
 用户已于 2026-08-28 打开实现 gate，并接受下方三个推荐决策；首选项已进入
-代码与测试，并在用户明确批准后完成 0.5.18 / 0.3.9 全渠道发布。2026-09-01
-Stripe 已给出最终文档结论，Invoice Receipt 已交付客户，发票事项结案。
+代码与测试，并在用户明确批准后完成 0.5.18 / 0.3.9 全渠道发布。08 月开票事项
+已于 09-01 结案。
 
 **发布 gate（用户 2026-08-28 再确认）**：实现完成不等于允许发布。正式改
 版本号、打 tag 或触发 PyPI/MCP/Marketplace 发布前必须再次取得用户明确同意。
@@ -2418,13 +2357,8 @@ pyobfus 不追 compiler/installer 主线的判断。
      registry，而是：注册后可疑度（包年龄/发布历史/源码链接）、SARIF/CI
      可阻断模式、缓存/并发/私有 index allowlist；保持现有 advisory 默认
      非阻断和诚实能力边界。
-10. **2026-08-27 客户跟进与下一轮功能 gate**：客户已回复开票主体（公司
-    实体，见 `docs/internal/CUSTOMER_SUPPORT_LOG.md` 2026-08-27 条）。
-    ✅ **2026-09-01 已完成**：Stripe Support 最终确认 `send invoice` 的 invoice
-    PDF 不会因后续付款而改成零余额或 `Paid`，Invoice Receipt 才是正式付款
-    证明。已在客户原线程解释并纠正先前预期，附上正确 receipt；错误 invoice
-    PDF 未发送。不得贷记、退款、解除付款或重扣。客户回访改为被动等待客户
-    邮件，不主动追发；若收到实际使用功能或大项目/CI/CD/团队工作流反馈，作为上方 P2 候选
+10. **客户反馈与下一轮功能 gate**：08 月开票事项已于 09-01 结案（私有记录）。
+    客户回访被动等待；若收到实际使用功能或大项目/CI/CD/团队工作流反馈，作为上方 P2 候选
     排序证据。`--plan` 已随 0.5.19 发布；delivery bundle、mapping 加密、团队
     license UX 仍需真实重复需求才做。
 11. **✅ 长尾词 / AI 搜索优化 rollout（2026-09-01 完成）**：
@@ -2468,10 +2402,7 @@ pyobfus 不追 compiler/installer 主线的判断。
 
 ## 恢复工作清单（发票交付后按序执行）
 
-> 2026-09-01 cold-start：Stripe 已确认 invoice PDF 的表现是 `send invoice`
-> 流程设计，正确付款证明为 Invoice Receipt；客户说明与 receipt 均已发送，
-> 支持事项完成，本清单立即生效。仍不要贷记/退款/解除付款/重扣；正式发版继续
-> 等待用户单独确认。
+> 2026-09-01 起生效（08 月开票事项已结案）；正式发版继续等待用户单独确认。
 
 1. **前置检查**：`git status` 干净、`origin/main` 已同步；三个测试根
    （`tests/`、`pyobfus_mcp/tests/`、`integration_tests/`）+ `black`/`ruff`/
