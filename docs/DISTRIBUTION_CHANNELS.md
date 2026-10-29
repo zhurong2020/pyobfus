@@ -7,7 +7,19 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-**Last updated**: 2026-10-28. Core 0.10.0's October 27 release day recorded
+**Latest channel update: 2026-10-29.** See the verified Glama update below.
+
+**2026-10-29 Glama 更新已确认**：维护者提供的管理员日志显示 build
+`01a186f7-6173-7520-92bf-877374e4b37f` 于 17:22 CST 成功（10.4 秒），
+安装 Core 0.11.0 / MCP 0.3.16 / runtime 0.1.1；MCP 初始化返回
+0.3.16，九个工具发现成功。渠道 release **0.10.2** 已发布，渠道号与
+Core 包版本独立。Build Spec 标记 Python 3.12，但 uv 安装日志显示
+`Python 3.13.5 environment at /usr`；未获取服务进程解释器路径，不能
+将该构建当作 Python 3.12 验证。checkout 为旧提交 `b05e29e`，安装步骤
+明确从 PyPI 固定版本安装；旧 checkout 不等于运行旧 Core。当前成功证据
+覆盖构建、握手和工具发现，未代表九个工具均执行过业务调用。
+
+**October 28 snapshot (historical)**: Core 0.10.0's October 27 release day recorded
 208 non-mirror downloads; this predates the October 28 DEV SARIF article and
 does not measure its effect. The next quiet-day and referral review is pending.
 The fourth DEV post is live with a custom cover, and the maintainer shared it
