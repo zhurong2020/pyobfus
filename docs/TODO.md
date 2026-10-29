@@ -92,7 +92,7 @@
       复现锁报错，并于 09-26 在原线程附上「No submissions yet」与 repository/path lock 两张截图，提供
       Claude Code workspace ID，请求后端定位/释放。**09-28 Rudy 回信「已升级内部，有消息再跟进」——球在对方，不必再催；锁没释放前别再点表单或换路径绕过**。**10-14 Tiffany 确认：原提交归属当前账号，无需补材料或寻找别的账号；目录团队解除锁后，使用 `claude.ai/directory/manage` developer portal 重提，Console 表单已停用。继续等待，不换仓库/路径重提。** **10-21 Tiffany 新信：团队仍在处理，取得进展后会通知；无需新动作。** 字段/描述与证据见
       `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`。
-- [x] **通知 Pro 客户升级到 0.6.1**（10-10 维护者定：发；草稿私有 `docs/internal/content-2026-10/pro_customer_notice_0.6.1.md`，10-10 已按线上许可证记录建 5 封 Gmail 草稿（每人一封、排除维护者自用许可证；未激活的那位多一句协助激活），维护者 10-10 12:35 已逐封发出（Gmail「已发送」核实 5 封、草稿箱清空）；有回信按 `/pyobfus-inbox` 跟进；取代原「是否通知升级到 0.5.32」，0.6.1 已含该修复）。原登记（2026-10-07）：0.5.10–0.5.31 的目录构建遇到同模块
+- [x] **通知 Pro 客户升级到 0.6.1**（10-10 维护者定：发；草稿私有 `docs/internal/content-2026-10/pro_customer_notice_0.6.1.md`，10-10 已按线上许可证记录逐个起草，维护者当日发出（Gmail「已发送」已核）；有回信按 `/pyobfus-inbox` 跟进；取代原「是否通知升级到 0.5.32」，0.6.1 已含该修复）。原登记（2026-10-07）：0.5.10–0.5.31 的目录构建遇到同模块
       装饰器/基类/lambda 会 import 时 NameError。两位 10 月新客户如用过目录构建可能受影响；需要的话由 Claude 起草、
       维护者审后发送，AI 代理不直接发信。
 - [ ] **MCP Trust Registry publish**：在其站点注册拿 API token 后
@@ -109,11 +109,9 @@
       会按最新 GitHub 代码安装，**无需更新提交内容**；
       ③ `--check` 仍默认联网（CLI，MCP 默认关）——10-11 定「等 Codex 这波完成后再审」，现可决定是否改默认离线；
       ⑤ 约 10-14 看 DEV 第 1 篇反响与 GitHub 流量来源，再决定是否投 HN（Show HN 已用过，只能普通投稿）。
-- [ ] **0.6.1 通知的回信**（10-10 发出 5 封，身份记在私有 memory）：随每周一巡检看 Gmail。10-11 KV 实读：
-      09-12 报障客户已于 10-05 联网激活成功（原「未激活」跟进结案）；另有一位 8 月客户至今从未联网激活、
-      一位 6 月客户当前无设备记录，二人均未来信——回信若报激活问题按 `LICENSE_ACTIVATION_GUIDE.md` 排障，
-      不再主动追发第二封。
-- [ ] **Payment Link 开票设置**（2026-10-05 登记，维护者 + API，不急）。链接 `plink_1SSnVd1BxxEBSJisxqFMUKeA`
+- [ ] **0.6.1 通知的回信**：随每周一巡检看 Gmail；回信若报激活问题按 `LICENSE_ACTIVATION_GUIDE.md`
+      排障，不主动追发第二封。各客户激活状态只在私有记录。
+- [ ] **Payment Link 开票设置**（2026-10-05 登记，维护者 + API，不急）。该链接
       由 API 创建，Dashboard 不能编辑。开 `customer_creation=always`（免费，根治访客结账没有 Customer、事后
       开票对不上）或 `invoice_creation`（每笔自动发票，可能另收 Invoicing 费，开前看说明）只能走 API；需先在
       Dashboard 建只含 Payment Links 写权限的 restricted key 并存进 Vaultwarden。
