@@ -59,7 +59,30 @@ pypi-attestations verify pypi \
 Repeat for each wheel/sdist you intend to trust or mirror. Do not verify only
 one file and assume the whole release is covered.
 
-## Latest Verified Snapshot — 2026-10-27
+## Latest Verified Snapshot — 2026-10-30
+
+Core 0.11.1 and MCP 0.3.17 were published from the same reviewed commit on
+2026-10-30. `pypi-attestations 0.0.30 verify pypi --repository`
+cryptographically verified both wheel and sdist for each project against
+`https://github.com/zhurong2020/pyobfus`. PyPI JSON digests:
+
+| Project | Version | Wheel SHA-256 | sdist SHA-256 |
+|---|---:|---|---|
+| `pyobfus` | `0.11.1` | `4d067b57ba55ef654094e3da4ae8e5d2947de5601a2dea6d07a80139683a4ed4` | `be3141c6c8ffdaca1e4a8a19376bb25cb44ee33b3241cc84d31d76bb8bf0357a` |
+| `pyobfus-mcp` | `0.3.17` | `422f8c06b1fbf34ff170a878badf4f5f434b91261e6e1770b91af6e4fb4a9a50` | `b9a87c15fd1b8e773d3b7b453f67dd785df952246a16f558870681c11415de38` |
+
+Both artifacts for each project passed cryptographic verification. Core and
+MCP fresh installs and `pip check` passed in isolated environments; the MCP
+install resolved Core 0.11.1 and runtime 0.1.1. MCP release workflow
+`41020413288` succeeded. Both MCP Integrity API endpoints returned HTTP 200.
+The MCP Registry versions endpoint reports 0.3.17
+`active` / `isLatest=true`. See the [Core GitHub Release](https://github.com/zhurong2020/pyobfus/releases/tag/v0.11.1),
+[MCP GitHub Release](https://github.com/zhurong2020/pyobfus/releases/tag/mcp-v0.3.17),
+and [official MCP Registry](https://registry.modelcontextprotocol.io/v0/servers/io.github.zhurong2020%2Fpyobfus-mcp/versions).
+The Zenodo archive for Core 0.11.1 was not yet discoverable in the API at
+verification time; follow up and add its DOI when available.
+
+## Previous Verified Snapshot — 2026-10-27
 
 Core 0.10.0 was verified against both exact PyPI artifact URLs with
 `pypi-attestations` 0.0.30 using `verify pypi --repository`

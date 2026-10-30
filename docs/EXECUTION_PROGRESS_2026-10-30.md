@@ -69,12 +69,16 @@ payload 和 `PreflightReport.to_dict()`：完成的 `--check` 报告有 `exit_co
 
 ## 2026-10-30 发布记录
 
-- 状态：发布候选本地验收通过；GitHub CodeQL 已通过，完整 CI 第三轮待完成后打标签。
+- 状态：Core 0.11.1 与 MCP 0.3.17 已发布；Core/MCP tag 对应提交
+  `f0786c246b3199fbe3dec5ea8ab418df0b0621f8`。CI、PyPI、PEP 740、安装及
+  MCP Registry 核验完成。Zenodo Core 0.11.1 归档尚未在 API 搜索结果中出现，待后续复查。
 - 版本：Core 0.11.1、MCP 0.3.17；runtime 0.1.1 无源码变更，不发布。
 - `scripts/check_unreleased_changelogs.py`：无遗留 Unreleased 条目；`scripts/check.sh` 全通过。
 - 测试：Core 4687 passed / 55 skipped；MCP 159 passed；integration 368 passed / 10 skipped；runtime 24 passed。
 - Core 与 MCP wheel/sdist 构建成功，`twine check` 四个发行文件均通过；新建临时 venv 从 wheel 安装，确认版本、Core CLI 和 MCP CLI 可执行。
 - 兼容性复核：在干净环境用 MCP 0.3.17 wheel + Core 0.9.1 + MCP SDK 2.0.0 重跑完整 MCP 测试（159 passed），并通过 legacy/auto stdio 九工具验收。修复了旧 Core 对嵌套报告未校验时向 MCP 抛出类型异常的问题；告警措辞测试使用最低 Core 版本已有的告警类型。
-- 远端门禁复盘：第一轮发现上述旧 Core 兼容差异；第二轮兼容矩阵通过，但 Windows 的 ZIP 读写层会规范化反斜杠。跨平台样例现修补合法 ZIP 的本地与中央目录同长度文件名字段为 `a\..\b.py`：POSIX 检查反斜杠，Windows 归一化后仍检查 `..`。定向 29 项及四个本地测试根均通过。第四轮 CI 已推送，等待各平台矩阵完成。
+- 远端门禁复盘：第一轮发现上述旧 Core 兼容差异；第二轮兼容矩阵通过，但 Windows 的 ZIP 读写层会规范化反斜杠。跨平台样例现修补合法 ZIP 的本地与中央目录同长度文件名字段为 `a\..\b.py`：POSIX 检查反斜杠，Windows 归一化后仍检查 `..`。定向 29 项及四个本地测试根均通过。最终 CI 39/39 成功，CodeQL 成功。
 - 发行物：`/tmp/pyobfus-release-20261030-{core,mcp}/`（临时核验，不入库）。
-- 发布后还需核验 PyPI 文件与 PEP 740 attestations、fresh install、GitHub Release；MCP 还需官方 Registry 状态。Zenodo 记录在 Core tag 后核对。
+- Core：PyPI wheel SHA-256 `4d067b57ba55ef654094e3da4ae8e5d2947de5601a2dea6d07a80139683a4ed4`；sdist `be3141c6c8ffdaca1e4a8a19376bb25cb44ee33b3241cc84d31d76bb8bf0357a`。两个文件的 PEP 740 repository-bound verification 均通过，Integrity API 均为 HTTP 200；fresh venv 安装、`pip check`、CLI `--version`/`--help` 通过。GitHub Release：[v0.11.1](https://github.com/zhurong2020/pyobfus/releases/tag/v0.11.1)。
+- MCP：GitHub Release workflow `41020413288` 成功。wheel SHA-256 `422f8c06b1fbf34ff170a878badf4f5f434b91261e6e1770b91af6e4fb4a9a50`；sdist `b9a87c15fd1b8e773d3b7b453f67dd785df952246a16f558870681c11415de38`；两文件 PEP 740 repository-bound verification 均通过，Integrity API 均为 HTTP 200；fresh venv 安装 Core 0.11.1、MCP 0.3.17、runtime 0.1.1，`pip check` 通过。官方 MCP Registry `0.3.17` 状态 `active` / `isLatest=true`。GitHub Release：[mcp-v0.3.17](https://github.com/zhurong2020/pyobfus/releases/tag/mcp-v0.3.17)。
+- Runtime 0.1.1 未变，本次未重新发布。Glama 是独立的托管目录渠道，不在本次自动同步范围；保留既有人工更新流程。
