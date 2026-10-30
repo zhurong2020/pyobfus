@@ -16,6 +16,8 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
   compile/import verification with readiness to ship. Tool names are unchanged;
   error, disabled-tool and rate-limit responses now include the documented
   additive `next_tool` envelope with no automatic next action.
+- Malformed nested delivery reports from older supported Core versions are
+  returned as structured MCP input errors instead of escaping as exceptions.
 
 ## [0.3.16] - 2026-10-26
 

@@ -59,8 +59,11 @@ def test_invalid_build_report_is_reported(root):
 
 
 def test_warning_does_not_recommend_shipping(root):
-    (root / "dist" / "app.pyc").write_bytes(b"truncated")
-    result = check_delivery(str(root / "dist"))
+    # Use a warning available in the declared minimum Core dependency. `.pyc`
+    # origin warnings require a newer Core than the SDK compatibility matrix's
+    # public 0.9.1 baseline.
+    (root / "report.json").write_text(json.dumps({"outputs": {"files": []}}))
+    result = check_delivery(str(root / "dist"), build_report=str(root / "report.json"))
     assert result["status"] == "warn"
     assert "review" in result["next_tool"]["reason"]
     assert "no known" not in result["next_tool"]["reason"]

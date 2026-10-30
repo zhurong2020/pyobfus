@@ -684,7 +684,7 @@ def check_delivery(
         return _error("NotFound", str(e), "Pass an existing directory, .whl or JSON file.")
     try:
         result = _check(target, build_report=report, provenance_manifest=manifest)
-    except (OSError, ValueError, zipfile.BadZipFile) as e:
+    except (OSError, ValueError, TypeError, AttributeError, zipfile.BadZipFile) as e:
         return _error(
             "InvalidInput",
             str(e),
