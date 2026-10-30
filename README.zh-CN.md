@@ -12,6 +12,8 @@ pyobfus 的普通 `.py` 文件。它不仅转换源码，还提供构建前检�
 
 Community 版本采用 Apache-2.0，不限制文件数和代码行数，也不需要试用。
 
+> **v0.11.1 更新**：交付检查现在会限制目录和 wheel 检查范围、拒绝不安全路径与畸形证据，并将未完整扫描报告为错误，而不是误报为干净结果。详见[变更日志](CHANGELOG.md)。
+
 > **v0.11.0 新增**：`--check-delivery` 对 `.pyc` 提供限定范围的源码来源比对，并对未检查内部载荷的冻结可执行文件给出警告。跨文件构建的模块属性诊断现可识别包根绝对导入；可选的 `--preserve-unproved-module-attributes` 在兼容性更重要时保留已识别的导出名称。诊断结果不等于交付物安全证明，详见[变更日志](CHANGELOG.md)与[交付诊断边界](docs/P2_DELIVERY_DIAGNOSTICS_2026-10-28.md)。
 
 > **v0.10.0 新增**：Pro 可选的 `--crossfile-opacity` 预览模式可在多模块构建中加密明确选定的模块顶层函数，并使用应用提供的密钥。构建需要全新输出目录及私有 mapping；`--unmap` 只恢复加密帧的函数名，不还原原始行号。用法与限制见[配置指南](https://github.com/zhurong2020/pyobfus/blob/main/docs/OPACITY_CONFIG.md#cross-file-l3-preview-since-0100)和[验证记录](https://github.com/zhurong2020/pyobfus/blob/main/docs/CROSSFILE_OPACITY_VALIDATION.md)。

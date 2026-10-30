@@ -17,7 +17,8 @@ Python 3.15 Community 打包、Python 3.12 L3 冻结交付、可复跑打包入�
 发布，并通过 GitHub CI / CodeQL 与发布后核验；未扩大跨文件 L3 free-threaded 支持。
 
 **2026-10-30 顺序推进**：[本轮执行表](EXECUTION_PROGRESS_2026-10-30.md)
-记录采用入口修订、问题取证与条件等待；文档改动仍在本地，未发布。
+记录采用入口修订、问题取证与条件等待；采用入口文档已随本轮 0.11.1 / 0.3.17
+发布准备提交推送，产品版本发布状态见上方。
 
 **2026-10-30 路线与设计复核**：核对源码、发布记录与 CPython、PyInstaller、
 Nuitka、GitHub SARIF、SLSA/PyPI 官方资料，清理独立目录 mapping、首屏措辞与

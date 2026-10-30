@@ -155,7 +155,7 @@ pyobfus_pro/        # Pro edition (commercial license) — kept separate from co
 skills/             # agent skills (pyobfus-review, pyobfus-protect) + plugin marketplace
 templates/          # copy-in AI rule files + python-baseline bootstrap
 tests/ · pyobfus_mcp/tests/ · integration_tests/
-docs/               # CURRENT_PLAN_ZH.md (current plan), archived roadmap/TODO, threat model
+docs/               # CURRENT_PLAN_ZH.md / TODO.md (current planning), archived roadmap, threat model
 cloudflare-worker/  # Pro license verification Worker
 ```
 
@@ -225,7 +225,7 @@ patent/release context.
 
 - **Architecture / repository ownership**: [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md).
 - **Community / Pro product boundary**: [`docs/EDITION_BOUNDARY_POLICY.md`](docs/EDITION_BOUNDARY_POLICY.md).
-- **Current execution tracker (2026-10-29)**: [session closeout](docs/SESSION_CLOSEOUT_2026-10-29.md) → [post-0.11.0 progress](docs/POST_011_PROGRESS_2026-10-29.md). Core 0.11.0 is published and verified; MCP 0.3.16/runtime 0.1.1 are unchanged. Update task status after each milestone. Earlier session records are historical.
+- **Current execution tracker (2026-10-30)**: [session closeout](docs/SESSION_CLOSEOUT_2026-10-30.md) → [execution progress](docs/EXECUTION_PROGRESS_2026-10-30.md) → [current plan](docs/CURRENT_PLAN_ZH.md). Core 0.11.1 and MCP 0.3.17 are published and verified; runtime 0.1.1 is unchanged. Update task status after each milestone. Earlier session records are historical.
 - **Current plan / daily source of truth**: [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md).
 - **What to pick up next**: [`docs/TODO.md`](docs/TODO.md), ordered, with acceptance criteria.
 - **Historical detail**: [`docs/POST_V0.4_TODO.md`](docs/POST_V0.4_TODO.md) and [`docs/ROADMAP.md`](docs/ROADMAP.md) are archived context, not the primary cold-start entry.

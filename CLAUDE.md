@@ -8,7 +8,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ## ⚡ Current pending work (cold-start 必读)
 
-**2026-10-29 当前执行入口**：Core 0.11.0 已发布并核验；MCP 0.3.16 / runtime 0.1.1 不变。按 [会话收尾](docs/SESSION_CLOSEOUT_2026-10-29.md) → [后续任务进度](docs/POST_011_PROGRESS_2026-10-29.md) 接续，完成一项即更新状态。发布证据见 [核验记录](docs/CORE_0_11_0_RELEASE_2026-10-29.md)。private 仓库待 11-01 账单解除后再同步。
+**2026-10-30 当前执行入口**：Core 0.11.1 / MCP 0.3.17 已发布并核验；runtime 0.1.1 不变，Glama 已用新版本成功构建并发现九个工具。按 [会话收尾](docs/SESSION_CLOSEOUT_2026-10-30.md) → [执行进度](docs/EXECUTION_PROGRESS_2026-10-30.md) → [当前计划](docs/CURRENT_PLAN_ZH.md) 接续，完成一项即更新状态。日期事项包括 11-01 后私有 CI 恢复核对、11-04 DEV 和 11-05 LinkedIn 一周复盘；Zenodo DOI 收录后补记。Glama 的 Python 实际版本与 checkout 边界见 [渠道记录](docs/DISTRIBUTION_CHANNELS.md)。
 
 **历史口径**：下面带较早日期的快照和审核流程不代表当前未完成工作，也不能覆盖维护者当前指令。旧交接中的 D 待合并、E 未开始已由本次状态取代。
 
