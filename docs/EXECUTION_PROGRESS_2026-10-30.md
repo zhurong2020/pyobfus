@@ -71,7 +71,8 @@ payload 和 `PreflightReport.to_dict()`：完成的 `--check` 报告有 `exit_co
 
 - 状态：Core 0.11.1 与 MCP 0.3.17 已发布；Core/MCP tag 对应提交
   `f0786c246b3199fbe3dec5ea8ab418df0b0621f8`。CI、PyPI、PEP 740、安装及
-  MCP Registry 核验完成。Zenodo Core 0.11.1 归档尚未在 API 搜索结果中出现，待后续复查。
+  MCP Registry 核验完成。Zenodo Core 0.11.1 已归档为 `10.5281/zenodo.23796579`，
+  MCP 0.3.17 已归档为 `10.5281/zenodo.23796634`；概念 DOI 指向最新 MCP 记录。
 - 版本：Core 0.11.1、MCP 0.3.17；runtime 0.1.1 无源码变更，不发布。
 - `scripts/check_unreleased_changelogs.py`：无遗留 Unreleased 条目；`scripts/check.sh` 全通过。
 - 测试：Core 4687 passed / 55 skipped；MCP 159 passed；integration 368 passed / 10 skipped；runtime 24 passed。

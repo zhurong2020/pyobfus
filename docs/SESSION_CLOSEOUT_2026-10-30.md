@@ -20,6 +20,10 @@ Cold start: this file → [execution tracker](EXECUTION_PROGRESS_2026-10-30.md) 
   uv logs show Python 3.13.5; checkout remains old commit `5a79d2c`. See
   [distribution status](DISTRIBUTION_CHANNELS.md).
 - Runtime remains 0.1.1. No release candidate is waiting for review.
+- Zenodo indexed Core v0.11.1 as [record 23796579](https://doi.org/10.5281/zenodo.23796579)
+  and MCP 0.3.17 as [record 23796634](https://doi.org/10.5281/zenodo.23796634).
+  The concept DOI resolves to the newer MCP archive; `CITATION.cff` now reflects
+  Core 0.11.1 and retains the concept DOI.
 
 ## Next actions
 
@@ -29,17 +33,14 @@ Cold start: this file → [execution tracker](EXECUTION_PROGRESS_2026-10-30.md) 
 3. Review DEV one-week data after November 4 09:43 CST and LinkedIn one-week
    data around November 5 evening CST; review adoption entry points in the first
    week of November.
-4. When the Core 0.11.1 Zenodo record is indexed, verify the record and add its
-   DOI to release documentation and `CITATION.cff` if needed.
-5. Start further correctness or platform work only from a real minimized issue
+4. Start further correctness or platform work only from a real minimized issue
    or a concrete target-platform need. Cross-file L3 continues to reject
    free-threaded builds.
 
 ## Audit state
 
-- pyobfus checkout is clean on `main` at `36864a2` when this closeout was
-  written; this closeout and the cold-start corrections are the final sync
-  changes for the session.
+- pyobfus checkout is clean on `main` at `a046e9f` after the final sync and
+  Zenodo citation update.
 - No non-main worktree or non-main uncommitted changes exist in this checkout.
   The separate `pyobfus-action` checkout is on a clean, unpushed documentation
   branch; this session did not change it.

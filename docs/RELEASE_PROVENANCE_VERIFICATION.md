@@ -79,8 +79,10 @@ The MCP Registry versions endpoint reports 0.3.17
 `active` / `isLatest=true`. See the [Core GitHub Release](https://github.com/zhurong2020/pyobfus/releases/tag/v0.11.1),
 [MCP GitHub Release](https://github.com/zhurong2020/pyobfus/releases/tag/mcp-v0.3.17),
 and [official MCP Registry](https://registry.modelcontextprotocol.io/v0/servers/io.github.zhurong2020%2Fpyobfus-mcp/versions).
-The Zenodo archive for Core 0.11.1 was not yet discoverable in the API at
-verification time; follow up and add its DOI when available.
+Zenodo subsequently indexed Core 0.11.1 as
+[record 23796579](https://doi.org/10.5281/zenodo.23796579) and MCP 0.3.17 as
+[record 23796634](https://doi.org/10.5281/zenodo.23796634). The concept DOI
+`10.5281/zenodo.20846053` now resolves to the MCP 0.3.17 archive.
 
 ## Previous Verified Snapshot — 2026-10-27
 

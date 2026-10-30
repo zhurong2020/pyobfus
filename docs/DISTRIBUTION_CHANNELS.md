@@ -18,6 +18,12 @@ For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 
 **Latest channel update: 2026-10-30.** See the verified Glama update below.
 
+**Zenodo release records verified 2026-10-30:** Core v0.11.1 is archived as
+[record 23796579](https://doi.org/10.5281/zenodo.23796579); MCP 0.3.17 is
+archived as [record 23796634](https://doi.org/10.5281/zenodo.23796634). The
+concept DOI resolves to the newer MCP record. `CITATION.cff` tracks Core
+0.11.1 and retains the concept DOI.
+
 **2026-10-30 Glama build 已确认成功**：维护者提供的 admin 页面与完整日志显示
 test `01a18bca-f442-7a9f-8ffa-f5725c4dbb99` 状态 `success`，用时 59.4 秒。
 Build steps 已固定为 MCP `0.3.17` + Core `0.11.1`；uv 安装日志确认实际安装
@@ -211,7 +217,7 @@ re-runnable source of truth for the calculation is
 
 ### PyPI — `pyobfus`
 - URL: https://pypi.org/project/pyobfus/
-- Current version: **0.10.0** (released 2026-10-27) · ships with PEP 740 attestations via OIDC trusted publishing
+- Current version: **0.11.1** (released 2026-10-30) · ships with PEP 740 attestations via OIDC trusted publishing
 - Current headline (0.10.0): opt-in Pro cross-file L3 preview with application key provider, staged multi-module builds, local name-only traceback restoration and delivery checks; see [validation and limits](CROSSFILE_OPACITY_VALIDATION.md).
 - Prior headline (0.9.1): `--unmap --trace-encoding` for legacy-encoded traces (exit 2 with guidance on decode errors); Pro opacity keeps module docstring/`__future__` prologue.
 - Prior headline (0.9.0): `--unmap` restores tracebacks from independent (`--no-cross-file`) directory builds via file-scoped mapping format 2; v1 mappings still supported.
@@ -284,7 +290,7 @@ re-runnable source of truth for the calculation is
 
 ### PyPI — `pyobfus-mcp`
 - URL: https://pypi.org/project/pyobfus-mcp/
-- Current version: **0.3.16** (released 2026-10-26; supports MCP SDK 1.27+ and released 2.x versions below 3.0) · ships with PEP 740 attestations via OIDC trusted publishing. See [release verification](MCP_SDK_2X_RELEASE_PREP_2026-10-26.md).
+- Current version: **0.3.17** (released 2026-10-30; supports MCP SDK 1.27+ and released 2.x versions below 3.0) · ships with PEP 740 attestations via OIDC trusted publishing. See [release verification](RELEASE_PROVENANCE_VERIFICATION.md).
 - Prior version 0.3.15 (2026-10-23) added `unmap_stack_trace` guidance for independent-file mappings.
 - 0.3.12 contents: fixes a startup-crash regression introduced hours earlier in
   0.3.11. That release resolved its version through a module-level
@@ -439,7 +445,7 @@ re-runnable source of truth for the calculation is
   prior is not evidence of an actual review. Continue tracking installs and
   real reviews, not raw update/download count alone.
 - Wiki: disabled · Discussions: enabled · Issues: open
-- Releases: latest Core `v0.10.0`, runtime `runtime-v0.1.1`, MCP `mcp-v0.3.16`, and VS Code
+- Releases: latest Core `v0.11.1`, runtime `runtime-v0.1.1`, MCP `mcp-v0.3.17`, and VS Code
   `vscode-v0.4.3`; MCP releases attach wheel+sdist.
 
 ### Open VSX — `zhurong2020.pyobfus` 🟢 LIVE
