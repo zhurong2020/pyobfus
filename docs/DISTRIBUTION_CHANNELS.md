@@ -16,7 +16,20 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-**Latest channel update: 2026-10-29.** See the verified Glama update below.
+**Latest channel update: 2026-10-30.** See the verified Glama update below.
+
+**2026-10-30 Glama build 已确认成功**：维护者提供的 admin 页面与完整日志显示
+test `01a18bca-f442-7a9f-8ffa-f5725c4dbb99` 状态 `success`，用时 59.4 秒。
+Build steps 已固定为 MCP `0.3.17` + Core `0.11.1`；uv 安装日志确认实际安装
+Core `0.11.1`、MCP `0.3.17`、runtime `0.1.1`。MCP initialize 返回
+`serverInfo.version=0.3.17` / protocol `2025-11-25`，`tools/list` 返回九个工具，
+prompts/resources 查询正常。故此次证据覆盖镜像构建、包版本、握手和工具发现；
+没有逐一调用九个工具。Build Spec 配置为 Python 3.12，但 uv 日志显示
+`Python 3.13.5 environment at /usr`，因此不将其作为 Python 3.12 运行时证据。
+镜像 checkout 仍为旧提交 `5a79d2c3a149bc45a83c30486bc6e4abf99246c6`，但 Build steps
+从 PyPI 安装了上述新包；这次核验不代表 Glama checkout 已同步到最新 Git 提交。
+页面 Recent Releases 显示渠道标签 `0.11.0`（2026-10-30）；这是 Glama 自己的
+渠道/发布标签，不应当作 MCP 包版本（MCP 仍为 0.3.17）。
 
 **2026-10-29 Glama 更新已确认**：维护者提供的管理员日志显示 build
 `01a186f7-6173-7520-92bf-877374e4b37f` 于 17:22 CST 成功（10.4 秒），

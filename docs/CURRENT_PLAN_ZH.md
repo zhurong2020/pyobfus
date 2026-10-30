@@ -5,7 +5,9 @@
 MCP Registry `active` / `isLatest=true` 均通过。发布证据见
 [当日执行记录](EXECUTION_PROGRESS_2026-10-30.md)及
 [来源核验记录](RELEASE_PROVENANCE_VERIFICATION.md)。Zenodo Core 0.11.1
-归档仍待 API 收录后补 DOI；Glama 独立托管渠道按既有人工流程处理。
+归档仍待 API 收录后补 DOI。Glama admin build `01a18bca-f442-7a9f-8ffa-f5725c4dbb99`
+已用 MCP 0.3.17 / Core 0.11.1 成功构建、握手并发现九个工具；Python 实际环境为
+3.13.5，checkout 仍是旧 commit，细节见[渠道记录](DISTRIBUTION_CHANNELS.md)。
 
 **2026-10-30 六项工程任务已完成本地实现与有界验收**：导入语义差分、
 Python 3.15 Community 打包、Python 3.12 L3 冻结交付、可复跑打包入口、
