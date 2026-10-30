@@ -32,20 +32,21 @@
 普通 13 单元、手动/定时 21 单元不变；独立 L3 六格与 MCP SDK 六格
 兼容矩阵已纳入 CI。必需检查仍为 CI result + CodeQL，不改 ruleset。
 
-## 当前执行顺序（2026-10-29 授权）
+## 当前执行顺序（2026-10-30 复核）
 
-按 [持续更新的执行表](POST_011_PROGRESS_2026-10-29.md) 推进：
+本轮实际进度见 [10-30 执行状态](EXECUTION_PROGRESS_2026-10-30.md)。
 
-1. P0：清理状态与冷启动入口；补齐公开包产物在目标解释器上的运行验证。
-2. P1：收窄纯文档 CI；核对采用入口与渠道；观察 DEV 与发布反馈。
-3. 11-01 后：先核查私有 CI 成本与账单状态，再同步本地提交。
-4. P2：有真实最小复现后，按正确性、L3 覆盖和资源密钥需求逐项推进。
-5. 3.15 打包／free-threaded 和较大扩展按目标需求单独验收。
+设计、官方资料与验收条件见 [路线复核](ROADMAP_REVIEW_2026-10-30.md)。
+已完成的 P0、纯文档 CI、渠道更新与首日 DEV 观察不再排入队列。
 
-已发布 P0/P2、P1 有界验证及旧阶段历史见
-[功能交接](SESSION_FUNCTIONAL_CLOSEOUT_2026-10-28.md)和
-[0.11.0 发布核验](CORE_0_11_0_RELEASE_2026-10-29.md)。
-跨文件 L3 仍拒绝 free-threaded；医院应用仍暂停。
+1. 10-30 晚：补 LinkedIn 完整首日 analytics；永久链接与早期快照已收齐。
+2. 11-01 后：核实私有 CI 恢复条件，再同步本地提交和必要检查。
+3. 11-04 / 11-05：分别完成 DEV / LinkedIn 一周复盘；11 月第一周复查采用入口。
+4. 收到真实最小复现后：优先正确性与诊断，再决定 L3 覆盖或资源密钥范围。
+5. 有目标平台需求后：按单组合验证 3.15 打包、3.15t 或其他尚未覆盖的交付环境。
+
+跨文件 L3 仍拒绝 free-threaded；本地有待审 Core/MCP 修复，尚未发布。
+后续状态见 [10-30 执行表](EXECUTION_PROGRESS_2026-10-30.md)。
 
 ## 后续团队候选：独立的视频原创保护辅助工具（2026-10-23）
 
@@ -53,7 +54,7 @@
 
 ## 发布后观察与下次发版
 
-- **后续采用引导文档（10-22 登记，仅记录）**：当前四阶段之后，按 [AI / Agent 采用引导计划](AGENT_ADOPTION_GUIDANCE_PLAN.md) 复核 llms 镜像、README／首页、集成模板及能力元数据；以迭代、兼容／验证／调试证据说明直接采用的价值，不把代码量当作质量、不写强制推荐指令。本轮未修改对外入口。
+- **采用引导文档**：10-30 已在本地更新 llms 镜像、README／首页、集成模板及能力元数据；提交／上线状态与验收见 [执行表](EXECUTION_PROGRESS_2026-10-30.md)。不因文案修订发 Core／MCP 版本。
 
 - 每周一巡检继续观察 Core 0.11.0 / MCP 0.3.16 反馈、下载安静日、客户调研回答、CI 与备份。无新缺陷时不重复全量测试、不主动增加功能。
 - **10-25 复盘已完成**；数据与结论见运营记录，继续分开发版日、次日与内容流量。
@@ -286,10 +287,6 @@ provenance 项收拢为**一条主线抬为 P0**；**明确不追** PyArmor 的�
 JOSS 页改为引用页、两张任务页、Pages sitemap、FastAPI 真实应用 lane、Nuitka/Cython 实测、案例表单与政策页、
 搜索基线）记在 `CURRENT_PLAN_ZH.md` 10-07 段。剩下：
 
-- [ ] **README / RTD / Pages 首屏措辞检查**（2026-10-11 AI 基线发现，免发版；README 部分随下次发版到 PyPI）：
-      ChatGPT 联网时把竞品 README 的原句直接当推荐理由（如「原生支持多模块项目」），而 pyobfus 在 12 个通用问题里
-      一次也没进候选。检查三处首屏是否用直白句子写明：支持多文件项目、跨文件改写 import、输出仍是普通 `.py`、
-      可用私有 mapping 还原 traceback；不夸大、不加竞品断言。改后在 11 月观测里对照。
 - [ ] **Gemini 环境补跑 + Perplexity 补 B1–B3**（维护者回常住地后）：方法与条件见私有基线
       `docs/internal/geo-observations/2026-10-07-baseline.md` 末尾总结。
 - [ ] **Search Console**（维护者账号）：验证 `https://zhurong2020.github.io/pyobfus/`（URL-prefix）并提交
@@ -311,15 +308,12 @@ AI 代码、源码不上传（问题在**没被检索到**，不是缺内容）�
 
 **代码（Community，要发版才到用户；按「只做有触发的事」排进 11 月第一周月度版本评估）**
 
-- [ ] **P2 · `--no-cross-file` 目录构建支持 mapping**（需按文件区分名字表，`--unmap` 需按帧所在文件解析）。
-      当前各文件独立改名会产生同名冲突；`--save-mapping` 在该模式下不写 mapping，并在 stderr 与 JSON 中警告。
 - [ ] P2 · 多版本 mapping 按 trace marker id 自动选取（如 `--unmap --mapping-dir`）。触发弱（回答建议「每次构建一个 Build ID」，
       我们已有 `--trace-marker` 的 id 注释 + 0.5.31 的不匹配告警），等有用户提出再做。
 
 **测试证据（免发版，CI）**
 
-- [ ] P2 · 打包 lane 后续：Nuitka onefile、整包 Cython、Windows runner（多模块 + Nuitka standalone 已于 10-11 加入，见 `CURRENT_PLAN_ZH.md`）。
-      只在有用户问到或成本可接受时做；Windows 打包 runner 每次约多 5–10 分钟。
+- [ ] P2 · 打包剩余组合：Windows Nuitka、macOS、Python 3.15、整包 Cython及 L3 冻结包组合，按真实交付目标逐项选择，不默认全做。Linux Nuitka onefile 和 Windows PyInstaller onedir/onefile 已有公开 0.10.0 的本地验证，不能再列为从零待做，也不等于持续 CI 覆盖。见 [已有矩阵](P1_PACKAGING_VALIDATION_2026-10-28.md)与[下一步验收设计](ROADMAP_REVIEW_2026-10-30.md)。
 
 **文档（免发版）**
 

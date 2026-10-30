@@ -245,6 +245,8 @@ def test_secure_tool_returns_rate_limit_error_envelope(
     r2 = my_tool(2)
     assert r2["status"] == "error"
     assert r2["error_type"] == "RateLimitExceeded"
+    assert r2["next_tool"]["tool"] is None
+    assert r2["next_tool"]["reason"] and r2["next_tool"]["args"] == {}
     assert "retry_after_seconds" in r2
     assert r2["retry_after_seconds"] > 0
     assert "PYOBFUS_MCP_RATE_LIMIT_PER_MIN" in r2["ai_hint"]
@@ -371,6 +373,8 @@ def test_secure_tool_disabled_returns_envelope(
     result = my_tool()
     assert result["status"] == "error"
     assert result["error_type"] == "ToolDisabled"
+    assert result["next_tool"]["tool"] is None
+    assert result["next_tool"]["reason"] and result["next_tool"]["args"] == {}
     assert "my_tool" in result["message"]
     assert "PYOBFUS_MCP_DISABLED_TOOLS" in result["ai_hint"]
 

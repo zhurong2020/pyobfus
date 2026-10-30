@@ -426,7 +426,8 @@ def _echo_pro_import_hint() -> None:
     "mapping files, private keys, original sources (with --provenance-manifest) "
     "and files the build did not produce (with --build-report). Bytecode source "
     "comparisons are bounded; frozen payloads are not unpacked. Reads files only; "
-    "nothing is executed. Exit code 0=ok/warn, 1=high findings, 2=error.",
+    "nothing is executed. Unsafe paths, malformed evidence or resource limits "
+    "abort inspection. Exit code 0=ok/warn, 1=high findings, 2=error.",
 )
 @click.option(
     "--json",

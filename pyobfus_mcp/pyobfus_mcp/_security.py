@@ -386,6 +386,11 @@ def secure_tool(
                 return {
                     "status": "error",
                     "error_type": "ToolDisabled",
+                    "next_tool": {
+                        "tool": None,
+                        "reason": "respect the operator's disabled-tool policy",
+                        "args": {},
+                    },
                     "message": (
                         f"Tool {tool_name!r} is administratively disabled "
                         f"via PYOBFUS_MCP_DISABLED_TOOLS."
@@ -415,6 +420,11 @@ def secure_tool(
                     return {
                         "status": "error",
                         "error_type": "RateLimitExceeded",
+                        "next_tool": {
+                            "tool": None,
+                            "reason": "wait for the retry interval before continuing",
+                            "args": {},
+                        },
                         "message": str(exc),
                         "ai_hint": (
                             f"Wait {exc.retry_after_seconds:.0f}s before retrying. "

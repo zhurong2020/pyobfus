@@ -56,3 +56,19 @@ def test_invalid_build_report_is_reported(root):
     result = check_delivery(str(root / "dist"), build_report=str(root / "report.json"))
     assert result["status"] == "error"
     assert result["error_type"] == "InvalidInput"
+
+
+def test_warning_does_not_recommend_shipping(root):
+    (root / "dist" / "app.pyc").write_bytes(b"truncated")
+    result = check_delivery(str(root / "dist"))
+    assert result["status"] == "warn"
+    assert "review" in result["next_tool"]["reason"]
+    assert "no known" not in result["next_tool"]["reason"]
+
+
+def test_malformed_nested_report_returns_mcp_error(root):
+    (root / "report.json").write_text('{"outputs": []}')
+    result = check_delivery(str(root / "dist"), build_report=str(root / "report.json"))
+    assert result["status"] == "error"
+    assert result["error_type"] == "InvalidInput"
+    assert result["ai_hint"] and "next_tool" in result

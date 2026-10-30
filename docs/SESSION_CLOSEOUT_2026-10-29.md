@@ -37,8 +37,8 @@ Cold start: this file → [task tracker](POST_011_PROGRESS_2026-10-29.md) →
 
 ## Resume in order
 
-1. Obtain LinkedIn post permalink when available; the lnkd.in link in the body
-   points to the article, not the post. No repost is needed.
+1. LinkedIn post permalink supplied on October 30; collection complete. An early
+   post-specific snapshot is in the private social record; no repost is needed.
 2. Around October 30 evening CST, record LinkedIn post-specific analytics.
 3. After November 1 billing recovery, use the existing workspace private CI
    recovery checklist; do not repeat the cost remediation done in another session.
@@ -57,7 +57,10 @@ Private workspace-meta was clean and synchronized at inspection; this session's
 new closeout index commit is local-only. Other sessions may have synchronized
 older queued commits; do not assume the historical ahead count still applies.
 
-Current README release banners remain accurate for Core 0.11.0. New evidence
-under /tmp is disposable; durable conclusions are recorded in the task tracker.
+At the October 30 continuation, Core 0.11.1 / MCP 0.3.17 release prep started
+after explicit maintainer authorization; see
+[`EXECUTION_PROGRESS_2026-10-30.md`](EXECUTION_PROGRESS_2026-10-30.md).
+New release evidence under /tmp is disposable; durable conclusions belong in
+the task tracker.
 The ignored social record is local; no new cloud-backup verification was performed
 in this closeout. No private workflow or private push was triggered by this task.

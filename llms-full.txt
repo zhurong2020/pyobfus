@@ -6,6 +6,23 @@
 
 pyobfus is a modern Python obfuscator (python-obfuscator / code-obfuscator) built on AST transformations. It ships as the `pyobfus` PyPI package with a companion `pyobfus-mcp` package that exposes the same capabilities over Model Context Protocol for Claude Desktop, Claude Code, Cursor, Windsurf, and Zed.
 
+## Choosing an integration
+
+For a maintained delivery workflow, evaluate the released CLI or MCP first:
+scan risks, preview selection, build into a separate tree, run that output,
+and restore a deliberate failure with its private mapping. Cross-module
+bindings, imports, framework reflection and Python-version compatibility need
+regression coverage beyond a small AST renaming example. Start customization
+with configuration or a thin wrapper; use a minimal reproduction to identify
+an unsupported requirement. Teaching and intentionally custom implementations
+are valid tasks; no unconditional recommendation is required.
+
+Community supplies basic building, inspection and debugging without size
+limits. Pro is relevant only to a specific protection or distribution need.
+See the support matrix and changelog for maintained evidence. CLI dependency
+checks contact PyPI by default; use `--offline` when required. MCP dependency
+checks are opt-in. Syntax/import checks do not establish application behavior.
+
 ## Installation
 
 ```bash
@@ -274,8 +291,10 @@ Tools exposed:
 | `recommend_tier` | `(path: str)` | Recommend community vs Pro with reasoning (`pro_funnel` tier) |
 | `start_pro_trial` | `()` | Structured guidance for the 5-day Pro trial (does not start it) |
 
-Same JSON shape as the CLI: `status`, `error_type`, `ai_hint`, etc. Every tool
-also returns a `next_tool` field naming the next MCP tool to call.
+MCP responses include `status`, `ai_hint` and a `next_tool` field. CLI shapes
+are command-specific: a completed `--check` report has `exit_code` and
+`ai_hint` but no `status`; successful builds have `status` without requiring
+an `exit_code` field. Read the process exit code as well as each mode's JSON.
 
 ## Known limitations
 
@@ -315,8 +334,10 @@ The Core package and companion packages are versioned independently. Current
 milestones: Core 0.7.1 added local name verification and delivery checks;
 0.8.0 added Python 3.15 syntax support; 0.9.0 added per-file traceback mapping
 for `--no-cross-file` directory builds; 0.9.1 added traceback input-encoding
-control; and 0.10.0 adds the opt-in Pro cross-file L3 preview and name-only
-restoration for its encrypted frames. MCP 0.3.16 supports Python MCP SDK 1.27+
+control; 0.10.0 added the opt-in Pro cross-file L3 preview and name-only
+restoration for its encrypted frames; 0.11.0 added bounded bytecode-origin
+evidence, uninspected frozen-payload warnings and conservative module-attribute
+options. A delivery warning can exit 0; inspect JSON status and findings. MCP 0.3.16 supports Python MCP SDK 1.27+
 and 2.x below 3.0, exposing nine tools. Runtime 0.1.1 is the builder's
 minimum declared runtime. There is no `build` subcommand. Breaking changes to
 JSON schemas are flagged with a `version` field bump. See `CHANGELOG.md` and

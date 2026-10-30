@@ -1,5 +1,6 @@
 # Development Roadmap
 
+> Design review (2026-10-30): [scope, official sources and acceptance](ROADMAP_REVIEW_2026-10-30.md).
 > Current execution: [post-0.11.0 progress](POST_011_PROGRESS_2026-10-29.md).
 > P0 compatibility and bounded P2 diagnostics shipped in Core 0.11.0.
 > Earlier pending-release statements are historical; further coverage is conditional.
@@ -37,7 +38,7 @@ limits are recorded in
 The bounded P1 packaging and L3 usability checks are recorded in
 [`P1_PACKAGING_VALIDATION_2026-10-28.md`](P1_PACKAGING_VALIDATION_2026-10-28.md).
 They found no need for packaging code changes in the tested configurations;
-P2 delivery diagnostics are next. The older rows below remain the decision
+P2 delivery diagnostics subsequently shipped in Core 0.11.0. The older rows below remain the decision
 criteria for new cases.
 The evidence, competitor scope, acceptance gates and sources are in
 [`FEATURE_EXPANSION_RESEARCH_2026-10-28.md`](FEATURE_EXPANSION_RESEARCH_2026-10-28.md).
@@ -50,7 +51,7 @@ are not new backlog items.
 | **P0 — correctness** | Reproduce and classify the Python 3.15 `json` / `unittest` module-attribute proof failures; fix any generated-behavior defect and make unproved access fail or report clearly | Minimal cases, original-versus-output comparison, supported-interpreter regression; no silent weakening of name verification |
 | **P1 — delivery** | Validate protected packages with PyInstaller and Nuitka on a bounded set of Linux/Windows and Python versions | Start with one-folder/standalone, then onefile; run the built artifact in a clean target, check trace mapping and that source, mapping and keys stay outside deliverables; expand only on observed failures |
 | **P1 — L3 usability** | Exercise the shipped multi-module L3 preview in one representative offline application and document the application's key-injection contract | Confirm clean-target runtime, wrong/missing key behavior, traceback recovery, and coverage report before designing a key-provider API |
-| **P2 — delivery diagnostics** | Conservative inspection of `.pyc` and frozen artifacts for `--check-delivery` | Merged in PR #156, not released: bounded bytecode-body comparison and outer frozen-container warnings; no embedded-payload claim ([record](P2_DELIVERY_DIAGNOSTICS_2026-10-28.md)) |
+| **P2 — delivery diagnostics** | Conservative inspection of `.pyc` and frozen artifacts for `--check-delivery` | Released in Core 0.11.0 (PR #156): bounded bytecode-body comparison and outer frozen-container warnings; no embedded-payload claim ([record](P2_DELIVERY_DIAGNOSTICS_2026-10-28.md)) |
 | **P2 — conditional coverage** | L3 method/nested coverage, resource key provider, parameter renaming, and complex import cycles | No new P1 blocker; implement separately only with a real minimized case and compatibility contract ([gate](P2_CONDITIONAL_COVERAGE_GATE_2026-10-28.md)) |
 | **Research gate** | Free-threaded Python 3.15 | Linux 3.15t bounded Core/runtime smoke verified once; cross-file L3 explicitly rejects this mode, and clean public-wheel/other-OS validation remains open ([record](PYTHON315_FREETHREADING_VALIDATION_2026-10-28.md)) |
 

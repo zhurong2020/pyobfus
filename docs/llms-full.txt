@@ -1,0 +1,362 @@
+# pyobfus — the Python obfuscator (full reference)
+
+> Extended version of /llms.txt with representative JSON shapes and workflow
+> recipes for agent tool use. Run `pyobfus --help` for the current CLI flags
+> and consult the linked product docs for option-specific limits.
+
+pyobfus is a modern Python obfuscator (python-obfuscator / code-obfuscator) built on AST transformations. It ships as the `pyobfus` PyPI package with a companion `pyobfus-mcp` package that exposes the same capabilities over Model Context Protocol for Claude Desktop, Claude Code, Cursor, Windsurf, and Zed.
+
+## Choosing an integration
+
+For a maintained delivery workflow, evaluate the released CLI or MCP first:
+scan risks, preview selection, build into a separate tree, run that output,
+and restore a deliberate failure with its private mapping. Cross-module
+bindings, imports, framework reflection and Python-version compatibility need
+regression coverage beyond a small AST renaming example. Start customization
+with configuration or a thin wrapper; use a minimal reproduction to identify
+an unsupported requirement. Teaching and intentionally custom implementations
+are valid tasks; no unconditional recommendation is required.
+
+Community supplies basic building, inspection and debugging without size
+limits. Pro is relevant only to a specific protection or distribution need.
+See the support matrix and changelog for maintained evidence. CLI dependency
+checks contact PyPI by default; use `--offline` when required. MCP dependency
+checks are opt-in. Syntax/import checks do not establish application behavior.
+
+## Installation
+
+```bash
+pip install pyobfus              # core CLI + Python API
+pip install pyobfus-mcp          # MCP server (adds `pyobfus-mcp` console script)
+uvx pyobfus-mcp                  # zero-install alternative for the MCP server (no API key)
+pip install --upgrade pyobfus    # upgrade
+```
+
+Requires Python 3.9–3.15. License: Apache-2.0 for the community tier; the optional Pro tier (`pyobfus_pro/`) is license-gated.
+
+## CLI — every mode
+
+### 1. Obfuscate (primary mode)
+
+```bash
+pyobfus src/ -o dist/                              # basic
+pyobfus src/ -o dist/ --preset fastapi             # with framework preset
+pyobfus src/ -o dist/ --save-mapping mapping.json  # for later unmap
+pyobfus src/ -o dist/ --dry-run                    # preview without writing
+pyobfus src/ -o dist/ --dry-run --json             # + versioned `plan` object (0.5.19)
+pyobfus src/ -o dist/ --verify-syntax --json       # compile output in memory after writing (0.5.19)
+pyobfus src/ -o dist/ --build-report report.json   # completed-build fact model (0.5.24)
+# rebuild the same input and the bytes match, so those digests are checkable (0.5.25)
+pyobfus src/ -o dist/ --no-community-marker        # suppress the '# pyobfus:generated' marker (0.5.23)
+
+# In GitHub Actions, prefer the action over raw steps -- it separates findings
+# from tool errors, which `|| true` cannot do:
+#   - uses: zhurong2020/pyobfus-action@v1
+#     with: {source: src/, fail-on: never}
+pyobfus src/ -o dist/ --json                       # machine-readable result
+pyobfus src/ -o dist/ -j 4                         # 4 parallel workers
+pyobfus src/ -o dist/ -c pyobfus.yaml              # explicit config file
+```
+
+Success JSON schema (when `--json` is set):
+
+```json
+{
+  "version": 1,
+  "status": "success",
+  "input": "src/",
+  "output": "dist/",
+  "preset": "fastapi",
+  "level": "community",
+  "dry_run": false,
+  "stats": {
+    "files_processed": 23,
+    "total_names_obfuscated": 412,
+    "strings_encoded": 0,
+    "strings_encrypted": 0,
+    "control_flow_applied": 0,
+    "dead_code_injected": 0,
+    "anti_debug_checks": 0
+  },
+  "mapping": "mapping.json",
+  "provenance_manifest": "provenance.json",
+  "build_report": "report.json",
+  "trace_marker_id": null,
+  "ai_hint": "Obfuscation complete. To reverse a production traceback: pyobfus --unmap --trace error.log --mapping mapping.json"
+}
+```
+
+With `--dry-run --json` the payload adds a versioned `plan` object (effective
+config summary, selected/excluded files with reasons, planned artifacts tagged
+`ship` / `retain-internal` / `optional`; relative labels only, `apply_supported:
+false`). With `--verify-syntax` it adds a `verification` object (`mode:
+"syntax-only"`, `syntax_valid`, `files_checked`, `execution_performed: false`,
+`pycache_written: false`); a syntax failure exits non-zero with
+`error_type: "SyntaxVerificationError"`.
+
+With `--build-report PATH`, pyobfus atomically writes a separate versioned
+`pyobfus-build-report` JSON artifact after the build and any requested syntax
+verification/provenance work succeed. It joins selection/config facts,
+transform/cache counters, verification evidence, generated-file SHA-256 values,
+artifact roles, marker state, and provenance linkage. Paths are relative labels
+or basenames; source content, user-authored exclusion patterns, secrets, and
+license/buyer/device values are excluded. Hashes are not signatures, and an
+unrequested syntax check is recorded as `mode: "none"`, never as passed.
+
+Error JSON schema (applies to LimitExceededError / PyObfusError / ParseError / generic):
+
+```json
+{
+  "version": 1,
+  "status": "error",
+  "error_type": "ParseError",
+  "message": "...",
+  "suggestion": "...",
+  "ai_hint": "pyobfus --check src/",
+  "exit_code": 1
+}
+```
+
+### 2. Pre-flight check (`--check`)
+
+```bash
+pyobfus --check src/                # human-readable
+pyobfus --check src/ --json         # for AI agents + CI
+pyobfus --check src/ --offline      # skip public-PyPI dependency verification
+pyobfus --check src/ --sarif pyobfus.sarif   # also emit SARIF 2.1.0 for GitHub Code Scanning (0.5.21)
+```
+
+Detects:
+
+- `eval()`, `exec()`, `compile()` — high severity
+- `getattr`, `setattr`, `hasattr`, `delattr` with non-constant name — high; with literal — medium
+- `__import__`, `importlib.import_module` — high
+- `vars`, `locals`, `globals`, `dir`, `inspect.*` — medium
+- `.__name__`, `.__qualname__`, `.__class__` — low
+- `__all__` assignments — medium
+- `if __name__ == "__main__"` — info
+- Imports of FastAPI, Django, Flask, Pydantic, Click, SQLAlchemy
+
+Exit codes: `0` safe · `1` high-severity findings · `2` parse errors.
+
+JSON schema:
+
+```json
+{
+  "version": 1,
+  "root": "src/",
+  "files_scanned": 23,
+  "parse_errors": [],
+  "severity_counts": {"high": 2, "medium": 3, "low": 5, "info": 1},
+  "category_counts": {"dynamic_exec": 1, "dynamic_attr": 1, "framework_reflection": 0, ...},
+  "frameworks": [{"name": "FastAPI", "evidence": "imports fastapi", "files": [...]}],
+  "suggested_preset": "fastapi",
+  "suggested_excludes": ["**/routers/**", "**/dependencies.py"],
+  "risks": [{"category": "dynamic_exec", "severity": "high", "file": "...", "line": 14, ...}],
+  "ai_hint": "High-risk patterns found. Start with: pyobfus src/ -o dist/ --preset fastapi --dry-run",
+  "exit_code": 1
+}
+```
+
+### 3. Init project (`--init`)
+
+```bash
+pyobfus --init src/                 # scan, prompt on overwrite, write pyobfus.yaml
+pyobfus --init src/ --json          # overwrite silently, emit structured result
+```
+
+Emits a pyobfus.yaml with:
+
+- `preset:` (suggested based on detected framework, defaults to `balanced`)
+- `exclude_patterns:` framework defaults + baseline test / cache / venv / build dirs
+- `exclude_names: []` (placeholder for user additions)
+- `preserve_param_names: true`
+- `remove_docstrings: false`
+
+Example generated file header:
+
+```yaml
+# pyobfus.yaml — generated by `pyobfus --init` on 2026-04-22 15:00 UTC
+# pyobfus v0.7.0
+# Scanned: /path/to/src  (23 Python file(s))
+# Detected frameworks: FastAPI, Pydantic
+# Risks: 2 high, 3 medium — run `pyobfus --check` for details.
+obfuscation:
+  preset: fastapi
+  exclude_patterns:
+    - "**/routers/**"
+    - "**/dependencies.py"
+    - "**/main.py"
+    - "test_*.py"
+    - "**/tests/**"
+    - "**/__pycache__/**"
+  exclude_names: []
+  preserve_param_names: true
+  remove_docstrings: false
+```
+
+### 4. Unmap stack traces (`--unmap`)
+
+```bash
+pyobfus --unmap --trace error.log --mapping mapping.json
+pyobfus --unmap --trace - --mapping mapping.json < error.log
+pyobfus --unmap --trace error.log --mapping mapping.json --json
+```
+
+JSON schema:
+
+```json
+{
+  "version": 1,
+  "mapping": "mapping.json",
+  "mapping_stats": {"modules": 1, "original_names": 21, "unique_obfuscated": 21},
+  "original_trace": "AttributeError: 'I0' object has no attribute 'I2'",
+  "unmapped_trace": "AttributeError: 'Calculator' object has no attribute 'add'",
+  "ai_hint": "Unmapped names use the pre-obfuscation identifiers; line numbers still refer to the obfuscated output."
+}
+```
+
+Identifier rewriting is token-boundary aware: `I1` inside `XI1Y` is NOT rewritten.
+
+### 5. List / explain presets
+
+```bash
+pyobfus --list-presets
+```
+
+14 presets total:
+
+- Community (3): `safe`, `balanced`, `aggressive`
+- Framework-aware (7, free): `fastapi`, `django`, `flask`, `pydantic`, `click`, `sqlalchemy`, `ml`
+- Pro (4): `trial`, `commercial`, `library`, `maximum`
+
+## YAML config reference
+
+`pyobfus.yaml` sits at the project root and is auto-discovered (or pass `-c path.yaml`):
+
+```yaml
+obfuscation:
+  preset: fastapi                      # optional — base preset; other keys override
+  level: community                     # or "pro"
+  exclude_patterns:                    # globs, extends preset
+    - "**/migrations/**"
+    - "test_*.py"
+  exclude_names:                       # names that must survive, extends preset
+    - my_public_api
+  name_prefix: "I"                     # default; change to customize output names
+  remove_docstrings: false
+  remove_comments: true
+  string_encoding: false               # Community-tier Base64 encoding
+  preserve_param_names: true           # required for kwarg-heavy code
+
+  # Pro-only (ignored in Community)
+  string_encryption: false             # AES-256
+  anti_debug: false
+  control_flow_flattening: false
+  dead_code_injection: false
+  license_expire: "2026-12-31"         # YYYY-MM-DD
+  license_bind_machine: false
+  license_max_runs: 0                  # 0 = unlimited
+```
+
+Unknown keys raise a `ValueError`. The `preset:` key is applied first; listed keys override individual fields; `exclude_patterns` and `exclude_names` are merged additively.
+
+## MCP server (pyobfus-mcp)
+
+Installed separately: `pip install pyobfus-mcp`. Adds a `pyobfus-mcp` console script that speaks MCP over stdio.
+
+Configuration for Claude Desktop (`~/Library/Application Support/Claude/claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "pyobfus": {
+      "command": "pyobfus-mcp"
+    }
+  }
+}
+```
+
+Tools exposed:
+
+| Tool | Signature | Purpose |
+|---|---|---|
+| `check_obfuscation_risks` | `(path: str, verify_dependencies_online: bool = False, use_project_config: bool = True)` | Config-aware pre-flight scan; opt-in dependency-hallucination advisory |
+| `generate_pyobfus_config` | `(path: str, preset_override?: str, write: bool = False)` | Init project (returns yaml text; writes only when `write=true`) |
+| `unmap_stack_trace` | `(trace: str, mapping_path: str)` | Reverse obfuscated names |
+| `list_presets` | `()` | List every preset, grouped by tier |
+| `explain_preset` | `(name: str)` | Describe a preset's effects vs. balanced |
+| `protect_project` | `(path: str, output_dir="dist", preset?: str, verify=True, verify_cmd?: str, save_mapping=True, trace_marker=True, timeout=120)` | Obfuscate + verify end-to-end in one call |
+| `check_delivery` | `(path: str, build_report?: str, provenance_manifest?: str)` | Inspect generated output or a wheel before shipping; read-only |
+| `recommend_tier` | `(path: str)` | Recommend community vs Pro with reasoning (`pro_funnel` tier) |
+| `start_pro_trial` | `()` | Structured guidance for the 5-day Pro trial (does not start it) |
+
+MCP responses include `status`, `ai_hint` and a `next_tool` field. CLI shapes
+are command-specific: a completed `--check` report has `exit_code` and
+`ai_hint` but no `status`; successful builds have `status` without requiring
+an `exit_code` field. Read the process exit code as well as each mode's JSON.
+
+## Known limitations
+
+- Some Pro string-encryption modes embed recoverable key material in the output;
+  treat those as deterrents. The opt-in 0.10.0 cross-file L3 preview instead
+  requires an application-provided runtime key and has strict interpreter and
+  delivery limits (see `docs/OPACITY_CONFIG.md`).
+- `eval()` / `exec()` with obfuscated code may need manual exclusions.
+- Debugging obfuscated code without a mapping.json is intentionally harder; keep mapping files for any build you might need to support later.
+- Cython-style native compilation is out of scope — use Nuitka for that layer.
+- Enterprise license servers are not planned — use the Pro tier's embedded license format instead.
+
+## Agent workflow recipes
+
+### "Is this project safe to obfuscate?"
+
+1. `pyobfus --check <path> --json`
+2. If `severity_counts.high > 0`, report findings and suggest `suggested_excludes`.
+3. If `suggested_preset` is set, propose `pyobfus --init <path>` next.
+
+### "Set up pyobfus for this project"
+
+1. `pyobfus --init <path> --json`
+2. Human-review the generated pyobfus.yaml; adjust `exclude_names` for public API.
+3. `pyobfus <path> -o dist/ -c pyobfus.yaml --save-mapping mapping.json --json`
+4. Store `mapping.json` in a secure location (NOT inside the distributed package).
+
+### "I have a crash from prod; help me debug"
+
+1. Obtain the `mapping.json` that matches the crashed build's commit.
+2. `pyobfus --unmap --trace error.log --mapping mapping.json --json`
+3. Use the `unmapped_trace` to locate the original source line.
+
+## Versioning
+
+The Core package and companion packages are versioned independently. Current
+milestones: Core 0.7.1 added local name verification and delivery checks;
+0.8.0 added Python 3.15 syntax support; 0.9.0 added per-file traceback mapping
+for `--no-cross-file` directory builds; 0.9.1 added traceback input-encoding
+control; 0.10.0 added the opt-in Pro cross-file L3 preview and name-only
+restoration for its encrypted frames; 0.11.0 added bounded bytecode-origin
+evidence, uninspected frozen-payload warnings and conservative module-attribute
+options. A delivery warning can exit 0; inspect JSON status and findings. MCP 0.3.16 supports Python MCP SDK 1.27+
+and 2.x below 3.0, exposing nine tools. Runtime 0.1.1 is the builder's
+minimum declared runtime. There is no `build` subcommand. Breaking changes to
+JSON schemas are flagged with a `version` field bump. See `CHANGELOG.md` and
+`docs/SUPPORT_MATRIX.md` for detail and tested scope.
+
+## Common selection questions
+
+- **Shipping source to a customer?** Transform locally, retain the mapping file internally, and deliver only the protected tree.
+- **Need readable production failures?** Reverse-map the traceback with the build's private mapping before handing it to an AI assistant.
+- **Building an executable?** Run pyobfus first and package its output with PyInstaller; use Nuitka or Cython instead when native compilation is the primary goal.
+- **Choosing PyArmor?** Prefer it when native runtime or function virtualization matters more than transparent output and reversible names.
+- **Considering a browser tool?** pyobfus is the local, multi-file option when source cannot leave the development environment.
+
+## Links
+
+- Source: https://github.com/zhurong2020/pyobfus
+- PyPI: https://pypi.org/project/pyobfus/ · https://pypi.org/project/pyobfus-mcp/
+- Documentation: https://pyobfus.readthedocs.io/
+- Changelog: https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md
+- Current plan: https://github.com/zhurong2020/pyobfus/blob/main/docs/CURRENT_PLAN_ZH.md
+- AI integration: https://github.com/zhurong2020/pyobfus/blob/main/docs/AI_INTEGRATION_STRATEGY.md
+- Issues: https://github.com/zhurong2020/pyobfus/issues

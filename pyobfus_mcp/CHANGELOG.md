@@ -6,6 +6,17 @@ The main `pyobfus` package changelog lives in the repo root at [CHANGELOG.md](..
 
 ## [Unreleased]
 
+## [0.3.17] - 2026-10-30
+
+### Fixed
+
+- Parse-error scans return `status: error` without suggesting a protection build.
+  Delivery warnings recommend reviewing uninspected content instead of claiming
+  there are no known mistakes. Successful protection guidance no longer equates
+  compile/import verification with readiness to ship. Tool names are unchanged;
+  error, disabled-tool and rate-limit responses now include the documented
+  additive `next_tool` envelope with no automatic next action.
+
 ## [0.3.16] - 2026-10-26
 
 ### Changed

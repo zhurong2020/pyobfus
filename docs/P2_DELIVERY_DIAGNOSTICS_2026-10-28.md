@@ -1,8 +1,9 @@
 # P2 delivery diagnostics: bounded bytecode evidence and frozen packages
 
 Status: merged via [PR #156](https://github.com/zhurong2020/pyobfus/pull/156)
-as `5b26085` after 44 successful and 2 skipped checks; **not released in Core
-0.10.0**.
+as `5b26085` after 44 successful and 2 skipped checks; **released in Core
+0.11.0**. The original October 28 validation used the then-unreleased change;
+see [release verification](CORE_0_11_0_RELEASE_2026-10-29.md).
 
 `--check-delivery` now accepts a directory, wheel, or a file with PE, ELF, or
 Mach-O magic. It still checks ordinary delivered files for the known mapping,
@@ -51,6 +52,18 @@ exit 1, and malformed targets exit 2. No new CI matrix or private repository
 workflow was added.
 
 ## Local acceptance
+
+### Unreleased robustness changes (2026-10-30)
+
+The current checkout aborts incomplete inspection with CLI exit 2 (MCP
+`InvalidInput`) for unsafe/duplicate wheel paths, external or directory
+symlinks, special files, malformed evidence shapes and resource limits.
+In-root regular-file symlinks remain supported. Limits are 100,000 entries,
+256 MiB per entry, 1 GiB total content, and 20 MiB per evidence JSON. No
+partial result is reported as clean. These changes are **not in 0.11.0**.
+See the [engineering validation](ENGINEERING_VALIDATION_2026-10-30.md).
+
+### Original 0.11.0 acceptance
 
 - A real protected output compiled to `.pyc` reports
   `matched_recorded_output`.

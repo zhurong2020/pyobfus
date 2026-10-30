@@ -460,6 +460,12 @@ def check_obfuscation_risks(
         )
     report = PreflightChecker(**checker_kwargs).check_path(target)
     payload = report.to_dict()
+    if payload.get("exit_code") == 2:
+        payload["status"] = "error"
+        payload["next_tool"] = _next_tool(
+            None, "fix the source parse errors and repeat check_obfuscation_risks before building"
+        )
+        return payload
     payload["status"] = "success" if payload.get("exit_code", 0) == 0 else "warnings"
 
     # Phase 3: surface Pro funnel signal when the scan finds patterns Pro
@@ -688,6 +694,8 @@ def check_delivery(
         follow_up = (
             "remove the high-severity files from the delivery, then call check_delivery again"
         )
+    elif result["status"] == "warn":
+        follow_up = "review the delivery warnings and uninspected content before deciding to ship"
     else:
         follow_up = "the delivery has no known pyobfus mistakes; ship it with your usual checks"
     result["next_tool"] = _next_tool(None, follow_up)
@@ -1348,7 +1356,7 @@ def protect_project(
     else:
         status = "success"
         ai_hint = f"Protected {stats.get('files_processed', '?')} file(s) into '{output_dir}' " f"with preset '{preset_used}'" + (
-            f" — verified (confidence: {confidence}); safe to ship."
+            f" — verification passed (confidence: {confidence}); run application behavior and delivery checks before shipping."
             if verify
             else " (verification skipped)."
         ) + (
@@ -1356,7 +1364,14 @@ def protect_project(
             if save_mapping
             else ""
         )
-        next_tool = _next_tool(None, "pipeline complete; obfuscated output is ready to ship")
+        next_tool = _next_tool(
+            None,
+            (
+                "run application behavior and delivery checks before shipping"
+                if verify
+                else "verification was skipped; verify the generated output before shipping"
+            ),
+        )
 
     if stats.get("module_attribute_accesses_unproved", 0):
         ai_hint += " Run check_obfuscation_risks to inspect unproved module attribute accesses before shipping."
@@ -1412,4 +1427,5 @@ def _error(error_type: str, message: str, ai_hint: str) -> Dict[str, Any]:
         "error_type": error_type,
         "message": message,
         "ai_hint": ai_hint,
+        "next_tool": _next_tool(None, "resolve the reported error before continuing"),
     }

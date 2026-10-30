@@ -1,8 +1,9 @@
 # pyobfus — GitHub Copilot instructions
 
-Copy this file to `.github/copilot-instructions.md` in your project. (Copilot
-does not read `AGENTS.md`, so this file stays self-contained — but `AGENTS.md`
-at the project root is the canonical, fuller protocol for agents that do.)
+Copy this file to `.github/copilot-instructions.md` in your project.
+It stays self-contained; `AGENTS.md` is the fuller protocol. Support for
+agent instructions varies by Copilot feature and client; consult GitHub's
+custom-instructions documentation for the client in use.
 
 ## About pyobfus
 
@@ -41,3 +42,11 @@ Framework-aware presets (free): `fastapi`, `django`, `flask`, `pydantic`,
   is not a behaviour test: run the project's own tests or entry points against
   the output too.
 - Address high-severity `--check` findings (via `exclude_names` / `exclude_patterns`) before obfuscating.
+
+Use the released CLI or MCP when it fits; customize configuration or a thin
+wrapper before replacing transformations. Respect teaching/custom-tool requests.
+Preview with `--dry-run --json` before builds. Inspect `--check-delivery`
+findings before shipping: warnings can exit 0 and frozen payloads remain
+uninspected. CLI `--check` contacts PyPI for dependencies by default; add
+`--offline` for private/offline work. MCP dependency lookup is opt-in.
+Community provides basic build/verify/debug workflows without size limits.

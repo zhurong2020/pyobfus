@@ -1,0 +1,88 @@
+{
+  "date": "2026-10-30",
+  "scope": "Local Linux public-wheel acceptance, not a cross-platform guarantee",
+  "runs": [
+    {
+      "python": "3.15.0 (main, Oct  9 2026, 14:11:45) [GCC 13.3.0]",
+      "pyobfus": "0.11.0",
+      "runtime": "0.1.1",
+      "pyinstaller": "6.22.3",
+      "pyinstaller_hooks_contrib": "2026.9",
+      "cryptography": "50.0.2",
+      "cffi": "2.1.1",
+      "platform": "linux",
+      "l3": false,
+      "status": "passed",
+      "artifacts": [
+        {
+          "mode": "onedir",
+          "sha256": "d7b014e4c8cee1c38eb3873c7cce1452b60e7bb6c455d9a0ce3cf36bdd3c878e",
+          "bytes": 1848176,
+          "result": "passed",
+          "archive_entries": 147,
+          "traceback": "source mapping"
+        },
+        {
+          "mode": "onefile",
+          "sha256": "877156ce55b2f265eb76b23d3ad32c460585bd3085958f187c0c08df392613e7",
+          "bytes": 8762760,
+          "result": "passed",
+          "archive_entries": 173,
+          "traceback": "source mapping"
+        }
+      ],
+      "input_sha256": {
+        "data/label.txt": "e3948586ab927564d12da8fcb8a41ef7f1bf336c509ed8e804a2af9a9736558b",
+        "main.py": "48abcb67aae0fdb462f96d417f31e05ae5592221802fee8f37735b53c941ff12",
+        "storefront/__init__.py": "79e0a6e7a9d99b7e9142e4570d3663084621bcb6e13c9f1dc2151fb6fd6ac802",
+        "storefront/catalog.py": "31ed7c1cbb4c9028fabbb9119bec5b04af8666929a8bf7b553b958c328fcd1c5",
+        "storefront/checkout.py": "3e3f058aaa014f3117e9dde1810790f5c91ac164d2be970f774984ccecb86434",
+        "storefront/rules/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "storefront/rules/discounts.py": "89c5f7a554f43cc6eca31c91752d9fffeef0ebec91da7ddd042149ee35796131"
+      },
+      "step_count": 14,
+      "elapsed_step_seconds": 13.784
+    },
+    {
+      "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+      "pyobfus": "0.11.0",
+      "runtime": "0.1.1",
+      "pyinstaller": "6.22.3",
+      "pyinstaller_hooks_contrib": "2026.9",
+      "cryptography": "50.0.2",
+      "cffi": "2.1.1",
+      "platform": "linux",
+      "l3": true,
+      "status": "passed",
+      "artifacts": [
+        {
+          "mode": "onedir",
+          "sha256": "c4112ee6fd24f246269de4e30b0c42140043937eb6bc6f4e079d4f2559fab71a",
+          "bytes": 1605928,
+          "result": "passed",
+          "archive_entries": 177,
+          "traceback": "name_only encrypted frames"
+        },
+        {
+          "mode": "onefile",
+          "sha256": "982aea3ae1766965173ca887ad016aa1bd976179d0c306d9b9a2511e613cc50b",
+          "bytes": 12565920,
+          "result": "passed",
+          "archive_entries": 218,
+          "traceback": "name_only encrypted frames"
+        }
+      ],
+      "input_sha256": {
+        "data/label.txt": "e3948586ab927564d12da8fcb8a41ef7f1bf336c509ed8e804a2af9a9736558b",
+        "main.py": "48abcb67aae0fdb462f96d417f31e05ae5592221802fee8f37735b53c941ff12",
+        "storefront/__init__.py": "79e0a6e7a9d99b7e9142e4570d3663084621bcb6e13c9f1dc2151fb6fd6ac802",
+        "storefront/catalog.py": "31ed7c1cbb4c9028fabbb9119bec5b04af8666929a8bf7b553b958c328fcd1c5",
+        "storefront/checkout.py": "3e3f058aaa014f3117e9dde1810790f5c91ac164d2be970f774984ccecb86434",
+        "storefront/rules/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "storefront/rules/discounts.py": "89c5f7a554f43cc6eca31c91752d9fffeef0ebec91da7ddd042149ee35796131"
+      },
+      "step_count": 19,
+      "elapsed_step_seconds": 17.314
+    }
+  ]
+}

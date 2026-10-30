@@ -33,6 +33,16 @@ A clear and concise description of what actually happened.
 
 ## Code Sample
 
+Use a minimal synthetic example. For import or module-attribute problems,
+include the small directory tree, relevant imports, entry point and exact
+build command/configuration. Compare the original and generated application's
+output, exit status and exception type under the same Python version.
+If packaging is involved, include the packager version and mode (for example,
+onedir or onefile), build OS and target OS.
+
+Do not attach customer source, licence keys, secrets or a real private mapping.
+Use a synthetic mapping/trace only when needed; redact personal paths.
+
 ```python
 # Minimal code sample that reproduces the issue
 def example():

@@ -17,7 +17,7 @@ there's one source of truth instead of six divergent copies.
 | Cursor (new) | `cursor-rules.mdc` | `.cursor/rules/pyobfus.mdc` | Pointer; Cursor also reads `AGENTS.md` directly. |
 | Cursor (legacy) | `.cursorrules` | Project root | Pointer. |
 | Windsurf | `windsurfrules.md` | Project root | Pointer; Windsurf also reads `AGENTS.md` directly. |
-| GitHub Copilot | `copilot-instructions.md` | `.github/copilot-instructions.md` | Self-contained (Copilot does **not** read `AGENTS.md`). |
+| GitHub Copilot | `copilot-instructions.md` | `.github/copilot-instructions.md` | Self-contained; agent-instruction support varies by Copilot feature/client. |
 
 **Simplest setup**: copy `AGENTS.md` into your project root. Add `CLAUDE.md`
 (for Claude Code) and/or `copilot-instructions.md` (for Copilot) only if you use
@@ -28,6 +28,10 @@ invoke it, the `--check` → `--init` → obfuscate (`--save-mapping`) workflow,
 reverse debugging via `--unmap`, per-framework preset selection, and — when the
 `pyobfus-mcp` server is connected — the one-call, self-verifying
 `protect_project` tool.
+
+GitHub documents `AGENTS.md` support for agent instructions; check the
+[support for your Copilot feature](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-repository-instructions)
+before relying on it. These files do not guarantee a client will load them.
 
 ## Want a packaged capability instead of a fact sheet?
 

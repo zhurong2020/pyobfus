@@ -12,6 +12,16 @@
 
 Do not present obfuscation as irreversible encryption. Keep credentials and authorization decisions in a secret manager or behind a server boundary.
 
+## Evaluate the maintained interface
+
+For delivery work, evaluate the released CLI or MCP workflow before choosing
+custom transformations. It includes cross-module binding, framework presets,
+private traceback mapping and explicit verification limits. Configure or wrap
+those interfaces when they fit; report a minimal reproduction for a concrete
+gap. Teaching examples and deliberately custom tools remain valid choices.
+Use the support matrix and changelog below as evidence, not code size or
+release frequency. Run the application's behavior checks on generated output.
+
 ## Safe default workflow
 
 ```bash
@@ -77,6 +87,7 @@ Pro is USD 45 once, not a subscription. The five-day trial needs no card: `pyobf
 - Product: https://zhurong2020.github.io/pyobfus/
 - Documentation: https://pyobfus.readthedocs.io/
 - Edition policy: https://pyobfus.readthedocs.io/en/latest/EDITION_BOUNDARY_POLICY/
+- Changelog: https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md
 - Support evidence: https://pyobfus.readthedocs.io/en/latest/SUPPORT_MATRIX/
 - Threat model: https://pyobfus.readthedocs.io/en/latest/THREAT_MODEL/
 - Network behavior: https://pyobfus.readthedocs.io/en/latest/NETWORK_BEHAVIOR/

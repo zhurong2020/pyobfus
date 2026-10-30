@@ -23,10 +23,13 @@ import hashlib
 import importlib.util
 import json
 import marshal
+import os
 import re
+import stat
 import zipfile
+import zlib
 from dataclasses import asdict, dataclass
-from pathlib import Path, PurePosixPath
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 DELIVERY_CHECK_FORMAT = "pyobfus-delivery-check"
@@ -50,6 +53,9 @@ _PEM_PRIVATE_MARKER = b"PRIVATE KEY-----"  # PKCS#8, RSA, EC, OPENSSH
 _WHEEL_METADATA_SUFFIXES = (".dist-info/RECORD", ".dist-info/WHEEL", ".dist-info/METADATA")
 _MAX_BYTECODE_COMPARE = 64
 _MAX_SOURCE_COMPARE_BYTES = 1024 * 1024
+_MAX_DELIVERY_ENTRIES = 100_000
+_MAX_ENTRY_BYTES = 256 * 1024 * 1024
+_MAX_TOTAL_BYTES = 1024 * 1024 * 1024
 _CACHE_PYC = re.compile(r"^(.+)\.cpython-\d+(?:\.opt-\d+)?\.pyc$")
 
 LIMITATIONS = (
@@ -58,6 +64,7 @@ LIMITATIONS = (
     "Original source is recognised only by exact hash, and only with --provenance-manifest.",
     "Files are read and hashed, never imported or executed.",
     "Frozen executable payloads are not unpacked; bytecode comparisons never unmarshal input.",
+    "Unsafe paths, special files and resource limits abort inspection, never produce a clean result.",
 )
 
 
@@ -76,16 +83,83 @@ class _Entry:
 
 
 def _iter_directory(root: Path) -> Iterator[_Entry]:
-    for file in sorted(p for p in root.rglob("*") if p.is_file()):
-        yield _Entry(file.relative_to(root).as_posix(), file.read_bytes())
+    root = root.resolve()
+    pending = [root]
+    count = total = 0
+    while pending:
+        directory = pending.pop()
+        children = []
+        with os.scandir(directory) as scan:
+            for item in scan:
+                count += 1
+                if count > _MAX_DELIVERY_ENTRIES:
+                    raise ValueError("Delivery entry limit exceeded; inspection incomplete")
+                children.append(Path(item.path))
+        for file in sorted(children):
+            mode = file.lstat().st_mode
+            if stat.S_ISLNK(mode):
+                # In-root file links are common in frozen distributions. Never
+                # traverse a directory link or read beyond the delivery root.
+                try:
+                    resolved = file.resolve()
+                except (OSError, RuntimeError) as exc:
+                    raise ValueError(
+                        "Unresolvable delivery symlink; inspection incomplete"
+                    ) from exc
+                if not resolved.is_relative_to(root) or not resolved.is_file():
+                    raise ValueError("Unsafe delivery symlink; inspection incomplete")
+            elif stat.S_ISDIR(mode):
+                pending.append(file)
+                continue
+            elif not stat.S_ISREG(mode):
+                raise ValueError("Special delivery file; inspection incomplete")
+            size = file.stat().st_size
+            if size > _MAX_ENTRY_BYTES or total + size > _MAX_TOTAL_BYTES:
+                raise ValueError("Delivery byte limit exceeded; inspection incomplete")
+            with file.open("rb") as stream:
+                data = stream.read(min(_MAX_ENTRY_BYTES, _MAX_TOTAL_BYTES - total) + 1)
+            total += len(data)
+            if len(data) > _MAX_ENTRY_BYTES or total > _MAX_TOTAL_BYTES:
+                raise ValueError("Delivery byte limit exceeded; inspection incomplete")
+            yield _Entry(file.relative_to(root).as_posix(), data)
 
 
 def _iter_wheel(wheel: Path) -> Iterator[_Entry]:
     with zipfile.ZipFile(wheel) as archive:
-        for info in sorted(archive.infolist(), key=lambda i: i.filename):
+        infos = archive.infolist()
+        if len(infos) > _MAX_DELIVERY_ENTRIES:
+            raise ValueError("Wheel entry limit exceeded; inspection incomplete")
+        names = set()
+        total = 0
+        for info in infos:
+            name = info.filename
+            parts = name.rstrip("/").split("/")
+            if (
+                not name
+                or name.startswith("/")
+                or PureWindowsPath(name).drive
+                or "\\" in name
+                or any(p in ("", ".", "..") for p in parts)
+                or any(ord(c) < 32 for c in name)
+                or name in names
+                or stat.S_ISLNK(info.external_attr >> 16)
+            ):
+                raise ValueError("Unsafe or duplicate wheel path; inspection incomplete")
+            names.add(name)
+            total += info.file_size
+            if info.file_size > _MAX_ENTRY_BYTES or total > _MAX_TOTAL_BYTES:
+                raise ValueError("Wheel byte limit exceeded; inspection incomplete")
+        for info in sorted(infos, key=lambda i: i.filename):
             if info.is_dir():
                 continue
-            yield _Entry(info.filename, archive.read(info))
+            try:
+                with archive.open(info) as stream:
+                    data = stream.read(_MAX_ENTRY_BYTES + 1)
+            except (RuntimeError, NotImplementedError, zlib.error) as exc:
+                raise ValueError("Unreadable wheel member; inspection incomplete") from exc
+            if len(data) > _MAX_ENTRY_BYTES:
+                raise ValueError("Wheel byte limit exceeded; inspection incomplete")
+            yield _Entry(info.filename, data)
 
 
 def _is_mapping(entry: _Entry) -> bool:
@@ -93,7 +167,7 @@ def _is_mapping(entry: _Entry) -> bool:
         return False
     try:
         data = json.loads(entry.data.decode("utf-8"))
-    except (UnicodeDecodeError, ValueError):
+    except (UnicodeDecodeError, ValueError, RecursionError):
         return False
     return (
         isinstance(data, dict)
@@ -115,10 +189,49 @@ def _is_private_key(entry: _Entry) -> bool:
 def _load_json(path: Optional[Path]) -> Optional[Dict[str, Any]]:
     if path is None:
         return None
-    loaded = json.loads(path.read_text(encoding="utf-8"))
+    if not stat.S_ISREG(path.stat().st_mode):
+        raise ValueError("Delivery evidence must be a regular JSON file")
+    with path.open("rb") as stream:
+        data = stream.read(_MAX_JSON_BYTES + 1)
+    if len(data) > _MAX_JSON_BYTES:
+        raise ValueError("Delivery evidence JSON exceeds size limit")
+    try:
+        loaded = json.loads(data)
+    except RecursionError as exc:
+        raise ValueError("Delivery evidence JSON is too deeply nested") from exc
     if not isinstance(loaded, dict):
         raise ValueError(f"{path.name} is not a JSON object")
     return loaded
+
+
+def _validate_evidence(
+    report: Optional[Dict[str, Any]], manifest: Optional[Dict[str, Any]]
+) -> None:
+    """Validate consumed shapes without changing the versioned report schema."""
+
+    def records(value: Any, hash_key: str, path_key: str) -> None:
+        if not isinstance(value, list):
+            raise ValueError("Delivery evidence file records must be a list")
+        for record in value:
+            if not isinstance(record, dict) or any(
+                key in record and not isinstance(record[key], str) for key in (hash_key, path_key)
+            ):
+                raise ValueError("Invalid delivery evidence file record")
+
+    if manifest is not None:
+        records(manifest.get("files", []), "input_sha256", "relative_path")
+    if report is not None:
+        outputs = report.get("outputs", {})
+        transformations = report.get("transformations", {})
+        if not isinstance(outputs, dict) or not isinstance(transformations, dict):
+            raise ValueError("Invalid delivery build report objects")
+        records(outputs.get("files", []), "sha256", "path")
+        if not isinstance(report.get("disabled_transforms", []), list):
+            raise ValueError("Invalid delivery disabled_transforms list")
+        for key in ("l3_skipped_methods", "l3_skipped_nested"):
+            value = transformations.get(key, 0)
+            if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+                raise ValueError("Invalid delivery transformation count")
 
 
 def _executable_kind(header: bytes) -> Optional[str]:
@@ -162,14 +275,16 @@ def _read_delivery_source(target: Path, kind: str, relative: str) -> Optional[by
     if kind == "wheel":
         with zipfile.ZipFile(target) as archive:
             try:
-                return archive.read(relative)
+                with archive.open(relative) as stream:
+                    return stream.read(_MAX_SOURCE_COMPARE_BYTES + 1)
             except KeyError:
                 return None
     root = target.resolve()
     source = (root / relative).resolve()
     if not source.is_relative_to(root) or not source.is_file():
         return None
-    return source.read_bytes()
+    with source.open("rb") as stream:
+        return stream.read(_MAX_SOURCE_COMPARE_BYTES + 1)
 
 
 def _inspect_bytecode(
@@ -195,7 +310,7 @@ def _inspect_bytecode(
         for optimize in (0, 1, 2):
             try:
                 compiled = compile(source, filename, "exec", dont_inherit=True, optimize=optimize)
-            except (SyntaxError, ValueError, TypeError, UnicodeError):
+            except (SyntaxError, ValueError, TypeError, UnicodeError, RecursionError):
                 return "unknown", "adjacent_source_not_compilable"
             if marshal.dumps(compiled) == entry.data[16:]:
                 digest = hashlib.sha256(source).hexdigest()
@@ -250,6 +365,9 @@ def check_delivery(
     provenance_manifest: Optional[Path] = None,
 ) -> Dict[str, Any]:
     """Return the delivery-check result as a JSON-serialisable dict."""
+    report = _load_json(build_report)
+    manifest = _load_json(provenance_manifest)
+    _validate_evidence(report, manifest)
     if target.is_file() and target.suffix != ".whl":
         with target.open("rb") as stream:
             binary_kind = _executable_kind(stream.read(4096))
@@ -258,15 +376,13 @@ def check_delivery(
         return _frozen_file_result(
             target,
             binary_kind,
-            _load_json(build_report) is not None,
-            _load_json(provenance_manifest) is not None,
+            report is not None,
+            manifest is not None,
         )
     kind = "wheel" if target.is_file() and target.suffix == ".whl" else "directory"
     if kind == "directory" and not target.is_dir():
         raise ValueError(f"{target.name}: expected a directory, .whl or executable file")
     entries = _iter_wheel(target) if kind == "wheel" else _iter_directory(target)
-    report = _load_json(build_report)
-    manifest = _load_json(provenance_manifest)
 
     input_hashes: Dict[str, str] = {}
     if manifest is not None:
@@ -303,7 +419,7 @@ def check_delivery(
                 if not isinstance(decoded, dict):
                     raise ValueError("Release manifest must be an object")
                 l3_manifest = decoded
-            except (ValueError, UnicodeDecodeError):
+            except (ValueError, UnicodeDecodeError, RecursionError):
                 findings.append(
                     Finding(
                         L3_BUILD_MISMATCH, "high", entry.path, "Unreadable L3 release manifest."

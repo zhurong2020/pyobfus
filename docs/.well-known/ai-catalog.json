@@ -11,16 +11,17 @@
       "type": "application/mcp-server+json",
       "url": "https://raw.githubusercontent.com/zhurong2020/pyobfus/main/pyobfus_mcp/server.json",
       "capabilities": [
-        "scan_project",
-        "obfuscate_file",
-        "obfuscate_package",
-        "unmap_traceback",
-        "validate_config",
+        "check_obfuscation_risks",
+        "generate_pyobfus_config",
         "protect_project",
+        "unmap_stack_trace",
+        "check_delivery",
+        "list_presets",
+        "explain_preset",
         "recommend_tier",
         "start_pro_trial"
       ],
-      "description": "Obfuscate Python projects and reverse-map protected stack traces through a local, no-phone-home MCP server.",
+      "description": "Local MCP tools for Python risk scans, protected builds, delivery inspection and traceback restoration. No source uploads or telemetry; dependency lookup is opt-in and Pro licence verification may use the network. Trial tool returns guidance only.",
       "representativeQueries": [
         "scan this Python project for obfuscation risks",
         "protect this FastAPI package and verify the result",
@@ -31,7 +32,7 @@
         "prepare a local-only Python build for delivery to a client",
         "check whether requirements.txt contains nonexistent public packages",
         "use an MCP server to protect a Python project from my AI coding agent",
-        "preview which files and artifacts a PyInstaller protection build will create"
+        "inspect my generated Python output before packaging it with PyInstaller"
       ]
     }
   ]

@@ -1,5 +1,22 @@
 # pyobfus 当前计划
 
+**2026-10-30 六项工程任务已完成本地实现与有界验收**：导入语义差分、
+Python 3.15 Community 打包、Python 3.12 L3 冻结交付、可复跑打包入口、
+交付检查器资源／路径边界、CLI/MCP 响应契约。审阅记录和测试结果见
+[工程验收](ENGINEERING_VALIDATION_2026-10-30.md)及
+[执行表](EXECUTION_PROGRESS_2026-10-30.md)。Core/MCP 修复已纳入 0.11.1 / 0.3.17
+发布候选，待 GitHub CI / CodeQL 与发布后核验；未扩大跨文件 L3 free-threaded 支持。
+
+**2026-10-30 顺序推进**：[本轮执行表](EXECUTION_PROGRESS_2026-10-30.md)
+记录采用入口修订、问题取证与条件等待；文档改动仍在本地，未发布。
+
+**2026-10-30 路线与设计复核**：核对源码、发布记录与 CPython、PyInstaller、
+Nuitka、GitHub SARIF、SLSA/PyPI 官方资料，清理独立目录 mapping、首屏措辞与
+已验证打包组合的重复待办；补充正确性复现、打包及 3.15t 的验收设计。
+见 [复核与可推进顺序](ROADMAP_REVIEW_2026-10-30.md)。路线复核本身只改文档，
+之后维护者另行授权发版。LinkedIn 永久链接与早期快照已收齐，
+完整首日／一周观察仍按原日期执行；明细留在私有运营记录。
+
 **最新会话交接**：[2026-10-29 收尾](SESSION_CLOSEOUT_2026-10-29.md)。
 
 **2026-10-29 DEV 首日观察已补齐**：维护者提供 Dashboard 文本，

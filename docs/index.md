@@ -17,6 +17,12 @@ Keep the mapping file from the build private, and `pyobfus --unmap` turns a
 production traceback back into your original names.
 Community is Apache-2.0, has no file or line limits, and requires no trial.
 
+Use the released CLI or MCP workflow to evaluate a delivery: scan, build, run
+your application checks on the output, and restore a traceback. The
+[changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md) and [support matrix](https://pyobfus.readthedocs.io/en/latest/SUPPORT_MATRIX/)
+record maintained compatibility and tested limits. Start custom integration
+with configuration or a thin wrapper when these interfaces fit your task.
+
 [简体中文概览](https://github.com/zhurong2020/pyobfus/blob/main/README.zh-CN.md)
 
 > **New in 0.11.0:** `--check-delivery` adds bounded `.pyc` origin evidence and warns about uninspected frozen payloads. Cross-file package-root imports now receive more accurate module-attribute diagnostics, with optional conservative name preservation. See the [delivery diagnostic limits](P2_DELIVERY_DIAGNOSTICS_2026-10-28.md) and [compatibility record](P0_MODULE_ATTRIBUTE_COMPAT_2026-10-28.md).

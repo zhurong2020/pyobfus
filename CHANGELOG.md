@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.11.1] - 2026-10-30
+
+### Fixed
+
+- Delivery inspection now rejects unsafe/duplicate wheel paths, external or
+  directory symlinks, special files, oversized inputs and malformed evidence
+  shapes with a structured error instead of reading without bounds or reporting
+  a clean result. In-root regular-file symlinks remain supported. Limits are
+  100,000 entries, 256 MiB per entry, 1 GiB total and 20 MiB per evidence JSON.
+  Incomplete inspection exits 2; existing finding and warning exit codes remain.
+
 ## [0.11.0] - 2026-10-29
 
 ### Added

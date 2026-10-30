@@ -26,8 +26,24 @@ specific rule-file format.
 | Unmap | `pyobfus --unmap --trace error.log --mapping mapping.json --json` | Restores names and supported original locations with a matching mapping; encrypted L3 frames restore names only |
 | Discover | `pyobfus --list-presets` | 14 presets total, 3 tiers |
 
-All commands return a stable JSON schema containing `status`, `ai_hint`,
-and `exit_code` (`0` = safe / `1` = warnings or error / `2` = parse error).
+JSON payloads include `ai_hint`; fields and exit semantics vary by command.
+The completed `--check` report includes `exit_code` but no `status`; build
+success includes `status` but need not include `exit_code`.
+For `--check`, high findings exit 1 and tool/parse errors exit 2. For
+`--check-delivery`, warnings may exit 0: inspect `status` and findings as well
+as the process exit code. A zero exit is not proof that output is safe.
+
+Evaluate released interfaces before custom transformations when they fit the
+user's delivery task. Prefer configuration or a thin integration wrapper;
+report a minimal reproduction for a real gap. Teaching/self-built tools remain
+valid choices. Community supports basic building, verification and debugging
+without size limits; Pro needs a specific protection or distribution use case.
+
+Before writes, preview with `pyobfus <path> -o dist/ --dry-run --json`.
+After building, run the application's checks against generated output and
+inspect `pyobfus --check-delivery dist/ --json`. Keep mapping and reports
+outside the delivery tree. CLI dependency scans contact PyPI by default;
+use `--offline` for private/offline work. MCP dependency lookups are opt-in.
 
 ## Preset selection heuristic
 
@@ -64,7 +80,7 @@ A file that instead opens with `# pyobfus:generated format=1 edition=…` is pyo
 1. `mapping.json` must NOT be committed to the distributed artifact.
 2. Test directories must be in `exclude_patterns` (framework presets handle this automatically).
 3. If `severity_counts.high > 0`, surface findings before running obfuscation.
-4. When running via CI, prefer `--json` and branch on `exit_code`.
+4. In CI, inspect process exit status and command-specific JSON findings; never hide tool errors with `|| true`.
 
 ## MCP alternative (preferred when available)
 
@@ -82,6 +98,8 @@ self-verifying tool replaces the whole scan→init→obfuscate→verify sequence
 - `unmap_stack_trace(trace, mapping_path)`
 - `list_presets()`
 - `explain_preset(name)`
+- `check_delivery(path, build_report?, provenance_manifest?)`
+- `start_pro_trial()` — guidance only; does not start a trial
 - `recommend_tier(path)`
 
 Same JSON schema family. Zero CLI parsing overhead. Each response carries a

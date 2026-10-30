@@ -76,6 +76,8 @@ def test_protect_project_healthy_is_verified(tmp_path: Path) -> None:
     assert result["verification"]["modules_broke"] == []
     # next_tool signals the chain is complete.
     assert result["next_tool"]["tool"] is None
+    assert "ready to ship" not in result["next_tool"]["reason"]
+    assert "safe to ship" not in result["ai_hint"]
 
 
 def test_protect_project_mapping_is_sibling_not_inside_output(tmp_path: Path) -> None:
