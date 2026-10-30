@@ -75,6 +75,6 @@ payload 和 `PreflightReport.to_dict()`：完成的 `--check` 报告有 `exit_co
 - 测试：Core 4687 passed / 55 skipped；MCP 159 passed；integration 368 passed / 10 skipped；runtime 24 passed。
 - Core 与 MCP wheel/sdist 构建成功，`twine check` 四个发行文件均通过；新建临时 venv 从 wheel 安装，确认版本、Core CLI 和 MCP CLI 可执行。
 - 兼容性复核：在干净环境用 MCP 0.3.17 wheel + Core 0.9.1 + MCP SDK 2.0.0 重跑完整 MCP 测试（159 passed），并通过 legacy/auto stdio 九工具验收。修复了旧 Core 对嵌套报告未校验时向 MCP 抛出类型异常的问题；告警措辞测试使用最低 Core 版本已有的告警类型。
-- 远端门禁复盘：第一轮发现上述旧 Core 兼容差异；第二轮兼容矩阵通过，但 Windows 3.14/3.15 将 `zipfile.writestr` 的反斜杠自动规范化，导致路径恶意样例未真正写入反斜杠。测试现改为在合法 ZIP 后修补本地与中央目录同长度文件名字段；定向 29 项及四个本地测试根均通过。第三轮已推送，等待 Windows/macOS/其余 CI 格子完成。
+- 远端门禁复盘：第一轮发现上述旧 Core 兼容差异；第二轮兼容矩阵通过，但 Windows 的 ZIP 读写层会规范化反斜杠。跨平台样例现修补合法 ZIP 的本地与中央目录同长度文件名字段为 `a\..\b.py`：POSIX 检查反斜杠，Windows 归一化后仍检查 `..`。定向 29 项及四个本地测试根均通过。第四轮 CI 已推送，等待各平台矩阵完成。
 - 发行物：`/tmp/pyobfus-release-20261030-{core,mcp}/`（临时核验，不入库）。
 - 发布后还需核验 PyPI 文件与 PEP 740 attestations、fresh install、GitHub Release；MCP 还需官方 Registry 状态。Zenodo 记录在 Core tag 后核对。

@@ -33,13 +33,13 @@ def test_unsafe_wheel_paths_are_errors(tmp_path, name):
 def test_backslash_wheel_path_is_rejected_even_when_zipfile_normalizes(tmp_path):
     wheel = tmp_path / "bad.whl"
     with zipfile.ZipFile(wheel, "w") as archive:
-        archive.writestr("a/b.py", "raise AssertionError('must not execute')")
+        archive.writestr("a/../b.py", "raise AssertionError('must not execute')")
     # Windows zipfile normalizes a backslash in writestr's filename to `/`.
     # Patch both same-length ZIP filename fields to model an archive from an
     # untrusted producer that stores a literal backslash.
     data = wheel.read_bytes()
-    assert data.count(b"a/b.py") == 2
-    wheel.write_bytes(data.replace(b"a/b.py", b"a\\b.py"))
+    assert data.count(b"a/../b.py") == 2
+    wheel.write_bytes(data.replace(b"a/../b.py", b"a\\..\\b.py"))
     assert_cli_error(wheel)
     assert list(tmp_path.iterdir()) == [wheel]
 
