@@ -1,5 +1,11 @@
 # pyobfus 当前计划
 
+**2026-10-31 运营收尾（无发版）**：一次企业开票请求按自开已付发票交付；只读核查确认 Stripe 无法为
+guest 付款原生开具已付发票。Pro 付款链接已经 API 原地修改（购买网址不变）：建正式 Customer，账单地址
+必填，公司名与税号选填；付款后自动开票与自动计税保持关闭。详见 `docs/TODO.md`「Payment Link 开票设置」。
+**下一笔真实购买时**按 TODO「核验新发号流程」复核，并确认 Customer 带有收集到的资料。其余日期事项不变：
+11-01 后私有 CI 恢复与 Stripe 待付款项核对、11-04 DEV、11-05 LinkedIn 一周复盘。
+
 **2026-10-30 发布完成**：Core 0.11.1 与 MCP 0.3.17 已发布并核验，runtime
 0.1.1 未变。全量 CI 39/39、CodeQL、PyPI 两产物 PEP 740、fresh install、
 MCP Registry `active` / `isLatest=true` 均通过。发布证据见
