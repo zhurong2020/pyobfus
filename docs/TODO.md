@@ -116,7 +116,12 @@ Zenodo 已归档 Core 0.11.1（`23796579`）及 MCP 0.3.17（`23796634`）；概
       ⑤ 约 10-14 看 DEV 第 1 篇反响与 GitHub 流量来源，再决定是否投 HN（Show HN 已用过，只能普通投稿）。
 - [ ] **0.6.1 通知的回信**：随每周一巡检看 Gmail；回信若报激活问题按 `LICENSE_ACTIVATION_GUIDE.md`
       排障，不主动追发第二封。各客户激活状态只在私有记录。
-- [ ] **Payment Link 开票设置**（2026-10-05 登记，维护者 + API，不急）。该链接
+- [x] **Payment Link 开票设置**（2026-10-05 登记；**2026-10-31 已通过 API 改好**，购买网址不变）。
+      现为 `customer_creation=always`、账单地址必填、公司名与税号选填；付款后自动开票保持关闭——测试模式里
+      该发票 PDF 在已付状态下仍显示应付金额和在线付款链接，不宜发给买家；自动计税保持关闭。开票仍按私有
+      runbook 自开，但买家资料可直接从 Stripe 读取。改动用仅含必要权限的 restricted key（Vaultwarden），
+      先测试模式验证、改前备份、改后读回核对。**待办**：下一笔真实购买时按上面「核验新发号流程」再走一遍，
+      并确认 Customer 带有收集到的资料。以下为原始记录：该链接
       由 API 创建，Dashboard 不能编辑。开 `customer_creation=always`（免费，根治访客结账没有 Customer、事后
       开票对不上）或 `invoice_creation`（每笔自动发票，可能另收 Invoicing 费，开前看说明）只能走 API；需先在
       Dashboard 建只含 Payment Links 写权限的 restricted key 并存进 Vaultwarden。
