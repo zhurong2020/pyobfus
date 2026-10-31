@@ -125,6 +125,12 @@ Zenodo 已归档 Core 0.11.1（`23796579`）及 MCP 0.3.17（`23796634`）；概
       不建 Stripe invoice、不关联付款。改链接仍待维护者决定：若改，优先收集公司名 + 税号（+ 地址）并
       `customer_creation=always`；若新建链接替换，需同步全部购买入口并先核 Worker 能处理。流程见私有
       `docs/internal/`（git 忽略）。
+      **2026-10-31 更新**：又一次开票按自开发票交付。交付前只读核查确认 Stripe 原生路径不可行：guest 付款
+      没有关联或转换为 Customer 的入口，不能套用到发票；用 Payment Record 标记已付会让同一笔收入重复记账；
+      账户开着一次性发票提醒，未付状态的发票会自动给买家发邮件。自开发票规范（编号 = 付款日期 + Stripe
+      收据号）在私有 runbook。下一步按维护者 10-31 指示推进 API 改链接：先只读探查 Dashboard 与 API key
+      现状，再建 restricted key、在测试模式验证参数，最后改 live 链接；Worker 已把 `session.customer`
+      写入许可记录，Customer 由空变为有值不影响发号。
 - [ ] **开启任何延迟到账付款方式前的检查**（规则，长期有效）：Worker 与 webhook 订阅已支持
       `checkout.session.async_payment_succeeded`，但开 ACH / SEPA / 银行转账等之前先确认 endpoint 仍订阅该事件，
       开后的第一笔按上面「核验新发号流程」走一遍。Stripe 付款方式是账户级配置，会按它动态展示。
