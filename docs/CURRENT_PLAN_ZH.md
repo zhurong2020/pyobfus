@@ -1,5 +1,8 @@
 # pyobfus 当前计划
 
+**最新会话交接（11-01）**：[收尾与冷启动顺序](SESSION_CLOSEOUT_2026-11-01.md)。
+三个 PR 的实质审阅／合并边界、RTD challenge 和备份复验是未完成主线；先读交接，再核实时状态。
+
 **2026-11-01 维护接续**：按授权完成采用入口核对、私有 CI 恢复取证，相关测试／文档修复
 已提交 PR；Action 八项检查与 llm-enrichment 双版本 CI 通过。SimpleITK 修复本地与
 远端 3.10／3.12／lint 均通过，PR 精简矩阵已验收。RTD challenge、当日备份云端完成状态及所有 PR 审阅边界见
