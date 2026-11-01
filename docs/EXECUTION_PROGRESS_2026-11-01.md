@@ -92,9 +92,9 @@
      旧快照拒绝逻辑不变；未部署、未更新页面。已合并 `ce20bb2`，记录 `6d0f485`。
    - [pyobfus-action #2](https://github.com/zhurong2020/pyobfus-action/pull/2)：Codex 1 项 must-fix 成立——README
      「Source, findings and mappings stay on the runner」不准确：`run_pyobfus.py` 把最多 50 行发现
-     （严重度、类别、`file:line`、消息）写入 `GITHUB_STEP_SUMMARY`。修订已在本地提交 `bb60129`（领先远端 1），
-     **未推送、未合并**：该公开仓 AGENTS.md 规定任何 push 都需负责人明确授权。版本区间与 install/offline
-     说法与代码一致。v1 tag、Marketplace 均未动。
+     （严重度、类别、`file:line`、消息）写入 `GITHUB_STEP_SUMMARY`。修订 `bb60129`；负责人当日明确授权后推送，
+     八项 hosted checks 全部通过，按该仓惯例 squash 合并为 `24f3328`（03:10 UTC）。版本区间与 install/offline
+     说法与代码一致。v1 tag 仍指 `284802e`（未移动），Marketplace 未动，未发版。
 2. **Read the Docs 已核实**：本机仍被 Cloudflare challenge（429），改从 arong-vps 出口各请求一次，均 HTTP 200。
    公开 builds API：最新构建 `35553414` 成功，commit `d2f0685` = 当时 origin/main，02:55 UTC 完成。
    `llms.txt`（6,041 B）与 `llms-full.txt`（15,791 B）与 `docs/` 源码逐字节一致；首页正文逐句对照
