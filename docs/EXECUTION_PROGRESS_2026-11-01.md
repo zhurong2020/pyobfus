@@ -130,3 +130,28 @@
   私有明细：`docs/internal/backup-docs-status-recheck-20261101.json`。
 - 状态核对时 `scripts/check.sh` 与 `git diff --check` 通过；仅更新状态文档。
   后续按维护状态与邮件／下载观察两类提交；无产品发版，私有原始资料不进入提交。
+
+## 邮件与下载量补核（同日）
+
+- 邮件按项目 inbox 流程做无日期限制候选检索，并核对相关线程最后消息；
+  未发现待维护者回复的客户支持请求。目录锁仍待支持方，无需补材料。
+  未发送或改动邮件，未核查实时交易；私有明细见 `docs/internal/ops-2026-11-01/email-review.md`。
+- 运行 `venv/bin/python scripts/download_snapshot.py --days 30`，数据截至 10-31：
+  Core 30 天 3,759，安静日 8 个、中位数 53；近 7 天仅 1 个安静日（86），样本不足。
+  MCP 30 天 940，安静日 20 个、中位数 13；近 7 天安静日 3 个、中位数 13。
+  runtime 30 天 2,689，受本仓 CI 安装显著影响，不作为用户数。
+- VS Code Marketplace 0.4.3 为 16 installs；Open VSX 792 downloads，口径不同不相加。
+  GitHub 14 天 views 143／unique 105；返回来源中未见 dev.to／reddit／chatgpt.com，
+  不能据此断言这些渠道完全没有流量。Action 可见代码引用仓库数 0，不等于真实采用数。
+- Core 安静日中位数较 10-25 快照的 40 高，但窗口与样本均变化，尚不足认定持续自然增长。
+  原始快照保存在 `docs/internal/ops-2026-11-01/download_snapshot.txt`；下次按周一节奏观察。
+
+### 分类提交验收
+
+- 维护状态与交接同步已提交为 `134e5df`；邮件／下载观察作为独立文档提交。
+- 本次提交前使用正常 HOME、仓库 `venv/`，四个 pytest 根各自独立调用：
+  Core 4,687 passed / 55 skipped（7 warnings），MCP 159 passed，
+  CLI integration 368 passed / 10 skipped，runtime 24 passed。
+- `scripts/check.sh`、暂存区与工作区 diff-check、提交钩子扫描通过。
+  仅文档变动，无产品版本调整；私有邮件／快照／备份明细仍被 Git 忽略。
+  本轮仅本地提交，远端 CI 与 RTD 的 `d84b4a8` 核验是提交前快照，未推送。
