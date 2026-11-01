@@ -155,3 +155,21 @@
 - `scripts/check.sh`、暂存区与工作区 diff-check、提交钩子扫描通过。
   仅文档变动，无产品版本调整；私有邮件／快照／备份明细仍被 Git 忽略。
   本轮仅本地提交，远端 CI 与 RTD 的 `d84b4a8` 核验是提交前快照，未推送。
+
+## 最终关闭核对（本 session）
+
+- 本 session 两个分类提交 `134e5df`、`54e1a77` 均已推送；上文「未推送」为分类提交时快照。
+  最终补齐 CLAUDE 冷启动入口、Claude/Codex memory、workspace-meta 路由／工作日志／README、
+  home 跨项目索引；仓库外 memory 是本地持久记录，不进入公开仓库。
+- README 中英文、MCP README、Action README、llms 镜像与版本边界已核对；
+  本 session 没有产品行为、版本或发布承诺变化，无需把运维交接写入产品 README。
+- 54 个工作树只读扫描：本 session 未产生非 main 分支修改；pyobfus 与本次关联仓库
+  均为 main 且在扫描时干净。另一个非 main 工作树有 7 项既有未提交内容，
+  已先告知维护者并保留；私有跨仓审计见 workspace-meta
+  `archives/SESSION_FINAL_SYNC_20261101_PYOBFUS.md`。其他项目既有修改未纳入提交。
+- 11:30 云备份及 MD5 核验覆盖当日日备快照，不代表本 session 后续新增私有记录已上云；
+  新记录等待下一次自然备份，不重复启动整套任务。
+- 本轮纯文档收尾沿用此前四个测试根通过证据，补跑 `scripts/check.sh` 与 diff-check；
+  新提交的 hosted CI／CodeQL 以远端实际运行结果为准，不继承旧提交的成功结论。
+- 推送后的 `54e1a77` CI（41284471483）与 CodeQL（41284471485）均已成功；
+  最终入口补齐提交仍需按其新 commit 核对，不把前述成功直接移用于新提交。
