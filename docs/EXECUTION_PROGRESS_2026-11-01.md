@@ -24,8 +24,9 @@
 ## 反馈与采用
 
 - GitHub 当前无开放 issue/PR；最新 main CI、CodeQL 和许可端点监控成功。
-- LinkedIn 当前没有后台连接，已请求维护者提供 analytics 文本。
-  精确首日采样已错过；补采只能标为实际采样时间，不能补造首日数字。
+- 维护者已提供 LinkedIn 帖子页与 DEV Dashboard，当前快照已补记；
+  精确首日采样已错过，不回填为首日或一周数据。指标与比较见私有
+  `docs/internal/content-2026-10/social-review-2026-10-29.md`。
 - DEV 一周复盘保持 11-04 09:43 CST 后，LinkedIn 一周复盘保持约 11-05 晚。
 - 托管 llms.txt 请求返回 HTTP 429，暂不能证明与源码同步。
 - 新购买后的发号与 Customer 核验仍为事件触发待办；邮件查询未提供新付款证据，

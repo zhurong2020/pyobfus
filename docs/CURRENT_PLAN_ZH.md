@@ -1,5 +1,9 @@
 # pyobfus 当前计划
 
+**2026-11-01 内容观察补记**：维护者提供 LinkedIn 帖子页及 DEV Dashboard，
+已保存当前快照与证据限制（私有 `docs/internal/content-2026-10/social-review-2026-10-29.md`）；
+不作为精确首日或一周数据，11-04／11-05 复查日期不变。
+
 **2026-11-01 接续执行**：私有 Guard 重跑通过；fetch 后 workspace-meta、
 cardiac-shared、vbca 均无积压提交。vbca 验收通过，cardiac-shared 四项依赖行为断言失败已登记；反馈观察、
 日期与证据限制见 [本轮执行](EXECUTION_PROGRESS_2026-11-01.md)。
