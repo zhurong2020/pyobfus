@@ -77,3 +77,30 @@
   本轮未读取客户记录或验证云端镜像完整性。
 - scripts/check.sh、git diff --check 通过；workspace-meta 本地凭据扫描
   （含最近八天新增历史）通过。本轮仅记录与定向 CI 验收，不重跑产品全量测试。
+
+## 同日接续（协调会话，北京时间 11:00 前后）
+
+1. **三个维护 PR 实质审阅**（Claude 审阅 + 每个 PR 一次独立的无头 Codex 只读审阅；三分支 base 均等于当前 main，无漂移）。
+   - [cardiac-shared #60](https://github.com/zhurong2020/cardiac-shared/pull/60)：Codex 1 项 must-fix 成立——
+     版本判断把仍受影响的 3.0.0b1 当成已修复，同时把正确的 2.3.x 当成受影响。按该仓「审阅即修复」授权改为只刻画
+     2.x 稳定线（受影响 2.4.0 ≤ v < 2.5.7，3.x 预发布 skip），`b08ad53`；SimpleITK 2.5.2／2.5.6／2.5.7
+     下两个几何测试文件各 20 passed，PR CI 3.10／3.12／lint 通过；其余要点（输出几何断言未放宽、注入错误
+     方向／原点走真实修复分支、体素逐元素不变、verifier 仍拒绝翻转仿射）经核成立。已合并 `f4f5f50`，状态记录 `6659cb7`。
+   - [llm-enrichment #1](https://github.com/zhurong2020/llm-enrichment/pull/1)：Codex 结论为批准，附 2 条小意见，均已采纳——
+     只把**末尾** `Z` 换成 `+00:00`（`_utc_iso`）；补充「新快照带 Z」的回归（较旧被拒、较新或带小数秒较新放行）。
+     3.12 全套 679 passed；3 个新比较在 Python 3.10 直接核对（3.10 不接受一位小数秒，测试改用 6 位）。
+     旧快照拒绝逻辑不变；未部署、未更新页面。已合并 `ce20bb2`，记录 `6d0f485`。
+   - [pyobfus-action #2](https://github.com/zhurong2020/pyobfus-action/pull/2)：Codex 1 项 must-fix 成立——README
+     「Source, findings and mappings stay on the runner」不准确：`run_pyobfus.py` 把最多 50 行发现
+     （严重度、类别、`file:line`、消息）写入 `GITHUB_STEP_SUMMARY`。修订已在本地提交 `bb60129`（领先远端 1），
+     **未推送、未合并**：该公开仓 AGENTS.md 规定任何 push 都需负责人明确授权。版本区间与 install/offline
+     说法与代码一致。v1 tag、Marketplace 均未动。
+2. **Read the Docs 已核实**：本机仍被 Cloudflare challenge（429），改从 arong-vps 出口各请求一次，均 HTTP 200。
+   公开 builds API：最新构建 `35553414` 成功，commit `d2f0685` = 当时 origin/main，02:55 UTC 完成。
+   `llms.txt`（6,041 B）与 `llms-full.txt`（15,791 B）与 `docs/` 源码逐字节一致；首页正文逐句对照
+   `docs/index.md` 均在（唯一差异为行内代码渲染空格）。本机 429 是访问拦截，不是部署问题。
+3. **备份**：日备脚本（PID 1554）仍在跑但在推进，没有停在「月快照复制」：月快照与周快照 09:52:43 已记 OK，
+   保留期清理已过，当前在 C 盘挂载上对整棵备份树执行 `du -sh`（进程状态 D，为 I/O 等待），之后统计文件数，再进入
+   云端同步。完整云端标记仍为 `2026-10-31 09:51:25`。未发信号、未重启备份；等云端标记更新后复验内部文档差异。
+4. **日期项**：11-02 定时 Guard（周一 01:17 UTC = 北京 09:17）、11-04 09:43 后 DEV 一周、约 11-05 晚 LinkedIn 一周，今日均不到期，未执行。
+
