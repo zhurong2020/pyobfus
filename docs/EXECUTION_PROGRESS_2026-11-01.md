@@ -33,6 +33,16 @@
 本轮维护文档 scripts/check.sh 与 diff-check 通过；相关仓库工作分支已推送。
 两个临时 SimpleITK 环境已清理；生产环境复核仍为 2.5.2／NumPy 1.26.4。
 
+### 同日立即复核
+
+- RTD 首页／llms 普通请求和 Mozilla 标识请求仍为 429。检索入口能读取两天前的
+  首页抓取，不能作为当前部署或 llms 字节一致性的证据；最新内容核验仍未闭合。
+- 备份月快照复制进程仍存在，五秒采样有 CPU 活动，尚未进入云端同步；
+  完整云端标记仍为 10-31。刷新远端 MD5 清单并复核已知差异，结果未变；
+  明细保存在私有 backup-recheck-20261101.json。不终止复制或重复启动备份。
+- PR 60／1／2 的当前状态均为 OPEN、非 draft、MERGEABLE；应运行检查全部成功，
+  cardiac-shared wheel-smoke 按配置跳过。正式审阅结论为空；本轮未合并 PR。
+
 ## CI 与同步
 
 - 私有 Actions 已恢复启动：workspace-meta Guard 重跑成功，Credential scan 6 秒。
