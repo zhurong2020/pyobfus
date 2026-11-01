@@ -1,5 +1,9 @@
 # pyobfus 当前计划
 
+**2026-11-01 接续执行**：私有 Guard 重跑通过；fetch 后 workspace-meta、
+cardiac-shared、vbca 均无积压提交。vbca 验收通过，cardiac-shared 四项依赖行为断言失败已登记；反馈观察、
+日期与证据限制见 [本轮执行](EXECUTION_PROGRESS_2026-11-01.md)。
+
 **2026-10-31 运营收尾（无发版）**：一次企业开票请求按自开已付发票交付；只读核查确认 Stripe 无法为
 guest 付款原生开具已付发票。Pro 付款链接已经 API 原地修改（购买网址不变）：建正式 Customer，账单地址
 必填，公司名与税号选填；付款后自动开票与自动计税保持关闭。详见 `docs/TODO.md`「Payment Link 开票设置」。
