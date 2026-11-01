@@ -1,15 +1,8 @@
 # TODO
 
-**11-01 接续**：[本轮执行](EXECUTION_PROGRESS_2026-11-01.md)。私有 Guard 已恢复并通过；
-三处相关 main 已同步，无积压提交。vbca 两项通过；cardiac-shared 暴露四项依赖行为断言失败，已转对应仓库跟进。
-LinkedIn／DEV 当前快照已补记；LinkedIn 首日精确采样已错过，一周复盘日期不变。
-
-**11-01 同日维护**：SimpleITK 测试兼容修复与 llm-enrichment CI 修复已提交 PR；
-Action 文档 PR 八项检查通过。GitHub Pages 采用入口与源码一致；RTD challenge 和
-本日日备完整上云仍待核验，详见本轮执行。没有新增产品发布。
-
 **最新会话交接**：[2026-11-01 收尾](SESSION_CLOSEOUT_2026-11-01.md) →
-[执行进度](EXECUTION_PROGRESS_2026-11-01.md)。先复核三个 PR，再核 RTD 最新部署与备份完成后的云端一致性。
+[执行进度](EXECUTION_PROGRESS_2026-11-01.md)。三个维护 PR 已合并，RTD 部署与云端备份
+核验已完成；无新增产品发布。下一步按下列日期观察，旧快照不覆盖最新结论。
 
 **当前状态（2026-10-30）**：Core 0.11.1 / MCP 0.3.17 已发布并通过发布核验；
 Glama 已更新 Build steps，构建、握手与九工具发现成功。Runtime 0.1.1 未变。
@@ -23,7 +16,7 @@ Zenodo 已归档 Core 0.11.1（`23796579`）及 MCP 0.3.17（`23796634`）；概
 [`FEATURE_EXPANSION_RESEARCH_2026-10-28.md`](FEATURE_EXPANSION_RESEARCH_2026-10-28.md)；旧版决策快照见[10-20 调研](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)，Python 3.15 的已发布基础范围见 [`PYTHON315_SUPPORT_PLAN.md`](PYTHON315_SUPPORT_PLAN.md)。
 
 当前版本：Core 0.11.1 / MCP 0.3.17 / runtime 0.1.1。
-任务状态以 [10-30 执行表](EXECUTION_PROGRESS_2026-10-30.md) 为入口。
+任务状态以 [11-01 执行表](EXECUTION_PROGRESS_2026-11-01.md) 为入口。
 
 ## 状态口径
 
@@ -42,21 +35,21 @@ Zenodo 已归档 Core 0.11.1（`23796579`）及 MCP 0.3.17（`23796634`）；概
 普通 13 单元、手动/定时 21 单元不变；独立 L3 六格与 MCP SDK 六格
 兼容矩阵已纳入 CI。必需检查仍为 CI result + CodeQL，不改 ruleset。
 
-## 当前执行顺序（2026-10-30 复核）
+## 当前执行顺序（2026-11-01 复核）
 
-本轮实际进度见 [10-30 执行状态](EXECUTION_PROGRESS_2026-10-30.md)。
+本轮实际进度见 [11-01 执行状态](EXECUTION_PROGRESS_2026-11-01.md)。
 
 设计、官方资料与验收条件见 [路线复核](ROADMAP_REVIEW_2026-10-30.md)。
 已完成的 P0、纯文档 CI、Core/MCP 发版、Glama 更新与首日 DEV 观察不再排入队列。
 
-1. 11-01 当前 LinkedIn／DEV 快照已补记；首日精确采样无法补回，下次按一周节点复查。
-2. 11-01：私有 Guard 恢复已核实，相关 main 无积压提交；完成必要恢复验收，11-02 观察定时 Guard。
-3. 11-04 09:43 CST 后：完成 DEV 一周复盘；约 11-05 晚完成 LinkedIn 一周复盘；11 月第一周复查采用入口。
+1. 11-02 北京时间 09:17 后：核验自然定时 Guard；vbca 文档过滤继续等待自然事件，不制造空提交。
+2. 11-04 09:43 CST 后：完成 DEV 一周复盘；首日精确采样无法补回。
+3. 约 11-05 晚：完成 LinkedIn 一周复盘；采用入口已于 11-01 核验。
 4. 收到真实最小复现后：优先正确性与诊断，再决定 L3 覆盖或资源密钥范围。
 5. 有目标平台需求后：按单组合验证 3.15 打包、3.15t 或其他尚未覆盖的交付环境。
 
 跨文件 L3 仍拒绝 free-threaded；当前没有待审的 Core/MCP 发布候选。
-后续状态见 [10-30 执行表](EXECUTION_PROGRESS_2026-10-30.md)。
+后续状态见 [11-01 执行表](EXECUTION_PROGRESS_2026-11-01.md)。
 
 ## 后续团队候选：独立的视频原创保护辅助工具（2026-10-23）
 

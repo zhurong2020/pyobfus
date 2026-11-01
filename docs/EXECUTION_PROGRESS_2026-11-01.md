@@ -108,3 +108,25 @@
    按约定不清理。许可与法律资料此前已校验一致。明细只在私有 `docs/internal/backup-docs-postsync-comparison-20261101.json`。
 4. **日期项**：11-02 定时 Guard（周一 01:17 UTC = 北京 09:17）、11-04 09:43 后 DEV 一周、约 11-05 晚 LinkedIn 一周，今日均不到期，未执行。
 
+
+## 状态核对与文档同步（同日后续）
+
+- 通过 GitHub API 再核三个 PR：cardiac-shared #60、llm-enrichment #1、
+  pyobfus-action #2 均为 MERGED，合并提交与「同日接续」一致；Action v1
+  仍为 `284802e`。pyobfus main `d84b4a8` 与 origin/main 同步，开放 issue／PR 均为 0，
+  对应 CI 与 CodeQL 成功。本次未重跑产品全量测试。
+- RTD 公开 builds API 最新构建 `35553790` 成功，commit `d84b4a8`。
+  arong-vps 普通请求 llms 返回 403，Mozilla 标识请求首页及两个 llms 均 200；
+  `llms.txt`／`llms-full.txt` SHA-256 分别为
+  `57dd77af6e3b9152360f90da4dc37bbd39e2a3f1df4449c297fcf11d1f265a7e`／
+  `c91fbff0cc42b9407115f4327617dbca6073ef61f9f2631ab54f45afa82a855a`，与本地源码一致。
+- 备份完成标记仍为 11-01 11:30:01，日志确认 current 与冷归档两段云端同步完成。
+- 已统一 AGENTS、当前计划、TODO、交接和冷启动 prompt 的当前状态；接续前证据明确标为历史。
+- 远端 Guard cron 确认为 `17 1 * * 1`，11-02 北京时间 09:17 后验收自然触发；
+  11-04 09:43 后 DEV、约 11-05 晚 LinkedIn 仍未到期，不提前采样或手动触发替代。
+- 刷新云端 MD5 清单后重新读取日备并逐文件核验：7,554 个普通文件全部一致，
+  缺失 0、内容差异 0、无哈希 0；另有 3 个解释器符号链接，按备份脚本
+  `--skip-links` 口径排除。云端仍多 2 个缓存文件，未清理。
+  私有明细：`docs/internal/backup-docs-status-recheck-20261101.json`。
+- 状态核对时 `scripts/check.sh` 与 `git diff --check` 通过；仅更新状态文档。
+  后续按维护状态与邮件／下载观察两类提交；无产品发版，私有原始资料不进入提交。

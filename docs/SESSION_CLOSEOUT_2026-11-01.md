@@ -5,9 +5,11 @@
 日期均为北京时间。此处是会话末快照，下次必须重新读取外部状态。
 复制用 [冷启动 prompt](COLD_START_PROMPT_2026-11-01.md)。
 
-> **同日接续已完成（见[本轮执行](EXECUTION_PROGRESS_2026-11-01.md)「同日接续」节）**：接续一三个 PR 均已审阅、修订并合并（cardiac-shared #60 `f4f5f50`、llm-enrichment #1 `ce20bb2`、pyobfus-action #2 `24f3328`，后者经负责人授权；v1 未动）；接续二 RTD 最新构建 `d2f0685` 成功，llms 两个文件逐字节一致；接续三 11-01 日备 11:30 完成上云，内部文档 7,554 个文件逐一 MD5 一致。仍待：11-02 定时 Guard、11-04 DEV、约 11-05 LinkedIn。
+> **同日接续已完成（见[本轮执行](EXECUTION_PROGRESS_2026-11-01.md)「同日接续」节）**：接续一三个 PR 均已审阅、修订并合并（cardiac-shared #60 `f4f5f50`、llm-enrichment #1 `ce20bb2`、pyobfus-action #2 `24f3328`，后者经负责人授权；v1 未动）；接续二 RTD 构建核实成功（后续最新成功构建已到 `d84b4a8`），llms 两个文件逐字节一致；接续三 11-01 日备 11:30 完成上云，内部文档 7,554 个文件逐一 MD5 一致。仍待：11-02 定时 Guard、11-04 DEV、约 11-05 LinkedIn。
 
-## 已完成与边界
+## 历史快照：接续前状态与边界
+
+以下至「日期／事件任务」之前保留接续前证据和操作背景，已由顶部完成摘要与执行记录「同日接续」覆盖，不再作为待办。
 
 - Core 0.11.1 / MCP 0.3.17 / runtime 0.1.1 不变，本次无产品发版、服务器部署或 tag 移动。
 - 私有 Actions 可启动：workspace-meta Guard、vbca、findata、cardiac-manuscripts
@@ -20,7 +22,7 @@
   `docs/internal/content-2026-10/social-review-2026-10-29.md`。
 - 临时 SimpleITK 环境已删除。生产研究环境仍是 SimpleITK 2.5.2、NumPy 1.26.4。
 
-## 接续一：三个 PR 的实质审阅
+## 历史接续一：三个 PR 的实质审阅（已完成）
 
 | 仓库／PR | 本地分支／提交 | 内容与已通过的验证 |
 |---|---|---|
@@ -36,7 +38,7 @@ llm-enrichment 审查旧快照拒绝逻辑与 UTC offset 等价性；不得以�
 Action 只审文档与真实契约，不移动 v1 或发 Marketplace。
 按各仓既有流程收口审阅；合并／发布按届时有效授权执行，不能把本次交接当作新增授权。
 
-## 接续二：Read the Docs 最新部署核验
+## 历史接续二：Read the Docs 最新部署核验（已完成）
 
 - `https://pyobfus.readthedocs.io/en/latest/`、`.../llms.txt` 和公开 builds API
   本机返回 HTTP 429，响应标记 `cf-mitigated: challenge`；普通／Mozilla 请求均如此。
@@ -45,7 +47,7 @@ Action 只审文档与真实契约，不移动 v1 或发 Marketplace。
   入口可访问后对照 `docs/index.md`、`docs/llms.txt`／`docs/llms-full.txt`。
   区分访问 challenge 与构建失败，不反复请求、不改产品代码迁就访问问题。
 
-## 接续三：备份完成后的复验
+## 历史接续三：备份完成后的复验（已完成）
 
 - 许可导出与当日日备一致；当日日备到云端的许可／法律资料校验通过。
 - 内部文档当日日备与云端 MD5 清单完整比较后，仍有缺失／内容差异；立即刷新远端
@@ -69,7 +71,9 @@ Action 只审文档与真实契约，不移动 v1 或发 Marketplace。
 - 下一笔真实购买：核验发号、激活与 Customer 资料；目录解锁继续等待支持方。
 - 不因 CI 已恢复而重跑所有历史运行／旧发布／部署；不因文档修订而发新版本。
 
-## 工作区与证据
+## 历史工作区快照与证据
+
+下列基线与分支描述为接续前快照；最新 main、PR 与核对结果见执行记录「状态核对与文档同步」。
 
 - 主仓 `~/projects/pyobfus`，main 会话末代码／记录基线 `b439dcd`
   （交接提交在此之后）；相关三仓在上表工作分支，均已推送且干净。
