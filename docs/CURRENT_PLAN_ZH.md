@@ -1,5 +1,10 @@
 # pyobfus 当前计划
 
+**2026-11-01 维护接续**：按授权完成采用入口核对、私有 CI 恢复取证，相关测试／文档修复
+已提交 PR；Action 八项检查与 llm-enrichment 双版本 CI 通过。SimpleITK 修复本地与
+远端 3.10／3.12／lint 均通过，PR 精简矩阵已验收。RTD challenge、当日备份云端完成状态及所有 PR 审阅边界见
+[执行记录](EXECUTION_PROGRESS_2026-11-01.md)。无产品发版或服务器部署。
+
 **2026-11-01 内容观察补记**：维护者提供 LinkedIn 帖子页及 DEV Dashboard，
 已保存当前快照与证据限制（私有 `docs/internal/content-2026-10/social-review-2026-10-29.md`）；
 不作为精确首日或一周数据，11-04／11-05 复查日期不变。
