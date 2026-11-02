@@ -309,3 +309,26 @@ endpoint has no business holding infrastructure credentials.
 
 **Before editing licence data by any other means, export it.** KV is the only
 copy, and a bad write cannot be undone.
+
+## Device-free CI verification
+
+`POST /api/verify` accepts `{license_key, activation: "ci"}` without a
+`device_id`. Active and expiration checks remain the same; CI does not modify
+or consume device slots. The response contains only `valid`, `activation`,
+`expires_at`, and `features`, omitting email and key. Deploy this endpoint before
+releasing clients that use CI activation. Device verification remains unchanged.
+
+Successful CI verification records best-effort telemetry as
+`ci_usage: {first_seen, last_used, day}` in the existing license record. Writes
+are attempted only when usage is missing, the UTC day changes, or `last_used`
+is at least one hour old. This is approximate activity telemetry, not a request
+counter; no new KV key prefixes are introduced. Failed telemetry writes log a
+fixed, redacted warning and do not fail verification. Parallel requests can read
+the same stale record and attempt simultaneous writes; KV provides no atomic
+compare-and-set, so a write can still overwrite concurrent device registration
+or revocation. Strict serialization requires a separate telemetry store or a
+Durable Object covering all license mutations.
+
+An optional `CI_RATE_LIMITER` binding may enforce a deployment limit (suggested policy: 120/hour using the platform's supported limiter);
+its identifier is the SHA-256 hash of the key. Without this binding there is
+no rate limit. Denials return HTTP 429 with `code: "rate_limited"` and no write.

@@ -150,3 +150,54 @@ test('the licence email matches current licence behaviour', () => {
   assert.match(body, /LICENSE_ACTIVATION_GUIDE\.md/);
   assert.doesNotMatch(body, /cannot be recovered/);
 });
+
+test('issuance logs omit the license key and buyer email', async (t) => {
+  const log = t.mock.method(console, 'log', () => {});
+  const error = t.mock.method(console, 'error', () => {});
+  const kv = fakeKv();
+  const response = await worker.fetch(
+    stripeRequest(sessionEvent('checkout.session.completed', 'paid')),
+    env(kv)
+  );
+  assert.equal(response.status, 200);
+  const key = [...kv.store.keys()][0];
+  const messages = JSON.stringify([
+    ...log.mock.calls.map((call) => call.arguments),
+    ...error.mock.calls.map((call) => call.arguments),
+  ]);
+  assert.ok(messages.includes('License created'));
+  assert.ok(!messages.includes(key));
+  assert.ok(!messages.includes('buyer@example.com'));
+  assert.ok(!messages.includes('PYOB-'));
+});
+
+
+test('request failures redact license keys echoed by storage', async (t) => {
+  const key = 'PYOB-AAAA-BBBB-CCCC-DDDD';
+  const error = t.mock.method(console, 'error', () => {});
+  const response = await worker.fetch(new Request('https://example.workers.dev/api/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ license_key: key, device_id: 'synthetic-device' }),
+  }), { LICENSES: { async get() { throw new Error(`Synthetic failure for ${key}`); } } });
+  assert.equal(response.status, 500);
+  const messages = JSON.stringify(error.mock.calls.map((call) => call.arguments));
+  assert.ok(messages.includes('[REDACTED-LICENSE]'));
+  assert.ok(!messages.includes(key));
+  assert.ok(!(await response.text()).includes(key));
+});
+
+test('mail-provider errors redact echoed license keys without network', async (t) => {
+  const error = t.mock.method(console, 'error', () => {});
+  t.mock.method(console, 'log', () => {});
+  const key = await deriveLicenseKey('synthetic-mail-session', SECRET);
+  t.mock.method(globalThis, 'fetch', async () => new Response(`Synthetic failure for ${key}`, { status: 500 }));
+  const response = await worker.fetch(
+    stripeRequest(sessionEvent('checkout.session.completed', 'paid', 'synthetic-mail-session')),
+    { ...env(fakeKv()), RESEND_API_KEY: 'synthetic-mail-key' }
+  );
+  assert.equal(response.status, 200);
+  const messages = JSON.stringify(error.mock.calls.map((call) => call.arguments));
+  assert.ok(messages.includes('[REDACTED-LICENSE]'));
+  assert.ok(!messages.includes(key));
+});
