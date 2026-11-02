@@ -1,5 +1,18 @@
 # pyobfus 当前计划
 
+**2026-11-02/03 Pro 授权检查修复 + CI 授权（已合并，未发版）**：Pro 功能此前在部分构建入口
+未统一检查授权，现由 `pyobfus/_entitlement.py` 统一要求有效试用或授权（PR #175 `58b33a3`）；
+同时新增 CI 用环境变量 `PYOBFUS_LICENSE_KEY`（仅环境变量、联网验证、不占设备名额、不落盘、失败即拒绝，
+见 `docs/CI_LICENSING.md`），并更正字符串加密描述为 Fernet（AES-128-CBC + HMAC-SHA256）。
+许可 Worker（PR #174 `2402ee9`）已先行部署，版本 `d8588738`（回滚目标 `16c89eeb`）；
+维护者自有授权线上冒烟通过：CI 验证 200、设备列表不变、响应无邮箱，真实 CLI 构建不写本地状态。
+实现经无头 Codex 六轮、Claude 审核；PR 检查全绿，全矩阵 21 组合在 `b87d2fa` 上均通过（macOS 3.9
+在 PR 运行中通过，全矩阵中两次因 GitHub 未分配 runner 被取消）。现有 Pro 客户已于 11-02 收到 CI 变更通知。
+**下一步**：约 11-04 起经维护者批准发 Core 0.12.0（版本号、README 横幅、CHANGELOG 同一提交，
+CHANGELOG 中 Worker 条目改为「已部署」）；发版后 pyobfus-action 增加 `license-key` 输入、Glama 改装新版本。
+后续设计：服务器签发的短期授权（F2）、可选 AES-256-GCM 字符串加密（F3）。审核记录在私有
+`docs/internal/pro-gate-2026-11/`。另有 Dependabot #45（vscode-extension 开发依赖 minimatch，moderate）待处理。
+
 **最新会话交接（11-01）**：[收尾与冷启动顺序](SESSION_CLOSEOUT_2026-11-01.md)。
 三个维护 PR 已审阅、修订并合并，RTD 部署与当日云端备份核验均已完成。
 下一步为 11-02 定时 Guard、11-04 DEV 与约 11-05 LinkedIn 观察。
