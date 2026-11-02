@@ -6,6 +6,11 @@
 // DRAFT: 嵘说 content membership webhook (not yet enabled in production)
 import { handleContentWebhook, verifyStripeSignature } from './content_webhook.js';
 
+// Error text from storage or mail providers can echo request values.
+function redactLicenseKeys(value) {
+  return String(value).replace(/PYOB-[A-Z0-9]{4}(?:-[A-Z0-9]{4}){3}/gi, '[REDACTED-LICENSE]');
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -66,10 +71,10 @@ export default {
       return new Response('Not Found', { status: 404 });
 
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error:', redactLicenseKeys(error.stack || error));
       return new Response(JSON.stringify({
         error: 'Internal Server Error',
-        message: error.message
+        message: redactLicenseKeys(error.message || error)
       }), {
         status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
@@ -298,10 +303,10 @@ async function handleTrialRequest(request, env, corsHeaders) {
  */
 async function handleVerify(request, env, corsHeaders) {
   const body = await request.json();
-  const { license_key, device_id } = body;
+  const { license_key, device_id, activation } = body;
 
   // Validate input
-  if (!license_key || !device_id) {
+  if (!license_key || (activation !== 'ci' && !device_id)) {
     return new Response(JSON.stringify({
       valid: false,
       code: 'bad_request',
@@ -351,6 +356,43 @@ async function handleVerify(request, env, corsHeaders) {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
+  }
+
+  if (activation === 'ci') {
+    // Optional binding; configure its limit in deployment (e.g. 120/hour).
+    // Raw keys must never enter rate-limiter identifiers or logs.
+    if (env.CI_RATE_LIMITER) {
+      const { success } = await env.CI_RATE_LIMITER.limit({ key: await sha256Hex(license_key) });
+      if (!success) {
+        return new Response(JSON.stringify({ valid: false, code: 'rate_limited',
+          error: 'CI verification rate limited' }), {
+          status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        });
+      }
+    }
+    const now = new Date().toISOString();
+    const day = now.slice(0, 10);
+    const previous = licenseData.ci_usage;
+    if (!previous || previous.day !== day ||
+        Date.parse(now) - Date.parse(previous.last_used) >= 3600 * 1000) {
+      licenseData.ci_usage = { first_seen: previous?.first_seen || previous?.last_used || now,
+        last_used: now, day };
+      // Best-effort hourly telemetry, not a request counter. KV has no atomic
+      // compare-and-set: a concurrent device registration or revocation can still
+      // be overwritten in the get/put window (including stale reads). Throttling
+      // reduces that window's frequency; strict serialization needs a separate
+      // telemetry store or a Durable Object for all license mutations.
+      try {
+        await env.LICENSES.put(license_key, JSON.stringify(licenseData));
+      } catch {
+        // Never log the key or exception (which may contain private data).
+        console.warn('CI usage telemetry write failed');
+      }
+    }
+    return new Response(JSON.stringify({ valid: true, activation: 'ci',
+      expires_at: licenseData.expires_at || null,
+      features: { string_encryption: true, anti_debug: true, control_flow: false }
+    }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
   }
 
   // Record this device. Exceeding the cap retires the least recently used
@@ -465,7 +507,7 @@ async function handleStripeWebhook(request, env, corsHeaders) {
       licenseKey
     );
 
-    console.log('License created:', licenseKey, 'for', licenseData.email, 'Email sent:', emailSent);
+    console.log('License created; email sent:', emailSent);
   }
 
   return new Response(JSON.stringify({ received: true }), {
@@ -744,11 +786,11 @@ async function sendLicenseEmail(apiKey, toEmail, licenseKey) {
       return true;
     } else {
       const error = await response.text();
-      console.error('Failed to send email:', response.status, error);
+      console.error('Failed to send email:', response.status, redactLicenseKeys(error));
       return false;
     }
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('Error sending email:', redactLicenseKeys(error.stack || error));
     return false;
   }
 }
