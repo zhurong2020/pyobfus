@@ -121,7 +121,7 @@ present.
 ## When this is (and isn't) enough
 
 This pairing gives you compiled delivery **plus** AST-level name protection,
-for free (Community Edition) or with AES-256 string encryption added (Pro
+for free (Community Edition) or with AES-128-CBC with HMAC-SHA256 (Fernet) string encryption added (Pro
 Edition, `--string-encryption`). It does **not** give you PyArmor's
 bytecode-level encryption or SOURCEdefender's load-time `.pye` encryption.
 If a single module is your crown jewel, layering one of those on that module

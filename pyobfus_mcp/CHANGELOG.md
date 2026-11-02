@@ -330,7 +330,7 @@ _(Published to PyPI 2026-06-22 via OIDC; MCP Registry updated to 0.3.1 isLatest 
   patent-safe-copy constraint is lifted. `recommend_tier` and `start_pro_trial`
   now surface Selective Opacity, forensic watermarking, the Runtime String
   Vault, `@seal_code`, and `--scrub-traceback` (available as `pyobfus build`
-  flags in 0.5.1 and via the `pyobfus_pro` API), not just the older AES-256 /
+  flags in 0.5.1 and via the `pyobfus_pro` API), not just the older AES-128-CBC with HMAC-SHA256 (Fernet) /
   anti-debug set. `check_obfuscation_risks` recommends the Runtime String Vault
   alongside string encryption when sensitive literals are found.
 - **Dependency floor raised to `pyobfus>=0.5.1`** (was `>=0.4.1`), since the

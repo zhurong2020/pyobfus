@@ -569,3 +569,8 @@ result = decorated()
             assert namespace["result"] == 15  # 5 + 10
         finally:
             sys.settrace(old_trace)
+
+
+@pytest.fixture(autouse=True)
+def _authorized_transform(active_pro_trial):
+    """Transform unit tests run with a synthetic trial in the test home."""

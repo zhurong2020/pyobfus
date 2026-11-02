@@ -1,5 +1,7 @@
 """Tests for Pro import obfuscation (P2-4)."""
 
+import pytest
+
 import ast
 import importlib.util
 import sys
@@ -76,7 +78,7 @@ def test_cli_import_obfuscation_encrypts_import_strings(tmp_path):
     )
 
     runner = CliRunner()
-    with patch("pyobfus.cli.is_trial_active", return_value=True):
+    with patch("pyobfus.trial.is_trial_active", return_value=True):
         result = runner.invoke(
             main,
             [str(src), "-o", str(out), "--level", "pro", "--import-obfuscation", "--stats"],
@@ -109,7 +111,7 @@ def test_cli_import_obfuscation_preserves_future_import_position(tmp_path):
     )
 
     runner = CliRunner()
-    with patch("pyobfus.cli.is_trial_active", return_value=True):
+    with patch("pyobfus.trial.is_trial_active", return_value=True):
         result = runner.invoke(
             main,
             [str(src), "-o", str(out), "--level", "pro", "--import-obfuscation"],
@@ -122,3 +124,8 @@ def test_cli_import_obfuscation_preserves_future_import_position(tmp_path):
 
     module = _load_module(out, "import_obfuscation_future_out")
     assert module.I0() == 5.0
+
+
+@pytest.fixture(autouse=True)
+def _authorized_transform(active_pro_trial):
+    """Transform unit tests run with a synthetic trial in the test home."""

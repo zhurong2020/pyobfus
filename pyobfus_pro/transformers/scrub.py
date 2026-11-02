@@ -127,6 +127,9 @@ def transform_module(
     Raises:
         SyntaxError: when ``source_code`` is not valid Python.
     """
+    from pyobfus._entitlement import require_pro_access
+
+    require_pro_access()
     tree = ast.parse(source_code, filename)
 
     if _already_transformed(tree):

@@ -68,7 +68,7 @@ def test_default_and_editions_preserve_parameters():
 
 @pytest.mark.parametrize("preset", [None, "safe", "balanced", "aggressive", "fastapi", "library"])
 @pytest.mark.parametrize("source", [KEYWORDS, MIXED], ids=["keyword", "mixed-signature"])
-def test_singlefile_subprocess_equivalence(tmp_path, preset, source):
+def test_singlefile_subprocess_equivalence(tmp_path, preset, source, monkeypatch):
     original = tmp_path / "app.py"
     output = tmp_path / "out.py"
     original.write_text(source)
@@ -76,6 +76,15 @@ def test_singlefile_subprocess_equivalence(tmp_path, preset, source):
     command = [sys.executable, "-m", "pyobfus", str(original), "-o", str(output), "--no-config"]
     if preset:
         command += ["--preset", preset]
+    # The library preset requests Pro fields even when level is overridden.
+    # Give this parameter-policy test a local trial in its subprocess home.
+    if preset == "library":
+        import pyobfus.trial as trial
+
+        state = tmp_path / "home" / ".pyobfus"
+        monkeypatch.setattr(trial, "TRIAL_DIR", state)
+        monkeypatch.setattr(trial, "TRIAL_FILE", state / "trial.json")
+        assert trial.start_trial()["success"]
     # Exercise library's parameter policy without license-controlled transforms.
     command += ["--level", "community"]
     built = subprocess.run(command, cwd=tmp_path, env=env, capture_output=True, text=True)

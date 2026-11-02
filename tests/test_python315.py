@@ -118,7 +118,7 @@ def test_function_lazy_import_is_syntax_error(tmp_path, statement):
     assert "SyntaxError" in run.stderr
 
 
-def test_pro_import_obfuscation_preserves_lazy():
+def test_pro_import_obfuscation_preserves_lazy(active_pro_trial):
     import ast
 
     from pyobfus_pro.import_obfuscation import ImportObfuscator
@@ -161,7 +161,7 @@ def test_lazy_failure_occurs_only_on_first_use(tmp_path, statement):
         assert "ModuleNotFoundError" in run.stderr
 
 
-def test_pro_import_obfuscation_preserves_lazy_control():
+def test_pro_import_obfuscation_preserves_lazy_control(active_pro_trial):
     import ast
 
     from pyobfus_pro.import_obfuscation import ImportObfuscator
@@ -182,12 +182,11 @@ def test_builtin_values_and_utf8_artifact(tmp_path):
     test_native_directory_semantics(tmp_path, source, 1)
 
 
-def test_pro_source_and_marshal_artifacts_execute(tmp_path, monkeypatch):
+def test_pro_source_and_marshal_artifacts_execute(tmp_path, active_pro_trial):
     from click.testing import CliRunner
 
     from pyobfus.cli import main
 
-    monkeypatch.setattr("pyobfus.cli.is_trial_active", lambda: True)
     source = tmp_path / "source.py"
     marked_source = (
         "from pyobfus_pro import opacity, seal_code, vault_secrets, Layer\n"

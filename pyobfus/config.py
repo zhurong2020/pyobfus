@@ -93,7 +93,7 @@ class ObfuscationConfig:
     preserve_param_names: bool = True  # Preserve keyword calls and signature compatibility
 
     # Pro Edition features
-    string_encryption: bool = False  # AES-256 encryption (Pro only)
+    string_encryption: bool = False  # AES-128-CBC with HMAC-SHA256 (Fernet) encryption (Pro only)
     import_obfuscation: bool = False  # Runtime importlib imports + encrypted import strings
     anti_debug: bool = False  # Anti-debugging checks (Pro only)
     control_flow_flattening: bool = False  # Control flow flattening (Pro only)
@@ -212,7 +212,7 @@ class ObfuscationConfig:
             max_files=None,  # Pro: unlimited
             max_total_loc=None,  # Pro: unlimited
             string_encoding=True,  # Pro: simple encoding
-            string_encryption=True,  # Pro: AES-256 encryption
+            string_encryption=True,  # Pro: AES-128-CBC with HMAC-SHA256 (Fernet) encryption
             anti_debug=True,  # Pro: anti-debugging
         )
 
@@ -305,7 +305,7 @@ class ObfuscationConfig:
         - All Pro features enabled
         - Control flow flattening
         - Dead code injection
-        - AES-256 string encryption
+        - AES-128-CBC with HMAC-SHA256 (Fernet) string encryption
         - Anti-debugging protection
         - Machine binding
         """

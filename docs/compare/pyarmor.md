@@ -27,7 +27,7 @@ comes back from production.
 | **Output format** | Pure `.py` files | `.py` + native libraries |
 | **Cross-platform output** | Community output is portable; Pro runtime policies may intentionally restrict it | Runtime packages and advanced modes depend on target platforms; verify the selected mode |
 | **Python 3.9-3.14** | Yes | Yes |
-| **String encryption** | AES-256 (Pro) | AES (Pro) |
+| **String encryption** | AES-128-CBC with HMAC-SHA256 (Fernet) (Pro) | AES (Pro) |
 | **Anti-debugging** | Yes (Pro) | Yes (Pro) |
 | **Control flow flattening** | Yes (Pro v0.3.0+) | Yes (Pro) |
 | **Import obfuscation** | Yes (Pro, runtime importlib + encrypted import strings) | Yes (Pro) |

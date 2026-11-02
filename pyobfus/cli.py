@@ -45,7 +45,9 @@ from pyobfus.exceptions import (
 )
 from pyobfus.transformers.name_mangler import NameMangler
 from pyobfus.utils import filter_python_files, format_skipped_directories
-from pyobfus.trial import is_trial_active, get_trial_expiry_message
+from pyobfus import trial
+from pyobfus.trial import get_trial_expiry_message
+from pyobfus._entitlement import ProAccessError, require_config_access, entitlement_session
 
 if TYPE_CHECKING:
     from pyobfus.core.mapping import ObfuscationMapping
@@ -235,7 +237,7 @@ def _echo_pro_import_hint() -> None:
 @click.option(
     "--string-encryption",
     is_flag=True,
-    help="Enable AES-256 string encryption (Pro feature)",
+    help="Enable AES-128-CBC with HMAC-SHA256 (Fernet) string encryption (Pro feature)",
 )
 @click.option(
     "--import-obfuscation",
@@ -540,6 +542,7 @@ def _echo_pro_import_hint() -> None:
     "Useful in CI pipelines that cache build artifacts.",
 )
 @click.version_option(version=__version__, prog_name="pyobfus")
+@entitlement_session()
 def main(
     input_path: Optional[str],
     output_path: Optional[str],
@@ -826,129 +829,16 @@ def main(
                 click.echo(f"Loaded configuration from: {effective_config_path}")
         elif preset:
             # Use preset configuration
-            pro_presets = ["trial", "commercial", "library", "maximum"]
-            if preset.lower() in pro_presets:
-                # Check Pro access for Pro presets
-                trial_active = is_trial_active()
-                has_pro_access = trial_active or PRO_AVAILABLE
-
-                if not has_pro_access:
-                    click.echo(
-                        f"Error: The '{preset}' preset requires Pro edition or active trial.",
-                        err=True,
-                    )
-                    _echo_pro_import_hint()
-                    click.echo("\nStart a free 5-day trial:", err=True)
-                    click.echo("  pyobfus-trial start", err=True)
-                    click.echo(
-                        f"\nOr purchase a license (${PRO_PRICE_USD} one-time):",
-                        err=True,
-                    )
-                    click.echo(f"  {STRIPE_PAYMENT_LINK}", err=True)
-                    sys.exit(1)
-
             config = ObfuscationConfig.get_preset(preset.lower())
             if verbose:
                 click.echo(f"Using preset: {preset}")
         else:
             # Use default based on level
-            if level == "pro":
-                # Check trial status first (refreshed at runtime)
-                trial_active = is_trial_active()
-
-                if trial_active:
-                    # Trial is active - allow Pro features without license
-                    trial_msg = get_trial_expiry_message()
-                    if verbose:
-                        click.echo(f"Trial mode: {trial_msg}")
-                    config = ObfuscationConfig.pro_edition()
-                elif PRO_AVAILABLE:
-                    # Pro edition installed - verify license
-                    assert pyobfus_pro is not None, "pyobfus_pro module should be loaded"
-
-                    try:
-                        # Get cached license status (unmasked to get full key)
-                        cached_status = pyobfus_pro.get_license_status(masked=False)
-                        if not cached_status:
-                            click.echo(
-                                "Error: No license key found. Please register your license first.",
-                                err=True,
-                            )
-                            click.echo(
-                                "\nTo register your license key, run:",
-                                err=True,
-                            )
-                            click.echo(
-                                "  pyobfus-license register YOUR-LICENSE-KEY",
-                                err=True,
-                            )
-                            click.echo(
-                                "\nOr start a free 5-day trial:",
-                                err=True,
-                            )
-                            click.echo(
-                                "  pyobfus-trial start",
-                                err=True,
-                            )
-                            click.echo(
-                                "\nPurchase a license at: https://github.com/zhurong2020/pyobfus",
-                                err=True,
-                            )
-                            sys.exit(1)
-
-                        # Verify the cached license (use unmasked key)
-                        full_license_key = cached_status["key"]
-                        license_result = pyobfus_pro.verify_license(full_license_key)
-
-                        if verbose:
-                            click.echo(f"License verified: {license_result['message']}")
-
-                    except pyobfus_pro.LicenseError as e:
-                        click.echo(
-                            f"Error: License verification failed - {e}",
-                            err=True,
-                        )
-                        click.echo(
-                            "\nPlease check your license status with: pyobfus-license status",
-                            err=True,
-                        )
-                        click.echo(
-                            "Or register a new license: pyobfus-license register YOUR-LICENSE-KEY",
-                            err=True,
-                        )
-                        click.echo(
-                            "\nOr start a free 5-day trial: pyobfus-trial start",
-                            err=True,
-                        )
-                        sys.exit(1)
-
-                    config = ObfuscationConfig.pro_edition()
-                else:
-                    # No Pro installed and no trial - show options
-                    click.echo(
-                        "Error: Pro edition features require a license or active trial.",
-                        err=True,
-                    )
-                    _echo_pro_import_hint()
-                    click.echo(
-                        "\nStart a free 5-day trial (no registration required):",
-                        err=True,
-                    )
-                    click.echo(
-                        "  pyobfus-trial start",
-                        err=True,
-                    )
-                    click.echo(
-                        "\nOr purchase a license ($45 one-time):",
-                        err=True,
-                    )
-                    click.echo(
-                        f"  {STRIPE_PAYMENT_LINK}",
-                        err=True,
-                    )
-                    sys.exit(1)
-            else:
-                config = ObfuscationConfig.community_edition()
+            config = (
+                ObfuscationConfig.pro_edition()
+                if level == "pro"
+                else ObfuscationConfig.community_edition()
+            )
 
         # Override config with CLI options. The flags below are tri-state
         # (None = not passed) so an explicit preset/config choice survives when
@@ -1010,29 +900,7 @@ def main(
             or fusion_requested
         )
         if pro_features_requested:
-            # Check if user has Pro access (license or trial)
-            trial_active = is_trial_active()
-            has_pro_access = trial_active or PRO_AVAILABLE
-
-            if not has_pro_access:
-                click.echo(
-                    "Error: Pro features require a license or active trial.",
-                    err=True,
-                )
-                _echo_pro_import_hint()
-                click.echo(
-                    "\nStart a free 5-day trial (no registration required):",
-                    err=True,
-                )
-                click.echo("  pyobfus-trial start", err=True)
-                click.echo(
-                    f"\nOr purchase a license (${PRO_PRICE_USD} one-time):",
-                    err=True,
-                )
-                click.echo(f"  {STRIPE_PAYMENT_LINK}", err=True)
-                sys.exit(1)
-
-            # User has Pro access - enable requested features
+            # Merge feature requests before the central entitlement check.
             config.level = "pro"
             if control_flow:
                 config.control_flow_flattening = True
@@ -1041,13 +909,15 @@ def main(
             if string_encryption:
                 config.string_encryption = True
                 if verbose:
-                    click.echo("Enabled: AES-256 String Encryption")
+                    click.echo("Enabled: AES-128-CBC with HMAC-SHA256 (Fernet) String Encryption")
             if import_obfuscation:
                 config.import_obfuscation = True
                 config.string_encryption = True
                 if verbose:
                     click.echo("Enabled: Import Obfuscation")
-                    click.echo("Enabled: AES-256 String Encryption (for import strings)")
+                    click.echo(
+                        "Enabled: AES-128-CBC with HMAC-SHA256 (Fernet) String Encryption (for import strings)"
+                    )
             if anti_debug:
                 config.anti_debug = True
                 if verbose:
@@ -1136,6 +1006,9 @@ def main(
                 config.embed_data = embed_data
                 if verbose:
                     click.echo(f"Enabled: Embedded encrypted data ({embed_data}, P2-14)")
+
+        # Gate the final configuration, including explicit/auto-discovered YAML.
+        require_config_access(config)
 
         # Determine if input is file or directory
         input_path_obj = Path(input_path)
@@ -1605,8 +1478,10 @@ def main(
             _display_stats(obfuscation_stats, config)
 
         # Subtle Pro feature hint (only for Community users without trial)
-        if config.level == "community" and not PRO_AVAILABLE and not is_trial_active():
-            click.echo("\nTip: Try Pro FREE for 5 days - AES-256 encryption & anti-debugging")
+        if config.level == "community" and not PRO_AVAILABLE and not trial.is_trial_active():
+            click.echo(
+                "\nTip: Try Pro FREE for 5 days - AES-128-CBC with HMAC-SHA256 (Fernet) encryption & anti-debugging"
+            )
             click.echo("     Start trial: pyobfus-trial start")
 
     except LimitExceededError as e:
@@ -1623,6 +1498,20 @@ def main(
         else:
             click.echo(f"\nError: {e}", err=True)
             click.echo("\nRaise or remove max_files/max_total_loc in the configuration.")
+        sys.exit(1)
+    except ProAccessError as e:
+        sys.stdout = _saved_stdout
+        if json_output:
+            _emit_error_json(
+                "ProAccessError",
+                str(e),
+                "Register your license or start a free 5-day trial.",
+                "pyobfus-license status",
+                exit_code=1,
+            )
+        else:
+            click.echo(f"\nError: {e}", err=True)
+            _echo_pro_import_hint()
         sys.exit(1)
     except PyObfusError as e:
         sys.stdout = _saved_stdout
@@ -1667,6 +1556,7 @@ def _report_dropped_encoding(source: str) -> None:
         click.echo(f"  Encoding declaration {encoding!r} not kept: output is UTF-8")
 
 
+@entitlement_session()
 def _obfuscate_file(
     input_file: Path,
     output_file: Path,
@@ -1697,6 +1587,7 @@ def _obfuscate_file(
     Returns:
         Dictionary with obfuscation statistics
     """
+    require_config_access(config)
     file_stats: dict = {
         "total_names_obfuscated": 0,
         "strings_encoded": 0,
@@ -1920,6 +1811,7 @@ def _obfuscate_file(
     return file_stats
 
 
+@entitlement_session()
 def _obfuscate_directory(
     input_dir: Path,
     output_dir: Path,
@@ -1942,6 +1834,7 @@ def _obfuscate_directory(
     Returns:
         Dictionary with aggregated obfuscation statistics
     """
+    require_config_access(config)
     dir_stats: dict = {
         "files_processed": 0,
         "total_names_obfuscated": 0,
@@ -2053,6 +1946,7 @@ def _obfuscate_directory(
     return dir_stats
 
 
+@entitlement_session()
 def _obfuscate_directory_crossfile(
     input_dir: Path,
     output_dir: Path,
@@ -2074,6 +1968,7 @@ def _obfuscate_directory_crossfile(
     Returns:
         Dictionary with obfuscation statistics
     """
+    require_config_access(config)
     dir_stats: dict = {
         "files_processed": 0,
         "total_names_obfuscated": 0,
@@ -2241,15 +2136,18 @@ def _handle_upgrade() -> None:
     Display Pro edition features and purchase information.
     """
     # Check current status
-    trial_active = is_trial_active()
+    trial_active = trial.is_trial_active()
     trial_msg = get_trial_expiry_message()
 
     if PRO_AVAILABLE:
         click.echo("\n" + "=" * 60)
-        click.echo("  pyobfus Professional Edition - ACTIVE")
+        click.echo("  pyobfus Professional Edition - COMPONENTS INSTALLED")
         click.echo("=" * 60)
-        click.echo("\nYour Pro license is active. You have access to all features:")
-        click.echo("  - AES-256 string encryption (--string-encryption)")
+        click.echo("\nPro components are importable; builds require a license or active trial.")
+        click.echo("Available Pro features:")
+        click.echo(
+            "  - AES-128-CBC with HMAC-SHA256 (Fernet) string encryption (--string-encryption)"
+        )
         click.echo("  - Anti-debugging protection (--anti-debug)")
         click.echo("  - Unlimited files and lines of code")
         click.echo("  - Priority email support")
@@ -2262,7 +2160,7 @@ def _handle_upgrade() -> None:
         click.echo("=" * 60)
         click.echo(f"\n  {trial_msg}")
         click.echo("\n  You have access to all Pro features:")
-        click.echo("  - AES-256 string encryption (--level pro)")
+        click.echo("  - AES-128-CBC with HMAC-SHA256 (Fernet) string encryption (--level pro)")
         click.echo("  - Anti-debugging protection (--level pro)")
         click.echo("  - Unlimited files and lines of code")
         click.echo("")
@@ -2286,7 +2184,7 @@ def _handle_upgrade() -> None:
     click.echo("")
     click.echo("  FEATURES")
     click.echo("  ---------")
-    click.echo("  [x] AES-256 string encryption")
+    click.echo("  [x] AES-128-CBC with HMAC-SHA256 (Fernet) string encryption")
     click.echo("      Encrypt all strings with military-grade encryption")
     click.echo("")
     click.echo("  [x] Anti-debugging protection")

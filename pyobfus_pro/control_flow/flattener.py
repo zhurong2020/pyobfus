@@ -62,6 +62,9 @@ class ControlFlowFlattener(ast.NodeTransformer):
         Args:
             config: Configuration options for flattening
         """
+        from pyobfus._entitlement import require_pro_access
+
+        require_pro_access()
         self.config = config or CFFConfig()
         self._function_counter = 0
         self._skip_functions: Set[str] = set()

@@ -115,6 +115,9 @@ def transform_module(
         SyntaxError: when ``source_code`` is not valid Python.
         ValueError: when a supplied ``vault_keys`` value is not 32 bytes.
     """
+    from pyobfus._entitlement import require_pro_access
+
+    require_pro_access()
     keys_input = vault_keys or {}
     for name, key in keys_input.items():
         if not isinstance(key, (bytes, bytearray)) or len(key) != _VAULT_KEY_SIZE:

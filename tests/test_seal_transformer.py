@@ -262,3 +262,8 @@ class TestUnsupportedLocations:
         """)
         with pytest.raises(SealBuildError, match="not supported"):
             transform_module(src)
+
+
+@pytest.fixture(autouse=True)
+def _authorized_transform(active_pro_trial):
+    """Transform unit tests run with a synthetic trial in the test home."""

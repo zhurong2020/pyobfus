@@ -37,3 +37,10 @@ def _security_test_setup(tmp_path, monkeypatch: pytest.MonkeyPatch) -> None:
 
     monkeypatch.setattr(trial, "TRIAL_DIR", tmp_path / ".pyobfus")
     monkeypatch.setattr(trial, "TRIAL_FILE", tmp_path / ".pyobfus" / "trial.json")
+
+    import pyobfus_pro.license as licensing
+    import pyobfus_pro.fingerprint as fingerprint
+
+    monkeypatch.setattr(licensing, "CACHE_DIR", tmp_path / ".pyobfus")
+    monkeypatch.setattr(licensing, "CACHE_FILE", tmp_path / ".pyobfus" / "license.json")
+    monkeypatch.setattr(fingerprint, "DEVICE_ID_FILE", tmp_path / ".pyobfus" / "device_id")

@@ -101,6 +101,60 @@ class LicenseRevokedError(LicenseError):
     pass
 
 
+def verify_ci_license(license_key: str) -> Dict[str, Any]:
+    """Online-only, device-free verification; never read or write local state."""
+    if not _validate_license_format(license_key):
+        raise LicenseVerificationError("Invalid PYOBFUS_LICENSE_KEY format (value hidden).")
+    req = urllib.request.Request(
+        LICENSE_API_URL,
+        data=json.dumps({"license_key": license_key, "activation": "ci"}).encode("utf-8"),
+        headers={"Content-Type": "application/json", "User-Agent": USER_AGENT},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=REQUEST_TIMEOUT) as response:
+            data = json.loads(response.read())
+        if (
+            not isinstance(data, dict)
+            or data.get("valid") is not True
+            or data.get("activation") != "ci"
+        ):
+            raise LicenseVerificationError("CI license verification denied.")
+        expires = data.get("expires_at")
+        if expires:
+            from datetime import timezone
+
+            expiry = datetime.fromisoformat(expires.replace("Z", "+00:00"))
+            now = datetime.now(timezone.utc) if expiry.tzinfo else datetime.now()
+            if expiry < now:
+                raise LicenseExpiredError("CI license has expired.")
+        return {"valid": True, "activation": "ci"}
+    except urllib.error.HTTPError as exc:
+        if exc.code == 400:
+            try:
+                old_server = (
+                    json.loads(exc.read()).get("error") == "Missing license_key or device_id"
+                )
+            except Exception:
+                old_server = False
+            if old_server:
+                raise LicenseVerificationError(
+                    "license server does not support CI activation yet"
+                ) from None
+            raise LicenseVerificationError("CI license verification denied.") from None
+        if exc.code == 429:
+            raise LicenseVerificationError("CI license rate limited; retry later.") from None
+        raise LicenseVerificationError(
+            "CI license verification denied (invalid, revoked or expired)."
+        ) from None
+    except LicenseError:
+        raise
+    except Exception:
+        raise LicenseVerificationError(
+            "CI license verification unavailable; online access is required."
+        ) from None
+
+
 def verify_license(license_key: str) -> Dict[str, Any]:
     """
     Verify license key against GitHub repository.

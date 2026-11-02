@@ -780,7 +780,7 @@ def test_start_pro_trial_returns_structured_guidance() -> None:
     assert result["trial_command"] == "pyobfus-trial start"
     assert result["trial_duration_days"] == 5
     features_blob = " ".join(result["trial_features"])
-    assert "AES-256 string encryption" in features_blob
+    assert "AES-128-CBC with HMAC-SHA256 (Fernet) string encryption" in features_blob
     assert "Selective Opacity" in features_blob  # v0.5 mechanisms surfaced
     assert "--import-obfuscation" in features_blob  # v0.5.7 mechanism surfaced
     assert result["post_trial_options"]["price_usd"] == 45

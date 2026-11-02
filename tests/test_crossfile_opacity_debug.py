@@ -208,3 +208,8 @@ def test_empty_components_rejected(artifact, file):
 def test_relative_file_with_frame_breaking_chars_rejected(bad):
     with pytest.raises(ValueError):
         l3_co_filename("aid", bad)
+
+
+@pytest.fixture(autouse=True)
+def _authorized_transform(active_pro_trial):
+    """Transform unit tests run with a synthetic trial in the test home."""

@@ -250,7 +250,7 @@ obfuscation:
   preserve_param_names: true           # required for kwarg-heavy code
 
   # Pro-only (ignored in Community)
-  string_encryption: false             # AES-256
+  string_encryption: false             # AES-128-CBC with HMAC-SHA256 (Fernet)
   anti_debug: false
   control_flow_flattening: false
   dead_code_injection: false

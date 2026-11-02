@@ -62,6 +62,9 @@ class DeadCodeInjector(ast.NodeTransformer):
             config: Configuration options
             seed: Random seed for reproducible results
         """
+        from pyobfus._entitlement import require_pro_access
+
+        require_pro_access()
         self.config = config or DCIConfig()
         self._random = random.Random(seed)
         self._var_counter = 0

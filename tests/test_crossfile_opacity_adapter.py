@@ -241,3 +241,8 @@ def test_fresh_names_avoid_except_handler_binding():
     assert res.key_name != "_pyobfus_l3_key"
     ns = _exec_with_provider(res.source, key)  # imports without NameError
     assert ns["f"](1) == 2
+
+
+@pytest.fixture(autouse=True)
+def _authorized_transform(active_pro_trial):
+    """Transform unit tests run with a synthetic trial in the test home."""

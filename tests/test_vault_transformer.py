@@ -383,3 +383,8 @@ class TestTamperDetection:
         ns = _exec(tampered_out)
         with pytest.raises(VaultError, match="wrong master key or tampered"):
             ns["SECRETS"].get("K")
+
+
+@pytest.fixture(autouse=True)
+def _authorized_transform(active_pro_trial):
+    """Transform unit tests run with a synthetic trial in the test home."""

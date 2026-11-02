@@ -105,7 +105,7 @@ debuggability, and it is what the JSON CLI and MCP interfaces are built around.
 
 The project adopts an open-core model. The Community Edition (Apache-2.0, and the
 subject of this paper) provides the core obfuscation features; a separately
-licensed Professional Edition adds further protection mechanisms such as AES-256
+licensed Professional Edition adds further protection mechanisms such as AES-128-CBC with HMAC-SHA256 (Fernet)
 string encryption, control-flow flattening, per-buyer forensic watermarking
 [@clasp], a runtime secret vault, and production-traceback encryption. A subset
 of these Professional mechanisms is the subject of a pending Chinese invention

@@ -429,3 +429,8 @@ if __name__ == "__main__":
 # Run pytest if executed directly
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
+
+
+@pytest.fixture(autouse=True)
+def _authorized_transform(active_pro_trial):
+    """Transform unit tests run with a synthetic trial in the test home."""

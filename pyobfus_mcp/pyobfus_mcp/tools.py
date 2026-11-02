@@ -16,7 +16,7 @@ primitives and the env vars that tune them
 
 Phase 3 (Pro funnel via MCP) adds:
   - `pro_value` field on `check_obfuscation_risks` (and `protect_project`)
-    when the scan finds likely sensitive string literals (Pro's AES-256
+    when the scan finds likely sensitive string literals (Pro's AES-128-CBC with HMAC-SHA256 (Fernet)
     string encryption would protect them) and/or likely-PII literals
     (P2-12: emails / IPv4 / GUIDs / home-directory paths naming a real
     user -- `sensitive_literal_count` and `pii_literal_count` are reported
@@ -346,7 +346,7 @@ def _pro_value_for_scan(
             f"variables, a secret manager or a server-side call), and rotate "
             f"any that have already shipped: a program that can decrypt a key "
             f"at runtime lets its recipient recover it, with or without "
-            f"obfuscation. For other embedded strings and data, Pro's AES-256 "
+            f"obfuscation. For other embedded strings and data, Pro's AES-128-CBC with HMAC-SHA256 (Fernet) "
             f"string encryption and the Runtime String Vault "
             f"(vault_secrets({{...}})) raise the cost of extraction."
         )
@@ -357,7 +357,7 @@ def _pro_value_for_scan(
             f"occurrence(s) (emails, IPv4 addresses, GUIDs, or home-directory "
             f"paths naming a real user). Consider whether these belong in "
             f"source at all (data minimization) before reaching for "
-            f"encryption; if they must ship, Pro's AES-256 string encryption "
+            f"encryption; if they must ship, Pro's AES-128-CBC with HMAC-SHA256 (Fernet) string encryption "
             f"applies here too."
         )
     if high_severity_findings > 0:
@@ -469,7 +469,7 @@ def check_obfuscation_risks(
     payload["status"] = "success" if payload.get("exit_code", 0) == 0 else "warnings"
 
     # Phase 3: surface Pro funnel signal when the scan finds patterns Pro
-    # features (AES-256 string encryption, anti-debugging) would protect.
+    # features (AES-128-CBC with HMAC-SHA256 (Fernet) string encryption, anti-debugging) would protect.
     # P2-12: also scan for PII-shaped literals (emails/IPv4/GUIDs/home-dir
     # paths) -- a distinct signal class from credential-shaped literals.
     sensitive_count = _count_sensitive_literals(target, config=config)
@@ -849,7 +849,7 @@ def recommend_tier(path: str) -> Dict[str, Any]:
     if sensitive_count > 0:
         reasons.append(
             f"Found {sensitive_count} likely-sensitive string literal(s) — "
-            f"{'Pro AES-256 string encryption strongly recommended' if pro_recommended else 'community is fine; consider Pro if those are real secrets'}."
+            f"{'Pro AES-128-CBC with HMAC-SHA256 (Fernet) string encryption strongly recommended' if pro_recommended else 'community is fine; consider Pro if those are real secrets'}."
         )
     if high_sev > 0:
         reasons.append(f"Scan flagged {high_sev} high-severity finding(s).")
@@ -872,7 +872,7 @@ def recommend_tier(path: str) -> Dict[str, Any]:
     pro_action = {
         **_pro_unlock(),
         "estimated_protection": (
-            "high (adds AES-256 string encryption + anti-debugging, plus the v0.5 "
+            "high (adds AES-128-CBC with HMAC-SHA256 (Fernet) string encryption + anti-debugging, plus the v0.5 "
             "mechanisms: Selective Opacity, forensic watermarking, Runtime String "
             "Vault, @seal_code, --scrub-traceback, and v0.5.7's --import-obfuscation)"
         ),
@@ -892,7 +892,7 @@ def recommend_tier(path: str) -> Dict[str, Any]:
             "project size alone is never a reason this tool needs Pro",
         ],
         "pro_tier_capabilities": [
-            "AES-256 string encryption, control-flow flattening, dead-code injection, anti-debugging",
+            "AES-128-CBC with HMAC-SHA256 (Fernet) string encryption, control-flow flattening, dead-code injection, anti-debugging",
             "Selective Opacity (v0.5) — per-symbol AES-256-GCM encryption of chosen functions with lazy code materialization",
             "Forensic watermarking (v0.5) — per-buyer deterministic builds for piracy traceback",
             "Runtime String Vault (v0.5) — encrypted KV namespace for runtime secrets",
@@ -976,7 +976,7 @@ def start_pro_trial() -> Dict[str, Any]:
         "trial_command": unlock["trial_command"],
         "trial_duration_days": unlock["trial_duration_days"],
         "trial_features": [
-            "AES-256 string encryption, control-flow flattening, dead-code injection, anti-debugging",
+            "AES-128-CBC with HMAC-SHA256 (Fernet) string encryption, control-flow flattening, dead-code injection, anti-debugging",
             "Selective Opacity (v0.5) — per-symbol AES-256-GCM encryption of chosen functions",
             "Forensic watermarking (v0.5) — per-buyer deterministic builds for piracy traceback",
             "Runtime String Vault (v0.5) — encrypted KV namespace for runtime secrets",

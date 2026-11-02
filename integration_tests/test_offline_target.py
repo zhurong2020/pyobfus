@@ -166,7 +166,7 @@ def _build(tmp_path: Path, name: str, *options: str) -> Path:
     out_dir = tmp_path / "ship"
     out_dir.mkdir(exist_ok=True)
     out = out_dir / f"{name}.py"
-    with patch("pyobfus.cli.is_trial_active", return_value=True):
+    with patch("pyobfus.trial.is_trial_active", return_value=True):
         result = CliRunner().invoke(
             main,
             [

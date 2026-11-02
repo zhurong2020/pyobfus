@@ -434,3 +434,8 @@ def Layer_OBFUSCATED():
     from pyobfus_pro import Layer
 
     return Layer.OBFUSCATED
+
+
+@pytest.fixture(autouse=True)
+def _authorized_transform(active_pro_trial):
+    """Build integration tests use a synthetic trial in the test home."""

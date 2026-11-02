@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- Enforce Pro build entitlement consistently across CLI flags, presets, YAML
+  configurations, JSON CLI, MCP builds and direct library transforms. An active
+  trial or valid license is required; registered cached/offline operation remains supported.
+- Remove license keys and buyer email addresses from Worker issuance logs
+  (source fix only; deployment is separate).
+
+### Added
+
+- Device-free CI activation through the secret `PYOBFUS_LICENSE_KEY` environment
+  variable, verified online once per build without persisting the key.
+
+### Changed
+
+- Pro builds in CI now need PYOBFUS_LICENSE_KEY or a registered runner.
+
+### Fixed
+
+- Correct Fernet string-encryption claims to AES-128-CBC with HMAC-SHA256
+  (Fernet). Cryptography and generated artifact/runtime formats are unchanged;
+  AES-256-GCM descriptions for other Pro mechanisms remain accurate.
+
 ## [0.11.1] - 2026-10-30
 
 ### Fixed
@@ -1808,7 +1831,7 @@ pyobfus src/ -o dist/ --expire 2025-12-31 --bind-machine
 ### Added
 - **String Encoding (Base64)**: Community Edition feature
 - **Pro Features** (require license):
-  - AES-256 String Encryption
+  - AES-128-CBC with HMAC-SHA256 (Fernet) String Encryption
   - Anti-Debugging Checks
 - **Parameter Preservation**: `--preserve-param-names` for keyword argument support
 - Self-service purchase flow with Stripe
@@ -1840,7 +1863,7 @@ pyobfus src/ -o dist/ --expire 2025-12-31 --bind-machine
 
 ### Added
 - **License Verification System** for Pro Edition
-- Pro Edition features: AES-256 encryption, Anti-debugging
+- Pro Edition features: AES-128-CBC with HMAC-SHA256 (Fernet) encryption, Anti-debugging
 
 ### Breaking Changes
 - Pro edition now requires license registration

@@ -55,7 +55,7 @@ def marked_file(tmp_path):
 
 
 def _invoke(runner, src, out, *flags):
-    with patch("pyobfus.cli.is_trial_active", return_value=True):
+    with patch("pyobfus.trial.is_trial_active", return_value=True):
         return runner.invoke(main, [str(src), "-o", str(out), "--level", "pro", *flags])
 
 
@@ -200,7 +200,7 @@ class TestFusionRuntime:
         cfg = tmp_path / "pyobfus.yaml"
         cfg.write_text("obfuscation:\n  exclude_names: [run, CFG]\n")
         out = tmp_path / "o.py"
-        with patch("pyobfus.cli.is_trial_active", return_value=True):
+        with patch("pyobfus.trial.is_trial_active", return_value=True):
             res = runner.invoke(
                 main,
                 [
@@ -304,7 +304,7 @@ class TestOpacityConfig:
         yaml_cfg = tmp_path / "pyobfus.yaml"
         yaml_cfg.write_text("obfuscation:\n  exclude_names: [secret_compute, plain_helper]\n")
         out = tmp_path / "o.py"
-        with patch("pyobfus.cli.is_trial_active", return_value=True):
+        with patch("pyobfus.trial.is_trial_active", return_value=True):
             res = runner.invoke(
                 main,
                 [
@@ -367,7 +367,7 @@ class TestBindDevice:
         yaml_cfg = tmp_path / "pyobfus.yaml"
         yaml_cfg.write_text("obfuscation:\n  exclude_names: [run]\n")
         out = tmp_path / "o.py"
-        with patch("pyobfus.cli.is_trial_active", return_value=True):
+        with patch("pyobfus.trial.is_trial_active", return_value=True):
             res = runner.invoke(
                 main,
                 [
@@ -392,7 +392,7 @@ class TestBindDevice:
         yaml_cfg = tmp_path / "pyobfus.yaml"
         yaml_cfg.write_text("obfuscation:\n  exclude_names: [run]\n")
         out = tmp_path / "o.py"
-        with patch("pyobfus.cli.is_trial_active", return_value=True):
+        with patch("pyobfus.trial.is_trial_active", return_value=True):
             res = runner.invoke(
                 main,
                 [
@@ -454,7 +454,7 @@ class TestVaultBindDevice:
         src = self._src(tmp_path)
         yaml_cfg = self._yaml(tmp_path)
         out = tmp_path / "o.py"
-        with patch("pyobfus.cli.is_trial_active", return_value=True):
+        with patch("pyobfus.trial.is_trial_active", return_value=True):
             res = runner.invoke(
                 main,
                 [
@@ -478,7 +478,7 @@ class TestVaultBindDevice:
         src = self._src(tmp_path)
         yaml_cfg = self._yaml(tmp_path)
         out = tmp_path / "o.py"
-        with patch("pyobfus.cli.is_trial_active", return_value=True):
+        with patch("pyobfus.trial.is_trial_active", return_value=True):
             res = runner.invoke(
                 main,
                 [
@@ -515,6 +515,7 @@ class TestVaultBindDevice:
 
 
 @requires_pro
+@pytest.mark.usefixtures("active_pro_trial")
 def test_vault_device_binding_uses_distinct_per_vault_salts():
     """Each vault gets its own salt (checked pre-Core so names are unmangled),
     so the two device-derived keys are independent."""
@@ -636,7 +637,7 @@ class TestFusionGating:
     def test_fusion_requires_pro_access(self, runner, marked_file, tmp_path):
         out = tmp_path / "o.py"
         with (
-            patch("pyobfus.cli.is_trial_active", return_value=False),
+            patch("pyobfus.trial.is_trial_active", return_value=False),
             patch("pyobfus.cli.PRO_AVAILABLE", False),
         ):
             res = runner.invoke(main, [str(marked_file), "-o", str(out), "--vault"])
@@ -728,7 +729,7 @@ class TestBindKeyEnv:
         return cfg
 
     def _build(self, runner, src, out, cfg, *extra):
-        with patch("pyobfus.cli.is_trial_active", return_value=True):
+        with patch("pyobfus.trial.is_trial_active", return_value=True):
             return runner.invoke(
                 main,
                 [

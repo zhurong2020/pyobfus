@@ -64,6 +64,9 @@ class LicenseEmbedder(ast.NodeTransformer):
         Args:
             config: Configuration options for license embedding
         """
+        from pyobfus._entitlement import require_pro_access
+
+        require_pro_access()
         self.config = config or LicenseEmbedConfig()
         self._var_counter = 0
 

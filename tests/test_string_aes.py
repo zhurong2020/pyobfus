@@ -1,7 +1,7 @@
 """
-Tests for AES-256 String Encryption feature - Pro Edition.
+Tests for AES-128-CBC with HMAC-SHA256 (Fernet) String Encryption feature - Pro Edition.
 
-Tests that string literals are encrypted with AES-256 (Fernet) and runtime
+Tests that string literals are encrypted with AES-128-CBC with HMAC-SHA256 (Fernet) and runtime
 decryption infrastructure is properly injected.
 """
 
@@ -30,10 +30,10 @@ else:
 
 @pytest.mark.skipif(not PRO_AVAILABLE, reason="Pro features not installed")
 class TestStringAESEncryption:
-    """Test suite for AES-256 string encryption feature."""
+    """Test suite for AES-128-CBC with HMAC-SHA256 (Fernet) string encryption feature."""
 
     def test_basic_string_encryption(self):
-        """Test that string literals are encrypted with AES-256."""
+        """Test that string literals are encrypted with AES-128-CBC with HMAC-SHA256 (Fernet)."""
         code = """
 message = "Hello, World!"
 """
@@ -463,3 +463,8 @@ data = {
         assert namespace["data"]["key1"] == "value1"
         assert namespace["data"]["key2"] == ["item1", "item2"]
         assert namespace["data"]["key3"]["nested"] == "value"
+
+
+@pytest.fixture(autouse=True)
+def _authorized_transform(active_pro_trial):
+    """Transform unit tests run with a synthetic trial in the test home."""

@@ -136,7 +136,7 @@
         "string_encryption": {
           "type": "boolean",
           "default": false,
-          "description": "AES-256 string encryption (Pro). Requires level: pro."
+          "description": "AES-128-CBC with HMAC-SHA256 (Fernet) string encryption (Pro). Requires level: pro."
         },
         "import_obfuscation": {
           "type": "boolean",

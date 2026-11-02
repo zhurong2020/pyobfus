@@ -33,3 +33,11 @@ def isolated_device_id(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     device_file = state_dir / "device_id"
     monkeypatch.setattr(fingerprint, "DEVICE_ID_FILE", device_file)
     assert fingerprint.DEVICE_ID_FILE.is_relative_to(tmp_path)
+
+
+@pytest.fixture
+def active_pro_trial(isolated_device_id):
+    """Explicit authorization for transform tests, including spawned builders."""
+    from pyobfus.trial import start_trial
+
+    assert start_trial()["success"]

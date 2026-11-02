@@ -49,6 +49,8 @@ Data Files" / PyArmor ``--bind-data`` gap in pure Python.
 
 from __future__ import annotations
 
+from pyobfus._entitlement import entitlement_session
+
 import ast
 from pyobfus.core.unparse import unparse
 import base64
@@ -377,6 +379,7 @@ def _ensure_bind_device_import(tree: ast.Module) -> None:
     tree.body.insert(insert_at, imp)
 
 
+@entitlement_session()
 def apply_pre_passes(source: str, config, *, module_qualname: str = "") -> str:
     """Source transforms that must run BEFORE the Core pipeline.
 
@@ -400,6 +403,9 @@ def apply_pre_passes(source: str, config, *, module_qualname: str = "") -> str:
     ``_VAULT_KEY_<name>`` constant names and imported symbols unchanged, so the
     injected ``bind_device_key(...)`` derivation survives mangling intact.
     """
+    from pyobfus._entitlement import require_config_access
+
+    require_config_access(config)
     if getattr(config, "vault", False):
         if getattr(config, "bind_device", False):
             source = _apply_vault_device_binding(source, config)
@@ -502,6 +508,7 @@ def _ensure_opacity_imports(tree: ast.Module) -> None:
     tree.body.insert(insert_at, imp)
 
 
+@entitlement_session()
 def apply_post_passes(
     source: str,
     config,
@@ -514,6 +521,9 @@ def apply_post_passes(
     Order: opacity (encrypt final mangled bytecode) -> seal (hash final
     bytecode / ciphertext for L3) -> scrub (excepthook) -> expire check.
     """
+    from pyobfus._entitlement import require_config_access
+
+    require_config_access(config)
     # --bind-device: derive the L3 layer key from a device fingerprint. The
     # ciphertext is encrypted at build with bind_device_key(target_id, salt), and
     # the emitted `_LAYER_KEY = b"..."` literal is rewritten (below) into a

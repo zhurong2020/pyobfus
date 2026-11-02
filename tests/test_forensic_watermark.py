@@ -258,6 +258,7 @@ class TestVerifyLayerKeyMatch:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.usefixtures("active_pro_trial")
 class TestOpacityIntegration:
     def test_watermarked_build_is_byte_deterministic_per_buyer(self):
         # Identical buyer ID + identical source + identical config =

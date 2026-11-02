@@ -102,6 +102,9 @@ def encrypt_targets(
             with free variables, a failed round-trip, or a detected key leak.
         ValueError: when ``key`` is not 32 bytes.
     """
+    from pyobfus._entitlement import require_pro_access
+
+    require_pro_access()
     if not isinstance(key, (bytes, bytearray)) or len(key) != _KEY_SIZE:
         raise ValueError(
             f"key must be exactly {_KEY_SIZE} bytes, got "
