@@ -7,6 +7,8 @@ import pytest
 
 from pyobfus_mcp.tools import protect_project, generate_pyobfus_config
 
+pytest.importorskip("pyobfus._entitlement", reason="installed Core has no Pro access gate")
+
 
 @pytest.mark.parametrize("access", ["none", "trial", "license"])
 @pytest.mark.parametrize("from_config", [False, True])

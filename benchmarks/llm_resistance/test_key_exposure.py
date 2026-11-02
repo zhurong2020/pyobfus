@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import base64
 from pathlib import Path
-from unittest.mock import patch
 
 import pytest
 from click.testing import CliRunner
@@ -35,34 +34,27 @@ if __name__ == "__main__":
 """
 
 
-@pytest.fixture(autouse=True)
-def _isolated_home(tmp_path, monkeypatch):
-    monkeypatch.setenv("HOME", str(tmp_path))
-    monkeypatch.setenv("USERPROFILE", str(tmp_path))
-
-
 def _build(tmp_path: Path, name: str, *options: str) -> Path:
     src = tmp_path / f"{name}_src.py"
     src.write_text(SOURCE, encoding="utf-8")
     cfg = tmp_path / "pyobfus.yaml"
     cfg.write_text("obfuscation:\n  exclude_names: [run]\n", encoding="utf-8")
     out = tmp_path / f"{name}.py"
-    with patch("pyobfus.cli.is_trial_active", return_value=True):
-        res = CliRunner().invoke(
-            main,
-            [
-                str(src),
-                "-o",
-                str(out),
-                "--level",
-                "pro",
-                "--config",
-                str(cfg),
-                "--selective-opacity",
-                *options,
-            ],
-            env={KEY_ENV: KEY_B64},
-        )
+    res = CliRunner().invoke(
+        main,
+        [
+            str(src),
+            "-o",
+            str(out),
+            "--level",
+            "pro",
+            "--config",
+            str(cfg),
+            "--selective-opacity",
+            *options,
+        ],
+        env={KEY_ENV: KEY_B64},
+    )
     assert res.exit_code == 0, res.output
     return out
 
