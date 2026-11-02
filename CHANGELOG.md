@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   configurations, JSON CLI, MCP builds and direct library transforms. An active
   trial or valid license is required; registered cached/offline operation remains supported.
 - Remove license keys and buyer email addresses from Worker issuance logs
-  (source fix only; deployment is separate).
+  (license server deployed 2026-11-02 together with CI activation support).
 
 ### Added
 
