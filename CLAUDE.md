@@ -8,6 +8,8 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ## ⚡ Current pending work (cold-start 必读)
 
+**2026-11-03 最新**：Pro 授权检查修复（#175）与 Worker CI 授权（#174，已部署）已合并，未发版；客户已通知。下一步约 11-04 经批准发 Core 0.12.0，见 `docs/CURRENT_PLAN_ZH.md` 顶部。
+
 **2026-11-01 最新交接**：先读 [会话收尾](docs/SESSION_CLOSEOUT_2026-11-01.md) →
 [本轮执行](docs/EXECUTION_PROGRESS_2026-11-01.md) → [冷启动](docs/COLD_START_PROMPT_2026-11-01.md)。
 三个维护 PR 已合并，RTD 与日备云端复验完成；邮件和下载已补核。
