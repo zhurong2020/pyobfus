@@ -144,6 +144,11 @@ string and numeric transforms, framework-aware presets, config-aware pre-flight 
 SARIF, structured dry-run, reverse traceback mapping, syntax verification,
 provenance, reproducible output and verifiable build reports.
 
+Pro builds require an active trial or a registered license. This applies to
+CLI flags, presets, configuration files, MCP builds, and direct library
+transforms. Installing the bundled Pro components alone does not activate Pro.
+See the [activation and offline-use guide](https://github.com/zhurong2020/pyobfus/blob/main/docs/LICENSE_ACTIVATION_GUIDE.md).
+
 Professional adds four kinds of commercial value:
 
 - **Protection strength:** AES encryption, control-flow flattening, dead-code
@@ -220,6 +225,9 @@ the customer your mapping or original source. `--trace-marker` can also stamp
 generated files with the exact recovery command.
 
 ## Purchase Professional Edition
+
+Pro builds in CI need `PYOBFUS_LICENSE_KEY` or a registered runner. The secret
+verifies online without consuming device slots; see [CI licensing](https://github.com/zhurong2020/pyobfus/blob/main/docs/CI_LICENSING.md).
 
 Professional Edition is **$45 USD, one time**—not a subscription. A five-day
 trial requires no registration or card:

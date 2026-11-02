@@ -29,6 +29,7 @@ def _src(body: str) -> str:
     return textwrap.dedent(body).strip() + "\n"
 
 
+@pytest.mark.usefixtures("active_pro_trial")
 class TestTransformInjection:
     def test_install_call_emitted_after_imports(self, keypair):
         _priv, pub = keypair
@@ -70,6 +71,7 @@ class TestTransformInjection:
         assert 0 <= install_pos < def_pos
 
 
+@pytest.mark.usefixtures("active_pro_trial")
 class TestIdempotency:
     def test_already_transformed_module_returns_unchanged(self, keypair):
         _priv, pub = keypair
@@ -82,6 +84,7 @@ class TestIdempotency:
         assert once == twice
 
 
+@pytest.mark.usefixtures("active_pro_trial")
 class TestEndToEnd:
     def test_transformed_module_installs_excepthook(self, keypair, restore_excepthook):
         _priv, pub = keypair

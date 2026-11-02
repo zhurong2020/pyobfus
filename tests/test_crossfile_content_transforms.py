@@ -138,7 +138,8 @@ class TestCrossFileParityWithSingleFile:
 class TestProPresetLevelSurvives:
     """A Pro preset must keep level=pro without an explicit --level pro."""
 
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     def test_commercial_preset_single_file_applies_pro(self, _trial, runner, tmp_path):
         src = tmp_path / "m.py"
         src.write_text("def f(x):\n    if x:\n        return 1\n    return 0\n")
@@ -152,7 +153,8 @@ class TestProPresetLevelSurvives:
         assert stats.get("control_flow_applied", 0) > 0
         assert stats.get("anti_debug_checks", 0) > 0
 
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     def test_commercial_preset_directory_applies_pro(self, _trial, runner, tmp_path):
         src = _project(tmp_path)
         out = tmp_path / "out"
@@ -162,7 +164,8 @@ class TestProPresetLevelSurvives:
         assert payload["level"] == "pro"
         assert payload["stats"].get("control_flow_applied", 0) > 0
 
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     def test_explicit_level_pro_still_wins(self, _trial, runner, tmp_path):
         # Passing --level pro on a community-default run still forces pro.
         src = tmp_path / "m.py"
@@ -178,7 +181,8 @@ class TestProPresetLevelSurvives:
 class TestCrossFileProRuntimeCorrectness:
     """Obfuscated cross-file Pro output must still import and run correctly."""
 
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     def test_obfuscated_project_executes(self, _trial, runner, tmp_path):
         src = _project(tmp_path)
         out = tmp_path / "out"
@@ -228,7 +232,8 @@ class TestLocalShadowingRenamedGlobal:
         )
         return src
 
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     def test_local_shadowing_executes(self, _trial, runner, tmp_path):
         src = self._shadow_project(tmp_path)
         out = tmp_path / "out"

@@ -54,7 +54,7 @@ def _invoke(args, yaml_text=None, tmp_path=None):
         cfg = tmp_path / "pyobfus.yaml"
         cfg.write_text(yaml_text, encoding="utf-8")
         args = [*args, "--config", str(cfg)]
-    with patch("pyobfus.cli.is_trial_active", return_value=True):
+    with patch("pyobfus.trial.is_trial_active", return_value=True):
         return CliRunner().invoke(main, args, env={KEY_ENV: KEY_B64})
 
 

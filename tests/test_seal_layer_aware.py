@@ -386,3 +386,8 @@ class TestCombinedPipeline:
         final_out = seal_transform(opacity_out, layer_assignments=assignments)
         ns = _exec(final_out)
         assert ns["critical"](3) == 21
+
+
+@pytest.fixture(autouse=True)
+def _authorized_transform(active_pro_trial):
+    """Transform unit tests run with a synthetic trial in the test home."""

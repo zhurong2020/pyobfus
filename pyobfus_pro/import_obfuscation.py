@@ -18,6 +18,9 @@ class ImportObfuscator(ast.NodeTransformer):
     """Rewrite module-level imports into importlib-based assignments."""
 
     def __init__(self) -> None:
+        from pyobfus._entitlement import require_pro_access
+
+        require_pro_access()
         self.imports_obfuscated = 0
         self._needs_helper = False
 

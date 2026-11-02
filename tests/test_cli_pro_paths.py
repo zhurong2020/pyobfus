@@ -72,7 +72,8 @@ def project_dir(tmp_path):
 class TestProLevelWithTrial:
     """Test --level pro with trial active (no license needed)."""
 
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial: 3 days left")
     def test_pro_level_trial_single_file(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
@@ -80,7 +81,8 @@ class TestProLevelWithTrial:
         assert result.exit_code == 0
         assert output.exists()
 
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial: 3 days left")
     def test_pro_level_trial_with_stats(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
@@ -101,7 +103,8 @@ class TestProFeatureExecution:
     # tests/test_control_flow_flattening.py / test_dead_code_injection.py /
     # test_string_aes.py / test_anti_debug.py still run on all Python versions.
     @requires_py39
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_control_flow_flattening(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
@@ -110,7 +113,8 @@ class TestProFeatureExecution:
         assert "Control flow" in result.output or output.exists()
 
     @requires_py39
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_string_encryption(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
@@ -120,7 +124,8 @@ class TestProFeatureExecution:
         assert result.exit_code == 0
 
     @requires_py39
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_anti_debug(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
@@ -128,7 +133,8 @@ class TestProFeatureExecution:
         assert result.exit_code == 0
 
     @requires_py39
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_dead_code_injection(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
@@ -136,7 +142,8 @@ class TestProFeatureExecution:
         assert result.exit_code == 0
 
     @requires_py39
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_all_pro_features_combined(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
@@ -158,7 +165,8 @@ class TestProFeatureExecution:
         assert "Statistics" in result.output
 
     @requires_py39
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_all_pro_features_with_stats(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         """Test _display_stats Pro branches with non-zero counts."""
@@ -184,7 +192,8 @@ class TestProFeatureExecution:
 class TestLicenseEmbedding:
     """Test license embedding features with trial active."""
 
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_expire_flag(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
@@ -193,14 +202,16 @@ class TestLicenseEmbedding:
         )
         assert result.exit_code == 0
 
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_bind_machine_flag(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
         result = runner.invoke(main, [str(simple_file), "-o", str(output), "--bind-machine", "-v"])
         assert result.exit_code == 0
 
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_max_runs_flag(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
@@ -209,7 +220,8 @@ class TestLicenseEmbedding:
         )
         assert result.exit_code == 0
 
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_all_license_embed_combined(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
@@ -242,7 +254,8 @@ class TestHandleUpgrade:
         assert "Pro" in result.output
 
     @patch("pyobfus.cli.PRO_AVAILABLE", False)
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial: 2 days left")
     def test_upgrade_trial_active(self, mock_msg, mock_trial, runner):
         """Test --upgrade when trial is active."""
@@ -251,7 +264,7 @@ class TestHandleUpgrade:
         assert "TRIAL" in result.output
 
     @patch("pyobfus.cli.PRO_AVAILABLE", False)
-    @patch("pyobfus.cli.is_trial_active", return_value=False)
+    @patch("pyobfus.trial.is_trial_active", return_value=False)
     def test_upgrade_community(self, mock_trial, runner):
         """Test --upgrade for community users."""
         result = runner.invoke(main, ["--upgrade"])
@@ -263,7 +276,8 @@ class TestHandleUpgrade:
 class TestProPresets:
     """Test Pro presets with trial active."""
 
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_preset_trial(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
@@ -272,7 +286,8 @@ class TestProPresets:
         )
         assert result.exit_code == 0
 
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_preset_commercial(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
@@ -281,7 +296,8 @@ class TestProPresets:
         )
         assert result.exit_code == 0
 
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_preset_library(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
@@ -290,7 +306,8 @@ class TestProPresets:
         )
         assert result.exit_code == 0
 
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_preset_maximum(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
@@ -300,7 +317,7 @@ class TestProPresets:
         assert result.exit_code == 0
 
     @patch("pyobfus.cli.PRO_AVAILABLE", False)
-    @patch("pyobfus.cli.is_trial_active", return_value=False)
+    @patch("pyobfus.trial.is_trial_active", return_value=False)
     def test_pro_preset_no_access(self, mock_trial, runner, simple_file, tmp_path):
         """Test Pro preset without Pro or trial access."""
         output = tmp_path / "output.py"
@@ -314,49 +331,35 @@ class TestProPresets:
 class TestProLicenseVerification:
     """Test --level pro with actual license verification path (PRO_AVAILABLE=True)."""
 
-    @patch("pyobfus.cli.is_trial_active", return_value=False)
-    @patch("pyobfus.cli.pyobfus_pro")
+    @patch("pyobfus.trial.is_trial_active", return_value=False)
+    @patch("pyobfus._entitlement.require_pro_access")
     def test_pro_level_license_verified(self, mock_pro, mock_trial, runner, simple_file, tmp_path):
         """Test the Pro license verification success path."""
-        mock_pro.get_license_status.return_value = {
-            "key": "PYOB-AAAA-BBBB-CCCC-DDDD",
-            "type": "pro",
-        }
-        mock_pro.verify_license.return_value = {
-            "valid": True,
-            "type": "pro",
-            "expires": "2099-12-31",
-            "message": "License verified",
-        }
+        mock_pro.return_value = None
         output = tmp_path / "output.py"
         result = runner.invoke(main, [str(simple_file), "-o", str(output), "--level", "pro", "-v"])
         assert result.exit_code == 0
-        assert "License verified" in result.output
+        mock_pro.assert_called()
 
-    @patch("pyobfus.cli.is_trial_active", return_value=False)
-    @patch("pyobfus.cli.pyobfus_pro")
+    @patch("pyobfus.trial.is_trial_active", return_value=False)
+    @patch("pyobfus._entitlement.require_pro_access")
     def test_pro_level_no_license(self, mock_pro, mock_trial, runner, simple_file, tmp_path):
         """Test --level pro with no cached license."""
-        mock_pro.get_license_status.return_value = None
+        from pyobfus._entitlement import ProAccessError
+
+        mock_pro.side_effect = ProAccessError("No license key found; register your license")
         output = tmp_path / "output.py"
         result = runner.invoke(main, [str(simple_file), "-o", str(output), "--level", "pro"])
         assert result.exit_code == 1
         assert "license" in result.output.lower() or "register" in result.output.lower()
 
-    @patch("pyobfus.cli.is_trial_active", return_value=False)
-    @patch("pyobfus.cli.pyobfus_pro")
+    @patch("pyobfus.trial.is_trial_active", return_value=False)
+    @patch("pyobfus._entitlement.require_pro_access")
     def test_pro_level_license_error(self, mock_pro, mock_trial, runner, simple_file, tmp_path):
         """Test --level pro with license verification failure."""
-        mock_pro.get_license_status.return_value = {
-            "key": "PYOB-AAAA-BBBB-CCCC-DDDD",
-        }
+        from pyobfus._entitlement import ProAccessError
 
-        # Create a real exception class for the mock
-        class MockLicenseError(Exception):
-            pass
-
-        mock_pro.LicenseError = MockLicenseError
-        mock_pro.verify_license.side_effect = MockLicenseError("Invalid key")
+        mock_pro.side_effect = ProAccessError("License verification failed")
         output = tmp_path / "output.py"
         result = runner.invoke(main, [str(simple_file), "-o", str(output), "--level", "pro"])
         assert result.exit_code == 1
@@ -367,7 +370,7 @@ class TestProNoAccess:
     """Test Pro paths when neither Pro nor trial is available."""
 
     @patch("pyobfus.cli.PRO_AVAILABLE", False)
-    @patch("pyobfus.cli.is_trial_active", return_value=False)
+    @patch("pyobfus.trial.is_trial_active", return_value=False)
     def test_pro_level_no_access(self, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
         result = runner.invoke(main, [str(simple_file), "-o", str(output), "--level", "pro"])
@@ -375,7 +378,7 @@ class TestProNoAccess:
         assert "trial" in result.output.lower() or "license" in result.output.lower()
 
     @patch("pyobfus.cli.PRO_AVAILABLE", False)
-    @patch("pyobfus.cli.is_trial_active", return_value=False)
+    @patch("pyobfus.trial.is_trial_active", return_value=False)
     def test_pro_features_no_access(self, mock_trial, runner, simple_file, tmp_path):
         output = tmp_path / "output.py"
         result = runner.invoke(main, [str(simple_file), "-o", str(output), "--control-flow"])
@@ -404,7 +407,8 @@ class TestStringEncoding:
 class TestDisplayStatsProBranches:
     """Test _display_stats with Pro-level stats."""
 
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_stats_with_all_pro_counts(self, mock_msg, mock_trial, runner, simple_file, tmp_path):
         """All Pro stats should appear when non-zero."""
@@ -431,7 +435,8 @@ class TestDisplayStatsProBranches:
 class TestDirectoryProMode:
     """Test directory obfuscation in Pro mode."""
 
-    @patch("pyobfus.cli.is_trial_active", return_value=True)
+    @pytest.mark.usefixtures("active_pro_trial")
+    @patch("pyobfus.trial.is_trial_active", return_value=True)
     @patch("pyobfus.cli.get_trial_expiry_message", return_value="Trial active")
     def test_directory_crossfile_pro(self, mock_msg, mock_trial, runner, project_dir, tmp_path):
         output = tmp_path / "dist"

@@ -30,6 +30,8 @@ string rather than the AST and remain single-file / ``--no-cross-file`` only.
 
 from __future__ import annotations
 
+from pyobfus._entitlement import entitlement_session
+
 import ast
 from typing import Any, Callable, Dict, Optional
 
@@ -92,6 +94,7 @@ def remove_docstrings(tree: ast.Module, config: ObfuscationConfig) -> ast.Module
     return tree
 
 
+@entitlement_session()
 def apply_content_transforms(
     tree: ast.Module,
     config: ObfuscationConfig,
@@ -113,6 +116,9 @@ def apply_content_transforms(
 
     Mutates and returns ``tree``; records per-transform counts in ``stats``.
     """
+    from pyobfus._entitlement import require_config_access
+
+    require_config_access(config)
     if stats is None:
         stats = {}
 
@@ -185,7 +191,7 @@ def _apply_pro_transforms(
         if echo:
             echo(f"  Imports obfuscated: {import_stats.get('imports_obfuscated', 0)}")
 
-    # String encryption (AES-256)
+    # String encryption (AES-128-CBC with HMAC-SHA256 (Fernet))
     if config.string_encryption:
         from pyobfus_pro.string_aes import StringAESEncryptor
 

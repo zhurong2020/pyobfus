@@ -76,7 +76,7 @@ def test_build_warns_and_reports_counts(project, tmp_path):
     src, cfg, keep = project
     out = tmp_path / "out.py"
     report = tmp_path / "report.json"
-    with patch("pyobfus.cli.is_trial_active", return_value=True):
+    with patch("pyobfus.trial.is_trial_active", return_value=True):
         res = CliRunner().invoke(
             main,
             [
@@ -112,3 +112,8 @@ def test_community_build_report_keeps_its_shape(tmp_path):
     assert res.exit_code == 0, res.output
     transformations = json.loads(report.read_text())["transformations"]
     assert not any(key.startswith("l3_") for key in transformations)
+
+
+@pytest.fixture(autouse=True)
+def _authorized_transform(active_pro_trial):
+    """Transform unit tests run with a synthetic trial in the test home."""

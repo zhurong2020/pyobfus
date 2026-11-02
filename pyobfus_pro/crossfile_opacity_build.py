@@ -7,6 +7,8 @@ No user module is imported or executed during a build.
 
 from __future__ import annotations
 
+from pyobfus._entitlement import entitlement_session
+
 import ast
 import base64
 import json
@@ -60,15 +62,9 @@ class _BuildKey:
 
 
 def _require_authorization() -> None:
-    from pyobfus.trial import is_trial_active
-    from pyobfus_pro.license import get_license_status, verify_license
+    from pyobfus._entitlement import require_pro_access
 
-    if is_trial_active():
-        return
-    status = get_license_status(masked=False)
-    if not status or not status.get("key"):
-        raise ValueError("Crossfile opacity requires a valid Pro license or active trial")
-    verify_license(status["key"])
+    require_pro_access()
 
 
 def _read_key(env_name: str) -> _BuildKey:
@@ -145,6 +141,7 @@ def _select(module: str, source: str, opacity: OpacityConfig) -> Tuple[ModulePla
     return replace(plan, selected=tuple(targets)), qualnames, len(plan.selected)
 
 
+@entitlement_session()
 def build_directory(
     input_dir: Path,
     output: Path,

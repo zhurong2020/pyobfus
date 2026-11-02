@@ -333,7 +333,7 @@ pyobfus/
 ├── pyobfus_pro/          # Pro Edition (proprietary)
 │   ├── license.py        # License verification
 │   ├── fingerprint.py    # Device fingerprinting
-│   ├── string_aes.py     # AES-256 encryption
+│   ├── string_aes.py     # AES-128-CBC with HMAC-SHA256 (Fernet) encryption
 │   └── anti_debug.py     # Anti-debugging
 ├── cloudflare-worker/    # License server
 ├── tests/                # Test suite (366 tests)
@@ -377,7 +377,7 @@ This repository contains only Community Edition features (Apache 2.0 licensed).
 - CLI interface
 
 **Pro Features** (proprietary, not in repo):
-- AES-256 string encryption
+- AES-128-CBC with HMAC-SHA256 (Fernet) string encryption
 - Control flow flattening
 - Anti-debugging
 - Advanced dead code injection

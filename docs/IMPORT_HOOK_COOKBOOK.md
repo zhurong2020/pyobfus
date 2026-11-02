@@ -56,7 +56,7 @@ against the originals.
 ## When this is (and isn't) enough
 
 This pairing gives you load-time encryption **plus** AST-level name
-protection, for free (Community Edition) or with AES-256 string encryption
+protection, for free (Community Edition) or with AES-128-CBC with HMAC-SHA256 (Fernet) string encryption
 added (Pro Edition, `--string-encryption`). It does **not** give you
 native-code compilation (Nuitka) or bytecode-level encryption (PyArmor) — if
 a single module is your crown jewel, layering PyArmor Pro or Nuitka on that

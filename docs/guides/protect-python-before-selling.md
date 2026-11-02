@@ -126,7 +126,7 @@ What the output looked like is the part to read carefully:
   a build, rebuild and rerun your tests. Step 3 above is what catches this
   kind of problem.
 - String literals are kept as written unless you turn on string encoding
-  (`string_encoding: true` in a config file; Pro adds AES-256 string
+  (`string_encoding: true` in a config file; Pro adds AES-128-CBC with HMAC-SHA256 (Fernet) string
   encryption). Never rely on either to hide secrets.
 
 Open a few files in `dist/` before you ship and decide whether that level of

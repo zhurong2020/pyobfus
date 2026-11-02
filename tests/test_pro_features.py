@@ -8,6 +8,8 @@ To run locally (with pyobfus_pro available):
     python -m pytest tests/test_pro_features.py -v
 """
 
+import pytest
+
 import sys
 from pathlib import Path
 
@@ -100,3 +102,8 @@ if __name__ == "__main__":
 
         traceback.print_exc()
         sys.exit(1)
+
+
+@pytest.fixture(autouse=True)
+def _authorized_transform(active_pro_trial):
+    """Transform unit tests run with a synthetic trial in the test home."""

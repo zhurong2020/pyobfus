@@ -5,6 +5,8 @@ This module provides the CrossFileOrchestrator class which coordinates
 the two-phase obfuscation process for multi-file projects.
 """
 
+from pyobfus._entitlement import entitlement_session
+
 import ast
 import os
 import stat
@@ -50,7 +52,25 @@ from pyobfus.transformers.local_name_transformer import LocalNameTransformer
 from pyobfus.transformers.scoped_imports import ScopeResolutionError
 from pyobfus.utils import filter_python_files
 
+# Pool state is initialized only by the owning build, never by configuration.
+_pool_capability: Optional[bytes] = None
 
+
+def _init_build_worker(capability: Optional[bytes]) -> None:
+    global _pool_capability
+    _pool_capability = capability
+
+
+def _transform_build_worker(capability: Optional[bytes], *args: Any) -> Any:
+    from pyobfus._entitlement import _approve_session
+
+    with entitlement_session():
+        if capability is not None and capability == _pool_capability:
+            _approve_session()
+        return _transform_single_file(*args)
+
+
+@entitlement_session()
 def _transform_single_file(
     file_path: Path,
     relative_path: Path,
@@ -284,6 +304,7 @@ class CrossFileOrchestrator:
         """Warnings from the most recent scan, including skipped local plans."""
         return list(self._planning_warnings)
 
+    @entitlement_session()
     def obfuscate(self, input_dir: Path, output_dir: Path) -> ObfuscationResult:
         """
         Obfuscate entire project with cross-file coordination.
@@ -295,6 +316,9 @@ class CrossFileOrchestrator:
         Returns:
             ObfuscationResult with statistics and messages
         """
+        from pyobfus._entitlement import require_config_access
+
+        require_config_access(self.config)
         warnings: List[str] = []
         errors: List[str] = []
 
@@ -674,10 +698,14 @@ class CrossFileOrchestrator:
 
         return ".".join(parent_parts) if parent_parts else None
 
+    @entitlement_session()
     def phase2_transform(
         self, input_dir: Path, output_dir: Path, progress_callback=None
     ) -> List[str]:
         """Attribute-rewriting builds stage output until every plan succeeds."""
+        from pyobfus._entitlement import require_config_access
+
+        require_config_access(self.config)
         if not self.config.crossfile_module_attributes:
             return self._phase2_transform(input_dir, output_dir, progress_callback)
         output_dir = Path(output_dir)
@@ -736,10 +764,16 @@ class CrossFileOrchestrator:
 
         if use_parallel:
             workers = max_workers or min(os.cpu_count() or 1, len(self.files))
-            with ProcessPoolExecutor(max_workers=workers) as executor:
+            from pyobfus._entitlement import _worker_capability
+
+            capability = _worker_capability()
+            with ProcessPoolExecutor(
+                max_workers=workers, initializer=_init_build_worker, initargs=(capability,)
+            ) as executor:
                 futures = {
                     executor.submit(
-                        _transform_single_file,
+                        _transform_build_worker,
+                        capability,
                         fi.path,
                         fi.relative_path,
                         fi.module_name,

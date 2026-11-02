@@ -740,3 +740,8 @@ def test_runtime_import_is_bound_before_first_encrypted_decorator(existing_impor
     namespace = {}
     exec(compile(transformed, "<runtime-import-order>", "exec", dont_inherit=True), namespace)
     assert namespace["calculate"]() == 7
+
+
+@pytest.fixture(autouse=True)
+def _authorized_transform(active_pro_trial):
+    """Transform unit tests run with a synthetic trial in the test home."""

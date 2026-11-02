@@ -74,7 +74,7 @@ still ordinary importable Python.
 ## When this is (and isn't) enough
 
 This pairing gets you single-binary distribution with AST-level name
-protection, for free (Community Edition) or with AES-256 string encryption
+protection, for free (Community Edition) or with AES-128-CBC with HMAC-SHA256 (Fernet) string encryption
 added (Pro Edition, `--string-encryption`). It does **not** give you
 Nuitka's native-code compilation or PyArmor's bytecode-level encryption —
 if a single algorithm module is your crown jewel, layering PyArmor Pro or

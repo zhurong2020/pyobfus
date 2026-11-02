@@ -202,7 +202,7 @@ def _simulate_missing_runtime(monkeypatch: pytest.MonkeyPatch) -> None:
     )
     monkeypatch.setattr(cli_module, "PRO_AVAILABLE", False)
     monkeypatch.setattr(cli_module, "PRO_IMPORT_ERROR", error)
-    monkeypatch.setattr(cli_module, "is_trial_active", lambda: False)
+    monkeypatch.setattr(cli_module.trial, "is_trial_active", lambda: False)
 
 
 def test_pro_import_hint_names_the_missing_runtime(monkeypatch: pytest.MonkeyPatch) -> None:

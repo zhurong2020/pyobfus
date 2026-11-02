@@ -1,7 +1,7 @@
 """
-AES-256 String Encryption Transformer (Pro Feature)
+AES-128-CBC with HMAC-SHA256 (Fernet) String Encryption Transformer (Pro Feature)
 
-Encrypts string literals in Python code using AES-256 and injects
+Encrypts string literals in Python code using AES-128-CBC with HMAC-SHA256 (Fernet) and injects
 runtime decryption functions. Much stronger than simple ROT13 encoding.
 
 Example:
@@ -24,10 +24,10 @@ from pyobfus.core.transformer import BaseTransformer
 
 class StringAESEncryptor(BaseTransformer):
     """
-    Encrypts string literals using AES-256 (Fernet symmetric encryption).
+    Encrypts string literals using AES-128-CBC with HMAC-SHA256 (Fernet).
 
     Features:
-    - AES-256-CBC encryption
+    - AES-128-CBC with HMAC-SHA256 (Fernet)
     - HMAC authentication
     - Per-file unique key
     - Runtime decryption function injection
@@ -42,6 +42,9 @@ class StringAESEncryptor(BaseTransformer):
             config: Obfuscation configuration
             analyzer: Symbol analyzer (optional)
         """
+        from pyobfus._entitlement import require_pro_access
+
+        require_pro_access()
         super().__init__(config, analyzer)
         self.encryption_key = Fernet.generate_key()
         self.cipher = Fernet(self.encryption_key)

@@ -45,6 +45,28 @@ pyobfus input.py -o output.py --string-encryption --anti-debug --control-flow
 Run `pyobfus --help` for the full list of Pro options (string encryption, control-flow flattening,
 dead-code injection, anti-debugging, runtime string vault, expiry and device binding, and more).
 
+## Where access is checked
+
+Every Pro build uses the same entitlement check: an active trial or a license
+accepted by the existing verifier/cache. The check covers individual CLI flags,
+`--level pro`, Pro presets, explicit and auto-discovered YAML configurations,
+JSON CLI, MCP `protect_project`, and direct library transforms. Importing the
+bundled `pyobfus_pro` package alone does not activate Pro. Denied builds report
+how to register a license or start a trial before writing output.
+
+Community builds, configuration generation/validation, local inspection and
+debugging remain available without Pro activation. Generated artifacts keep
+their existing runtime behavior; the recipient does not activate the builder.
+
+For ephemeral CI runners, set the secret environment variable `PYOBFUS_LICENSE_KEY`.
+It takes precedence over registration and trials, verifies online once per build,
+and does not consume device slots or write a local cache. Verification failures
+deny Pro access; there is no offline fallback for this variable. Air-gapped
+builds use normal registration and cache instead. See [CI licensing](CI_LICENSING.md)
+for secret handling and platform examples. The documented `--no-verify` recovery
+path below remains supported through the existing local cache.
+Application key variables such as `--bind-key-env` serve a different purpose.
+
 ## Managing Your License
 
 ### Check status
@@ -171,4 +193,4 @@ No. Each license is for the purchaser's own use. See the Terms of Service.
 
 ---
 
-**Last Updated**: 2026-10-05
+**Last Updated**: 2026-11-02

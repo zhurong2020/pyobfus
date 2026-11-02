@@ -187,7 +187,7 @@ def test_pro_source_and_marshal_artifacts_execute(tmp_path, monkeypatch):
 
     from pyobfus.cli import main
 
-    monkeypatch.setattr("pyobfus.cli.is_trial_active", lambda: True)
+    monkeypatch.setattr("pyobfus.trial.is_trial_active", lambda: True)
     source = tmp_path / "source.py"
     marked_source = (
         "from pyobfus_pro import opacity, seal_code, vault_secrets, Layer\n"

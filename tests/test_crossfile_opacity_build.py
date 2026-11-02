@@ -22,10 +22,10 @@ _REAL_AUTHORIZATION = builder._require_authorization
 
 
 @pytest.fixture
-def project(tmp_path, monkeypatch):
+def project(tmp_path, monkeypatch, active_pro_trial):
     # Synthetic authorization only: no real license/trial reads or network.
     monkeypatch.setattr(builder, "_require_authorization", lambda: None)
-    monkeypatch.setattr("pyobfus.cli.is_trial_active", lambda: True)
+    monkeypatch.setattr("pyobfus.trial.is_trial_active", lambda: True)
     source = tmp_path / "src"
     source.mkdir()
     (source / "a.py").write_text(

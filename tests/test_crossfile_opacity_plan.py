@@ -341,7 +341,7 @@ def test_module_level_only_nested_functions_are_not_targets():
 # --------------------------------------------------------------------------
 
 
-def test_cli_crossfile_opacity_rejects_and_writes_nothing(tmp_path):
+def test_cli_crossfile_opacity_rejects_and_writes_nothing(tmp_path, active_pro_trial):
     from click.testing import CliRunner
 
     from pyobfus.cli import main

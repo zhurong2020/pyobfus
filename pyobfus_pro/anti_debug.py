@@ -54,6 +54,9 @@ class AntiDebugInjector(BaseTransformer):
             config: Obfuscation configuration
             analyzer: Symbol analyzer (optional)
         """
+        from pyobfus._entitlement import require_pro_access
+
+        require_pro_access()
         super().__init__(config, analyzer)
         self.check_function_name = "_check_debugger"
         self.injected_functions = 0

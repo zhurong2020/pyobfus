@@ -67,7 +67,7 @@ python examples/multifile_obfuscated/main.py
 **Purpose**: Demonstrates Pro Edition features (requires `pyobfus[pro]`)
 
 **Note**: These examples use advanced features:
-- AES-256 string encryption (requires `cryptography` package)
+- AES-128-CBC with HMAC-SHA256 (Fernet) string encryption (requires `cryptography` package)
 - Anti-debugging checks
 - Runtime decryption infrastructure
 

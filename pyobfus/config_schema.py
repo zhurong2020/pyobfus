@@ -58,7 +58,7 @@ _FIELD_DESCRIPTIONS: Dict[str, str] = {
     "community_marker": 'Transparent build marker on generated files: "auto" '
     '(emit), "on" (always emit) or "off" (suppress). Attribution only -- not a '
     "license check or authenticity proof.",
-    "string_encryption": "AES-256 string encryption (Pro).",
+    "string_encryption": "AES-128-CBC with HMAC-SHA256 (Fernet) string encryption (Pro).",
     "import_obfuscation": "Rewrite imports to runtime importlib calls + "
     "encrypted import strings (Pro).",
     "anti_debug": "Inject runtime debugger-detection checks: sys.gettrace, "

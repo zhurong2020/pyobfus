@@ -238,6 +238,7 @@ class TestPeriodCheck:
 # ---------------------------------------------------------------------------
 
 
+@pytest.mark.usefixtures("active_pro_trial")
 class TestOpacityIntegration:
     def test_correct_machine_id_decrypts_correctly(self):
         # Build with a key derived from the current machine; decrypt on
@@ -301,6 +302,7 @@ class TestOpacityIntegration:
             ns["critical"](3)
 
 
+@pytest.mark.usefixtures("active_pro_trial")
 class TestVaultIntegration:
     def test_correct_machine_id_decrypts_vault(self):
         import textwrap

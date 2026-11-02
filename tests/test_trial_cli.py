@@ -129,7 +129,7 @@ class TestTrialFeatures:
     def test_features_command(self, runner):
         result = runner.invoke(cli, ["features"])
         assert result.exit_code == 0
-        assert "AES-256" in result.output
+        assert "AES-128-CBC with HMAC-SHA256 (Fernet)" in result.output
         assert "Anti-Debugging" in result.output
         assert "Control Flow" in result.output
 

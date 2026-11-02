@@ -189,10 +189,10 @@ def test_copy_changes_only_execution_bits(tmp_path):
 
 
 @pytest.mark.parametrize("mode", ["single", "directory", "legacy"])
-def test_pro_output_preserves_prologue(build, mode, monkeypatch):
+def test_pro_output_preserves_prologue(build, mode, monkeypatch, active_pro_trial):
     import pyobfus.cli as cli
 
-    monkeypatch.setattr(cli, "is_trial_active", lambda: True)
+    monkeypatch.setattr(cli.trial, "is_trial_active", lambda: True)
     _, output, _ = build(
         mode, SHEBANG + '\n# coding: utf-8\nprint("ok")\n', ["--level", "pro", "--dead-code"]
     )
@@ -200,10 +200,10 @@ def test_pro_output_preserves_prologue(build, mode, monkeypatch):
     assert subprocess.check_output([sys.executable, str(output)], text=True) == "ok\n"
 
 
-def test_pro_fusion_restores_prologue_after_text_passes(build, monkeypatch):
+def test_pro_fusion_restores_prologue_after_text_passes(build, monkeypatch, active_pro_trial):
     import pyobfus.cli as cli
 
-    monkeypatch.setattr(cli, "is_trial_active", lambda: True)
+    monkeypatch.setattr(cli.trial, "is_trial_active", lambda: True)
     _, output, _ = build(
         "single",
         SHEBANG + '\n# coding: utf-8\nprint("ok")\n',

@@ -115,6 +115,9 @@ def transform_module(
         SyntaxError: when ``source_code`` is not valid Python.
         ValueError: when ``layer_key`` is supplied but not 32 bytes.
     """
+    from pyobfus._entitlement import require_pro_access
+
+    require_pro_access()
     if layer_key is not None and (
         not isinstance(layer_key, (bytes, bytearray)) or len(layer_key) != _LAYER_KEY_SIZE
     ):

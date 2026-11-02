@@ -79,7 +79,7 @@ Agree. Don't argue the philosophy. Quote the README's threat-model section.
 
 Be direct, no deflection:
 
-> Pro adds string encryption (AES-256), control-flow flattening, anti-debug, and dead-code injection. Same Apache 2.0 core; commercial license for the Pro modules. Pricing on the GitHub README. Honestly the community tier handles 80% of what most people need.
+> Pro adds string encryption (AES-128-CBC with HMAC-SHA256 (Fernet)), control-flow flattening, anti-debug, and dead-code injection. Same Apache 2.0 core; commercial license for the Pro modules. Pricing on the GitHub README. Honestly the community tier handles 80% of what most people need.
 
 ### "What was wrong with PyArmor's trial?" / "How big does my code need to be?" (added 2026-05-09)
 

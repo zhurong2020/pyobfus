@@ -439,7 +439,7 @@ def test_encoded_user_frames(tmp_path):
     )
 
 
-def test_fusion_boundary_disables_locations(tmp_path, monkeypatch, capsys):
+def test_fusion_boundary_disables_locations(tmp_path, monkeypatch, capsys, active_pro_trial):
     from types import SimpleNamespace
 
     import pyobfus.cli as cli

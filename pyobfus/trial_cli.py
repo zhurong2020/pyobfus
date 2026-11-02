@@ -45,7 +45,7 @@ def start(email: str) -> None:
 
     \b
     Trial includes:
-      - AES-256 string encryption
+      - AES-128-CBC with HMAC-SHA256 (Fernet) string encryption
       - Anti-debugging protection
       - Unlimited files and lines of code
 
@@ -80,7 +80,7 @@ def start(email: str) -> None:
         click.echo("  -----------")
         click.echo("  Use Pro features with the --level pro flag:")
         click.echo("")
-        click.echo("    # AES-256 string encryption")
+        click.echo("    # AES-128-CBC with HMAC-SHA256 (Fernet) string encryption")
         click.echo("    pyobfus input.py -o output.py --level pro")
         click.echo("")
         click.echo("  Check trial status anytime:")
@@ -197,7 +197,7 @@ def features() -> None:
     click.echo("  INCLUDED IN PRO (and trial):")
     click.echo("  -----------------------------")
     click.echo("")
-    click.echo("  [x] AES-256 String Encryption")
+    click.echo("  [x] AES-128-CBC with HMAC-SHA256 (Fernet) String Encryption")
     click.echo("      Encrypt all string literals with military-grade encryption.")
     click.echo("      Much stronger than Base64 encoding in Community Edition.")
     click.echo("")
