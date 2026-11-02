@@ -14,6 +14,7 @@ Core 0.10.0 release source on 2026-10-27; you can repeat the check yourself
 | `pyobfus --check` finds dependency files | Community | `pypi.org` | Dependency **names** read from `requirements*.txt` / `pyproject.toml` | `--check --offline` |
 | `pyobfus-trial start --email <address>` | Pro trial | pyobfus licence server | The email address and a device ID | Run `pyobfus-trial start` without `--email` |
 | Pro licence verification and device release | Pro | pyobfus licence server | The licence key and a device ID | `pyobfus-license register <KEY> --no-verify` |
+| CI build with `PYOBFUS_LICENSE_KEY` set | Pro | pyobfus licence server | The licence key and `activation: "ci"` (no device ID) | Unset the variable and use a registered, cached licence |
 
 ## 1. Dependency check in `--check` (Community)
 
@@ -52,6 +53,12 @@ pyobfus-license register <KEY> --no-verify
 ```
 
 See the [licence activation guide](LICENSE_ACTIVATION_GUIDE.md) for details.
+
+When the `PYOBFUS_LICENSE_KEY` environment variable is set (intended for CI),
+each build sends one request with the licence key and `activation: "ci"`
+instead. No device ID is sent, no device slot is used and nothing is cached:
+every build verifies online, and a build without network access fails rather
+than falling back. See [CI licensing](CI_LICENSING.md).
 
 ## What never goes over the network
 
