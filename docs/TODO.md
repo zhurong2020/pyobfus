@@ -1,6 +1,7 @@
 # TODO
 
 **2026-11-03**：授权检查修复与 CI 授权已合并、Worker 已部署，Core 0.12.0 待批准发版，见下方「下一版 Core 0.12.0」。
+最新工程与运营巡检见 [11-03 执行记录](EXECUTION_PROGRESS_2026-11-03.md)；11-02 自然定时 Guard 已验收成功。
 
 **上一轮会话交接**：[2026-11-01 收尾](SESSION_CLOSEOUT_2026-11-01.md) →
 [执行进度](EXECUTION_PROGRESS_2026-11-01.md)。三个维护 PR 已合并，RTD 部署与云端备份
@@ -18,7 +19,7 @@ Zenodo 已归档 Core 0.11.1（`23796579`）及 MCP 0.3.17（`23796634`）；概
 [`FEATURE_EXPANSION_RESEARCH_2026-10-28.md`](FEATURE_EXPANSION_RESEARCH_2026-10-28.md)；旧版决策快照见[10-20 调研](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)，Python 3.15 的已发布基础范围见 [`PYTHON315_SUPPORT_PLAN.md`](PYTHON315_SUPPORT_PLAN.md)。
 
 当前版本：Core 0.11.1 / MCP 0.3.17 / runtime 0.1.1。
-任务状态以 [11-01 执行表](EXECUTION_PROGRESS_2026-11-01.md) 为入口。
+任务状态以 [11-03 执行表](EXECUTION_PROGRESS_2026-11-03.md) 为入口，11-01 记录保留历史证据。
 
 ## 下一版 Core 0.12.0（2026-11-03 登记，待维护者批准发版）
 
@@ -40,7 +41,6 @@ Zenodo 已归档 Core 0.11.1（`23796579`）及 MCP 0.3.17（`23796634`）；概
 相关后续（不阻塞发版）：
 - 服务器签发短期授权凭证（F2）单独设计，迁移须保持终身授权有效。
 - 可选的 AES-256-GCM 字符串加密（F3），需新产物格式与兼容测试。
-- Dependabot #45：`vscode-extension` 开发依赖 minimatch（moderate），升级到 ≥11.0.1。
 - 给 Codex 的任务模板补一句：跑完所有工作流里的 pytest 命令（含 `benchmarks/llm_resistance`、
   MCP SDK 兼容任务、3.15 环境），本轮这三处均为 CI 才发现。
 
@@ -61,21 +61,21 @@ Zenodo 已归档 Core 0.11.1（`23796579`）及 MCP 0.3.17（`23796634`）；概
 普通 13 单元、手动/定时 21 单元不变；独立 L3 六格与 MCP SDK 六格
 兼容矩阵已纳入 CI。必需检查仍为 CI result + CodeQL，不改 ruleset。
 
-## 当前执行顺序（2026-11-01 复核）
+## 当前执行顺序（2026-11-03 复核）
 
-本轮实际进度见 [11-01 执行状态](EXECUTION_PROGRESS_2026-11-01.md)。
+本轮实际进度见 [11-03 执行状态](EXECUTION_PROGRESS_2026-11-03.md)。
 
 设计、官方资料与验收条件见 [路线复核](ROADMAP_REVIEW_2026-10-30.md)。
 已完成的 P0、纯文档 CI、Core/MCP 发版、Glama 更新与首日 DEV 观察不再排入队列。
 
-1. 11-02 北京时间 09:17 后：核验自然定时 Guard；vbca 文档过滤继续等待自然事件，不制造空提交。
+1. 完成 Core 0.12.0 发布准备，11-04 经批准后发布；扩展依赖修复验收见执行记录。vbca 文档过滤继续等待自然事件，不制造空提交。
 2. 11-04 09:43 CST 后：完成 DEV 一周复盘；首日精确采样无法补回。
 3. 约 11-05 晚：完成 LinkedIn 一周复盘；采用入口已于 11-01 核验。
 4. 收到真实最小复现后：优先正确性与诊断，再决定 L3 覆盖或资源密钥范围。
 5. 有目标平台需求后：按单组合验证 3.15 打包、3.15t 或其他尚未覆盖的交付环境。
 
-跨文件 L3 仍拒绝 free-threaded；当前没有待审的 Core/MCP 发布候选。
-后续状态见 [11-01 执行表](EXECUTION_PROGRESS_2026-11-01.md)。
+跨文件 L3 仍拒绝 free-threaded；Core 0.12.0 已进入待批准发布排期，MCP 是否随发另行决定。
+后续状态见 [11-03 执行表](EXECUTION_PROGRESS_2026-11-03.md)。
 
 ## 后续团队候选：独立的视频原创保护辅助工具（2026-10-23）
 
@@ -122,7 +122,7 @@ Zenodo 已归档 Core 0.11.1（`23796579`）及 MCP 0.3.17（`23796634`）；概
       自动回信称只懂 Claude Code worktree 锁、需真人释放提交锁并主动提出转人工,维护者已回「yes」转人工**。
       09-25 真人支持 Rudy 回信要求核对原提交账号；维护者已查三个常用邮箱均无确认邮件，随后以同一仓库根路径
       复现锁报错，并于 09-26 在原线程附上「No submissions yet」与 repository/path lock 两张截图，提供
-      Claude Code workspace ID，请求后端定位/释放。**09-28 Rudy 回信「已升级内部，有消息再跟进」——球在对方，不必再催；锁没释放前别再点表单或换路径绕过**。**10-14 Tiffany 确认：原提交归属当前账号，无需补材料或寻找别的账号；目录团队解除锁后，使用 `claude.ai/directory/manage` developer portal 重提，Console 表单已停用。继续等待，不换仓库/路径重提。** **10-21 Tiffany 新信：团队仍在处理，取得进展后会通知；无需新动作。** 字段/描述与证据见
+      Claude Code workspace ID，请求后端定位/释放。**09-28 Rudy 回信「已升级内部，有消息再跟进」——球在对方，不必再催；锁没释放前别再点表单或换路径绕过**。**10-14 Tiffany 确认：原提交归属当前账号，无需补材料或寻找别的账号；目录团队解除锁后，使用 `claude.ai/directory/manage` developer portal 重提，Console 表单已停用。继续等待，不换仓库/路径重提。** **10-28 支持更新仍在解除 hold、无需补材料；11-03 复核未见更新。** 字段/描述与证据见
       `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`。
 - [x] **通知 Pro 客户升级到 0.6.1**（10-10 维护者定：发；草稿私有 `docs/internal/content-2026-10/pro_customer_notice_0.6.1.md`，10-10 已按线上许可证记录逐个起草，维护者当日发出（Gmail「已发送」已核）；有回信按 `/pyobfus-inbox` 跟进；取代原「是否通知升级到 0.5.32」，0.6.1 已含该修复）。原登记（2026-10-07）：0.5.10–0.5.31 的目录构建遇到同模块
       装饰器/基类/lambda 会 import 时 NameError。两位 10 月新客户如用过目录构建可能受影响；需要的话由 Claude 起草、
@@ -595,10 +595,10 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
   **已于 09-22 删除**（没等到 09-27 期限，因为它本来就说不准）。微信支付已 Enabled，
   中国买家主路径未受影响。**等 Stripe 真 Enabled 再加回来**；可向 Stripe 支持直接问审核在等什么。
 
-- **下载量复查**：11-01 已核数据至 10-31：Core 30 天安静日 8 个、中位数 53，
-  近 7 天仅 1 个安静日（86），不足认定持续增长；MCP 30 天安静日中位数 13。
-  邮件补核未发现待回复客户支持请求。完整口径与限制见
-  [11-01 执行记录](EXECUTION_PROGRESS_2026-11-01.md)，原始快照及邮件明细仅存私有目录。
+- **下载量复查**：11-03 已核数据至 11-01：Core 30 天安静日 8 个、中位数 56，
+  近 7 天只有 2 个安静日，不足认定持续增长；MCP 30 天安静日中位数 12。
+  邮件补核未发现新增待回复客户支持请求。完整口径与限制见
+  [11-03 执行记录](EXECUTION_PROGRESS_2026-11-03.md)，原始快照及邮件明细仅存私有目录。
   继续每周观察，不作为发版 gate。
 - **归因查询**：GitHub 代码搜索 `uses: zhurong2020/pyobfus-action`，量的是
   可见性不是采纳量。
@@ -649,7 +649,7 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
 
 ## 外部等待（不阻塞本地开发）
 
-- **Claude Plugin Marketplace —— 等待支持团队解除提交锁**。09-28 已升级内部；10-11 Tiffany 回信仍在处理、无需补充材料；10-14 再确认旧提交就在当前账号下、只能由目录团队释放，释放后改到 <https://claude.ai/directory/manage> 用付费账号重提（Console 表单已停用）。10-21 Tiffany 更新仍在处理；10-25 增量检索未见新信。此前“需要重提”的记录已被后端锁事实取代；不反复提交或换路径绕过。维护者清单与私有 `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md` 保留原始证据。
+- **Claude Plugin Marketplace —— 等待支持团队解除提交锁**。09-28 已升级内部；10-14 确认旧提交就在当前账号下、只能由目录团队释放；10-28 支持仍在解除 hold，11-03 复核未见更新。释放后改到 <https://claude.ai/directory/manage> 用付费账号重提（Console 表单已停用）。不反复提交或换路径绕过。原始证据见私有 `docs/internal/ops-2026-11-03/email-review.md` 与既有目录记录。
 - Open VSX namespace 归属验证：可选，`not verified` 是「未申请」不是「被拒」。
 - **Canopii [`canopii-cli#6`](https://github.com/canopii-dev/canopii-cli/issues/6)
   —— 单次 follow-up 已发，等待上游**。2026-09-23 确认 issue 仍 `OPEN`、0 条上游回复后，

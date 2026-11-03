@@ -104,6 +104,24 @@ available from the Command Palette or the status bar menu.
 | `pyobfus: Unlock Pro Edition` | $45 one-time, 30-day money-back guarantee. |
 | `pyobfus: Show Menu` | The same menu the status bar item opens. |
 
+## Development
+
+Use Node.js 22.13 or later on the Node 22 line (CI uses Node 22), plus the
+repository's WSL `venv/` with pyobfus installed. Run `npm ci`, `npm run lint`,
+`npm run typecheck`, then `PYOBFUS_PYTHON_PATH="$(cd .. && pwd)/venv/bin/python3" npm test`
+from this directory. A display is required; use `xvfb-run -a npm test` in a
+headless environment with the same interpreter variable set.
+
+The test host follows the latest VS Code stable release and caches each
+version in `.vscode-test/`. A new stable release can require a download even
+when an older test host is cached.
+
+Development overrides select patched minimatch (`>=11.0.1`) and glob
+(`>=14.0.2`) under the affected development tools. ESLint v10 removes
+the older minimatch API dependency. The lockfile is validated with both
+npm 10 (used by CI's Node 22) and npm 11. Recheck lint, type checking, host tests
+(including coverage), packaging and `npm audit` when changing these overrides.
+
 ## Links
 
 - [pyobfus on GitHub](https://github.com/zhurong2020/pyobfus)
