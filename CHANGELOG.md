@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-11-04
+
 ### Security
 
 - Enforce Pro build entitlement consistently across CLI flags, presets, YAML
@@ -26,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Keep development mypy below 2.0 so fresh development installations retain
+  the configured Python 3.9 checking target.
 - Correct Fernet string-encryption claims to AES-128-CBC with HMAC-SHA256
   (Fernet). Cryptography and generated artifact/runtime formats are unchanged;
   AES-256-GCM descriptions for other Pro mechanisms remain accurate.
