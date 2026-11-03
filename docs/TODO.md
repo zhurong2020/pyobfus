@@ -29,6 +29,10 @@ Zenodo 已归档 Core 0.11.1（`23796579`）及 MCP 0.3.17（`23796634`）；概
 11-03 构建产物演练、公开版对照及真实 CI 授权冒烟已通过；详细执行顺序以
 [本次发布清单](CORE_012_RELEASE_CHECKLIST.md) 为准。演练产物仍带 0.11.1 元数据，不能用于正式上传。
 本次仅发 Core；MCP 0.3.17／runtime 0.1.1／扩展 0.4.3 暂不随发，原因见清单。
+版本文件已准备在 [候选草稿 #181](https://github.com/zhurong2020/pyobfus/pull/181)，
+Action [草稿 #3](https://github.com/zhurong2020/pyobfus-action/pull/3) 的 11 个 hosted 任务已全通过。
+Core 候选 `2bd86ab` 的手动全矩阵 47 个 job／21 个 OS-Python 单元也已全通过。
+发布当日优先采用已审阅候选并核验最终 main/tag；不把草稿或本地产物写成已发布版本。
 
 1. **发版时机**：约 11-04 起（给客户一两天配置 secret），须维护者明确批准。
 2. **发版提交**（同一提交）：`pyproject.toml` 升 0.12.0、`CHANGELOG.md` 把 `[Unreleased]` 改为

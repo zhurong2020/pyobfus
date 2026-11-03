@@ -1,5 +1,19 @@
 # 2026-11-03 项目检查与运营补核
 
+**发版前准备接续**：仅发布 Core 的范围、版本候选、产物演练、真实线上 CI 授权验证、
+发布说明／支持答复草稿及发布后渠道变更步骤均已准备，见
+[0.12.0 发布清单](CORE_012_RELEASE_CHECKLIST.md)。
+[Core 候选 #181](https://github.com/zhurong2020/pyobfus/pull/181)（`2bd86ab`）准备版本、
+README、CHANGELOG、CITATION 预定 11-04 日期，并将开发 mypy 上界修为 `<2`，
+避免 fresh install 的 mypy 2.x 不支持已配置 Python 3.9 目标。
+候选的手动全矩阵 [41562014384](https://github.com/zhurong2020/pyobfus/actions/runs/41562014384)
+47 个 job、21 个 OS／Python 单元均成功，Linux packaging lane 通过。
+[Action 草稿 #3](https://github.com/zhurong2020/pyobfus-action/pull/3) 的
+[11 个 hosted 消费者任务](https://github.com/zhurong2020/pyobfus-action/actions/runs/41561283062) 均成功；
+包含 `license-key` 和 `fail-on: never` 不再隐藏结构化授权错误的修复。
+两份草稿均未合并或发布，Action `v1` 未移动；main 仍为 Core 0.11.1。
+私有产物／答复／渠道补丁记录在 `docs/internal/release-0.12.0-prep-2026-11-03/`。
+
 **修复收尾**：[PR #178](https://github.com/zhurong2020/pyobfus/pull/178) 已合并至 main
 `486ffe9`（11-03 01:02:54 UTC）。PR 最终检查 44 success / 1 按配置 skipped，
 包含 [Core CI 39 jobs](https://github.com/zhurong2020/pyobfus/actions/runs/41555784726)、
