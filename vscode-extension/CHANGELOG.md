@@ -10,8 +10,8 @@ Independent version/release cadence from the main `pyobfus` and `pyobfus-mcp` Py
 
 - Update the development toolchain to patched minimatch and glob releases
   (GHSA-g3hv-75wg-m249 and GHSA-3g3m-2fjr-6pw4). Upgrade ESLint to v10 to
-  remove its legacy minimatch dependency; limit overrides to the affected
-  modern dependency ranges. These dependencies are excluded from the VSIX.
+  remove its legacy minimatch dependency; scope overrides to the affected
+  development tools. These dependencies are excluded from the VSIX.
 
 ### Development
 

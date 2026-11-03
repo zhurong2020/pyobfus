@@ -117,8 +117,9 @@ version in `.vscode-test/`. A new stable release can require a download even
 when an older test host is cached.
 
 Development overrides select patched minimatch (`>=11.0.1`) and glob
-(`>=14.0.2`) for the affected modern dependency ranges. ESLint v10 removes
-the older minimatch API dependency. Recheck lint, type checking, host tests
+(`>=14.0.2`) under the affected development tools. ESLint v10 removes
+the older minimatch API dependency. The lockfile is validated with both
+npm 10 (used by CI's Node 22) and npm 11. Recheck lint, type checking, host tests
 (including coverage), packaging and `npm audit` when changing these overrides.
 
 ## Links

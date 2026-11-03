@@ -52,12 +52,16 @@ Dependabot #45 仍 open：扩展开发工具依赖 minimatch，
 扩展改用 ESLint 10.14.0，移除旧版 ESLint 带入的 minimatch 3；TypeScript ESLint
 现有 8.72.1 支持 ESLint 10，保留现有 lint 规则。Node 开发基线明确为 22.13 以上的 Node 22。
 
-对 minimatch `>=9 <11.0.1` 使用 `^11.0.1` 的有界 override，锁定结果为 11.0.4。
+对具体开发工具的 minimatch 子依赖使用 `^11.0.1` override，锁定结果为 11.0.4。
 复查 audit 另发现 glob 的
 [取消后仍继续遍历漏洞](https://github.com/advisories/GHSA-3g3m-2fjr-6pw4)
-（`GHSA-3g3m-2fjr-6pw4`），对 `>=9 <14.0.2` 使用 `^14.0.2`，锁定结果为 14.0.3。
-这两项 override 只覆盖使用现代导出接口的依赖范围，不把旧 minimatch 3 强行替换为 11。
+（`GHSA-3g3m-2fjr-6pw4`），对具体开发工具的 glob 子依赖使用 `^14.0.2`，锁定结果为 14.0.3。
+这些 override 按实际消费者限定，仅覆盖使用现代导出接口的开发工具，不把旧 minimatch 3 强行替换为 11。
 此前所有旧 minimatch 节点及 glob 10／13 节点均已从 lockfile 移除。
+
+首版范围选择器在 npm 11 本地通过，但 CI 的 npm 10.9.9 拒绝锁文件（`EUSAGE`）；
+本地复现后改为按消费者限定，分别通过 npm 10.9.9 与 npm 11.6.4 的干净安装，
+不靠升级 CI 的 npm 或跳过锁文件校验绕过问题。
 
 干净 `npm ci` 与完整 `npm audit` 均为零漏洞；lint、typecheck、扩展普通测试 53 项、
 带 coverage 的 53 项测试均通过，覆盖了 c8／test-exclude 所在工具链。
@@ -67,7 +71,9 @@ Dependabot #45 仍 open：扩展开发工具依赖 minimatch，
 
 Core／MCP／runtime 源码和版本未改；扩展版本仍为 0.4.3，不为开发依赖单独发布扩展。
 Core 0.12.0 的版本号／横幅／CHANGELOG promotion 与 tag 留到 11-04 发布步骤。
-本地完整检查与四个 Python 测试根在提交前另行复验，hosted CI 以本次修复 PR 为准。
+本地完整检查与四个 Python 测试根在提交前另行复验：Core 4977 passed / 55 skipped、
+MCP 167 passed、集成 368 passed / 10 skipped、runtime 24 passed，基准 8 passed。
+hosted CI 以 [修复 PR #178](https://github.com/zhurong2020/pyobfus/pull/178) 为准。
 
 ## 下载与反馈
 
