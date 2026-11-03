@@ -1,5 +1,12 @@
 # pyobfus 当前计划
 
+**2026-11-03 三项提前准备**：F2 设计草稿已保存在私有
+`docs/internal/f2-signed-lease-2026-11-03/`，尚未实施；进入实现前仍须确认离线迁移、兼容与验收范围。
+[下一项交付验证方案](NEXT_DELIVERY_VALIDATION_PLAN.md)默认选择 Windows Nuitka standalone，
+等待明确目标与正式发布物后执行，不扩大支持承诺。
+[Core 0.12.0 发布后观察表](CORE_012_POST_RELEASE_OBSERVATION.md)已备好时间点、现有基线、
+问题分类及待填模板；发布后数据尚未采集。本轮只准备文档，不改变候选、版本或渠道。
+
 **2026-11-03 发布准备接续**：当前源码 wheel／sdist 构建与 `twine check`、全新环境安装、
 `pip check` 及 Community canary 均通过，并与公开 0.11.1 对照得到相同结果 `25`。
 新产物无授权 Pro 构建被拒，隔离 CI 服务的成功／拒绝／限流／不可达路径通过，
