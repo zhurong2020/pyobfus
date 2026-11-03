@@ -1,5 +1,15 @@
 # pyobfus 当前计划
 
+**2026-11-03 发布准备接续**：当前源码 wheel／sdist 构建与 `twine check`、全新环境安装、
+`pip check` 及 Community canary 均通过，并与公开 0.11.1 对照得到相同结果 `25`。
+新产物无授权 Pro 构建被拒，隔离 CI 服务的成功／拒绝／限流／不可达路径通过，
+维护者自有许可证的真实线上构建与产物执行也通过，未写本地注册状态。
+版本仍为 0.11.1，演练产物不可上传；明日版本提交后重新构建。
+已整理 [Core 0.12.0 发布清单](CORE_012_RELEASE_CHECKLIST.md)，仅发 Core，MCP／runtime／扩展暂不随发；
+发布说明、支持答复及原始证据只留私有 `docs/internal/release-0.12.0-prep-2026-11-03/`。
+Action 独立分支准备 `license-key` 与授权错误门禁修复；本地四项回归及实际 composite 步骤演练通过，
+hosted 消费者验收及后续发布仍须按独立仓规则完成，不移动 `v1`。
+
 **2026-11-03 项目巡检补核**：工程检查、下载、Gmail 与备份新鲜度已复核，见
 [执行记录](EXECUTION_PROGRESS_2026-11-03.md)。本地四个 Python 测试根、基准测试与扩展
 53 项测试均通过；11-02 自然定时 Guard 成功。随后按维护者授权修复扩展 minimatch

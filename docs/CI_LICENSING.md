@@ -27,6 +27,28 @@ Fork pull requests normally cannot access secrets. Run Community checks for
 untrusted contributions and reserve licensed packaging for trusted branches.
 Do not expose secrets to untrusted pull-request code.
 
+### Using the published GitHub Action
+
+With Core 0.12.0+, the currently published Action accepts the license through
+the step environment:
+
+```yaml
+- uses: zhurong2020/pyobfus-action@v1
+  env:
+    PYOBFUS_LICENSE_KEY: ${{ secrets.PYOBFUS_LICENSE_KEY }}
+  with:
+    source: src/
+    mode: build
+    output: dist/
+    preset: commercial
+    pyobfus-version: "0.12.0"
+```
+
+Core 0.12.0 must be published before using this version pin. A dedicated
+Action `license-key` input is being prepared separately; do not use it with
+the existing `v1` tag until that wrapper update is released. The Action's
+`offline` input controls dependency-name lookups, not CI license verification.
+
 ## GitLab CI
 
 Create a **masked**, protected CI/CD variable named `PYOBFUS_LICENSE_KEY` in the

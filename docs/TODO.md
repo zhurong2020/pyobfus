@@ -26,16 +26,20 @@ Zenodo 已归档 Core 0.11.1（`23796579`）及 MCP 0.3.17（`23796634`）；概
 授权检查修复（#175）与 CI 授权 `PYOBFUS_LICENSE_KEY` 已合并，许可 Worker（#174）已部署；
 现有 Pro 客户已于 11-02 收到通知。按顺序：
 
+11-03 构建产物演练、公开版对照及真实 CI 授权冒烟已通过；详细执行顺序以
+[本次发布清单](CORE_012_RELEASE_CHECKLIST.md) 为准。演练产物仍带 0.11.1 元数据，不能用于正式上传。
+本次仅发 Core；MCP 0.3.17／runtime 0.1.1／扩展 0.4.3 暂不随发，原因见清单。
+
 1. **发版时机**：约 11-04 起（给客户一两天配置 secret），须维护者明确批准。
 2. **发版提交**（同一提交）：`pyproject.toml` 升 0.12.0、`CHANGELOG.md` 把 `[Unreleased]` 改为
    `[0.12.0] - <日期>`（Security / Added / Changed / Fixed 已写好）、README「What's new in v0.12.0」横幅
-   （写明 CI 需 `PYOBFUS_LICENSE_KEY`）。打 tag `v0.12.0` 走 OIDC 发布。
+   （写明 CI 需 `PYOBFUS_LICENSE_KEY`），同步 `CITATION.cff` 的版本及实际日期。打 tag `v0.12.0` 走 OIDC 发布。
 3. **发版核验**：全矩阵 CI（`gh workflow run ci.yml --ref main`）+ CodeQL、PyPI PEP 740、全新 venv 安装后
    无授权 Pro 构建被拒且 `PYOBFUS_LICENSE_KEY`（维护者自有授权）构建成功、GitHub Release、Zenodo 与
    `CITATION.cff`、RTD 上 `CI_LICENSING` 页面可访问。
 4. **发版后同步**：pyobfus-action 增加 `license-key` 输入（映射为环境变量，文档示例用 secret）；
    Glama Build steps 改装 `pyobfus==0.12.0`；按多仓同步清单更新 workspace-meta 版本表与工作日志；
-   MCP 是否随发另行决定（MCP 代码本轮未改功能，只有测试）。
+   MCP 本次暂不随发（MCP 代码本轮未改功能，只有测试）。
 5. **验收**：客户来信中 CI 授权相关问题均已答复；Worker 日志无密钥。
 
 相关后续（不阻塞发版）：
