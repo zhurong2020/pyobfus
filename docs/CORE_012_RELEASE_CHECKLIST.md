@@ -41,27 +41,75 @@ The localhost verifier is a test fixture, not evidence of live service behavior;
 the live check is recorded separately. The live check did not re-read the online
 device list, so it is not a fresh device-count comparison.
 
-## Final version commit and checks
+## Prepared release candidates
 
-- [ ] Recheck customer CI replies and any newly failed workflow before proceeding.
-- [ ] Confirm the final release scope above and obtain release approval.
-- [ ] In the same release commit, set `pyproject.toml` to 0.12.0, promote Core's
-  `[Unreleased]` changelog with the real release date, update the README banner,
-  and update `CITATION.cff` version/date. Do not invent a new Zenodo record DOI
-  before the archive exists. Worker logging entries already say deployed.
-- [ ] README and release notes explicitly state that Pro CI builds need
+- [Core draft PR #181](https://github.com/zhurong2020/pyobfus/pull/181), revision
+  `2bd86ab`, prepares the 0.12.0 metadata, README, changelog and citation date
+  together. November 4 is the planned release date, not a claim of publication.
+  This candidate is separate from main and has not been merged or tagged.
+- The candidate also caps development mypy below 2.0: a fresh installation of
+  mypy 2.4.1 reported that the configured Python 3.9 target was unsupported.
+  Fresh resolution to mypy 1.20.2 checks all 119 source files with that target.
+  This is a development dependency fix, not a runtime dependency change.
+- The candidate's [manual full CI run](https://github.com/zhurong2020/pyobfus/actions/runs/41562014384)
+  completed successfully: all **47 jobs**, including all **21 OS/Python cells**,
+  passed on `2bd86ab`. The independent Linux packaging lane also passed.
+  This is candidate evidence; the final adopted main/tag revision is checked
+  separately on release day.
+- Actual **0.12.0** wheel and sdist builds, `twine check`, private-path inspection,
+  fresh installation, `pip check` and canary execution have passed. The wheel
+  also passed unauthorized rejection, isolated verifier cases and a separate
+  real deployed-service owner-license build. These artifacts are candidates,
+  not PyPI distributions or proof of final release provenance.
+- The existing VS Code extension's 53 tests also passed with interpreter
+  resolution explicitly pointing to the fresh 0.12.0 wheel installation.
+  The extension itself remains at 0.4.3.
+- [Action draft PR #3](https://github.com/zhurong2020/pyobfus-action/pull/3),
+  revision `aa9e1b7`, passed all
+  [11 hosted consumer jobs](https://github.com/zhurong2020/pyobfus-action/actions/runs/41561283062).
+  Besides `license-key`, it fixes structured `status: error` / exit-1 responses
+  being hidden by `fail-on: never`. The exact version and moving `v1` tags
+  remain unchanged; the input is not yet in the published Action.
+- The post-Core-publication Action version-pin patch has been prepared and
+  `git apply --check` validated; applying it and verifying the published Core
+  dependency remain post-publication steps. Release-note/support drafts and
+  the Glama package-pin/acceptance plan are retained in private preparation records.
+
+## Candidate preparation checks
+
+- [x] Prepare one candidate commit setting `pyproject.toml` to 0.12.0, promoting
+  Core's changelog with the planned November 4 date, updating the README banner
+  and `CITATION.cff` version/date. No new Zenodo record DOI is invented.
+- [x] Candidate README and draft release notes explicitly state that Pro CI builds need
   `PYOBFUS_LICENSE_KEY` or registered runner state. Link the
   [CI licensing guide](CI_LICENSING.md). Correctly describe Fernet without
   implying that the generated artifact format changed.
-- [ ] Refresh the editable package metadata after the version edit.
-- [ ] Run `scripts/check.sh`, `scripts/check_unreleased_changelogs.py` and
+- [x] Refresh the candidate environment's editable metadata after the version edit.
+- [x] Run `scripts/check.sh`, `scripts/check_unreleased_changelogs.py` and
   `scripts/check_runtime_version.py` with the repository `venv/` Python.
   A sibling's pending changelog is reviewed, not automatically a reason to
   release that package. Record the deliberate deferrals above.
-- [ ] Run each Python test root separately. Include the benchmark smoke/key
+- [x] Run each candidate Python test root separately. Include the benchmark smoke/key
   exposure commands from CI. Verify the MCP SDK and Python 3.15 jobs through
   their maintained workflows rather than assuming the four local roots cover them.
-- [ ] Merge the version commit through normal checks, then run the manual
+- [x] Build actual 0.12.0 wheel/sdist and inspect them. Fresh installs, `pip check`,
+  canary semantics, unauthorized rejection and live owner CI smoke pass.
+- [x] Complete the candidate's full 21-cell matrix, SDK/L3/runtime jobs and
+  packaging lane. Preserve exact revision and workflow results.
+- [x] Refresh customer CI-support mail and confirm the public CI licensing page
+  is readable on November 3. Repeat the mail/deployment check at publication.
+
+## November 4 adoption checks
+
+- [ ] Recheck customer CI replies and newly failed workflows before proceeding.
+- [ ] Confirm the release scope and approval; verify that the candidate's planned
+  date remains correct. If the date changes, update and recheck it.
+- [ ] Adopt the candidate through normal merge checks. Do not reuse an old
+  rehearsal artifact or assume a draft is an already-published release.
+- [ ] On the final version revision, recheck metadata and required commands as
+  applicable; the candidate evidence is retained as preparation, not substituted
+  for the final revision's checks.
+- [ ] Run the manual
   full CI matrix on that exact main revision and verify CodeQL. November 3's
   passing 13-cell push matrix is not the final 21-cell release matrix.
 - [ ] Rebuild wheel/sdist from the final version revision. Run `twine check`,
@@ -90,8 +138,8 @@ device list, so it is not a fresh device-count comparison.
 
 ## Channel follow-up
 
-- [ ] Validate the prepared Action input through hosted consumer tests. After
-  Core 0.12.0 is available, switch its temporary reviewed-source test pin to the
+- [x] Validate the prepared Action input through hosted consumer tests.
+- [ ] After Core 0.12.0 is available, switch its temporary reviewed-source test pin to the
   published wheel, release the wrapper through its own approval path, and only
   then use `license-key` in `@v1` examples. Until then, pass the secret through the
   published Action step's `env: PYOBFUS_LICENSE_KEY`.

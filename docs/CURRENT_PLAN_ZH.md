@@ -8,7 +8,12 @@
 已整理 [Core 0.12.0 发布清单](CORE_012_RELEASE_CHECKLIST.md)，仅发 Core，MCP／runtime／扩展暂不随发；
 发布说明、支持答复及原始证据只留私有 `docs/internal/release-0.12.0-prep-2026-11-03/`。
 Action 独立分支准备 `license-key` 与授权错误门禁修复；本地四项回归及实际 composite 步骤演练通过，
-hosted 消费者验收及后续发布仍须按独立仓规则完成，不移动 `v1`。
+随后经授权提交 [Action 草稿 #3](https://github.com/zhurong2020/pyobfus-action/pull/3)，
+11 个 hosted 消费者任务全通过，未合并或移动 `v1`。
+Core 的版本文件、预定 11-04 日期和 mypy 开发依赖上界修复已准备为
+[候选草稿 #181](https://github.com/zhurong2020/pyobfus/pull/181)；实际 0.12.0 wheel／sdist
+安装演练与真实线上 CI 构建通过，[候选完整矩阵](https://github.com/zhurong2020/pyobfus/actions/runs/41562014384)
+47 个 job（含 21 个 OS／Python 单元）全通过，Linux packaging lane 也通过。main 仍为 0.11.1。
 
 **2026-11-03 项目巡检补核**：工程检查、下载、Gmail 与备份新鲜度已复核，见
 [执行记录](EXECUTION_PROGRESS_2026-11-03.md)。本地四个 Python 测试根、基准测试与扩展
