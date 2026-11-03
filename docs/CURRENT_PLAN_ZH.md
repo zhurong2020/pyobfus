@@ -1,5 +1,12 @@
 # pyobfus 当前计划
 
+**2026-11-03 项目巡检补核**：工程检查、下载、Gmail 与备份新鲜度已复核，见
+[执行记录](EXECUTION_PROGRESS_2026-11-03.md)。本地四个 Python 测试根、基准测试与扩展
+53 项测试均通过；11-02 自然定时 Guard 成功。随后按维护者授权修复扩展 minimatch
+及复查发现的 glob 告警，迁移 ESLint v10，干净安装与完整 npm audit 为 0，扩展测试及打包通过。
+依赖修复进入源码维护，不要求单独发布扩展；远端 CI 与告警关闭情况见执行记录。
+Core 0.12.0 仍待批准，DEV／LinkedIn 一周复盘仍按原日期；无产品发布。
+
 **2026-11-02/03 Pro 授权检查修复 + CI 授权（已合并，未发版）**：Pro 功能此前在部分构建入口
 未统一检查授权，现由 `pyobfus/_entitlement.py` 统一要求有效试用或授权（PR #175 `58b33a3`）；
 同时新增 CI 用环境变量 `PYOBFUS_LICENSE_KEY`（仅环境变量、联网验证、不占设备名额、不落盘、失败即拒绝，
@@ -11,7 +18,7 @@
 **下一步**：约 11-04 起经维护者批准发 Core 0.12.0（版本号、README 横幅、CHANGELOG 同一提交，
 CHANGELOG 中 Worker 条目改为「已部署」）；发版后 pyobfus-action 增加 `license-key` 输入、Glama 改装新版本。
 后续设计：服务器签发的短期授权（F2）、可选 AES-256-GCM 字符串加密（F3）。审核记录在私有
-`docs/internal/pro-gate-2026-11/`。另有 Dependabot #45（vscode-extension 开发依赖 minimatch，moderate）待处理。
+`docs/internal/pro-gate-2026-11/`。扩展依赖告警 #45 的后续修复见上方 11-03 巡检接续。
 
 **最新会话交接（11-01）**：[收尾与冷启动顺序](SESSION_CLOSEOUT_2026-11-01.md)。
 三个维护 PR 已审阅、修订并合并，RTD 部署与当日云端备份核验均已完成。
