@@ -4,7 +4,8 @@
 [执行记录](EXECUTION_PROGRESS_2026-11-03.md)。本地四个 Python 测试根、基准测试与扩展
 53 项测试均通过；11-02 自然定时 Guard 成功。随后按维护者授权修复扩展 minimatch
 及复查发现的 glob 告警，迁移 ESLint v10，干净安装与完整 npm audit 为 0，扩展测试及打包通过。
-依赖修复进入源码维护，不要求单独发布扩展；远端 CI 与告警关闭情况见执行记录。
+依赖修复已随 [#178](https://github.com/zhurong2020/pyobfus/pull/178) 合并，PR 44 项检查成功、
+1 项按配置跳过，Dependabot #45 自动标为 fixed；不要求单独发布扩展。证据见执行记录。
 Core 0.12.0 仍待批准，DEV／LinkedIn 一周复盘仍按原日期；无产品发布。
 
 **2026-11-02/03 Pro 授权检查修复 + CI 授权（已合并，未发版）**：Pro 功能此前在部分构建入口
@@ -16,7 +17,7 @@ Core 0.12.0 仍待批准，DEV／LinkedIn 一周复盘仍按原日期；无产�
 实现经无头 Codex 六轮、Claude 审核；PR 检查全绿，全矩阵 21 组合在 `b87d2fa` 上均通过（macOS 3.9
 在 PR 运行中通过，全矩阵中两次因 GitHub 未分配 runner 被取消）。现有 Pro 客户已于 11-02 收到 CI 变更通知。
 **下一步**：约 11-04 起经维护者批准发 Core 0.12.0（版本号、README 横幅、CHANGELOG 同一提交，
-CHANGELOG 中 Worker 条目改为「已部署」）；发版后 pyobfus-action 增加 `license-key` 输入、Glama 改装新版本。
+Worker 条目已注明部署完成）；发版后 pyobfus-action 增加 `license-key` 输入、Glama 改装新版本。
 后续设计：服务器签发的短期授权（F2）、可选 AES-256-GCM 字符串加密（F3）。审核记录在私有
 `docs/internal/pro-gate-2026-11/`。扩展依赖告警 #45 的后续修复见上方 11-03 巡检接续。
 

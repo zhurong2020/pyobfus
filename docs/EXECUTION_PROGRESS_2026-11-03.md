@@ -1,5 +1,12 @@
 # 2026-11-03 项目检查与运营补核
 
+**修复收尾**：[PR #178](https://github.com/zhurong2020/pyobfus/pull/178) 已合并至 main
+`486ffe9`（11-03 01:02:54 UTC）。PR 最终检查 44 success / 1 按配置 skipped，
+包含 [Core CI 39 jobs](https://github.com/zhurong2020/pyobfus/actions/runs/41555784726)、
+[扩展 CI](https://github.com/zhurong2020/pyobfus/actions/runs/41555785126) 与 CodeQL。
+Dependabot #45 已于 01:03:04 UTC 自动标为 `fixed`，未手动 dismiss。
+本地 main 已同步，未发产品版本；合并后 main 的例行工作流自然触发。
+
 本次未发布产品、部署服务、发送邮件或修改运行依赖。首次检查完成工程健康验收；
 随后按维护者追问补核下载、Gmail、测试缓存原因与待办同步。不能把首次检查称为完整运营巡检。
 
