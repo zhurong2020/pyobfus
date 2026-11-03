@@ -149,5 +149,8 @@ device list, so it is not a fresh device-count comparison.
   the release evidence, and monitor customer CI replies. No duplicate notification
   mail is sent automatically by this checklist.
 
+Use the [post-release observation table](CORE_012_POST_RELEASE_OBSERVATION.md)
+for T0, support triage and subsequent checkpoints; future results remain unfilled.
+
 The DEV one-week review remains November 4 after 09:43 CST; the LinkedIn review
 remains around November 5 evening. Neither is a Core release blocker.
