@@ -86,6 +86,13 @@ evening before evaluating the already-scoped small channel experiment.
 
 ## Remaining timed checks and evidence
 
+Session-end update: [RTD build 35630733](https://app.readthedocs.org/projects/pyobfus/builds/35630733/)
+succeeded on `68bc6d7`; the public CI guide serves the Action v1.1.0 input.
+The natural backup later completed with marker **November 4 09:49:59 CST**,
+but its earlier snapshot still lacks the new release evidence. This resolves
+the uploading state below, not the pending evidence-inclusion check. See the
+[session handoff](SESSION_CLOSEOUT_2026-11-04.md).
+
 - T+24h: **November 5 after 09:27 CST**; T+72h: **November 7 after 09:27 CST**.
   Review support, licensing monitor and reproducible build/runtime issues.
 - The November 4 natural backup was still uploading when checked. Its local

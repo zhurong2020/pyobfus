@@ -1,5 +1,11 @@
 # pyobfus 当前计划
 
+**2026-11-04 会话最终收尾**：[收尾与下一次顺序](SESSION_CLOSEOUT_2026-11-04.md) →
+[冷启动 prompt](COLD_START_PROMPT_2026-11-04.md)。Core 0.12.0、Action v1.1.0／v1、
+Glama 渠道 0.11.3 与 DEV 复盘均已完成；最新已核接续 RTD 构建为 35630733／`68bc6d7`。
+11-04 自然备份已于 09:49:59 完成上云，但快照不含本次新发布证据；仍待下次自然快照核对。
+本轮收尾只同步文档与本机记忆，下一步 T+24h、LinkedIn、T+72h 按下方日期执行。
+
 **2026-11-04 渠道接续与 DEV 复盘完成**：Action #3 已合并为 `3237e16`，最终候选及
 main 各 11 个 hosted 任务全通过；Action v1.1.0 已发布，`v1` 同步指向该版本，Marketplace
 最新版本与 `license-key` 文档已核实。维护者提供 Glama 成功构建和刷新后的发布页面，
@@ -14,8 +20,8 @@ DEV 一周窗口快照：SARIF 阅读 <25、反应/评论 0/0，followers 28；�
 密码学核验均通过；公开 wheel 的 Python 3.12/3.15 全新安装、Community canary、
 无授权拒绝及真实线上自有授权构建通过。GitHub Release、Zenodo `23934493` 和
 RTD 发布 revision 构建均已核实。见[发布核验](CORE_0_12_0_RELEASE_2026-11-04.md)。
-MCP 0.3.17／runtime 0.1.1／扩展 0.4.3 不变；Action 独立发布与 Glama admin
-切换仍待接续，T+24h/72h 和自然备份包含性检查尚未到期。下方“待批准”文字为历史快照。
+MCP 0.3.17／runtime 0.1.1／扩展 0.4.3 不变；Action 与 Glama 已按上方接续记录完成。
+T+24h/72h 和新证据备份包含性仍待后续检查。下方“待批准”文字为历史快照。
 
 **2026-11-03 三项提前准备**：F2 设计草稿已保存在私有
 `docs/internal/f2-signed-lease-2026-11-03/`，尚未实施；进入实现前仍须确认离线迁移、兼容与验收范围。

@@ -240,6 +240,11 @@ patent/release context.
 
 ## Where to look next
 
+- **Session closeout (2026-11-04)**: [final handoff](docs/SESSION_CLOSEOUT_2026-11-04.md)
+  and [cold-start prompt](docs/COLD_START_PROMPT_2026-11-04.md). Core/Action/Glama
+  rollout and DEV review are complete; continue scheduled observations and verify
+  new evidence in the next natural backup. Earlier pending-release notes are historical.
+
 - **Architecture / repository ownership**: [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md).
 - **Community / Pro product boundary**: [`docs/EDITION_BOUNDARY_POLICY.md`](docs/EDITION_BOUNDARY_POLICY.md).
 - **Latest (2026-11-04)**: Core **0.12.0 is published and verified**, tag
