@@ -1,5 +1,11 @@
 # Distribution Channels State
 
+**2026-11-04 渠道与内容观察更新**：Action v1.1.0 / `v1`、Marketplace 最新版本已核实；
+Glama 成功构建 `01a1a435-fda7-7745-ab9b-f6be9267c82a` 已关联渠道 release 0.11.3，
+实际安装 Core 0.12.0 / MCP 0.3.17 / runtime 0.1.1，握手和九工具发现通过。
+DEV 一周复盘已完成：SARIF 阅读 <25、反应/评论 0/0、followers 28；LinkedIn 仍待约 11-05 晚复盘。
+完整证据及 Python/checkout 限制见[接续验收](CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md)。
+
 **2026-10-29 DEV 首日观察已补齐**：维护者提供 Dashboard 文本，
 本次记录于 17:37 CST，距 10-28 09:43 发布约 32 小时，非精确 24 小时采样。
 SARIF 文章阅读 **<25**、反应 **0**、评论 **0**；区间不能转换为精确阅读数。
@@ -19,9 +25,8 @@ For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 **Latest channel update: 2026-11-04.** Core 0.12.0 is published and verified;
 [release evidence](CORE_0_12_0_RELEASE_2026-11-04.md) records PyPI provenance,
 GitHub Release, Zenodo record 23934493 and RTD build 35630172. The concept DOI
-now identifies the Core 0.12.0 archive. Action's separate wrapper release and
-Glama's admin Core pin remain pending; the October 30 Glama image below is
-still the latest verified deployed image.
+now identifies the Core 0.12.0 archive. Action v1.1.0 and Glama channel 0.11.3
+are verified in the follow-up above; the October 30 image below is historical.
 
 **Zenodo release records verified 2026-10-30:** Core v0.11.1 is archived as
 [record 23796579](https://doi.org/10.5281/zenodo.23796579); MCP 0.3.17 is

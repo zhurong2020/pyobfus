@@ -29,25 +29,30 @@ Do not expose secrets to untrusted pull-request code.
 
 ### Using the published GitHub Action
 
-With Core 0.12.0+, the currently published Action accepts the license through
-the step environment:
+Action **v1.1.0** and the updated moving `@v1` tag accept `license-key` with
+Core 0.12.0+. Store the value in an Actions secret:
 
 ```yaml
 - uses: zhurong2020/pyobfus-action@v1
-  env:
-    PYOBFUS_LICENSE_KEY: ${{ secrets.PYOBFUS_LICENSE_KEY }}
   with:
     source: src/
     mode: build
     output: dist/
     preset: commercial
     pyobfus-version: "0.12.0"
+    license-key: ${{ secrets.PYOBFUS_LICENSE_KEY }}
 ```
 
-Core 0.12.0 must be published before using this version pin. A dedicated
-Action `license-key` input is being prepared separately; do not use it with
-the existing `v1` tag until that wrapper update is released. The Action's
-`offline` input controls dependency-name lookups, not CI license verification.
+An explicit non-empty input overrides an inherited `PYOBFUS_LICENSE_KEY`.
+An empty input preserves the calling step's `env: PYOBFUS_LICENSE_KEY`, which
+remains supported. The wrapper forwards the key only through its CLI child's
+environment, never argv or Action outputs. Action v1.1.0 also rejects structured
+CLI tool errors even under `fail-on: never`; findings retain their configured gate.
+
+Action and Core versions are independent. For an immutable wrapper use
+`@v1.1.0` or its exact SHA; `pyobfus-version` separately pins the builder.
+The Action's `offline` input controls dependency-name lookups, not CI license
+verification. See [the verified channel rollout](CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md).
 
 ## GitLab CI
 

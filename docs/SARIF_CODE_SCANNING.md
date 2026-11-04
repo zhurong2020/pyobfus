@@ -134,7 +134,10 @@ The action is at
 [zhurong2020/pyobfus-action](https://github.com/zhurong2020/pyobfus-action)
 ([Marketplace](https://github.com/marketplace/actions/pyobfus-scan-and-build)).
 It also exposes per-severity counts, `files-scanned` and the pyobfus `version`
-as step outputs, and renders a findings table in the job summary.
+as step outputs, and renders a findings table in the job summary. Action
+v1.1.0 keeps structured CLI `status: error` responses as tool failures even
+when the exit code is 1 and `fail-on: never` is selected. Its optional
+`license-key` input is documented in [CI licensing](CI_LICENSING.md).
 
 ### Raw steps, and the pitfall they carry
 

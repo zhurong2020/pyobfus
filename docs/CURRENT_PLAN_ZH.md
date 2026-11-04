@@ -1,5 +1,14 @@
 # pyobfus 当前计划
 
+**2026-11-04 渠道接续与 DEV 复盘完成**：Action #3 已合并为 `3237e16`，最终候选及
+main 各 11 个 hosted 任务全通过；Action v1.1.0 已发布，`v1` 同步指向该版本，Marketplace
+最新版本与 `license-key` 文档已核实。维护者提供 Glama 成功构建和刷新后的发布页面，
+渠道 0.11.3 对应本次构建，安装 Core 0.12.0／MCP 0.3.17／runtime 0.1.1，握手和九工具发现通过。
+DEV 一周窗口快照：SARIF 阅读 <25、反应/评论 0/0，followers 28；不据此推断导流或安装增长。
+详见[渠道接续验收](CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md)。当前自然备份快照早于发布，
+新证据仍待下一次自然快照核对；后续 T+24h/72h 与约 11-05 晚 LinkedIn 观察按日期进行。
+下方 Action／Glama／DEV“待接续”文字为此前历史状态。
+
 **2026-11-04 Core 0.12.0 已发布并核验**：候选 #181 合并为 `73ff6a8`，最终完整矩阵
 47/47（含 21 个 OS/Python 组合）、CodeQL、OIDC 发布、PyPI 双产物哈希与 PEP 740
 密码学核验均通过；公开 wheel 的 Python 3.12/3.15 全新安装、Community canary、

@@ -45,7 +45,9 @@ The GitHub Action lives in `zhurong2020/pyobfus-action`, not this repository.
 GitHub Marketplace requires `action.yml` at the repository root, `uses:`
 fetches that repository, and the Action's moving `v1` tag must not collide with
 Core release tags. It installs or invokes pyobfus; it does not bundle a copy of
-the runtime into generated output.
+the runtime into generated output. Action v1.1.0 adds an optional `license-key`
+input for Core 0.12.0+ CI builds and enforces structured CLI tool-error failures;
+Core remains the owner of licensing and entitlement policy.
 
 ## Repository and distribution map
 

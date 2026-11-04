@@ -11,13 +11,14 @@ T0 指实际 PyPI 发布并完成基础核验的时间，记录 UTC 和 CST；�
 | 时间点 | 检查内容 | 证据与结果 |
 |---|---|---|
 | T0 | 最终 main/tag、GitHub Release、PyPI wheel/sdist 哈希与 PEP 740、fresh install、授权正负例 | 已通过：`v0.12.0` / `73ff6a8`、双产物签名/哈希、3.12/3.15 fresh install、授权正负例；见发布记录 |
-| T0 渠道联动 | Action 采用实际含修复的 revision/tag；Glama 实装 Core/MCP/runtime、握手/九工具；RTD 最终 revision | RTD `35630172` / `73ff6a8` 成功；Action 与 Glama 仍待独立接续，MCP 不新发版本 |
+| T0 渠道联动 | Action 采用实际含修复的 revision/tag；Glama 实装 Core/MCP/runtime、握手/九工具；RTD 最终 revision | RTD 发布 revision 构建成功；Action v1.1.0 / `3237e16`、Glama 渠道 0.11.3 已核实，见接续验收 |
 | T+24h | 客户 CI 回复、配置迁移、有效许可被拒、服务 429/不可达、源码/产物运行问题、CI/监控异常 | 待填写；无来信只记“未发现”，不称所有用户成功 |
 | T+72h | 未解决案例、复现与修复进展；是否需要调整支持说明或暂停相关渠道切换 | 待填写；没有新风险时不重复全量测试 |
 | T+7d | 周度下载、支持问题分类、版本采用可见证据与内容来源；记录样本量和覆盖限制 | 待填写，依据实际上游数据截止日，不强填完整七天 |
 | T+30d | 按既有运营节奏回顾持续需求、交付缺口与 F2 设计是否值得进入实施 | 待填写，不自动转成固定月度发版窗口 |
 
-11-04 09:43 CST 后 DEV 和约 11-05 晚 LinkedIn 是已有单帖复盘日期。
+DEV 11-04 一周复盘已完成，见[接续验收](CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md)；
+约 11-05 晚 LinkedIn 仍是已有单帖复盘日期。
 它们独立于 T0，不用平台账号周报补成某帖的完整首周数据，也不因发布延后自动改掉窗口。
 
 ## 需要观察的信号
@@ -79,7 +80,7 @@ T0 指实际 PyPI 发布并完成基础核验的时间，记录 UTC 和 CST；�
 |---|---|
 | T0 UTC／CST、最终 tag/SHA、检查人 | 2026-11-04 01:27:35 UTC / 09:27:35 CST；`v0.12.0` / `73ff6a8`；发布执行代理 |
 | PyPI 两产物 SHA-256、签名核验、fresh install | 双产物密码学核验、公开 wheel 的 Python 3.12/3.15 fresh install 通过；哈希见发布记录 |
-| Action/Core/Glama/RTD 精确版本与验证链接 | Core 0.12.0；RTD `35630172`；Action/Glama 待接续，见发布记录 |
+| Action/Core/Glama/RTD 精确版本与验证链接 | Core 0.12.0；Action v1.1.0 / `3237e16`；Glama 渠道 0.11.3；RTD 发布及记录 revision 均成功，见接续验收 |
 | 本次观察时间／数据截止日／窗口 | 待发布 |
 | CI 授权、构建、配置问题分类与状态 | 私有去重记录；公开只写去标识工程结论 |
 | 安静日中位数和样本数、渠道指标及比较限制 | 待发布 |

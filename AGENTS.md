@@ -57,6 +57,7 @@ venv/bin/pytest tests/                 # core suite (run each test root separate
 venv/bin/pytest pyobfus_mcp/tests/     # MCP server suite
 venv/bin/pytest integration_tests/     # end-to-end CLI
 venv/bin/pytest pyobfus_runtime/tests/  # redistributable runtime boundary
+venv/bin/pytest benchmarks/llm_resistance/test_smoke.py benchmarks/llm_resistance/test_key_exposure.py
 ```
 
 `scripts/check.sh` is the only list of lint/type/docs paths: CI's lint and
@@ -135,6 +136,11 @@ failure/cancellation; the `protect-main` ruleset requires only `CI result` and
 steps run under bash so the first failing pytest fails the job.
 Core jobs time out after 30 minutes, integration after 15, others after 10.
 New PR pushes cancel superseded runs; main runs are never cancelled by this policy.
+
+Release validation must cover every maintained workflow pytest command, not
+only the four local roots. Verify MCP SDK compatibility and Python 3.15 jobs
+through their maintained hosted workflows, and run the complete manual 21-cell
+matrix on the final release revision.
 
 Targets: Python **3.9–3.15** must all pass. (Python 3.8 was dropped in 0.5.0 —
 EOL 2024-10 — which removed the old `astunparse`/`@requires_py39` flakiness;
@@ -240,8 +246,10 @@ patent/release context.
   `v0.12.0` / `73ff6a8`; final full CI 47/47, CodeQL, PyPI dual-artifact
   cryptographic provenance and fresh installs passed. MCP 0.3.17 / runtime
   0.1.1 / extension 0.4.3 remain unchanged. See
-  [release evidence](docs/CORE_0_12_0_RELEASE_2026-11-04.md); Action and Glama
-  rollout, future observation and natural backup inclusion remain follow-up.
+  [release evidence](docs/CORE_0_12_0_RELEASE_2026-11-04.md) and
+  [channel follow-up](docs/CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md). Action
+  v1.1.0 / `v1`, Glama channel 0.11.3 and DEV one-week review are complete;
+  future observation, LinkedIn and natural backup inclusion remain pending.
 - **Status review and remediation (2026-11-03)**: [engineering and operations evidence](docs/EXECUTION_PROGRESS_2026-11-03.md). Local suites pass; Nov 2 scheduled Guard passed. Downloads and Gmail were refreshed; extension minimatch/glob remediation and ESLint v10 migration are recorded there. Core 0.12.0 remains scheduled for Nov 4, subject to release approval.
 - **Previous execution tracker (2026-11-01)**: [session closeout](docs/SESSION_CLOSEOUT_2026-11-01.md) → [execution progress](docs/EXECUTION_PROGRESS_2026-11-01.md) → [current plan](docs/CURRENT_PLAN_ZH.md). Three maintenance PRs are merged; RTD deployment and backup verification are complete. Next: Nov 2 scheduled Guard, Nov 4 DEV review, and around Nov 5 LinkedIn review. Core 0.11.1 / MCP 0.3.17 / runtime 0.1.1 are unchanged. Earlier session records are historical.
 - **Current plan / daily source of truth**: [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md).
