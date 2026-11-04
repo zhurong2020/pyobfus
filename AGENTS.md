@@ -236,7 +236,12 @@ patent/release context.
 
 - **Architecture / repository ownership**: [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md).
 - **Community / Pro product boundary**: [`docs/EDITION_BOUNDARY_POLICY.md`](docs/EDITION_BOUNDARY_POLICY.md).
-- **Latest (2026-11-03)**: Pro entitlement fix (#175) and CI licensing via `PYOBFUS_LICENSE_KEY` are merged; the license Worker (#174) is deployed. Core 0.12.0 is not yet released — see the top of [current plan](docs/CURRENT_PLAN_ZH.md) and [TODO](docs/TODO.md).
+- **Latest (2026-11-04)**: Core **0.12.0 is published and verified**, tag
+  `v0.12.0` / `73ff6a8`; final full CI 47/47, CodeQL, PyPI dual-artifact
+  cryptographic provenance and fresh installs passed. MCP 0.3.17 / runtime
+  0.1.1 / extension 0.4.3 remain unchanged. See
+  [release evidence](docs/CORE_0_12_0_RELEASE_2026-11-04.md); Action and Glama
+  rollout, future observation and natural backup inclusion remain follow-up.
 - **Status review and remediation (2026-11-03)**: [engineering and operations evidence](docs/EXECUTION_PROGRESS_2026-11-03.md). Local suites pass; Nov 2 scheduled Guard passed. Downloads and Gmail were refreshed; extension minimatch/glob remediation and ESLint v10 migration are recorded there. Core 0.12.0 remains scheduled for Nov 4, subject to release approval.
 - **Previous execution tracker (2026-11-01)**: [session closeout](docs/SESSION_CLOSEOUT_2026-11-01.md) → [execution progress](docs/EXECUTION_PROGRESS_2026-11-01.md) → [current plan](docs/CURRENT_PLAN_ZH.md). Three maintenance PRs are merged; RTD deployment and backup verification are complete. Next: Nov 2 scheduled Guard, Nov 4 DEV review, and around Nov 5 LinkedIn review. Core 0.11.1 / MCP 0.3.17 / runtime 0.1.1 are unchanged. Earlier session records are historical.
 - **Current plan / daily source of truth**: [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md).

@@ -34,6 +34,6 @@ keywords:
   - stack-trace mapping
   - AI-assisted debugging
 # Zenodo concept DOI (all versions — always resolves to the latest archive).
-# Verified v0.11.1 archive: 10.5281/zenodo.23796579 (2026-10-30).
-# MCP 0.3.17 archive is the latest record: 10.5281/zenodo.23796634.
+# Verified v0.12.0 archive: 10.5281/zenodo.23934493 (2026-11-04).
+# Concept DOI resolves to this Core archive at the verification date.
 doi: 10.5281/zenodo.20846053

@@ -59,7 +59,24 @@ pypi-attestations verify pypi \
 Repeat for each wheel/sdist you intend to trust or mirror. Do not verify only
 one file and assume the whole release is covered.
 
-## Latest Verified Snapshot — 2026-10-30
+## Latest Verified Snapshot — 2026-11-04
+
+Core 0.12.0 wheel and sdist passed repository-bound cryptographic verification
+with `pypi-attestations verify pypi --repository`. Downloaded hashes match PyPI
+JSON and the hosted OIDC publishing log; certificate identities match final
+commit `73ff6a8ec20b4c93aa25ea1572d3b5909cf2605c` and `refs/tags/v0.12.0`.
+
+| Artifact | SHA-256 |
+|---|---|
+| wheel | `fee25a032b0bfc4cda56abc2fa908d261c71f1c0f269a7ee90e1c04e6793e755` |
+| sdist | `b33e0998fe9d52db5e46ec3362280700f56cf7f276f297972ee77ff364f5a6de` |
+
+See [final release validation](CORE_0_12_0_RELEASE_2026-11-04.md) and the
+[OIDC publication](https://github.com/zhurong2020/pyobfus/actions/runs/41753931632).
+Fresh published-wheel installations on Python 3.12/3.15 and a separate real
+owner-license CI build passed. MCP 0.3.17 and runtime 0.1.1 are unchanged.
+
+## Previous Verified Snapshot — 2026-10-30
 
 Core 0.11.1 and MCP 0.3.17 were published from the same reviewed commit on
 2026-10-30. `pypi-attestations 0.0.30 verify pypi --repository`

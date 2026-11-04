@@ -1,6 +1,8 @@
 # Core 0.12.0 发布后观察表
 
-准备日期：2026-11-03。状态：观察模板，0.12.0 尚未发布，未来栏位均待填写。
+准备日期：2026-11-03；T0 更新：2026-11-04。Core 0.12.0 已发布并完成基础核验；
+T0 为 **01:27:35 UTC / 09:27:35 CST**，见[发布记录](CORE_0_12_0_RELEASE_2026-11-04.md)。
+未来观察栏位仍待填写。
 T0 指实际 PyPI 发布并完成基础核验的时间，记录 UTC 和 CST；预定 11-04 不当作已发生时间。
 本表沿用 [发布清单](CORE_012_RELEASE_CHECKLIST.md) 和现有统计脚本，不新增遥测、付费服务或抓取任务。
 
@@ -8,8 +10,8 @@ T0 指实际 PyPI 发布并完成基础核验的时间，记录 UTC 和 CST；�
 
 | 时间点 | 检查内容 | 证据与结果 |
 |---|---|---|
-| T0 | 最终 main/tag、GitHub Release、PyPI wheel/sdist 哈希与 PEP 740、fresh install、授权正负例 | 待发布填写；复用发布清单验收，不重新发明一套发布流程 |
-| T0 渠道联动 | Action 采用实际含修复的 revision/tag；Glama 实装 Core/MCP/runtime、握手/九工具；RTD 最终 revision | 待填写；只更新 Core 不意味着 MCP Registry 有新版本 |
+| T0 | 最终 main/tag、GitHub Release、PyPI wheel/sdist 哈希与 PEP 740、fresh install、授权正负例 | 已通过：`v0.12.0` / `73ff6a8`、双产物签名/哈希、3.12/3.15 fresh install、授权正负例；见发布记录 |
+| T0 渠道联动 | Action 采用实际含修复的 revision/tag；Glama 实装 Core/MCP/runtime、握手/九工具；RTD 最终 revision | RTD `35630172` / `73ff6a8` 成功；Action 与 Glama 仍待独立接续，MCP 不新发版本 |
 | T+24h | 客户 CI 回复、配置迁移、有效许可被拒、服务 429/不可达、源码/产物运行问题、CI/监控异常 | 待填写；无来信只记“未发现”，不称所有用户成功 |
 | T+72h | 未解决案例、复现与修复进展；是否需要调整支持说明或暂停相关渠道切换 | 待填写；没有新风险时不重复全量测试 |
 | T+7d | 周度下载、支持问题分类、版本采用可见证据与内容来源；记录样本量和覆盖限制 | 待填写，依据实际上游数据截止日，不强填完整七天 |
@@ -75,9 +77,9 @@ T0 指实际 PyPI 发布并完成基础核验的时间，记录 UTC 和 CST；�
 
 | 字段 | 待填写 |
 |---|---|
-| T0 UTC／CST、最终 tag/SHA、检查人 | 待发布 |
-| PyPI 两产物 SHA-256、签名核验、fresh install | 待发布 |
-| Action/Core/Glama/RTD 精确版本与验证链接 | 待发布 |
+| T0 UTC／CST、最终 tag/SHA、检查人 | 2026-11-04 01:27:35 UTC / 09:27:35 CST；`v0.12.0` / `73ff6a8`；发布执行代理 |
+| PyPI 两产物 SHA-256、签名核验、fresh install | 双产物密码学核验、公开 wheel 的 Python 3.12/3.15 fresh install 通过；哈希见发布记录 |
+| Action/Core/Glama/RTD 精确版本与验证链接 | Core 0.12.0；RTD `35630172`；Action/Glama 待接续，见发布记录 |
 | 本次观察时间／数据截止日／窗口 | 待发布 |
 | CI 授权、构建、配置问题分类与状态 | 私有去重记录；公开只写去标识工程结论 |
 | 安静日中位数和样本数、渠道指标及比较限制 | 待发布 |

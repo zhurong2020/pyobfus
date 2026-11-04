@@ -1,8 +1,9 @@
 # Core 0.12.0 release checklist
 
 Prepared 2026-11-03 for a release on or after 2026-11-04. This is a preparation
-record, not evidence that 0.12.0 has been published. Release approval is separate
-from approval to prepare and test the changes.
+record. **Released and verified November 4**; see the
+[final release evidence](CORE_0_12_0_RELEASE_2026-11-04.md). Explicit release
+approval was obtained separately from preparation approval.
 
 ## Scope
 
@@ -101,39 +102,39 @@ device list, so it is not a fresh device-count comparison.
 
 ## November 4 adoption checks
 
-- [ ] Recheck customer CI replies and newly failed workflows before proceeding.
-- [ ] Confirm the release scope and approval; verify that the candidate's planned
+- [x] Recheck customer CI replies and newly failed workflows before proceeding.
+- [x] Confirm the release scope and approval; verify that the candidate's planned
   date remains correct. If the date changes, update and recheck it.
-- [ ] Adopt the candidate through normal merge checks. Do not reuse an old
+- [x] Adopt the candidate through normal merge checks. Do not reuse an old
   rehearsal artifact or assume a draft is an already-published release.
-- [ ] On the final version revision, recheck metadata and required commands as
+- [x] On the final version revision, recheck metadata and required commands as
   applicable; the candidate evidence is retained as preparation, not substituted
   for the final revision's checks.
-- [ ] Run the manual
+- [x] Run the manual
   full CI matrix on that exact main revision and verify CodeQL. November 3's
   passing 13-cell push matrix is not the final 21-cell release matrix.
-- [ ] Rebuild wheel/sdist from the final version revision. Run `twine check`,
+- [x] Rebuild wheel/sdist from the final version revision. Run `twine check`,
   inspect wheel contents, install in a fresh environment outside checkout import
   paths, run `pip check`, the canary and the entitlement checks, and retain hashes.
 
 ## Publish and verify
 
-- [ ] Confirm the release tag points to the checked version revision. Push
+- [x] Confirm the release tag points to the checked version revision. Push
   `v0.12.0` only as the authorized release step; `release.yml` uses PyPI Trusted
   Publishing/OIDC with PEP 740 attestations. Do not substitute a manual token
   upload, or invoke the workflow's publishing fallback as a dry run.
-- [ ] Verify PyPI version and wheel/sdist hashes against the workflow artifacts.
+- [x] Verify PyPI version and wheel/sdist hashes against the workflow artifacts.
   Cryptographically verify both distributions under the
   [provenance runbook](RELEASE_PROVENANCE_VERIFICATION.md); an HTTP 200 alone is
   only an attestation-presence check.
-- [ ] Fresh-install the exact PyPI 0.12.0 wheel, check dependency resolution,
+- [x] Fresh-install the exact PyPI 0.12.0 wheel, check dependency resolution,
   and repeat Community, no-license rejection and live owner CI smoke cases.
-- [ ] Verify GitHub Release notes, Zenodo's archive/version and concept DOI,
+- [x] Verify GitHub Release notes, Zenodo's archive/version and concept DOI,
   then update the verified DOI evidence and citation record as needed.
-- [ ] Verify Read the Docs' latest successful build revision and the public
+- [x] Verify Read the Docs' latest successful build revision and the public
   `CI_LICENSING` page. If a local challenge blocks access, distinguish the
   access limitation from an actual deployment failure.
-- [ ] Prepare a short release verification record; keep customer and credential
+- [x] Prepare a short release verification record; keep customer and credential
   details in ignored private records.
 
 ## Channel follow-up
