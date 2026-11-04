@@ -13,6 +13,9 @@ Core 0.12.0、Action v1.1.0／v1、Glama 渠道 0.11.3 和 DEV 一周复盘均�
 当前版本：Core 0.12.0 / MCP 0.3.17 / runtime 0.1.1。
 任务状态以 [11-04 发布核验](CORE_0_12_0_RELEASE_2026-11-04.md) 为入口，较早记录保留历史证据。
 
+晚间[巡检](OPERATIONS_REVIEW_2026-11-04.md)已补核下载、邮件与当前部署；
+下载截止 11-03，不替代发布 T+24h 检查。下一次自然备份包含性检查须同时覆盖本次巡检私有记录。
+
 ## Core 0.12.0 发布后接续（2026-11-04）
 
 Core 0.12.0 已发布并通过[核验](CORE_0_12_0_RELEASE_2026-11-04.md)。
@@ -110,7 +113,7 @@ Action v1.1.0 / `v1` 与 Glama 渠道 0.11.3 已完成；DEV 一周复盘已记�
       自动回信称只懂 Claude Code worktree 锁、需真人释放提交锁并主动提出转人工,维护者已回「yes」转人工**。
       09-25 真人支持 Rudy 回信要求核对原提交账号；维护者已查三个常用邮箱均无确认邮件，随后以同一仓库根路径
       复现锁报错，并于 09-26 在原线程附上「No submissions yet」与 repository/path lock 两张截图，提供
-      Claude Code workspace ID，请求后端定位/释放。**09-28 Rudy 回信「已升级内部，有消息再跟进」——球在对方，不必再催；锁没释放前别再点表单或换路径绕过**。**10-14 Tiffany 确认：原提交归属当前账号，无需补材料或寻找别的账号；目录团队解除锁后，使用 `claude.ai/directory/manage` developer portal 重提，Console 表单已停用。继续等待，不换仓库/路径重提。** **10-28 支持更新仍在解除 hold、无需补材料；11-03 复核未见更新。** 字段/描述与证据见
+      Claude Code workspace ID，请求后端定位/释放。**09-28 Rudy 回信「已升级内部，有消息再跟进」——球在对方，不必再催；锁没释放前别再点表单或换路径绕过**。**10-14 Tiffany 确认：原提交归属当前账号，无需补材料或寻找别的账号；目录团队解除锁后，使用 `claude.ai/directory/manage` developer portal 重提，Console 表单已停用。继续等待，不换仓库/路径重提。** **10-28 支持更新仍在解除 hold、无需补材料；11-04 复核仍待审核，继续等待；最新证据见私有 `docs/internal/operations-review-2026-11-04/email-review.md`。** 字段/描述与证据见
       `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`。
 - [x] **通知 Pro 客户升级到 0.6.1**（10-10 维护者定：发；草稿私有 `docs/internal/content-2026-10/pro_customer_notice_0.6.1.md`，10-10 已按线上许可证记录逐个起草，维护者当日发出（Gmail「已发送」已核）；有回信按 `/pyobfus-inbox` 跟进；取代原「是否通知升级到 0.5.32」，0.6.1 已含该修复）。原登记（2026-10-07）：0.5.10–0.5.31 的目录构建遇到同模块
       装饰器/基类/lambda 会 import 时 NameError。两位 10 月新客户如用过目录构建可能受影响；需要的话由 Claude 起草、
@@ -637,7 +640,7 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
 
 ## 外部等待（不阻塞本地开发）
 
-- **Claude Plugin Marketplace —— 等待支持团队解除提交锁**。09-28 已升级内部；10-14 确认旧提交就在当前账号下、只能由目录团队释放；10-28 支持仍在解除 hold，11-03 复核未见更新。释放后改到 <https://claude.ai/directory/manage> 用付费账号重提（Console 表单已停用）。不反复提交或换路径绕过。原始证据见私有 `docs/internal/ops-2026-11-03/email-review.md` 与既有目录记录。
+- **Claude Plugin Marketplace —— 等待支持团队解除提交锁**。09-28 已升级内部；10-14 确认旧提交就在当前账号下、只能由目录团队释放；10-28 支持仍在解除 hold，11-04 复核仍待审核，继续等待；最新证据见私有 `docs/internal/operations-review-2026-11-04/email-review.md`。释放后改到 <https://claude.ai/directory/manage> 用付费账号重提（Console 表单已停用）。不反复提交或换路径绕过。原始证据见私有 `docs/internal/ops-2026-11-03/email-review.md` 与既有目录记录。
 - Open VSX namespace 归属验证：可选，`not verified` 是「未申请」不是「被拒」。
 - **Canopii [`canopii-cli#6`](https://github.com/canopii-dev/canopii-cli/issues/6)
   —— 单次 follow-up 已发，等待上游**。2026-09-23 确认 issue 仍 `OPEN`、0 条上游回复后，
