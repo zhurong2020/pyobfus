@@ -4,7 +4,7 @@
 请在 ~/projects/pyobfus 续接发布后的观察工作。
 先读 AGENTS.md、docs/SESSION_CLOSEOUT_2026-11-04.md、
 docs/CORE_0_12_0_RELEASE_2026-11-04.md、
-docs/CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md，再读 CURRENT_PLAN_ZH.md / TODO.md。
+docs/CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md，再读 OPERATIONS_REVIEW_2026-11-04.md 和 CURRENT_PLAN_ZH.md / TODO.md。
 
 已完成：Core 0.12.0（v0.12.0 / 73ff6a8）、完整 CI 47/47 / 21 组合、
 PyPI 双产物密码学签名、fresh install 和真实 Pro CI 冒烟；Action v1.1.0 / v1
@@ -13,6 +13,8 @@ PyPI 双产物密码学签名、fresh install 和真实 Pro CI 冒烟；Action v
 MCP/runtime/扩展版本未另发。DEV 一周复盘已完成，阅读 <25、反应/评论 0/0、followers 28。
 不要重复发版、移动 tag、Glama build 或 DEV 复盘。
 
+晚间已补核：下载截至 11-03，尚不包含 0.12.0 发布日；RTD 35630935 / 9c87645 成功。
+邮件相关结论和私有记录入口见晚间巡检；下一次自然备份需包含该巡检证据。
 下次先重新核 Git/CI/RTD 的最新 revision，不把历史 build ID 当作当前状态。
 按北京时间依次推进：
 1. 11-05 09:27 后 T+24h：支持来信、许可监控、构建/运行问题。
