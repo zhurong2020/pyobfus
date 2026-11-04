@@ -28,6 +28,14 @@ your application checks on the output, and restore a traceback. The
 record maintained compatibility and tested limits. Start custom integration
 with configuration or a thin wrapper when these interfaces fit your task.
 
+> **What's new in v0.12.0:** Pro builds consistently require a license or
+> active trial. CI builds can verify online through the secret
+> `PYOBFUS_LICENSE_KEY` environment variable without consuming device slots
+> or saving registration state. See the
+> [CI licensing guide](https://pyobfus.readthedocs.io/en/latest/CI_LICENSING/).
+> String encryption uses Fernet (AES-128-CBC with HMAC-SHA256); the description
+> is corrected, while cryptography and generated artifact formats are unchanged.
+>
 > **What's new in v0.11.1:** `--check-delivery` now bounds directory and
 > wheel inspection, rejects unsafe paths and malformed evidence, and reports
 > incomplete scans as errors instead of clean results. See the
