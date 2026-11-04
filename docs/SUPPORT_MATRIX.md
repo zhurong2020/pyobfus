@@ -1,9 +1,10 @@
 # Support matrix
 
-What is actually verified, by what, as of 2026-10-27 (`pyobfus` 0.10.0 adds an opt-in multi-module L3 preview;
-0.9.1 added `--trace-encoding`; 0.9.0 added independent-build mapping; 0.8.0 added Python 3.15 /
-`pyobfus-mcp` 0.3.16 / `pyobfus-runtime` 0.1.1 /
-VS Code extension 0.4.3 / `pyobfus-action` 1.0.1).
+What is actually verified, by what, as of 2026-11-04 (`pyobfus` 0.12.0 /
+`pyobfus-mcp` 0.3.17 / `pyobfus-runtime` 0.1.1 / VS Code extension 0.4.3 /
+`pyobfus-action` 1.1.0). See the [Core release evidence](CORE_0_12_0_RELEASE_2026-11-04.md)
+and [Action/Glama follow-up](CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md) for exact
+revisions and tested limits; version updates do not broaden the cells below.
 
 Four labels, used strictly:
 
@@ -38,7 +39,7 @@ existing compatibility contract. L3 bytecode requires the builder's minor.
 | `pyobfus-mcp` server | tested (3.11, 3.13, 3.15) | advisory-only | advisory-only | `ci.yml` jobs `mcp-tests` (3.11/3.15), `mcp-sdk-latest` and `mcp-sdk-compat` (3.13) |
 | Opt-in cross-file L3 preview (3.10/3.12/3.15) | tested | advisory-only | tested | `ci.yml` job `crossfile-opacity` runs feature, mapping and delivery tests with the public runtime 0.1.1 wheel; see [restricted scope](CROSSFILE_OPACITY_VALIDATION.md). Artifacts require the same CPython implementation/minor and GIL mode as the builder. |
 | VS Code extension | tested (Node 22, Python 3.12) | advisory-only | advisory-only | `vscode-extension-ci.yml`, headless xvfb |
-| `pyobfus-action` composite wrapper | tested | tested | tested | External `zhurong2020/pyobfus-action` CI runs the local action against real clean/risky fixtures on all three hosted-runner OS families; Action release 1.0.1 |
+| `pyobfus-action` composite wrapper | tested | tested | tested | External `zhurong2020/pyobfus-action` CI runs the local action against real clean/risky fixtures on all three hosted-runner OS families; Action release 1.1.0; explicit/inherited CI license forwarding and denied-build gating use exact Core 0.12.0 on all three OS families |
 | Free-threaded 3.14 (`--disable-gil`) | verified once, 2026-08-20 | advisory-only | advisory-only | Manual run of the full core suite plus an end-to-end smoke on a downloaded free-threaded build; not in CI. See [`PYTHON314_FREETHREADING.md`](PYTHON314_FREETHREADING.md) |
 | Free-threaded 3.15 (`--disable-gil`), Community/Core and selected runtime paths | verified once, 2026-10-28 | advisory-only | advisory-only | Local 3.15.2 no-GIL build, bounded build/execute/traceback, 44 targeted Core/runtime tests plus 68 selected runtime tests and a two-thread provider probe; current checkout, not a public-wheel or full-suite claim. Cross-file L3 preflight still rejects this mode. See [dated validation](PYTHON315_FREETHREADING_VALIDATION_2026-10-28.md). |
 

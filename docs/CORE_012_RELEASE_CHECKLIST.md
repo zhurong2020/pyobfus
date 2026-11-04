@@ -139,19 +139,21 @@ device list, so it is not a fresh device-count comparison.
 
 ## Channel follow-up
 
-- [x] Validate the prepared Action input through hosted consumer tests.
-- [ ] After Core 0.12.0 is available, switch its temporary reviewed-source test pin to the
-  published wheel, release the wrapper through its own approval path, and only
-  then use `license-key` in `@v1` examples. Until then, pass the secret through the
-  published Action step's `env: PYOBFUS_LICENSE_KEY`.
-- [ ] Update Glama's installation step to `pyobfus==0.12.0`, then verify the
-  build, MCP handshake and nine tools. Do not bump MCP solely for this install pin.
-- [ ] Update workspace version records, verify the next natural backup includes
-  the release evidence, and monitor customer CI replies. No duplicate notification
-  mail is sent automatically by this checklist.
+See [November 4 follow-up verification](CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md).
+
+- [x] Validate the Action input through hosted consumer tests against published
+  Core 0.12.0; final candidate and main each passed all 11 jobs.
+- [x] Release Action v1.1.0, update moving `v1`, verify Marketplace and examples.
+- [x] Update Glama's Core pin, verify installed versions, build, handshake and
+  nine tools; refreshed admin evidence associates release 0.11.3 with this build.
+- [x] Update workspace version records for the Core release. Channel follow-up
+  synchronization is included with the November 4 follow-up record.
+- [ ] Verify the next natural backup includes the release and channel evidence;
+  the in-flight November 4 snapshot predates these files. Continue support
+  observation at its scheduled checkpoints. No automatic duplicate mail is sent.
 
 Use the [post-release observation table](CORE_012_POST_RELEASE_OBSERVATION.md)
 for T0, support triage and subsequent checkpoints; future results remain unfilled.
 
-The DEV one-week review remains November 4 after 09:43 CST; the LinkedIn review
-remains around November 5 evening. Neither is a Core release blocker.
+The DEV one-week review is complete in the follow-up record; the LinkedIn
+review remains around November 5 evening. Neither is a Core release blocker.
