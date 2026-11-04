@@ -1,6 +1,6 @@
 # TODO
 
-**2026-11-03**：授权检查修复与 CI 授权已合并、Worker 已部署，Core 0.12.0 待批准发版，见下方「下一版 Core 0.12.0」。
+**2026-11-04**：Core 0.12.0 已发布并核验，见[发布记录](CORE_0_12_0_RELEASE_2026-11-04.md)及下方渠道接续。
 最新工程与运营巡检见 [11-03 执行记录](EXECUTION_PROGRESS_2026-11-03.md)；11-02 自然定时 Guard 已验收成功。
 
 **上一轮会话交接**：[2026-11-01 收尾](SESSION_CLOSEOUT_2026-11-01.md) →
@@ -18,39 +18,26 @@ Zenodo 已归档 Core 0.11.1（`23796579`）及 MCP 0.3.17（`23796634`）；概
 顺序做」，不记录历史。最新依据见
 [`FEATURE_EXPANSION_RESEARCH_2026-10-28.md`](FEATURE_EXPANSION_RESEARCH_2026-10-28.md)；旧版决策快照见[10-20 调研](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)，Python 3.15 的已发布基础范围见 [`PYTHON315_SUPPORT_PLAN.md`](PYTHON315_SUPPORT_PLAN.md)。
 
-当前版本：Core 0.11.1 / MCP 0.3.17 / runtime 0.1.1。
-任务状态以 [11-03 执行表](EXECUTION_PROGRESS_2026-11-03.md) 为入口，11-01 记录保留历史证据。
+当前版本：Core 0.12.0 / MCP 0.3.17 / runtime 0.1.1。
+任务状态以 [11-04 发布核验](CORE_0_12_0_RELEASE_2026-11-04.md) 为入口，较早记录保留历史证据。
 
-## 下一版 Core 0.12.0（2026-11-03 登记，待维护者批准发版）
+## Core 0.12.0 发布后接续（2026-11-04）
 
-授权检查修复（#175）与 CI 授权 `PYOBFUS_LICENSE_KEY` 已合并，许可 Worker（#174）已部署；
-现有 Pro 客户已于 11-02 收到通知。按顺序：
+Core 0.12.0 已发布并通过[核验](CORE_0_12_0_RELEASE_2026-11-04.md)。
+MCP 0.3.17／runtime 0.1.1／扩展 0.4.3 不随发；正式发布准备项已移出本节。
 
-11-03 构建产物演练、公开版对照及真实 CI 授权冒烟已通过；详细执行顺序以
-[本次发布清单](CORE_012_RELEASE_CHECKLIST.md) 为准。演练产物仍带 0.11.1 元数据，不能用于正式上传。
-本次仅发 Core；MCP 0.3.17／runtime 0.1.1／扩展 0.4.3 暂不随发，原因见清单。
-版本文件已准备在 [候选草稿 #181](https://github.com/zhurong2020/pyobfus/pull/181)，
-Action [草稿 #3](https://github.com/zhurong2020/pyobfus-action/pull/3) 的 11 个 hosted 任务已全通过。
-Core 候选 `2bd86ab` 的手动全矩阵 47 个 job／21 个 OS-Python 单元也已全通过。
-发布当日优先采用已审阅候选并核验最终 main/tag；不把草稿或本地产物写成已发布版本。
-
-1. **发版时机**：约 11-04 起（给客户一两天配置 secret），须维护者明确批准。
-2. **发版提交**（同一提交）：`pyproject.toml` 升 0.12.0、`CHANGELOG.md` 把 `[Unreleased]` 改为
-   `[0.12.0] - <日期>`（Security / Added / Changed / Fixed 已写好）、README「What's new in v0.12.0」横幅
-   （写明 CI 需 `PYOBFUS_LICENSE_KEY`），同步 `CITATION.cff` 的版本及实际日期。打 tag `v0.12.0` 走 OIDC 发布。
-3. **发版核验**：全矩阵 CI（`gh workflow run ci.yml --ref main`）+ CodeQL、PyPI PEP 740、全新 venv 安装后
-   无授权 Pro 构建被拒且 `PYOBFUS_LICENSE_KEY`（维护者自有授权）构建成功、GitHub Release、Zenodo 与
-   `CITATION.cff`、RTD 上 `CI_LICENSING` 页面可访问。
-4. **发版后同步**：pyobfus-action 增加 `license-key` 输入（映射为环境变量，文档示例用 secret）；
-   Glama Build steps 改装 `pyobfus==0.12.0`；按多仓同步清单更新 workspace-meta 版本表与工作日志；
-   MCP 本次暂不随发（MCP 代码本轮未改功能，只有测试）。
-5. **验收**：客户来信中 CI 授权相关问题均已答复；Worker 日志无密钥。
-
-相关后续（不阻塞发版）：
-- F2 设计草稿已备于私有 `docs/internal/f2-signed-lease-2026-11-03/`；下一步确认离线迁移、兼容与验收范围后再决定实现，迁移须保持终身授权有效。
-- 可选的 AES-256-GCM 字符串加密（F3），需新产物格式与兼容测试。
-- 给 Codex 的任务模板补一句：跑完所有工作流里的 pytest 命令（含 `benchmarks/llm_resistance`、
-  MCP SDK 兼容任务、3.15 环境），本轮这三处均为 CI 才发现。
+1. **Action 独立发布**：草稿 #3 的 post-Core pin 改用 PyPI `pyobfus==0.12.0`，
+   重新验收 hosted 消费者后，经独立批准合并、发布精确版本并移动 `v1`。
+   在此之前公开 Action 继续使用 step `env: PYOBFUS_LICENSE_KEY`，不宣称 `license-key` 已上线。
+2. **Glama admin 切换**：安装固定为 Core 0.12.0 / MCP 0.3.17，复验实际安装版本、
+   镜像构建、MCP 握手和九工具发现；当前会话没有 Glama admin 工具，旧镜像不作新版本证据。
+3. **发布后观察**：按[观察表](CORE_012_POST_RELEASE_OBSERVATION.md)执行 T+24h/72h，
+   复核支持来信、许可监控及下一次自然备份包含本次证据，不提前填写结果。
+4. **独立设计项**：F2 离线迁移、兼容与验收范围仍待确认；F3 AES-256-GCM
+   仍需新格式与兼容测试，不属于本次发布。
+   F2 设计草稿保存在私有 `docs/internal/f2-signed-lease-2026-11-03/`，迁移须保持终身授权有效。
+5. **任务模板**：给 Codex 的模板补充跑完工作流中的全部 pytest 命令，包括
+   `benchmarks/llm_resistance`、MCP SDK 兼容任务及 Python 3.15；不能只依赖四个本地测试根。
 
 ## 状态口径
 
@@ -69,22 +56,22 @@ Core 候选 `2bd86ab` 的手动全矩阵 47 个 job／21 个 OS-Python 单元也
 普通 13 单元、手动/定时 21 单元不变；独立 L3 六格与 MCP SDK 六格
 兼容矩阵已纳入 CI。必需检查仍为 CI result + CodeQL，不改 ruleset。
 
-## 当前执行顺序（2026-11-03 复核）
+## 当前执行顺序（2026-11-04 复核）
 
-本轮实际进度见 [11-03 执行状态](EXECUTION_PROGRESS_2026-11-03.md)。
+本轮实际进度见 [11-04 发布核验](CORE_0_12_0_RELEASE_2026-11-04.md)。
 
 设计、官方资料与验收条件见 [路线复核](ROADMAP_REVIEW_2026-10-30.md)。
 已完成的 P0、纯文档 CI、Core/MCP 发版、Glama 更新与首日 DEV 观察不再排入队列。
 
-1. 完成 Core 0.12.0 发布准备，11-04 经批准后发布；扩展依赖修复验收见执行记录。vbca 文档过滤继续等待自然事件，不制造空提交。
+1. 完成 Core 0.12.0 的 Action／Glama 渠道接续及发布后观察；扩展不随发。vbca 文档过滤继续等待自然事件，不制造空提交。
 2. 11-04 09:43 CST 后：完成 DEV 一周复盘；首日精确采样无法补回。
 3. 约 11-05 晚：完成 LinkedIn 一周复盘；采用入口已于 11-01 核验。
 4. 完成上述两篇内容复盘后：评估小型渠道试验。先归纳目标用户、具体反馈、可归因访问来源及安装/使用问题，再选择一个与 Python 应用交付场景匹配的社区做一次实用技术案例分享；遵守社区规则，不把渠道当广告位。试验后按具体使用线索与问题决定是否继续，不用下载尖峰证明增长。若证据显示项目定位或上手路径不清，再提出 README 小范围修订。邮件营销建议仅作为待验证想法，不购买服务或回复推销邮件。
 5. 收到真实最小复现后：优先正确性与诊断，再决定 L3 覆盖或资源密钥范围。
 6. 有目标平台需求后：按[单组合验收方案](NEXT_DELIVERY_VALIDATION_PLAN.md)优先考虑 Windows Nuitka standalone；其他组合各自确认需求，不默认扩矩阵。
 
-跨文件 L3 仍拒绝 free-threaded；Core 0.12.0 已进入待批准发布排期，MCP 是否随发另行决定。
-后续状态见 [11-03 执行表](EXECUTION_PROGRESS_2026-11-03.md)。
+跨文件 L3 仍拒绝 free-threaded；Core 0.12.0 已发布，MCP 本次不随发。
+后续状态见 [11-04 发布核验](CORE_0_12_0_RELEASE_2026-11-04.md)。
 
 ## 后续团队候选：独立的视频原创保护辅助工具（2026-10-23）
 
@@ -96,7 +83,7 @@ Core 候选 `2bd86ab` 的手动全矩阵 47 个 job／21 个 OS-Python 单元也
 
 - **采用引导文档**：10-30 已更新并推送 llms 镜像、README／首页、集成模板及能力元数据；托管站点是否已同步以其部署状态为准。验收见 [执行表](EXECUTION_PROGRESS_2026-10-30.md)。不因文案修订发 Core／MCP 版本。
 
-- 每周一巡检继续观察 Core 0.11.1 / MCP 0.3.17 反馈、下载安静日、客户调研回答、CI 与备份。无新缺陷时不重复全量测试、不主动增加功能。
+- 每周一巡检继续观察 Core 0.12.0 / MCP 0.3.17 反馈、下载安静日、客户调研回答、CI 与备份。无新缺陷时不重复全量测试、不主动增加功能。
 - **10-25 复盘已完成**；数据与结论见运营记录，继续分开发版日、次日与内容流量。
 - 下次发布按实际新增改动与维护者授权确定，不恢复此前 10-15 的等待通知状态。
 - **3.15 兼容 P0 已随 Core 0.8.0 发布**：后续只跟进已登记的兼容性限制；MCP SDK 2.x 生产支持已随 MCP 0.3.16 发布，mapping 与 Pro 新功能仍分别按需求和授权推进。

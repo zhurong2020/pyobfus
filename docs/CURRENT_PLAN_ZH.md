@@ -1,5 +1,13 @@
 # pyobfus 当前计划
 
+**2026-11-04 Core 0.12.0 已发布并核验**：候选 #181 合并为 `73ff6a8`，最终完整矩阵
+47/47（含 21 个 OS/Python 组合）、CodeQL、OIDC 发布、PyPI 双产物哈希与 PEP 740
+密码学核验均通过；公开 wheel 的 Python 3.12/3.15 全新安装、Community canary、
+无授权拒绝及真实线上自有授权构建通过。GitHub Release、Zenodo `23934493` 和
+RTD 发布 revision 构建均已核实。见[发布核验](CORE_0_12_0_RELEASE_2026-11-04.md)。
+MCP 0.3.17／runtime 0.1.1／扩展 0.4.3 不变；Action 独立发布与 Glama admin
+切换仍待接续，T+24h/72h 和自然备份包含性检查尚未到期。下方“待批准”文字为历史快照。
+
 **2026-11-03 三项提前准备**：F2 设计草稿已保存在私有
 `docs/internal/f2-signed-lease-2026-11-03/`，尚未实施；进入实现前仍须确认离线迁移、兼容与验收范围。
 [下一项交付验证方案](NEXT_DELIVERY_VALIDATION_PLAN.md)默认选择 Windows Nuitka standalone，

@@ -16,7 +16,12 @@ For **historical deltas** per session, see [V0.4_EXECUTION_LOG.md](V0.4_EXECUTIO
 For the frozen post-release evidence and recheck checklist from 2026-08-24, see
 [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-**Latest channel update: 2026-10-30.** See the verified Glama update below.
+**Latest channel update: 2026-11-04.** Core 0.12.0 is published and verified;
+[release evidence](CORE_0_12_0_RELEASE_2026-11-04.md) records PyPI provenance,
+GitHub Release, Zenodo record 23934493 and RTD build 35630172. The concept DOI
+now identifies the Core 0.12.0 archive. Action's separate wrapper release and
+Glama's admin Core pin remain pending; the October 30 Glama image below is
+still the latest verified deployed image.
 
 **Zenodo release records verified 2026-10-30:** Core v0.11.1 is archived as
 [record 23796579](https://doi.org/10.5281/zenodo.23796579); MCP 0.3.17 is
