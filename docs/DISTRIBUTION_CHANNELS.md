@@ -1,5 +1,10 @@
 # Distribution Channels State
 
+**2026-11-06 Glama 渠道 0.12.0**：维护者 11-05 新建渠道 release 0.12.0，关联成功构建
+`01a1ac58-1a8f-7c1c-a73f-fb09f5a9a1e5`，固定 checkout `9c87645`，安装命令不变
+（MCP 0.3.17 / Core 0.12.0）。证据为后台 Dockerfile 页面与 Glama 通知邮件，未取构建日志；
+见[接续验收](CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md)。
+
 **2026-11-04 渠道与内容观察更新**：Action v1.1.0 / `v1`、Marketplace 最新版本已核实；
 Glama 成功构建 `01a1a435-fda7-7745-ab9b-f6be9267c82a` 已关联渠道 release 0.11.3，
 实际安装 Core 0.12.0 / MCP 0.3.17 / runtime 0.1.1，握手和九工具发现通过。

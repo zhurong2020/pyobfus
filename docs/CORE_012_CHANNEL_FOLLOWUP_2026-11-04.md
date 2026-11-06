@@ -34,6 +34,26 @@ Structured CLI `status: error` / exit-1 responses now fail even under
 
 ## Glama build and channel release
 
+**Update 2026-11-06 — channel release 0.12.0.** The maintainer created a
+further channel release on November 5. Evidence is the maintainer-provided
+Dockerfile admin page plus Glama notification mail; no build or instance log
+was obtained, so handshake and tool discovery are not re-verified here.
+
+| Field | Evidence |
+|---|---|
+| Test/build | `01a1ac58-1a8f-7c1c-a73f-fb09f5a9a1e5`, November 5 23:33 CST |
+| Result | Glama mail "Build succeeded for pyobfus-mcp", 15:34 UTC |
+| Channel release | **0.12.0**, dated November 5 (mail "Release 0.12.0 published", 15:35 UTC) |
+| Install command | unchanged: `pyobfus-mcp==0.3.17 pyobfus==0.12.0` |
+| Pinned checkout | `9c87645` (repository head at that time) |
+| Base image / Python | `debian:trixie-slim`, Python 3.12 requested |
+
+The Glama channel label now matches the Core version; the installed packages
+are the same as for 0.11.3. The November 4 evidence below remains the record of
+a verified handshake and nine-tool discovery.
+
+### November 4 build (channel 0.11.3)
+
 Evidence is the maintainer-provided admin pages plus build and instance logs,
 not an independent login to the admin account.
 

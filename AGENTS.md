@@ -253,7 +253,7 @@ patent/release context.
   0.1.1 / extension 0.4.3 remain unchanged. See
   [release evidence](docs/CORE_0_12_0_RELEASE_2026-11-04.md) and
   [channel follow-up](docs/CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md). Action
-  v1.1.0 / `v1`, Glama channel 0.11.3 and DEV one-week review are complete;
+  v1.1.0 / `v1`, Glama channel 0.12.0 (Nov 5; 0.11.3 on Nov 4) and DEV one-week review are complete;
   future observation, LinkedIn and natural backup inclusion remain pending.
 - **Status review and remediation (2026-11-03)**: [engineering and operations evidence](docs/EXECUTION_PROGRESS_2026-11-03.md). Local suites pass; Nov 2 scheduled Guard passed. Downloads and Gmail were refreshed; extension minimatch/glob remediation and ESLint v10 migration are recorded there. Core 0.12.0 remains scheduled for Nov 4, subject to release approval.
 - **Previous execution tracker (2026-11-01)**: [session closeout](docs/SESSION_CLOSEOUT_2026-11-01.md) → [execution progress](docs/EXECUTION_PROGRESS_2026-11-01.md) → [current plan](docs/CURRENT_PLAN_ZH.md). Three maintenance PRs are merged; RTD deployment and backup verification are complete. Next: Nov 2 scheduled Guard, Nov 4 DEV review, and around Nov 5 LinkedIn review. Core 0.11.1 / MCP 0.3.17 / runtime 0.1.1 are unchanged. Earlier session records are historical.

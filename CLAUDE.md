@@ -12,7 +12,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 [发布核验](docs/CORE_0_12_0_RELEASE_2026-11-04.md) →
 [渠道接续](docs/CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md) →
 [冷启动](docs/COLD_START_PROMPT_2026-11-04.md)。Core **0.12.0** 与 Action **v1.1.0／v1**
-已发布核验；Glama 渠道 **0.11.3** 与 DEV 一周复盘完成。MCP 0.3.17 / runtime 0.1.1 /
+已发布核验；Glama 渠道 **0.12.0**（11-05，原 0.11.3）与 DEV 一周复盘完成。MCP 0.3.17 / runtime 0.1.1 /
 扩展 0.4.3 不变。下一步：11-05 09:27 后 T+24h、约 11-05 晚 LinkedIn、11-07 09:27 后 T+72h，
 以及下一次自然快照对新证据的备份包含性核对。11-04 已上传的快照不覆盖本轮新文件。
 下方旧交接与“待发布”只作历史，不重复发版、移动标签或 Glama build。
@@ -148,7 +148,7 @@ PR #108（PY315-1 惰性导入保留、PY315-2 推导式解包、3.15 新内建�
 - **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.17，2026-10-30 发布，MCP SDK `>=1.27.0,<3.0.0`**；9 tools: 7 community + 2 pro_funnel · dep `pyobfus>=0.5.18` · `uvx pyobfus-mcp` 零安装；发布验证见 `docs/RELEASE_PROVENANCE_VERIFICATION.md`)
 - **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp`（**0.3.17**，`active` / `isLatest=true`；见 `docs/CURRENT_PLAN_ZH.md`）
 - **Smithery (Skill)**: https://smithery.ai/skills/zhurong2020/pyobfus-protect (2026-06-22 上线 · 本地工具走 Skill 渠道非 MCP 渠道) · **mcp.so**: 已收录
-- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus — 渠道 **0.11.3**（2026-11-04）关联成功 test `01a1a435-fda7-7745-ab9b-f6be9267c82a`，安装 Core 0.12.0 / MCP 0.3.17 / runtime 0.1.1，握手和九工具发现通过。Python 安装阶段与旧 checkout 边界见 `docs/CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md`。
+- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus — 渠道 **0.12.0**（2026-11-05）关联成功 test `01a1ac58-1a8f-7c1c-a73f-fb09f5a9a1e5`（pin `9c87645`），安装命令同 0.11.3；握手和九工具发现以 0.11.3 构建 `01a1a435-…` 为已核证据。Python 安装阶段与旧 checkout 边界见 `docs/CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md`。
 
 - **GitHub Action**: https://github.com/zhurong2020/pyobfus-action (**v1.1.0**，2026-11-04 发布，移动 `v1` 同指 `3237e16`，Marketplace 最新版本已核：<https://github.com/marketplace/actions/pyobfus-scan-and-build>)。独立仓库**是硬性要求**——Marketplace 要求 `action.yml` 在仓库根目录且一仓一 action；另外 action 的移动 `v1` tag 会与 Core 的 `v*` 命名空间冲突并重新触发 `release.yml`。⚠️ 两个只会在上架页面才暴露的限制：**listing 名不能与已有 GitHub 用户重名**（`github.com/pyobfus` 是第三方账号，故名为 `pyobfus scan and build`；GitHub **不因不活跃释放用户名**，只受理商标投诉，此事已定论），以及 **description 上限 125 字符**（首版 151 被拒 → v1.0.1）。两条现均由该仓库 CI 断言拦截。**归因查询**（本 action 存在的理由，周期性复盘时与下载量一起看）：<https://github.com/search?q=%22zhurong2020%2Fpyobfus-action%22+path%3A.github%2Fworkflows&type=code>
 - **GitHub**: https://github.com/zhurong2020/pyobfus (public)
