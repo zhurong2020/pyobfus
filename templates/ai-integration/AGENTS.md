@@ -81,6 +81,8 @@ A file that instead opens with `# pyobfus:generated format=1 edition=…` is pyo
 2. Test directories must be in `exclude_patterns` (framework presets handle this automatically).
 3. If `severity_counts.high > 0`, surface findings before running obfuscation.
 4. In CI, inspect process exit status and command-specific JSON findings; never hide tool errors with `|| true`.
+5. Before shipping, run `pyobfus --check-delivery dist/ --json`. CLI exit codes: 0 ok or warnings (still read the JSON warnings), 1 high findings (e.g. a mapping or private key in the output), 2 inspection could not complete, which is not a clean result. With the `check_delivery` MCP tool, read `status`, findings and limitations in the response instead of exit codes.
+6. Pro features need an active trial or licence (Core 0.12.0+). In CI, supply the licence only as the secret environment variable `PYOBFUS_LICENSE_KEY` (Action: `license-key: ${{ secrets.PYOBFUS_LICENSE_KEY }}`); never print, log or commit it, and do not run licensed builds for untrusted fork pull requests.
 
 ## MCP alternative (preferred when available)
 
