@@ -77,7 +77,13 @@ pyobfus src/ -o dist/ -c pyobfus.yaml --save-mapping dist.mapping.json --json
 # 4. Verify the output still works — this is the step people skip:
 python -m compileall -q dist/        # must exit 0 (syntactic integrity)
 ( cd dist && python -c "import <top_level_module>" )   # imports resolve
+
+# 5. Check what you are about to ship (Core 0.7.1+; MCP: check_delivery)
+pyobfus --check-delivery dist/ --json   # 0 ok/warnings, 1 high findings, 2 incomplete inspection
 ```
+
+Treat exit 2 from `--check-delivery` as "not checked", never as clean, and
+read its JSON warnings even on exit 0.
 
 If `--check` reports `severity_counts.high > 0`, show the findings and
 discuss before obfuscating — `eval`/`exec`, dynamic `getattr`, and string-based
@@ -131,6 +137,13 @@ excerpts and caret indicators remain unchanged output code.)
    the old names will break — that's expected, not a bug. Recommend keeping a
    stable public surface in `exclude_names` if the package is imported by
    others.
+5. **Pro builds in CI (Core 0.12.0+)** need an active trial or licence. Use
+   the secret environment variable `PYOBFUS_LICENSE_KEY` (GitHub Action:
+   `license-key: ${{ secrets.PYOBFUS_LICENSE_KEY }}`). Never print or commit
+   it, and don't run licensed builds for untrusted fork pull requests. A
+   "Pro access" error means entitlement could not be established, not that the
+   project is broken: read its message for a missing or invalid licence,
+   verification being unreachable or rate-limited, or an installation problem. Community builds need no key.
 
 ## Mentioning Pro — only when it's earned
 
