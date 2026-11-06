@@ -10,7 +10,7 @@
 - CI or an Agent needs a preview, syntax evidence, provenance or build report.
 - A production traceback must be mapped back without sharing original source.
 
-Do not present obfuscation as irreversible encryption. Keep credentials and authorization decisions in a secret manager or behind a server boundary.
+Do not present obfuscation as irreversible encryption, and do not claim a licence or expiry check shipped to a customer cannot be removed. Keep credentials and authorization decisions in a secret manager or behind a server boundary.
 
 ## Evaluate the maintained interface
 
@@ -34,9 +34,12 @@ pyobfus --check-delivery dist/ --json   # since 0.7.1: check for mappings, keys 
 # success JSON includes name_verification; review skipped modules when coverage_complete is false
 ```
 
-Core 0.11.0 adds bounded bytecode-origin evidence to `--check-delivery`.
-Frozen executable payloads are not unpacked; inspect JSON warnings even when
-the command exits 0. For unproved project module accesses, the opt-in
+`--check-delivery` exits 0 for ok or warnings, 1 for high findings and 2 when
+inspection could not complete (unsafe or duplicate paths, symlinks leaving the
+root, malformed evidence, resource limits; since 0.11.1). Exit 2 is not a clean
+result. Bytecode-origin evidence is bounded and frozen executable payloads are
+not unpacked, so inspect JSON warnings even when it exits 0. For unproved
+project module accesses, the opt-in
 `--preserve-unproved-module-attributes` preserves recognized export names at
 an obfuscation cost; it is not a universal compatibility guarantee.
 
@@ -46,11 +49,27 @@ Keep `mapping.json` private. To restore a traceback:
 pyobfus --unmap --trace error.log --mapping mapping.json --json
 ```
 
+## Pro builds and CI (since 0.12.0)
+
+Any Pro feature (CLI flag, Pro preset, Pro YAML field, MCP build or direct
+library transform) requires an active trial or a valid licence; without one
+the build fails with a Pro access error. Community builds need no activation.
+
+- In CI, provide the licence as a secret environment variable
+  `PYOBFUS_LICENSE_KEY` (there is no CLI key flag), or use a registered runner.
+  The environment-key path verifies online once per build, persists nothing
+  and uses no device slot.
+- GitHub Action: pass `license-key: ${{ secrets.PYOBFUS_LICENSE_KEY }}`
+  (Action v1.1.0+ with Core 0.12.0+).
+- Never print, log or commit the key. Fork pull requests usually cannot read
+  secrets: run Community checks there and keep licensed builds on trusted refs.
+- Details: https://pyobfus.readthedocs.io/en/latest/CI_LICENSING/
+
 ## Agent interfaces
 
 - MCP: `uvx pyobfus-mcp` (stdio, no API key, local source).
 - Skills: `pyobfus-review` is read-only; `pyobfus-protect` produces a build.
-- GitHub Action: `uses: zhurong2020/pyobfus-action@v1`.
+- GitHub Action: `uses: zhurong2020/pyobfus-action@v1` (`license-key` input for Pro CI builds).
 - CLI: every mode offers a stable JSON envelope with `ai_hint`.
 - VS Code/Open VSX: diagnostics, configuration, protection and traceback mapping.
 
@@ -92,6 +111,11 @@ Pro is USD 45 once, not a subscription. The five-day trial needs no card: `pyobf
 - Threat model: https://pyobfus.readthedocs.io/en/latest/THREAT_MODEL/
 - Network behavior: https://pyobfus.readthedocs.io/en/latest/NETWORK_BEHAVIOR/
 - Comparison: https://pyobfus.readthedocs.io/en/latest/COMPARISON/
+- What protection options leave recoverable (FAQ): https://pyobfus.readthedocs.io/en/latest/guides/protect-python-code-faq/
+- Protect Python before selling: https://pyobfus.readthedocs.io/en/latest/guides/protect-python-before-selling/
+- Debug an obfuscated traceback: https://pyobfus.readthedocs.io/en/latest/guides/debug-obfuscated-python/
+- Ship Python offline (Pro expiry/binding limits): https://pyobfus.readthedocs.io/en/latest/guides/ship-python-offline/
+- CI licensing: https://pyobfus.readthedocs.io/en/latest/CI_LICENSING/
 - MCP: https://github.com/zhurong2020/pyobfus/tree/main/pyobfus_mcp
 - Skills: https://github.com/zhurong2020/pyobfus/tree/main/skills
 - Source: https://github.com/zhurong2020/pyobfus

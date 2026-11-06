@@ -32,7 +32,9 @@
         "prepare a local-only Python build for delivery to a client",
         "check whether requirements.txt contains nonexistent public packages",
         "use an MCP server to protect a Python project from my AI coding agent",
-        "inspect my generated Python output before packaging it with PyInstaller"
+        "inspect my generated Python output before packaging it with PyInstaller",
+        "can my Python code be protected from being read by customers",
+        "run a licensed pyobfus Pro build in GitHub Actions"
       ]
     }
   ]
