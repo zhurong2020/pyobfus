@@ -75,6 +75,11 @@ Action v1.1.0 / `v1` 与 Glama 渠道 0.11.3 已完成；DEV 一周复盘已记�
 
 - Core 0.12.0 发布后按[观察表](CORE_012_POST_RELEASE_OBSERVATION.md)记录 T0、24 小时、72 小时及后续复盘；现有基线不当作发布后结果。
 
+- **每次发版的 Agent 文档同步（11-06 定）**：打 tag 前，凡改变 Agent 可见行为（新参数、退出码、JSON 字段、授权要求、MCP 工具）的版本，
+  同一 PR 内同步 `llms.txt`／`docs/llms.txt`、`llms-full.txt`／`docs/llms-full.txt`（各自两份一致，`check.sh` 比对 `llms.txt`）、
+  `templates/ai-integration/AGENTS.md`、`skills/*/SKILL.md`、`docs/.well-known/ai-catalog.json`；`llms-full.txt` 只写当前生效行为与功能最低版本，
+  历史留在 CHANGELOG。11-06 补齐了 0.11.1（`--check-delivery` 退出码 2）与 0.12.0（Pro 授权、`PYOBFUS_LICENSE_KEY`）的滞后。
+
 - **采用引导文档**：10-30 已更新并推送 llms 镜像、README／首页、集成模板及能力元数据；托管站点是否已同步以其部署状态为准。验收见 [执行表](EXECUTION_PROGRESS_2026-10-30.md)。不因文案修订发 Core／MCP 版本。
 
 - 每周一巡检继续观察 Core 0.12.0 / MCP 0.3.17 反馈、下载安静日、客户调研回答、CI 与备份。无新缺陷时不重复全量测试、不主动增加功能。

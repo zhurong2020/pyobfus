@@ -212,6 +212,7 @@ pytest integration_tests/ -v
    包错过，PyPI 页面 description 从此永久落后一个版本，只能等下次自然
    发版才带上（2026-08-17 v0.5.14 实际踩过这个坑，处置见
    `docs/CURRENT_PLAN_ZH.md` 当前状态块）。
+3a. **Agent 文档同步**：改变 Agent 可见行为（参数、退出码、JSON、授权、MCP 工具）的版本，同一提交里更新 `llms.txt`/`llms-full.txt`（及 `docs/` 镜像）、`templates/ai-integration/AGENTS.md`、`skills/*/SKILL.md`、`ai-catalog.json`（清单见 `docs/TODO.md`「每次发版的 Agent 文档同步」；0.11.1/0.12.0 曾漏，11-06 补）。
 4. `python -m build && twine upload dist/*`（或走 `git tag vX.Y.Z && git push --tags`
    触发 `.github/workflows/release.yml` 的 OIDC 自动发布，是当前实际使用的路径）
 5. **发布后**更新 `CITATION.cff` 的 `version` / `date-released`：Zenodo 的 GitHub
