@@ -36,6 +36,7 @@ with configuration or a thin wrapper when these interfaces fit your task.
 | Task | Go to |
 |---|---|
 | Decide how to protect software you sell | [Protect Python code before selling](guides/protect-python-before-selling.md) |
+| Find out what each protection option leaves recoverable | [FAQ: can Python code be protected?](guides/protect-python-code-faq.md) |
 | Install and protect a project | [Quick start](#quick-start) |
 | See a minimal before/after transformation | [Canonical README example](https://github.com/zhurong2020/pyobfus#minimal-example) |
 | Find risks before changing code | [`--check` and SARIF](SARIF_CODE_SCANNING.md) |

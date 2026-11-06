@@ -71,6 +71,7 @@ nav:
     - Share a usage report: case-studies/README.md
   - Guides:
     - Protect Python before selling: guides/protect-python-before-selling.md
+    - "FAQ: can Python code be protected?": guides/protect-python-code-faq.md
     - Debug an obfuscated traceback: guides/debug-obfuscated-python.md
     - Ship Python offline: guides/ship-python-offline.md
   - Compare:
