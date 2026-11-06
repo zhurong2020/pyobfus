@@ -1,5 +1,14 @@
 # pyobfus 当前计划
 
+**2026-11-06 下午：渠道试验评估、FAQ 与 Agent 文档同步（无发版）**：
+GitHub 14 天最大来源 aocr.org（53/53）经核为美国骨科放射学会站点，无 pyobfus 相关页面，流量集中于 11-05 单日且只访问仓库首页，
+按机器流量排除（vuink.com 9/9 形态类似）；真实浏览量应扣除约 53。Stack Overflow 相关新问题流量低，且其政策禁止任何部分由 LLM
+起草的内容（含改写），维护者若在 SO 作答须本人从零撰写。原 SO 稿转为站内
+[FAQ](guides/protect-python-code-faq.md)（PR #191，两轮 Codex 审查）。Agent 文档此前停在 0.11.0：PR #192 补齐 0.11.1
+（`--check-delivery` 退出码 2）与 0.12.0（Pro 授权、`PYOBFUS_LICENSE_KEY`、Action `license-key`），精简 `llms-full.txt`，
+并把「发版同步 Agent 文档」写入 AGENTS.md／CLAUDE.md／TODO；pyobfus-action PR #4 重写其 AGENTS.md（命令与 CI 一致）。
+三个 PR 的 CI 均通过后合并。小型渠道试验下一步待维护者选：本人在 SO 作答，或 Reddit（需先核社区 AI 规则与账号 karma 门槛）。
+
 **2026-11-06 巡检与 CI 修复**：11-06 定时 CI 仅 `Test (ubuntu-latest, Python 3.9)` 失败，
 原因是 `ubuntu-latest` 切到 Ubuntu 26.04 后 `setup-python` 无 3.9 构建（装环境即失败，未跑测试）；
 PR #188 将该格固定到 `ubuntu-24.04`，其余矩阵不变，PR CI 41/41 与 CodeQL 通过后合并（`869e3ae`）。
