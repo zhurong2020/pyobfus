@@ -142,6 +142,13 @@ only the four local roots. Verify MCP SDK compatibility and Python 3.15 jobs
 through their maintained hosted workflows, and run the complete manual 21-cell
 matrix on the final release revision.
 
+A release that changes agent-visible behavior (flags, exit codes, JSON fields,
+licensing requirements, MCP tools) updates the agent-facing docs in the same
+PR: `llms.txt` and `llms-full.txt` (plus their `docs/` mirrors),
+`templates/ai-integration/AGENTS.md`, `skills/*/SKILL.md` and
+`docs/.well-known/ai-catalog.json`. Keep `llms-full.txt` to current behavior
+and feature minimum versions; history stays in `CHANGELOG.md`.
+
 Targets: Python **3.9–3.15** must all pass. (Python 3.8 was dropped in 0.5.0 —
 EOL 2024-10 — which removed the old `astunparse`/`@requires_py39` flakiness;
 `docs/PYTHON38_COMPATIBILITY.md` is retained only as historical record.)
