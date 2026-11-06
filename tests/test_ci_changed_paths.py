@@ -85,11 +85,21 @@ def test_matrix_versions(event):
     assert len(cells) == (21 if event in ("schedule", "workflow_dispatch") else 13)
     assert len({(cell["os"], cell["python-version"]) for cell in cells}) == len(cells)
     for os_name in ("ubuntu-latest", "windows-latest", "macos-latest"):
-        versions = {cell["python-version"] for cell in cells if cell["os"] == os_name}
+        versions = {
+            cell["python-version"] for cell in cells if cell["os"].startswith(os_name.split("-")[0])
+        }
         expected = {"3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.15"}
         if event not in ("schedule", "workflow_dispatch") and os_name != "ubuntu-latest":
             expected = {"3.9", "3.14", "3.15"}
         assert versions == expected
+
+
+def test_python39_avoids_ubuntu_image_without_it():
+    cells = build_matrix("push")["include"]
+    ubuntu39 = [
+        c["os"] for c in cells if c["python-version"] == "3.9" and c["os"].startswith("ubuntu")
+    ]
+    assert ubuntu39 == ["ubuntu-24.04"]
 
 
 def test_metadata_does_not_hide_code_change():
