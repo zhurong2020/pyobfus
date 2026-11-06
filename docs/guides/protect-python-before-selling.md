@@ -30,6 +30,8 @@ Two things hold in every row:
   terms of anything else you add.
 
 The rest of this page covers the first row, with pointers for the others.
+For what each option leaves recoverable and why local licence checks can be
+removed, see the [FAQ](protect-python-code-faq.md).
 
 ## Step 1: check the project
 
