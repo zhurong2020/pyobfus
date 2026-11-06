@@ -49,13 +49,19 @@ def code_changed(paths: Iterable[str]) -> bool:
     return any(not docs_only(path) for path in paths)
 
 
+# ubuntu-latest moved to Ubuntu 26.04 in November 2026 and actions/setup-python
+# publishes no Python 3.9 build for it (3.9 is EOL). Keep testing the supported
+# floor on the newest Ubuntu image that still has it.
+RUNNER_OVERRIDES = {("ubuntu-latest", "3.9"): "ubuntu-24.04"}
+
+
 def test_matrix(event: str) -> dict:
     """Keep the full grid on scheduled/manual runs; otherwise cover OS edge versions."""
     versions = ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
     full = event in ("schedule", "workflow_dispatch")
     return {
         "include": [
-            {"os": os_name, "python-version": version}
+            {"os": RUNNER_OVERRIDES.get((os_name, version), os_name), "python-version": version}
             for os_name in ("ubuntu-latest", "windows-latest", "macos-latest")
             for version in versions
             if full or os_name == "ubuntu-latest" or version in ("3.9", "3.14", "3.15")
