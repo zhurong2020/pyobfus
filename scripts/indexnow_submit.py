@@ -186,7 +186,10 @@ def main(argv=None):
             status = response.status
     except urllib.error.HTTPError as exc:
         status = exc.code
-        exc.close()
+        try:
+            exc.close()
+        except Exception:  # Python 3.9: an HTTPError without a body has no file to close
+            pass
     except (urllib.error.URLError, OSError) as exc:
         print(f"IndexNow network failure: {exc}")
         return 1 if args.strict else 0
