@@ -1193,14 +1193,14 @@ gh api repos/zhurong2020/pyobfus --jq '.topics' | tr ',' '\n' | grep -i pyarmor 
 > v0.5 ship date pushed from 2026-06-15 → late July / early August 2026 to allow patent filing window (~4-6 weeks).
 >
 > **2026-05-09 late-evening update (Session 27)**:
-> - Patent dossier framework scaffolded at `~/projects/pyobfus-legal/patent/` (off-repo): 10 sub-directories matching the CNIPA web 端 8 个 upload tabs + reusable templates symlinked from `cac-plus-ip/02_china_发明专利/_templates_CNIPA/`. v0.5 session uses this as the working directory when patent draft starts. See `pyobfus-legal/patent/README.md` for full structure + 11-step submission flow.
-> - **CNIPA case # `10000559675571` already created** on 专利业务办理系统 web (https://cponline.cnipa.gov.cn → 我的办公桌 → 国家申请 → 发明专利申请) and recorded in `pyobfus-legal/patent/00_案卷信息/case_metadata.md`.
+> - Patent dossier framework scaffolded at `~/projects/pyobfus-legal/patent/` (off-repo): 10 sub-directories matching the CNIPA web 端 8 个 upload tabs + reusable templates symlinked from private template records (details in private records). v0.5 session uses this as the working directory when patent draft starts. See `pyobfus-legal/patent/README.md` for full structure + 11-step submission flow.
+> - **CNIPA filing case created** (identifier in private records) on 专利业务办理系统 web (https://cponline.cnipa.gov.cn → 我的办公桌 → 国家申请 → 发明专利申请) and recorded in `pyobfus-legal/patent/00_案卷信息/case_metadata.md`.
 > - **USB Key / CPC desktop client are NOT required** (Session 25/26 backlog mentions are superseded). Web-based 实名认证 user path supports full submission incl. 电子签章 — applicable for individual pro-se filing. USB Key only required for 代理批量 / PCT / 委托代理 scenarios.
 
 > **2026-05-10 update — Patent draft v1 + CNIPA web upload progress**:
 >
 > - Patent draft v1 complete at `pyobfus-legal/patent/` (off-repo): 5 formal application docx (claims / specification / drawings / abstract / fee-reduction request) + 1 internal disclosure mother doc + 7 mermaid figures (PNG + JPEG) + ID card A4 PDF. Invention name finalized at trim-A: 「一种基于多层选择保护与法医水印的代码混淆方法及系统」 (25 字 within CNIPA 默认 limit).
-> - **费减备案 (fee reduction recordation) submitted 2026-05-10 09:16** via 专利业务办理系统 → 专利事务服务 → 费减备案 (Path A: 备案 covers 2026 全年 individual applicant patents — replaces per-case 100008 form for both pyobfus and cac-plus-ip filings this year). Currently 待审核, expected approval 1-15 working days.
+> - **Fee reduction recordation**: filing workflow and account details are kept in private records.
 > - **5 CNIPA web tabs filled + saved**: 权利要求书 / 说明书 / 说明书附图 / 说明书摘要 / 发明专利请求书. 说明书 server-side renumbering ("保存并刷新") timed out at 239 paragraphs; "保存不刷新" succeeded (manual numbering already CNIPA-standard 0001-0239). 摘要附图 = 1, 实质审查请求 = 勾, 提前公布 = 不勾, 不丧失新颖性宽限期 = 不勾.
 > - **Final 提交 button** (= filing date = priority date = 不可撤销) **pending 备案 approval** to maximize automatic 85% fee reduction at 缴费 step. 1-2 weeks total expected before 提交; 受理通知书 + 申请号 expected 1-2 weeks after that.
 > - **Estimated 申请号 receipt**: late May / early June 2026. **v0.5 public release earliest**: ~mid-June 2026 (after 申请号 + Path C 解禁 of `pyobfus-pro-dev` private code → public `pyobfus_pro/`).
@@ -1213,7 +1213,7 @@ gh api repos/zhurong2020/pyobfus --jq '.topics' | tr ',' '\n' | grep -i pyarmor 
 > - Latest patent state for cold-start: off-repo `pyobfus-legal/patent/SESSION_LOG_20260617.md` + memory `patent_correction_notice_2026-06-01.md`.
 >
 > **2026-06-05 update — FILED + ACCEPTED, then in formality correction (historical)**:
-> - **Filed + accepted**: 申请号 **202610712171X** · 申请日 2026-05-22 (submitted 2026-05-22 via web, NOT CPC client). 受理通知书 issued. All fees paid in full (1610 yuan, verified via official 审查信息查询). Shared 2026 fee-reduction recordation `202600565835` approved (cac-plus-ip reuses it).
+> - **Filed + accepted**: 申请号 **202610712171X** · 申请日 2026-05-22 (submitted 2026-05-22 via web, NOT CPC client). 受理通知书 issued. All fees paid in full (1610 yuan, verified via official 审查信息查询). Fee-reduction account details are kept in private records.
 > - A 补正通知书 (formality correction, issued 2026-06-01) required re-submitting the specification with system-generated paragraph numbers; **answered 2026-06-11**, accepted per the 2026-06-17 update above.
 
 ### Already in `docs/ROADMAP.md` v0.5+ (still valid · re-prioritized · patent-gated marked 🔒)
@@ -1425,7 +1425,7 @@ gh api repos/zhurong2020/pyobfus --jq '.topics' | tr ',' '\n' | grep -i pyarmor 
 
 **Why**: free Crossref-DOI peer-reviewed venue for open-source software. Diamond Open Access (0 author APC, 0 reader paywall). pyobfus crosses JOSS's **6-month public-history threshold on 2026-05-12** (V0.1.0 first PyPI 2025-11-12; verified via cardiac-manuscripts JOSS submission path research 2026-04-27, source URL https://joss.theoj.org). Citing a JOSS DOI in README + landing pages + future research-software discussions raises pyobfus's academic legitimacy at zero cost.
 
-**Reference**: <https://joss.theoj.org> · <https://joss.readthedocs.io/en/latest/submitting.html> · `~/projects/cardiac-ml-research/docs/project/JOSS_OPEN_CORE_POLICY_RESEARCH.md` (2025-11-19 prior research confirming open-core compatible with JOSS) · `~/projects/cardiac-manuscripts/cac-plus_methodology/supplementary/joss_submission_path.md` (2026-04-27 verification of 6-month rule)
+**Reference**: <https://joss.theoj.org> · <https://joss.readthedocs.io/en/latest/submitting.html> · `~/projects/cardiac-ml-research/docs/project/JOSS_OPEN_CORE_POLICY_RESEARCH.md` (2025-11-19 prior research confirming open-core compatible with JOSS) · private prior research (details in private records) (2026-04-27 verification of 6-month rule)
 
 **Critical sequencing constraint**: must be submitted **AFTER** patent 申请号 received per `memory/pyobfus_patent_strategy.md` Path C. JOSS publication is not net-new disclosure for already-public V0.4.0 features (PyPI release exhausted CN novelty 2025-11-11), but the JOSS paper:
 1. Citing "patent pending CN [申请号]" needs the申请号 to exist

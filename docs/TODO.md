@@ -37,7 +37,7 @@ Action v1.1.0 / `v1` 与 Glama 渠道 0.11.3 已完成；DEV 一周复盘已记�
 - 任何一项做完后，把它从本文件移除，并在 `CURRENT_PLAN_ZH.md` 记状态；
   不要在这里留「✅ 已完成」的历史层。
 - **下游反馈归属（2026-09-17）**：pyobfus 是本工作区自行维护的公共 PyPI 工具。
-  CAC Plus 或其他项目暴露的通用混淆缺口、最小复现和回归证据，必须同步登记在本仓库
+  内部下游应用或其他项目暴露的通用混淆缺口、最小复现和回归证据，必须同步登记在本仓库
   （公开 TODO 使用去标识描述，敏感交付背景只进入本地 internal 记录），不能只留在下游文档。
   下游是否选择混淆自己的代码由其分发边界决定；公开第三方依赖不因被打包而自动成为
   pyobfus 的处理目标。
@@ -118,17 +118,11 @@ Action v1.1.0 / `v1` 与 Glama 渠道 0.11.3 已完成；DEV 一周复盘已记�
       复现锁报错，并于 09-26 在原线程附上「No submissions yet」与 repository/path lock 两张截图，提供
       Claude Code workspace ID，请求后端定位/释放。**09-28 Rudy 回信「已升级内部，有消息再跟进」——球在对方，不必再催；锁没释放前别再点表单或换路径绕过**。**10-14 Tiffany 确认：原提交归属当前账号，无需补材料或寻找别的账号；目录团队解除锁后，使用 `claude.ai/directory/manage` developer portal 重提，Console 表单已停用。继续等待，不换仓库/路径重提。** **10-28 支持更新仍在解除 hold、无需补材料；11-04 复核仍待审核，继续等待；最新证据见私有 `docs/internal/operations-review-2026-11-04/email-review.md`。** 字段/描述与证据见
       `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`。
-- [x] **通知 Pro 客户升级到 0.6.1**（10-10 维护者定：发；草稿私有 `docs/internal/content-2026-10/pro_customer_notice_0.6.1.md`，10-10 已按线上许可证记录逐个起草，维护者当日发出（Gmail「已发送」已核）；有回信按 `/pyobfus-inbox` 跟进；取代原「是否通知升级到 0.5.32」，0.6.1 已含该修复）。原登记（2026-10-07）：0.5.10–0.5.31 的目录构建遇到同模块
-      装饰器/基类/lambda 会 import 时 NameError。两位 10 月新客户如用过目录构建可能受影响；需要的话由 Claude 起草、
-      维护者审后发送，AI 代理不直接发信。
+- [x] **0.6.1 升级通知流程**：0.5.10–0.5.31 目录构建的同模块装饰器/基类/lambda 可在 import 时触发 NameError，0.6.1 已含修复。通知由维护者审后发送，AI 代理不直接发信（细节见私有记录）。
 - [ ] **MCP Trust Registry publish**：在其站点注册拿 API token 后
       `MCPTRUSTCHECKER_TOKEN=… npx --yes mcptrustchecker@1.14.0 publish pyobfus-mcp --registry pypi --online --category developer-tools`
       （wheel 已扫 A · 94/100，09-23 已用 CLI help 核对参数；不要把 token 写进 shell history、仓库或聊天）。
-- [x] **下一笔真实 Pro 购买后核验新发号流程**（2026-10-05 登记；**2026-10-29 用一笔真实付款核过**）。
-      KV 只读：该付款对应且只有一条许可记录，`stripe_session_id` 与 Stripe 付款详情 Logs 中的 Checkout Session
-      一致，key 符合 `PYOB-XXXX-XXXX-XXXX-XXXX`；之后联网激活成功，说明许可邮件已送达。
-      Workbench 投递状态未单独打开看（发号与激活已证明 webhook 处理成功）。以后同类核验仍按原步骤：任何一项
-      不符先停下排查，不在 Dashboard 手工重放事件（Stripe 本身会按退避自动重投）。
+- [x] **核验新发号流程**：已验证仅对已付款事件发号及 session 派生键的幂等路径（细节见私有记录）。后续核验应只读比对许可记录与 Checkout Session；不符先排查，不在 Dashboard 手工重放事件。
 - [ ] **10-11 会话遗留的维护者小事**（2026-10-11 收尾登记）：
       ① ChatGPT 账号个性化：AI 回答基线测试时关闭了，测完可按需恢复（恢复后自己看到的推荐不可信，复测前再关）；
       ② Anthropic 目录支持（Tiffany 10-11 来信「仍在处理」）：可选致谢回信，草稿在 10-11 会话，未发；插件提交的是仓库+manifest 路径，
@@ -210,8 +204,7 @@ awesome-python 要的 adoption trajectory 也因此拿不出来。09-25 用户�
    plugin 重提）；某个渠道出现可归因安装之前不再新增渠道。
 6. Y-3 vault 覆盖、`preserved.*` reason codes 等「后续」项，等下游真的碰到再做。
 
-**测试判定（10-25 复盘看三样）**：4 周安静日中位数是否明显高于 9 月的 31；trial 登记是否
-从 0 起步；客户来信 / issue 是否出现。三样都没动，说明节奏不是变量，下一步该换的是渠道
+**测试判定（10-25 复盘看三样）**：4 周安静日中位数是否明显高于 9 月的 31；trial 登记是否出现变化（基线细节见私有记录）；客户来信 / issue 是否出现。三样都没动，说明节奏不是变量，下一步该换的是渠道
 或产品定位，不是再把发版调快。
 
 **查进度的固定动作（2026-09-25 用户定）**：每次用户让查看项目进度，除仓库状态外**一并**给出
@@ -450,7 +443,7 @@ V2EX 仍卡在账号激活（要邀请码）；Stack Overflow 按 2026-04-22 的
 
 **选题池**（真实素材，按搜索意图排；Stripe webhook 那段默认不写，待维护者定）
 
-1. Cloudflare 拦 `Python-urllib` UA（403 / error code 1010），全体付费客户两个月激活不了
+1. Cloudflare 拦 `Python-urllib` UA（403 / error code 1010），暴露激活可靠性与监控缺口（细节见私有记录）
    —— **10-11 已发布 DEV，下一步观察来源与反响**，放在 gitignored 的 `docs/internal/content-2026-10/01-urllib-user-agent-postmortem.md`
    （`published: false`；维护者 09-27 定：发稿前不进公开仓库）
 2. SARIF 上传前别再 `|| true`（带出 `pyobfus-action`）—— **10-28 已发布**：
@@ -539,15 +532,13 @@ V2EX 仍卡在账号激活（要邀请码）；Stack Overflow 按 2026-04-22 的
 
 ## 真实交付场景暴露的 Pro 缺口（2026-09-14 · 待排期，优先级待维护者定）
 
-来自一个把 Pro 输出交付到第三方离线 Windows 机器的内部下游项目（torch/MONAI +
-Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机器上。详细背景在本地私有的
-`docs/internal/DOWNSTREAM_DEMAND_2026-09-14.md`。**不改动上面的排期顺序**，只登记。
+来自内部下游应用的离线 Windows 交付需求（细节见私有记录）。**不改动上面的排期顺序**，只登记。
 
 | # | 缺口 | 证据 | 方向 |
 |---|---|---|---|
 | ~~Y-2~~ ✅ | ~~`--expire-hard` 没有到期前提醒~~ **已实现 2026-09-24，随 Core 0.5.30 发布** | runtime `expire_check` 加向后兼容 `warn_days`，窗口内发 `LicenseExpiryWarning`（`UserWarning` 子类，宿主可经 `warnings`/`logging.captureWarnings` 接管）| `--expire-warn-days N`（须配 `--expire-hard`）；16 测试含端到端「warns but still loads」 |
 | ~~Y-3~~ ✅ | ~~设备绑定只认 pyobfus 自己的 `current_machine_id()`~~ **v1 已于 2026-09-25 实现，随 Core 0.5.30 发布** | `--bind-key-env NAME`：L3 密钥改由应用提供（`pyobfus_runtime.set_key_provider` 回调 或 base64 env 回退），一次构建跑任意授权机器；v1 只覆盖 L3，配 `--vault` 报错、与 `--bind-device` 互斥。契约 `docs/Y3_KEY_PROVIDER_DESIGN.md` | 19 测试（10 运行时 + 9 构建/校验/端到端含正确/错误 key/provider 通道）；vault 覆盖为后续 |
-| ~~Y-4~~ ✅ | ~~Windows 上运行混淆输出没有 CI 验证~~ **已补基础合同** | `integration` job 扩为 Ubuntu + Windows；单文件和跨文件示例均执行混淆产物并与原输出比较 | 覆盖基础 Community 交付；torch/MONAI、Python embedded、L3 runtime 等重型真实下游组合仍需 Y-1 专项验证 |
+| ~~Y-4~~ ✅ | ~~Windows 上运行混淆输出没有 CI 验证~~ **已补基础合同** | `integration` job 扩为 Ubuntu + Windows；单文件和跨文件示例均执行混淆产物并与原输出比较 | 覆盖基础 Community 交付；复杂私有下游构建（细节见私有记录）仍需 Y-1 专项验证 |
 | ~~Y-6~~ ✅ | ~~name-mangling 打断运行时注解~~ **已修** | 函数签名表达式此前被跳过，或在参数局部作用域压栈后才遍历，导致同模块/导入类改名后 eager annotation 仍引用旧名 | 注解和默认值现在按 Python 语义在函数局部作用域压栈前改写；端到端测试覆盖同模块、跨模块、默认值及参数名遮蔽导入类型 |
 | ~~Y-7~~ ✅ | ~~cross-file mangler 作用域 bug~~ **已修** (`069a820`) | 函数局部变量复用被重命名的模块级名字时 Load 引用被误改 → `NameError: name 'Ixx'`。`LocalNameTransformer` 现按 Python 作用域收集函数体内全部绑定名（含 lambda/推导式作用域）| 已修 + 2 回归测试 |
 | ~~Y-8~~ ✅ | ~~control-flow flattening 的 `_cff_return_N` 未绑定~~ **已修** | 根因并非函数大小本身：一条路径显式 `return`、另一条路径自然落底时，统一生成的 `return _cff_return_N` 会读取未初始化变量。大型 `try/finally` 只是更容易出现这种路径组合 | 状态机启动前将共享 return slot 初始化为 Python 隐式返回值 `None`；已补最小条件分支与 `try/finally` early-return 两个回归测试 |

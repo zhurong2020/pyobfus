@@ -30,10 +30,7 @@ Cold start: this file → [task tracker](POST_011_PROGRESS_2026-10-29.md) →
   IDs) out of the public plan and TODO into a git-ignored private archive.
 - PR #167 added a third pre-commit scan and a `commit-msg` hook for Stripe
   object IDs and non-allowlisted e-mail addresses in added lines.
-- A real purchase verified the paid-only, session-derived key issuance path
-  (TODO item closed). One invoice request is open and handled outside Stripe;
-  status and next steps live only in the private support log and
-  `docs/internal/billing/`.
+- The paid-only, session-derived key issuance path has been verified. Stripe's native invoice path does not fit guest checkouts; invoices are issued outside Stripe per a private runbook (details in private records).
 
 ## Resume in order
 
@@ -44,7 +41,7 @@ Cold start: this file → [task tracker](POST_011_PROGRESS_2026-10-29.md) →
    recovery checklist; do not repeat the cost remediation done in another session.
 4. DEV one-week review after November 4 09:43 CST; LinkedIn one-week review
    around November 5 evening CST. Do not infer causation from release/CI spikes.
-5. Open invoice request: follow the private support log (2026-10-29 entry).
+5. Billing process: follow the private runbook (details in private records).
 6. P2/P3 wait for a real minimized delivery blocker or target-platform need.
    Cross-file L3 still rejects free-threaded builds. No new release is pending.
 

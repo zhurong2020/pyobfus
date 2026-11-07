@@ -2,11 +2,7 @@
 
 Status: research complete; no implementation committed by this document.
 
-This note evaluates the feature candidates recorded after the first real Pro
-customer support signal. It separates technical/market evidence from user
-validation: one customer saying that usage is going well and requesting an
-invoice is valuable commercial evidence, but it is not evidence that the
-customer needs a team license server, mapping encryption, or a new build mode.
+This note evaluates feature candidates while separating technical/market evidence from user validation. An invoice request alone does not establish demand for a team license server, mapping encryption, or a new build mode (details in private records).
 
 ## Method
 
@@ -226,7 +222,7 @@ Decision:
 
 ## Prioritized research outcome
 
-1. Implement config-aware `--check` after customer/invoice follow-up permits the
+1. Implement config-aware `--check` when maintainer prioritization permits the
    next development cycle.
 2. Design an additive `plan` object for existing `--dry-run --json`.
 3. Spike syntax-only post-build verification and feed its result into JSON/
