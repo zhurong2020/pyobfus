@@ -36,3 +36,13 @@
 - 无头 Codex／Codebuddy 做 AI 观测必须隔离：中性目录（路径里不能有项目名）、独立 `CODEX_HOME`（只带 auth 与 config）、Codebuddy `--no-session-persistence`；`while read` 循环内的命令要 `</dev/null`；统计用整词匹配（`pyobfuscate` 会误中）。
 - 不要用脚本轮询 pyobfus.readthedocs.io 判断上线：对脚本一律 Cloudflare 质询（429）。
 - 「备份包含性核对」先看最新快照日期，再看配置。
+
+## 收尾后补充（11-07 下午）
+
+- 维护者用 Chrome 插件跑了首轮只读盘点（注册当天，多数报告处理中）；原始 JSON 存私有 workspace-meta。
+  pyobfus 两站：文档站 sitemap 成功 146 页；落地页 sitemap 在 Google 仍「无法抓取」、Bing 已成功读取 2 网址。
+  **11-08／11-09 用同一 Prompt 复采**（TODO「周期性」已登记，#203），届时也看 Bing IndexNow 页是否出现提交记录。
+- 同一会话里顺带完成了个人站 arong.eu.org 的基础设置（站点地图提交、robots.txt 改为网站自管并放开百度与华为搜索、
+  Cloudflare AI 爬虫防火墙开关核对），这些不属于 pyobfus，全部记录在
+  `findata/content/SEARCH_PRESENCE_TODO_2026-11-07.md`，后续由 findata 会话接手。
+- 维护者开启了 Cloudflare 账号两步验证，恢复码已存入 Vaultwarden（条目名见私有 memory）。
