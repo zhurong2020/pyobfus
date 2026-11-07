@@ -53,3 +53,19 @@
 - `CLAUDE.md` 精简为当前交接 + 「仍生效的约定」，历史段落移至私有记录；公开文件中的客户、下游部署与账号细节改写为抽象工程事实；钩子邮箱白名单只保留公开支持地址。
 - README 只保留最新「What's new」；删除 `smithery.yaml`（Smithery 技能目录已下线）与未使用的 `.env.stripe.example`；旧发帖稿移入私有归档。
 - 合并规则：没有常设自动合并授权，所有 PR 按维护者当次会话指示合并。
+
+## Core 0.13.0 发布（11-07 晚，维护者批准）
+
+- 内容：Community pre-commit 钩子（#194）与专利申请标识、IP 发版检查（#211）；MCP 0.3.17 / runtime 0.1.1 / 扩展 0.4.3 / Action v1.1.0 不变。
+- 核验：完整 21 组合矩阵 47/47；合并后 tree 与候选一致；`v0.13.0` → `0f2c7b0`，PyPI 两个产物均有 PEP 740 证明；Python 3.12 与 3.15 全新安装通过；GitHub Release 手工创建。详见 [发布记录](CORE_0_13_0_RELEASE_2026-11-07.md)（#212）。
+- Glama：test `01a1b56b-40fd-7b04-9e65-eb349b7314a8` 安装 Core 0.13.0，握手与九工具通过；渠道标签 0.12.1 为 Glama 自身编号，与 Core 版本独立，不需对齐（#213）。
+- 剩余：Zenodo 归档后更新 `CITATION.cff` 的 version DOI（当晚定时检查；未完成则下次会话补做）。
+
+## 最新下一步（取代上文「下一步（按日期）」）
+
+1. Zenodo／`CITATION.cff` DOI（如当晚未完成）。
+2. 11-08：带末尾 `/` 的落地页请求编入索引；维护者复采搜索盘点（JSON 存私有 workspace-meta）。
+3. 11-09 周检：进度 + 下载量 + Gmail + Search Console／Bing／IndexNow，并观察 0.13.0 发布后反馈。
+4. 约 11-11：Core 0.12.0 T+7d；12 月首周月度搜索／AI 观测。
+5. 待维护者决定：专有许可专利条款（须专业审阅）、F2 五项设计决定、小型渠道试验（SO 本人作答或 Reddit）。
+6. 长期：`ubuntu-24.04` 退役前为 Python 3.9 另找 runner；Claude 插件市场锁等待回复。
