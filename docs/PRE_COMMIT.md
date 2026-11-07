@@ -1,6 +1,6 @@
 # pre-commit hooks
 
-Available from the **next release (unreleased)** in Community. These local
+Available since **0.13.0** in Community. These local
 correctness and safety checks need no Pro licence. Inspection reads files;
 it does not execute them, contact the network or consult licence state.
 [pre-commit](https://pre-commit.com/) installs the hook environment separately
@@ -13,16 +13,14 @@ Add this to `.pre-commit-config.yaml`:
 ```yaml
 repos:
   - repo: https://github.com/zhurong2020/pyobfus
-    rev: REPLACE_WITH_FIRST_HOOK_RELEASE_TAG
+    rev: v0.13.0
     hooks:
       - id: pyobfus-no-private-material
       - id: pyobfus-check-delivery
         args: [dist/]
 ```
 
-Replace `rev` with the first release that includes these hooks (unreleased at
-the time of writing; use a tag ≥ that release). The placeholder is not a tag;
-0.12.0 does not include the hooks.
+Use `v0.13.0` or a later release tag; 0.12.0 and earlier do not include the hooks.
 
 Install pre-commit in your development environment, then enable both stages:
 

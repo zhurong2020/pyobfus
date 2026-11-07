@@ -28,13 +28,12 @@ your application checks on the output, and restore a traceback. The
 record maintained compatibility and tested limits. Start custom integration
 with configuration or a thin wrapper when these interfaces fit your task.
 
-> **What's new in v0.12.0:** Pro builds consistently require a license or
-> active trial. CI builds can verify online through the secret
-> `PYOBFUS_LICENSE_KEY` environment variable without consuming device slots
-> or saving registration state. See the
-> [CI licensing guide](https://pyobfus.readthedocs.io/en/latest/CI_LICENSING/).
-> String encryption uses Fernet (AES-128-CBC with HMAC-SHA256); the description
-> is corrected, while cryptography and generated artifact formats are unchanged.
+> **What's new in v0.13.0:** Community
+> [pre-commit hooks](https://pyobfus.readthedocs.io/en/latest/PRE_COMMIT/)
+> stop pyobfus mapping files and PEM private keys from being committed
+> (`pyobfus-no-private-material`) and check built output before pushing
+> (`pyobfus-check-delivery`). They read files locally, print only paths and
+> reasons, and need no licence.
 >
 > Earlier releases: see the [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
 
@@ -242,7 +241,7 @@ secret-manager or server boundaries.
 - [vs Nuitka](https://pyobfus.readthedocs.io/en/latest/compare/nuitka/)
 - [PyInstaller cookbook](https://pyobfus.readthedocs.io/en/latest/PYINSTALLER_COOKBOOK/)
 - [Compiled-packaging cookbook](https://github.com/zhurong2020/pyobfus/blob/main/docs/COMPILED_PACKAGING_COOKBOOK.md)
-- [pre-commit hooks](https://pyobfus.readthedocs.io/en/latest/PRE_COMMIT/) (next release, unreleased): block mappings and private keys in commits and check built output before pushing.
+- [pre-commit hooks](https://pyobfus.readthedocs.io/en/latest/PRE_COMMIT/) (since 0.13.0): block mappings and private keys in commits and check built output before pushing.
 - [Integration testing](https://pyobfus.readthedocs.io/en/latest/INTEGRATION_TESTING/)
 
 ## Architecture and development
@@ -265,3 +264,5 @@ with archival DOI [10.5281/zenodo.20846053](https://doi.org/10.5281/zenodo.20846
 
 Core is Apache-2.0; Professional implementation is proprietary. See
 [`LICENSE-NOTICE.md`](https://github.com/zhurong2020/pyobfus/blob/main/LICENSE-NOTICE.md).
+Selected Professional Edition mechanisms are patent pending
+(CN 202610712171X, not yet granted).
