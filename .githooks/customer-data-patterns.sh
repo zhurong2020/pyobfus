@@ -15,9 +15,9 @@ CUSTOMER_STRIPE_ID_RE='(^|[^A-Za-z0-9_])(cs_live|cs_test|pi|ch|pm|pmc|gcus|cus|p
 CUSTOMER_EMAIL_RE='[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}'
 
 # E-mail addresses that may appear: documentation/test domains, the
-# maintainer's public addresses, project and vendor support addresses, and
+# maintainer's public support address, project and vendor support addresses, and
 # git trailers. Matched against the whole address, case-insensitively.
-CUSTOMER_EMAIL_ALLOW_RE='^([^@]+@(example\.(com|org|net)|[^@]*\.example|[^@]*\.invalid|[^@]*\.test|corp\.com|bar\.com|b\.co|users\.noreply\.github\.com|noreply\.github\.com|anthropic\.com|mail\.anthropic\.com|glama\.ai|mcpservers\.org|pulsemcp\.com|microsoft\.com|pyobfus\.dev|arong\.eu\.org)|your@email\.com|zhurong0525@(gmail|icloud)\.com|wuxiami@hotmail\.com|zhurong@7fp1fj\.onmicrosoft\.com)$'
+CUSTOMER_EMAIL_ALLOW_RE='^([^@]+@(example\.(com|org|net)|[^@]*\.example|[^@]*\.invalid|[^@]*\.test|corp\.com|bar\.com|b\.co|users\.noreply\.github\.com|noreply\.github\.com|anthropic\.com|mail\.anthropic\.com|glama\.ai|mcpservers\.org|pulsemcp\.com|microsoft\.com|pyobfus\.dev|arong\.eu\.org)|your@email\.com|zhurong0525@gmail\.com)$'
 
 # Skipped by the e-mail check only (Stripe IDs are checked everywhere):
 # source files, where decorators such as `x@enum.global_enum` look like
