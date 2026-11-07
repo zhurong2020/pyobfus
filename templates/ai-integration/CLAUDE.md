@@ -23,3 +23,4 @@ Everything below is a quick reminder; `AGENTS.md` is the source of truth.
   preset that matches the detected framework.
 - **Always**: keep `mapping.json` out of the distributed artifact — it reveals
   every original name and is required for `--unmap` debugging later.
+- **Before shipping**: `pyobfus --check-delivery dist/ --json`; exit 1 (high findings) or 2 (incomplete) means do not ship. Pro builds in CI (Core 0.12.0+) need the licence as the secret environment variable `PYOBFUS_LICENSE_KEY` (Action input `license-key`); never print or commit it.
