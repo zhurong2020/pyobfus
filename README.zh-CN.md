@@ -87,6 +87,12 @@ Agent 入口见公开、可由人审查的
 [`AGENTS.md`](https://github.com/zhurong2020/pyobfus/blob/main/AGENTS.md)。项目不会根据
 User-Agent 返回隐藏指令或不同事实。
 
+## 中文指南
+
+- [卖给客户前如何保护 Python 源码](https://pyobfus.readthedocs.io/en/latest/zh/protect-python-before-selling/)
+- [Python 混淆后客户报错，怎样定位原来的函数](https://pyobfus.readthedocs.io/en/latest/zh/debug-obfuscated-python/)
+- [各保护方案能还原出什么（英文 FAQ）](https://pyobfus.readthedocs.io/en/latest/guides/protect-python-code-faq/)
+
 ## 安全边界
 
 混淆提高阅读和逆向成本，但不能让客户端 Python 逻辑不可恢复。密钥、凭证和授权决策
