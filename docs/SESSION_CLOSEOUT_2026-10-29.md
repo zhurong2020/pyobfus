@@ -52,7 +52,7 @@ Cold start: this file → [task tracker](POST_011_PROGRESS_2026-10-29.md) →
 
 Before this closeout edit, public main was clean at 3645f12 with no open PRs.
 The related Action docs branch is clean and remains unpushed. The unrelated
-hospital non-main worktree still has seven pre-existing modifications; untouched.
+A non-main worktree in another private repository still has pre-existing modifications; untouched.
 Private workspace-meta was clean and synchronized at inspection; this session's
 new closeout index commit is local-only. Other sessions may have synchronized
 older queued commits; do not assume the historical ahead count still applies.

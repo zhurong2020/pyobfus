@@ -137,26 +137,10 @@ Action v1.1.0 / `v1` 与 Glama 渠道 0.11.3 已完成；DEV 一周复盘已记�
       ⑤ 约 10-14 看 DEV 第 1 篇反响与 GitHub 流量来源，再决定是否投 HN（Show HN 已用过，只能普通投稿）。
 - [ ] **0.6.1 通知的回信**：随每周一巡检看 Gmail；回信若报激活问题按 `LICENSE_ACTIVATION_GUIDE.md`
       排障，不主动追发第二封。各客户激活状态只在私有记录。
-- [x] **Payment Link 开票设置**（2026-10-05 登记；**2026-10-31 已通过 API 改好**，购买网址不变）。
-      现为 `customer_creation=always`、账单地址必填、公司名与税号选填；付款后自动开票保持关闭——测试模式里
-      该发票 PDF 在已付状态下仍显示应付金额和在线付款链接，不宜发给买家；自动计税保持关闭。开票仍按私有
-      runbook 自开，但买家资料可直接从 Stripe 读取。改动用仅含必要权限的 restricted key（Vaultwarden），
-      先测试模式验证、改前备份、改后读回核对。**待办**：下一笔真实购买时按上面「核验新发号流程」再走一遍，
-      并确认 Customer 带有收集到的资料。以下为原始记录：该链接
-      由 API 创建，Dashboard 不能编辑。开 `customer_creation=always`（免费，根治访客结账没有 Customer、事后
-      开票对不上）或 `invoice_creation`（每笔自动发票，可能另收 Invoicing 费，开前看说明）只能走 API；需先在
-      Dashboard 建只含 Payment Links 写权限的 restricted key 并存进 Vaultwarden。
-      **2026-10-29 更新**：开票请求已不止一次。Dashboard 实看：该链接不收集地址、公司名或税号，
-      Post-payment invoice 关闭，Edit 禁用，买家均为 guest。现行做法是在 Stripe 外自开标明已付的发票，
-      不建 Stripe invoice、不关联付款。改链接仍待维护者决定：若改，优先收集公司名 + 税号（+ 地址）并
-      `customer_creation=always`；若新建链接替换，需同步全部购买入口并先核 Worker 能处理。流程见私有
-      `docs/internal/`（git 忽略）。
-      **2026-10-31 更新**：又一次开票按自开发票交付。交付前只读核查确认 Stripe 原生路径不可行：guest 付款
-      没有关联或转换为 Customer 的入口，不能套用到发票；用 Payment Record 标记已付会让同一笔收入重复记账；
-      账户开着一次性发票提醒，未付状态的发票会自动给买家发邮件。自开发票规范（编号 = 付款日期 + Stripe
-      收据号）在私有 runbook。下一步按维护者 10-31 指示推进 API 改链接：先只读探查 Dashboard 与 API key
-      现状，再建 restricted key、在测试模式验证参数，最后改 live 链接；Worker 已把 `session.customer`
-      写入许可记录，Customer 由空变为有值不影响发号。
+- [x] **Payment Link 开票设置**（2026-10-31 已通过 API 改好，购买网址不变）：结账现会创建 Customer 并收集账单地址，
+      公司名与税号选填；付款后自动开票保持关闭，开票按私有 runbook 在 Stripe 外自开。改动用仅含必要权限的 restricted key，
+      先测试模式验证、改前备份、改后读回核对。**待办**：下一笔真实购买时按「核验新发号流程」复核发号与 Customer 资料。
+      过程与原因见私有 `docs/internal/billing/`。
 - [ ] **开启任何延迟到账付款方式前的检查**（规则，长期有效）：Worker 与 webhook 订阅已支持
       `checkout.session.async_payment_succeeded`，但开 ACH / SEPA / 银行转账等之前先确认 endpoint 仍订阅该事件，
       开后的第一笔按上面「核验新发号流程」走一遍。Stripe 付款方式是账户级配置，会按它动态展示。

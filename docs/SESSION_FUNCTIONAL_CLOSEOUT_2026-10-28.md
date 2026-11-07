@@ -30,8 +30,7 @@ backup. The public versions remain Core **0.10.0**, MCP **0.3.16** and runtime
   duplicate triggers, timeout and cost before a necessary Guard run and push.
 - `pyobfus-action` is on clean, unpushed branch
   `docs/core-0.10.0-runtime-guide` (`5c6fa1c`); its repository-specific push
-  authorization has not been supplied. The unrelated hospital worktree on
-  `feat/hospital-edition-v2.6.0` still has seven pre-existing modifications;
+  authorization has not been supplied. An unrelated non-main worktree in another private repository still has pre-existing modifications;
   this session did not touch them.
 - The 3.15t interpreter, compatible wheels, evidence scripts and P1 fixtures
   remain under `/tmp`. They are disposable local validation artifacts, not

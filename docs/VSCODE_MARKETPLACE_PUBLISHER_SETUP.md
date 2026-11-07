@@ -18,7 +18,7 @@ Microsoft.
 ## Step 1 — Create the Marketplace publisher account (worked, no issues)
 
 1. Went to the official VS Code ["Publishing Extensions"](https://code.visualstudio.com/api/working-with-extensions/publishing-extension) docs page.
-2. Signed in at `https://marketplace.visualstudio.com` with `wuxiami@hotmail.com`.
+2. Signed in at `https://marketplace.visualstudio.com` with the maintainer's personal Microsoft account.
 3. Filled in the "Create Publisher" form — publisher ID `zhurong2020`, matching
    the existing brand identity used everywhere else (PyPI `zhurong2020`,
    GitHub `zhurong2020`, MCP Registry `io.github.zhurong2020`).
@@ -38,7 +38,7 @@ $PAT`. Azure DevOps org creation is where this got stuck.
 1. Went through the Azure DevOps get-started flow (`dev.azure.com` → sign in
    → consent screen → "Almost done... Select an Azure subscription for
    billing"). Tried this with **two different sign-ins**:
-   - `wuxiami@hotmail.com` (personal account)
+   - the maintainer's personal Microsoft account (personal account)
    - `zhurong@7fp1fj.onmicrosoft.com` (M365 Developer Program E5 sandbox
      tenant — linked/connected to the hotmail account; the actual paid
      subscription lives here)
@@ -47,7 +47,7 @@ $PAT`. Azure DevOps org creation is where this got stuck.
    associated with this account."**
 
 2. Independently confirmed real, valid subscriptions exist by logging into
-   `portal.azure.com` with `wuxiami@hotmail.com` directly. Two subscriptions
+   `portal.azure.com` with the maintainer's personal Microsoft account directly. Two subscriptions
    were listed, both eligible on paper:
 
    | Subscription | ID | Directory | Role | Type |
@@ -127,13 +127,13 @@ obvious success banner, so success was confirmed two ways:
 
 ## Updating an already-listed extension (confirmed 2026-08-06, M2 / v0.2.0)
 
-> **Sign in with `wuxiami@hotmail.com`** — the maintainer has multiple
+> **Sign in with the maintainer's personal Microsoft account** — the maintainer has multiple
 > Microsoft accounts; this is the one the `zhurong2020` publisher account was
 > created under (Step 1 above) and the only one that can see/update this
 > listing. Confirmed again 2026-08-17 (v0.4.0 update); confirmed again
 > 2026-08-22 (v0.4.1 update) — publisher page showed the green verified
 > checkmark next to 0.4.1, the "[Succeeded] Extension publish on Visual
-> Studio Marketplace" email arrived at `wuxiami@hotmail.com`, and the public
+> Studio Marketplace" email arrived at the maintainer's personal Microsoft account, and the public
 > listing independently re-checked (`curl` on
 > `marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus`) returned
 > `"version":"0.4.1"`.
@@ -144,7 +144,7 @@ built — don't just describe the steps and let them assemble the URL**
 
 1. Clickable management page:
    <https://marketplace.visualstudio.com/manage/publishers/zhurong2020>
-2. Sign-in reminder: `wuxiami@hotmail.com`.
+2. Sign-in reminder: the maintainer's personal Microsoft account.
 3. The `.vsix` path **as the Windows browser sees it**. The checkout lives inside
    WSL (since 2026-09-21), so give the UNC form, not a `/home/...` path:
    `\\wsl.localhost\<distro>\home\<user>\projects\pyobfus\vscode-extension\pyobfus-<version>.vsix`
