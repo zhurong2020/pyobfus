@@ -326,7 +326,7 @@ JOSS 页改为引用页、两张任务页、Pages sitemap、FastAPI 真实应用
 
 - [ ] **Gemini 环境补跑 + Perplexity 补 B1–B3**（维护者回常住地后）：方法与条件见私有基线
       `docs/internal/geo-observations/2026-10-07-baseline.md` 末尾总结。
-- [ ] **Search Console**（维护者账号）：验证 `https://zhurong2020.github.io/pyobfus/`（URL-prefix）并提交
+- [x] **Search Console**（11-07 完成：`/pyobfus/` 资源自动验证并提交 sitemap，待 Google 读取；文档站 `https://pyobfus.readthedocs.io/en/latest/` 用 HTML 文件验证，sitemap 读取成功 146 页；Bing Webmaster 已从 GSC 导入。验证文件 `docs/google03878b382b498ff9.html` 必须保留。原始待办：）验证 `https://zhurong2020.github.io/pyobfus/`（URL-prefix）并提交
       `/pyobfus/sitemap.xml`；RTD 的 sitemap 对脚本返回 Cloudflare 质询，在 GSC 里看抓取状态。域名根 `robots.txt`
       属个人站仓库，没有改。
 - [ ] **mcp.so 列表文案过时**（「50% cheaper than PyArmor」）：维护者在 mcp.so 看能否更新描述。
