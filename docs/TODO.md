@@ -606,6 +606,11 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
   IndexNow 提交记录与「AI Performance（beta）」。另看 GitHub Actions 里 Pages 末步与 `IndexNow docs
   notification` 的返回码（200/202 正常，403/422 查 key 文件）。只记结论，数据明细放私有目录。
   维护者用 Chrome 插件做只读盘点时，Prompt 在 `~/projects/workspace-meta/archives/SEARCH_CONSOLE_SETUP_GUIDE_2026-11-07.md` 第 5 步。
+- **11-08／11-09 重新采集搜索盘点**：11-07 首次盘点在注册当天，pyobfus 两站的收录、效果、链接均显示处理中；
+  维护者用同一 Prompt 复采后看三件事：落地页 sitemap 在 GSC 是否仍「无法抓取」（Bing 已成功读取 2 个网址）；
+  文档站与落地页的收录数和未收录原因；Bing 的 IndexNow 页是否出现提交记录（API 当日返回 202／200，Bing 页面可能滞后；
+  若 11-09 后仍无记录，先在浏览器确认 `https://pyobfus.readthedocs.io/en/latest/0f5fb35e631b28ef475c62df09d73cdd.txt`
+  可访问，RTD 对部分抓取者有 Cloudflare 质询）。原始 JSON 在私有仓库 `workspace-meta/archives/`。
 - **月度搜索／AI 观测（每月第一周）**：WebSearch 12 题 + Codex（隔离 `CODEX_HOME`、中性目录）+ Codebuddy
   `hy4free` / `deepseek-v4-pro` / `kimi-k3.1-pro`，并读 Bing「AI Performance」。方法、隔离与坑见私有
   `docs/internal/geo-observations/2026-11-07-baseline.md`；下次 2026-12 第一周。
