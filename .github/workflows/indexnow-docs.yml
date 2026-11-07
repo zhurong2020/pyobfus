@@ -1,0 +1,54 @@
+name: IndexNow docs notification
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+  workflow_dispatch:
+    inputs:
+      all_nav_pages:
+        description: Submit all local MkDocs navigation pages
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+# Advisory only; deliberately independent of the required CI result check.
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v5
+        with:
+          fetch-depth: 0
+      - name: Collect changed docs
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: |
+          : > changed-docs.txt
+          if [[ -n "$BEFORE" && ! "$BEFORE" =~ ^0+$ ]]; then
+            git -c core.quotePath=false diff --name-only "$BEFORE" "$AFTER" > changed-docs.txt
+          fi
+      # RTD challenges scripted polling. Allow a fixed build window instead.
+      - name: Wait for Read the Docs build
+        run: sleep 240
+      - name: Notify search engines via IndexNow
+        continue-on-error: true
+        env:
+          ALL_NAV: ${{ inputs.all_nav_pages }}
+        run: |
+          source_args=(--from-changed-docs)
+          if [[ "$ALL_NAV" == 'true' ]]; then
+            source_args=(--from-nav)
+          fi
+          python3 scripts/indexnow_submit.py \
+            --host pyobfus.readthedocs.io \
+            --key 0f5fb35e631b28ef475c62df09d73cdd \
+            --key-location https://pyobfus.readthedocs.io/en/latest/0f5fb35e631b28ef475c62df09d73cdd.txt \
+            "${source_args[@]}" < changed-docs.txt

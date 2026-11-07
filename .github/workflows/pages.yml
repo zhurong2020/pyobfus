@@ -78,6 +78,7 @@ jobs:
     # Pages receives the same bytes at deploy time.
     - name: Add the public Agent guide to the Pages artifact
       run: |
+        test -f landing/0f5fb35e631b28ef475c62df09d73cdd.txt
         test -s llms.txt
         cmp --silent llms.txt docs/llms.txt
         cp llms.txt landing/llms.txt
@@ -88,3 +89,12 @@ jobs:
         path: landing
     - id: deployment
       uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346  # v5.0.1
+
+    - name: Notify search engines via IndexNow
+      continue-on-error: true
+      run: >-
+        python3 scripts/indexnow_submit.py
+        --host zhurong2020.github.io
+        --key 0f5fb35e631b28ef475c62df09d73cdd
+        --key-location https://zhurong2020.github.io/pyobfus/0f5fb35e631b28ef475c62df09d73cdd.txt
+        --from-sitemap landing/sitemap.xml
