@@ -18,6 +18,58 @@ exclude_docs: |
   # Unimplemented proposal; reviewed in GitHub before product documentation.
   CROSSFILE_PARAMETER_RENAMING_DESIGN.md
   CROSSFILE_MODULE_ATTRIBUTE_DESIGN.md
+  # Maintainer working records, plans, research and release-process evidence
+  # (2026-11-07). They stay public on GitHub for transparency but are not
+  # product documentation, so they are kept off the site and its sitemap.
+  SESSION_CLOSEOUT_*.md
+  SESSION_FUNCTIONAL_CLOSEOUT_*.md
+  EXECUTION_PROGRESS_*.md
+  PROGRESS_*.md
+  PRIORITY_PROGRESS_*.md
+  POST_*_PROGRESS_*.md
+  OPS_REVIEW_*.md
+  OPERATIONS_REVIEW_*.md
+  COLD_START_PROMPT_*.md
+  CURRENT_PLAN_ZH.md
+  TODO.md
+  POST_V0.4_TODO.md
+  ROADMAP.md
+  RESUME_PLAN_*.md
+  V0.4_EXECUTION_LOG.md
+  V0.5*_RELEASE_PLAN.md
+  CORE_0_1*_RELEASE_*.md
+  CORE_012_*.md
+  CORE_NEXT_RELEASE_READINESS_*.md
+  MCP_SDK_2X_RELEASE_PREP_*.md
+  MCP_SDK_2X_REVIEW_*.md
+  DOC_SYNC_AUDIT_*.md
+  CROSS_REPO_DOC_SYNC_AUDIT_*.md
+  SITE_INFORMATION_ARCHITECTURE_REVIEW_*.md
+  FEATURE_EXPANSION_RESEARCH_*.md
+  DISTRIBUTION_EXPANSION_RESEARCH_*.md
+  EXTERNAL_CHANNEL_SNAPSHOT_*.md
+  SEO_AND_COMPETITOR_SCAN_*.md
+  ADOPTION_*_2026-*.md
+  AGENTIC_DISCOVERABILITY_*.md
+  AGENT_ADOPTION_GUIDANCE_PLAN.md
+  AI_INTEGRATION_STRATEGY.md
+  AI_ERA_*.md
+  ROADMAP_REVIEW_*.md
+  NEXT_FEATURE_DECISION.md
+  ENGINEERING_VALIDATION_*.md
+  P0_*_2026-*.md
+  P1_*_2026-*.md
+  P2_*_2026-*.md
+  VIDEO_ORIGINALITY_*.md
+  JOSS_REJECTION_*.md
+  TRIAL_STRATEGY_DECISION_*.md
+  DISTRIBUTION_CHANNELS.md
+  DEV_PUBLISHING_CHECKLIST.md
+  OPEN_VSX_PUBLISH_PLAN.md
+  VSCODE_MARKETPLACE_PUBLISHER_SETUP.md
+  VSCODE_EXTENSION_PLAN.md
+  AFFILIATE_PROGRAM_DESIGN.md
+  DUAL_USE_CONTEXT_AND_SAFETY_FLAGS.md
 
 repo_name: zhurong2020/pyobfus
 repo_url: https://github.com/zhurong2020/pyobfus
@@ -106,9 +158,6 @@ nav:
     - Network behavior: NETWORK_BEHAVIOR.md
     - Supply-chain assurance (SLSA / CycloneDX / PEP 740): SUPPLY_CHAIN_ASSURANCE.md
     - Reason codes: REASON_CODES.md
-  - Distribution:
-    - Open VSX publishing: OPEN_VSX_PUBLISH_PLAN.md
-    - Affiliate pilot design (not launched): AFFILIATE_PROGRAM_DESIGN.md
 
 markdown_extensions:
   - admonition

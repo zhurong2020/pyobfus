@@ -52,7 +52,7 @@ CLI tool errors even under `fail-on: never`; findings retain their configured ga
 Action and Core versions are independent. For an immutable wrapper use
 `@v1.1.0` or its exact SHA; `pyobfus-version` separately pins the builder.
 The Action's `offline` input controls dependency-name lookups, not CI license
-verification. See [the verified channel rollout](CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md).
+verification. See [the verified channel rollout](https://github.com/zhurong2020/pyobfus/blob/main/docs/CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md).
 
 ## GitLab CI
 

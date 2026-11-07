@@ -2,15 +2,15 @@
 
 **优先级：P0，维护者于 2026-10-20 明确确认。** 利用 Python 3.15 发布窗口，尽快完成兼容支持；优先于 MCP SDK 升级、mapping 扩展、目录 fusion、参数改名及其他新增功能。
 
-**执行状态：已完成并随 Core 0.8.0 于 2026-10-20 发布**（PR #108，Claude 独立审核后合并；发布核验见 [当前计划](CURRENT_PLAN_ZH.md) 顶部）。下文保留为实施记录。见 [2026-10-20 验证记录](PYTHON315_VALIDATION.md)。医院应用继续暂停。
+**执行状态：已完成并随 Core 0.8.0 于 2026-10-20 发布**（PR #108，Claude 独立审核后合并；发布核验见 [当前计划](https://github.com/zhurong2020/pyobfus/blob/main/docs/CURRENT_PLAN_ZH.md) 顶部）。下文保留为实施记录。见 [2026-10-20 验证记录](PYTHON315_VALIDATION.md)。医院应用继续暂停。
 
 ## 1. 当前事实与入口
 
 - 已发布版本：Core 0.7.5 / MCP 0.3.13 / runtime 0.1.1。
 - 已发布 Core 0.7.5 的支持范围为 **Python 3.9–3.14**；支持分支增加 **3.15**，具体 CI head 与验收结论写入实施 PR。
 - 10-20 已用原生 Linux x86_64 CPython 3.15.0，对 checkout 和 PyPI Core 0.7.5 wheel 复现两项缺口；原文与产物均用独立 Python 子进程比较。
-- 最小输入、解释器／wheel 哈希、结果与限制见 [10-20 调研 §5](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)。小型证据和探针位于本地忽略目录 `docs/internal/research-2026-10-20/`。临时解释器路径只作复跑便利，不作为其他机器的环境前提。
-- 工作规则以 [AGENTS.md](https://github.com/zhurong2020/pyobfus/blob/main/AGENTS.md) 为准；实际进度写回 [当前计划](CURRENT_PLAN_ZH.md)，待办写回 [TODO](TODO.md)。
+- 最小输入、解释器／wheel 哈希、结果与限制见 [10-20 调研 §5](https://github.com/zhurong2020/pyobfus/blob/main/docs/FEATURE_EXPANSION_RESEARCH_2026-10-20.md)。小型证据和探针位于本地忽略目录 `docs/internal/research-2026-10-20/`。临时解释器路径只作复跑便利，不作为其他机器的环境前提。
+- 工作规则以 [AGENTS.md](https://github.com/zhurong2020/pyobfus/blob/main/AGENTS.md) 为准；实际进度写回 [当前计划](https://github.com/zhurong2020/pyobfus/blob/main/docs/CURRENT_PLAN_ZH.md)，待办写回 [TODO](https://github.com/zhurong2020/pyobfus/blob/main/docs/TODO.md)。
 
 ## 2. 实施范围与建议顺序
 
@@ -72,7 +72,7 @@ VS Code：`vscode-tests315-final.log`（53 项，原生 3.15 CLI）；Action：`
 - Core／MCP／runtime 适用的 `pyproject.toml` 分类器，以及格式／类型目标配置；保留既有最低版本，按各包实际证据更新。
 - `AGENTS.md`、`CLAUDE.md`、`SUPPORT_MATRIX.md`、README 中英文、文档首页；核对生成的配置 schema／VS Code 描述／工具清单中是否存在 Python 版本枚举。
 - Core 与受影响包的 `[Unreleased]`、发布说明、构建兼容性及 runtime 限制；版本号由实际范围决定，本计划不预设 0.7.6 或其他版本。
-- 原先 [10-12 路线图](AI_ERA_PROTECTION_ROADMAP_2026-10-12.md) 和 [10-20 调研](FEATURE_EXPANSION_RESEARCH_2026-10-20.md) 保留研究历史，更新实施结果指针；TODO 移除已完成项，当前计划记录完成证据。
+- 原先 [10-12 路线图](https://github.com/zhurong2020/pyobfus/blob/main/docs/AI_ERA_PROTECTION_ROADMAP_2026-10-12.md) 和 [10-20 调研](https://github.com/zhurong2020/pyobfus/blob/main/docs/FEATURE_EXPANSION_RESEARCH_2026-10-20.md) 保留研究历史，更新实施结果指针；TODO 移除已完成项，当前计划记录完成证据。
 
 发布仍需维护者另行确认。若 runtime 源码变动，先升版本、先发 runtime，再发依赖它的 Core；MCP／扩展／Action 不因 Core 支持新解释器而自动发版。发布前完整检查与审核，发布后做 PyPI 产物、PEP 740、全新环境安装、GitHub Release、Zenodo/CFF 核对，沿用现有 runbook。
 
