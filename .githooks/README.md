@@ -94,7 +94,7 @@ unrelated edits) for:
 - E-mail addresses not on `CUSTOMER_EMAIL_ALLOW_RE` (documentation/test
   domains, the maintainer's public addresses, project and vendor support
   addresses). Source files (`.py`, `.ts`, `.js` …) and lock files are skipped
-  for this check only: decorators like `x@enum.global_enum` look like
+  for this check only: decorator syntax can resemble
   addresses.
 
 Patterns live in `.githooks/customer-data-patterns.sh`, shared with the

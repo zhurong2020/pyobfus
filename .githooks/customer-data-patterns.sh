@@ -20,7 +20,7 @@ CUSTOMER_EMAIL_RE='[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2
 CUSTOMER_EMAIL_ALLOW_RE='^([^@]+@(example\.(com|org|net)|[^@]*\.example|[^@]*\.invalid|[^@]*\.test|corp\.com|bar\.com|b\.co|users\.noreply\.github\.com|noreply\.github\.com|anthropic\.com|mail\.anthropic\.com|glama\.ai|mcpservers\.org|pulsemcp\.com|microsoft\.com|pyobfus\.dev|arong\.eu\.org)|your@email\.com|zhurong0525@gmail\.com)$'
 
 # Skipped by the e-mail check only (Stripe IDs are checked everywhere):
-# source files, where decorators such as `x@enum.global_enum` look like
+# source files, where decorator syntax can resemble
 # addresses, and lock files, which carry package-author metadata.
 CUSTOMER_EMAIL_SKIP_FILE_RE='\.(py|pyi|ts|js|mjs|cjs)$|(^|/)(package-lock\.json|uv\.lock|poetry\.lock)$'
 

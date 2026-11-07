@@ -17,10 +17,7 @@ key escrow on a server it controls — cannot bind the L3 decryption key to
 the runtime key is derived from pyobfus's fingerprint rather than material the
 application supplies.
 
-Downstream driver: an internal downstream application (offline Windows, torch/MONAI,
-Python 3.13 embedded). It wants one artifact whose L3 layer decrypts only when
-its own server, after verifying the site's authorization, provides the key
-material.
+Downstream driver: an internal downstream application needs an offline Windows deployment whose L3 layer decrypts only when the application supplies authorized key material (details in private records).
 
 ## Decision (v1)
 

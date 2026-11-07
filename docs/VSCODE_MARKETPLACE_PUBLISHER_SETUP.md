@@ -39,9 +39,7 @@ $PAT`. Azure DevOps org creation is where this got stuck.
    → consent screen → "Almost done... Select an Azure subscription for
    billing"). Tried this with **two different sign-ins**:
    - the maintainer's personal Microsoft account (personal account)
-   - `zhurong@7fp1fj.onmicrosoft.com` (M365 Developer Program E5 sandbox
-     tenant — linked/connected to the hotmail account; the actual paid
-     subscription lives here)
+   - the maintainer's Microsoft sandbox account (details in private records)
 
    Both failed at the same step with: **"We couldn't find any subscriptions
    associated with this account."**
@@ -50,10 +48,7 @@ $PAT`. Azure DevOps org creation is where this got stuck.
    `portal.azure.com` with the maintainer's personal Microsoft account directly. Two subscriptions
    were listed, both eligible on paper:
 
-   | Subscription | ID | Directory | Role | Type |
-   |---|---|---|---|---|
-   | zhurong free subs | `4bada6e0-463e-4b96-84fc-f9b6debb12f1` | Default Directory (wuxiamihotmail.onmicrosoft.com) | Owner | Azure Plan |
-   | Azure 订阅 1 | `7d51f0c4-a972-4e5e-9390-ce245b42afde` | Default Directory (wuxiamihotmail.onmicrosoft.com) | Owner | Azure Plan |
+   Account identifiers and subscription names are kept in private records.
 
    Both are Owner-role, Azure Plan type, same directory as the sign-in used
    in step 1 — on paper, exactly what Azure DevOps org creation should

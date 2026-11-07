@@ -20,13 +20,13 @@ arong.eu.org 与老博客已交 findata。
 ### 仍生效的约定（从历次交接提炼，2026-11-07）
 
 - **工作方式**：代码修改默认交无头 Codex 实现、Claude 审核（注意 Codex 5 小时额度；沙箱 `.git` 只读时由 Claude 提交／推送）。
-  代码合并与发版各需维护者明确批准；纯文档 PR 在 CI 与 CodeQL 通过后可直接合并。
+  所有 PR（含纯文档）的合并均遵循维护者在每次会话中的明确指示，无常设自动合并授权；发版另需明确批准。
 - **发版节奏（10-23 定）**：不为观察下载设静默期，按功能与修复的自然进度规划发版，每次发版仍须批准（`docs/TODO.md`「节奏」）。
 - **查进度固定动作**：进度 + 下载量（`python scripts/download_snapshot.py`）+ Gmail（`/pyobfus-inbox`），三样一起给。
 - **内容与稿件**：未发稿件放 gitignored 的 `docs/internal/content-*/`，不进公开目录；排期见 `docs/TODO.md`「内容节奏」。
   `llms.txt`／`AGENTS.md`／MCP 已覆盖 Agent 需求，不另做 AI 专用页；落地页 JSON-LD 的 offers 须随改价同步。
 - **runtime**：`pyobfus_runtime` 源码有改动必须先升版本、先发 runtime（`scripts/check_runtime_version.py`）。
-- **本机 Python 3.15**：用工作区登记的 `~/venvs/py315_20261020`（`../workspace-meta/VENV_INDEX.md` §0），不新建 venv。
+- **本机 Python 3.15**：常规检查使用 `~/venvs/py315_20261020`；已发布 wheel 的全新安装验证可按 `../workspace-meta/VENV_INDEX.md` 使用一次性环境。
 - **Affiliate**：只有设计（`docs/AFFILIATE_PROGRAM_DESIGN.md`），条款未生效；实现前须补幂等、退款／争议、隐私与财税确认，文档完成不等于授权实现。
 - **Claude 插件市场**：仓库锁已升级到 Anthropic 内部，等支持回复；锁未释放前不要重提表单或换路径（证据见私有 `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`）。
 - **IP**：专利标识与专有许可专利条款待随版本发布，见 `docs/TODO.md`「IP 相关」；法务侧在仓库外 `pyobfus-legal/`。
@@ -65,7 +65,7 @@ arong.eu.org 与老博客已交 findata。
   下一硬期限 = 实审请求 ≈2029-05-22（实审费已缴）。v0.5 机制已于 v0.5.0 公开发布。
 - 冷启动资料：`~/projects/pyobfus-legal/patent/SESSION_LOG_20260617.md`（最新时间线）· 官方通知书正本
   `~/projects/pyobfus-legal/patent/08_提交记录/` · memory `patent_correction_notice_2026-06-01.md`。
-- 与 cac-plus-ip 共享同一申请人与费减备案，跨项目索引见 `~/projects/cac-plus-ip/CLAUDE.md` + memory `ip_workflow_cross_project.md`。
+- 与本地私有仓库 `~/projects/cac-plus-ip/` 共享同一申请人、费减备案与 CNIPA 申请模板；跨项目索引见该仓 `CLAUDE.md` 与 memory `ip_workflow_cross_project.md`。
 - **红线**：`pyobfus-legal/` **永不入 git**（含 PII）。命名清单见 memory `pro_disclosure_finding_2026-05-09.md` + `pyobfus_patent_strategy.md`。
 
 ## 项目概述
@@ -174,4 +174,4 @@ vX.Y.Z"横幅），跟徽标是两回事。
 |----------|---------------|------|
 | `pyobfus-legal/` | cardiac-research.code-workspace（WSL 本地同级目录 `~/projects/pyobfus-legal/` · 2026-09-21 起为真实目录，不再是 OneDrive 软链接）| pyobfus 软著 + 专利申报材料的物理仓库（**不在 git repo 内** · 含 PII，不公开）。包含 `software_copyright/` (V0.4.0 软著已 2026-05-09 提交 CCPC) 和未来的 `patent/` (v0.5 专利申请目录)。物理路径：`~/projects/pyobfus-legal/`（旧 OneDrive 副本 `/mnt/c/onedrive/msft/OneDrive - MSFT/rong/3-job/program/pyobfus-legal/` 已过期勿再编辑），工作区入口：`~/projects/pyobfus-legal/`（symlink） |
 | `pyobfus-pro-dev/` | 本地 `~/projects/pyobfus-pro-dev`；GitHub `zhurong2020/pyobfus-pro-dev`（**private + archived，只读，推送 403**） | **专利 `202610712171X` 的发明/实现时间线证据库，不是开发源**。v0.5 Pro 机制 2026-05-09 起在此开发（早于 05-22 申请日），06-17 初审合格后 squash 合入公开仓库，逐提交历史只在这里；`pyobfus-legal/patent/01_权利要求书/disclosure_v1.md` 依据其 `PATENT_NOTES.md`（28 条）与集成测试撰写，第 12 节引用它。**用途**：实审请求（≈2029-05）、审查答复、无效/维权时证明实现时间与方式。**规则**：保留远端归档、不删不公开；不在其中开发/发版/拷回公开仓库；跨仓同步时跳过它。2026-10-14 远端已包含两个历史标记/`.gitignore` 提交，仍为 archived；10-11 已删本地 `venv-3.10/`。可选加固：`git bundle` 离线备份放 `pyobfus-legal/patent/`（未做）。 |
-| `cac-plus-ip/` | cardiac-research.code-workspace（同 workspace 内）| **同申请人的并行 IP 工作流**。CAC Plus 医学 AI 项目的 3 件中国发明专利 + 2 件软著申请仓库。**与 pyobfus 内容无关、但工作流共享**：同一个 CCPC 账号 / 同一个 CPC 客户端 USB Key / 同一个 85% 个人申请减免资格 / 同一套 CNIPA 官方申请模板（位于 `cac-plus-ip/02_china_发明专利/_templates_CNIPA/`，pyobfus v0.5 专利申请直接复用，不重复下载）|
+| `cac-plus-ip/` | 本地私有仓库（同 workspace） | 同申请人的并行 IP 工作流，与 pyobfus 内容无关；可复用其 CNIPA 申请模板，项目材料保持分离。 |

@@ -45,11 +45,7 @@ CP1252 help 输出。后续开发优先级见 `docs/CURRENT_PLAN_ZH.md` 与 `doc
 
 ### 🔴 2026-09-13 — 许可系统可靠性（历史记录）
 
-一位新客户报激活失败，查出**与他无关的全线故障**：Cloudflare 边缘拦 `urllib` 默认
-UA（403 + `error code: 1010`），请求到不了 Worker，**所有付费客户自约 2026-07-08 起
-都激活不了、近两个月无人察觉**。排查中又挖出四个更早的缺陷（8 月那位客户其实也从未
-成功激活、一封求助邮件躺了三个月、设备指纹含 `platform.release()` 导致 OS 升级即丢
-许可、吊销从未生效）。四项修复已全部发布为 **`0.5.26`**（先部署 Worker 再发客户端，
+许可排障发现 Cloudflare 边缘拦截默认 urllib UA（403 / error code 1010）、设备释放路径缺失、指纹随 OS 版本变化及吊销回退缺陷（细节见私有记录）。四项修复已全部发布为 **`0.5.26`**（先部署 Worker 再发客户端，
 顺序是硬约束）。真正的产出是两个**机制**：合成监控（`.github/workflows/license-endpoint-monitor.yml`，
 用不存在的 key 打生产端点、零副作用）与 KV 每日自动导出并入 OneDrive 备份
 （`~/scripts/pyobfus_kv_export.sh`，失败拒绝落盘）。
@@ -228,8 +224,7 @@ UA（403 + `error code: 1010`），请求到不了 Worker，**所有付费客户
   独立核实为 `active` / `isLatest=true`，且新版 intent description 生效。
   昨日待查的 docs commit `289752a` CI run `33521916080` 也已 success；最新
   收尾 commit `4b7bf9a` 的 CI / CodeQL / Pages 同样全绿。本轮发版无剩余项。
-- **客户 Invoice Receipt 已交付**：客户回访仅被动等待来信，不阻塞
-  开发主线。
+- **开票处理**：Stripe 发票路径的限制与处理规则见私有记录，不阻塞开发主线。
 
 - **`pyobfus 0.5.19` 已发布（2026-08-30，用户明确批准）**：把此前 held 的两个
   独立 commit 组成 Core 小版本——`3758482` 的 `--dry-run --json` versioned
@@ -265,15 +260,7 @@ UA（403 + `error code: 1010`），请求到不了 Worker，**所有付费客户
   08-25 随即回落为 27 / 8；GitHub issue、PR、Discussion 均无新增，维持
   “发布/自动化噪音，尚无有机增长”判断。证据已追加到
   [`docs/EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md`](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md)。
-- 一位真实 Pro 客户确认使用进展良好，并要求为既有 Payment Link 购买开票。
-  付款已成功关联，Dashboard 为 Paid / US$0.00 remaining。2026-09-01 Stripe
-  Support 最终确认：`send invoice` 的 invoice PDF 按设计保留原始应付金额与
-  条款，无法重生成零余额或 `Paid` 样式；Invoice Receipt 才是正式付款证明。
-  用户已在原客户线程解释并纠正先前预期，附上正确 receipt，错误 invoice PDF
-  未发送；该支持事项已完成。不得贷记、退款、解除付款或重扣。客户回访改为
-  被动等待客户邮件，不主动追发；不能把单次开票需求提前解释为团队许可或企业功能
-  需求。当前状态以 `docs/CURRENT_PLAN_ZH.md` 为准；具体客户/支付信息只留在
-  Git 忽略的 `docs/internal/` 运营记录，绝不进入公开提交。
+- 企业开票需求暴露了 Stripe 原生路径对 guest checkout 与发票 PDF 的限制；按私有 runbook 在 Stripe 外开票，不据此推断团队许可或企业功能需求（细节见私有记录）。
 - 下一轮功能方向已完成代码审计与官方资料调研，最新一版见
   [`docs/FEATURE_EXPANSION_RESEARCH_2026-09-02.md`](FEATURE_EXPANSION_RESEARCH_2026-09-02.md)
   （刷新并取代 2026-08-26 版）。
@@ -292,7 +279,7 @@ UA（403 + `error code: 1010`），请求到不了 Worker，**所有付费客户
   `origin/main` tip 一律以 `docs/CURRENT_PLAN_ZH.md` +
   `~/projects/WORK_LOG_INDEX.md` 顶行为准**（每轮追加）。此前 session 的 Stripe
   交接、配置感知实现和 HOME 隔离测试也均已 push。冷启动后先读
-  `docs/CURRENT_PLAN_ZH.md`；发票与 SEO 发版均已结案，客户回访只等待来信。
+  `docs/CURRENT_PLAN_ZH.md`；SEO 发版已完成；开票处理细节见私有记录。
   除非用户明确 gate，不启动其它功能实现或发布。外部事项现为 Canopii #6
   回复/重扫、MCP Trust Checker 登记、Claude plugin pending 观察，并在
   1–2 周后复查下载；若 9 月 1–7 日仍无 advisory 反馈，再考虑 GitHub Discussion
@@ -382,16 +369,14 @@ review`（Aug 2），无变化。
 文案补 Nx Console 2026 事件+CodeQL-clean+SHA-pinned CI。四项均 held 在
 `[Unreleased]`，未发布（下次按"1-2 天间隔"节奏判断）。
 
-🔴 **过程中意外发现并已修复部署一个真实、可被利用的安全漏洞**：排查一位付费
-客户活跃度时，在 `cloudflare-worker/src/index.js` 发现 Stripe webhook
+🔴 **过程中意外发现并已修复部署一个真实、可被利用的安全漏洞**：许可系统审计时，在 `cloudflare-worker/src/index.js` 发现 Stripe webhook
 从未校验签名（"TODO: Verify Stripe signature"从未实现）——任何人知道公开
 URL 就能伪造请求白拿永久 Pro license，完全绕过付款。已复用仓库里 
 `content_webhook.js` 已验证的 HMAC-SHA256 校验函数修复（commit `b49fdb2`，
 5 场景功能测试全过：合法签名/篡改 body/错误 secret/**缺签名请求头**[即
 原漏洞利用方式]/10 分钟前重放，全部按预期通过），**并已用 `npx wrangler
 deploy` 部署到生产、现场重放原攻击确认 `HTTP 400 Invalid signature`**。
-KV 里仅 4 条 license 记录全部对得上号（3 真实客户+1 自测数据），无证据
-显示漏洞被实际利用过。`STRIPE_WEBHOOK_SECRET` 早在 2025-11-12 就已配置为
+未发现漏洞被实际利用的证据（核查细节见私有记录）。`STRIPE_WEBHOOK_SECRET` 早在 2025-11-12 就已配置为
 Cloudflare secret，纯代码修复，未新增任何密钥。
 
 README 顺带两处修正：加了"Watch this repo → Releases"的 CTA（此前 0
@@ -399,11 +384,7 @@ watcher）；Pro Support 段落"any issues→email"改窄为"license/账号问�
 留邮件，其他导去 GitHub"。
 
 **跨项目动作**：① Gmail MCP（`claude.ai Gmail` 连接器）本 session 首次接入，
-是账号级能力非 pyobfus 专属，已记入全局 `~/.claude/CLAUDE.md`；② 用 Gmail
-搜索顺手查到 cardiac-manuscripts AIC-01(CAC Plus) 论文的拒稿信，动手更新
-追踪文档前先去核对，发现该项目自己的 `STATUS.md` 已经领先于其"权威"
-`PAPERS_MASTER_INVENTORY.md`——已同步该文件五处并单独 commit+push 到
-cardiac-manuscripts 仓库（不影响 pyobfus 仓库本身）。
+是账号级能力非 pyobfus 专属，已记入全局 `~/.claude/CLAUDE.md`；② 另一个内部项目的状态文档已同步，不影响 pyobfus 仓库（细节见私有记录）。
 
 完整过程见 memory `pyobfus_p2_30_33_scan_followups_2026-08-20.md` +
 `reference_pyobfus_pro_customer_outreach.md`（含安全漏洞完整时间线）+
@@ -447,7 +428,7 @@ cardiac-manuscripts 仓库（不影响 pyobfus 仓库本身）。
 
 **✅ Plugin marketplace 提交已完成（2026-08-02）**：Console 表单提交成功，显示"Plugin submitted for review"——状态是**待 Anthropic 审核**，不是已上线；`Link to plugin` 字段一度报 `must not contain spaces or control characters`（复制粘贴带入隐藏字符，手动重新输入后解决）。后续查审核结果看 `github.com/anthropics/claude-plugins-community`（审核通过后隔夜同步）或 Console 里的"View submissions"。
 
-**✅ 2026-08-04 找到确切查询入口 + 状态确认**：权威地址是 **`https://platform.claude.com/plugins/submissions`**（Claude Console → Plugin submissions，需登录 user 自己的 Console 账号 `Rong / Shanghai Nirong Technology Co., Ltd.`）。页面显示 pyobfus 状态仍是 **"Submitted and pending review"**（提交于 2 天前，与 08-02 提交时间吻合，尚无 approve/reject 结论）。顺带核实了那个"protected_project"笔误确实还留在已提交的描述文案里（"One-call protected_project workflow..."一句）——继续维持"机会性修复"处置，不主动改，除非 Anthropic 跟进要求补充信息。公开旁证渠道（`claude-plugins-community` 仓库 `.claude-plugin/marketplace.json`，2298 个插件里搜 `pyobfus`）2026-08-04 同步核实：尚未出现，与 Console 状态一致。
+**✅ 2026-08-04 找到确切查询入口 + 状态确认**：权威地址是 **`https://platform.claude.com/plugins/submissions`**（Claude Console → Plugin submissions，需登录 user 自己的 Console 账号 （账号细节见私有记录））。页面显示 pyobfus 状态仍是 **"Submitted and pending review"**（提交于 2 天前，与 08-02 提交时间吻合，尚无 approve/reject 结论）。顺带核实了那个"protected_project"笔误确实还留在已提交的描述文案里（"One-call protected_project workflow..."一句）——继续维持"机会性修复"处置，不主动改，除非 Anthropic 跟进要求补充信息。公开旁证渠道（`claude-plugins-community` 仓库 `.claude-plugin/marketplace.json`，2298 个插件里搜 `pyobfus`）2026-08-04 同步核实：尚未出现，与 Console 状态一致。
 
 **✅ 2026-08-09 再次手动确认 Claude plugin submission 状态**：user 打开 `https://platform.claude.com/plugins/submissions`，页面仍显示 `Plugin submissions` → `pyobfus` → **"Submitted and pending review"**，日期 **Aug 2**，没有 approve/reject/补充信息。提交描述仍显示 `"One-call protected_project workflow"` 这个 typo（正确工具名是 `protect_project`），继续维持既定处置：不为 typo 单独重提，除非 Anthropic 要求修改或给出编辑/重提路径。
 
@@ -514,7 +495,7 @@ cardiac-manuscripts 仓库（不影响 pyobfus 仓库本身）。
 
 **✅ 2026-08-06：M0（pyobfus 0.5.12）+ M2（vscode-extension v0.2.0）均已发布，P2-2 四个里程碑（M0/M1/M2/M3）全部 code-complete，只差 M3 发布。** VS Code Marketplace「更新已有 listing」的真实流程已现场探明并写入 `docs/VSCODE_MARKETPLACE_PUBLISHER_SETUP.md`：扩展名称旁「⋯」菜单 → Update（不是 Manage tab、也不是「New extension」按钮）。
 
-- 🐛 **同日 M2 发布后，user 亲手实测右键混淆命令，揪出并修复一个真崩溃 bug，已加急发 vscode-extension 0.2.1（不等 2 天 gate）**：`runJsonCommand` 从未传 `cwd`，`-m pyobfus` 把进程 cwd 放在 `sys.path` 最前——若 cwd（或其兄弟目录）恰好叫 `pyobfus`（例如 maintainer 自己 `~/projects/pyobfus` 指回本仓库的符号链接），Python 会把它当 namespace package 抢先命中，报 "'pyobfus' is a package and cannot be directly executed"，即使目标解释器本身完全正常。诊断途中一度被**同一段报错文字的另一个不相关根因**带偏：user 实测那个文件解析到的解释器（`vbca/wsl_venv`，cardiac 研究共用 venv）里装的是 2025-12 的古董版本 `pyobfus==0.2.3`，那时候压根没有 `__main__.py`——两种根因文字完全相同，靠 `pip show` 交叉核实才分清。修复：`runJsonCommand` 默认 `cwd=os.tmpdir()`（对 check/workspace-check/反解 trace 安全，已核实它们的 `--check`/`--unmap` 分支不碰 `pyobfus.yaml` 自动发现）；`obfuscateFile.ts` 单独用 `cwdForTarget()`（工作区根目录优先，否则退回目标自身目录）因为混淆主命令确实会从 cwd 自动发现 `pyobfus.yaml`；`reportCliError` 新增 `isStalePyobfusInstall` 识别，命中老版本时给"升级或换解释器"按钮而非原始 traceback。8 个新测试（含两个用真实 `--dry-run --verbose` 输出核实 auto-discovery 确实按 cwd 生效，不是只测路径字符串），32/32 全绿，真实 CI 也全过。tag `vscode-v0.2.1` + GitHub Release 已建，公开 listing 已核实显示 0.2.1。完整诊断经过见 memory `pyobfus_vscode_cwd_bug_fix_2026-08-06.md`。
+- 🐛 **同日 M2 发布后，user 亲手实测右键混淆命令，揪出并修复一个真崩溃 bug，已加急发 vscode-extension 0.2.1（不等 2 天 gate）**：`runJsonCommand` 从未传 `cwd`，`-m pyobfus` 把进程 cwd 放在 `sys.path` 最前——若 cwd（或其兄弟目录）恰好叫 `pyobfus`（例如 maintainer 自己 `~/projects/pyobfus` 指回本仓库的符号链接），Python 会把它当 namespace package 抢先命中，报 "'pyobfus' is a package and cannot be directly executed"，即使目标解释器本身完全正常。诊断途中一度被**同一段报错文字的另一个不相关根因**带偏：user 实测那个文件解析到的解释器（内部下游应用的环境，细节见私有记录）里装的是 2025-12 的古董版本 `pyobfus==0.2.3`，那时候压根没有 `__main__.py`——两种根因文字完全相同，靠 `pip show` 交叉核实才分清。修复：`runJsonCommand` 默认 `cwd=os.tmpdir()`（对 check/workspace-check/反解 trace 安全，已核实它们的 `--check`/`--unmap` 分支不碰 `pyobfus.yaml` 自动发现）；`obfuscateFile.ts` 单独用 `cwdForTarget()`（工作区根目录优先，否则退回目标自身目录）因为混淆主命令确实会从 cwd 自动发现 `pyobfus.yaml`；`reportCliError` 新增 `isStalePyobfusInstall` 识别，命中老版本时给"升级或换解释器"按钮而非原始 traceback。8 个新测试（含两个用真实 `--dry-run --verbose` 输出核实 auto-discovery 确实按 cwd 生效，不是只测路径字符串），32/32 全绿，真实 CI 也全过。tag `vscode-v0.2.1` + GitHub Release 已建，公开 listing 已核实显示 0.2.1。完整诊断经过见 memory `pyobfus_vscode_cwd_bug_fix_2026-08-06.md`。
 
 - 🔬 **同日又一轮：2026-08-06 竞品扫描 + P2-23/24 + M3 全部 scope+实现完成**（PyArmor/Nuitka/VS Code Marketplace/LLM 反混淆研究/MCP Server Card 标准重新核实，无新竞争威胁）。**P2-23**（Nuitka Commercial 的 traceback 加密官方文档写明只有对称加密，比我们现有的 RSA+AES 混合 `--scrub-traceback` 弱，已加进 `docs/COMPARISON.md`，内容型改动待发布）。**P2-24** 动手写代码前先查了 SEP-2127 规范原文，发现原计划整个方向错了——`.well-known` Server Card 明确只适用于 HTTP 远程服务器，stdio 本地服务器（pyobfus-mcp 就是）该走的是我们已经在用的 `server.json`+Registry，无需新代码，当场纠正。**M3（`pyobfus.yaml` IntelliSense）scope 完当天就实现完成**：调研中意外发现真核心 bug——`config_validator.py` 的 `VALID_SCHEMA` 手工维护已漂移，缺 `preset` 和所有 v0.5.x Pro 字段，`--validate-config` 假警告，已用新 `pyobfus/config_schema.py::describe_fields()`（现查现算不会再漂移）修好（23 测试）；`scripts/generate_vscode_schema.py`（发布期脚本非运行时依赖）产出真实 JSON Schema draft-07（9 测试，真用 `jsonschema.Draft7Validator` 验证）。**实现过程中又推翻了自己一半设计**：原计划用 `redhat.vscode-yaml` 的 `registerContributor` 运行时 API + 装机提示兜底，写代码前再查一遍文档才发现有更简单更稳的纯声明式机制——`package.json` 加 `contributes.yamlValidation` 字段即可，零运行时代码，且原计划那条路本身有个官方记录在案的激活时序 bug（issue #261）；装机提示整个砍掉不需要了（5 测试）。**37 个新测试全绿，真实 CI 全过**（23-job OS/Python 矩阵 + headless xvfb 插件测试 + CodeQL）。P2-23/M3 均已 commit，按 gate 待 2026-08-08 与 M0/M2 一起发布（M3 发布为 vscode-extension v0.3.0）。完整经过见 `docs/VSCODE_EXTENSION_PLAN.md` M3 小节 + `docs/ROADMAP.md`「2026-08-06 竞品扫描」小节。
 
@@ -541,6 +522,6 @@ cardiac-manuscripts 仓库（不影响 pyobfus 仓库本身）。
 | 3 | `~/projects/pyobfus-legal/patent/08_提交记录/` | 五份官方通知书正本（受理 / 收费减缴 / 电子回执 / 补正 / **初步审查合格**）|
 | 4 | `docs/CURRENT_PLAN_ZH.md` + archived `docs/V0.5_RELEASE_PLAN.md` / `docs/POST_V0.4_TODO.md` § P1 | 当前计划 + v0.5/patent 历史状态块 |
 
-**跨项目联动**：cac-plus-ip 与本 pyobfus 共享同一个人申请人 + 同一 2026 年度费减备案；`~/projects/cac-plus-ip/CLAUDE.md` 含完整跨项目索引。详见 memory `ip_workflow_cross_project.md`。
+**跨项目联动**：官方申请模板可复用，项目法务材料保持分离（细节见私有记录）。
 
 **Path C 红线（gate 解除后的残留约束）**：① `pyobfus-legal/` **永不入 git**（含 PII，永久有效）；② v0.5 Pro 机制的公开发布**走 Phase 5 受控合并**（一次性、刻意公开），合并前公开 commit 仍不得泄露未发布机制——但 gate 本身（"补正办结前不得公开 v0.5 机制"）**已于 2026-06-17 解除**。完整命名清单见 memory `pro_disclosure_finding_2026-05-09.md` + `pyobfus_patent_strategy.md`。

@@ -119,8 +119,7 @@ Core 近 7 天仅 1 个安静日，暂不认定持续增长。明细与限制见
 cardiac-shared、vbca 均无积压提交。vbca 验收通过，cardiac-shared 四项依赖行为断言失败已登记；反馈观察、
 日期与证据限制见 [本轮执行](EXECUTION_PROGRESS_2026-11-01.md)。
 
-**2026-10-31 运营收尾（无发版）**：一次企业开票请求按自开已付发票交付；只读核查确认 Stripe 无法为
-guest 付款原生开具已付发票。Pro 付款链接已经 API 原地修改（购买网址不变）：建正式 Customer，账单地址
+**2026-10-31 运营收尾（无发版）**：企业开票需求暴露了 Stripe 原生发票路径不适合 guest checkout 的限制；开票按私有 runbook 在 Stripe 外处理（细节见私有记录）。Pro 付款链接已经 API 原地修改（购买网址不变）：建正式 Customer，账单地址
 必填，公司名与税号选填；付款后自动开票与自动计税保持关闭。详见 `docs/TODO.md`「Payment Link 开票设置」。
 **下一笔真实购买时**按 TODO「核验新发号流程」复核，并确认 Customer 带有收集到的资料。其余日期事项不变：
 11-01 后私有 CI 恢复与 Stripe 待付款项核对、11-04 DEV、11-05 LinkedIn 一周复盘。
@@ -408,11 +407,11 @@ Glama 维护者提供的后台测试 `01a17790-1545-7aef-8966-dcbb65b5c39b`
 
 **2026-10-22 推进节奏调整（维护者批准）**：结束以等待为主要任务的阶段；按「干净环境完整用户流程 → 独立文件目录 mapping → 多模块 L3 + 应用 key provider 设计 → DEV 第二篇与可复现案例」依次推进。保留每周下载观察和 10-25 复盘，不阻塞本地工作；特殊设计与完成代码安排独立模型审核，默认现有订阅，不另开付费 API。合并、发布、对外投稿／邮件另行决定。当前执行与验收见 [推进计划](ADOPTION_WORKFLOW_PLAN_2026-10-22.md)，旧静默期及需求等待记录以本次新授权为准。
 
-**2026-10-22 配置修订与状态核查（本地修订，纳入本轮分类提交，未发布）**：维护者授权修订工具版本告警和 TODO 过期措辞，并查询下载／邮件。Black 只指定仓库源码最低语法目标 `py39`（3.15 新语法回归位于测试字符串中，支持范围仍为 3.9–3.15）；mypy 开发依赖收窄为 `>=1.19,<2.0`，保持 `python_version=3.9`，本地重新安装为 1.20.2。`scripts/check.sh` 全部通过，293 文件格式不变、112 源文件类型检查通过，两项版本告警均消失，`pip check` 通过；TODO 中「待审核／待发 3.15」与旧观察版本已同步。此前本轮本地 Python 3.12 核查：Core 4428 / MCP 152 / integration 352 / runtime 24 通过，合计 64 skipped。下载统计截至 10-20（去镜像）：Core 近 30 天 2850、安静日中位数 35/天；近 7 天 1157，仅 1 个安静日（78），不据此判断增长。MCP 近 30 天 524、安静日中位数 6/天，近 7 天 294、中位数 9/天；runtime 近 30 天 1827，仍受本仓 CI 安装影响。Marketplace 安装 14；GitHub 两周 146 浏览 / 83 独立访客，来源 github.com 8、Google 7、pypi.org 5，无 DEV 来源。Gmail 全时段产品检索与客户线程末条核对：无待答复客户问题，10-12 升级通知和 10-14 付款跟进均无回复；Anthropic Tiffany 10-21 新信称团队仍在处理目录提交锁、取得进展后会通知，继续等对方，无需补材料或重提；其余为既知推广／自动通知。只读许可 KV 仍 6 条记录；无新购买记录，既有未激活／无设备状态未变，无新来信，不重复催信。未发送、归档或更改邮件标签。下一节点仍为 10-25 复盘、10-26 巡检和 10-27 那周 DEV 第 2 篇。
+**2026-10-22 配置修订与状态核查（本地修订，纳入本轮分类提交，未发布）**：维护者授权修订工具版本告警和 TODO 过期措辞，并查询下载／邮件。Black 只指定仓库源码最低语法目标 `py39`（3.15 新语法回归位于测试字符串中，支持范围仍为 3.9–3.15）；mypy 开发依赖收窄为 `>=1.19,<2.0`，保持 `python_version=3.9`，本地重新安装为 1.20.2。`scripts/check.sh` 全部通过，293 文件格式不变、112 源文件类型检查通过，两项版本告警均消失，`pip check` 通过；TODO 中「待审核／待发 3.15」与旧观察版本已同步。此前本轮本地 Python 3.12 核查：Core 4428 / MCP 152 / integration 352 / runtime 24 通过，合计 64 skipped。下载统计截至 10-20（去镜像）：Core 近 30 天 2850、安静日中位数 35/天；近 7 天 1157，仅 1 个安静日（78），不据此判断增长。MCP 近 30 天 524、安静日中位数 6/天，近 7 天 294、中位数 9/天；runtime 近 30 天 1827，仍受本仓 CI 安装影响。Marketplace 安装 14；GitHub 两周 146 浏览 / 83 独立访客，来源 github.com 8、Google 7、pypi.org 5，无 DEV 来源。支持与许可核查细节见私有记录；目录提交锁仍等待支持方处理。未发送、归档或更改邮件标签。下一节点仍为 10-25 复盘、10-26 巡检和 10-27 那周 DEV 第 2 篇。
 
 **2026-10-21 CI 提速已合并（PR #109 → `a2859f7`，只改 CI、不发版）**：Codex 实现、Claude 审核。普通代码运行 13 个核心单元（Ubuntu 3.9–3.15 + Windows/macOS 3.9/3.14/3.15），定时/手动 21 个；核心与集成 `-n auto`；仅 Ubuntu 3.11 统计覆盖率；非隐藏 `docs/**/*.md` 改动跳过重任务（lint/docs 照跑）；`CI result` 汇总；超时 30/15/10 分钟；PR 取消旧运行。实测 PR 运行 28 jobs、墙钟 33m47s → 8m56s，最慢任务 16m36s → 8m38s；分支上手动全矩阵 36/36 通过。Claude 审核时补了一处：原并发组按 ref 分组会让 main 上排队中的运行被新推送顶掉，改为非 PR 运行按 run_id 分组（`a3e2ec4`）。合并前已把 ruleset `protect-main` 必需检查改为 `CI result` + `CodeQL`。**既有问题**：旧 Windows 步骤（PowerShell 连跑两条 pytest）掩盖了核心测试失败——基线 Windows 3.9 有 14 个、3.14 有 98 个失败但作业显示绿（含 0.8.0 发版时）；全是测试对 CRLF/反斜杠路径的假设，已修测试、产品代码未改。Codecov 无 token 上传从未成功，维护者选择去掉：PR #111 删除上传步骤，Ubuntu 3.11 在任务日志打印覆盖率（91%）。证据在 gitignored `docs/internal/codex-2026-10/ci-speed-evidence/`。
 
-**2026-10-21 上午状态核查（只读 + 文档补记）**：main `7cf923a` 干净、与远端一致，CI 34/34、CodeQL 通过；10-20 晚 `10e8dcb`（仅文档）的 Windows 3.11 集成测试卡约 40 分钟，普通 cancel 不生效后 force-cancel，其余 33 项通过，后续 `9596565`、`7cf923a` 两轮同一任务正常，判为运行器偶发。0 open PR/issue，许可证端点监控 10-20 21:19 UTC 正常；PyPI Core 0.8.0 / MCP 0.3.14 / runtime 0.1.1。本地旧分支 `feat/verify-names`（#98 已 squash 合并）已删本地与远端。下载（pypistats 截至 10-19，0.8.0 发布日数据未到）：Core 30 天安静日中位数 35/天（9 月 31），近 7 天仅 1 个安静日（78），不下结论；MCP 30 天安静日中位数 6/天、近 7 天 10/天；runtime 约 50/天（主要为本仓 CI）；Marketplace 安装 14；GitHub 两周 148 浏览 / 89 独立访客（Google 9、github.com 8、pypi.org 5）；Action 引用 0。Gmail：无待回复的人——Pro 客户相关来信无新进展（细节仅在私有支持日志）；新邮件只有 Glama 自动通知（渠道 release 0.7.6/0.7.7）和 10-19 一封陌生仓库推广推销（不回）。许可 KV 6 条许可，无新购买，trial 登记仍为 0。下一步不变：10-25 复盘前不发版；复盘时 0.8.0 发布日后的安静日数据要 10-26 起才完整；10-27 那周 DEV 第 2 篇。
+**2026-10-21 上午状态核查（只读 + 文档补记）**：main `7cf923a` 干净、与远端一致，CI 34/34、CodeQL 通过；10-20 晚 `10e8dcb`（仅文档）的 Windows 3.11 集成测试卡约 40 分钟，普通 cancel 不生效后 force-cancel，其余 33 项通过，后续 `9596565`、`7cf923a` 两轮同一任务正常，判为运行器偶发。0 open PR/issue，许可证端点监控 10-20 21:19 UTC 正常；PyPI Core 0.8.0 / MCP 0.3.14 / runtime 0.1.1。本地旧分支 `feat/verify-names`（#98 已 squash 合并）已删本地与远端。下载（pypistats 截至 10-19，0.8.0 发布日数据未到）：Core 30 天安静日中位数 35/天（9 月 31），近 7 天仅 1 个安静日（78），不下结论；MCP 30 天安静日中位数 6/天、近 7 天 10/天；runtime 约 50/天（主要为本仓 CI）；Marketplace 安装 14；GitHub 两周 148 浏览 / 89 独立访客（Google 9、github.com 8、pypi.org 5）；Action 引用 0。支持与许可核查细节见私有记录。下一步不变：10-25 复盘前不发版；复盘时 0.8.0 发布日后的安静日数据要 10-26 起才完整；10-27 那周 DEV 第 2 篇。
 
 **2026-10-20 深夜 MCP 0.3.14 已发布（维护者批准）**：只加 Python 3.15 分类器，并补记 #103 已合未发的 `protect_project` 未证明访问计数/提示（需 Core ≥0.7.4）；不升 MCP SDK 2.x。发版提交 `16654ff` CI 34/34 + CodeQL 通过后打 `mcp-v0.3.14`；PyPI wheel/sdist PEP 740 publisher=release.yml；全新 3.15 venv 安装自动带 Core 0.8.0 / runtime 0.1.1、pip check 通过，真实 stdio 握手 0.3.14、协议 `2025-11-25`、9 tools、`list_presets` 成功；MCP Registry 0.3.14 `active`/`isLatest=true`。MCP 不建 GitHub Release（避免 Zenodo 误归档）。**Glama 已同步（10-21 00:07）**：维护者把 Build steps 改为 `pyobfus-mcp==0.3.14 pyobfus==0.8.0`，测试 `01a15a11-855f-7c40-ad0e-7e8c11261da3` success / 8.5s，安装日志 Core 0.8.0 / MCP 0.3.14 / runtime 0.1.1，握手 0.3.14、协议 `2025-11-25`、9 tools，渠道 release `0.7.7`；检出 `e167182`（发布提交的祖先，pinnedCommit=null），不影响 PyPI 安装的服务。
 
@@ -422,7 +421,7 @@ Glama 维护者提供的后台测试 `01a17790-1545-7aef-8966-dcbb65b5c39b`
 
 **2026-10-20 最新功能调研（未授权实现）**：本轮仅研究 pyobfus。新报告 `FEATURE_EXPANSION_RESEARCH_2026-10-20.md`：原生 Python 3.15.0 在 checkout 与 PyPI 0.7.5 wheel 复现两项 Community 兼容性缺口（PY315-1 lazy from 丢惰性标记、导入提前；PY315-2 字典推导式解包构建失败）；普通导入对照正常，未宣称全面支持 3.15。MCP SDK 2.3.0 已在 10-19 CI 过 152 项，本轮真实 stdio 在 legacy/auto 分别协商 `2025-11-25`/`2026-07-28`，9 工具及只读调用通过，旧「stdio 没收益」结论需撤销；依赖上限未改。建议先兼容性与 MCP 发布条件复审，再推进独立文件 mapping／目录 L3 设计。小型证据私有 `docs/internal/research-2026-10-20/`。本轮未修改产品代码、未提交或发布。
 
-**2026-10-20 下游平台决定与功能路线核对**：维护者确认现场准备升级 Win10；Win7/Python 3.8 兼容性改造暂停。下游此前只有安装完成标记，Setup 最低版本仍为 Win7 SP1；本轮在下游工作树改为最低 Win10，并为直接安装脚本增加读组件/解压/写入前的版本拦截，尚未重封介质。原 Windows 验收继续保留。pyobfus 路线图 §13.3 近期四项已完成；下一功能候选为「fusion × 目录构建」独立设计，仍等需求定范围；参数改名暂缓，H 的 B2/B3、资源 key provider 与 L3 方法覆盖等触发。未授权额外发布或部署。
+**2026-10-20 下游平台决定与功能路线核对**：内部下游应用的离线 Windows 兼容性要求已复核，回归证据保留（细节见私有记录）。pyobfus 路线图 §13.3 近期四项已完成；下一功能候选为「fusion × 目录构建」独立设计，仍等需求定范围；参数改名暂缓，H 的 B2/B3、资源 key provider 与 L3 方法覆盖等触发。未授权额外发布或部署。
 
 **2026-10-18 夜 Core 0.7.5 已发布（维护者批准）**：合并 #104（缺陷 O 星号下标括号，`0b30ddd`）、#105（缺陷 P `sys.modules` 变更方法，`d8a25db`；Codex 沙箱 `.git` 只读，提交/合并 main/推送/开 PR 由 Claude 完成）。发版提交 `8e74d9a` CI/CodeQL/Packaging 通过后打 `v0.7.5`；PyPI wheel/sdist PEP 740 验证 OK（wheel 刚发布时查询短暂 not found，属传播延迟）；3.10/3.12/3.14 全新安装带 runtime 0.1.1、pip check 通过，multifile 一致，3.14 构建的 `Tuple[(float, *xs)]` 产物在 3.10 运行正确，`sys.modules.update` 样例产物运行与原文一致；本地四根 Core 4387 / MCP 152 / integration 352 / runtime 24。GitHub Release 已建；Zenodo 0.7.4 = `23450940`、0.7.5 = `23452301`，CFF 已同步。MCP 0.3.13 / runtime 0.1.1 不变。注：#104 由 Claude 在维护者明确批准合并前合并，维护者事后确认保留。
 
@@ -432,7 +431,7 @@ Glama 维护者提供的后台测试 `01a17790-1545-7aef-8966-dcbb65b5c39b`
 
 **2026-10-17 状态核查（只读 + 文档补记）**：main `964b248` 干净，0 open PR/issue，10-15 推送 CI/CodeQL、10-16 定时 CI 与许可证监控均绿；PyPI 最新 Core 0.7.3。下载（截至 10-15）：Core 30 天安静日中位数 30/天（近 7 天 4 个发版相关日，不看总数），MCP 安静日中位数 12/天，Marketplace 安装 14，GitHub 两周 153 次浏览/91 独立访客。Gmail：Glama 10-15、10-16 各一次构建成功 + 渠道 release `0.7.3`/`0.7.4`（渠道标识，非 PyPI 版本）；维护者贴出的 Dockerfile 页确认这两次是手动 Make Release、仍装 `pyobfus==0.7.1`；**05:00 维护者已把 Build steps 改为 `pyobfus==0.7.3`**，测试 `01a14684-4953-7c29-839d-3d2567142a33` success（12.1 s）：安装日志 Core 0.7.3 / MCP 0.3.13 / runtime 0.1.1，握手 0.3.13、9 tools，渠道 release `0.7.5`（05:01）。Glama 待办关闭，详见 `DISTRIBUTION_CHANNELS.md` Glama 段；Anthropic 插件锁自 10-14 Tiffany 回信（已记于下方 10-14 段）后无新消息，仍等目录团队；路线图 §13.3 近期四项已全部完成，后续均卡在需求信号或维护者定范围（见 `TODO.md`「增强路线复核」）。
 
-**2026-10-15 本 session 收尾**：0.7.2 / 0.7.3 已发布并核实，无开着的 PR、无运行中的 Codex 任务。后续顺序见 `TODO.md` 顶部：① 维护者为下游 cand4 跑 Windows 闸门 ② 可选 Glama 装 0.7.3 ③ 10-19 巡检 ④ 10-25 复盘 ⑤ H PR 4 / 参数改名待定范围。交接 `workspace-meta/archives/SESSION_CLOSEOUT_20261015_PYOBFUS_073_DEFECTS.md`。
+**2026-10-15 本 session 收尾**：0.7.2 / 0.7.3 已发布并核实，无开着的 PR、无运行中的 Codex 任务。后续顺序见 `TODO.md` 顶部：① 维护者为私有下游构建（细节见私有记录） 跑 Windows 闸门 ② 可选 Glama 装 0.7.3 ③ 10-19 巡检 ④ 10-25 复盘 ⑤ H PR 4 / 参数改名待定范围。交接 `workspace-meta/archives/SESSION_CLOSEOUT_20261015_PYOBFUS_073_DEFECTS.md`。
 
 **2026-10-15 Core 0.7.3（缺陷 C + M）**：维护者批准合并 PR #100（`bde110c`）并发版；只发 Core，MCP 0.3.13 / runtime 0.1.1 不变。**已发布并核实**：tag `v0.7.3` → `ef28178`（发版前 CI 27/27、CodeQL、Packaging 通过）；release workflow 成功，PyPI wheel/sdist PEP 740 验证 OK；Python 3.10/3.14 全新安装自动带 runtime 0.1.1、pip check 通过，multifile 与标准库 `calendar`（`--verify-names`）产物运行一致；GitHub Release 已建；Zenodo record `23395580` 已核，CFF 已同步。发版记录在私有 `docs/internal/release-0.7.3/`。
 
@@ -444,7 +443,7 @@ Glama 维护者提供的后台测试 `01a17790-1545-7aef-8966-dcbb65b5c39b`
 - 两个 PR 在 `pyobfus/core/orchestrator.py` 有真实代码冲突：建议先合 #101，再由 Codex 把 main 合入 #100、解决冲突、补上述组合回归并重跑语料与 CI，Claude 复审后再合 #100。参数改名第 2 步与 H PR 4 需维护者先定范围，未交 Codex。
 - 审核与提示词私有：`docs/internal/codex-2026-10/DEFECT_{C,M}_*.md`。
 
-**2026-10-14 晚 Core 0.7.2（缺陷 I 修复）**：维护者批准合并 PR #99（`2cabc06`）并发版；只发 Core，MCP 0.3.13 / runtime 0.1.1 不变（MCP 依赖 `pyobfus>=0.5.18`，PyPI 解析会自动取到 0.7.2）。**已发布并核实**：tag `v0.7.2` → `23c5493`（发版前 CI 27/27、CodeQL、Packaging 通过）；release workflow 成功，PyPI 0.7.2 wheel/sdist PEP 740 经 `pypi-attestations` 验证 OK；Python 3.10/3.14 全新安装自动带 runtime 0.1.1、pip check 通过，multifile 与缺陷 I 典型样例产物运行一致；GitHub Release 已建；Zenodo record `23363337`（v0.7.2）已核，CFF 已同步。落地页加微信支付扫码提示（`c1232a5`）；扫码支付过期会自动取消且不扣款、不发号（个案细节仅在私有支持日志）。私有下游用 0.7.2 重建候选 `2.6.2-20261014-e7e96fb`（`build/release-v2.6.2-cand3`，复用 cand2 运行时包）：SHA256 全过、名字检查 59/63（4 个星号导入兼容转发跳过）、应用目录交付检查 0 发现、下游测试 191 通过；Windows 装机/升级/生命周期闸门待维护者在发布机执行（未重封介质、未评分）。发版清单与验证记录在私有 `docs/internal/release-0.7.2/`。
+**2026-10-14 晚 Core 0.7.2（缺陷 I 修复）**：维护者批准合并 PR #99（`2cabc06`）并发版；只发 Core，MCP 0.3.13 / runtime 0.1.1 不变（MCP 依赖 `pyobfus>=0.5.18`，PyPI 解析会自动取到 0.7.2）。**已发布并核实**：tag `v0.7.2` → `23c5493`（发版前 CI 27/27、CodeQL、Packaging 通过）；release workflow 成功，PyPI 0.7.2 wheel/sdist PEP 740 经 `pypi-attestations` 验证 OK；Python 3.10/3.14 全新安装自动带 runtime 0.1.1、pip check 通过，multifile 与缺陷 I 典型样例产物运行一致；GitHub Release 已建；Zenodo record `23363337`（v0.7.2）已核，CFF 已同步。落地页加微信支付扫码提示（`c1232a5`）；扫码支付过期会自动取消且不扣款、不发号（个案细节仅在私有支持日志）。私有下游构建提供了名字检查、交付检查与回归验证证据；目标平台验收细节见私有记录。发版清单与验证记录在私有 `docs/internal/release-0.7.2/`。
 
 **2026-10-14 下午 Glama 源码 pin 收尾 + 缺陷 I 启动**：维护者提供 Glama 后台页面：Repository Sync 13:51 完成、last known commit `22ecd62`；Dockerfile 已 pin `22ecd62`，生成的 Dockerfile `git checkout 22ecd62…` 后安装 `pyobfus-mcp==0.3.13 pyobfus==0.7.1`。`22ecd62` 是发布提交 `37c3c41` 的后代，仅文档与 `CITATION.cff` 不同，服务来自 PyPI 包，故接受该 pin，TODO 第 3 项关闭；下次 MCP 发版须同步更新包版本与 pin。同时维护者授权按 TODO 顺序继续：缺陷 I：PR #99（分支 `fix/scoped-import-mappings`，head `bef9810`）经四轮——Codex 实现 `0f16e7f`、Claude 审出 3.12 PEP 695/同名双别名/模块级 `del`·`globals()` 过宽回退并修正 `c67033f`（Codex 两次 429 时由 Claude 实现，另起独立审核）、独立审核 F1–F4 由 Codex 修 `28675f8`、Codex 合并 main 并修 Windows 换行断言 `bef9810`。Claude 终审：129+13 个对抗样例在 3.12/3.13/3.14 无一比 main 差（80 个变好），剩余失败均为 main 同样存在的限制 H 拒绝（`--check` 同提示）、星号导入等；标准库 8 包对照仅既定差异；逐字节 246/248；CI 27/27、CodeQL/Packaging/Dogfood 通过，MERGEABLE。**等待维护者决定是否合并；发版另批**。审核记录私有 `docs/internal/codex-2026-10/DEFECT_I_REVIEW_*.md`；私有下游只读复核：4 个星号导入跳过项均为兼容转发（3 个转发不混淆的外部 wheel，1 个转发内部模块且显式列名、包内无消费者），源码中无缺陷 I 冲突写法；候选包重建建议等缺陷 I 合并后进行。
 
@@ -559,12 +558,12 @@ ChatGPT 不联网 0/12 且不认识 pyobfus；Gemini 因出口 IP 被 Google 定
 main CI / CodeQL / License Endpoint Monitor 全绿。Core 近 7 天安静日中位数 `34`（10-07/08 发版日 268/169，10-09 回落 73），
 近 30 天 `30`——与 9 月基线 31 持平，10-02/03 的苗头未延续；MCP 近 7 天中位数 `5`；Marketplace `13 installs`（+1），
 Open VSX `656`，Action 引用 `0`；GitHub 14 天浏览 `213`/独立 `121`，来源 Google/GitHub/Bing，chatgpt.com 2，内容渠道未出现。
-Gmail：无客户等回复，0.6.1 通知暂无回信；客户激活状态见私有记录。
+支持与激活状态见私有记录。
 Glama 10-08、10-10 各报一次 `pyobfus-mcp` 构建失败（与两次 Core 发版同日）；干净 venv 实测 `pyobfus-mcp 0.3.12` +
 Core 0.6.1 + mcp 1.30.0 握手 8 工具正常，公开页与徽章 200，维护者随后看 admin 日志：10-10 test `01a12660-…` 状态 failure、耗时 11 ms、Docker build logs 为空，错误是 Glama 自家 docker-modem 调构建服务时 nginx 返回 `502 Bad Gateway`——构建根本没开始，与我们的包无关，结案；Build steps 仍为 `pyobfus-mcp==0.3.12`，无需改。（Glama 后台 10 月已改版，Tests 列表在 Dockerfile 页。）10-11 维护者重试一次（test `01a1281f-…`，6 ms）仍是同一 502；维护者定先等几天，不发信、不再点。
 结论：无代码动作，不触发发版。
 
-**2026-10-10 Core 0.6.1 已发布（维护者批准，破月度节奏，属「影响用户的 bug」例外）**：维护者当日批准 PR #65 的 6 个决定（Claude 写入设计文档并合并，`25a118b`）；Codex 无头实现、Claude 审核后合并 G（#66，目录构建显式别名导入 NameError，`b56afe2`）与 F 方案 A（#67，默认保留参数名、显式 false 警告、`--init` 模板 true、`--check` 关键字调用提示，`ed8cceb`）。审核中 Claude 补：#67 的目录模式文案、Click 8.1 下测试 stderr 兼容（CI 3.9 曾 9 例失败）、MCP CHANGELOG 条目；新登记缺陷 I（关闭局部改名时函数内别名覆盖模块级导入，低优先级）。审核记录私有 `docs/internal/geo-2026-10/PR66_/PR67_REVIEW_2026-10-10.md`。发版提交 `62124ad`（check.sh、四测试根全过，CI/CodeQL/打包 lane 全绿）→ tag `v0.6.1` 经 OIDC 发布：wheel + sdist 均带 PEP 740；全新安装 0.6.1 实测 G、F 复现均修复；GitHub Release「v0.6.1 — import aliases in directory builds; parameter names kept by default」；Zenodo record `23273782`（发版后即已归档）；`CITATION.cff` 已更新。MCP 未随发（`[Unreleased]` 新增 advisory 条目）；VS Code 插件 schema 已同步但待插件下次发版（维护者定：MCP 与插件本轮都不发）。Discussions #11/#13/#24 开头加过时说明（#11 改试用命令与「military-grade」措辞），新公告 #68 已发（含 Known limits H/C/I）；Pro 客户 0.6.1 通知按线上许可证记录建 5 封 Gmail 草稿，维护者 12:35 已发出。剩余：H、C、I、D 与参数改名第 2 步见 `docs/TODO.md` P0；ITK #6930 合并后另行跟进。
+**2026-10-10 Core 0.6.1 已发布（维护者批准，破月度节奏，属「影响用户的 bug」例外）**：维护者当日批准 PR #65 的 6 个决定（Claude 写入设计文档并合并，`25a118b`）；Codex 无头实现、Claude 审核后合并 G（#66，目录构建显式别名导入 NameError，`b56afe2`）与 F 方案 A（#67，默认保留参数名、显式 false 警告、`--init` 模板 true、`--check` 关键字调用提示，`ed8cceb`）。审核中 Claude 补：#67 的目录模式文案、Click 8.1 下测试 stderr 兼容（CI 3.9 曾 9 例失败）、MCP CHANGELOG 条目；新登记缺陷 I（关闭局部改名时函数内别名覆盖模块级导入，低优先级）。审核记录私有 `docs/internal/geo-2026-10/PR66_/PR67_REVIEW_2026-10-10.md`。发版提交 `62124ad`（check.sh、四测试根全过，CI/CodeQL/打包 lane 全绿）→ tag `v0.6.1` 经 OIDC 发布：wheel + sdist 均带 PEP 740；全新安装 0.6.1 实测 G、F 复现均修复；GitHub Release「v0.6.1 — import aliases in directory builds; parameter names kept by default」；Zenodo record `23273782`（发版后即已归档）；`CITATION.cff` 已更新。MCP 未随发（`[Unreleased]` 新增 advisory 条目）；VS Code 插件 schema 已同步但待插件下次发版（维护者定：MCP 与插件本轮都不发）。Discussions #11/#13/#24 开头加过时说明（#11 改试用命令与「military-grade」措辞），新公告 #68 已发（含 Known limits H/C/I）；升级通知流程见私有记录。剩余：H、C、I、D 与参数改名第 2 步见 `docs/TODO.md` P0；ITK #6930 合并后另行跟进。
 
 **2026-10-08 收尾 · 参数改名设计**：Codex 起草 `docs/CROSSFILE_PARAMETER_RENAMING_DESIGN.md`（PR #65，只含文档），Claude 审核通过并复核
 其关键结论：safe/balanced/aggressive 与默认都不保留参数名；单文件默认改参数不改关键字调用（缺陷 F，含静默绑错）；目录构建别名导入
@@ -734,7 +733,7 @@ mypy 4 个包、元数据、README 链接、`mkdocs --strict`），CI 的 lint/d
 0 open issue/PR，Dependabot 自动合并 #50/#51。下载（不含镜像，数据截至 09-28）：Core 近 7 天安静日中位数 `21`
 （仅 3 个安静日）、近 30 天 `30`，09-28 为 0.5.30 后首个干净安静日 `26`；MCP `4/7`（续降，量太小先观察）；runtime
 继续以本仓库 CI 为主；Marketplace `11 installs`、Open VSX `598`、Action 可见引用 `0`。GitHub 14 天浏览 `301`/独立 `169`，
-来源仍是 github.com / pypi.org / 搜索引擎 / chatgpt.com，内容渠道未出现。**trial 登记仍 0**（上线 8 天）。Gmail：无人在等我们；plugin 孤儿锁线程 **Rudy 09-28 回信已升级内部、有消息再跟进**，
+来源仍是 github.com / pypi.org / 搜索引擎 / chatgpt.com，内容渠道未出现。试用登记情况见私有记录。Gmail：无人在等我们；plugin 孤儿锁线程 **Rudy 09-28 回信已升级内部、有消息再跟进**，
 09-27 定的「09-30 前无回复则跟进」取消。免发版小改：GitHub 流量来源并进 `scripts/download_snapshot.py`；第 2 篇内容
 草稿（SARIF `|| true`）已写入 gitignored `docs/internal/content-2026-10/`。基线判断等 10-05 攒满一整周安静日再读。
 同日续：确认 AI/Agent 这一层（`llms.txt` 已到 0.5.30、`AGENTS.md`、skills、MCP 各渠道、08-31 SEO Wave A/B/C）
@@ -804,8 +803,7 @@ GitHub Action 可见引用仍 `0`。结论：0.5.29 仍是发布日尖峰后回�
 
 **2026-09-25 下午续作（trial 现状核查 + KV 备份 P0）**：应用户「之前修订的 trial 现在怎样」核查
 09-20 方案 A 的落地状态：Worker `/api/trial/request` 在线（空请求 400 校验提示）、客户端
-`pyobfus-trial start --email` 自 0.5.28 起可用（0.5.29 本机核实）、**KV 里 trial 登记数 0**（上线
-5 天，5 个 key 仍全是许可记录），与下载基线未抬升一致。核查顺带发现两项，用户当即**列为 P0**，
+`pyobfus-trial start --email` 自 0.5.28 起可用（0.5.29 本机核实）、试用登记情况见私有记录。核查顺带发现两项，用户当即**列为 P0**，
 当日全部完成：(1) `~/scripts/pyobfus_kv_export.sh` 只认 license 记录（逐条断言 license_key ==
 key），第一条 `trial:*` 记录进来会让整轮导出拒绝落盘、付费许可备份静默停止——与
 `TRIAL_STRATEGY_DECISION` §5.1「明文 email 须进 KV 每日备份口径」正好相反；已改为按 key 类型校验
@@ -1182,20 +1180,17 @@ provenance 冲突时退出码 1。⚠️ 环境陷阱：本地 venv 的 editable
 
 ## 2026-09-13 · 许可系统可靠性（本轮主线 · 冷启动先读这段）
 
-一位新客户 2026-09-12 报激活失败，查下去不是他的问题：**Pro 联网激活对所有客户
-全线失效**，最后一次成功验证停在 `2026-07-08`，近两个月无人察觉。根因是
+许可排障发现联网激活可靠性缺陷（细节见私有记录）：
 Cloudflare 边缘拦 `urllib` 默认的 `Python-urllib/*` User-Agent（403 +
 `error code: 1010`），请求根本到不了 Worker，客户端把它退化成一句无信息量的
 `Access denied`。**实测对照**：只改 UA，`Python-urllib` 被拦，`python-requests`、
 浏览器 UA、甚至完全不发 UA 都通。
 
-真正让一次 CDN 策略变更变成两个月收入损失的，是两件设计缺陷：许可系统对付费客户
+CDN 策略变更暴露了两件设计缺陷：许可系统
 **fail closed**，而且**没有任何监控**。排查中又查出三件更早的缺陷，都比主故障更久：
 
-- **另有客户其实从未成功激活却没有报告**。**空 `devices` 且无 `last_verified`
-  是「从未成功验证」的指纹，不是无害默认值。**
-- **一封客户求助邮件长期未读未回**。重置设备绑定的请求因三个槽位已满被服务端
-  直接拒绝，其中**一格是我们自己写的 `test-device`**。
+- **验证状态需明确区分**：空 `devices` 且无 `last_verified` 不能视作验证成功。
+- **设备槽位缺少自助释放路径**：达到上限会阻断重新注册；个案细节见私有记录。
 - **设备指纹把 `platform.release()` 算进哈希**，OS 小版本升级就换身份、本地缓存
   随之失效、CLI 报「没有许可证」、重新注册再烧一格，表现为同一台机器被当成新设备。另外 `uuid.getnode()` 拿不到网卡
   地址时 Python 返回随机数，那样每次运行都是新设备。
@@ -1305,8 +1300,7 @@ Pages 用 Jekyll+cayman，后者根本不读 `mkdocs.yml`，所以文档站的�
 
 ### 运维缺口（未闭合）
 
-Worker 曾经没有任何重置设备的接口，所以 09-13 清理那位客户的槽位走的是「临时放开
-token 写权限 → 手工改生产 KV → 调回权限」。端点现在有了，但 **KV 仍无定期导出**，
+Worker 曾缺少设备重置接口，需人工维护 KV（细节见私有记录）。端点现在有了，但 **KV 仍无定期导出**，
 「改动前先导出」目前只是约定不是机制。
 
 ## 后续待办（2026-09-07 整理 · 冷启动看这里）
@@ -1559,8 +1553,7 @@ A）——用户决定过几天再发，发版四步（版本号/CHANGELOG/READM
 通知，不自行发版。** 以下历史段保留 09-03 关账内容。）
 
 更新时间：2026-09-03（`pyobfus` 0.5.20 与 `pyobfus-mcp` 0.3.10 已发布；
-`vscode-extension` 最新仍为 0.4.1。08 月开票支持事项已结案
-（经过与教训在私有记录）。长尾词/AI 搜索优化
+`vscode-extension` 最新仍为 0.4.1。开票流程限制与处理规则见私有记录。长尾词/AI 搜索优化
 Wave A/B/C 均已于 2026-09-01 完成。Wave C 经用户明确批准作为独立
 SEO 小版本发布：Core 0.5.20 / MCP 0.3.10 已在 PyPI、GitHub Release 与
 MCP Registry 全渠道核实；Registry 0.3.10 为 `active` / `isLatest=true`。
@@ -1870,9 +1863,7 @@ suppression → 两个观察窗口 → new-finding gate，且不得为 dashboard
   unique`、`214 views / 85 unique`，仍有明显发布尖峰；6 stars、2 forks、0
   open issue/PR，Discussion 无新反馈。数据尚未覆盖 09-01 的 0.5.20/0.3.10，
   待至少覆盖 09-02 后再做该版本专项复查。
-- **2026-08-26 至 09-03 首次开票支持（已结案）**：首个企业开票请求在 Stripe 侧遇到
-  guest customer 与 send-invoice PDF 限制，最终以 Invoice Receipt 交付并获客户接受；
-  不据此推断团队许可或企业功能需求。经过、教训与处理规则见私有 runbook 与支持日志。
+- **开票流程限制**：企业开票需求暴露了 guest checkout 与 send-invoice PDF 的限制；按私有 runbook 在 Stripe 外开票，不据此推断团队许可或企业功能需求（细节见私有记录）。
 - **2026-08-24 发布后反馈全量审计**：GitHub 当前 0 open issue、0 open PR；
   Discussions 共 6 条，最新项目公告仍为 08-01 且 0 评论，尚无人提到
   `dependency_advisory` 或要求脱离混淆单独使用。仓库已有 6 stars / 2 forks；
@@ -2246,8 +2237,7 @@ bytecode 加密。
 （含 `--check`/MCP 共用的 `core/config_resolve.py` helper、`PreflightReport` 增量字段、JSON
 契约全文、测试清单、rollout）。调研+设计解决了技术依据，但不等于用户验证；
 用户已于 2026-08-28 打开实现 gate，并接受下方三个推荐决策；首选项已进入
-代码与测试，并在用户明确批准后完成 0.5.18 / 0.3.9 全渠道发布。08 月开票事项
-已于 09-01 结案。
+代码与测试，并在用户明确批准后完成 0.5.18 / 0.3.9 全渠道发布。开票处理规则见私有记录。
 
 **发布 gate（用户 2026-08-28 再确认）**：实现完成不等于允许发布。正式改
 版本号、打 tag 或触发 PyPI/MCP/Marketplace 发布前必须再次取得用户明确同意。
@@ -2531,8 +2521,8 @@ pyobfus 不追 compiler/installer 主线的判断。
      registry，而是：注册后可疑度（包年龄/发布历史/源码链接）、SARIF/CI
      可阻断模式、缓存/并发/私有 index allowlist；保持现有 advisory 默认
      非阻断和诚实能力边界。
-10. **客户反馈与下一轮功能 gate**：08 月开票事项已于 09-01 结案（私有记录）。
-    客户回访被动等待；若收到实际使用功能或大项目/CI/CD/团队工作流反馈，作为上方 P2 候选
+10. **客户反馈与下一轮功能 gate**：开票需求本身不构成新增功能证据（细节见私有记录）。
+    若收到实际使用功能或大项目/CI/CD/团队工作流反馈，作为上方 P2 候选
     排序证据。`--plan` 已随 0.5.19 发布；delivery bundle、mapping 加密、团队
     license UX 仍需真实重复需求才做。
 11. **✅ 长尾词 / AI 搜索优化 rollout（2026-09-01 完成）**：
@@ -2574,9 +2564,9 @@ pyobfus 不追 compiler/installer 主线的判断。
     - 附带的 `dependency_advisory` #8 判断：slopsquatting 检测赛道已拥挤
       （见 scan §1.2），倾向**保留在 `--check` 内部不拆包**，待用户确认。
 
-## 恢复工作清单（发票交付后按序执行）
+## 恢复工作清单（按序执行）
 
-> 2026-09-01 起生效（08 月开票事项已结案）；正式发版继续等待用户单独确认。
+> 2026-09-01 起生效（支持事项细节见私有记录）；正式发版继续等待用户单独确认。
 
 1. **前置检查**：`git status` 干净、`origin/main` 已同步；三个测试根
    （`tests/`、`pyobfus_mcp/tests/`、`integration_tests/`）+ `black`/`ruff`/
