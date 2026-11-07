@@ -63,7 +63,7 @@
 
 ## 最新下一步（取代上文「下一步（按日期）」）
 
-1. Zenodo／`CITATION.cff` DOI（如当晚未完成）。
+1. ~~Zenodo／`CITATION.cff` DOI~~：已于当晚完成（record `24031969`，#215）。
 2. 11-08：带末尾 `/` 的落地页请求编入索引；维护者复采搜索盘点（JSON 存私有 workspace-meta）。
 3. 11-09 周检：进度 + 下载量 + Gmail + Search Console／Bing／IndexNow，并观察 0.13.0 发布后反馈。
 4. 约 11-11：Core 0.12.0 T+7d；12 月首周月度搜索／AI 观测。
