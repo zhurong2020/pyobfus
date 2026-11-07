@@ -1,8 +1,8 @@
 # Support matrix
 
-What is actually verified, by what, as of 2026-11-04 (`pyobfus` 0.12.0 /
+What is actually verified, by what, as of 2026-11-07 (`pyobfus` 0.13.0 /
 `pyobfus-mcp` 0.3.17 / `pyobfus-runtime` 0.1.1 / VS Code extension 0.4.3 /
-`pyobfus-action` 1.1.0). See the [Core release evidence](https://github.com/zhurong2020/pyobfus/blob/main/docs/CORE_0_12_0_RELEASE_2026-11-04.md)
+`pyobfus-action` 1.1.0). See the [Core 0.13.0 release evidence](https://github.com/zhurong2020/pyobfus/blob/main/docs/CORE_0_13_0_RELEASE_2026-11-07.md), [Core 0.12.0 release evidence](https://github.com/zhurong2020/pyobfus/blob/main/docs/CORE_0_12_0_RELEASE_2026-11-04.md)
 and [Action/Glama follow-up](https://github.com/zhurong2020/pyobfus/blob/main/docs/CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md) for exact
 revisions and tested limits; version updates do not broaden the cells below.
 

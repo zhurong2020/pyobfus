@@ -266,7 +266,11 @@ patent/release context.
 
 - **Architecture / repository ownership**: [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md).
 - **Community / Pro product boundary**: [`docs/EDITION_BOUNDARY_POLICY.md`](docs/EDITION_BOUNDARY_POLICY.md).
-- **Latest (2026-11-04)**: Core **0.12.0 is published and verified**, tag
+- **Latest (2026-11-07)**: Core **0.13.0 is published and verified** (Community
+  pre-commit hooks; patent-pending notice), tag `v0.13.0` / `0f2c7b0`; see
+  [release evidence](docs/CORE_0_13_0_RELEASE_2026-11-07.md). Zenodo/CITATION
+  and the Glama build update follow. The 0.12.0 entry below is historical.
+- **Previous (2026-11-04)**: Core **0.12.0 is published and verified**, tag
   `v0.12.0` / `73ff6a8`; final full CI 47/47, CodeQL, PyPI dual-artifact
   cryptographic provenance and fresh installs passed. MCP 0.3.17 / runtime
   0.1.1 / extension 0.4.3 remain unchanged. See
