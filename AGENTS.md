@@ -149,6 +149,12 @@ PR: `llms.txt` and `llms-full.txt` (plus their `docs/` mirrors),
 `docs/.well-known/ai-catalog.json`. Keep `llms-full.txt` to current behavior
 and feature minimum versions; history stays in `CHANGELOG.md`.
 
+Every release also checks the patent boundary: mechanisms covered by the
+pending patent application live only in `pyobfus_pro/` or `pyobfus_runtime/`,
+never in the Apache-2.0 core (Apache-2.0 §3 would grant the patent rights for
+core code). Public wording is "patent pending (CN 202610712171X, not yet
+granted)", never "patented".
+
 Targets: Python **3.9–3.15** must all pass. (Python 3.8 was dropped in 0.5.0 —
 EOL 2024-10 — which removed the old `astunparse`/`@requires_py39` flakiness;
 `docs/PYTHON38_COMPATIBILITY.md` is retained only as historical record.)
