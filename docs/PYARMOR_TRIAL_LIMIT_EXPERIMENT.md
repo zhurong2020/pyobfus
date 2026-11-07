@@ -10,7 +10,7 @@
 
 PyArmor's free / trial tier officially "can't obfuscate big scripts" but the [official documentation](https://pyarmor.readthedocs.io/en/latest/licenses.html) never quantifies what counts as "big." This experiment measures the threshold empirically and provides reproducible commands so anyone can verify or re-test after future PyArmor updates.
 
-This file is the source-of-truth for the same finding cited in the launch articles (`_drafts/article-01-claude-code-mcp-integration.md` Section 1, the CN trio in `_drafts/post-cn-ready/`).
+This file is the source-of-truth for the same finding cited in the 2026 launch articles (drafts archived privately since 2026-11-07).
 
 ## Setup
 
@@ -151,5 +151,5 @@ Re-run this experiment when:
 
 - PyArmor official license comparison: <https://pyarmor.readthedocs.io/en/latest/licenses.html>
 - PyArmor docs landing: <https://pyarmor.readthedocs.io/>
-- This experiment cited inline in: `_drafts/article-01-claude-code-mcp-integration.md` (launch draft, archived privately since 2026-11-07) Section 1 + `_drafts/post-cn-ready/{tech_empowerment,zhihu,v2ex}.md`
+- This experiment was cited in the 2026 launch-article drafts (English article and Chinese posts), archived privately since 2026-11-07.
 - Verified-facts table reference: `docs/POST_V0.4_TODO.md` § "Verified facts baseline"
