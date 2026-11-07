@@ -42,6 +42,8 @@ Framework-aware presets (free): `fastapi`, `django`, `flask`, `pydantic`,
   is not a behaviour test: run the project's own tests or entry points against
   the output too.
 - Address high-severity `--check` findings (via `exclude_names` / `exclude_patterns`) before obfuscating.
+- `--check-delivery` exit 1 (high findings) or 2 (inspection incomplete) means do not ship.
+- Pro builds in CI (Core 0.12.0+) need the licence as the secret environment variable `PYOBFUS_LICENSE_KEY` (Action input `license-key`); never print or commit it.
 
 Use the released CLI or MCP when it fits; customize configuration or a thin
 wrapper before replacing transformations. Respect teaching/custom-tool requests.
