@@ -8,6 +8,8 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ## ⚡ Current pending work (cold-start 必读)
 
+**2026-11-07 晚 Core 0.13.0 已发布**（Community pre-commit 钩子 + 专利申请标识）：核验见 [发布记录](docs/CORE_0_13_0_RELEASE_2026-11-07.md)。待办：Zenodo 归档后更新 `CITATION.cff` DOI；维护者在 Glama 后台改 Build steps 为 `pyobfus==0.13.0` 并建渠道 release。MCP／runtime／扩展／Action 不变。
+
 **2026-11-07 最终交接**：先读 [会话收尾](docs/SESSION_CLOSEOUT_2026-11-07.md) → [当前计划](docs/CURRENT_PLAN_ZH.md) → [TODO](docs/TODO.md)「周期性」。
 无发版，公开版本不变；main 含未发布的 Community pre-commit 钩子（#194）。已做：CI 3.9 runner、FAQ／中文指南、Agent 文档同步规则、
 IndexNow、Search Console／Bing 登记（文档站验证文件 `docs/google03878b382b498ff9.html` 必须保留）、T+24h／T+72h、备份故障修复与核对。
@@ -72,10 +74,7 @@ arong.eu.org 与老博客已交 findata。
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.9-3.15, AST, setuptools
-- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.12.0，2026-11-04 发布**；完整版本历史见 `CHANGELOG.md`)
-- **VS Code 插件**: https://marketplace.visualstudio.com/items?itemName=zhurong2020.pyobfus (**latest v0.4.3，2026-09-10 发布**；Marketplace 与 Open VSX 两边同版本，均已 `curl` 独立复核；publisher `zhurong2020`；独立版本节奏，见 `vscode-extension/CHANGELOG.md`。**发版必须两个 registry 都发**：Marketplace 手工上传 + `ovsx publish`，runbook 见 `docs/OPEN_VSX_PUBLISH_PLAN.md`)
-- **PyPI MCP 包**: https://pypi.org/project/pyobfus-mcp/ (**latest v0.3.17，2026-10-30 发布，MCP SDK `>=1.27.0,<3.0.0`**；9 tools: 7 community + 2 pro_funnel · dep `pyobfus>=0.5.18` · `uvx pyobfus-mcp` 零安装；发布验证见 `docs/RELEASE_PROVENANCE_VERIFICATION.md`)
-- **MCP Registry**: `io.github.zhurong2020/pyobfus-mcp`（**0.3.17**，`active` / `isLatest=true`；见 `docs/CURRENT_PLAN_ZH.md`）
+- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.13.0，2026-11-07 发布**；完整版本历史见 `CHANGELOG.md`）
 - **Smithery**: 已下线——Smithery 并入 Arcade 后技能目录取消，2026-11-07 核实原技能页 404；`smithery.yaml` 已删除。**mcp.so**: 已收录
 - **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus — 渠道 **0.12.0**（2026-11-05）关联成功 test `01a1ac58-1a8f-7c1c-a73f-fb09f5a9a1e5`（pin `9c87645`），安装命令同 0.11.3；握手和九工具发现以 0.11.3 构建 `01a1a435-…` 为已核证据。Python 安装阶段与旧 checkout 边界见 `docs/CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md`。
 
