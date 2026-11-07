@@ -272,6 +272,7 @@ secret-manager or server boundaries.
 - [vs Nuitka](https://pyobfus.readthedocs.io/en/latest/compare/nuitka/)
 - [PyInstaller cookbook](https://pyobfus.readthedocs.io/en/latest/PYINSTALLER_COOKBOOK/)
 - [Compiled-packaging cookbook](https://github.com/zhurong2020/pyobfus/blob/main/docs/COMPILED_PACKAGING_COOKBOOK.md)
+- [pre-commit hooks](https://pyobfus.readthedocs.io/en/latest/PRE_COMMIT/) (next release, unreleased): block mappings and private keys in commits and check built output before pushing.
 - [Integration testing](https://pyobfus.readthedocs.io/en/latest/INTEGRATION_TESTING/)
 
 ## Architecture and development

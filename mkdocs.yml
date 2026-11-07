@@ -66,6 +66,7 @@ nav:
     - How to cite: CITATION.md
     - License activation: LICENSE_ACTIVATION_GUIDE.md
     - CI licensing: CI_LICENSING.md
+    - pre-commit hooks (unreleased): PRE_COMMIT.md
     - Project structure: PROJECT_STRUCTURE.md
     - Community / Pro boundary: EDITION_BOUNDARY_POLICY.md
     - Share a usage report: case-studies/README.md

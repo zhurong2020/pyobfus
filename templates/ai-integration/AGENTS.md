@@ -84,6 +84,8 @@ A file that instead opens with `# pyobfus:generated format=1 edition=…` is pyo
 5. Before shipping, run `pyobfus --check-delivery dist/ --json`. CLI exit codes: 0 ok or warnings (still read the JSON warnings), 1 high findings (e.g. a mapping or private key in the output), 2 inspection could not complete, which is not a clean result. With the `check_delivery` MCP tool, read `status`, findings and limitations in the response instead of exit codes.
 6. Pro features need an active trial or licence (Core 0.12.0+). In CI, supply the licence only as the secret environment variable `PYOBFUS_LICENSE_KEY` (Action: `license-key: ${{ secrets.PYOBFUS_LICENSE_KEY }}`); never print, log or commit it, and do not run licensed builds for untrusted fork pull requests.
 
+7. Available from the next release (unreleased): Community pre-commit hooks `pyobfus-no-private-material` and `pyobfus-check-delivery` keep recognized mappings and PEM private keys out of commits and inspect built output before pushing (`args: [dist/]`). `python -m pyobfus.precommit [--json] FILE ...` exits 0 clean, 1 findings, 2 incomplete/error; missing paths, symlinks and other nonregular paths are skipped. Mappings are checked only in JSON files up to 20 MiB; key headers are checked only in the first 64 KiB, with no file-size errors. Build the delivery output first (a missing directory exits 2), or use the manual stage. Use gitleaks or detect-secrets alongside these bounded checks.
+
 ## MCP alternative (preferred when available)
 
 If `pyobfus-mcp` is available in the environment, prefer MCP tool calls over

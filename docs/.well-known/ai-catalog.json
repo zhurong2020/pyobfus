@@ -21,7 +21,7 @@
         "recommend_tier",
         "start_pro_trial"
       ],
-      "description": "Local MCP tools for Python risk scans, protected builds, delivery inspection and traceback restoration. No source uploads or telemetry; dependency lookup is opt-in and Pro licence verification may use the network. Trial tool returns guidance only.",
+      "description": "Local MCP tools for Python risk scans, protected builds, delivery inspection and traceback restoration. No source uploads or telemetry; dependency lookup is opt-in and Pro licence verification may use the network. Trial tool returns guidance only. Companion Community pre-commit hooks for mapping/private-key checks and built-output inspection are available from the next release (unreleased), via the CLI rather than MCP.",
       "representativeQueries": [
         "scan this Python project for obfuscation risks",
         "protect this FastAPI package and verify the result",
