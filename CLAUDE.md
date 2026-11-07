@@ -12,104 +12,27 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 无发版，公开版本不变；main 含未发布的 Community pre-commit 钩子（#194）。已做：CI 3.9 runner、FAQ／中文指南、Agent 文档同步规则、
 IndexNow、Search Console／Bing 登记（文档站验证文件 `docs/google03878b382b498ff9.html` 必须保留）、T+24h／T+72h、备份故障修复与核对。
 下一步：11-08 再请求编入索引、11-09 周检（含搜索引擎检查）、约 11-11 T+7d、维护者跑只读盘点、12 月首周月度观测。
-arong.eu.org 与老博客已交 findata。下方 11-04 及更早交接为历史。
+arong.eu.org 与老博客已交 findata。
 
-**2026-11-04 最终交接**：先读 [会话收尾](docs/SESSION_CLOSEOUT_2026-11-04.md) →
-[发布核验](docs/CORE_0_12_0_RELEASE_2026-11-04.md) →
-[渠道接续](docs/CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md) →
-[冷启动](docs/COLD_START_PROMPT_2026-11-04.md)。Core **0.12.0** 与 Action **v1.1.0／v1**
-已发布核验；Glama 渠道 **0.12.0**（11-05，原 0.11.3）与 DEV 一周复盘完成。MCP 0.3.17 / runtime 0.1.1 /
-扩展 0.4.3 不变。下一步：11-05 09:27 后 T+24h、约 11-05 晚 LinkedIn、11-07 09:27 后 T+72h，
-以及下一次自然快照对新证据的备份包含性核对。11-04 已上传的快照不覆盖本轮新文件。
-下方旧交接与“待发布”只作历史，不重复发版、移动标签或 Glama build。
+**单一事实来源**：[`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md)（当前计划）与 [`docs/TODO.md`](docs/TODO.md)（排期、验收、周期性任务）。
+`docs/ROADMAP.md`、`docs/POST_V0.4_TODO.md` 为归档。11-04 及更早的交接段落已移至私有 `docs/internal/CLAUDE_MD_HISTORY_2026-11-07.md`。
 
-**2026-10-30 当前执行入口**：Core 0.11.1 / MCP 0.3.17 已发布并核验；runtime 0.1.1 不变，Glama 已用新版本成功构建并发现九个工具。按 [会话收尾](docs/SESSION_CLOSEOUT_2026-10-30.md) → [执行进度](docs/EXECUTION_PROGRESS_2026-10-30.md) → [当前计划](docs/CURRENT_PLAN_ZH.md) 接续，完成一项即更新状态。日期事项包括 11-01 后私有 CI 恢复核对、11-04 DEV 和 11-05 LinkedIn 一周复盘；Zenodo DOI 收录后补记。Glama 的 Python 实际版本与 checkout 边界见 [渠道记录](docs/DISTRIBUTION_CHANNELS.md)。
+### 仍生效的约定（从历次交接提炼，2026-11-07）
 
-**2026-10-31 运营（无发版）**：企业发票已自开交付；Pro 付款链接经 API 改为建 Customer 并收集地址、公司名与税号（自动开票关闭）。见 [当前计划](docs/CURRENT_PLAN_ZH.md) 顶部 10-31 段；下一笔真实购买需复核发号与 Customer 资料。
+- **工作方式**：代码修改默认交无头 Codex 实现、Claude 审核（注意 Codex 5 小时额度；沙箱 `.git` 只读时由 Claude 提交／推送）。
+  代码合并与发版各需维护者明确批准；纯文档 PR 在 CI 与 CodeQL 通过后可直接合并。
+- **发版节奏（10-23 定）**：不为观察下载设静默期，按功能与修复的自然进度规划发版，每次发版仍须批准（`docs/TODO.md`「节奏」）。
+- **查进度固定动作**：进度 + 下载量（`python scripts/download_snapshot.py`）+ Gmail（`/pyobfus-inbox`），三样一起给。
+- **内容与稿件**：未发稿件放 gitignored 的 `docs/internal/content-*/`，不进公开目录；排期见 `docs/TODO.md`「内容节奏」。
+  `llms.txt`／`AGENTS.md`／MCP 已覆盖 Agent 需求，不另做 AI 专用页；落地页 JSON-LD 的 offers 须随改价同步。
+- **runtime**：`pyobfus_runtime` 源码有改动必须先升版本、先发 runtime（`scripts/check_runtime_version.py`）。
+- **本机 Python 3.15**：用工作区登记的 `~/venvs/py315_20261020`（`../workspace-meta/VENV_INDEX.md` §0），不新建 venv。
+- **Affiliate**：只有设计（`docs/AFFILIATE_PROGRAM_DESIGN.md`），条款未生效；实现前须补幂等、退款／争议、隐私与财税确认，文档完成不等于授权实现。
+- **Claude 插件市场**：仓库锁已升级到 Anthropic 内部，等支持回复；锁未释放前不要重提表单或换路径（证据见私有 `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`）。
+- **IP**：专利标识与专有许可专利条款待随版本发布，见 `docs/TODO.md`「IP 相关」；法务侧在仓库外 `pyobfus-legal/`。
+- **self-dogfooding**：四条 lane 为观察模式，`Dogfood` workflow 刻意不是必需检查。
+- **公开记录**：客户、付款、下游部署与支持过程只写进私有记录，公开文档写抽象工程事实（`AGENTS.md`「Public vs private records」）。
 
-**历史口径**：下面带较早日期的快照和审核流程不代表当前未完成工作，也不能覆盖维护者当前指令。旧交接中的 D 待合并、E 未开始已由本次状态取代。
-
-**Single source of truth for current plan**: [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md) — 重启 session 第一份必读
-
-**下一步做什么**: [`docs/TODO.md`](docs/TODO.md) — 排期清单（顺序 + 验收标准 + 周期性任务），依据见 `docs/FEATURE_EXPANSION_RESEARCH_2026-10-20.md`
-
-`docs/ROADMAP.md` 和 `docs/POST_V0.4_TODO.md` 已归档为历史执行记录和细节来源。日常优先级、外部 blocker、下次工作建议都以 `docs/CURRENT_PLAN_ZH.md` 为准。
-
-### 2026-10-20 — Core 0.8.0 已发布：Python 3.15 支持（冷启动先读 `docs/CURRENT_PLAN_ZH.md` 顶部）
-
-PR #108（PY315-1 惰性导入保留、PY315-2 推导式解包、3.15 新内建名保留、3.15 三平台 CI）由无头 Codex 实现、Claude 独立审核后合并并发布；PyPI/PEP 740/全新 3.15 与 3.10 安装/GitHub Release/Zenodo `23500657`/CFF 均已核。同晚维护者批准发 MCP 0.3.14（3.15 分类器 + #103 提示）：PyPI/PEP 740、全新 3.15 安装握手 0.3.14/9 tools、MCP Registry active/isLatest 均已核；runtime 0.1.1、VS Code 不发。Glama 10-21 已改装 0.3.14/0.8.0 并测试通过（9 tools）。本机跑 3.15 用工作区登记的 `~/venvs/py315_20261020`（路由见 `../workspace-meta/VENV_INDEX.md` §0，按需 `pip install -e .`），不要再建新 venv；10-20 审核用的源码编译 3.15 在 `/tmp`，已不可依赖。遗留（3.15 标准库 json/unittest 冒烟、free-threaded 未验证）见 `docs/TODO.md` 10-20 段。医院应用仍暂停。
-
-### 2026-10-18 — 历史 session 收尾
-
-同日发布 Core 0.7.4（缺陷 N #102、H PR 4 选项 1 #103）与 0.7.5（缺陷 O #104、P #105），均 Codex 实现 + Claude 审核、全渠道核实。医院版 cand4 闸门等现场 Win7→Win10 答复；参数改名暂缓，B2/B3 等触发；DEV 第 2 篇 10-27 发。代码修改先交无头 Codex（注意 5 小时额度，沙箱 `.git` 只读时由 Claude 提交/推送）；合并与发版各需维护者明确批准。交接见 `../workspace-meta/archives/SESSION_CLOSEOUT_20261018_PYOBFUS_074_075.md`。
-
-### 🟢 2026-10-12 — Core 0.7.0 + runtime 0.1.1 已发布；路线图复核修复随发（冷启动先读 `docs/CURRENT_PLAN_ZH.md` 顶部 10-12 段、路线图 §13、`docs/TODO.md`「增强路线复核」）
-
-### 🟢 2026-10-11 — 限制 H 三个实现 PR 合并、默认开启；下一版 0.7.0 待 10-13 拍板（冷启动先读 `docs/CURRENT_PLAN_ZH.md` 顶部 10-11 段与 `docs/TODO.md`「下一版 Core 0.7.0」）
-
-### 🟢 2026-10-10 — Core 0.6.1 已发布（G #66 + F 方案 A #67）
-
-### 🟢 2026-10-08 — Core 0.6.0 已发布
-
-- **0.6.0**（tag `v0.6.0` → `30cb13b`）：目录构建默认改函数局部变量（#57，`--no-crossfile-local-names` 可关），
-  修复三个 0.5.32 既有缺陷：类体引用同名方法（#62）、单文件改函数内定义名（#63）、单文件改类体注解字段（#64，dataclass 关键字构造报错）。
-  PyPI（PEP 740，publisher=release.yml）、全新安装、GitHub Release、Zenodo `23228339`、`CITATION.cff` 均已核；发布提交 CI 全绿。
-  MCP 未随发（`pyobfus_mcp` 的 `[Unreleased]` 仍待定）。
-- 同日收尾：参数改名设计 PR #65 已审（待维护者拍板 6 个决定）；新登记缺陷 G（目录构建 `from x import f as g` NameError）、
-  F（单文件默认改参数不改关键字调用）。下一步顺序 G → F → 参数改名，见 `docs/TODO.md` P0 段。
-
-- Claude 交叉审核三个 PR 后修复 #57 的三处问题（函数内定义的函数/类名不再改、注解作用域顺序、symtable 报错按文件降级），
-  三个 PR squash 合并：Worker CI `f65be9a`、打包 lane `26337d8`、目录构建局部变量改名 `81df698`；main CI 全绿。
-  报告私有 `docs/internal/geo-2026-10/CROSS_REVIEW_2026-10-08.md`。下一步与两个既有缺陷见 `docs/TODO.md` P0 段。
-
-### 🟢 2026-10-07 — Core 0.5.32 已发布（同日 0.5.31 + 0.5.32，提前结束静默期）+ GEO 第一轮 + 目录构建改名深度 P0（历史记录，当前入口见 10-20 段）
-
-- **10-07 第二版 `0.5.32`**：修复自 0.5.10 起目录构建里同模块装饰器/基类/元类/lambda 引用 NameError（#58），
-  PyPI/PEP 740/Release/Zenodo `23212358`/CFF 已核。PR #57 审核意见：私有 `docs/internal/geo-2026-10/PR57_REVIEW.md`。
-- **10-07**：维护者批准提前发 `0.5.31`（目录构建不删 docstring 属「影响用户的 bug」例外；另带 `--unmap` 位置参数与
-  mapping 不匹配告警）。PyPI/PEP 740/GitHub Release/Zenodo `23210576`/CFF 全部核实。MCP 未随发。
-  **P0**：目录（cross-file）构建只改模块级名字，第 1 步改函数局部变量——Codex 实现、Claude 审核，10-08 已合并（见上段）。
-  GEO 方案私有原件与基线在 gitignored `docs/internal/geo-2026-10/`、`docs/internal/geo-observations/`。
-
-- **内容引流改为定期发（2026-09-27 定）**：10-11 前只写不发，10-13 那周起 DEV 双周一篇、arong.eu.org + 知乎月度、
-  微博不发 pyobfus；Show HN 已用完。**未发稿件放 gitignored 的 `docs/internal/content-*/`，不进 `_drafts/`**。
-  排期与退出条件见 `docs/TODO.md`「内容节奏」。第 1、2 篇草稿已写待维护者审（第 2 篇头注释列了发稿前必须核的三条事实）。
-- **AI/Agent 内容（09-28 定）**：`llms.txt`/`AGENTS.md`/MCP 这层已完整，**不另做 AI 专用页**；缺口用文章补
-  （选题第 7 篇「混淆后让 AI 助手继续调试」排 11-24）。落地页已有 `SoftwareApplication` JSON-LD，改价须同步其 offers。
-  每周一巡检跑 `python scripts/download_snapshot.py`（已含 GitHub 流量来源）；09-30 巡检记录在 `CURRENT_PLAN_ZH.md` 顶部。
-  只留决策摘要、不存完整 stdout 或另建 CSV/JSON；10-25 复盘后改为月度留存，细则见 `docs/TODO.md`「节奏」。
-- **IP 后续（09-28 登记，待拍板未执行）**：提前公布 / 专利标识 + 专有许可补专利条款（随 11 月月度版本）/ 出海建议否、
-  2027-03 复核（优先权窗口 2027-05-22）。仓库侧见 `docs/TODO.md`「IP 相关」，法务侧 `~/projects/pyobfus-legal/IP商业化迁移_TODO.md`。
-- **Affiliate 只完成设计，未上线**：邀请制 3–5 人、无 cookie、签名 Stripe reference、20% / 30 天
-  / 月结 / $50；公开设计 `docs/AFFILIATE_PROGRAM_DESIGN.md`，条款草案明确未生效。实现前先补 Worker
-  event/session 双幂等、paid/async、refund/dispute、隐私日志、测试、KV 备份、Privacy/最终条款与财税确认；
-  **文档完成不等于授权实现/部署**，且不需要 Core 发版。
-- **`0.5.29` 已发布并全渠道收尾**（runtime import 切换 + builder 声明 `pyobfus-runtime>=0.1,<1` 依赖
-  + provenance `runtime_requirement` + Pro 导入失败提示；PyPI/PEP 740/全新装/Release/Zenodo record `22949529`
-  /`CITATION.cff` 均核实）。Zenodo webhook 送达(202)但约 2.5h 才归档——延迟不是失败。
-- **Core `0.5.30` 已发布**：**Y-2 `--expire-warn-days`**（到期前告警不停机）+
-  **Y-3 `--bind-key-env`**（L3 密钥改由应用提供，一次构建跑任意授权机器；v1 仅 L3，配 `--vault` 报错、
-  与 `--bind-device` 互斥；`docs/Y3_KEY_PROVIDER_DESIGN.md`）。真实下游 Pro 缺口 Y-1/2/3 全清零。
-  用户 09-26 明确要求立即发版；本地四测试根、quality 与 Lane C 候选 wheel 全绿，远端 CI 27/27 +
-  CodeQL 全绿，tag 经 OIDC/PEP 740 发布，PyPI 全新安装和 GitHub Release 已核实；Zenodo record
-  `22986080` 与 `CITATION.cff` 也已同步。自本版起进入 10-25 前静默观察期。
-- **self-dogfooding 四 lane 已落地为观察模式**：`dogfood/canary/` + `scripts/dogfood/run.py` +
-  非阻塞 `Dogfood` workflow（**刻意不是必需检查**）；升 PR gate 是单独 reviewed 步骤。
-- **Claude plugin：孤儿仓库锁已由真人支持 Rudy 于 09-28 升级到 Anthropic 内部**，等其跟进（球在对方）。维护者查
-  `wuxiami@hotmail.com` / `zhurong0525@gmail.com` / `zhurong0525@icloud.com` 均无 08-02
-  确认邮件；同一公开仓库根路径稳定复现锁报错。09-26 已在 Rudy 原线程附「No submissions yet」与
-  repository/path lock 两张截图、三个候选邮箱及 Claude Code workspace ID，请求后端定位/释放。
-  **现在等支持回复；锁没释放前别再点表单或换路径绕过**。证据与字段见
-  `docs/internal/CLAUDE_PLUGIN_RESUBMISSION_2026-09-22.md`。
-- 其余维护者动作不变（MCP Trust Registry publish 需 token / AlternativeTo 提交 / OneDrive 删两旧副本）；
-  awesome-python PR #3352 被拒（采用量·含镜像口径）、Vercel 卸载、giscus 保留、`pyobfus-pro-dev` 归档。
-- **09-25 下午 P0（用户列，当日完成）**：trial 服务端上线 5 天登记 0；KV 每日备份脚本此前不认
-  `trial:*` 记录（第一条会让许可备份静默停止）→ 已按类型校验 + 自检 + 挪进日备份随 systemd 补跑，
-  09-24/25 漏导已补。脚本在 `~/scripts/`（仓库外）。详见 `docs/CURRENT_PLAN_ZH.md` 09-25 下午段。
-- **发版节奏（10-23 维护者定，取代 09-25 静默期／月度版）**：下载量已稳定在固定水平、没有特殊情况不会因发版增加，
-  **不再为观察下载设静默期**；按功能扩展与错误修订的自然进度规划发版，每次发版仍须维护者明确批准。全文 `docs/TODO.md`「节奏」段。**查进度固定动作：进度 + 下载量
-  （`python scripts/download_snapshot.py`）+ Gmail（`/pyobfus-inbox`），三样一起给**，缺一样不算查过。
-- 「2026-10-24 状态快照（已被 10-27 交接取代）」：10-24 另起 crossfile-opacity（多模块 L3 + 应用密钥）五切片（设计 §11，预览未发版）：切片 A/B/C 已合并（PR #121/#122/#123），切片 D 在 PR #126 待合并，切片 E 未开始；A–E 全绿前不发版，详见 `docs/CURRENT_PLAN_ZH.md` 顶部。此前 Core 0.9.1（`--trace-encoding`、Pro opacity prologue，PR #120）于 10-24 发布；Core 0.9.0（独立目录构建 mapping v2，PR #112）与 MCP 0.3.15（`unmap_stack_trace` 提示）于 10-23 发布；此前 Core 0.8.0（Python 3.15 支持 #108，PY315-1/2，Codex 实现 + Claude 审核）于 10-20 发布；此前 Core 0.7.5（缺陷 O 星号下标括号 #104、P sys.modules 变更方法 #105）与 0.7.4（缺陷 N #102、H PR 4 选项 1 #103）均于 10-18 发布；0.7.3 为缺陷 C/M、0.7.2 为缺陷 I；同晚 MCP 0.3.14（3.15 分类器 + #103 提示），runtime 0.1.1 不变，MCP 9 工具；发布核验见 `docs/CURRENT_PLAN_ZH.md` 顶部。下游医院应用整体暂停，等待现场后续回复；微信付款未完成买家已于 10-14 发跟进邮件、被动等待。以后 runtime 源码改动仍必须先升版本、先发 runtime。
 
 
 ## 历史进展（已下沉）
