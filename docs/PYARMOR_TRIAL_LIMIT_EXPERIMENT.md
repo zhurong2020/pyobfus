@@ -151,5 +151,5 @@ Re-run this experiment when:
 
 - PyArmor official license comparison: <https://pyarmor.readthedocs.io/en/latest/licenses.html>
 - PyArmor docs landing: <https://pyarmor.readthedocs.io/>
-- This experiment cited inline in: `_drafts/article-01-claude-code-mcp-integration.md` Section 1 + `_drafts/post-cn-ready/{tech_empowerment,zhihu,v2ex}.md`
+- This experiment cited inline in: `_drafts/article-01-claude-code-mcp-integration.md` (launch draft, archived privately since 2026-11-07) Section 1 + `_drafts/post-cn-ready/{tech_empowerment,zhihu,v2ex}.md`
 - Verified-facts table reference: `docs/POST_V0.4_TODO.md` § "Verified facts baseline"

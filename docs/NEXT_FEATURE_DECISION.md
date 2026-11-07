@@ -18,7 +18,7 @@ P2-21 items).
 ## Decision window
 
 Open the launch poll using
-[`_drafts/launch-v0.5.4/github-poll.md`](https://github.com/zhurong2020/pyobfus/blob/main/_drafts/launch-v0.5.4/github-poll.md),
+`_drafts/launch-v0.5.4/github-poll.md` (archived privately on 2026-11-07),
 then review it after **14 days or 10 votes**, whichever comes first. Record the
 opening date, closing trigger, links, and raw counts below.
 
