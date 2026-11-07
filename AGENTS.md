@@ -247,6 +247,12 @@ patent/release context.
 
 ## Where to look next
 
+- **Session closeout (2026-11-07)**: [final handoff](docs/SESSION_CLOSEOUT_2026-11-07.md).
+  No release; public versions unchanged. main contains unreleased Community
+  pre-commit hooks (#194), IndexNow notifications, Search Console/Bing
+  registration (keep `docs/google03878b382b498ff9.html` and the IndexNow key
+  files). Next: weekly checks in `docs/TODO.md` (periodic), T+7d, monthly
+  search/AI observation. The 2026-11-04 entry below is historical.
 - **Session closeout (2026-11-04)**: [final handoff](docs/SESSION_CLOSEOUT_2026-11-04.md)
   and [cold-start prompt](docs/COLD_START_PROMPT_2026-11-04.md). Core/Action/Glama
   rollout and DEV review are complete; continue scheduled observations and verify
