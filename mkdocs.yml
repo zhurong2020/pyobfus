@@ -73,8 +73,11 @@ nav:
   - Guides:
     - Protect Python before selling: guides/protect-python-before-selling.md
     - "FAQ: can Python code be protected?": guides/protect-python-code-faq.md
-    - Debug an obfuscated traceback: guides/debug-obfuscated-python.md
+    - Debug tracebacks after obfuscation: guides/debug-obfuscated-python.md
     - Ship Python offline: guides/ship-python-offline.md
+  - 中文:
+    - 卖给客户前如何保护源码: zh/protect-python-before-selling.md
+    - 混淆后报错怎样定位原函数: zh/debug-obfuscated-python.md
   - Compare:
     - Overview: COMPARISON.md
     - vs PyArmor: compare/pyarmor.md
