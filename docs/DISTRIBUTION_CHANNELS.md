@@ -1,5 +1,7 @@
 # Distribution Channels State
 
+**2026-11-07 Glama（Core 0.13.0）**：Build steps 改为 `pyobfus==0.13.0`；test `01a1b56b-40fd-7b04-9e65-eb349b7314a8` 成功，安装 Core 0.13.0 / MCP 0.3.17 / runtime 0.1.1，握手与九工具发现通过。自动渠道 release 标签为 **0.12.1**（Glama 自身递增，非 Core 版本号）。
+
 **2026-11-07 搜索引擎登记**：Google Search Console 已有 `https://zhurong2020.github.io/pyobfus/`（自动验证，sitemap 已提交、待首次读取）与 `https://pyobfus.readthedocs.io/en/latest/`（HTML 文件验证，`docs/google03878b382b498ff9.html` 须保留；sitemap 读取成功，146 页）；Bing Webmaster Tools 已从 GSC 导入两个站点：文档站 sitemap 146 网址、落地页 `https://zhurong2020.github.io/pyobfus/sitemap.xml` 2 网址，均 11-07 处理成功、无错误（Bing 后台按站点分开，用左上角站点选择器切换）。Bing 的「AI Performance（beta）」可作为月度 AI 观测的官方数据源。IndexNow 见下文。
 
 **2026-11-06 Glama 渠道 0.12.0**：维护者 11-05 新建渠道 release 0.12.0，关联成功构建
