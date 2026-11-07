@@ -46,3 +46,10 @@
   Cloudflare AI 爬虫防火墙开关核对），这些不属于 pyobfus，全部记录在
   `findata/content/SEARCH_PRESENCE_TODO_2026-11-07.md`，后续由 findata 会话接手。
 - 维护者开启了 Cloudflare 账号两步验证，恢复码已存入 Vaultwarden（条目名见私有 memory）。
+
+## 公开仓库清理（11-07 晚，PR #206–#209）
+
+- 文档站只发布产品文档：会话收尾、计划、TODO、调研、发版过程证据与渠道手册经 `mkdocs.yml` `exclude_docs` 排除（仍在 GitHub），sitemap 147 → 71。
+- `CLAUDE.md` 精简为当前交接 + 「仍生效的约定」，历史段落移至私有记录；公开文件中的客户、下游部署与账号细节改写为抽象工程事实；钩子邮箱白名单只保留公开支持地址。
+- README 只保留最新「What's new」；删除 `smithery.yaml`（Smithery 技能目录已下线）与未使用的 `.env.stripe.example`；旧发帖稿移入私有归档。
+- 合并规则：没有常设自动合并授权，所有 PR 按维护者当次会话指示合并。
