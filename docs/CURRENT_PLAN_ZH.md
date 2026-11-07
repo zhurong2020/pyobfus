@@ -1,5 +1,10 @@
 # pyobfus 当前计划
 
+**2026-11-07 上午（无发版）**：T+24h／T+72h 观察已补齐（[观察表](CORE_012_POST_RELEASE_OBSERVATION.md)），未发现客户问题。
+合并 #194（Community pre-commit 钩子，未发版）、#195（中文指南与报错还原指南开头）、#196（IndexNow 通知，仅 CI）。
+11-07 月度搜索／AI 观测已做（私有记录 `docs/internal/geo-observations/2026-11-07-baseline.md`）。Search Console 已添加 `/pyobfus/` 资源。
+**阻塞**：本机日备份自 11-05 起未运行（用户级 systemd 管理器开机超时），备份包含性核对待维护者批准 sudo 修复后补做。
+
 **2026-11-06 下午：渠道试验评估、FAQ 与 Agent 文档同步（无发版）**：
 GitHub 14 天最大来源 aocr.org（53/53）经核为美国骨科放射学会站点，无 pyobfus 相关页面，流量集中于 11-05 单日且只访问仓库首页，
 按机器流量排除（vuink.com 9/9 形态类似）；真实浏览量应扣除约 53。Stack Overflow 相关新问题流量低，且其政策禁止任何部分由 LLM
