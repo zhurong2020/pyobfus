@@ -1,0 +1,14 @@
+- id: pyobfus-no-private-material
+  name: Block pyobfus mappings and private keys
+  description: Keep pyobfus mapping files and PEM private keys out of commits.
+  entry: python -m pyobfus.precommit
+  language: python
+  pass_filenames: true
+- id: pyobfus-check-delivery
+  name: Check pyobfus built delivery
+  description: 'Inspect built output before pushing; set args: [<output dir>] (for example dist/).'
+  entry: pyobfus --check-delivery
+  language: python
+  pass_filenames: false
+  always_run: true
+  stages: [pre-push, manual]
