@@ -407,11 +407,11 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 专利申请 CN 202610712171X 与软著的法务事项（是否提前公布、是否出海、商标、转公司）在仓库外的
 `pyobfus-legal/IP商业化迁移_TODO.md` 跟踪，**不在公开仓库展开**。这里只登记要改本仓库的部分：
 
-- [ ] **专利标识**：README 与 `landing/index.html` 加申请阶段标识。措辞必须是「专利申请，尚未授权」+
+- [x] **专利标识**（0.13.0 候选已加到 README、README.zh-CN 与两个落地页，随 0.13.0 发布）：README 与 `landing/index.html` 加申请阶段标识。措辞必须是「专利申请，尚未授权」+
       申请号（英文 "Patent pending (CN 202610712171X, not yet granted)"），**不能写成已授权**。
-- [ ] **专有许可补专利条款**：`pyobfus_pro/LICENSE`、`pyobfus_runtime/LICENSE` 现对专利只字未提；补
+- [ ] **专有许可补专利条款**（未随 0.13.0；措辞须专业人士审过后单独跟进）：`pyobfus_pro/LICENSE`、`pyobfus_runtime/LICENSE` 现对专利只字未提；补
       「仅授予按本许可运行所需的专利权利，不授予其他专利许可」。措辞发版前请专业人士过目。
-- [ ] **发版检查清单加一条**：专利覆盖机制的实现不得进入 Apache-2.0 核心（Apache-2.0 §3 会把核心代码
+- [x] **发版检查清单加一条**（0.13.0 候选已写入 CLAUDE.md 发布流程 3b 与 AGENTS.md）：专利覆盖机制的实现不得进入 Apache-2.0 核心（Apache-2.0 §3 会把核心代码
       涉及的专利权免费授出）。09-28 核查：核心只做 CLI 转发，实现都在 `pyobfus_pro/` 与 `pyobfus-runtime`，
       边界当前守住。
 - 节奏：三项可以先写好放进 `[Unreleased]`，**随 11 月第一周月度版本发**，不单独打破 10-25 前静默期。
