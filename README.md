@@ -36,37 +36,7 @@ with configuration or a thin wrapper when these interfaces fit your task.
 > String encryption uses Fernet (AES-128-CBC with HMAC-SHA256); the description
 > is corrected, while cryptography and generated artifact formats are unchanged.
 >
-> **What's new in v0.11.1:** `--check-delivery` now bounds directory and
-> wheel inspection, rejects unsafe paths and malformed evidence, and reports
-> incomplete scans as errors instead of clean results. See the
-> [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md)
-> for details.
->
-> **What's new in v0.11.0:** `--check-delivery` reports bounded `.pyc`
-> source evidence and warns when a frozen executable's internal payload has
-> not been inspected. Cross-file builds now recognize package-root absolute
-> imports in module-attribute diagnostics; the optional
-> `--preserve-unproved-module-attributes` keeps recognized export names when
-> compatibility matters more than renaming them. These checks do not prove a
-> delivered artifact safe. See the [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md)
-> and [delivery limits](https://github.com/zhurong2020/pyobfus/blob/main/docs/P2_DELIVERY_DIAGNOSTICS_2026-10-28.md).
->
-> **What's new in v0.10.0:** Opt-in Pro `--crossfile-opacity` protects selected
-> top-level functions in a multi-module build using an application-provided
-> key. Builds require a fresh output directory and a private mapping;
-> `--unmap` restores encrypted frame names without claiming original line
-> numbers. This restricted preview has explicit interpreter and delivery
-> checks. See the [configuration guide](https://github.com/zhurong2020/pyobfus/blob/main/docs/OPACITY_CONFIG.md#cross-file-l3-preview-since-0100),
-> [validation and limits](https://github.com/zhurong2020/pyobfus/blob/main/docs/CROSSFILE_OPACITY_VALIDATION.md),
-> and [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
->
-> **What's new in v0.9.0:** `--unmap` now works for independent directory builds
-> (`--no-cross-file`). The mapping records names per file, so two files that reuse
-> the same short name restore to the right originals, frame by frame. Older
-> mappings keep working; older pyobfus versions reject the new mapping format
-> instead of guessing. See the
-> [debugging guide](https://github.com/zhurong2020/pyobfus/blob/main/docs/guides/debug-obfuscated-python.md)
-> and the [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
+> Earlier releases: see the [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
 
 ## Why pyobfus
 
