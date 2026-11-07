@@ -1,6 +1,6 @@
 # pyobfus 当前计划
 
-**2026-11-07 晚 Core 0.13.0 已发布**：Community pre-commit 钩子与专利申请标识；完整 21 组合矩阵、PEP 740、3.12／3.15 全新安装、GitHub Release 均已核实，见 [发布记录](CORE_0_13_0_RELEASE_2026-11-07.md)。剩 Zenodo／CITATION 与 Glama 渠道更新。
+**2026-11-07 晚 Core 0.13.0 已发布**：Community pre-commit 钩子与专利申请标识；完整 21 组合矩阵、PEP 740、3.12／3.15 全新安装、GitHub Release 均已核实，见 [发布记录](CORE_0_13_0_RELEASE_2026-11-07.md)。Zenodo record `24031969`、`CITATION.cff` 与 Glama 渠道均已完成。
 
 **2026-11-07 上午（无发版）**：T+24h／T+72h 观察已补齐（[观察表](CORE_012_POST_RELEASE_OBSERVATION.md)），未发现客户问题。
 合并 #194（Community pre-commit 钩子，未发版）、#195（中文指南与报错还原指南开头）、#196（IndexNow 通知，仅 CI）。
