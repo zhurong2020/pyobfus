@@ -8,6 +8,12 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ## ⚡ Current pending work (cold-start 必读)
 
+**2026-11-07 最终交接**：先读 [会话收尾](docs/SESSION_CLOSEOUT_2026-11-07.md) → [当前计划](docs/CURRENT_PLAN_ZH.md) → [TODO](docs/TODO.md)「周期性」。
+无发版，公开版本不变；main 含未发布的 Community pre-commit 钩子（#194）。已做：CI 3.9 runner、FAQ／中文指南、Agent 文档同步规则、
+IndexNow、Search Console／Bing 登记（文档站验证文件 `docs/google03878b382b498ff9.html` 必须保留）、T+24h／T+72h、备份故障修复与核对。
+下一步：11-08 再请求编入索引、11-09 周检（含搜索引擎检查）、约 11-11 T+7d、维护者跑只读盘点、12 月首周月度观测。
+arong.eu.org 与老博客已交 findata。下方 11-04 及更早交接为历史。
+
 **2026-11-04 最终交接**：先读 [会话收尾](docs/SESSION_CLOSEOUT_2026-11-04.md) →
 [发布核验](docs/CORE_0_12_0_RELEASE_2026-11-04.md) →
 [渠道接续](docs/CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md) →
