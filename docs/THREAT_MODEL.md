@@ -8,7 +8,7 @@ part of the model — over-claiming protection is itself a risk to users.
 Companion documents: [`SECURITY.md`](https://github.com/zhurong2020/pyobfus/blob/main/SECURITY.md) (reporting + trust
 boundary), [`COMPARISON.md`](COMPARISON.md) ("bytecode protection is not
 magic"), [`SELF_DOGFOODING_BEST_PRACTICES.md`](SELF_DOGFOODING_BEST_PRACTICES.md),
-and the not-yet-launched [`AFFILIATE_PROGRAM_DESIGN.md`](AFFILIATE_PROGRAM_DESIGN.md).
+and the not-yet-launched [`AFFILIATE_PROGRAM_DESIGN.md`](https://github.com/zhurong2020/pyobfus/blob/main/docs/AFFILIATE_PROGRAM_DESIGN.md).
 
 ## Assets
 

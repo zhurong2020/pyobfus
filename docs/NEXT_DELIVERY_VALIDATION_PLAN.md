@@ -6,9 +6,9 @@
 
 ## 选择依据与范围
 
-[已有打包记录](P1_PACKAGING_VALIDATION_2026-10-28.md)已经覆盖公开 0.10.0 的 Linux Nuitka
+[已有打包记录](https://github.com/zhurong2020/pyobfus/blob/main/docs/P1_PACKAGING_VALIDATION_2026-10-28.md)已经覆盖公开 0.10.0 的 Linux Nuitka
 standalone/onefile，以及 Windows PyInstaller onedir/onefile；Windows Nuitka 仍是独立缺口。
-[10-30 路线复核](ROADMAP_REVIEW_2026-10-30.md)要求一次只扩一个所需组合。
+[10-30 路线复核](https://github.com/zhurong2020/pyobfus/blob/main/docs/ROADMAP_REVIEW_2026-10-30.md)要求一次只扩一个所需组合。
 先沿用 Python 3.12 和现有小夹具，避免同时更换打包器、解释器和保护层。
 
 | 轴 | 本次建议 | 本轮不扩展的轴 |

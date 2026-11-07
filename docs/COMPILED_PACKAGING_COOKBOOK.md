@@ -150,7 +150,7 @@ on top of this pipeline is a reasonable escalation. See
   2026-10-11; the [hosted run](https://github.com/zhurong2020/pyobfus/actions/runs/38107417778) also passed. Nuitka onefile, Cython for
   a whole package, macOS and Windows remain outside this evidence.
 
-**2026-10-28 public-wheel follow-up:** [the bounded delivery validation](P1_PACKAGING_VALIDATION_2026-10-28.md)
+**2026-10-28 public-wheel follow-up:** [the bounded delivery validation](https://github.com/zhurong2020/pyobfus/blob/main/docs/P1_PACKAGING_VALIDATION_2026-10-28.md)
 uses the released Core 0.10.0 wheel. A multi-module app with a data file ran
 under PyInstaller onedir/onefile on Linux and Windows, and Nuitka onefile on
 Linux; deliberate failures retained reverse-mappable project frames. The

@@ -2,7 +2,7 @@
 
 This document is the durable map of pyobfus's source, distribution, and
 cross-repository boundaries. Current priorities belong in
-[`CURRENT_PLAN_ZH.md`](CURRENT_PLAN_ZH.md); historical implementation detail
+[`CURRENT_PLAN_ZH.md`](https://github.com/zhurong2020/pyobfus/blob/main/docs/CURRENT_PLAN_ZH.md); historical implementation detail
 belongs in dated design documents.
 
 ## Name-verification ownership (since Core 0.7.1)
@@ -140,4 +140,4 @@ When a package or repository boundary changes, update the owning README and
 changelog, this document, [`SUPPORT_MATRIX.md`](SUPPORT_MATRIX.md), and
 [`THREAT_MODEL.md`](THREAT_MODEL.md) when their claims are affected. The
 cross-repository audit and maintenance rule are recorded in
-[`CROSS_REPO_DOC_SYNC_AUDIT_2026-10-02.md`](CROSS_REPO_DOC_SYNC_AUDIT_2026-10-02.md).
+[`CROSS_REPO_DOC_SYNC_AUDIT_2026-10-02.md`](https://github.com/zhurong2020/pyobfus/blob/main/docs/CROSS_REPO_DOC_SYNC_AUDIT_2026-10-02.md).

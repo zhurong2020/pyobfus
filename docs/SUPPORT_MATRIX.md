@@ -2,8 +2,8 @@
 
 What is actually verified, by what, as of 2026-11-04 (`pyobfus` 0.12.0 /
 `pyobfus-mcp` 0.3.17 / `pyobfus-runtime` 0.1.1 / VS Code extension 0.4.3 /
-`pyobfus-action` 1.1.0). See the [Core release evidence](CORE_0_12_0_RELEASE_2026-11-04.md)
-and [Action/Glama follow-up](CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md) for exact
+`pyobfus-action` 1.1.0). See the [Core release evidence](https://github.com/zhurong2020/pyobfus/blob/main/docs/CORE_0_12_0_RELEASE_2026-11-04.md)
+and [Action/Glama follow-up](https://github.com/zhurong2020/pyobfus/blob/main/docs/CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md) for exact
 revisions and tested limits; version updates do not broaden the cells below.
 
 Four labels, used strictly:
@@ -357,7 +357,7 @@ examples require a license and are not part of these Community packaging checks.
 | Dependency | Range | Status | Evidence |
 |---|---|---|---|
 | `mcp` SDK 1.x | `>=1.27.0,<3.0.0` (shipped in MCP 0.3.16) | tested | `ci.yml` job `mcp-sdk-compat` covers the 1.27.0 floor; `mcp-sdk-latest` resolves the newest allowed SDK |
-| `mcp` SDK 2.x | `>=1.27.0,<3.0.0` (shipped in MCP 0.3.16) | tested | `ci.yml` job `mcp-sdk-compat` covers 2.0.0 and newest 2.x with all nine stdio tools; see [release verification](MCP_SDK_2X_RELEASE_PREP_2026-10-26.md) |
+| `mcp` SDK 2.x | `>=1.27.0,<3.0.0` (shipped in MCP 0.3.16) | tested | `ci.yml` job `mcp-sdk-compat` covers 2.0.0 and newest 2.x with all nine stdio tools; see [release verification](https://github.com/zhurong2020/pyobfus/blob/main/docs/MCP_SDK_2X_RELEASE_PREP_2026-10-26.md) |
 | `pyobfus` floor for the MCP server | `>=0.5.18` | tested | MCP suite installs the local Core checkout |
 | `pyobfus-runtime` for the builder/artifacts | `>=0.1.1,<1` | tested | Declared by Core metadata; runtime boundary suite and clean-wheel install verify the current 0.x contract |
 | `pyobfus-action` → `pyobfus` | latest by default; exact `pyobfus-version` supported | tested | External Action CI covers default install and version pinning. Action and Core versions are independent; pin for reproducible CI. |

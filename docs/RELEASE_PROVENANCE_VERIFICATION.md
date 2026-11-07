@@ -71,7 +71,7 @@ commit `73ff6a8ec20b4c93aa25ea1572d3b5909cf2605c` and `refs/tags/v0.12.0`.
 | wheel | `fee25a032b0bfc4cda56abc2fa908d261c71f1c0f269a7ee90e1c04e6793e755` |
 | sdist | `b33e0998fe9d52db5e46ec3362280700f56cf7f276f297972ee77ff364f5a6de` |
 
-See [final release validation](CORE_0_12_0_RELEASE_2026-11-04.md) and the
+See [final release validation](https://github.com/zhurong2020/pyobfus/blob/main/docs/CORE_0_12_0_RELEASE_2026-11-04.md) and the
 [OIDC publication](https://github.com/zhurong2020/pyobfus/actions/runs/41753931632).
 Fresh published-wheel installations on Python 3.12/3.15 and a separate real
 owner-license CI build passed. MCP 0.3.17 and runtime 0.1.1 are unchanged.
@@ -127,7 +127,7 @@ files, and the downloaded wheel SHA-256 matched the PyPI JSON digest
 `69603cc66265910f07a32954ae45c6c18e231cd6f19734d83e944f9c4ef430b1`.
 Fresh PyPI installs on Python 3.10 and 3.15 passed dependency checks, 153
 MCP tests and the nine-tool stdio contract. See
-[MCP release evidence](MCP_SDK_2X_RELEASE_PREP_2026-10-26.md).
+[MCP release evidence](https://github.com/zhurong2020/pyobfus/blob/main/docs/MCP_SDK_2X_RELEASE_PREP_2026-10-26.md).
 
 ## Earlier Verified Snapshot — 2026-10-14
 
