@@ -2,7 +2,7 @@
 
 **优先级：P0，维护者于 2026-10-20 明确确认。** 利用 Python 3.15 发布窗口，尽快完成兼容支持；优先于 MCP SDK 升级、mapping 扩展、目录 fusion、参数改名及其他新增功能。
 
-**执行状态：已完成并随 Core 0.8.0 于 2026-10-20 发布**（PR #108，Claude 独立审核后合并；发布核验见 [当前计划](https://github.com/zhurong2020/pyobfus/blob/main/docs/CURRENT_PLAN_ZH.md) 顶部）。下文保留为实施记录。见 [2026-10-20 验证记录](PYTHON315_VALIDATION.md)。医院应用继续暂停。
+**执行状态：已完成并随 Core 0.8.0 于 2026-10-20 发布**（PR #108，Claude 独立审核后合并；发布核验见 [当前计划](https://github.com/zhurong2020/pyobfus/blob/main/docs/CURRENT_PLAN_ZH.md) 顶部）。下文保留为实施记录。见 [2026-10-20 验证记录](PYTHON315_VALIDATION.md)。下游应用继续暂停。
 
 ## 1. 当前事实与入口
 
@@ -78,4 +78,4 @@ VS Code：`vscode-tests315-final.log`（53 项，原生 3.15 CLI）；Action：`
 
 ## 6. 后续 session 的启动提示
 
-> 先读 AGENTS.md、CURRENT_PLAN_ZH.md 顶部和 PYTHON315_SUPPORT_PLAN.md。维护者已将 Python 3.15 兼容性列为 P0；本次 session 的具体实现与发布范围以维护者当次指示为准。先复现 PY315-1／PY315-2，再审计并完成 3.15 验收，保持 3.9–3.14 正确性。不要恢复医院应用工作，不捆绑 MCP 2.x、参数改名或目录 fusion。完成后同步支持声明和证据，合并与发版按各自 gate 执行。
+> 先读 AGENTS.md、CURRENT_PLAN_ZH.md 顶部和 PYTHON315_SUPPORT_PLAN.md。维护者已将 Python 3.15 兼容性列为 P0；本次 session 的具体实现与发布范围以维护者当次指示为准。先复现 PY315-1／PY315-2，再审计并完成 3.15 验收，保持 3.9–3.14 正确性。不要恢复下游应用工作，不捆绑 MCP 2.x、参数改名或目录 fusion。完成后同步支持声明和证据，合并与发版按各自 gate 执行。

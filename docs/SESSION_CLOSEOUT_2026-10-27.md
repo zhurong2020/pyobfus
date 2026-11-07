@@ -33,8 +33,7 @@
 ## 分支与验证边界
 
 本次核查 `~/projects/` 下 53 个 Git 仓库、54 个 worktree。唯一有未提交
-内容的非 main 工作树是 `cardiac-ai-cac/.worktrees/hospital` 的
-`feat/hospital-edition-v2.6.0`，有 7 个既有修改，已先告知并保持原样。
+内容的非 main 工作树在另一个私有仓库（与本仓无关），有此前已存在的修改，已先告知并保持原样。
 `pyobfus` main 干净，`pyobfus-action` 非 main 分支也干净；两者均无 stash。
 Action 分支的“未推送提交”与“未提交改动”是不同状态。
 

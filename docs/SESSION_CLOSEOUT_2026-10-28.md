@@ -32,8 +32,7 @@
 ## 关会话前最后审计
 
 2026-10-28 再查 54 个 Git worktree：唯一非 main 未提交内容在
-`cardiac-ai-cac/.worktrees/hospital` 的 `feat/hospital-edition-v2.6.0`，
-共 7 个此前已存在的医院版修改；已先告知维护者，本会话未触碰。
+另一个私有仓库（与本仓无关）的非 main 工作树有此前已存在的修改；已先告知维护者，本会话未触碰。
 `pyobfus-action` 的非 main 文档分支工作树干净，提交仍未推送。
 
 项目的 `AGENTS.md` 和 `CLAUDE.md` 已指向本交接；用户版根 README
