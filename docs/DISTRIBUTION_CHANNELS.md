@@ -518,7 +518,7 @@ re-runnable source of truth for the calculation is
 
 ### Stack Overflow — Rong Zhu
 - URL: https://stackoverflow.com/users/... (11 rep · 4 bronze badges)
-- **Status: ⏸️ SEEDING PAUSED** (see `_drafts/stackoverflow-seeding-targets.md`)
+- **Status: ⏸️ SEEDING PAUSED** (see `docs/internal/drafts-archive-2026-11-07/stackoverflow-seeding-targets.md`（私有，2026-11-07 起不在公开仓库）)
 - Rationale: SO's site-wide AI-content ban + low per-question traffic + low-rep account = bad risk/reward
 - Re-evaluation trigger: pyobfus stars > 300 OR 6 months elapsed (whichever first)
 
@@ -537,7 +537,7 @@ re-runnable source of truth for the calculation is
   - [x] Post #1 scheduled 2026-04-24 evening → slipped to **2026-05-07 evening** (article went through v1 → v2 → v3 voice rewrite → v4 GPTZero-diagnostic-driven rewrite before final publish)
 - **First post (LIVE 2026-05-07)**: *"Let Claude Code Debug Your Obfuscated Python: A Guide to the pyobfus MCP Integration"*
   - URL: <https://dev.to/zhurong2020/let-claude-code-debug-your-obfuscated-python-a-guide-to-the-pyobfus-mcp-integration-3epm>
-  - Source-of-truth file: `_drafts/article-01-claude-code-mcp-integration.md` (kept post-publish for revision history)
+  - Source-of-truth file: `docs/internal/drafts-archive-2026-11-07/article-01-claude-code-mcp-integration.md`（私有，2026-11-07 起不在公开仓库） (kept post-publish for revision history)
   - Tags: `ai`, `python`, `claudecode`, `mcp`
   - Cover: `pyobfus-legal/software_copyright/screenshots/03_obfuscate_demo.png` (BEFORE/AFTER side-by-side)
   - 2 inline images: `04_json_output.png` (after Preflight check section) + `03_obfuscate_demo.png` (after Obfuscate-with-mapping section)

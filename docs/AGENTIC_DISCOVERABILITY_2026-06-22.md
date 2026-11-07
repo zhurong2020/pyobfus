@@ -159,7 +159,7 @@ Read the Docs root redirect/admin step.
 
 ## 6. How this compounds with the launch wave
 
-The launch wave (HN/Reddit/dev.to, currently in `_drafts/`) and this agentic-discoverability work are the **same content effort** viewed from two angles:
+The launch wave (HN/Reddit/dev.to, since 2026-11-07 archived privately) and this agentic-discoverability work are the **same content effort** viewed from two angles:
 - An AEO-structured dev.to/HN post → ranks in traditional search **and** becomes an answer-engine citation source **and** builds entity authority that makes Claude/Perplexity more likely to name pyobfus.
 - Registry listings (Smithery/PulseMCP) → give agents a runtime path to the tool the moment a launch reader's agent goes looking.
 

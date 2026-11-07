@@ -179,7 +179,7 @@ Rule: **No marketing article until the MCP server and unmap command are live.** 
 
 ### Strategy revision 2026-04-22 — pause Stack Overflow seeding
 
-Initial plan had Stack Overflow as channel #4 (5 seeded answers). Concrete investigation on 2026-04-22 — see `_drafts/stackoverflow-seeding-targets.md` — found:
+Initial plan had Stack Overflow as channel #4 (5 seeded answers). Concrete investigation on 2026-04-22 — see `docs/internal/drafts-archive-2026-11-07/stackoverflow-seeding-targets.md` (private since 2026-11-07) — found:
 
 - Best 2024+ candidate (Q79400498) has **40 views/month**. Expected click-through to pyobfus: ~0.4/month even if our answer ranks well.
 - Three top-tier targets combined ≈ 2 clicks/month.
@@ -202,7 +202,7 @@ Initial plan had Stack Overflow as channel #4 (5 seeded answers). Concrete inves
 
 ### Forum AI-policy reality check (as of 2026-04)
 
-See `_drafts/forum-ai-policy-and-voice-guide.md` for the full matrix. Short version:
+See `docs/internal/drafts-archive-2026-11-07/forum-ai-policy-and-voice-guide.md` (private since 2026-11-07) for the full matrix. Short version:
 
 - **Stack Overflow, Hacker News**: AI content banned outright. No disclosure path. Post removal + account penalty on detection.
 - **Medium**: AI allowed with first-two-paragraph disclosure. Undisclosed → Network-Only distribution (effectively shadow-banned).
