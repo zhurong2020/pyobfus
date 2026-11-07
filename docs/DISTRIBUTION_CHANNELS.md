@@ -1,6 +1,6 @@
 # Distribution Channels State
 
-**2026-11-07 搜索引擎登记**：Google Search Console 已有 `https://zhurong2020.github.io/pyobfus/`（自动验证，sitemap 已提交、待首次读取）与 `https://pyobfus.readthedocs.io/en/latest/`（HTML 文件验证，`docs/google03878b382b498ff9.html` 须保留；sitemap 读取成功，146 页）；Bing Webmaster Tools 已从 GSC 导入（146 网址，无错误）。Bing 的「AI Performance（beta）」可作为月度 AI 观测的官方数据源。IndexNow 见下文。
+**2026-11-07 搜索引擎登记**：Google Search Console 已有 `https://zhurong2020.github.io/pyobfus/`（自动验证，sitemap 已提交、待首次读取）与 `https://pyobfus.readthedocs.io/en/latest/`（HTML 文件验证，`docs/google03878b382b498ff9.html` 须保留；sitemap 读取成功，146 页）；Bing Webmaster Tools 已从 GSC 导入两个站点：文档站 sitemap 146 网址、落地页 `https://zhurong2020.github.io/pyobfus/sitemap.xml` 2 网址，均 11-07 处理成功、无错误（Bing 后台按站点分开，用左上角站点选择器切换）。Bing 的「AI Performance（beta）」可作为月度 AI 观测的官方数据源。IndexNow 见下文。
 
 **2026-11-06 Glama 渠道 0.12.0**：维护者 11-05 新建渠道 release 0.12.0，关联成功构建
 `01a1ac58-1a8f-7c1c-a73f-fb09f5a9a1e5`，固定 checkout `9c87645`，安装命令不变

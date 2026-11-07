@@ -600,6 +600,15 @@ Python 3.13 嵌入版）。这是 Pro 输出第一次真正交付到别人的机
 - **归因查询**：GitHub 代码搜索 `uses: zhurong2020/pyobfus-action`，量的是
   可见性不是采纳量。
 - **竞品扫描**：有触发点再做（新对手 / 生态政策变化 / 临近发布），不定期盯梢。
+- **搜索引擎巡检（11-07 起，随每周一巡检）**：Google Search Console 两个资源
+  （`https://zhurong2020.github.io/pyobfus/`、`https://pyobfus.readthedocs.io/en/latest/`）看站点地图状态、
+  「网页」收录数与未收录原因、近 28 天效果；Bing Webmaster 用左上角站点选择器分别看两个站点的 Sitemaps、
+  IndexNow 提交记录与「AI Performance（beta）」。另看 GitHub Actions 里 Pages 末步与 `IndexNow docs
+  notification` 的返回码（200/202 正常，403/422 查 key 文件）。只记结论，数据明细放私有目录。
+  维护者用 Chrome 插件做只读盘点时，Prompt 在 `~/projects/workspace-meta/archives/SEARCH_CONSOLE_SETUP_GUIDE_2026-11-07.md` 第 5 步。
+- **月度搜索／AI 观测（每月第一周）**：WebSearch 12 题 + Codex（隔离 `CODEX_HOME`、中性目录）+ Codebuddy
+  `hy4free` / `deepseek-v4-pro` / `kimi-k3.1-pro`，并读 Bing「AI Performance」。方法、隔离与坑见私有
+  `docs/internal/geo-observations/2026-11-07-baseline.md`；下次 2026-12 第一周。
 
 ## 第三方授权（2026-09-13 审计 · 因一封 Vercel 邮件触发）
 
