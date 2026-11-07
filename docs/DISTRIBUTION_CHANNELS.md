@@ -1000,3 +1000,21 @@ Update whenever:
 - A channel's status changes (paused ↔ active)
 - A publish / post goes live (note the URL + date)
 - Monthly metrics snapshot (copy current row of numbers)
+
+## Search engine notification (IndexNow)
+
+CI sends public page URLs, the host, and a public verification key to
+[IndexNow](https://www.indexnow.org/documentation). `pages.yml` submits
+`landing/sitemap.xml` after deployment. `indexnow-docs.yml` submits changed
+Markdown URLs on main after a fixed 240-second Read the Docs build window;
+manual runs can submit all local navigation pages. Excluded maintainer documents
+are skipped. A zero before-SHA or a manual run with the all-pages option disabled
+submits nothing. Notifications are best effort, not a required check; the fixed
+wait does not guarantee that RTD has finished building.
+
+The public key files are `landing/0f5fb35e631b28ef475c62df09d73cdd.txt`
+(served under `https://zhurong2020.github.io/pyobfus/`) and
+`docs/0f5fb35e631b28ef475c62df09d73cdd.txt`
+(served under `https://pyobfus.readthedocs.io/en/latest/`). Each key location
+limits submissions to its host and directory. This notification is CI-only:
+it adds no package network behavior or telemetry.
