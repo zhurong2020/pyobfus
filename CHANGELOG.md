@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Community pre-commit hooks block pyobfus mapping and private-key files from
+  commits and inspect built output before pushing; the filename checker supports
+  versioned JSON results without printing private contents.
+
 ## [0.12.0] - 2026-11-04
 
 ### Security
