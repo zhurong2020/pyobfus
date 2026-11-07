@@ -1,18 +1,33 @@
 ---
-title: Debug obfuscated Python tracebacks
-description: Keep a private build mapping, restore identifiers from a production traceback, and investigate the failure with your editor or coding assistant.
+title: Debug production tracebacks after Python obfuscation
+description: How to map an obfuscated Python traceback back to original names, files and lines with a private per-build mapping, using pyobfus --unmap.
 ---
 
-# How to debug an obfuscated Python traceback
+# How to debug production tracebacks after Python obfuscation
+
+**Short answer:** keep a private mapping file for every build you ship, and
+use the mapping from the exact build the customer runs to translate the
+traceback back to your original names. With pyobfus that is
+`--save-mapping` at build time and `pyobfus --unmap --trace error.log
+--mapping <that build's mapping>` afterwards. With mappings from 0.7.0 or
+later, standard frames also point to the original file and line.
+
+For any obfuscator that can produce a traceback mapping, the same principles
+apply; the exact restoration scope and commands depend on the tool:
+
+- **One mapping per build.** Changes to source, configuration or tool version
+  can change names and line mappings, so keep the mapping of every build you ship. Store it under the release version (and ideally
+  record a build id in the shipped files, which `--trace-marker` does).
+- **Never ship the mapping.** It reverses the obfuscation; keep it out of
+  release archives, public CI artifacts and issue trackers.
+- **Collect the whole traceback.** File names, line numbers and the exception
+  chain are what the mapping translates.
 
 You shipped obfuscated Python, a customer hits an error, and the traceback
-they send back says `in I5` and `I1 = I7 * I3[0]['discount_rate']`. This page
-shows how to turn that back into your own names so you, or a coding
-assistant, can find the bug, without giving the customer anything that
+they send back says `in I5` and `I1 = I7 * I3[0]['discount_rate']`. The rest
+of this page walks through turning that back into your own names so you, or a
+coding assistant, can find the bug, without giving the customer anything that
 reverses the obfuscation.
-
-The short version: save a mapping file when you build, keep it private, and
-run `pyobfus --unmap` on the traceback with the mapping from that same build.
 
 ## Before you start
 
@@ -52,8 +67,8 @@ pyobfus pricing.py -o dist/pricing.py \
   mapping; it does not contain the mapping.
 
 Store each release's mapping under its version number, for example
-`private/maps/1.4.2/pricing.map.json`. Every build produces new names, so a
-mapping only fits the build it came from.
+`private/maps/1.4.2/pricing.map.json`. Changes to source, configuration or tool
+version can change names, so use the mapping from the build the customer runs.
 
 ## 2. Get the traceback
 
