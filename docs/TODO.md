@@ -302,7 +302,7 @@ JOSS 页改为引用页、两张任务页、Pages sitemap、FastAPI 真实应用
       `docs/internal/geo-observations/2026-10-07-baseline.md` 末尾总结。
 - [x] **Search Console**（11-07 完成：`/pyobfus/` 资源自动验证并提交 sitemap，待 Google 读取；文档站 `https://pyobfus.readthedocs.io/en/latest/` 用 HTML 文件验证，sitemap 读取成功 146 页；Bing Webmaster 已从 GSC 导入。验证文件 `docs/google03878b382b498ff9.html` 必须保留。原始待办：）验证 `https://zhurong2020.github.io/pyobfus/`（URL-prefix）并提交
       `/pyobfus/sitemap.xml`；RTD 的 sitemap 对脚本返回 Cloudflare 质询，在 GSC 里看抓取状态。域名根 `robots.txt`
-      属个人站仓库，没有改。
+      属个人站仓库；11-08 在该仓库加了 `Sitemap: https://zhurong2020.github.io/pyobfus/sitemap.xml`（个人站提交 `4a6f14e`）。
 - [ ] **mcp.so 列表文案过时**（「50% cheaper than PyArmor」）：维护者在 mcp.so 看能否更新描述。
 - [ ] **Discussions 置顶一条**指向新的 Show and tell 表单（公开发帖，10-11 之后由维护者发）。
 - 60–90 天后再定（P2）：多工具交付 benchmark、扩展 LLM 实验与期刊论文（都依赖上面的真实应用数据）；
@@ -576,7 +576,7 @@ V2EX 仍卡在账号激活（要邀请码）；Stack Overflow 按 2026-04-22 的
   notification` 的返回码（200/202 正常，403/422 查 key 文件）。只记结论，数据明细放私有目录。
   维护者用 Chrome 插件做只读盘点时，Prompt 在 `~/projects/workspace-meta/archives/SEARCH_CONSOLE_SETUP_GUIDE_2026-11-07.md` 第 5 步。
 - **11-08／11-09 重新采集搜索盘点**：11-07 首次盘点在注册当天，pyobfus 两站的收录、效果、链接均显示处理中；
-  维护者用同一 Prompt 复采后看三件事：落地页 sitemap 在 GSC 是否仍「无法抓取」（Bing 已成功读取 2 个网址）；
+  维护者用同一 Prompt 复采后看三件事：落地页 sitemap 在 GSC 是否仍「无法抓取」（Bing 已成功读取 2 个网址；11-08 已核实文件对 Googlebot UA 返回 200、XML 有效，按完整网址重新提交后列表仍为同一行，说明原提交网址正确，只等 Google 处理；落地页已请求编入索引）；
   文档站与落地页的收录数和未收录原因；Bing 的 IndexNow 页是否出现提交记录（API 当日返回 202／200，Bing 页面可能滞后；
   若 11-09 后仍无记录，先在浏览器确认 `https://pyobfus.readthedocs.io/en/latest/0f5fb35e631b28ef475c62df09d73cdd.txt`
   可访问，RTD 对部分抓取者有 Cloudflare 质询）。原始 JSON 在私有仓库 `workspace-meta/archives/`。
