@@ -72,6 +72,6 @@
 
 ## 11-08 补充：落地页 sitemap 与编入索引
 
-- GSC 落地页 sitemap 仍「无法抓取」。核实：`/pyobfus/sitemap.xml` 对 Googlebot UA 返回 200、`application/xml`，XML 有效，列出两页；Bing 已读取成功。维护者按完整网址重新提交后列表仍为一行，说明原提交网址正确，属 Google 新提交的处理延迟；11-09 周检复看。
+- GSC 落地页 sitemap 仍「无法抓取」。核实：`/pyobfus/sitemap.xml` 对 Googlebot UA 返回 200、`application/xml`，XML 有效，列出两页；Bing 已读取成功。维护者按完整网址重新提交后列表仍为一行；公开访问成功不足以确定 Google 失败原因，须继续核对报告与受影响 URL。
 - 维护者对 `https://zhurong2020.github.io/pyobfus/` 做了网址检查：可编入索引，已请求编入索引（11-08 09:09）。
 - 个人站仓库根 `robots.txt` 增加 `Sitemap: https://zhurong2020.github.io/pyobfus/sitemap.xml`（该仓库 `4a6f14e`）；`pages.yml` 注释同步。

@@ -1,5 +1,8 @@
 # pyobfus 当前计划
 
+**2026-11-11 顺序接续**：本地已同步远端 `df58068`（#218／#219）；最新托管 CI、Packaging、Framework、Dogfood 与许可端点监控成功。Core 0.12.0 T+7d、下载／邮件巡检、11-09 搜索盘点与自然备份抽核见 [本轮记录](OPERATIONS_REVIEW_2026-11-11.md)。公开版本仍为 Core 0.13.0／MCP 0.3.17／runtime 0.1.1／扩展 0.4.3／Action v1.1.0。
+当前优先：GSC 落地页“重定向错误”须取得示例 URL 再定位；公开请求未复现，不再断言只是 Google 处理延迟。下一周检 11-16，T+30d 约 12-04；F2 兼容性、专业许可审阅与渠道试验按独立范围推进。下方带日期段落为历史快照。
+
 **2026-11-07 晚 Core 0.13.0 已发布**：Community pre-commit 钩子与专利申请标识；完整 21 组合矩阵、PEP 740、3.12／3.15 全新安装、GitHub Release 均已核实，见 [发布记录](CORE_0_13_0_RELEASE_2026-11-07.md)。Zenodo record `24031969`、`CITATION.cff` 与 Glama 渠道均已完成。
 
 **2026-11-07 上午（无发版）**：T+24h／T+72h 观察已补齐（[观察表](CORE_012_POST_RELEASE_OBSERVATION.md)），未发现客户问题。

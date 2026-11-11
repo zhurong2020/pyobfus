@@ -8,10 +8,12 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ## ⚡ Current pending work (cold-start 必读)
 
+**2026-11-11 接续**：见 [本轮巡检](docs/OPERATIONS_REVIEW_2026-11-11.md) → [当前计划](docs/CURRENT_PLAN_ZH.md) → [TODO](docs/TODO.md)。本地已同步 `df58068`；T+7d、下载／邮件、11-09 搜索盘点与备份抽核已做。优先取得 GSC“重定向错误”示例 URL；下次周检 11-16，T+30d 约 12-04。F2 先确认兼容与离线迁移；许可条款先专业审阅。下方 11-07 段为历史交接。
+
 **2026-11-07 晚 Core 0.13.0 已发布**（Community pre-commit 钩子 + 专利申请标识）：核验见 [发布记录](docs/CORE_0_13_0_RELEASE_2026-11-07.md)。Zenodo record `24031969` 已归档、`CITATION.cff` 已同步，Glama 已更新并通过检测；本版发布收尾完成。MCP／runtime／扩展／Action 不变。
 
 **2026-11-07 最终交接**：先读 [会话收尾](docs/SESSION_CLOSEOUT_2026-11-07.md) → [当前计划](docs/CURRENT_PLAN_ZH.md) → [TODO](docs/TODO.md)「周期性」。
-无发版，公开版本不变；main 含未发布的 Community pre-commit 钩子（#194）。已做：CI 3.9 runner、FAQ／中文指南、Agent 文档同步规则、
+该段记录 11-07 上午状态；晚间 Core 0.13.0 已发布 Community pre-commit 钩子（#194）。已做：CI 3.9 runner、FAQ／中文指南、Agent 文档同步规则、
 IndexNow、Search Console／Bing 登记（文档站验证文件 `docs/google03878b382b498ff9.html` 必须保留）、T+24h／T+72h、备份故障修复与核对。
 下一步：11-08 再请求编入索引、11-09 周检（含搜索引擎检查）、约 11-11 T+7d、维护者跑只读盘点、12 月首周月度观测。
 arong.eu.org 与老博客已交 findata。
