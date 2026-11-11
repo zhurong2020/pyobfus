@@ -77,10 +77,12 @@ inactive-state errors do not echo internal stored status values.
 
 Release order is mandatory: provision the issuer key, independently review and
 distribute its public key, deploy/validate the compatible server, then release
-the client after full compatibility tests. The candidate public-key table is
-intentionally empty. `scripts/check_ci_lease_keys.py` blocks Core publishing
-until it is populated; the check does not prove the server is deployed or that
-the key pair has been validated. Never configure a runtime public-key override
+the client after full compatibility tests. The production issuer key
+`ci-2026-11` was provisioned on 2026-11-11, its public key is in the client
+table, and the compatible Worker is deployed and was validated against a live
+license. `scripts/check_ci_lease_keys.py` still blocks Core publishing whenever
+the table is empty; the check does not prove the server is deployed or that the
+key pair has been validated. Never configure a runtime public-key override
 or enable unsigned fallback to work around this gate. See the
 [Worker operations guide](https://github.com/zhurong2020/pyobfus/blob/main/cloudflare-worker/README.md).
 

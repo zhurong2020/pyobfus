@@ -350,12 +350,13 @@ logging request or key material. All signed-endpoint responses, including
 denials, are `Cache-Control: no-store`; inactive-state diagnostics never echo
 the stored status value.
 
-These bindings have not been provisioned by the implementation. The candidate
-client trust table is intentionally empty, and Core publishing checks it before
-building. Before release, obtain separate approval for secure issuer-key
-provisioning, review the corresponding public key in the client, deploy the
-backward-compatible server from the WSL checkout, and independently verify the
-live pair. Never commit a private JWK or put it in KV, a workflow artifact,
+Production provisioning (2026-11-11): `CI_SIGNING_KEY_ID = "ci-2026-11"` is a
+public `[vars]` entry in `wrangler.toml`; the private JWK is the
+`CI_SIGNING_PRIVATE_JWK` secret and is kept outside the repository by the
+maintainer. The matching public key is in `pyobfus_pro/ci_lease.py`, and Core
+publishing still refuses an empty client table. Any later key change needs
+separate approval, a reviewed public key in a client release, deployment from
+the WSL checkout and an independent live-pair check. Never commit a private JWK or put it in KV, a workflow artifact,
 logs, reports or a generated application. Do not change production bindings
 or deploy as part of a local test.
 

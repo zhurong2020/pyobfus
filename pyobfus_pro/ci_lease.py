@@ -28,7 +28,13 @@ MAX_TOKEN_BYTES = 16 * 1024
 # Release gate: populate with reviewed issuer public keys before shipping a
 # client that requires signed CI admission. Never trust an environment variable,
 # token-supplied key/URL, or a synthetic test key here. Unknown keys fail closed.
-TRUSTED_PUBLIC_KEYS: Dict[str, bytes] = {}
+TRUSTED_PUBLIC_KEYS: Dict[str, bytes] = {
+    # Production issuer key provisioned 2026-11-11; JWK x = S32KKUFjobvQLXkIIuuw6YxSQqndPRj1MXFl-BHCeyU
+    "ci-2026-11": (
+        b"\x4b\x7d\x8a\x29\x41\x63\xa1\xbb\xd0\x2d\x79\x08\x22\xeb\xb0\xe9"
+        b"\x8c\x52\x42\xa9\xdd\x3d\x18\xf5\x31\x71\x65\xf8\x11\xc2\x7b\x25"
+    ),
+}
 
 _SEGMENT = re.compile(r"[A-Za-z0-9_-]+\Z", re.ASCII)
 _KID = re.compile(r"[A-Za-z0-9_-]{1,64}\Z", re.ASCII)
