@@ -23,6 +23,11 @@ updates:
       python-minor-patch:
         update-types: ["minor", "patch"]
     ignore:
+      # mypy 2.x rejects the configured Python 3.9 target but can still exit 0.
+      # Keep this compatibility bound until our minimum target changes or
+      # upstream restores support; do not auto-widen it again.
+      - dependency-name: "mypy"
+        versions: [">=2.0"]
       # ruff's minor bumps ship new default lint rules that fail CI's Lint job
       # on existing code; adopt them deliberately, not automatically. Patch
       # updates (bug fixes, same ruleset) still flow.
