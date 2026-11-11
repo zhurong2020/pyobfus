@@ -8,6 +8,8 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ## ⚡ Current pending work (cold-start 必读)
 
+**2026-11-11 夜 Core 0.14.0 已发布**（签名 CI 构建准入）：核验见 [发布记录](docs/CORE_0_14_0_RELEASE_2026-11-11.md)。#221 squash 为 `96e6340`、tag `v0.14.0`，PyPI 0.14.0 带 attestation，全新安装与线上签名准入通过。待：Zenodo 归档后同步 CITATION、Glama Build steps（手工）、#221 独立外部审阅（发版后补）。
+
 **2026-11-11 晚 生产 key 与 Worker 上线**：#220 已合并；生产 key `ci-2026-11` 已生成，公钥入 `pyobfus_pro/ci_lease.py`，Worker 版本 `13aaa4a8` 已部署并线上配对通过（回滚 `d8588738`）。私钥待备份 Vaultwarden；#221 合并与发版待批准。详见 [当前计划](docs/CURRENT_PLAN_ZH.md)。
 
 **2026-11-11 本次会话收尾**：先读 [会话收尾](docs/SESSION_CLOSEOUT_2026-11-11.md)。`74769cd` 签名拒绝响应修订已推送，托管 48 success／2 skipped，本地全量与 Worker 70 项通过。#220 源码审阅无阻塞，待明确合并决定；#221 仍待独立外部审阅、公钥／轮换方案及最终发布验收。未合并、配置生产 key、部署或发版。私有接续见 `docs/internal/f2-ci-implementation-2026-11-11/NEXT_SESSION.md`，下方为此前阶段快照。
@@ -82,7 +84,7 @@ arong.eu.org 与老博客已交 findata。
 
 - **定位**: Python 代码混淆器 (开源 + 商业双许可)
 - **技术栈**: Python 3.9-3.15, AST, setuptools
-- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.13.0，2026-11-07 发布**；完整版本历史见 `CHANGELOG.md`）
+- **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.14.0，2026-11-11 发布**；完整版本历史见 `CHANGELOG.md`）
 - **Smithery**: 已下线——Smithery 并入 Arcade 后技能目录取消，2026-11-07 核实原技能页 404；`smithery.yaml` 已删除。**mcp.so**: 已收录
 - **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus — 2026-11-07 渠道 release **0.12.1**（Glama 自动递增标签）对应 test `01a1b56b-40fd-7b04-9e65-eb349b7314a8`，安装 Core 0.13.0 / MCP 0.3.17 / runtime 0.1.1，握手与九工具发现通过；发 Core 或 MCP 后须手工改后台 Build steps。checkout 与 Python 实装边界见 `docs/CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md`。
 
