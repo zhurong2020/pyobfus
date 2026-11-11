@@ -94,6 +94,10 @@ high-severity count into "a few issues".
 
 ## For CI
 
+Read-only Community scans need no CI authorization. An unreleased source
+candidate changes only licensed environment-key builds to signed admission;
+it does not add an online requirement to this review or workstation/offline use.
+
 ```bash
 pyobfus --check src/ --sarif pyobfus.sarif
 ```

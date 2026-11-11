@@ -25,6 +25,7 @@ from .fingerprint import get_device_fingerprint
 LICENSE_API_BASE = "https://pyobfus-license-server.zhurong0525.workers.dev"
 LICENSE_API_URL = f"{LICENSE_API_BASE}/api/verify"
 DEACTIVATE_API_URL = f"{LICENSE_API_BASE}/api/deactivate"
+CI_LEASE_API_URL = f"{LICENSE_API_BASE}/api/ci/lease"
 
 # Legacy: GitHub repository for license data (deprecated, kept for reference)
 LICENSE_REPO_URL = "https://raw.githubusercontent.com/zhurong2020/pyobfus-licenses/main"
@@ -102,53 +103,59 @@ class LicenseRevokedError(LicenseError):
 
 
 def verify_ci_license(license_key: str) -> Dict[str, Any]:
-    """Online-only, device-free verification; never read or write local state."""
+    """Signed online admission; no local state or unsigned protocol fallback."""
     if not _validate_license_format(license_key):
         raise LicenseVerificationError("Invalid PYOBFUS_LICENSE_KEY format (value hidden).")
+    try:
+        from . import ci_lease
+    except ImportError:
+        raise LicenseVerificationError(
+            "CI signing dependencies unavailable; reinstall pyobfus."
+        ) from None
+    nonce = secrets.token_urlsafe(32)
     req = urllib.request.Request(
-        LICENSE_API_URL,
-        data=json.dumps({"license_key": license_key, "activation": "ci"}).encode("utf-8"),
+        CI_LEASE_API_URL,
+        data=json.dumps(
+            {
+                "license_key": license_key,
+                "activation": "ci",
+                "protocol": ci_lease.PROTOCOL,
+                "nonce": nonce,
+            }
+        ).encode("utf-8"),
         headers={"Content-Type": "application/json", "User-Agent": USER_AGENT},
         method="POST",
     )
     try:
         with urllib.request.urlopen(req, timeout=REQUEST_TIMEOUT) as response:
-            data = json.loads(response.read())
-        if (
-            not isinstance(data, dict)
-            or data.get("valid") is not True
-            or data.get("activation") != "ci"
-        ):
-            raise LicenseVerificationError("CI license verification denied.")
-        expires = data.get("expires_at")
-        if expires:
-            from datetime import timezone
-
-            expiry = datetime.fromisoformat(expires.replace("Z", "+00:00"))
-            now = datetime.now(timezone.utc) if expiry.tzinfo else datetime.now()
-            if expiry < now:
-                raise LicenseExpiredError("CI license has expired.")
+            data = ci_lease.strict_json(response.read(ci_lease.MAX_RESPONSE_BYTES + 1))
+        ci_lease.verify_response(data, license_key, nonce)
         return {"valid": True, "activation": "ci"}
     except urllib.error.HTTPError as exc:
-        if exc.code == 400:
+        if exc.code in (400, 404):
             try:
-                old_server = (
-                    json.loads(exc.read()).get("error") == "Missing license_key or device_id"
-                )
+                error = ci_lease.strict_json(exc.read(ci_lease.MAX_RESPONSE_BYTES + 1))
+                old_server = error.get("code") not in ("invalid_key", "bad_request")
             except Exception:
-                old_server = False
+                old_server = True
             if old_server:
                 raise LicenseVerificationError(
-                    "license server does not support CI activation yet"
+                    "license server does not support signed CI activation yet; upgrade the server"
                 ) from None
             raise LicenseVerificationError("CI license verification denied.") from None
         if exc.code == 429:
             raise LicenseVerificationError("CI license rate limited; retry later.") from None
+        if exc.code >= 500:
+            raise LicenseVerificationError(
+                "CI signed verification unavailable; check service configuration."
+            ) from None
         raise LicenseVerificationError(
             "CI license verification denied (invalid, revoked or expired)."
         ) from None
     except LicenseError:
         raise
+    except ci_lease.CILeaseError:
+        raise LicenseVerificationError("CI signed authorization is invalid or expired.") from None
     except Exception:
         raise LicenseVerificationError(
             "CI license verification unavailable; online access is required."

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- CI environment-key builds require request-bound, issuer-signed Ed25519
+  admission instead of accepting an unsigned verification response. Proofs
+  expire after at most five minutes (with one minute of clock tolerance) and
+  are verified only at build admission; a running build may finish normally.
+  Workstation registration and offline caches are unchanged. This candidate
+  requires issuer key provisioning and server rollout before client release.
+
 ### Fixed
 
 - Restore the development mypy upper bound below 2.0 and keep automated

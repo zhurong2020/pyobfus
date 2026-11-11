@@ -54,6 +54,34 @@ Action and Core versions are independent. For an immutable wrapper use
 The Action's `offline` input controls dependency-name lookups, not CI license
 verification. See [the verified channel rollout](https://github.com/zhurong2020/pyobfus/blob/main/docs/CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md).
 
+## Unreleased: signed CI build admission
+
+This is a source candidate, not behavior shipped in Core 0.13.0. No production
+signing key or server rollout is implied by merging the implementation.
+
+The environment-key path requests `/api/ci/lease` with a fresh nonce and requires
+a versioned Ed25519 JWS. It checks the fixed issuer, CI audience and token type,
+the requested license reference, nonce, permissions and strict time/size bounds
+against a public key distributed with the client. Unknown keys, modified or
+expired responses, wrong purposes, malformed data and unsigned legacy responses
+deny access; there is no automatic fallback to the old CI protocol.
+
+Proofs last at most 300 seconds with 60 seconds of clock tolerance. They admit
+one build session; the existing owned worker pool may finish a long build, while
+the next build must verify online again. Proofs and request nonces stay in memory
+and are not added to reports or generated artifacts. The signed endpoint does
+not write license/device records. Older clients retain `/api/verify` behavior.
+Registered workstation and offline use with the CI variable unset is unchanged.
+
+Release order is mandatory: provision the issuer key, independently review and
+distribute its public key, deploy/validate the compatible server, then release
+the client after full compatibility tests. The candidate public-key table is
+intentionally empty. `scripts/check_ci_lease_keys.py` blocks Core publishing
+until it is populated; the check does not prove the server is deployed or that
+the key pair has been validated. Never configure a runtime public-key override
+or enable unsigned fallback to work around this gate. See the
+[Worker operations guide](https://github.com/zhurong2020/pyobfus/blob/main/cloudflare-worker/README.md).
+
 ## GitLab CI
 
 Create a **masked**, protected CI/CD variable named `PYOBFUS_LICENSE_KEY` in the

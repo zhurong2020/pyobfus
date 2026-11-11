@@ -41,3 +41,57 @@ def active_pro_trial(isolated_device_id):
     from pyobfus.trial import start_trial
 
     assert start_trial()["success"]
+
+
+@pytest.fixture
+def ci_issuer(monkeypatch):
+    """Independent ephemeral JWS signer; no private key committed or persisted."""
+    import base64
+    import hashlib
+    import json
+    import time
+    from types import SimpleNamespace
+
+    from cryptography.hazmat.primitives import serialization
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+    from pyobfus_pro import ci_lease
+
+    key = Ed25519PrivateKey.generate()
+    public = key.public_key().public_bytes(
+        serialization.Encoding.Raw, serialization.PublicFormat.Raw
+    )
+    monkeypatch.setattr(ci_lease, "TRUSTED_PUBLIC_KEYS", {"test-issuer": public})
+
+    def claims(license_key, nonce):
+        now = int(time.time())
+        return {
+            "v": 1,
+            "iss": ci_lease.ISSUER,
+            "aud": ci_lease.AUDIENCE,
+            "sub": "sha256:" + hashlib.sha256(license_key.encode()).hexdigest(),
+            "activation": "ci",
+            "entitlements": ["build:pro"],
+            "nonce": nonce,
+            "iat": now,
+            "nbf": now,
+            "exp": now + 300,
+        }
+
+    def response(
+        license_key, nonce, *, payload=None, header=None, payload_bytes=None, header_bytes=None
+    ):
+        def encode(raw):
+            return base64.urlsafe_b64encode(raw).rstrip(b"=")
+
+        h = {"alg": "Ed25519", "typ": ci_lease.TOKEN_TYPE, "kid": "test-issuer"}
+        h.update(header or {})
+        p = claims(license_key, nonce) if payload is None else payload
+        message = (
+            encode(header_bytes if header_bytes is not None else json.dumps(h).encode())
+            + b"."
+            + encode(payload_bytes if payload_bytes is not None else json.dumps(p).encode())
+        )
+        token = message + b"." + encode(key.sign(message))
+        return {"protocol": ci_lease.PROTOCOL, "lease": token.decode()}
+
+    return SimpleNamespace(claims=claims, response=response, public=public)

@@ -5,6 +5,7 @@
 
 // DRAFT: 嵘说 content membership webhook (not yet enabled in production)
 import { handleContentWebhook, verifyStripeSignature } from './content_webhook.js';
+import { readCiRequest, issueCiLease, ciResponse } from './ci_lease.js';
 
 // Error text from storage or mail providers can echo request values.
 function redactLicenseKeys(value) {
@@ -29,6 +30,14 @@ export default {
 
     // Route handler
     try {
+      if (url.pathname === '/api/ci/lease' && request.method === 'POST') {
+        // Keep issuer failures and all request values out of the generic logger.
+        try {
+          return await handleVerify(request, env, corsHeaders, true);
+        } catch {
+          return ciResponse({ valid: false, code: 'unavailable', error: 'CI verification unavailable' }, corsHeaders, 503);
+        }
+      }
       if (url.pathname === '/api/verify' && request.method === 'POST') {
         return await handleVerify(request, env, corsHeaders);
       }
@@ -301,8 +310,14 @@ async function handleTrialRequest(request, env, corsHeaders) {
  * POST /api/verify
  * Body: { license_key: string, device_id: string }
  */
-async function handleVerify(request, env, corsHeaders) {
-  const body = await request.json();
+async function handleVerify(request, env, corsHeaders, signedCi = false) {
+  let body;
+  try {
+    body = signedCi ? await readCiRequest(request) : await request.json();
+  } catch (error) {
+    if (!signedCi) throw error;
+    return ciResponse({ valid: false, code: 'bad_request', error: 'Invalid CI lease request' }, corsHeaders, 400);
+  }
   const { license_key, device_id, activation } = body;
 
   // Validate input
@@ -369,6 +384,12 @@ async function handleVerify(request, env, corsHeaders) {
           status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
         });
       }
+    }
+    if (signedCi) {
+      // Do not rewrite a licensing record for telemetry: doing so can overwrite
+      // concurrent revocation/device changes. The legacy endpoint stays intact.
+      const signed = await issueCiLease(env, license_key, body.nonce, licenseData.expires_at);
+      return ciResponse(signed, corsHeaders);
     }
     const now = new Date().toISOString();
     const day = now.slice(0, 10);

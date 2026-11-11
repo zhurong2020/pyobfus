@@ -300,6 +300,12 @@ precedence over cached registration and trials, is verified online once per
 build (including parallel workers), is not persisted, and uses no device
 slot. Invalid, revoked, expired or unreachable verification denies Pro.
 
+Unreleased source candidate: the environment-key path requires issuer-signed,
+request-bound Ed25519 admission and rejects unsigned legacy responses. A proof
+admits only the active build session; its expiry does not interrupt a long build.
+Workstation/offline registration is unchanged. Production public keys and
+compatible server rollout are release gates; this is not shipped in Core 0.13.0.
+
 ```yaml
 # GitHub Actions
 - uses: zhurong2020/pyobfus-action@v1        # v1.1.0+

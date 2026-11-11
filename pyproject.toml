@@ -52,6 +52,7 @@ dependencies = [
     "click>=8.0",
     "pyyaml>=5.4",
     "cryptography>=42.0",  # AES-256-GCM / RSA-OAEP / PBKDF2 for Pro features + license management
+    "PyJWT>=2.15.1,<3",  # Standard JWS parsing and Ed25519 CI admission (Pro)
     # Artifacts built by the Pro fusion passes import pyobfus_runtime, and the
     # pyobfus_pro package shipped in this same wheel re-exports it. Without this
     # line a licensed Pro install could not import pyobfus_pro and would silently
