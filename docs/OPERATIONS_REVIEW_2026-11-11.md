@@ -57,3 +57,12 @@ HTTP 200 不保证收录，见 [Google 官方说明](https://developers.google.c
 4. 渠道规则初核与技术案例草稿已准备，账号条件和最终线程仍待核对；稿件只存私有目录，发帖另按明确授权执行，SO 仍须维护者从零撰写。
 5. 12 月首周月度搜索／AI 观测，约 12-04 Core 0.12.0 T+30d；未到日期不预填完成。
 6. Windows Nuitka 单组合保留需求门槛；Python 3.9 runner 替代方案在当前镜像退役前安排；插件目录锁等待支持方。
+
+## 合并后收尾与维护核查
+
+- 维护者批准后，#217 squash 合并为 `702d465`，本地 main 已同步，合并 tree 与已测候选一致。
+- 合并后 [CI](https://github.com/zhurong2020/pyobfus/actions/runs/42947241080)、[CodeQL](https://github.com/zhurong2020/pyobfus/actions/runs/42947241045)、[Pages](https://github.com/zhurong2020/pyobfus/actions/runs/42947241207) 与 [IndexNow workflow](https://github.com/zhurong2020/pyobfus/actions/runs/42947241152) 均成功；workflow 成功仍不等于收录完成。
+- 核对实际 lint 日志与全新 dev 环境，发现 mypy 2.4.1 对 `python_version=3.9` 输出“不支持”但 exit 0。维护分支恢复 `mypy>=1.19,<2.0`，并在 Dependabot 对该依赖排除 `>=2.0` 的版本更新，保留现有 Python 3.9 支持与类型目标。没有扩大一般扫描排除或改变 ruleset。
+- 修复后的全新环境解析到 mypy 1.20.2，原目标诊断消失；`scripts/check.sh lint` 通过。仓库 venv 完整检查通过；四个测试根与基准再次独立运行，结果仍为 Core 5024／55 skipped、MCP 167、integration 368／10 skipped、runtime 24、benchmark 8。
+- F2 的设计决策说明和新增非生产互通证据保存于私有 `docs/internal/release-next-2026-11-11/`。建议先 CI 后工作站，尚未改变授权策略、增加生产依赖或部署 Worker。
+- 当前新增内容是开发检查兼容性维护，不能据此宣称新的用户保护功能已实现。Core 0.13.0 保持不变，尚无新的发版批准。

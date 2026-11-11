@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Restore the development mypy upper bound below 2.0 and keep automated
+  version updates within it. Mypy 2.x reports the configured Python 3.9 target
+  as unsupported while still returning success, weakening the type-check gate.
+
 ## [0.13.0] - 2026-11-07
 
 ### Added
