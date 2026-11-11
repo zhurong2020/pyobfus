@@ -85,4 +85,4 @@ HTTP 200 不保证收录，见 [Google 官方说明](https://developers.google.c
 
 修订已提交并推送为 `74769cd`，其自身检查共 48 success／2 skipped；[Core CI](https://github.com/zhurong2020/pyobfus/actions/runs/42991395599)、[Worker CI](https://github.com/zhurong2020/pyobfus/actions/runs/42991395772)、[CodeQL](https://github.com/zhurong2020/pyobfus/actions/runs/42991395603)、[Packaging](https://github.com/zhurong2020/pyobfus/actions/runs/42991395576) 与 [Dogfood](https://github.com/zhurong2020/pyobfus/actions/runs/42991395594) 均成功。该结果覆盖本次代码修订，不代表后续文档提交或未来 release revision 的检查。
 
-#220 源码审阅未见阻塞，42 success／1 skipped，仍未合并。独立外部审阅与生产操作尚未执行；本次文档同步与分类提交不构成合并、部署或发版批准。完整接续见 [11-11 会话收尾](SESSION_CLOSEOUT_2026-11-11.md)。
+#220 源码审阅未见阻塞，42 success／1 skipped；维护者确认后已于 11-11 合并为 `2127c0c`，并同步进 #221。独立外部审阅与生产操作尚未执行；本次文档同步与分类提交不构成合并、部署或发版批准。完整接续见 [11-11 会话收尾](SESSION_CLOSEOUT_2026-11-11.md)。
