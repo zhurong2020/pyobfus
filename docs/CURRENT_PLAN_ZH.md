@@ -1,5 +1,7 @@
 # pyobfus 当前计划
 
+**2026-11-11 夜 Core 0.14.0 已发布**：维护者批准后 #221 squash 合并为 `96e6340`，tag `v0.14.0`，release.yml 成功，PyPI 0.14.0（wheel/sdist 各 1 份 attestation），3.12／3.15 全新安装与线上签名 CI 准入通过，GitHub Release 已建。核验见[发布记录](CORE_0_14_0_RELEASE_2026-11-11.md)。待：Zenodo 归档后同步 `CITATION.cff`、Glama Build steps 手工更新、#221 独立外部审阅（发版后补）。
+
 **2026-11-11 晚 生产 key 与 Worker 上线**：维护者批准后合并 #220（`2127c0c`）并同步进 #221；生成生产签发 key `ci-2026-11`（私钥仅在 Worker secret 与维护者本机私有目录，待入 Vaultwarden），公钥写入客户端信任表，发布 gate 检查通过。Worker 部署为版本 `13aaa4a8`（回滚版本 `d8588738`）；线上验证：伪造 key 返回 404 且 no-store，作者许可的签名准入通过，错误信任 key 被拒，旧 `/api/verify` CI 路径不变。#221 合并与 Core 发版仍须单独批准。
 
 **2026-11-11 本次会话接续**：修订 `74769cd` 已推送至草稿 #221，统一签名端点拒绝响应的 no-store 与固定 inactive 文本。该 revision 托管检查 48 success／2 skipped，Core／Worker／CodeQL／Packaging／Dogfood 均通过。本地完整回归：Core 5073 passed／55 skipped、MCP 167、integration 368 passed／10 skipped、runtime 24、基准 8、Worker 70；完整检查脚本通过。#220 源码审阅未见阻塞问题，42 success／1 skipped，仍待明确合并决定。#221 的独立外部审阅、生产公钥、部署、最终发布验收尚未完成；轮换／回滚草案已准备。版本仍为 Core 0.13.0，本次未合并、部署或发版。详情见[会话收尾](SESSION_CLOSEOUT_2026-11-11.md)；下方为此前阶段快照。
