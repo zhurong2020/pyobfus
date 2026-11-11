@@ -61,8 +61,8 @@ jobs:
         grep -q 'pyobfus#minimal-example' landing/zh-cn/index.html
 
     # The project sitemap lists exactly the pages in this artifact. The domain
-    # root's robots.txt belongs to another repository, so this file is found
-    # through Search Console rather than a robots.txt Sitemap line.
+    # root's robots.txt belongs to another repository; it lists this sitemap
+    # (added 2026-11-08), and Search Console has it submitted as well.
     - name: Check the sitemap lists every HTML page and parses
       run: |
         python3 -c "import xml.dom.minidom as m; m.parse('landing/sitemap.xml')"

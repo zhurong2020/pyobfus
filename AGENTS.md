@@ -253,11 +253,12 @@ patent/release context.
 
 ## Where to look next
 
+- **Current handoff (2026-11-11)**: [operations review](docs/OPERATIONS_REVIEW_2026-11-11.md). Core 0.13.0 remains current; T+7d and download/inbox/search/backup checks are recorded. Next: obtain the affected URL for the GSC redirect error, Nov 16 weekly review, F2 compatibility and offline migration decisions, and professional review of proprietary patent clauses. Earlier entries below are historical.
 - **Session closeout (2026-11-07)**: [final handoff](docs/SESSION_CLOSEOUT_2026-11-07.md).
-  No release; public versions unchanged. main contains unreleased Community
-  pre-commit hooks (#194), IndexNow notifications, Search Console/Bing
-  registration (keep `docs/google03878b382b498ff9.html` and the IndexNow key
-  files). Next: weekly checks in `docs/TODO.md` (periodic), T+7d, monthly
+  Core 0.13.0 was released later that day, including Community
+  pre-commit hooks (#194). IndexNow and Search Console/Bing registration were
+  completed (keep `docs/google03878b382b498ff9.html` and the IndexNow key
+  files). Next at that time: weekly checks, T+7d, monthly
   search/AI observation. The 2026-11-04 entry below is historical.
 - **Session closeout (2026-11-04)**: [final handoff](docs/SESSION_CLOSEOUT_2026-11-04.md)
   and [cold-start prompt](docs/COLD_START_PROMPT_2026-11-04.md). Core/Action/Glama

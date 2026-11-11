@@ -1,8 +1,8 @@
 # TODO
 
-**2026-11-04 最新入口**：[会话收尾](SESSION_CLOSEOUT_2026-11-04.md) →
-[发布核验](CORE_0_12_0_RELEASE_2026-11-04.md) → [渠道接续](CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md)。
-Core 0.12.0、Action v1.1.0／v1、Glama 渠道 0.12.0（11-05；11-04 为 0.11.3）和 DEV 一周复盘均已完成。
+**2026-11-11 最新入口**：[本轮巡检](OPERATIONS_REVIEW_2026-11-11.md) →
+[当前计划](CURRENT_PLAN_ZH.md) → [Core 0.13.0 发布核验](CORE_0_13_0_RELEASE_2026-11-07.md)。
+Core 0.13.0 发布、Zenodo／CITATION 与 Glama 接续均已完成；Action v1.1.0／v1 不变。
 未完成事项仅按下列当前清单推进；较早执行记录保留历史，不覆盖当前版本。
 
 排期中的任务清单。**当前计划与状态仍以
@@ -10,11 +10,10 @@ Core 0.12.0、Action v1.1.0／v1、Glama 渠道 0.12.0（11-05；11-04 为 0.11.
 顺序做」，不记录历史。最新依据见
 [`FEATURE_EXPANSION_RESEARCH_2026-10-28.md`](FEATURE_EXPANSION_RESEARCH_2026-10-28.md)；旧版决策快照见[10-20 调研](FEATURE_EXPANSION_RESEARCH_2026-10-20.md)，Python 3.15 的已发布基础范围见 [`PYTHON315_SUPPORT_PLAN.md`](PYTHON315_SUPPORT_PLAN.md)。
 
-当前版本：Core 0.12.0 / MCP 0.3.17 / runtime 0.1.1。
-任务状态以 [11-04 发布核验](CORE_0_12_0_RELEASE_2026-11-04.md) 为入口，较早记录保留历史证据。
+当前版本：Core 0.13.0 / MCP 0.3.17 / runtime 0.1.1 / 扩展 0.4.3 / Action v1.1.0。
+任务状态以 [11-11 巡检](OPERATIONS_REVIEW_2026-11-11.md) 为入口，较早记录保留历史证据。
 
-晚间[巡检](OPERATIONS_REVIEW_2026-11-04.md)已补核下载、邮件与当前部署；
-下载截止 11-03，不替代发布 T+24h 检查。下一次自然备份包含性检查须同时覆盖本次巡检私有记录。
+下一次自然备份包含性检查须覆盖 11-11 新增私有巡检与设计材料。
 
 ## Core 0.12.0 发布后接续（2026-11-04）
 
@@ -24,10 +23,9 @@ MCP 0.3.17／runtime 0.1.1／扩展 0.4.3 不随发；正式发布准备项已�
 Action v1.1.0 / `v1` 与 Glama 渠道 0.11.3 已完成；DEV 一周复盘已记录，见
 [渠道接续验收](CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md)。下一步：
 
-1. **发布后观察**：T+24h／T+72h 与备份包含性已于 11-07 完成（见[观察表](CORE_012_POST_RELEASE_OBSERVATION.md)）；剩 T+7d（约 11-11）与 T+30d。
-3. [x] **LinkedIn 一周复盘**（11-06 完成）：SARIF 帖 1 周 43 次展示、未见反应/评论、无可归因访问；DEV 与 LinkedIn 两篇复盘均已完成，可进入小型渠道试验评估（见下方第 3 项）。
-4. **Python 3.9 支持**（11-06 维护者确认保留）：Ubuntu 3.9 格已固定 `ubuntu-24.04`（#188）；该镜像退役前需改用其它可提供 3.9 的 runner 或容器。
-5. **独立设计项**：F2 离线迁移、兼容与验收范围仍待确认；F3 AES-256-GCM
+1. **发布后观察**：剩 Core 0.12.0 T+30d（约 12-04）；同时继续观察 0.13.0 反馈。已完成时点见[观察表](CORE_012_POST_RELEASE_OBSERVATION.md)。
+2. **Python 3.9 支持**（11-06 维护者确认保留）：Ubuntu 3.9 格已固定 `ubuntu-24.04`（#188）；该镜像退役前需改用其它可提供 3.9 的 runner 或容器。
+3. **独立设计项**：F2 离线迁移、兼容与验收范围仍待确认；F3 AES-256-GCM
    仍需新格式与兼容测试，不属于本次发布。
    F2 设计草稿保存在私有 `docs/internal/f2-signed-lease-2026-11-03/`，迁移须保持终身授权有效。
 
@@ -48,16 +46,16 @@ Action v1.1.0 / `v1` 与 Glama 渠道 0.11.3 已完成；DEV 一周复盘已记�
 普通 13 单元、手动/定时 21 单元不变；独立 L3 六格与 MCP SDK 六格
 兼容矩阵已纳入 CI。必需检查仍为 CI result + CodeQL，不改 ruleset。
 
-## 当前执行顺序（2026-11-04 复核）
+## 当前执行顺序（2026-11-11 复核）
 
-本轮实际进度见 [11-04 发布核验](CORE_0_12_0_RELEASE_2026-11-04.md)。
+本轮实际进度见 [11-11 巡检](OPERATIONS_REVIEW_2026-11-11.md)。
 
 设计、官方资料与验收条件见 [路线复核](ROADMAP_REVIEW_2026-10-30.md)。
 已完成的 P0、纯文档 CI、Core/MCP 发版、Glama 更新与首日 DEV 观察不再排入队列。
 
-1. Core 0.12.0 发布后观察剩 T+7d（约 11-11）与 T+30d；T+24h／T+72h、备份包含性已完成。vbca 文档过滤继续等待自然事件。
-2. [x] LinkedIn 一周复盘已于 11-06 完成（见[当前计划](CURRENT_PLAN_ZH.md)顶部）；采用入口已于 11-01 核验。
-3. 小型渠道试验（11-06 已评估，见[当前计划](CURRENT_PLAN_ZH.md)顶部；待维护者选 SO 本人作答或 Reddit）。原计划：先归纳目标用户、具体反馈、可归因访问来源及安装/使用问题，再选择一个与 Python 应用交付场景匹配的社区做一次实用技术案例分享；遵守社区规则，不把渠道当广告位。试验后按具体使用线索与问题决定是否继续，不用下载尖峰证明增长。若证据显示项目定位或上手路径不清，再提出 README 小范围修订。邮件营销建议仅作为待验证想法，不购买服务或回复推销邮件。
+1. 优先定位 GSC 落地页「重定向错误」：取得受影响 URL、上次抓取时间与实时检查结果；本次公开请求未复现。Core 0.12.0 剩 T+30d（约 12-04）；下一次周检 11-16。vbca 文档过滤继续等待自然事件。
+2. F2 先完成 profile／库兼容矩阵与离线迁移决策；Pro／runtime 专利许可条款先完成专业审阅。11-11 局部探针与审阅包在私有 `docs/internal/operations-2026-11-11/`，不等于生产实现。
+3. 小型渠道试验：11-11 已核 r/Python 官方规则并准备私有技术案例，不能发独立 showcase 帖；待选择合规线程或其它社区并确认账号条件。试验后按具体使用线索与问题决定是否继续，不用下载尖峰证明增长。若证据显示项目定位或上手路径不清，再提出 README 小范围修订。不购买服务或回复推销邮件。
 4. 收到真实最小复现后：优先正确性与诊断，再决定 L3 覆盖或资源密钥范围。
 5. 有目标平台需求后：按[单组合验收方案](NEXT_DELIVERY_VALIDATION_PLAN.md)优先考虑 Windows Nuitka standalone；其他组合各自确认需求，不默认扩矩阵。
 
@@ -79,7 +77,7 @@ Action v1.1.0 / `v1` 与 Glama 渠道 0.11.3 已完成；DEV 一周复盘已记�
 
 - **采用引导文档**：10-30 已更新并推送 llms 镜像、README／首页、集成模板及能力元数据；托管站点是否已同步以其部署状态为准。验收见 [执行表](EXECUTION_PROGRESS_2026-10-30.md)。不因文案修订发 Core／MCP 版本。
 
-- 每周一巡检继续观察 Core 0.12.0 / MCP 0.3.17 反馈、下载安静日、客户调研回答、CI 与备份。无新缺陷时不重复全量测试、不主动增加功能。
+- 每周一巡检继续观察 Core 0.13.0 / MCP 0.3.17 反馈、下载安静日、客户调研回答、CI 与备份。无新缺陷时不重复全量测试、不主动增加功能。
 - **10-25 复盘已完成**；数据与结论见运营记录，继续分开发版日、次日与内容流量。
 - 下次发布按实际新增改动与维护者授权确定，不恢复此前 10-15 的等待通知状态。
 - **3.15 兼容 P0 已随 Core 0.8.0 发布**：后续只跟进已登记的兼容性限制；MCP SDK 2.x 生产支持已随 MCP 0.3.16 发布，mapping 与 Pro 新功能仍分别按需求和授权推进。
@@ -302,7 +300,7 @@ JOSS 页改为引用页、两张任务页、Pages sitemap、FastAPI 真实应用
       `docs/internal/geo-observations/2026-10-07-baseline.md` 末尾总结。
 - [x] **Search Console**（11-07 完成：`/pyobfus/` 资源自动验证并提交 sitemap，待 Google 读取；文档站 `https://pyobfus.readthedocs.io/en/latest/` 用 HTML 文件验证，sitemap 读取成功 146 页；Bing Webmaster 已从 GSC 导入。验证文件 `docs/google03878b382b498ff9.html` 必须保留。原始待办：）验证 `https://zhurong2020.github.io/pyobfus/`（URL-prefix）并提交
       `/pyobfus/sitemap.xml`；RTD 的 sitemap 对脚本返回 Cloudflare 质询，在 GSC 里看抓取状态。域名根 `robots.txt`
-      属个人站仓库，没有改。
+      属个人站仓库；11-08 在该仓库加了 `Sitemap: https://zhurong2020.github.io/pyobfus/sitemap.xml`（个人站提交 `4a6f14e`）。
 - [ ] **mcp.so 列表文案过时**（「50% cheaper than PyArmor」）：维护者在 mcp.so 看能否更新描述。
 - [ ] **Discussions 置顶一条**指向新的 Show and tell 表单（公开发帖，10-11 之后由维护者发）。
 - 60–90 天后再定（P2）：多工具交付 benchmark、扩展 LLM 实验与期刊论文（都依赖上面的真实应用数据）；
@@ -414,7 +412,7 @@ Magic"**已经**诚实写明 9.2.x 的 `--vmc`/`--ecc` 函数级虚拟化是 pyo
 - [x] **发版检查清单加一条**（0.13.0 候选已写入 CLAUDE.md 发布流程 3b 与 AGENTS.md）：专利覆盖机制的实现不得进入 Apache-2.0 核心（Apache-2.0 §3 会把核心代码
       涉及的专利权免费授出）。09-28 核查：核心只做 CLI 转发，实现都在 `pyobfus_pro/` 与 `pyobfus-runtime`，
       边界当前守住。
-- 节奏：三项可以先写好放进 `[Unreleased]`，**随 11 月第一周月度版本发**，不单独打破 10-25 前静默期。
+- 节奏：标识与发版检查已随 0.13.0 完成；许可条款单独等待专业审阅，不设历史静默期或自动发版日期。11-11 已准备私有审阅包。
 
 ## 内容节奏（2026-09-27 用户定 · 只写不发到 10-11，10-13 那周起发）
 
@@ -575,11 +573,7 @@ V2EX 仍卡在账号激活（要邀请码）；Stack Overflow 按 2026-04-22 的
   IndexNow 提交记录与「AI Performance（beta）」。另看 GitHub Actions 里 Pages 末步与 `IndexNow docs
   notification` 的返回码（200/202 正常，403/422 查 key 文件）。只记结论，数据明细放私有目录。
   维护者用 Chrome 插件做只读盘点时，Prompt 在 `~/projects/workspace-meta/archives/SEARCH_CONSOLE_SETUP_GUIDE_2026-11-07.md` 第 5 步。
-- **11-08／11-09 重新采集搜索盘点**：11-07 首次盘点在注册当天，pyobfus 两站的收录、效果、链接均显示处理中；
-  维护者用同一 Prompt 复采后看三件事：落地页 sitemap 在 GSC 是否仍「无法抓取」（Bing 已成功读取 2 个网址）；
-  文档站与落地页的收录数和未收录原因；Bing 的 IndexNow 页是否出现提交记录（API 当日返回 202／200，Bing 页面可能滞后；
-  若 11-09 后仍无记录，先在浏览器确认 `https://pyobfus.readthedocs.io/en/latest/0f5fb35e631b28ef475c62df09d73cdd.txt`
-  可访问，RTD 对部分抓取者有 Cloudflare 质询）。原始 JSON 在私有仓库 `workspace-meta/archives/`。
+- **下次搜索盘点（11-16 周检，错误示例可提前核查）**：取得 GSC 落地页「重定向错误」示例 URL、上次抓取时间及实时检查结果；复看 sitemap、两个项目资源的收录数和未收录原因。Bing IndexNow 上次字段为 `null`，须实际确认记录，不能当作零提交；若后台仍无记录，先用浏览器核对 RTD key 文件可访问性（RTD 对部分抓取者有 Cloudflare 质询）。原始 JSON 在私有仓库 `workspace-meta/archives/`；11-09 盘点结论见 [11-11 巡检](OPERATIONS_REVIEW_2026-11-11.md)。
 - **月度搜索／AI 观测（每月第一周）**：WebSearch 12 题 + Codex（隔离 `CODEX_HOME`、中性目录）+ Codebuddy
   `hy4free` / `deepseek-v4-pro` / `kimi-k3.1-pro`，并读 Bing「AI Performance」。方法、隔离与坑见私有
   `docs/internal/geo-observations/2026-11-07-baseline.md`；下次 2026-12 第一周。
