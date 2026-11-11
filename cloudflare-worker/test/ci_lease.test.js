@@ -57,6 +57,7 @@ test('signed CI: fixed profile, verifiable signature, no key/email/devices/KV wr
 for (const [label, change] of [
   ['missing protocol', { protocol: undefined }], ['wrong protocol', { protocol: 'old' }],
   ['wrong activation', { activation: 'offline' }], ['bad nonce', { nonce: 'x' }],
+  ['newline nonce', { nonce: nonce + '\n' }], ['newline license', { license_key: licenseKey + '\n' }],
   ['noncanonical nonce', { nonce: nonce.slice(0, -1) + 'B' }],
   ['device input', { device_id: 'runner' }], ['object license', { license_key: {} }],
 ]) test(`request rejection before storage: ${label}`, async () => {
@@ -99,6 +100,7 @@ test('misconfigured signer fails closed without exposing secrets or logging exce
   mismatched.x = JSON.parse(other.CI_SIGNING_PRIVATE_JWK).x;
   for (const candidate of [undefined, { ...config, CI_SIGNING_PRIVATE_JWK: licenseKey },
     { ...config, CI_SIGNING_KEY_ID: '../key' },
+    { ...config, CI_SIGNING_KEY_ID: 'test-issuer\n' },
     { ...config, CI_SIGNING_PRIVATE_JWK: JSON.stringify(mismatched) }]) {
     const r = await verify({ config: candidate });
     assert.equal(r.res.status, 503);

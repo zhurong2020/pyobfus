@@ -10,7 +10,7 @@ function b64url(bytes) {
 }
 
 function decode32(value) {
-  if (typeof value !== 'string' || !/^[A-Za-z0-9_-]{43}$/.test(value)) throw new Error('invalid');
+  if (typeof value !== 'string' || value.length !== 43 || !/^[A-Za-z0-9_-]{43}$/.test(value)) throw new Error('invalid');
   const bytes = Uint8Array.from(atob(value.replace(/-/g, '+').replace(/_/g, '/') + '='), c => c.charCodeAt(0));
   if (bytes.length !== 32 || b64url(bytes) !== value) throw new Error('invalid');
   return bytes;
@@ -46,7 +46,8 @@ export async function readCiRequest(request) {
     if (!body || Array.isArray(body) || typeof body !== 'object' ||
         Object.keys(body).sort().join(',') !== 'activation,license_key,nonce,protocol' ||
         body.activation !== 'ci' || body.protocol !== CI_PROTOCOL || !validNonce(body.nonce) ||
-        typeof body.license_key !== 'string' || !/^PYOB-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{4}$/.test(body.license_key)) {
+        typeof body.license_key !== 'string' || body.license_key.length !== 24 ||
+        !/^PYOB-(?:[A-Fa-f0-9]{4}-){3}[A-Fa-f0-9]{4}$/.test(body.license_key)) {
       throw new Error('invalid');
     }
     return body;
@@ -61,7 +62,7 @@ export async function readCiRequest(request) {
 export async function issueCiLease(env, licenseKey, nonce, licenseExpiry) {
   // This binding must be provisioned separately. Never generate a fallback key.
   const kid = env.CI_SIGNING_KEY_ID;
-  if (typeof kid !== 'string' || !/^[A-Za-z0-9_-]{1,64}$/.test(kid) ||
+  if (typeof kid !== 'string' || kid.length < 1 || kid.length > 64 || /[^A-Za-z0-9_-]/.test(kid) ||
       typeof env.CI_SIGNING_PRIVATE_JWK !== 'string' || env.CI_SIGNING_PRIVATE_JWK.length > 2048) {
     throw new Error('CI signer unavailable');
   }

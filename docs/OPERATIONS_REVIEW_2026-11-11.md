@@ -71,6 +71,6 @@ HTTP 200 不保证收录，见 [Google 官方说明](https://developers.google.c
 
 维护者批准“先 CI，后工作站”，实现见[草稿 #221](https://github.com/zhurong2020/pyobfus/pull/221)，依赖 #220。新增独立签发端点与 Pro 验签模块，保持旧 CI／工作站接口、缓存及设备行为；候选公钥表为空，Core 发布流程明确阻断未配置的信任表。
 
-本地核心 5073 passed／55 skipped、MCP 167、integration 368／10 skipped、runtime 24、基准 8；Worker 单元 65。Python 3.15 与最低 cryptography 42 的针对性用例各 68 项通过。托管 [Worker CI](https://github.com/zhurong2020/pyobfus/actions/runs/42952684003) 的三格实际 workerd／Python 互通与 Worker 单元均成功。Core CI／CodeQL 在草稿改为目标 main 后另行验证，不借用 #220 的结果。
+本地核心 5073 passed／55 skipped、MCP 167、integration 368／10 skipped、runtime 24、基准 8；Worker 单元 67（含末尾换行格式边界）。Python 3.15 与最低 cryptography 42 的针对性用例各 68 项通过。托管 [Worker CI](https://github.com/zhurong2020/pyobfus/actions/runs/42952684003) 的三格实际 workerd／Python 互通与 Worker 单元均成功。Core CI／CodeQL 在草稿改为目标 main 后另行验证，不借用 #220 的结果。
 
 原始证据与接续保存于私有 `docs/internal/f2-ci-implementation-2026-11-11/`。没有配置生产 key、部署服务或发版；独立审阅、密钥发布／轮换计划和最终发布验收仍是后续门槛。
