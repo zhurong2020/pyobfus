@@ -29,3 +29,9 @@
 4. 取得 GSC 重定向错误示例；11-16 周检复核下载、反馈、CI、搜索与新增私有材料备份。专利许可专业审阅及 12 月观测继续按 [TODO](TODO.md) 执行。
 
 长期状态以 [当前计划](CURRENT_PLAN_ZH.md) 为准，待办以 [TODO](TODO.md) 为准。
+
+## 最终关闭前同步检查
+
+[复制用冷启动](COLD_START_PROMPT_2026-11-11.md)已补齐。项目README沿用已发布行为及CI指南入口；本轮未发版，不改产品版本、CITATION、Action/MCP/扩展发布说明。跨仓README、工作日志、仓库映射、工作区路由、home索引及Codex/Claude本机memory已同步，逐项范围与分支结果见工作区私有审计 `workspace-meta/archives/SESSION_FINAL_SYNC_20261111_PYOBFUS.md`。
+
+本次非main工作区在分类提交后无未提交内容；12c45ff、3c15d0e及此次收尾文档提交保留本地，未推送。74769cd代码已推送。下一次按git状态复核准确差异；私有材料仍在忽略目录，新增内容的自然备份包含性尚待核对。
