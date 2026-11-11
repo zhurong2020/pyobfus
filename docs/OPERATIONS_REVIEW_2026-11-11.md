@@ -74,3 +74,9 @@ HTTP 200 不保证收录，见 [Google 官方说明](https://developers.google.c
 本地核心 5073 passed／55 skipped、MCP 167、integration 368／10 skipped、runtime 24、基准 8；Worker 单元 67（含末尾换行格式边界）。Python 3.15 与最低 cryptography 42 的针对性用例各 68 项通过。托管 [Worker CI](https://github.com/zhurong2020/pyobfus/actions/runs/42952684003) 的三格实际 workerd／Python 互通与 Worker 单元均成功。Core CI／CodeQL 在草稿改为目标 main 后另行验证，不借用 #220 的结果。
 
 原始证据与接续保存于私有 `docs/internal/f2-ci-implementation-2026-11-11/`。没有配置生产 key、部署服务或发版；独立审阅、密钥发布／轮换计划和最终发布验收仍是后续门槛。
+
+### 候选接续审阅
+
+当前会话源码审阅发现，新签名端点复用的拒绝响应未统一禁止缓存，且 inactive 文本会回显存储状态。候选修订为新端点的拒绝响应添加 `Cache-Control: no-store`，并固定 inactive 错误文本；旧验证端点保持兼容。Worker 回归增加所有签名响应的缓存断言、私有状态不回显及存储／限流服务异常用例，70 项通过；Python 授权相关 68 项与完整 `scripts/check.sh` 通过。提交前各测试根独立复验：Core 5073 passed／55 skipped，MCP 167，integration 368 passed／10 skipped，runtime 24，基准 8。
+
+密钥发布／轮换和回滚草案已补入私有接续。当前单 signer 协议切换 key 前须先分发新公钥并明确旧客户端升级窗口；仅保留服务端旧 key 不能让旧客户端自动信任新 key。此次源码审阅不代替独立外部审阅，先前托管结果也不覆盖此次修订；生产配置、合并和发布仍分别验收。

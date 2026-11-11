@@ -336,6 +336,9 @@ async function handleVerify(request, env, corsHeaders, signedCi = false) {
   const licenseData = await env.LICENSES.get(license_key, { type: 'json' });
 
   if (!licenseData) {
+    if (signedCi) {
+      return ciResponse({ valid: false, code: 'invalid_key', error: 'Invalid license key' }, corsHeaders, 404);
+    }
     return new Response(JSON.stringify({
       valid: false,
       code: 'invalid_key',
@@ -348,6 +351,11 @@ async function handleVerify(request, env, corsHeaders, signedCi = false) {
 
   // Check if license is active
   if (licenseData.status !== 'active') {
+    if (signedCi) {
+      return ciResponse({ valid: false,
+        code: licenseData.status === 'revoked' ? 'revoked' : 'inactive',
+        error: 'CI license verification denied' }, corsHeaders, 403);
+    }
     return new Response(JSON.stringify({
       valid: false,
       code: licenseData.status === 'revoked' ? 'revoked' : 'inactive',
@@ -362,6 +370,9 @@ async function handleVerify(request, env, corsHeaders, signedCi = false) {
   if (licenseData.expires_at) {
     const expiresAt = new Date(licenseData.expires_at);
     if (expiresAt < new Date()) {
+      if (signedCi) {
+        return ciResponse({ valid: false, code: 'expired', error: 'License has expired' }, corsHeaders, 403);
+      }
       return new Response(JSON.stringify({
         valid: false,
         code: 'expired',
@@ -379,6 +390,10 @@ async function handleVerify(request, env, corsHeaders, signedCi = false) {
     if (env.CI_RATE_LIMITER) {
       const { success } = await env.CI_RATE_LIMITER.limit({ key: await sha256Hex(license_key) });
       if (!success) {
+        if (signedCi) {
+          return ciResponse({ valid: false, code: 'rate_limited',
+            error: 'CI verification rate limited' }, corsHeaders, 429);
+        }
         return new Response(JSON.stringify({ valid: false, code: 'rate_limited',
           error: 'CI verification rate limited' }), {
           status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' }

@@ -346,7 +346,9 @@ The signer requires **both** `CI_SIGNING_KEY_ID` and the secret
 `CI_SIGNING_PRIVATE_JWK` (an Ed25519 private JWK with matching `x` and `d`). There
 is no default key, on-demand production generation, or unsigned success if a
 binding is missing. Configuration/signing failures return a fixed 503 without
-logging request or key material. Signed successes are `Cache-Control: no-store`.
+logging request or key material. All signed-endpoint responses, including
+denials, are `Cache-Control: no-store`; inactive-state diagnostics never echo
+the stored status value.
 
 These bindings have not been provisioned by the implementation. The candidate
 client trust table is intentionally empty, and Core publishing checks it before

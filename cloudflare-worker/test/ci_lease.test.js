@@ -16,15 +16,22 @@ async function issuer() {
     publicKey: pair.publicKey };
 }
 
-async function verify({ config, record = active, body, raw, limiter } = {}) {
+async function verify({ config, record = active, body, raw, limiter, storageError } = {}) {
   let reads = 0, writes = 0;
   const env = { ...config, CI_RATE_LIMITER: limiter, LICENSES: {
-    async get(key) { reads++; assert.equal(key, licenseKey); return structuredClone(record); },
+    async get(key) {
+      reads++; assert.equal(key, licenseKey);
+      if (storageError) throw storageError;
+      return structuredClone(record);
+    },
     async put() { writes++; throw new Error('signed CI must not rewrite license records'); }
   } };
   const req = new Request('https://example.com/api/ci/lease', { method: 'POST',
     body: raw === undefined ? JSON.stringify(body || { license_key: licenseKey, activation: 'ci', protocol: CI_PROTOCOL, nonce }) : raw });
   const res = await worker.fetch(req, env);
+  // Every signed response, including denials and infrastructure errors, must
+  // avoid intermediary/browser storage of licensing outcomes.
+  assert.equal(res.headers.get('Cache-Control'), 'no-store');
   return { res, data: await res.json(), reads, writes };
 }
 
@@ -77,6 +84,13 @@ for (const [label, record, status] of [
   assert.equal(r.res.status, status); assert.equal(r.writes, 0);
 });
 
+test('stored inactive status never enters signed response diagnostics', async () => {
+  const r = await verify({ record: { ...active, status: 'private-storage-detail' } });
+  assert.equal(r.res.status, 403);
+  assert.deepEqual(r.data, { valid: false, code: 'inactive', error: 'CI license verification denied' });
+  assert.equal(r.writes, 0);
+});
+
 test('rate limiter uses a digest and does not invoke a signer or mutate records', async () => {
   const r = await verify({ limiter: { async limit({ key }) {
     assert.match(key, /^[a-f0-9]{64}$/); return { success: false };
@@ -113,4 +127,18 @@ test('misconfigured signer fails closed without exposing secrets or logging exce
 test('invalid stored expiry never yields a signed success', async () => {
   const r = await verify({ config: await issuer(), record: { ...active, expires_at: 'not-a-date' } });
   assert.equal(r.res.status, 503); assert.equal(r.writes, 0);
+});
+
+for (const component of ['storage', 'limiter']) test(`signed CI ${component} failure has fixed diagnostics and no logs`, async (t) => {
+  const logs = [];
+  t.mock.method(console, 'error', (...args) => logs.push(args));
+  const failure = new Error('private-provider-detail ' + licenseKey);
+  const options = component === 'storage' ? { storageError: failure } : {
+    limiter: { async limit() { throw failure; } }
+  };
+  const r = await verify(options);
+  assert.equal(r.res.status, 503);
+  assert.deepEqual(r.data, { valid: false, code: 'unavailable', error: 'CI verification unavailable' });
+  assert.equal(r.writes, 0);
+  assert.deepEqual(logs, []);
 });
