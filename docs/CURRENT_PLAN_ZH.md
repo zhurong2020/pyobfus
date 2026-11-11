@@ -1,5 +1,7 @@
 # pyobfus 当前计划
 
+**2026-11-11 本次会话接续**：修订 `74769cd` 已推送至草稿 #221，统一签名端点拒绝响应的 no-store 与固定 inactive 文本。该 revision 托管检查 48 success／2 skipped，Core／Worker／CodeQL／Packaging／Dogfood 均通过。本地完整回归：Core 5073 passed／55 skipped、MCP 167、integration 368 passed／10 skipped、runtime 24、基准 8、Worker 70；完整检查脚本通过。#220 源码审阅未见阻塞问题，42 success／1 skipped，仍待明确合并决定。#221 的独立外部审阅、生产公钥、部署、最终发布验收尚未完成；轮换／回滚草案已准备。版本仍为 Core 0.13.0，本次未合并、部署或发版。详情见[会话收尾](SESSION_CLOSEOUT_2026-11-11.md)；下方为此前阶段快照。
+
 **2026-11-11 F2 首阶段实现候选**：维护者选择“先 CI，后工作站”。[草稿 #221](https://github.com/zhurong2020/pyobfus/pull/221) 依赖尚未合并的 #220，目标为 main 以运行现有 Core CI／CodeQL。新增独立 CI 签名入口、Pro 客户端严格验签与 workerd 互通检查；Worker CI 的 3.9／3.12 最低 cryptography 与 3.15 三格均通过。工作站／离线缓存、设备名额和已生成产物保持原行为。生产信任公钥表刻意留空，发布流程阻止未配置密钥的 Core 发布；生产 key、部署、迁移与发版均未执行。明细留私有 `docs/internal/f2-ci-implementation-2026-11-11/`；独立审阅和最终兼容性检查仍待完成。
 
 **2026-11-11 后续维护与 F2 决策准备**：#217 已合并为 `702d465`，合并后 CI／CodeQL／Pages／IndexNow workflow 均成功。复查发现 mypy 2.4.1 报 Python 3.9 检查目标不受支持却返回成功；已在全新环境复现，维护分支恢复 `<2.0` 并阻止自动版本更新再次扩大该范围，尚未合并或发版。F2 继续非生产兼容性验证，建议先 CI 后工作站，等待范围决定；详见 [本轮巡检补充](OPERATIONS_REVIEW_2026-11-11.md)。
