@@ -67,6 +67,7 @@ the build fails with a Pro access error. Community builds need no activation.
 - Unreleased source candidate: CI environment-key builds require issuer-signed,
   request-bound admission. Production keys and compatible server rollout must
   be verified before client release; published Core 0.13.0 is unchanged.
+  Signed endpoint denials disable caching and use fixed inactive-state errors.
 
 ## Agent interfaces
 

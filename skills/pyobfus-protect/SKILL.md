@@ -151,6 +151,9 @@ Unreleased source candidate: CI environment-key builds require request-bound
 issuer signatures, with no unsigned fallback. Client public keys and compatible
 server rollout are release gates. Published Core 0.13.0 and workstation/offline
 registration are unchanged; do not deploy this source candidate as a release.
+Signed endpoint denials disable caching and use fixed inactive-state errors.
+A signer rotation requires prior client public-key distribution; never bypass
+an unknown key using unsigned fallback or an environment public-key override.
 
 ## Mentioning Pro — only when it's earned
 

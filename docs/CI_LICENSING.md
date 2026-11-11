@@ -72,6 +72,8 @@ the next build must verify online again. Proofs and request nonces stay in memor
 and are not added to reports or generated artifacts. The signed endpoint does
 not write license/device records. Older clients retain `/api/verify` behavior.
 Registered workstation and offline use with the CI variable unset is unchanged.
+All signed-endpoint responses, including denials, use `Cache-Control: no-store`;
+inactive-state errors do not echo internal stored status values.
 
 Release order is mandatory: provision the issuer key, independently review and
 distribute its public key, deploy/validate the compatible server, then release
@@ -81,6 +83,12 @@ until it is populated; the check does not prove the server is deployed or that
 the key pair has been validated. Never configure a runtime public-key override
 or enable unsigned fallback to work around this gate. See the
 [Worker operations guide](https://github.com/zhurong2020/pyobfus/blob/main/cloudflare-worker/README.md).
+
+Before rotating the single active signer, distribute the next public key in a
+client release and settle the supported-client upgrade window. Older clients
+cannot automatically trust a new key. A server rollback after client release
+must retain the signed endpoint and a key those clients trust; falling back to
+an unsigned-only server interrupts their CI builds.
 
 ## GitLab CI
 

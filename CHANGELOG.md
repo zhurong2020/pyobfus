@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   are verified only at build admission; a running build may finish normally.
   Workstation registration and offline caches are unchanged. This candidate
   requires issuer key provisioning and server rollout before client release.
+- Signed CI endpoint denials also disable caching, and inactive-state errors
+  use fixed diagnostics rather than echoing stored status values.
 
 ### Fixed
 

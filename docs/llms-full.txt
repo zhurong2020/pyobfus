@@ -305,6 +305,10 @@ request-bound Ed25519 admission and rejects unsigned legacy responses. A proof
 admits only the active build session; its expiry does not interrupt a long build.
 Workstation/offline registration is unchanged. Production public keys and
 compatible server rollout are release gates; this is not shipped in Core 0.13.0.
+All signed-endpoint responses disable caching; inactive-state diagnostics do not
+echo stored values. Distribute the next client trust key before signer rotation;
+older clients cannot automatically trust a new key. Server rollback must retain
+signed admission with a client-trusted key, never unsigned fallback.
 
 ```yaml
 # GitHub Actions

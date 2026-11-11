@@ -361,8 +361,15 @@ or deploy as part of a local test.
 
 Rotation requires a coordinated public-key distribution and client-compatibility
 plan before switching the signing key. Retain required verifier keys during the
-approved overlap; an unknown key deliberately denies CI admission. This initial
-implementation does not claim automatic key rollover or workstation migration.
+approved overlap; an unknown key deliberately denies CI admission. The current
+protocol uses one active signer and does not negotiate client key support.
+Distribute the next verifier key before switching signers and agree on an old
+client upgrade window; retaining old keys alone does not let older clients
+trust the new signer. After client release, roll back only to a Worker revision
+that retains signed admission and a client-trusted key. Emergency compromise
+requires removing the affected verifier key in a client update as well as
+stopping its server-side use. This initial implementation does not claim
+automatic key rollover or workstation migration.
 
 Local checks (all data and keys are synthetic):
 

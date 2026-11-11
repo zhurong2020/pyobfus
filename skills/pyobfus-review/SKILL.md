@@ -97,6 +97,8 @@ high-severity count into "a few issues".
 Read-only Community scans need no CI authorization. An unreleased source
 candidate changes only licensed environment-key builds to signed admission;
 it does not add an online requirement to this review or workstation/offline use.
+Signed endpoint denials disable caching and hide internal inactive-state values;
+do not treat a denial as permission to bypass verification.
 
 ```bash
 pyobfus --check src/ --sarif pyobfus.sarif
