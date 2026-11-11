@@ -332,3 +332,56 @@ Durable Object covering all license mutations.
 An optional `CI_RATE_LIMITER` binding may enforce a deployment limit (suggested policy: 120/hour using the platform's supported limiter);
 its identifier is the SHA-256 hash of the key. Without this binding there is
 no rate limit. Denials return HTTP 429 with `code: "rate_limited"` and no write.
+
+## Signed CI admission (Core 0.14.0+)
+
+The dedicated `/api/ci/lease` endpoint issues request-bound Ed25519 JWS proofs.
+It uses existing license status/expiry checks and the optional CI rate limiter,
+but never rewrites license/device records. `/api/verify` remains compatible with
+published clients and workstation registration. The runtime entrypoint is
+`src/worker.js`; it exposes only the default handler, while `index.js` retains
+helper exports for Node regressions.
+
+The signer requires **both** `CI_SIGNING_KEY_ID` and the secret
+`CI_SIGNING_PRIVATE_JWK` (an Ed25519 private JWK with matching `x` and `d`). There
+is no default key, on-demand production generation, or unsigned success if a
+binding is missing. Configuration/signing failures return a fixed 503 without
+logging request or key material. All signed-endpoint responses, including
+denials, are `Cache-Control: no-store`; inactive-state diagnostics never echo
+the stored status value.
+
+Production provisioning (2026-11-11): `CI_SIGNING_KEY_ID = "ci-2026-11"` is a
+public `[vars]` entry in `wrangler.toml`; the private JWK is the
+`CI_SIGNING_PRIVATE_JWK` secret and is kept outside the repository by the
+maintainer. The matching public key is in `pyobfus_pro/ci_lease.py`, and Core
+publishing still refuses an empty client table. Any later key change needs
+separate approval, a reviewed public key in a client release, deployment from
+the WSL checkout and an independent live-pair check. Never commit a private JWK or put it in KV, a workflow artifact,
+logs, reports or a generated application. Do not change production bindings
+or deploy as part of a local test.
+
+Rotation requires a coordinated public-key distribution and client-compatibility
+plan before switching the signing key. Retain required verifier keys during the
+approved overlap; an unknown key deliberately denies CI admission. The current
+protocol uses one active signer and does not negotiate client key support.
+Distribute the next verifier key before switching signers and agree on an old
+client upgrade window; retaining old keys alone does not let older clients
+trust the new signer. After client release, roll back only to a Worker revision
+that retains signed admission and a client-trusted key. Emergency compromise
+requires removing the affected verifier key in a client update as well as
+stopping its server-side use. This initial implementation does not claim
+automatic key rollover or workstation migration.
+
+Local checks (all data and keys are synthetic):
+
+```bash
+node --test cloudflare-worker/test/*.test.js
+npm install --prefix /tmp/pyobfus-ci-worker --no-save --package-lock=false miniflare@4.20260730.0
+venv/bin/python scripts/validate_ci_lease_worker.py --miniflare-root /tmp/pyobfus-ci-worker
+```
+
+Miniflare runs actual local workerd at the maintained compatibility date with
+in-memory/local test bindings and no Cloudflare account. Worker CI maintains
+Python 3.9/3.12 with cryptography 42 and Python 3.15 with current cryptography;
+the ordinary Core matrix covers the remaining supported interpreters. None of
+these checks configure, read or deploy production secrets.

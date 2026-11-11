@@ -28,12 +28,10 @@ your application checks on the output, and restore a traceback. The
 record maintained compatibility and tested limits. Start custom integration
 with configuration or a thin wrapper when these interfaces fit your task.
 
-> **What's new in v0.13.0:** Community
-> [pre-commit hooks](https://pyobfus.readthedocs.io/en/latest/PRE_COMMIT/)
-> stop pyobfus mapping files and PEM private keys from being committed
-> (`pyobfus-no-private-material`) and check built output before pushing
-> (`pyobfus-check-delivery`). They read files locally, print only paths and
-> reasons, and need no licence.
+> **What's new in v0.14.0:** CI builds using `PYOBFUS_LICENSE_KEY` now require
+> a short-lived, request-bound, issuer-signed admission from the license server,
+> with no unsigned fallback. Workstation and offline use are unchanged; see
+> [CI licensing](https://pyobfus.readthedocs.io/en/latest/CI_LICENSING/).
 >
 > Earlier releases: see the [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
 

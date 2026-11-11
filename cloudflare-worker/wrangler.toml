@@ -1,6 +1,11 @@
 name = "pyobfus-license-server"
-main = "src/index.js"
+main = "src/worker.js"
 compatibility_date = "2025-11-12"
+
+# Public identifier of the active CI issuer key. The private JWK is the
+# CI_SIGNING_PRIVATE_JWK secret and is never committed.
+[vars]
+CI_SIGNING_KEY_ID = "ci-2026-11"
 
 # KV Namespace Binding
 [[kv_namespaces]]

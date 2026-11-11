@@ -54,6 +54,43 @@ Action and Core versions are independent. For an immutable wrapper use
 The Action's `offline` input controls dependency-name lookups, not CI license
 verification. See [the verified channel rollout](https://github.com/zhurong2020/pyobfus/blob/main/docs/CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md).
 
+## Signed CI build admission (since 0.14.0)
+
+Core 0.14.0 clients use signed CI build admission; older clients keep using `/api/verify`.
+
+The environment-key path requests `/api/ci/lease` with a fresh nonce and requires
+a versioned Ed25519 JWS. It checks the fixed issuer, CI audience and token type,
+the requested license reference, nonce, permissions and strict time/size bounds
+against a public key distributed with the client. Unknown keys, modified or
+expired responses, wrong purposes, malformed data and unsigned legacy responses
+deny access; there is no automatic fallback to the old CI protocol.
+
+Proofs last at most 300 seconds with 60 seconds of clock tolerance. They admit
+one build session; the existing owned worker pool may finish a long build, while
+the next build must verify online again. Proofs and request nonces stay in memory
+and are not added to reports or generated artifacts. The signed endpoint does
+not write license/device records. Older clients retain `/api/verify` behavior.
+Registered workstation and offline use with the CI variable unset is unchanged.
+All signed-endpoint responses, including denials, use `Cache-Control: no-store`;
+inactive-state errors do not echo internal stored status values.
+
+Release order is mandatory: provision the issuer key, independently review and
+distribute its public key, deploy/validate the compatible server, then release
+the client after full compatibility tests. The production issuer key
+`ci-2026-11` was provisioned on 2026-11-11, its public key is in the client
+table, and the compatible Worker is deployed and was validated against a live
+license. `scripts/check_ci_lease_keys.py` still blocks Core publishing whenever
+the table is empty; the check does not prove the server is deployed or that the
+key pair has been validated. Never configure a runtime public-key override
+or enable unsigned fallback to work around this gate. See the
+[Worker operations guide](https://github.com/zhurong2020/pyobfus/blob/main/cloudflare-worker/README.md).
+
+Before rotating the single active signer, distribute the next public key in a
+client release and settle the supported-client upgrade window. Older clients
+cannot automatically trust a new key. A server rollback after client release
+must retain the signed endpoint and a key those clients trust; falling back to
+an unsigned-only server interrupts their CI builds.
+
 ## GitLab CI
 
 Create a **masked**, protected CI/CD variable named `PYOBFUS_LICENSE_KEY` in the

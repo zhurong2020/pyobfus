@@ -92,7 +92,7 @@ def _isolated_pool_initializer(capability):
 
 @pytest.mark.parametrize("method", ["spawn", "forkserver"])
 @pytest.mark.parametrize("mode", ["registered", "ci"])
-def test_owned_pool_verifies_once(tmp_path, monkeypatch, method, mode):
+def test_owned_pool_verifies_once(tmp_path, monkeypatch, method, mode, ci_issuer):
     if method not in multiprocessing.get_all_start_methods():
         pytest.skip("start method unavailable")
     from concurrent.futures import ProcessPoolExecutor
@@ -116,8 +116,8 @@ def test_owned_pool_verifies_once(tmp_path, monkeypatch, method, mode):
     if mode == "ci":
         monkeypatch.setenv("PYOBFUS_LICENSE_KEY", KEY)
         online = Mock(
-            side_effect=lambda *a, **kw: io.BytesIO(
-                b'{"valid":true,"activation":"ci","expires_at":null}'
+            side_effect=lambda req, **kw: io.BytesIO(
+                json.dumps(ci_issuer.response(KEY, json.loads(req.data)["nonce"])).encode()
             )
         )
         monkeypatch.setattr(licensing.urllib.request, "urlopen", online)
@@ -141,7 +141,7 @@ def test_owned_pool_verifies_once(tmp_path, monkeypatch, method, mode):
 
 
 @pytest.mark.parametrize("failure", [None, "network", 400, 403, 429, "invalid", "expired"])
-def test_ci_online_only_and_secret_safe(tmp_path, monkeypatch, capsys, failure):
+def test_ci_online_only_and_secret_safe(tmp_path, monkeypatch, capsys, failure, ci_issuer):
     monkeypatch.setenv("PYOBFUS_LICENSE_KEY", KEY)
     monkeypatch.setattr("pyobfus.trial.is_trial_active", lambda: True)
 
@@ -160,7 +160,9 @@ def test_ci_online_only_and_secret_safe(tmp_path, monkeypatch, capsys, failure):
 
     def open_request(req, **kw):
         calls.append(json.loads(req.data))
-        assert calls[-1] == {"license_key": KEY, "activation": "ci"}
+        assert req.full_url == licensing.CI_LEASE_API_URL
+        assert set(calls[-1]) == {"license_key", "activation", "protocol", "nonce"}
+        assert calls[-1]["license_key"] == KEY and calls[-1]["activation"] == "ci"
         if failure == "network":
             raise urllib.error.URLError(KEY)
         if isinstance(failure, int):
@@ -171,10 +173,14 @@ def test_ci_online_only_and_secret_safe(tmp_path, monkeypatch, capsys, failure):
                 {},
                 io.BytesIO(json.dumps({"error": "Missing license_key or device_id"}).encode()),
             )
-        payload = {"valid": failure != "invalid", "activation": "ci"}
+        nonce = calls[-1]["nonce"]
+        payload = ci_issuer.claims(KEY, nonce)
         if failure == "expired":
-            payload["expires_at"] = "2000-01-01"
-        return io.BytesIO(json.dumps(payload).encode())
+            payload.update(iat=0, nbf=0, exp=300)
+        envelope = ci_issuer.response(KEY, nonce, payload=payload)
+        if failure == "invalid":
+            envelope = {"valid": True, "activation": "ci"}
+        return io.BytesIO(json.dumps(envelope).encode())
 
     monkeypatch.setattr(licensing.urllib.request, "urlopen", open_request)
     src = tmp_path / "input.py"
@@ -185,8 +191,9 @@ def test_ci_online_only_and_secret_safe(tmp_path, monkeypatch, capsys, failure):
     assert result.exit_code == (1 if failure else 0), result.output
     assert len(calls) == 1
     assert KEY not in result.output + str(result.exception) + str(capsys.readouterr())
+    assert calls[0]["nonce"] not in result.output
     if failure == 400:
-        assert "does not support CI activation yet" in result.output
+        assert "does not support signed CI activation yet" in result.output
     if failure == 429:
         assert "rate limited" in result.output
 

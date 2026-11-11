@@ -8,6 +8,12 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ## ⚡ Current pending work (cold-start 必读)
 
+**2026-11-11 晚 生产 key 与 Worker 上线**：#220 已合并；生产 key `ci-2026-11` 已生成，公钥入 `pyobfus_pro/ci_lease.py`，Worker 版本 `13aaa4a8` 已部署并线上配对通过（回滚 `d8588738`）。私钥待备份 Vaultwarden；#221 合并与发版待批准。详见 [当前计划](docs/CURRENT_PLAN_ZH.md)。
+
+**2026-11-11 本次会话收尾**：先读 [会话收尾](docs/SESSION_CLOSEOUT_2026-11-11.md)。`74769cd` 签名拒绝响应修订已推送，托管 48 success／2 skipped，本地全量与 Worker 70 项通过。#220 源码审阅无阻塞，待明确合并决定；#221 仍待独立外部审阅、公钥／轮换方案及最终发布验收。未合并、配置生产 key、部署或发版。私有接续见 `docs/internal/f2-ci-implementation-2026-11-11/NEXT_SESSION.md`，下方为此前阶段快照。
+
+**2026-11-11 F2 CI 首阶段候选**：维护者已批准“先 CI，后工作站”。草稿 #221／分支 `feat/ci-signed-lease-v1`，父依赖为未合并 #220，PR 目标 main 以运行现有 Core CI／CodeQL；Worker 三格互通已通过，其余候选检查与独立审阅待核。私有接续 `docs/internal/f2-ci-implementation-2026-11-11/PROGRESS.md`。工作站／离线不迁移；生产信任表为空且发布流程有阻断，未配置 key、未部署、未发版。不得重用 #217 的合并批准。
+
 **2026-11-11 接续**：见 [本轮巡检](docs/OPERATIONS_REVIEW_2026-11-11.md) → [当前计划](docs/CURRENT_PLAN_ZH.md) → [TODO](docs/TODO.md)。本地已同步 `df58068`；T+7d、下载／邮件、11-09 搜索盘点与备份抽核已做。优先取得 GSC“重定向错误”示例 URL；下次周检 11-16，T+30d 约 12-04。F2 先确认兼容与离线迁移；许可条款先专业审阅。下方 11-07 段为历史交接。
 
 **2026-11-07 晚 Core 0.13.0 已发布**（Community pre-commit 钩子 + 专利申请标识）：核验见 [发布记录](docs/CORE_0_13_0_RELEASE_2026-11-07.md)。Zenodo record `24031969` 已归档、`CITATION.cff` 已同步，Glama 已更新并通过检测；本版发布收尾完成。MCP／runtime／扩展／Action 不变。

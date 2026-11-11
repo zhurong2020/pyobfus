@@ -66,3 +66,23 @@ HTTP 200 不保证收录，见 [Google 官方说明](https://developers.google.c
 - 修复后的全新环境解析到 mypy 1.20.2，原目标诊断消失；`scripts/check.sh lint` 通过。仓库 venv 完整检查通过；四个测试根与基准再次独立运行，结果仍为 Core 5024／55 skipped、MCP 167、integration 368／10 skipped、runtime 24、benchmark 8。
 - F2 的设计决策说明和新增非生产互通证据保存于私有 `docs/internal/release-next-2026-11-11/`。建议先 CI 后工作站，尚未改变授权策略、增加生产依赖或部署 Worker。
 - 当前新增内容是开发检查兼容性维护，不能据此宣称新的用户保护功能已实现。Core 0.13.0 保持不变，尚无新的发版批准。
+
+## F2 CI 首阶段候选（维护核查之后）
+
+维护者批准“先 CI，后工作站”，实现见[草稿 #221](https://github.com/zhurong2020/pyobfus/pull/221)，依赖 #220。新增独立签发端点与 Pro 验签模块，保持旧 CI／工作站接口、缓存及设备行为；候选公钥表为空，Core 发布流程明确阻断未配置的信任表。
+
+本地核心 5073 passed／55 skipped、MCP 167、integration 368／10 skipped、runtime 24、基准 8；Worker 单元 67（含末尾换行格式边界）。Python 3.15 与最低 cryptography 42 的针对性用例各 68 项通过。托管 [Worker CI](https://github.com/zhurong2020/pyobfus/actions/runs/42952684003) 的三格实际 workerd／Python 互通与 Worker 单元均成功。Core CI／CodeQL 在草稿改为目标 main 后另行验证，不借用 #220 的结果。
+
+原始证据与接续保存于私有 `docs/internal/f2-ci-implementation-2026-11-11/`。没有配置生产 key、部署服务或发版；独立审阅、密钥发布／轮换计划和最终发布验收仍是后续门槛。
+
+### 候选接续审阅
+
+当前会话源码审阅发现，新签名端点复用的拒绝响应未统一禁止缓存，且 inactive 文本会回显存储状态。候选修订为新端点的拒绝响应添加 `Cache-Control: no-store`，并固定 inactive 错误文本；旧验证端点保持兼容。Worker 回归增加所有签名响应的缓存断言、私有状态不回显及存储／限流服务异常用例，70 项通过；Python 授权相关 68 项与完整 `scripts/check.sh` 通过。提交前各测试根独立复验：Core 5073 passed／55 skipped，MCP 167，integration 368 passed／10 skipped，runtime 24，基准 8。
+
+密钥发布／轮换和回滚草案已补入私有接续。当前单 signer 协议切换 key 前须先分发新公钥并明确旧客户端升级窗口；仅保留服务端旧 key 不能让旧客户端自动信任新 key。此次源码审阅不代替独立外部审阅，先前托管结果也不覆盖此次修订；生产配置、合并和发布仍分别验收。
+
+### 本次会话托管验收与接续
+
+修订已提交并推送为 `74769cd`，其自身检查共 48 success／2 skipped；[Core CI](https://github.com/zhurong2020/pyobfus/actions/runs/42991395599)、[Worker CI](https://github.com/zhurong2020/pyobfus/actions/runs/42991395772)、[CodeQL](https://github.com/zhurong2020/pyobfus/actions/runs/42991395603)、[Packaging](https://github.com/zhurong2020/pyobfus/actions/runs/42991395576) 与 [Dogfood](https://github.com/zhurong2020/pyobfus/actions/runs/42991395594) 均成功。该结果覆盖本次代码修订，不代表后续文档提交或未来 release revision 的检查。
+
+#220 源码审阅未见阻塞，42 success／1 skipped；维护者确认后已于 11-11 合并为 `2127c0c`，并同步进 #221。独立外部审阅与生产操作尚未执行；本次文档同步与分类提交不构成合并、部署或发版批准。完整接续见 [11-11 会话收尾](SESSION_CLOSEOUT_2026-11-11.md)。

@@ -6,10 +6,18 @@ on:
     paths:
       - 'cloudflare-worker/**'
       - '.github/workflows/worker-ci.yml'
+      - 'pyobfus_pro/ci_lease.py'
+      - 'pyobfus_pro/license.py'
+      - 'pyproject.toml'
+      - 'scripts/validate_ci_lease_worker.py'
   pull_request:
     paths:
       - 'cloudflare-worker/**'
       - '.github/workflows/worker-ci.yml'
+      - 'pyobfus_pro/ci_lease.py'
+      - 'pyobfus_pro/license.py'
+      - 'pyproject.toml'
+      - 'scripts/validate_ci_lease_worker.py'
   workflow_dispatch:
 
 permissions:
@@ -30,3 +38,39 @@ jobs:
           node-version: '22'
       - name: Run offline Worker regressions
         run: node --test test/*.test.js
+
+  signed-ci-interop:
+    name: Signed CI workerd interop (${{ matrix.python }}, crypto ${{ matrix.crypto }})
+    runs-on: ${{ matrix.python == '3.9' && 'ubuntu-24.04' || 'ubuntu-latest' }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { python: '3.9', crypto: '42.0.0' }
+          - { python: '3.12', crypto: '42.0.0' }
+          - { python: '3.15', crypto: latest }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: '22'
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install exact minimum JWT and selected cryptography
+        shell: bash
+        env:
+          CRYPTO_VERSION: ${{ matrix.crypto }}
+        run: |
+          python -m pip install -e ./pyobfus_runtime
+          if [[ "$CRYPTO_VERSION" == latest ]]; then
+            python -m pip install -e . 'PyJWT==2.15.1'
+          else
+            python -m pip install -e . 'PyJWT==2.15.1' "cryptography==$CRYPTO_VERSION"
+          fi
+          python -m pip check
+      - name: Install pinned local Worker runtime
+        run: npm install --prefix "$RUNNER_TEMP/ci-worker" --no-save --package-lock=false miniflare@4.20260730.0
+      - name: Check real Worker signature and Python admission
+        run: python scripts/validate_ci_lease_worker.py --miniflare-root "$RUNNER_TEMP/ci-worker"
