@@ -333,7 +333,7 @@ An optional `CI_RATE_LIMITER` binding may enforce a deployment limit (suggested 
 its identifier is the SHA-256 hash of the key. Without this binding there is
 no rate limit. Denials return HTTP 429 with `code: "rate_limited"` and no write.
 
-## Signed CI admission (unreleased implementation)
+## Signed CI admission (Core 0.14.0+)
 
 The dedicated `/api/ci/lease` endpoint issues request-bound Ed25519 JWS proofs.
 It uses existing license status/expiry checks and the optional CI rate limiter,

@@ -94,9 +94,10 @@ high-severity count into "a few issues".
 
 ## For CI
 
-Read-only Community scans need no CI authorization. An unreleased source
-candidate changes only licensed environment-key builds to signed admission;
-it does not add an online requirement to this review or workstation/offline use.
+Read-only Community scans need no CI authorization. Since 0.14.0: licensed
+environment-key builds require request-bound, issuer-signed admission with no
+unsigned fallback. The license server serves the signed endpoint; older clients
+keep using the legacy endpoint. This review and workstation/offline use are unchanged.
 Signed endpoint denials disable caching and hide internal inactive-state values;
 do not treat a denial as permission to bypass verification.
 

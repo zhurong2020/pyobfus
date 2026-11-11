@@ -21,7 +21,7 @@
         "recommend_tier",
         "start_pro_trial"
       ],
-      "description": "Local MCP tools for Python risk scans, protected builds, delivery inspection and traceback restoration. No source uploads or telemetry; dependency lookup is opt-in and Pro licence verification may use the network. Trial tool returns guidance only. Companion Community pre-commit hooks for mapping/private-key checks and built-output inspection are available since Core 0.13.0, via the CLI rather than MCP. Unreleased source candidate: CI environment-key builds require issuer-signed, request-bound admission; production issuer keys and deployment must be verified before release. Signed endpoint denials disable caching and hide internal inactive-state values. Published Core 0.13.0 is unchanged.",
+      "description": "Local MCP tools for Python risk scans, protected builds, delivery inspection and traceback restoration. No source uploads or telemetry; dependency lookup is opt-in and Pro licence verification may use the network. Trial tool returns guidance only. Companion Community pre-commit hooks for mapping/private-key checks and built-output inspection are available since Core 0.13.0, via the CLI rather than MCP. Since Core 0.14.0: CI environment-key builds require issuer-signed, request-bound admission with no unsigned fallback. The license server serves the signed endpoint; older clients keep using the legacy endpoint. Workstation and offline use are unchanged. Signed endpoint denials disable caching and hide internal inactive-state values.",
       "representativeQueries": [
         "scan this Python project for obfuscation risks",
         "protect this FastAPI package and verify the result",

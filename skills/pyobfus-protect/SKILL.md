@@ -147,10 +147,9 @@ excerpts and caret indicators remain unchanged output code.)
 
 6. Since 0.13.0: Community pre-commit hooks `pyobfus-no-private-material` and `pyobfus-check-delivery` keep recognized mappings and PEM private keys out of commits and inspect built output before pushing (`args: [dist/]`). `python -m pyobfus.precommit [--json] FILE ...` exits 0 clean, 1 findings, 2 incomplete/error; missing paths, symlinks and other nonregular paths are skipped. Mappings are checked only in JSON files up to 20 MiB; key headers are checked only in the first 64 KiB, with no file-size errors. Build the delivery output first (a missing directory exits 2), or use the manual stage. Use gitleaks or detect-secrets alongside these bounded checks.
 
-Unreleased source candidate: CI environment-key builds require request-bound
-issuer signatures, with no unsigned fallback. Client public keys and compatible
-server rollout are release gates. Published Core 0.13.0 and workstation/offline
-registration are unchanged; do not deploy this source candidate as a release.
+Since 0.14.0: CI environment-key builds require request-bound issuer signatures,
+with no unsigned fallback. The license server serves the signed endpoint; older
+clients keep using the legacy endpoint. Workstation/offline registration is unchanged.
 Signed endpoint denials disable caching and use fixed inactive-state errors.
 A signer rotation requires prior client public-key distribution; never bypass
 an unknown key using unsigned fallback or an environment public-key override.

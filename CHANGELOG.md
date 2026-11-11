@@ -7,16 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-11-11
+
 ### Security
 
 - CI environment-key builds require request-bound, issuer-signed Ed25519
   admission instead of accepting an unsigned verification response. Proofs
   expire after at most five minutes (with one minute of clock tolerance) and
   are verified only at build admission; a running build may finish normally.
-  Workstation registration and offline caches are unchanged. This candidate
-  requires issuer key provisioning and server rollout before client release.
+  Workstation registration and offline caches are unchanged. The license
+  server serves the signed endpoint; clients older than 0.14.0 keep using
+  the legacy endpoint. There is no unsigned fallback.
 - Signed CI endpoint denials also disable caching, and inactive-state errors
   use fixed diagnostics rather than echoing stored status values.
+
+### Changed
+
+- Add the runtime dependency `PyJWT>=2.15.1,<3`.
 
 ### Fixed
 

@@ -64,9 +64,10 @@ the build fails with a Pro access error. Community builds need no activation.
 - Never print, log or commit the key. Fork pull requests usually cannot read
   secrets: run Community checks there and keep licensed builds on trusted refs.
 - Details: https://pyobfus.readthedocs.io/en/latest/CI_LICENSING/
-- Unreleased source candidate: CI environment-key builds require issuer-signed,
-  request-bound admission. Production keys and compatible server rollout must
-  be verified before client release; published Core 0.13.0 is unchanged.
+- Since 0.14.0: CI environment-key builds require issuer-signed, request-bound
+  admission with no unsigned fallback. The license server serves the signed
+  endpoint; older clients keep using the legacy endpoint. Workstation and
+  offline use are unchanged.
   Signed endpoint denials disable caching and use fixed inactive-state errors.
 
 ## Agent interfaces

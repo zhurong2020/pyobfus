@@ -54,10 +54,9 @@ Action and Core versions are independent. For an immutable wrapper use
 The Action's `offline` input controls dependency-name lookups, not CI license
 verification. See [the verified channel rollout](https://github.com/zhurong2020/pyobfus/blob/main/docs/CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md).
 
-## Unreleased: signed CI build admission
+## Signed CI build admission (since 0.14.0)
 
-This is a source candidate, not behavior shipped in Core 0.13.0. No production
-signing key or server rollout is implied by merging the implementation.
+Core 0.14.0 clients use signed CI build admission; older clients keep using `/api/verify`.
 
 The environment-key path requests `/api/ci/lease` with a fresh nonce and requires
 a versioned Ed25519 JWS. It checks the fixed issuer, CI audience and token type,
