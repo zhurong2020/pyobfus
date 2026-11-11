@@ -66,3 +66,11 @@ HTTP 200 不保证收录，见 [Google 官方说明](https://developers.google.c
 - 修复后的全新环境解析到 mypy 1.20.2，原目标诊断消失；`scripts/check.sh lint` 通过。仓库 venv 完整检查通过；四个测试根与基准再次独立运行，结果仍为 Core 5024／55 skipped、MCP 167、integration 368／10 skipped、runtime 24、benchmark 8。
 - F2 的设计决策说明和新增非生产互通证据保存于私有 `docs/internal/release-next-2026-11-11/`。建议先 CI 后工作站，尚未改变授权策略、增加生产依赖或部署 Worker。
 - 当前新增内容是开发检查兼容性维护，不能据此宣称新的用户保护功能已实现。Core 0.13.0 保持不变，尚无新的发版批准。
+
+## F2 CI 首阶段候选（维护核查之后）
+
+维护者批准“先 CI，后工作站”，实现见[草稿 #221](https://github.com/zhurong2020/pyobfus/pull/221)，依赖 #220。新增独立签发端点与 Pro 验签模块，保持旧 CI／工作站接口、缓存及设备行为；候选公钥表为空，Core 发布流程明确阻断未配置的信任表。
+
+本地核心 5073 passed／55 skipped、MCP 167、integration 368／10 skipped、runtime 24、基准 8；Worker 单元 65。Python 3.15 与最低 cryptography 42 的针对性用例各 68 项通过。托管 [Worker CI](https://github.com/zhurong2020/pyobfus/actions/runs/42952684003) 的三格实际 workerd／Python 互通与 Worker 单元均成功。Core CI／CodeQL 在草稿改为目标 main 后另行验证，不借用 #220 的结果。
+
+原始证据与接续保存于私有 `docs/internal/f2-ci-implementation-2026-11-11/`。没有配置生产 key、部署服务或发版；独立审阅、密钥发布／轮换计划和最终发布验收仍是后续门槛。

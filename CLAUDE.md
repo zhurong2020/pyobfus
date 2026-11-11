@@ -8,7 +8,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ## ⚡ Current pending work (cold-start 必读)
 
-**2026-11-11 F2 CI 首阶段实施**：维护者已批准“先 CI，后工作站”。当前分支 `feat/ci-signed-lease-v1`，父依赖为未合并 #220；候选代码／测试正在验证。私有接续 `docs/internal/f2-ci-implementation-2026-11-11/PROGRESS.md`。工作站／离线不迁移；生产信任表为空且发布流程有阻断，未配置 key、未部署、未发版。不得重用 #217 的合并批准。
+**2026-11-11 F2 CI 首阶段候选**：维护者已批准“先 CI，后工作站”。草稿 #221／分支 `feat/ci-signed-lease-v1`，父依赖为未合并 #220，PR 目标 main 以运行现有 Core CI／CodeQL；Worker 三格互通已通过，其余候选检查与独立审阅待核。私有接续 `docs/internal/f2-ci-implementation-2026-11-11/PROGRESS.md`。工作站／离线不迁移；生产信任表为空且发布流程有阻断，未配置 key、未部署、未发版。不得重用 #217 的合并批准。
 
 **2026-11-11 接续**：见 [本轮巡检](docs/OPERATIONS_REVIEW_2026-11-11.md) → [当前计划](docs/CURRENT_PLAN_ZH.md) → [TODO](docs/TODO.md)。本地已同步 `df58068`；T+7d、下载／邮件、11-09 搜索盘点与备份抽核已做。优先取得 GSC“重定向错误”示例 URL；下次周检 11-16，T+30d 约 12-04。F2 先确认兼容与离线迁移；许可条款先专业审阅。下方 11-07 段为历史交接。
 
