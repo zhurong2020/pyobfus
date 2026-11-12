@@ -1,5 +1,7 @@
 site_name: pyobfus Documentation
-site_url: https://pyobfus.readthedocs.io
+# Read the Docs sets READTHEDOCS_CANONICAL_URL (e.g. https://pyobfus.readthedocs.io/en/latest/);
+# canonical tags and sitemap.xml must point at served pages, not at the bare host.
+site_url: !ENV [READTHEDOCS_CANONICAL_URL, "https://pyobfus.readthedocs.io/en/latest/"]
 site_description: AST-based Python obfuscator with reverse stack-trace mapping for debuggable, local-first code protection before customer delivery.
 
 # MkDocs excludes dot-directories by default. ARD requires this exact
