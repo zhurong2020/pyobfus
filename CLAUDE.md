@@ -8,6 +8,8 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ## ⚡ Current pending work (cold-start 必读)
 
+**2026-11-12 #221 审阅完成、Worker 限流上线**：独立审阅仅一项低危（CI 未实际限流），#227 修复并部署 Worker `209eb969`（回滚 `13aaa4a8`），线上验证通过；#226 修正文档站 canonical。见 [当前计划](docs/CURRENT_PLAN_ZH.md)。
+
 **2026-11-12 发布收尾完成**：CITATION 已同步 Zenodo `24140234`（#224）；Glama 渠道 0.13.1 装 Core 0.14.0（test `01a1cd2b`）；签发私钥已在 Vaultwarden 并复核。GSC 重定向错误示例为无斜杠 `/zh-cn`，单次 301 到 `/zh-cn/`（200），无需改代码。剩 #221 独立外部审阅、11-16 周检。见 [当前计划](docs/CURRENT_PLAN_ZH.md)。
 
 **2026-11-11 夜 Core 0.14.0 已发布**（签名 CI 构建准入）：核验见 [发布记录](docs/CORE_0_14_0_RELEASE_2026-11-11.md)。#221 squash 为 `96e6340`、tag `v0.14.0`，PyPI 0.14.0 带 attestation，全新安装与线上签名准入通过。待：Zenodo 归档后同步 CITATION、Glama Build steps（手工）、#221 独立外部审阅（发版后补）。
