@@ -55,7 +55,7 @@ Action v1.1.0 / `v1` 与 Glama 渠道 0.11.3 已完成；DEV 一周复盘已记�
 
 0. #220 的 mypy Python 3.9 目标修复已于 2026-11-11 获维护者确认并合并（`2127c0c`），#221 已同步；不为此自动发版。证据见 [巡检补充](OPERATIONS_REVIEW_2026-11-11.md)。
 1. 优先定位 GSC 落地页「重定向错误」：取得受影响 URL、上次抓取时间与实时检查结果；本次公开请求未复现。Core 0.12.0 剩 T+30d（约 12-04）；下一次周检 11-16。vbca 文档过滤继续等待自然事件。
-2. F2 CI 首阶段已随 Core 0.14.0 发布（11-11，[发布记录](CORE_0_14_0_RELEASE_2026-11-11.md)），生产 key `ci-2026-11`、Worker `13aaa4a8` 已上线。剩：#221 独立外部审阅（发版后补）、Zenodo 归档后同步 `CITATION.cff`、Glama Build steps 改为 Core 0.14.0（维护者手工）、换 key 方案与旧客户端升级窗口。工作站／离线迁移仍延后。Pro／runtime 专利许可条款继续等待专业审阅；私有接续见 `docs/internal/f2-ci-implementation-2026-11-11/`。
+2. F2 CI 首阶段已随 Core 0.14.0 发布（11-11，[发布记录](CORE_0_14_0_RELEASE_2026-11-11.md)），生产 key `ci-2026-11`、Worker `13aaa4a8` 已上线。剩：#221 独立外部审阅（发版后补）（Zenodo／CITATION 与 Glama 已于 11-12 完成）、换 key 方案与旧客户端升级窗口。工作站／离线迁移仍延后。Pro／runtime 专利许可条款继续等待专业审阅；私有接续见 `docs/internal/f2-ci-implementation-2026-11-11/`。
 3. 小型渠道试验：11-11 已核 r/Python 官方规则并准备私有技术案例，不能发独立 showcase 帖；待选择合规线程或其它社区并确认账号条件。试验后按具体使用线索与问题决定是否继续，不用下载尖峰证明增长。若证据显示项目定位或上手路径不清，再提出 README 小范围修订。不购买服务或回复推销邮件。
 4. 收到真实最小复现后：优先正确性与诊断，再决定 L3 覆盖或资源密钥范围。
 5. 有目标平台需求后：按[单组合验收方案](NEXT_DELIVERY_VALIDATION_PLAN.md)优先考虑 Windows Nuitka standalone；其他组合各自确认需求，不默认扩矩阵。
@@ -574,7 +574,7 @@ V2EX 仍卡在账号激活（要邀请码）；Stack Overflow 按 2026-04-22 的
   IndexNow 提交记录与「AI Performance（beta）」。另看 GitHub Actions 里 Pages 末步与 `IndexNow docs
   notification` 的返回码（200/202 正常，403/422 查 key 文件）。只记结论，数据明细放私有目录。
   维护者用 Chrome 插件做只读盘点时，Prompt 在 `~/projects/workspace-meta/archives/SEARCH_CONSOLE_SETUP_GUIDE_2026-11-07.md` 第 5 步。
-- **下次搜索盘点（11-16 周检，错误示例可提前核查）**：取得 GSC 落地页「重定向错误」示例 URL、上次抓取时间及实时检查结果；复看 sitemap、两个项目资源的收录数和未收录原因。Bing IndexNow 上次字段为 `null`，须实际确认记录，不能当作零提交；若后台仍无记录，先用浏览器核对 RTD key 文件可访问性（RTD 对部分抓取者有 Cloudflare 质询）。原始 JSON 在私有仓库 `workspace-meta/archives/`；11-09 盘点结论见 [11-11 巡检](OPERATIONS_REVIEW_2026-11-11.md)。
+- **下次搜索盘点（11-16 周检，错误示例可提前核查）**：GSC「重定向错误」示例已于 11-12 取得并定性（无斜杠 `/zh-cn` 单次 301 到 `/zh-cn/`，正常目录重定向，见当前计划）；周检时在 GSC 检查 `https://zhurong2020.github.io/pyobfus/zh-cn/` 是否已编入索引，未编入则对该带斜杠地址请求编入索引；复看 sitemap、两个项目资源的收录数和未收录原因。Bing IndexNow 上次字段为 `null`，须实际确认记录，不能当作零提交；若后台仍无记录，先用浏览器核对 RTD key 文件可访问性（RTD 对部分抓取者有 Cloudflare 质询）。原始 JSON 在私有仓库 `workspace-meta/archives/`；11-09 盘点结论见 [11-11 巡检](OPERATIONS_REVIEW_2026-11-11.md)。
 - **月度搜索／AI 观测（每月第一周）**：WebSearch 12 题 + Codex（隔离 `CODEX_HOME`、中性目录）+ Codebuddy
   `hy4free` / `deepseek-v4-pro` / `kimi-k3.1-pro`，并读 Bing「AI Performance」。方法、隔离与坑见私有
   `docs/internal/geo-observations/2026-11-07-baseline.md`；下次 2026-12 第一周。
