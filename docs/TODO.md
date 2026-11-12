@@ -574,7 +574,7 @@ V2EX 仍卡在账号激活（要邀请码）；Stack Overflow 按 2026-04-22 的
   IndexNow 提交记录与「AI Performance（beta）」。另看 GitHub Actions 里 Pages 末步与 `IndexNow docs
   notification` 的返回码（200/202 正常，403/422 查 key 文件）。只记结论，数据明细放私有目录。
   维护者用 Chrome 插件做只读盘点时，Prompt 在 `~/projects/workspace-meta/archives/SEARCH_CONSOLE_SETUP_GUIDE_2026-11-07.md` 第 5 步。
-- **下次搜索盘点（11-16 周检，错误示例可提前核查）**：取得 GSC 落地页「重定向错误」示例 URL、上次抓取时间及实时检查结果；复看 sitemap、两个项目资源的收录数和未收录原因。Bing IndexNow 上次字段为 `null`，须实际确认记录，不能当作零提交；若后台仍无记录，先用浏览器核对 RTD key 文件可访问性（RTD 对部分抓取者有 Cloudflare 质询）。原始 JSON 在私有仓库 `workspace-meta/archives/`；11-09 盘点结论见 [11-11 巡检](OPERATIONS_REVIEW_2026-11-11.md)。
+- **下次搜索盘点（11-16 周检，错误示例可提前核查）**：GSC「重定向错误」示例已于 11-12 取得并定性（无斜杠 `/zh-cn` 单次 301 到 `/zh-cn/`，正常目录重定向，见当前计划）；周检时在 GSC 检查 `https://zhurong2020.github.io/pyobfus/zh-cn/` 是否已编入索引，未编入则对该带斜杠地址请求编入索引；复看 sitemap、两个项目资源的收录数和未收录原因。Bing IndexNow 上次字段为 `null`，须实际确认记录，不能当作零提交；若后台仍无记录，先用浏览器核对 RTD key 文件可访问性（RTD 对部分抓取者有 Cloudflare 质询）。原始 JSON 在私有仓库 `workspace-meta/archives/`；11-09 盘点结论见 [11-11 巡检](OPERATIONS_REVIEW_2026-11-11.md)。
 - **月度搜索／AI 观测（每月第一周）**：WebSearch 12 题 + Codex（隔离 `CODEX_HOME`、中性目录）+ Codebuddy
   `hy4free` / `deepseek-v4-pro` / `kimi-k3.1-pro`，并读 Bing「AI Performance」。方法、隔离与坑见私有
   `docs/internal/geo-observations/2026-11-07-baseline.md`；下次 2026-12 第一周。
