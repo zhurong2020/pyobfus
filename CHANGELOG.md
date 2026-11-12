@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- Configure Worker CI admission limits per licence and per client IP, checking
+  the IP limit before KV reads. Limiter outages fail open to preserve licensing
+  availability. Requires a Worker deployment; no client release is needed.
+
 ## [0.14.0] - 2026-11-11
 
 ### Security

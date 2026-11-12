@@ -305,6 +305,22 @@ async function handleTrialRequest(request, env, corsHeaders) {
   });
 }
 
+// Preserve admission availability without logging provider details.
+async function ciRateLimited(binding, key) {
+  try {
+    return binding ? (await binding.limit({ key })).success === false : false;
+  } catch {
+    return false;
+  }
+}
+
+function ciRateLimitResponse(corsHeaders, signedCi) {
+  const body = { valid: false, code: 'rate_limited', error: 'CI verification rate limited' };
+  return signedCi ? ciResponse(body, corsHeaders, 429) : new Response(JSON.stringify(body), {
+    status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+  });
+}
+
 /**
  * Handle license verification request
  * POST /api/verify
@@ -330,6 +346,13 @@ async function handleVerify(request, env, corsHeaders, signedCi = false) {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }
     });
+  }
+
+  if (signedCi || activation === 'ci') {
+    const ip = request.headers.get('CF-Connecting-IP');
+    if (await ciRateLimited(env.CI_IP_RATE_LIMITER, ip ? await sha256Hex(ip) : 'no-ip')) {
+      return ciRateLimitResponse(corsHeaders, signedCi);
+    }
   }
 
   // Fetch license from KV
@@ -385,20 +408,8 @@ async function handleVerify(request, env, corsHeaders, signedCi = false) {
   }
 
   if (activation === 'ci') {
-    // Optional binding; configure its limit in deployment (e.g. 120/hour).
-    // Raw keys must never enter rate-limiter identifiers or logs.
-    if (env.CI_RATE_LIMITER) {
-      const { success } = await env.CI_RATE_LIMITER.limit({ key: await sha256Hex(license_key) });
-      if (!success) {
-        if (signedCi) {
-          return ciResponse({ valid: false, code: 'rate_limited',
-            error: 'CI verification rate limited' }, corsHeaders, 429);
-        }
-        return new Response(JSON.stringify({ valid: false, code: 'rate_limited',
-          error: 'CI verification rate limited' }), {
-          status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-        });
-      }
+    if (await ciRateLimited(env.CI_RATE_LIMITER, await sha256Hex(license_key))) {
+      return ciRateLimitResponse(corsHeaders, signedCi);
     }
     if (signedCi) {
       // Do not rewrite a licensing record for telemetry: doing so can overwrite
