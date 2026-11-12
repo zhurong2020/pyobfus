@@ -1,5 +1,7 @@
 # pyobfus 当前计划
 
+**2026-11-12 发布收尾完成**：#223（收尾文档）与 #224（`CITATION.cff` 同步 Zenodo record `24140234`）已合并。Glama：维护者 11-12 在后台 Admin → Dockerfile 把 Build steps 改为 `uv pip install --system --break-system-packages pyobfus-mcp==0.3.17 pyobfus==0.14.0`，点「Build & Release」成功，渠道 release **0.13.1**（Glama 自动递增标签）对应 test `01a1cd2b-9b11-7d91-a42a-325647cedf0f`（2026-11-12 08:32 北京时间）；本次未逐行核对 Instance logs 中的安装版本与工具数。页面底部只有「Build & Release」（构建并发布渠道 release）与「Build」（仅构建测试）两个按钮，无单独 Save。Pinned commit 显示为 `df58068`（Glama 同步的 head，落后于 main；安装来自 PyPI，不影响结果）。签发私钥已在 Vaultwarden（11-11 入库，11-12 复核与本机缓存一致），下方“待入 Vaultwarden”为当时状态。剩：#221 独立外部审阅、GSC 重定向错误示例、11-16 周检。
+
 **2026-11-11 夜 Core 0.14.0 已发布**：维护者批准后 #221 squash 合并为 `96e6340`，tag `v0.14.0`，release.yml 成功，PyPI 0.14.0（wheel/sdist 各 1 份 attestation），3.12／3.15 全新安装与线上签名 CI 准入通过，GitHub Release 已建。核验见[发布记录](CORE_0_14_0_RELEASE_2026-11-11.md)。待：Zenodo 归档后同步 `CITATION.cff`、Glama Build steps 手工更新、#221 独立外部审阅（发版后补）。
 
 **2026-11-11 晚 生产 key 与 Worker 上线**：维护者批准后合并 #220（`2127c0c`）并同步进 #221；生成生产签发 key `ci-2026-11`（私钥仅在 Worker secret 与维护者本机私有目录，待入 Vaultwarden），公钥写入客户端信任表，发布 gate 检查通过。Worker 部署为版本 `13aaa4a8`（回滚版本 `d8588738`）；线上验证：伪造 key 返回 404 且 no-store，作者许可的签名准入通过，错误信任 key 被拒，旧 `/api/verify` CI 路径不变。#221 合并与 Core 发版仍须单独批准。
