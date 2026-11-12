@@ -221,3 +221,88 @@ def test_release_key_gate_is_static_and_rejects_empty_table(tmp_path, ci_issuer)
     # A source expression is not executed while checking a publish prerequisite.
     source.write_text("TRUSTED_PUBLIC_KEYS: dict = dict()\n")
     assert not check(source)
+
+
+@pytest.mark.parametrize("signature", ["other-key", "zero"])
+def test_untrusted_signatures_under_trusted_kid(ci_issuer, signature):
+    import base64
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+
+    nonce = secrets.token_urlsafe(32)
+    response = ci_issuer.response(KEY, nonce)
+    header, payload, _ = response["lease"].split(".")
+    message = f"{header}.{payload}".encode()
+    sig = Ed25519PrivateKey.generate().sign(message) if signature == "other-key" else bytes(64)
+    response["lease"] = message.decode() + "." + base64.urlsafe_b64encode(sig).rstrip(b"=").decode()
+    with pytest.raises(ci_lease.CILeaseError):
+        ci_lease.verify_response(response, KEY, nonce)
+
+
+@pytest.mark.parametrize("now,accepted", [(940, True), (939, False), (1359, True), (1360, False)])
+def test_skew_edges(ci_issuer, monkeypatch, now, accepted):
+    monkeypatch.setattr(ci_lease.time, "time", lambda: 1000)
+    nonce = secrets.token_urlsafe(32)
+    response = ci_issuer.response(KEY, nonce)
+    monkeypatch.setattr(ci_lease.time, "time", lambda: now)
+    if accepted:
+        assert ci_lease.verify_response(response, KEY, nonce) is None
+    else:
+        with pytest.raises(ci_lease.CILeaseError):
+            ci_lease.verify_response(response, KEY, nonce)
+
+
+@pytest.mark.parametrize("failure", ["timeout", "read", "truncated", "dependency"])
+def test_ci_failure_denies_without_state_or_trial(monkeypatch, failure):
+    import builtins
+    import sys
+    import pyobfus_pro
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("CI accessed local state or trial")
+
+    for name in [
+        "get_license_status",
+        "load_cached_license",
+        "cache_license",
+        "get_device_fingerprint",
+    ]:
+        monkeypatch.setattr(licensing, name, forbidden)
+    monkeypatch.setattr("pyobfus.trial.is_trial_active", forbidden)
+    monkeypatch.setenv("PYOBFUS_LICENSE_KEY", KEY)
+    calls = []
+
+    class BrokenRead(io.BytesIO):
+        def read(self, size=-1):
+            raise OSError(KEY)
+
+    def open_request(*args, **kwargs):
+        calls.append(1)
+        if failure == "timeout":
+            raise TimeoutError(KEY)
+        return BrokenRead() if failure == "read" else io.BytesIO(b'{"lease":')
+
+    monkeypatch.setattr(licensing.urllib.request, "urlopen", open_request)
+    if failure == "dependency":
+        monkeypatch.delitem(sys.modules, "pyobfus_pro.ci_lease")
+        monkeypatch.delattr(pyobfus_pro, "ci_lease")
+        original_import = builtins.__import__
+
+        def unavailable(name, *args, **kwargs):
+            if name.startswith("cryptography"):
+                raise ImportError("cryptography " + KEY)
+            return original_import(name, *args, **kwargs)
+
+        monkeypatch.setattr(builtins, "__import__", unavailable)
+    expected = {
+        "timeout": "CI license verification unavailable; online access is required.",
+        "read": "CI license verification unavailable; online access is required.",
+        "truncated": "CI signed authorization is invalid or expired.",
+        "dependency": "CI signing dependencies unavailable; reinstall pyobfus.",
+    }[failure]
+    with pytest.raises(licensing.LicenseVerificationError) as error:
+        licensing.verify_ci_license(KEY)
+    assert str(error.value) == expected
+    with pytest.raises(gate.ProAccessError) as error:
+        gate.require_pro_access()
+    assert str(error.value) == expected + " Check PYOBFUS_LICENSE_KEY or use a registered runner."
+    assert len(calls) == (0 if failure == "dependency" else 2)

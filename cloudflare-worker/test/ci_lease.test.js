@@ -16,9 +16,9 @@ async function issuer() {
     publicKey: pair.publicKey };
 }
 
-async function verify({ config, record = active, body, raw, limiter, storageError } = {}) {
+async function verify({ config, record = active, body, raw, limiter, ipLimiter, ip, storageError } = {}) {
   let reads = 0, writes = 0;
-  const env = { ...config, CI_RATE_LIMITER: limiter, LICENSES: {
+  const env = { ...config, CI_RATE_LIMITER: limiter, CI_IP_RATE_LIMITER: ipLimiter, LICENSES: {
     async get(key) {
       reads++; assert.equal(key, licenseKey);
       if (storageError) throw storageError;
@@ -26,7 +26,7 @@ async function verify({ config, record = active, body, raw, limiter, storageErro
     },
     async put() { writes++; throw new Error('signed CI must not rewrite license records'); }
   } };
-  const req = new Request('https://example.com/api/ci/lease', { method: 'POST',
+  const req = new Request('https://example.com/api/ci/lease', { method: 'POST', duplex: 'half', headers: ip ? { 'CF-Connecting-IP': ip } : {},
     body: raw === undefined ? JSON.stringify(body || { license_key: licenseKey, activation: 'ci', protocol: CI_PROTOCOL, nonce }) : raw });
   const res = await worker.fetch(req, env);
   // Every signed response, including denials and infrastructure errors, must
@@ -129,7 +129,7 @@ test('invalid stored expiry never yields a signed success', async () => {
   assert.equal(r.res.status, 503); assert.equal(r.writes, 0);
 });
 
-for (const component of ['storage', 'limiter']) test(`signed CI ${component} failure has fixed diagnostics and no logs`, async (t) => {
+for (const component of ['storage']) test(`signed CI ${component} failure has fixed diagnostics and no logs`, async (t) => {
   const logs = [];
   t.mock.method(console, 'error', (...args) => logs.push(args));
   const failure = new Error('private-provider-detail ' + licenseKey);
@@ -141,4 +141,35 @@ for (const component of ['storage', 'limiter']) test(`signed CI ${component} fai
   assert.deepEqual(r.data, { valid: false, code: 'unavailable', error: 'CI verification unavailable' });
   assert.equal(r.writes, 0);
   assert.deepEqual(logs, []);
+});
+
+for (const ip of [undefined, '192.0.2.1']) test(`IP denial before KV: ${ip}`, async () => {
+  const r = await verify({ record: null, ip, ipLimiter: { async limit({ key }) {
+    const expected = ip ? Buffer.from(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ip))).toString('hex') : 'no-ip';
+    assert.equal(key, expected);
+    return { success: false };
+  } } });
+  assert.equal(r.res.status, 429);
+  assert.equal(r.data.code, 'rate_limited');
+  assert.equal(r.reads, 0);
+});
+
+for (const binding of ['limiter', 'ipLimiter']) test(`${binding} failure permits valid signed grant without logs`, async (t) => {
+  const logs = [];
+  t.mock.method(console, 'error', (...args) => logs.push(args));
+  t.mock.method(console, 'warn', (...args) => logs.push(args));
+  const r = await verify({ config: await issuer(), [binding]: { async limit() { throw new Error(licenseKey + ' 192.0.2.1'); } } });
+  assert.equal(r.res.status, 200);
+  assert.ok(r.data.lease);
+  assert.deepEqual(logs, []);
+});
+
+for (const chunks of [[new Uint8Array([255])], [new Uint8Array(2048), new Uint8Array(2049)]]) test(`reject streamed body: ${chunks.map(c => c.length)}`, async () => {
+  const raw = new ReadableStream({ start(controller) {
+    for (const chunk of chunks) controller.enqueue(chunk);
+    controller.close();
+  } });
+  const r = await verify({ raw });
+  assert.equal(r.res.status, 400);
+  assert.equal(r.reads, 0);
 });

@@ -92,3 +92,15 @@ for (const size of [1, 32]) test(`CI telemetry put failure: ${size} concurrent v
   assert.equal(writes, size);
   assert.deepEqual(warnings, Array(size).fill('CI usage telemetry write failed'));
 });
+
+for (const ci of [true, false]) test(`legacy endpoint IP limiter only for CI: ${ci}`, async () => {
+  let reads = 0, calls = 0;
+  const res = await worker.fetch(new Request('https://example.com/api/verify', {
+    method: 'POST', body: JSON.stringify({ license_key: key, ...(ci ? { activation: 'ci' } : { device_id: 'runner' }) })
+  }), { CI_IP_RATE_LIMITER: { async limit({ key: identifier }) {
+    calls++; assert.equal(identifier, 'no-ip'); return { success: false };
+  } }, LICENSES: { async get() { reads++; return structuredClone(active); }, async put() {} } });
+  assert.equal(res.status, ci ? 429 : 200);
+  assert.equal(reads, ci ? 0 : 1);
+  assert.equal(calls, ci ? 1 : 0);
+});

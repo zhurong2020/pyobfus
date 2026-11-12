@@ -11,3 +11,19 @@ CI_SIGNING_KEY_ID = "ci-2026-11"
 [[kv_namespaces]]
 binding = "LICENSES"
 id = "61072fc72c35405c850427da381ccdbf"
+
+# CI requests per licence, using hashed keys.
+[[ratelimits]]
+name = "CI_RATE_LIMITER"
+namespace_id = "2101"
+[ratelimits.simple]
+limit = 30
+period = 60
+
+# CI requests per client IP, before licence KV lookup.
+[[ratelimits]]
+name = "CI_IP_RATE_LIMITER"
+namespace_id = "2102"
+[ratelimits.simple]
+limit = 60
+period = 60

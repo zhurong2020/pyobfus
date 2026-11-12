@@ -329,14 +329,18 @@ compare-and-set, so a write can still overwrite concurrent device registration
 or revocation. Strict serialization requires a separate telemetry store or a
 Durable Object covering all license mutations.
 
-An optional `CI_RATE_LIMITER` binding may enforce a deployment limit (suggested policy: 120/hour using the platform's supported limiter);
-its identifier is the SHA-256 hash of the key. Without this binding there is
-no rate limit. Denials return HTTP 429 with `code: "rate_limited"` and no write.
+The declared bindings apply to both CI endpoints: `CI_RATE_LIMITER` allows
+30 requests per 60 seconds per licence, and `CI_IP_RATE_LIMITER` allows 60
+requests per 60 seconds per client IP before KV lookup. Identifiers are SHA-256
+hex digests; absent client IPs share `no-ip`. Missing bindings and limiter errors
+fail open to preserve licensing availability, without logging private data or
+provider exceptions. Denials return HTTP 429 with `code: "rate_limited"` and no
+write; retry later.
 
 ## Signed CI admission (Core 0.14.0+)
 
 The dedicated `/api/ci/lease` endpoint issues request-bound Ed25519 JWS proofs.
-It uses existing license status/expiry checks and the optional CI rate limiter,
+It uses existing license status/expiry checks and the CI rate limiters,
 but never rewrites license/device records. `/api/verify` remains compatible with
 published clients and workstation registration. The runtime entrypoint is
 `src/worker.js`; it exposes only the default handler, while `index.js` retains

@@ -128,5 +128,5 @@ access to the build context, builder and build logs.
 If a key leaks, contact support to revoke/reissue it, replace the CI secret,
 and remove exposed copies and logs. Deleting a log alone does not revoke a key.
 
-CI use is rate-limited per license and does not consume device slots.
-A 429 response means retry later. The CI response omits email and the license key.
+CI verification is rate-limited per license and per client IP and does not consume
+device slots. A 429 response means retry later. The CI response omits email and the license key.
