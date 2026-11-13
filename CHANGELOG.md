@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Signed CI admission reports an upgrade hint when the issuer key is unknown
+  to this client, while continuing to deny the build without exposing key IDs.
+
 ### Security
 
 - Configure Worker CI admission limits per licence and per client IP, checking

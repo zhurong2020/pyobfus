@@ -87,7 +87,9 @@ or enable unsigned fallback to work around this gate. See the
 
 Before rotating the single active signer, distribute the next public key in a
 client release and settle the supported-client upgrade window. Older clients
-cannot automatically trust a new key. A server rollback after client release
+cannot automatically trust a new key. A client that does not trust the server's
+current issuer key reports an upgrade message (`pip install -U pyobfus`) and
+denies the build. A server rollback after client release
 must retain the signed endpoint and a key those clients trust; falling back to
 an unsigned-only server interrupts their CI builds.
 

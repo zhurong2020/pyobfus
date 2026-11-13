@@ -79,7 +79,6 @@ def test_time_boundaries(ci_issuer, monkeypatch, changes):
         {"alg": "none"},
         {"alg": "HS256"},
         {"alg": "EdDSA"},
-        {"kid": "unknown"},
         {"kid": []},
         {"kid": "../key"},
         {"typ": "workstation+jwt"},
@@ -100,7 +99,7 @@ def test_key_rotation_and_no_environment_override(ci_issuer, monkeypatch):
     response = ci_issuer.response(KEY, nonce)
     monkeypatch.setattr(ci_lease, "TRUSTED_PUBLIC_KEYS", {"other-key": ci_issuer.public})
     monkeypatch.setenv("PYOBFUS_CI_PUBLIC_KEY", ci_issuer.public.hex())
-    with pytest.raises(ci_lease.CILeaseError):
+    with pytest.raises(ci_lease.CILeaseUntrustedKeyError):
         ci_lease.verify_response(response, KEY, nonce)
 
 
@@ -306,3 +305,62 @@ def test_ci_failure_denies_without_state_or_trial(monkeypatch, failure):
         gate.require_pro_access()
     assert str(error.value) == expected + " Check PYOBFUS_LICENSE_KEY or use a registered runner."
     assert len(calls) == (0 if failure == "dependency" else 2)
+
+
+@pytest.mark.parametrize(
+    "failure",
+    ["unknown", "malformed", "algorithm", "type", "shape", "signature", "claims", "table"],
+)
+def test_ci_key_diagnostics_direct_and_online(ci_issuer, monkeypatch, failure):
+    header = {"kid": "future-issuer-sensitive-marker"}
+    if failure == "malformed":
+        header["kid"] = "../sensitive-marker"
+    elif failure == "algorithm":
+        header["alg"] = "HS256"
+    elif failure == "type":
+        header["typ"] = "wrong"
+    elif failure == "shape":
+        header["jku"] = "https://invalid.example/key"
+    elif failure in ("signature", "claims", "table"):
+        header = {}
+    if failure == "table":
+        monkeypatch.setattr(ci_lease, "TRUSTED_PUBLIC_KEYS", {"test-issuer": b"short"})
+
+    def make_response(nonce):
+        claims = ci_issuer.claims(KEY, nonce)
+        if failure == "claims":
+            claims["iss"] = "wrong"
+        response = ci_issuer.response(KEY, nonce, header=header, payload=claims)
+        if failure == "signature":
+            prefix, signature = response["lease"].rsplit(".", 1)
+            first = "A" if signature[0] != "A" else "B"
+            response["lease"] = prefix + "." + first + signature[1:]
+        return response
+
+    expected = (
+        "CI signed authorization uses an issuer key this pyobfus version does not "
+        "trust; upgrade pyobfus (pip install -U pyobfus) and retry."
+        if failure == "unknown"
+        else "CI signed authorization is invalid or expired."
+    )
+    nonce = secrets.token_urlsafe(32)
+    response = make_response(nonce)
+    with pytest.raises(ci_lease.CILeaseError) as error:
+        ci_lease.verify_response(response, KEY, nonce)
+    assert type(error.value) is (
+        ci_lease.CILeaseUntrustedKeyError if failure == "unknown" else ci_lease.CILeaseError
+    )
+    assert str(error.value) == expected
+    assert header.get("kid", "test-issuer") not in str(error.value)
+    assert response["lease"] not in str(error.value)
+
+    def online_response(req, **kwargs):
+        body = json.loads(req.data)
+        return io.BytesIO(json.dumps(make_response(body["nonce"])).encode())
+
+    monkeypatch.setattr(licensing.urllib.request, "urlopen", online_response)
+    with pytest.raises(licensing.LicenseVerificationError) as error:
+        licensing.verify_ci_license(KEY)
+    assert str(error.value) == expected
+    assert header.get("kid", "test-issuer") not in str(error.value)
+    assert KEY not in str(error.value)

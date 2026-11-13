@@ -48,6 +48,17 @@ class CILeaseError(ValueError):
         super().__init__("CI signed authorization is invalid or expired.")
 
 
+class CILeaseUntrustedKeyError(CILeaseError):
+    """Fixed upgrade diagnostic; admission remains denied."""
+
+    def __init__(self) -> None:
+        ValueError.__init__(
+            self,
+            "CI signed authorization uses an issuer key this pyobfus version does not "
+            "trust; upgrade pyobfus (pip install -U pyobfus) and retry.",
+        )
+
+
 def _reject_constant(value: str) -> Any:
     raise CILeaseError()
 
@@ -116,6 +127,9 @@ def verify_response(response: Dict[str, Any], license_key: str, nonce: str) -> N
         kid = header["kid"]
         if not isinstance(kid, str) or not _KID.fullmatch(kid):
             raise CILeaseError()
+        if kid not in TRUSTED_PUBLIC_KEYS:
+            # The unverified kid is attacker-controlled; this hint still denies admission.
+            raise CILeaseUntrustedKeyError()
         raw_key = TRUSTED_PUBLIC_KEYS.get(kid)
         if not isinstance(raw_key, bytes) or len(raw_key) != 32:
             raise CILeaseError()
@@ -159,5 +173,7 @@ def verify_response(response: Dict[str, Any], license_key: str, nonce: str) -> N
             or expires <= now - CLOCK_SKEW_SECONDS
         ):
             raise CILeaseError()
+    except CILeaseUntrustedKeyError:
+        raise
     except Exception:
         raise CILeaseError() from None
