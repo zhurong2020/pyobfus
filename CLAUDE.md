@@ -8,7 +8,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ## ⚡ Current pending work (cold-start 必读)
 
-**2026-11-13 会话收尾**：见 [收尾](docs/SESSION_CLOSEOUT_2026-11-13.md)。Glama 渠道 0.14.0（维护者手工发布，test 页已核）；#230 未信任签发 key 提示升级、#231 预分发备用 key `ci-2026-11b`（私钥已入 Vaultwarden，不配 Worker）均已合并，随下次 Core 发版带出；正常换 key 窗口 180 天 + 提前 60 天通知。无发版、无部署。下次 11-16 周检。
+**2026-11-13 会话收尾**：见 [收尾](docs/SESSION_CLOSEOUT_2026-11-13.md)。Glama 渠道 0.14.0（维护者手工发布，test 页已核）；#230 未信任签发 key 提示升级、#231 预分发备用 key `ci-2026-11b`（私钥已入 Vaultwarden，不配 Worker）均已合并，随下次 Core 发版带出；正常换 key 窗口 180 天 + 提前 60 天通知；#233 把 Pro 客户通知列入 TODO 2a（下次发版后通知，现在不群发）。无发版、无部署。下次 11-16 周检。
 
 **2026-11-12 #221 审阅完成、Worker 限流上线**：独立审阅仅一项低危（CI 未实际限流），#227 修复并部署 Worker `209eb969`（回滚 `13aaa4a8`），线上验证通过；#226 修正文档站 canonical。见 [当前计划](docs/CURRENT_PLAN_ZH.md)。
 

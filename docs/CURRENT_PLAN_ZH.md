@@ -1,6 +1,6 @@
 # pyobfus 当前计划
 
-**2026-11-13 会话收尾**：#229／#230／#231 已合并（`be06f30`／`dc47f26`／`d3ff339`），无发版、无部署；入口见[收尾](SESSION_CLOSEOUT_2026-11-13.md)。下次 11-16 周检。
+**2026-11-13 会话收尾**：#229／#230／#231／#233 已合并（`be06f30`／`dc47f26`／`d3ff339`／`aa57efa`；#233 为 Pro 客户通知待办，现在不群发，下次 Core 发版后发），无发版、无部署；入口见[收尾](SESSION_CLOSEOUT_2026-11-13.md)。下次 11-16 周检。
 
 **2026-11-13 Glama 渠道核对**：维护者 11-13 03:56（北京时间）在后台手工点「Build & Release」，test `01a1d155-5ae8-767a-816e-dc0d2966670a` success／15.5 s，渠道 release **0.14.0**（03:57 发布，release 说明即 GitHub v0.14.0 Release 正文）。维护者提供的 test 页面：Build Spec 与 0.13.1 相同（`pyobfus-mcp==0.3.17 pyobfus==0.14.0`，`pinnedCommit: null`，实际 checkout 当时 head `c448878`），uv 装于 /usr 的 Python 3.13.5，安装 Core 0.14.0／MCP 0.3.17／runtime 0.1.1／MCP SDK 2.3.0／PyJWT 2.15.1，握手 serverInfo 0.3.17、协议 2025-11-25，`tools/list` 九个工具（七 community + 两 pro_funnel）。后台 Releases 页显示已开启 Auto-Release（每个 GitHub Release 自动构建发布）；Dockerfile 配置页的 Pinned commit 显示同步 head `c448878`。本机访问 glama.ai 被 TLS 拒绝，核对依赖维护者转述页面。渠道最新为 0.14.0，安装内容与 0.13.1 相同。 同日 F2 轮换方案出私有草案（备用 key 预分发、90 天升级窗口、紧急泄漏与回滚），待维护者拍板；#230（无头 Codex 实现、Claude 审阅）让客户端遇到未信任签发 key 时提示升级，本地 Core 5090 passed／55 skipped、integration 368／10 skipped、check.sh 通过，托管 47 success／2 skipped，经维护者指示合并为 `dc47f26`（#229 为 `be06f30`），未发版。维护者随后定：现在生成备用签发 key `ci-2026-11b`（不配 Worker，公钥随下次自然 Core 发版预分发），正常轮换窗口为新 key 随版本发布满 180 天且提前 60 天通知 Pro 客户（换 key 会影响在 CI 锁定 ≥0.14.0 旧版本的现有客户）；本地配对与端到端签名验证通过，私钥已入 Vaultwarden 并与本地缓存逐字节校验一致；公钥见 #231。
 
