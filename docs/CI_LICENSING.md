@@ -86,8 +86,14 @@ or enable unsigned fallback to work around this gate. See the
 [Worker operations guide](https://github.com/zhurong2020/pyobfus/blob/main/cloudflare-worker/README.md).
 
 Before rotating the single active signer, distribute the next public key in a
-client release and settle the supported-client upgrade window. Older clients
-cannot automatically trust a new key. A client that does not trust the server's
+client release and settle the supported-client upgrade window. Older clients cannot automatically
+trust a new key. Releases after
+0.14.0 also trust a standby issuer key (`ci-2026-11b`) that is not configured on
+the server, so a later signer switch does not lock out those clients. A planned
+(non-emergency) switch happens no earlier than 180 days after the first release
+that trusts the new key, with at least 60 days' notice to Pro customers; that
+release becomes the minimum version for signed CI admission. A suspected key
+compromise is handled immediately and may require an upgrade sooner. A client that does not trust the server's
 current issuer key reports an upgrade message (`pip install -U pyobfus`) and
 denies the build. A server rollback after client release
 must retain the signed endpoint and a key those clients trust; falling back to

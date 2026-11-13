@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Signed CI admission also trusts a standby issuer public key (`ci-2026-11b`),
+  not yet used by the license server, so a future signer switch does not lock
+  out clients from this release onward.
+
 ### Fixed
 
 - Signed CI admission reports an upgrade hint when the issuer key is unknown
