@@ -10,7 +10,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 **2026-11-12 #221 审阅完成、Worker 限流上线**：独立审阅仅一项低危（CI 未实际限流），#227 修复并部署 Worker `209eb969`（回滚 `13aaa4a8`），线上验证通过；#226 修正文档站 canonical。见 [当前计划](docs/CURRENT_PLAN_ZH.md)。
 
-**2026-11-12 发布收尾完成**：CITATION 已同步 Zenodo `24140234`（#224）；Glama 渠道 0.13.1 装 Core 0.14.0（test `01a1cd2b`）；签发私钥已在 Vaultwarden 并复核。GSC 重定向错误示例为无斜杠 `/zh-cn`，单次 301 到 `/zh-cn/`（200），无需改代码。剩 #221 独立外部审阅、11-16 周检。见 [当前计划](docs/CURRENT_PLAN_ZH.md)。
+**2026-11-12 发布收尾完成**：CITATION 已同步 Zenodo `24140234`（#224）；Glama 渠道 0.13.1 装 Core 0.14.0（test `01a1cd2b`；同日 20:00 UTC 又发布渠道 0.14.0，11-13 据邮件核对）；签发私钥已在 Vaultwarden 并复核。GSC 重定向错误示例为无斜杠 `/zh-cn`，单次 301 到 `/zh-cn/`（200），无需改代码。剩 #221 独立外部审阅、11-16 周检。见 [当前计划](docs/CURRENT_PLAN_ZH.md)。
 
 **2026-11-11 夜 Core 0.14.0 已发布**（签名 CI 构建准入）：核验见 [发布记录](docs/CORE_0_14_0_RELEASE_2026-11-11.md)。#221 squash 为 `96e6340`、tag `v0.14.0`，PyPI 0.14.0 带 attestation，全新安装与线上签名准入通过。待：Zenodo 归档后同步 CITATION、Glama Build steps（手工）、#221 独立外部审阅（发版后补）。
 
@@ -90,7 +90,7 @@ arong.eu.org 与老博客已交 findata。
 - **技术栈**: Python 3.9-3.15, AST, setuptools
 - **PyPI 主包**: https://pypi.org/project/pyobfus/ (**latest v0.14.0，2026-11-11 发布**；完整版本历史见 `CHANGELOG.md`）
 - **Smithery**: 已下线——Smithery 并入 Arcade 后技能目录取消，2026-11-07 核实原技能页 404；`smithery.yaml` 已删除。**mcp.so**: 已收录
-- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus — 2026-11-12 渠道 release **0.13.1**（Glama 自动递增标签）对应 test `01a1cd2b-9b11-7d91-a42a-325647cedf0f`，Build steps 为 `pyobfus-mcp==0.3.17 pyobfus==0.14.0`；发 Core 或 MCP 后须手工改：Admin → Dockerfile → Build steps，点「Build & Release」（另一按钮「Build」只测试不发布）。checkout 与 Python 实装边界见 `docs/CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md`。
+- **Glama Listing**: https://glama.ai/mcp/servers/zhurong2020/pyobfus — 渠道 release **0.14.0**（11-12 20:00 UTC，Glama 自动递增标签，test `01a1d155-5ae8-767a-816e-dc0d2966670a`；此前 0.13.1／test `01a1cd2b`），Build steps 为 `pyobfus-mcp==0.3.17 pyobfus==0.14.0`；发 Core 或 MCP 后须手工改：Admin → Dockerfile → Build steps，点「Build & Release」（另一按钮「Build」只测试不发布）。checkout 与 Python 实装边界见 `docs/CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md`。
 
 - **GitHub Action**: https://github.com/zhurong2020/pyobfus-action (**v1.1.0**，2026-11-04 发布，移动 `v1` 同指 `3237e16`，Marketplace 最新版本已核：<https://github.com/marketplace/actions/pyobfus-scan-and-build>)。独立仓库**是硬性要求**——Marketplace 要求 `action.yml` 在仓库根目录且一仓一 action；另外 action 的移动 `v1` tag 会与 Core 的 `v*` 命名空间冲突并重新触发 `release.yml`。⚠️ 两个只会在上架页面才暴露的限制：**listing 名不能与已有 GitHub 用户重名**（`github.com/pyobfus` 是第三方账号，故名为 `pyobfus scan and build`；GitHub **不因不活跃释放用户名**，只受理商标投诉，此事已定论），以及 **description 上限 125 字符**（首版 151 被拒 → v1.0.1）。两条现均由该仓库 CI 断言拦截。**归因查询**（本 action 存在的理由，周期性复盘时与下载量一起看）：<https://github.com/search?q=%22zhurong2020%2Fpyobfus-action%22+path%3A.github%2Fworkflows&type=code>
 - **GitHub**: https://github.com/zhurong2020/pyobfus (public)
