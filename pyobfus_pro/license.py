@@ -154,6 +154,8 @@ def verify_ci_license(license_key: str) -> Dict[str, Any]:
         ) from None
     except LicenseError:
         raise
+    except ci_lease.CILeaseUntrustedKeyError as exc:
+        raise LicenseVerificationError(str(exc)) from None
     except ci_lease.CILeaseError:
         raise LicenseVerificationError("CI signed authorization is invalid or expired.") from None
     except Exception:
