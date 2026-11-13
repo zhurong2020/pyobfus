@@ -34,6 +34,13 @@ TRUSTED_PUBLIC_KEYS: Dict[str, bytes] = {
         b"\x4b\x7d\x8a\x29\x41\x63\xa1\xbb\xd0\x2d\x79\x08\x22\xeb\xb0\xe9"
         b"\x8c\x52\x42\xa9\xdd\x3d\x18\xf5\x31\x71\x65\xf8\x11\xc2\x7b\x25"
     ),
+    # Standby issuer key generated 2026-11-13; not configured on the Worker. Shipped in
+    # advance so a later signer switch does not lock out clients that include it.
+    # JWK x = EbCWYNYRI3lPiHlflUk5mvPOjR4FbH7j6ZC96NGSTbE
+    "ci-2026-11b": (
+        b"\x11\xb0\x96\x60\xd6\x11\x23\x79\x4f\x88\x79\x5f\x95\x49\x39\x9a"
+        b"\xf3\xce\x8d\x1e\x05\x6c\x7e\xe3\xe9\x90\xbd\xe8\xd1\x92\x4d\xb1"
+    ),
 }
 
 _SEGMENT = re.compile(r"[A-Za-z0-9_-]+\Z", re.ASCII)

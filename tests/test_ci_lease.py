@@ -364,3 +364,15 @@ def test_ci_key_diagnostics_direct_and_online(ci_issuer, monkeypatch, failure):
     assert str(error.value) == expected
     assert header.get("kid", "test-issuer") not in str(error.value)
     assert KEY not in str(error.value)
+
+
+def test_production_trust_table_entries_are_distinct_ed25519_keys():
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
+
+    ring = ci_lease.TRUSTED_PUBLIC_KEYS
+    assert {"ci-2026-11", "ci-2026-11b"} <= set(ring)
+    assert len(set(ring.values())) == len(ring)
+    for kid, raw in ring.items():
+        assert ci_lease._KID.fullmatch(kid)
+        assert isinstance(raw, bytes) and len(raw) == 32
+        Ed25519PublicKey.from_public_bytes(raw)
