@@ -222,10 +222,13 @@ class TestDeliveryReferenceExample:
         protected_data.mkdir(exist_ok=True)
         shutil.copy2(source / "storefront" / "data" / "label.txt", protected_data)
 
+        # Running the delivered app must not add runtime __pycache__ files to the
+        # delivery being checked below (a real delivery would not ship them).
+        no_bytecode_env = {**UTF8_ENV, "PYTHONDONTWRITEBYTECODE": "1"}
         protected = subprocess.run(
             [sys.executable, "-X", "utf8", "main.py", "pro"],
             cwd=output,
-            env=UTF8_ENV,
+            env=no_bytecode_env,
             capture_output=True,
             text=True,
             encoding="utf-8",
@@ -237,7 +240,7 @@ class TestDeliveryReferenceExample:
         protected_failure = subprocess.run(
             [sys.executable, "-X", "utf8", "main.py", "bogus_tier"],
             cwd=output,
-            env=UTF8_ENV,
+            env=no_bytecode_env,
             capture_output=True,
             text=True,
             encoding="utf-8",
