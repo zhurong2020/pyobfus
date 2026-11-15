@@ -501,3 +501,99 @@ def test_cli_malformed_pyinstaller_is_error(tmp_path):
     result = CliRunner().invoke(main, ["--check-delivery", str(binary), "--json"])
     assert result.exit_code == 2
     assert json.loads(result.output)["status"] == "error"
+
+
+def test_canonical_marshal_reference_indices_and_flags():
+    # The outer tuple reserves index 0 before its leaf reserves index 1.
+    inline = b")\x02z\x03abcz\x03abc"
+    referenced = b"\xa9\x02\xfa\x03abcr\x01\x00\x00\x00"
+    assert dc._canonical_marshal(referenced) == inline
+    assert dc._canonical_marshal(inline) == inline
+    assert dc._canonical_marshal(b"\xe9\x01\x00\x00\x00") == b"i\x01\x00\x00\x00"
+
+
+def test_canonical_marshal_compiled_code():
+    import marshal
+
+    code = compile("def f(x):\n return (x, 'same', 'same')\n", "module.py", "exec")
+    # Add a reserved root slot to an otherwise reference-free code stream.
+    plain = marshal.dumps(code, 2)
+    flagged = bytes([plain[0] | 0x80]) + plain[1:]
+    assert dc._canonical_marshal(plain) == dc._canonical_marshal(flagged)
+    assert dc._canonical_marshal(marshal.dumps(code)) is not None
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        b"",
+        b"s\x04\x00\x00\x00abc",
+        b"r\x00\x00\x00\x00",
+        b"r\xff\xff\xff\xff",
+        b"?",
+        b"NN",
+        b")\x01" * 202 + b"N",
+        b"\xa9\x01r\x00\x00\x00\x00",
+        b"(\xff\xff\xff\x7f",
+        b")\x010",
+        b":NNN" if __import__("sys").version_info < (3, 14) else b":NN",
+    ],
+)
+def test_canonical_marshal_rejects_invalid(data):
+    assert dc._canonical_marshal(data) is None
+
+
+def test_canonical_marshal_expansion_cap():
+    leaf = b"\xf3" + struct.pack("<i", 1024) + b"a" * 1024
+    stream = b")\xff" + leaf + (b"r" + struct.pack("<i", 0)) * 254
+    assert dc._canonical_marshal(stream) is None
+
+
+def test_runtime_bytecode_matches_adjacent_source(tmp_path):
+    import os
+    import subprocess
+    import sys
+
+    package = tmp_path / "tiny"
+    package.mkdir()
+    (package / "__init__.py").write_text("", encoding="utf-8")
+    (package / "module.py").write_text(SOURCE, encoding="utf-8")
+    env = os.environ.copy()
+    env.pop("PYTHONDONTWRITEBYTECODE", None)
+    env.pop("PYTHONPYCACHEPREFIX", None)
+    subprocess.run(
+        [sys.executable, "-E", "-c", "import tiny.module"],
+        cwd=tmp_path,
+        env=env,
+        check=True,
+    )
+    assert list(package.glob("__pycache__/*.pyc"))
+    result = dc.check_delivery(package)
+    assert dc.BYTECODE_ORIGIN_UNKNOWN not in _codes(result)
+    assert result["status"] == "ok"
+    samples = result["inspection"]["bytecode"]["sample"]
+    assert samples
+    assert all(item["reason"] == "source_not_in_build_report" for item in samples)
+    assert result["inspection"]["bytecode"]["matched_adjacent_source"] == len(samples)
+
+
+def test_bytecode_canonical_comparison_preserves_filename(tmp_path):
+    source = tmp_path / "module.py"
+    source.write_text(SOURCE, encoding="utf-8")
+    py_compile.compile(str(source), dfile="unrelated/build/module.py", doraise=True)
+    result = dc.check_delivery(tmp_path)
+    assert dc.BYTECODE_ORIGIN_UNKNOWN in _codes(result)
+    assert result["inspection"]["bytecode"]["sample"][0]["reason"] == (
+        "bytecode_body_differs_or_build_path_unknown"
+    )
+
+
+def test_canonical_marshal_slice():
+    import marshal
+    import sys
+
+    if sys.version_info < (3, 14):
+        pytest.skip("marshal slices require Python 3.14")
+    assert dc._canonical_marshal(marshal.dumps(slice(1, 5, 2))) == (
+        b":i\x01\x00\x00\x00i\x05\x00\x00\x00i\x02\x00\x00\x00"
+    )

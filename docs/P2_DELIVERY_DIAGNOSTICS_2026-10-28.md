@@ -84,3 +84,34 @@ Sources for the safety boundary:
 [Python `marshal` documentation](https://docs.python.org/3/library/marshal.html),
 [Python `py_compile` documentation](https://docs.python.org/3/library/py_compile.html),
 and [PyInstaller archive viewer](https://pyinstaller.org/en/latest/advanced-topics.html).
+
+
+## Bytecode comparison canonicalisation
+
+The exact-byte comparison has a bounded pure-bytes fallback (2026-11-15).
+Marshal reference flags and indices can vary with process state. Both the fresh
+compilation and delivered body are parsed into bytes with FLAG_REF cleared and
+TYPE_REF expanded. Delivered bytes are never unmarshalled, imported or executed.
+The current interpreter's magic and the same candidate filename and optimization
+level are still required. JSON fields and match reasons remain unchanged.
+
+The implementation was checked against CPython `Python/marshal.c` tags v3.9.0,
+v3.10.0, v3.11.0, v3.12.0, v3.13.0, v3.14.0 and v3.15.0
+([CPython source](https://github.com/python/cpython/blob/v3.15.0/Python/marshal.c)).
+Leaf `r_ref` inserts after reading its payload; containers insert or reserve
+before reading children (`r_ref_reserve` / `r_ref_insert` for code, frozen
+containers and slices). The parser uses that same index order, publishing spans
+only after completion; recursive references fail closed. Singleton tags do not
+add reference slots, even when flagged, matching the reader.
+
+Code layouts use six raw integers and eight object fields before firstlineno
+on 3.9/3.10, five integers and eight objects on 3.11–3.15, then one or two
+line/exception table objects respectively. Slice is supported on 3.14+, and
+frozendict on 3.15+. Other supported marshal scalar/container encodings retain
+their bytes; this is not general Python object equality.
+
+Unknown tags, incomplete or trailing data, invalid/unresolved references, depth
+over 200, counts or work above min(input bytes, 1,000,000), input above 16 MiB,
+or output above min(8 × input bytes, 16 MiB) fail closed to unknown origin.
+References store spans in a single bounded output buffer rather than copied
+trees. Existing source-size and comparison-count limits remain in force.
