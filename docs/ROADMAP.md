@@ -1,9 +1,20 @@
 # Development Roadmap
 
+> **Current decision snapshot (2026-11-15):** this long-form file preserves
+> historical rationale; it is not a live release/status ledger. The current
+> product sequence is the dated
+> [competitive and roadmap review](COMPETITIVE_ROADMAP_RESEARCH_2026-11-15.md):
+> public delivery reference application → one Windows Nuitka standalone
+> validation → one frozen-format `--check-delivery` increment → resource/L3
+> expansion only after real demand. Execution order and gates live in
+> [TODO](TODO.md), and operational truth lives in
+> [CURRENT_PLAN_ZH](CURRENT_PLAN_ZH.md). Current published versions are Core
+> 0.14.0, MCP 0.3.17, runtime 0.1.1, extension 0.4.3 and Action v1.1.0.
+
 > Design review (2026-10-30): [scope, official sources and acceptance](ROADMAP_REVIEW_2026-10-30.md).
-> Current execution: [post-0.11.0 progress](POST_011_PROGRESS_2026-10-29.md).
-> P0 compatibility and bounded P2 diagnostics shipped in Core 0.11.0.
-> Earlier pending-release statements are historical; further coverage is conditional.
+> The post-0.11.0 progress link and P0/P2 statements below are historical
+> evidence, not current backlog. Earlier pending-release statements are
+> historical; further coverage remains conditional.
 
 > The sections dated before 2026-10-28 are historical roadmap context. The
 > functional expansion supplement below is a current proposal. Operational
