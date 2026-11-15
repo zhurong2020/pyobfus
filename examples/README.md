@@ -90,6 +90,16 @@ or an AI assistant can locate the bug without the de-obfuscation map ever being
 shipped to the recipient. See [`ai_debugging/README.md`](ai_debugging/README.md)
 for the full reproduce-it walkthrough.
 
+### 5. Verifiable delivery reference (`delivery_reference/`)
+
+**Purpose**: Demonstrates one auditable multi-module delivery path with a
+resource, a fixed-allowlist dynamic plugin, a stable reverse-mappable error,
+and an application-owned key input for the optional Pro lane.
+
+Start with [`delivery_reference/README.md`](delivery_reference/README.md).
+The example's Community baseline is stdlib-only; freezer and Pro acceptance
+remain explicit, isolated steps rather than ordinary example prerequisites.
+
 ## General Usage Pattern
 
 1. **Choose your example**: Start with `simple.py` for basic understanding

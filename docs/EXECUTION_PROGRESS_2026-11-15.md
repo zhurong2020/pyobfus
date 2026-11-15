@@ -75,6 +75,23 @@
 - 完整 `scripts/check.sh` 通过：black、ruff、mypy、JSON、Agent guide twins、README
   链接与 `mkdocs --strict` 均通过。
 
+## 后续顺序推进（同日）
+
+1. **GSC 公开侧诊断完成**：11-15 以 Googlebot UA 复核首页与 `/zh-cn/` 为 200，
+   `/zh-cn` 仅一次 301 到带斜杠地址；`/sitemap.xml` 返回 200、`application/xml`，
+   只列两个正确 canonical URL；根 `robots.txt` 也列出项目 sitemap。项目侧未发现循环、
+   多跳、阻止抓取或错误 URL，不为迎合历史 GSC 状态修改正确配置。后续只观察 Google
+   重新处理，并以 `/zh-cn/` 的实时检查为准。
+2. **公开交付参考应用验收合同完成**：范围、Community／Pro 边界、目录隔离、正常／
+   负例、证据、停止条件和实施顺序见
+   [参考应用验收合同](DELIVERY_REFERENCE_APP_ACCEPTANCE_2026-11-15.md)。应用实现与 Windows
+   Nuitka 实跑尚未开始，不预填通过。
+3. **公开参考应用第一阶段完成**：新增 `examples/delivery_reference/`，包含自包含多模块
+   storefront、包资源、固定 allowlist 动态插件、稳定业务异常、Community 配置和不含
+   key 的应用 key-provider 示例；`integration_tests/test_examples.py` 新增原文与 Community
+   保护目录契约测试。定向测试 5 项通过，完整 `scripts/check.sh` 通过。Pro L3、冻结交付
+   与 Windows Nuitka 仍未执行。
+
 ## 冷启动规则
 
 新会话先读本文，再读 [当前计划](CURRENT_PLAN_ZH.md)、[TODO](TODO.md)、

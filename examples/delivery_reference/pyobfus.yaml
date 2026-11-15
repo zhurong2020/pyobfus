@@ -1,0 +1,8 @@
+obfuscation:
+  level: community
+  exclude_patterns:
+    - "__init__.py"
+  exclude_names:
+    - "render"
+  remove_docstrings: true
+  remove_comments: true

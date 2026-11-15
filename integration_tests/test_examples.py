@@ -14,6 +14,8 @@ external toolchains and stay advisory-only):
   restores the originals from the saved mapping.
 - `import_hook/` — the stdlib loader loads the obfuscated module, and the
   original identifiers never reach the loaded source.
+- `delivery_reference/` — the original and Community-protected directories
+  preserve resource, dynamic-plugin, normal, and stable failure behavior.
 
 `examples/simple.py` and `examples/multifile/` are executed by
 `test_cli_end_to_end.py` in this same pytest root.
@@ -166,3 +168,63 @@ class TestImportHookExample:
             assert (
                 original_name not in obfuscated_source
             ), f"{original_name!r} survived obfuscation and reached the import hook"
+
+
+class TestDeliveryReferenceExample:
+    def test_community_directory_preserves_delivery_contract(self, tmp_path):
+        source = EXAMPLES / "delivery_reference"
+
+        baseline = subprocess.run(
+            [sys.executable, "-X", "utf8", "main.py", "pro"],
+            cwd=source,
+            env=UTF8_ENV,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+        assert baseline.returncode == 0, baseline.stderr
+        assert baseline.stdout == "pricing-v1\npro: 65.88\n"
+
+        failed = subprocess.run(
+            [sys.executable, "-X", "utf8", "main.py", "bogus_tier"],
+            cwd=source,
+            env=UTF8_ENV,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+        assert failed.returncode != 0
+        assert "ValueError: Unknown pricing tier: bogus_tier" in failed.stderr
+
+        output = tmp_path / "protected"
+        mapping = tmp_path / "private" / "mapping.json"
+        report = tmp_path / "private" / "build.json"
+        mapping.parent.mkdir()
+        result = run_cli(
+            str(source),
+            "-o",
+            str(output),
+            "--config",
+            str(source / "pyobfus.yaml"),
+            "--save-mapping",
+            str(mapping),
+            "--build-report",
+            str(report),
+            "--verify-syntax",
+            "--jobs",
+            "1",
+        )
+        assert result.returncode == 0, result.stderr
+        shutil.copytree(source / "storefront" / "data", output / "storefront" / "data")
+
+        protected = subprocess.run(
+            [sys.executable, "-X", "utf8", "main.py", "pro"],
+            cwd=output,
+            env=UTF8_ENV,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+        assert protected.returncode == 0, protected.stderr
+        assert protected.stdout == baseline.stdout
+        assert mapping.exists() and report.exists()
