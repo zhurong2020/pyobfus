@@ -91,6 +91,13 @@
    key 的应用 key-provider 示例；`integration_tests/test_examples.py` 新增原文与 Community
    保护目录契约测试。定向测试 5 项通过，完整 `scripts/check.sh` 通过。Pro L3、冻结交付
    与 Windows Nuitka 仍未执行。
+4. **Community 证据补全**：参考应用测试现同时验证保护后异常、私有 mapping 的 JSON
+   unmap 结果及带 build report／provenance 的 `--check-delivery`。一次测试设计偏差曾把
+   原始 `data/__init__.py` 复制进保护树，交付检查正确报告 medium；改为只复制文档约定的
+   `label.txt` 后状态为 ok。该过程证明检查没有把未记录 Python 文件误报为 clean。
+5. **Windows Nuitka 环境门槛 blocked**：本机原生 Windows 仅有 CPython 3.11，未发现
+   CPython 3.12、Nuitka、`cl.exe` 或 Visual Studio 2022 工具链。没有自动安装、没有改用
+   3.11 冒充目标组合；Windows x64／CPython 3.12／Nuitka standalone 继续保持未执行。
 
 ## 冷启动规则
 

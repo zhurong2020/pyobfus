@@ -199,6 +199,7 @@ class TestDeliveryReferenceExample:
         output = tmp_path / "protected"
         mapping = tmp_path / "private" / "mapping.json"
         report = tmp_path / "private" / "build.json"
+        provenance = tmp_path / "private" / "provenance.json"
         mapping.parent.mkdir()
         result = run_cli(
             str(source),
@@ -210,12 +211,16 @@ class TestDeliveryReferenceExample:
             str(mapping),
             "--build-report",
             str(report),
+            "--provenance-manifest",
+            str(provenance),
             "--verify-syntax",
             "--jobs",
             "1",
         )
         assert result.returncode == 0, result.stderr
-        shutil.copytree(source / "storefront" / "data", output / "storefront" / "data")
+        protected_data = output / "storefront" / "data"
+        protected_data.mkdir(exist_ok=True)
+        shutil.copy2(source / "storefront" / "data" / "label.txt", protected_data)
 
         protected = subprocess.run(
             [sys.executable, "-X", "utf8", "main.py", "pro"],
@@ -227,4 +232,32 @@ class TestDeliveryReferenceExample:
         )
         assert protected.returncode == 0, protected.stderr
         assert protected.stdout == baseline.stdout
-        assert mapping.exists() and report.exists()
+        assert mapping.exists() and report.exists() and provenance.exists()
+
+        protected_failure = subprocess.run(
+            [sys.executable, "-X", "utf8", "main.py", "bogus_tier"],
+            cwd=output,
+            env=UTF8_ENV,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+        assert protected_failure.returncode != 0
+        assert "ValueError: Unknown pricing tier: bogus_tier" in protected_failure.stderr
+        trace = tmp_path / "private" / "trace.txt"
+        trace.write_text(protected_failure.stderr, encoding="utf-8")
+        unmapped = run_cli("--unmap", "--trace", str(trace), "--mapping", str(mapping), "--json")
+        assert unmapped.returncode == 0, unmapped.stderr
+        assert "quote_order" in unmapped.stdout
+
+        checked = run_cli(
+            "--check-delivery",
+            str(output),
+            "--build-report",
+            str(report),
+            "--provenance-manifest",
+            str(provenance),
+            "--json",
+        )
+        assert checked.returncode == 0, checked.stderr
+        assert '"status": "ok"' in checked.stdout

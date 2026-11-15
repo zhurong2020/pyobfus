@@ -99,10 +99,20 @@ fixture 提交。任何关键项为 unknown 时，总结最多为 partial。
    key-provider 接口和 README。~~ 2026-11-15 完成于 `examples/delivery_reference/`。
 2. ~~增加轻量测试，验证原文正常／负例和 Community 保护目录行为；不在普通 CI 安装
    Nuitka。~~ 2026-11-15 定向测试 5 项及 `scripts/check.sh` 通过。
-3. 用仓库 `venv/` 继续验证 mapping/unmap 与 `--check-delivery` 的完整证据记录。
+3. ~~用仓库 `venv/` 验证 mapping/unmap 与 `--check-delivery` 的完整证据记录。~~
+   2026-11-15 完成；测试明确携带 build report 与 provenance，未记录 Python 文件会产生
+   medium 而非 clean。
 4. 在明确许可的隔离状态验证 Pro lane；不能满足时保留 blocked。
 5. 以该示例执行单一 Windows Nuitka standalone 方案，先产出结果和 cookbook；只有发现
    可复用的产品缺口才提出代码改动。
 
 完成本合同本身不等于批准第 1–5 步的发布或外部上传。实现提交仍须经过
 `scripts/check.sh` 和相关测试；任何发布、Worker 部署或客户通知另设 gate。
+
+## 2026-11-15 Windows 执行门槛结果
+
+只读环境盘点发现原生 Windows 只有 CPython 3.11，未发现目标 CPython 3.12、Nuitka、
+`cl.exe` 或 Visual Studio 2022。依照停止条件，本次记为 **blocked（工具链缺失）**：未
+自动安装、未换版本、未把 WSL 或 3.11 结果填作 Windows 3.12 standalone 通过。解除阻塞
+需要维护者另行同意安装固定 Python 3.12、Nuitka 与 MSVC，或批准一个边界明确的单格
+hosted Windows 验收。

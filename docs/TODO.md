@@ -78,7 +78,7 @@ Action v1.1.0 / `v1` 与 Glama 渠道 0.11.3 已完成；DEV 一周复盘已记�
 已完成的 P0、纯文档 CI、Core/MCP 发版、Glama 更新与首日 DEV 观察不再排入队列。
 
 1. **收口 11-16 周检增量**：11-15 已完成下载、备份、CI、收件箱和 GSC 提前检查。公开侧复核确认 `/zh-cn` 只是正常单跳 301，首页、`/zh-cn/`、sitemap 与 robots 均可抓取；不改正确配置，等待 GSC 重处理。Bing 必须先选中 pyobfus 属性再核 IndexNow，不能把默认其它站点的指标或 `null` 解释为 pyobfus 的零。
-2. **实现公开交付参考应用并执行单组合验收**：最小范围与接受标准已冻结在[验收合同](DELIVERY_REFERENCE_APP_ACCEPTANCE_2026-11-15.md)。下一步先建立自包含公开示例和轻量基线测试，再验证 Community 目录保护；随后按[单组合方案](NEXT_DELIVERY_VALIDATION_PLAN.md)执行 Windows Nuitka standalone，不扩矩阵。
+2. **解除 Windows 单组合验收环境阻塞**：公开参考应用、Community 目录保护、unmap 与交付检查证据已完成，见[验收合同](DELIVERY_REFERENCE_APP_ACCEPTANCE_2026-11-15.md)。原生 Windows 只有 Python 3.11，且缺 Nuitka／MSVC；下一步需单独批准安装固定 Python 3.12、Nuitka 与 Visual Studio 2022 工具链，或批准边界明确的单格 hosted Windows 验收。解除前不改用 3.11、不扩矩阵。
 3. **冻结格式的交付检查候选**：仅在第 2 项形成可复现样本后，选择一个冻结格式设计保守的 `--check-delivery` 检测；不宣称解析所有嵌入 payload。
 4. **签发 key 的下一次自然发版接续**：#230 升级提示与 #231 备用公钥已合并但未发布；下次自然 Core 发版时预分发，`ci-2026-11b` 不配 Worker。正常轮换维持“信任版本发布满 180 天 + 至少提前 60 天通知”。工作站／离线迁移仍延后，Pro／runtime 专利许可条款继续等待专业审阅。
 4a. **Pro 客户通知（与签发 key 相关，草稿由 Claude 起草、维护者审后发送）**：
