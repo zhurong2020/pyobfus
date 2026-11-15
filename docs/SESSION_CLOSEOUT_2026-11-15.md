@@ -13,7 +13,7 @@
 
 ## 待办（下次会话从这里开始）
 
-1. **Glama**：维护者已改 Build steps 为 `pyobfus==0.15.0` 并点「Build & Release」，收尾时 status pending；请维护者提供 test 页后记录。
+1. ~~**Glama**~~：已完成。Glama 渠道 release **0.14.1**（Glama 自动递增标签，2026-11-15 23:06 北京时间发布）：维护者改 Build steps 为 `uv pip install --system --break-system-packages pyobfus-mcp==0.3.17 pyobfus==0.15.0` 并点「Build & Release」；test `01a1dfbc-345a-79cf-95ba-581e06887151` success／27.9 s，`pinnedCommit: null`（实际 checkout Glama 同步 head `cde07eb`，落后于 main；安装来自 PyPI，不影响结果），uv 装于 /usr 的 Python 3.13.5，安装 Core 0.15.0／MCP 0.3.17／runtime 0.1.1，握手 serverInfo 0.3.17、协议 2025-11-25，`tools/list` 九个工具（七 community + 两 pro_funnel）。
 2. **Zenodo／CITATION**：归档后按 CLAUDE.md 发布流程第 5 步核对 record，再同步 `CITATION.cff`。
 3. **Pro 客户通知（TODO 4a）**：私有草稿 `docs/internal/pro_customer_notice_0_15_0_DRAFT_2026-11-15.md` 待维护者审；审后按 Worker 许可记录核对收件人再发送。
 4. **本 PR（#239）合并**：等待维护者指示。
