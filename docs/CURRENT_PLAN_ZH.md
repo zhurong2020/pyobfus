@@ -8,6 +8,8 @@
 核验、删除范围和保留边界见[本地目录审计](LOCAL_ASSET_AUDIT_2026-11-15.md)。该操作
 不改变版本、部署或发布状态。
 
+**2026-11-15 晚 Core 0.15.0 已发布**：#235（PyInstaller CArchive 顶层交付检查）、#236（Python 3.15 `.pyc` 来源比对规范化，修复误报）、#237（Windows x64／CPython 3.12／Nuitka standalone 单格托管验收：D1–D8 pass、D9 unknown、Pro L3 blocked，总体 partial）经维护者指示合并；#238 发版准备经完整矩阵 47/47 后合并为 `3e76503`，tag `v0.15.0`，PyPI 带 provenance，3.12／3.15 全新安装通过，GitHub Release 已建。核验见[发布记录](CORE_0_15_0_RELEASE_2026-11-15.md)。待：Zenodo 后同步 CITATION、Glama Build steps（维护者手工）、Pro 客户通知（TODO 4a，待审）。
+
 **2026-11-15 竞品与路线复核**：基于当前 Core 0.14.0 状态，重新核对 PyArmor
 9.3.0、PyLocket 1.1.21、Nuitka 4.3.5／Commercial、SOURCEdefender 与开源进入者。
 结论是不追原生 VM／云端保护平台，定位收敛为“面向持续交付的、可验证且可调试的
