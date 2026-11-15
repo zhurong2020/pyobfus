@@ -41,6 +41,25 @@ def aggregate(results: dict[str, str]) -> str:
     return "pass"
 
 
+def compiler_evidence(report: Path, nuitka_version_text: str) -> dict[str, str]:
+    """Combine Nuitka's report (compiler name) with its version banner.
+
+    Nuitka 4.3.1 records only the compiler name in ``<scons_environment>``; the
+    version comes from ``nuitka --version`` ("Version C compiler: ..."). Raises
+    ``ValueError`` when either piece is missing, so the step stays unknown.
+    """
+    node = ET.parse(report).getroot().find("scons_environment")
+    name = (
+        (node.attrib.get("the_compiler") or node.attrib.get("c_compiler") or "")
+        if node is not None
+        else ""
+    )
+    match = re.search(r"^Version C compiler:\s*(.+)$", nuitka_version_text, re.MULTILINE)
+    if not name or not match:
+        raise ValueError("compiler name or version missing")
+    return {"report_compiler": name, "nuitka_compiler_version": match.group(1).strip()}
+
+
 def hashes(root: Path) -> dict[str, str]:
     return {
         p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
@@ -324,6 +343,14 @@ class Runner:
                     raise RuntimeError("Installed wheel differs from public wheel")
         env["nuitka"] = self.run([sys.executable, "-m", "nuitka", "--version"]).stdout.strip()
         env["compiler"] = "pending actual Nuitka report in D5"
+        vswhere = Path(
+            os.environ.get("ProgramFiles(x86)", r"C:\Program Files (x86)"),
+            "Microsoft Visual Studio/Installer/vswhere.exe",
+        )
+        if vswhere.is_file():
+            env["visual_studio"] = self.run(
+                [vswhere, "-latest", "-products", "*", "-property", "installationVersion"]
+            ).stdout.strip()
 
     def behavior(self, root: Path, frozen: bool = False) -> str:
         entry = [root / "main.exe"] if frozen else [sys.executable, "-B", root / "main.py"]
@@ -469,18 +496,15 @@ class Runner:
                     else "protected build; compare passing original control"
                 )
                 raise
-            tree = ET.parse(report)
-            compilers = [
-                dict(node.attrib) for node in tree.iter() if "compiler" in node.tag.lower()
-            ]
-            self.report["environment"][lane + "_compiler_report"] = compilers
-            if not compilers or not any(
-                "version" in key.lower() for compiler in compilers for key in compiler
-            ):
-                raise Unknown("Actual compiler unavailable from Nuitka report")
-        self.report["environment"][
-            "compiler"
-        ] = "Actual compiler attributes recorded from Nuitka XML (selector --msvc=latest)"
+            try:
+                compiler = compiler_evidence(report, self.report["environment"].get("nuitka", ""))
+            except (ValueError, ET.ParseError) as exc:
+                raise Unknown("Actual compiler unavailable from Nuitka report/version") from exc
+            self.report["environment"][lane + "_compiler_report"] = compiler
+        self.report["environment"]["compiler"] = (
+            "Compiler name from Nuitka XML scons_environment, version from nuitka --version, "
+            "Visual Studio from vswhere (selector --msvc=latest)"
+        )
         self.report["download_consent"] = (
             "--assume-yes-for-downloads permits Windows dependency walker download; no interactive prompt"
         )

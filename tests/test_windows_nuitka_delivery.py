@@ -73,3 +73,22 @@ def test_delivery_audit(tmp_path):
         "x.build",
         "trace.txt",
     }
+
+
+def test_compiler_evidence(tmp_path):
+    report = tmp_path / "r.xml"
+    report.write_text(
+        '<nuitka-compilation-report><scons_environment c_compiler="cl" the_cc_name="cl" '
+        'the_compiler="cl" /></nuitka-compilation-report>',
+        encoding="utf-8",
+    )
+    banner = "4.3.1\nOS: Windows\nVersion C compiler: cl (cl 14.3).\n"
+    assert runner.compiler_evidence(report, banner) == {
+        "report_compiler": "cl",
+        "nuitka_compiler_version": "cl (cl 14.3).",
+    }
+    with pytest.raises(ValueError):
+        runner.compiler_evidence(report, "4.3.1\n")
+    report.write_text("<nuitka-compilation-report />", encoding="utf-8")
+    with pytest.raises(ValueError):
+        runner.compiler_evidence(report, banner)
