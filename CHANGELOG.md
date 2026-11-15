@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- `--check-delivery` compares bounded canonical marshal bytes when reference
+  encoding varies between processes, avoiding false unknown-origin `.pyc` warnings
+  without unmarshalling delivered data or relaxing source filename matching.
+
 - Signed CI admission reports an upgrade hint when the issuer key is unknown
   to this client, while continuing to deny the build without exposing key IDs.
 

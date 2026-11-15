@@ -27,6 +27,7 @@ import os
 import re
 import stat
 import struct
+import sys
 import zipfile
 import zlib
 from dataclasses import asdict, dataclass
@@ -294,6 +295,129 @@ def _read_delivery_source(target: Path, kind: str, relative: str) -> Optional[by
         return stream.read(_MAX_SOURCE_COMPARE_BYTES + 1)
 
 
+def _canonical_marshal(data: bytes) -> Optional[bytes]:
+    """Expand marshal references using bytes only, never constructing Python objects.
+
+    Only the running interpreter's format is supported. References to unfinished
+    containers (cycles), invalid streams and excessive expansion fail closed.
+    Reference spans point into one bounded output buffer, avoiding copied trees.
+    """
+    limit = min(8 * len(data), 16 * 1024 * 1024)
+    if not data or len(data) > 16 * 1024 * 1024:
+        return None
+    output = bytearray()
+    refs: List[Optional[Tuple[int, int]]] = []
+    position = 0
+    work = 0
+
+    def read(size: int) -> bytes:
+        nonlocal position
+        if size < 0 or size > len(data) - position:
+            raise ValueError
+        result = data[position : position + size]
+        position += size
+        return result
+
+    def emit(value: bytes) -> None:
+        if len(value) > limit - len(output):
+            raise ValueError
+        output.extend(value)
+
+    def count() -> int:
+        raw = read(4)
+        value = int.from_bytes(raw, "little", signed=True)
+        if value < 0 or value > min(len(data), 1_000_000):
+            raise ValueError
+        emit(raw)
+        return value
+
+    def walk(depth: int, allow_null: bool = False) -> bool:
+        nonlocal work
+        work += 1
+        if depth > 200 or work > min(len(data), 1_000_000):
+            raise ValueError
+        tag = read(1)[0]
+        kind = chr(tag & 0x7F)
+        start = len(output)
+        if kind == "r":
+            index = int.from_bytes(read(4), "little", signed=True)
+            if index < 0 or index >= len(refs) or refs[index] is None:
+                raise ValueError
+            span = refs[index]
+            assert span is not None
+            emit(output[span[0] : span[1]])
+            return False
+        if kind == "0":
+            if not allow_null or tag & 0x80:
+                raise ValueError
+            emit(b"0")
+            return True
+        # CPython ignores FLAG_REF for these singleton tags. All other supported
+        # objects insert/reserve a slot before any child is read. Publish its
+        # span only on completion, rejecting recursive/unresolved references.
+        slot: Optional[int] = None
+        if tag & 0x80 and kind not in "NFTS.":
+            slot = len(refs)
+            refs.append(None)
+        emit(kind.encode("ascii"))
+        if kind in "NFTS.":
+            pass
+        elif kind in "iIgy":
+            emit(read({"i": 4, "I": 8, "g": 8, "y": 16}[kind]))
+        elif kind == "l":
+            raw = read(4)
+            emit(raw)
+            emit(read(2 * abs(int.from_bytes(raw, "little", signed=True))))
+        elif kind in "fx":
+            for _ in range(2 if kind == "x" else 1):
+                raw = read(1)
+                emit(raw)
+                emit(read(raw[0]))
+        elif kind in "stuaA":
+            size = count()
+            emit(read(size))
+        elif kind in "zZ":
+            raw = read(1)
+            emit(raw)
+            emit(read(raw[0]))
+        elif kind in "([<>)":
+            if kind == ")":
+                raw = read(1)
+                emit(raw)
+                size = raw[0]
+            else:
+                size = count()
+            for _ in range(size):
+                walk(depth + 1)
+        elif kind == "{" or (kind == "}" and sys.version_info >= (3, 15)):
+            while not walk(depth + 1, allow_null=True):
+                walk(depth + 1)
+        elif kind == ":" and sys.version_info >= (3, 14):
+            for _ in range(3):
+                walk(depth + 1)
+        elif kind == "c":
+            modern = sys.version_info >= (3, 11)
+            emit(read(20 if modern else 24))
+            for _ in range(8):
+                walk(depth + 1)
+            emit(read(4))  # firstlineno
+            for _ in range(2 if modern else 1):
+                walk(depth + 1)
+        else:
+            raise ValueError
+        if slot is not None:
+            refs[slot] = (start, len(output))
+        return False
+
+    try:
+        walk(0)
+        if position != len(data):
+            return None
+        return bytes(output)
+    except (ValueError, RecursionError):
+        return None
+
+
 def _inspect_bytecode(
     entry: _Entry, target: Path, kind: str, output_hashes: Dict[str, str]
 ) -> Tuple[str, str]:
@@ -313,13 +437,25 @@ def _inspect_bytecode(
     filenames = [relative]
     if kind == "directory":
         filenames.insert(0, str((target / relative).resolve()))
+    delivered = entry.data[16:]
+    canonical_delivered = None
+    canonical_attempted = False
     for filename in filenames:
         for optimize in (0, 1, 2):
             try:
                 compiled = compile(source, filename, "exec", dont_inherit=True, optimize=optimize)
             except (SyntaxError, ValueError, TypeError, UnicodeError, RecursionError):
                 return "unknown", "adjacent_source_not_compilable"
-            if marshal.dumps(compiled) == entry.data[16:]:
+            fresh = marshal.dumps(compiled)
+            matches = fresh == delivered
+            if not matches:
+                if not canonical_attempted:
+                    canonical_delivered = _canonical_marshal(delivered)
+                    canonical_attempted = True
+                if canonical_delivered is not None:
+                    canonical_fresh = _canonical_marshal(fresh)
+                    matches = canonical_fresh is not None and canonical_fresh == canonical_delivered
+            if matches:
                 digest = hashlib.sha256(source).hexdigest()
                 if digest in output_hashes:
                     return "matched_recorded_output", "exact_bytecode_body_match"

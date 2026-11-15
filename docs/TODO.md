@@ -80,7 +80,7 @@ Action v1.1.0 / `v1` 与 Glama 渠道 0.11.3 已完成；DEV 一周复盘已记�
 1. **收口 11-16 周检增量**：11-15 已完成下载、备份、CI、收件箱和 GSC 提前检查。公开侧复核确认 `/zh-cn` 只是正常单跳 301，首页、`/zh-cn/`、sitemap 与 robots 均可抓取；不改正确配置，等待 GSC 重处理。Bing 必须先选中 pyobfus 属性再核 IndexNow，不能把默认其它站点的指标或 `null` 解释为 pyobfus 的零。
 2. **解除 Windows 单组合验收环境阻塞**：公开参考应用、Community 目录保护、unmap 与交付检查证据已完成，见[验收合同](DELIVERY_REFERENCE_APP_ACCEPTANCE_2026-11-15.md)。原生 Windows 只有 Python 3.11，且缺 Nuitka／MSVC；下一步需单独批准安装固定 Python 3.12、Nuitka 与 Visual Studio 2022 工具链，或批准边界明确的单格 hosted Windows 验收。解除前不改用 3.11、不扩矩阵。
 3. **PyInstaller CArchive 顶层交付检查**：首个冻结格式已选定并完成[安全设计](PYINSTALLER_CARCHIVE_DELIVERY_DESIGN_2026-11-15.md)。只解析有界 cookie／TOC 和普通顶层成员，检查 mapping／私钥／byte-identical 原文；不对 PYZ 使用 `marshal.load`，未检查载荷继续明确为 unknown／warn。
-3a. **Python 3.15 `.pyc` 来源比对误报（待设计）**：`--check-delivery` 用 `marshal.dumps(compile(...))` 与交付 `.pyc` 逐字节比对；3.15 下 marshal 输出随进程状态变化（同一源码在独立进程与已导入 pyobfus 的进程中字节不同），合法的运行时 `.pyc` 被判为 `bytecode_origin_unknown`（medium）。只会多报、不会漏报；CI 中参考应用测试已改为运行时不写字节码。修复须保持“不反序列化交付数据”的边界，方案（如隔离子进程编译或只读规范化 marshal 引用标记）先评估再交 Codex 实现。
+3a. **Python 3.15 `.pyc` 来源比对误报（已实现，见 PR）**：有界纯字节 marshal 引用规范化回退；交付数据不反序列化，文件名匹配不放宽。
 4. **签发 key 的下一次自然发版接续**：#230 升级提示与 #231 备用公钥已合并但未发布；下次自然 Core 发版时预分发，`ci-2026-11b` 不配 Worker。正常轮换维持“信任版本发布满 180 天 + 至少提前 60 天通知”。工作站／离线迁移仍延后，Pro／runtime 专利许可条款继续等待专业审阅。
 4a. **Pro 客户通知（与签发 key 相关，草稿由 Claude 起草、维护者审后发送）**：
    - 下一次 Core 发版（带 #230 升级提示与 #231 备用 key）后：给现有 Pro 客户发一封说明——建议在 CI 中升级到该版本、不要长期锁定旧版本；将来计划内换签发 key 会提前至少 60 天通知；工作站注册与 0.14.0 之前的版本不受影响。现在不单独群发（尚无影响客户的变更生效）。
