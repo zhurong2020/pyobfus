@@ -100,6 +100,8 @@ unsigned fallback. The license server serves the signed endpoint; older clients
 keep using the legacy endpoint. This review and workstation/offline use are unchanged.
 Signed endpoint denials disable caching and hide internal inactive-state values;
 do not treat a denial as permission to bypass verification.
+Since 0.15.0, clients trust a standby issuer key ahead of future rotation and
+report an upgrade hint for unknown issuer keys while still denying the build.
 
 ```bash
 pyobfus --check src/ --sarif pyobfus.sarif

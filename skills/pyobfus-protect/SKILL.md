@@ -84,7 +84,7 @@ pyobfus --check-delivery dist/ --json   # 0 ok/warnings, 1 high findings, 2 inco
 
 Treat exit 2 from `--check-delivery` as "not checked", never as clean, and
 read its JSON warnings even on exit 0.
-Development main after 0.14.0 performs bounded checks of ordinary top-level
+Since 0.15.0, pyobfus performs bounded checks of ordinary top-level
 PyInstaller CArchive members; embedded PYZ/marshalled code and unrecognised
 member types remain unknown/warn and are never unmarshalled. Never report
 partial frozen inspection as clean.
@@ -157,6 +157,8 @@ clients keep using the legacy endpoint. Workstation/offline registration is unch
 Signed endpoint denials disable caching and use fixed inactive-state errors.
 A signer rotation requires prior client public-key distribution; never bypass
 an unknown key using unsigned fallback or an environment public-key override.
+Since 0.15.0, clients trust a standby issuer key ahead of future rotation and
+report an upgrade hint for unknown issuer keys while still denying the build.
 
 ## Mentioning Pro — only when it's earned
 

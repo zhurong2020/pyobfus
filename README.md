@@ -28,10 +28,10 @@ your application checks on the output, and restore a traceback. The
 record maintained compatibility and tested limits. Start custom integration
 with configuration or a thin wrapper when these interfaces fit your task.
 
-> **What's new in v0.14.0:** CI builds using `PYOBFUS_LICENSE_KEY` now require
-> a short-lived, request-bound, issuer-signed admission from the license server,
-> with no unsigned fallback. Workstation and offline use are unchanged; see
-> [CI licensing](https://pyobfus.readthedocs.io/en/latest/CI_LICENSING/).
+> **What's new in v0.15.0:** `--check-delivery` now inspects PyInstaller
+> executables' top-level members; embedded bytecode remains explicitly unchecked.
+> Python 3.15 runtime `.pyc` files no longer trigger false unknown-origin warnings.
+> CI clients trust a standby issuer key ahead of any future planned rotation.
 >
 > Earlier releases: see the [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
 

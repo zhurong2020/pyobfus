@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-11-15
+
 ### Changed
 
 - `--check-delivery` recognizes PyInstaller CArchive executables and performs
@@ -25,7 +27,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `--check-delivery` compares bounded canonical marshal bytes when reference
   encoding varies between processes, avoiding false unknown-origin `.pyc` warnings
   without unmarshalling delivered data or relaxing source filename matching.
-
 - Signed CI admission reports an upgrade hint when the issuer key is unknown
   to this client, while continuing to deny the build without exposing key IDs.
 
@@ -33,7 +34,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Configure Worker CI admission limits per licence and per client IP, checking
   the IP limit before KV reads. Limiter outages fail open to preserve licensing
-  availability. Requires a Worker deployment; no client release is needed.
+  availability. This server-side change is already deployed; no client change
+  is included.
 
 ## [0.14.0] - 2026-11-11
 
