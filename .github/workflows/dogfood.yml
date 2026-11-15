@@ -60,7 +60,7 @@ jobs:
         run: python scripts/dogfood/run.py lane-a --out dogfood_out
       - name: Upload Lane A evidence
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: dogfood-lane-a
           path: dogfood_out/lane_a
@@ -87,7 +87,7 @@ jobs:
         run: python scripts/dogfood/run.py lane-d --out dogfood_out
       - name: Upload canary evidence
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: dogfood-canary
           path: |
@@ -116,7 +116,7 @@ jobs:
         run: python scripts/dogfood/run.py lane-c --out dogfood_out
       - name: Upload Lane C evidence
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: dogfood-lane-c
           path: dogfood_out/lane_c
