@@ -1,0 +1,37 @@
+name: Windows Nuitka single-combination acceptance
+on:
+  workflow_dispatch:
+  push:
+    branches: [acceptance/windows-nuitka]
+permissions:
+  contents: read
+jobs:
+  acceptance:
+    runs-on: windows-2022
+    timeout-minutes: 35
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # existing repository pin
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # existing repository pin
+        with:
+          python-version: '3.12'
+          architecture: x64
+      - name: Fresh public-wheel environment
+        run: |
+          set -euo pipefail
+          python -m venv "$RUNNER_TEMP/acceptance-venv"
+          "$RUNNER_TEMP/acceptance-venv/Scripts/python.exe" -m pip install --index-url https://pypi.org/simple --only-binary=pyobfus pyobfus==0.14.0 nuitka==4.3.1 ordered-set zstandard
+      - name: Execute D1–D10
+        run: |
+          set -euo pipefail
+          "$RUNNER_TEMP/acceptance-venv/Scripts/python.exe" scripts/validate_windows_nuitka_delivery.py --work-dir "$RUNNER_TEMP/nuitka-private-run" --evidence-dir evidence
+      # No pinned upload-artifact existed in the repository; full v4.6.2 pin.
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always() && hashFiles('evidence/summary.json') != ''
+        with:
+          name: windows-nuitka-acceptance-evidence
+          path: evidence/
+          retention-days: 14
+          if-no-files-found: error

@@ -1,7 +1,7 @@
 # 公开交付参考应用：最小范围与验收合同
 
 日期：2026-11-15。状态：**范围与接受标准已定义；公开应用和 Community 目录契约
-已实现，Windows Nuitka 验收尚未执行**。本文不批准发布、扩平台矩阵、引入托管密钥或改变 Community／Pro
+已实现；Windows Nuitka 单格托管验收已执行，结果 partial（见文末）**。本文不批准发布、扩平台矩阵、引入托管密钥或改变 Community／Pro
 边界。
 
 ## 目的
@@ -116,3 +116,51 @@ fixture 提交。任何关键项为 unknown 时，总结最多为 partial。
 自动安装、未换版本、未把 WSL 或 3.11 结果填作 Windows 3.12 standalone 通过。解除阻塞
 需要维护者另行同意安装固定 Python 3.12、Nuitka 与 MSVC，或批准一个边界明确的单格
 hosted Windows 验收。
+
+## How to run
+
+The focused runner is `scripts/validate_windows_nuitka_delivery.py`. Push the
+prepared revision to `acceptance/windows-nuitka`, or dispatch
+`windows-nuitka-acceptance.yml` once it is available on the default branch.
+The maintainer approved one hosted Windows run; do not trigger both paths or
+rerun automatically. This preparation does not launch that run.
+
+The workflow uses Windows 2022, x64 Python `3.12` (actual patch recorded;
+3.12.14 availability was not confirmed), public `pyobfus==0.14.0`, and
+`nuitka==4.3.1`. This supersedes the plan's historical Core 0.12.0 input only.
+No existing upload-artifact SHA pin was found; v4.6.2 is pinned to
+`ea165f8d65b6e75b540449e92b4886f43607fa02`.
+Only sanitized `evidence/` is uploaded, retained for 14 days. Full logs,
+mapping, traces and compiler reports remain in the ephemeral private staging
+root. A failed or blocked required stage fails the job; unknowns (for example
+uninspected frozen internals) keep the overall status at `partial` in the
+evidence, never `pass`. The
+consumer runs on the builder with Python preinstalled, not a clean target.
+Results are recorded only after execution; no step is pre-filled as passed.
+Pro stage C stays blocked and is never attempted with a real key.
+
+## 2026-11-15 托管验收结果（Windows x64／CPython 3.12／Nuitka standalone）
+
+维护者批准单格托管运行。第 1 次运行（run `43722482030`）原始源码对照构建与运行均成功，
+但运行脚本误在 Nuitka 报告中查找编译器版本（4.3.1 报告只记编译器名），D5 记为 unknown、
+D6–D9 未执行；修复脚本后经维护者再次批准，第 2 次运行（run `43723177124`，提交
+`e480ebb`）完成全部步骤。以下只记第 2 次结果，证据为 artifact
+`windows-nuitka-acceptance-evidence`（保留 14 天；仅含状态、哈希与清洗后的摘要）。
+
+| 项目 | 记录 |
+|---|---|
+| 环境 | Windows Server 2022（10.0.20348），CPython 3.12.10 x64（runner 实际版本，非计划中的 3.12.14），Nuitka 4.3.1，MSVC `cl 14.3`（Visual Studio 17.14.37906.3，`--msvc=latest` 解析结果） |
+| Core | PyPI `pyobfus-0.14.0-py3-none-any.whl`，SHA-256 `c7d3e8537bb2980aa79f525d67fe06726b7f89dacc5cfa925a33ad5181803b25`，已核对安装文件与 wheel 一致 |
+| D1–D4 | pass：原文正常／业务负例／资源负例基线；Community 跨文件保护（mapping、build report、provenance 放 private/）；保护源码行为与基线一致 |
+| D5 | pass：原文对照与保护后 standalone 均构建并运行成功，显式包含资源与 allowlist 插件；两次构建累计约 74 s |
+| D6–D7 | pass：只把 `main.dist` 移交 delivery／consumer，隐藏 source、protected、build，清除继承路径与许可变量后，正常、负例与资源缺失变体均符合基线 |
+| D8 | pass：冻结 traceback 用私有 mapping 还原，`quote_order`、`render_order` 等实际出现的 4 个帧全部 mapped，无臆造帧 |
+| D9 | **unknown**：交付 13 个文件中只有 `storefront/data/label.txt` 一个非二进制资源，审计无违规（无原文 `.py`、mapping、报告、私钥或 trace）；`--check-delivery` 为 warn：medium `delivery.frozen_uninspected`（8 个 PE 载荷内部未检查）及各 `.py` 的 info `delivery.missing_output`（已编译，符合预期） |
+| C（Pro L3） | blocked：托管环境无隔离 Pro 许可，未尝试 |
+
+阶段：A pass、B pass、C blocked、E pass、F unknown、G pass → **总体 partial**。这是本合同在
+冻结交付上可达到的上限：交付检查不解析 Nuitka 载荷内部，未检查内容不写成 clean。
+
+边界：消费运行在同一台已预装 Python 的托管构建机上，属于局部验收，不是干净目标机
+验证；只覆盖此一格，不扩展平台支持声明，不改变发版或版别。
+

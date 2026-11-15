@@ -78,7 +78,7 @@ Action v1.1.0 / `v1` 与 Glama 渠道 0.11.3 已完成；DEV 一周复盘已记�
 已完成的 P0、纯文档 CI、Core/MCP 发版、Glama 更新与首日 DEV 观察不再排入队列。
 
 1. **收口 11-16 周检增量**：11-15 已完成下载、备份、CI、收件箱和 GSC 提前检查。公开侧复核确认 `/zh-cn` 只是正常单跳 301，首页、`/zh-cn/`、sitemap 与 robots 均可抓取；不改正确配置，等待 GSC 重处理。Bing 必须先选中 pyobfus 属性再核 IndexNow，不能把默认其它站点的指标或 `null` 解释为 pyobfus 的零。
-2. **解除 Windows 单组合验收环境阻塞**：公开参考应用、Community 目录保护、unmap 与交付检查证据已完成，见[验收合同](DELIVERY_REFERENCE_APP_ACCEPTANCE_2026-11-15.md)。原生 Windows 只有 Python 3.11，且缺 Nuitka／MSVC；下一步需单独批准安装固定 Python 3.12、Nuitka 与 Visual Studio 2022 工具链，或批准边界明确的单格 hosted Windows 验收。解除前不改用 3.11、不扩矩阵。
+2. **Windows Nuitka 单组合验收（2026-11-15 托管执行，partial）**：D1–D8 全部通过，D9 因冻结载荷内部未检查如实为 unknown，Pro L3 blocked；结果与边界见[验收合同](DELIVERY_REFERENCE_APP_ACCEPTANCE_2026-11-15.md)文末。后续只在真实交付需求出现时再扩组合或做干净目标机验证。
 3. **PyInstaller CArchive 顶层交付检查**：首个冻结格式已选定并完成[安全设计](PYINSTALLER_CARCHIVE_DELIVERY_DESIGN_2026-11-15.md)。只解析有界 cookie／TOC 和普通顶层成员，检查 mapping／私钥／byte-identical 原文；不对 PYZ 使用 `marshal.load`，未检查载荷继续明确为 unknown／warn。
 3a. **Python 3.15 `.pyc` 来源比对误报（已实现，见 PR）**：有界纯字节 marshal 引用规范化回退；交付数据不反序列化，文件名匹配不放宽。
 4. **签发 key 的下一次自然发版接续**：#230 升级提示与 #231 备用公钥已合并但未发布；下次自然 Core 发版时预分发，`ci-2026-11b` 不配 Worker。正常轮换维持“信任版本发布满 180 天 + 至少提前 60 天通知”。工作站／离线迁移仍延后，Pro／runtime 专利许可条款继续等待专业审阅。
