@@ -116,3 +116,25 @@ fixture 提交。任何关键项为 unknown 时，总结最多为 partial。
 自动安装、未换版本、未把 WSL 或 3.11 结果填作 Windows 3.12 standalone 通过。解除阻塞
 需要维护者另行同意安装固定 Python 3.12、Nuitka 与 MSVC，或批准一个边界明确的单格
 hosted Windows 验收。
+
+## How to run
+
+The focused runner is `scripts/validate_windows_nuitka_delivery.py`. Push the
+prepared revision to `acceptance/windows-nuitka`, or dispatch
+`windows-nuitka-acceptance.yml` once it is available on the default branch.
+The maintainer approved one hosted Windows run; do not trigger both paths or
+rerun automatically. This preparation does not launch that run.
+
+The workflow uses Windows 2022, x64 Python `3.12` (actual patch recorded;
+3.12.14 availability was not confirmed), public `pyobfus==0.14.0`, and
+`nuitka==4.3.1`. This supersedes the plan's historical Core 0.12.0 input only.
+No existing upload-artifact SHA pin was found; v4.6.2 is pinned to
+`ea165f8d65b6e75b540449e92b4886f43607fa02`.
+Only sanitized `evidence/` is uploaded, retained for 14 days. Full logs,
+mapping, traces and compiler reports remain in the ephemeral private staging
+root. A failed or blocked required stage fails the job; unknowns (for example
+uninspected frozen internals) keep the overall status at `partial` in the
+evidence, never `pass`. The
+consumer runs on the builder with Python preinstalled, not a clean target.
+Results are recorded only after execution; no step is pre-filled as passed.
+Pro stage C stays blocked and is never attempted with a real key.
