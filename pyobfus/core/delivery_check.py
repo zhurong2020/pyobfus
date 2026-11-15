@@ -26,11 +26,12 @@ import marshal
 import os
 import re
 import stat
+import struct
 import zipfile
 import zlib
 from dataclasses import asdict, dataclass
 from pathlib import Path, PurePosixPath, PureWindowsPath
-from typing import Any, Dict, Iterator, List, Optional, Tuple
+from typing import Any, BinaryIO, Dict, Iterator, List, Optional, Tuple
 
 DELIVERY_CHECK_FORMAT = "pyobfus-delivery-check"
 DELIVERY_CHECK_VERSION = 1
@@ -57,13 +58,19 @@ _MAX_DELIVERY_ENTRIES = 100_000
 _MAX_ENTRY_BYTES = 256 * 1024 * 1024
 _MAX_TOTAL_BYTES = 1024 * 1024 * 1024
 _CACHE_PYC = re.compile(r"^(.+)\.cpython-\d+(?:\.opt-\d+)?\.pyc$")
+_PYINSTALLER_COOKIE_MAGIC = b"MEI\014\013\012\013\016"
+_PYINSTALLER_COOKIE = struct.Struct("!8sIIII64s")
+_PYINSTALLER_TOC_ENTRY = struct.Struct("!IIIIBc")
+_MAX_FROZEN_TOC_BYTES = 20 * 1024 * 1024
+_MAX_FROZEN_MEMBER_BYTES = 64 * 1024 * 1024
+_MAX_FROZEN_TOTAL_BYTES = 256 * 1024 * 1024
 
 LIMITATIONS = (
     "Finds known pyobfus mistakes only; an empty result does not mean the delivery is safe.",
     "Does not look for credentials in strings; use gitleaks or TruffleHog.",
     "Original source is recognised only by exact hash, and only with --provenance-manifest.",
     "Files are read and hashed, never imported or executed.",
-    "Frozen executable payloads are not unpacked; bytecode comparisons never unmarshal input.",
+    "PyInstaller CArchive top-level members are checked with bounds; embedded PYZ and bytecode are never unmarshalled.",
     "Unsafe paths, special files and resource limits abort inspection, never produce a clean result.",
 )
 
@@ -321,8 +328,14 @@ def _inspect_bytecode(
 
 
 def _frozen_file_result(
-    target: Path, binary_kind: str, report: bool, manifest: bool
+    target: Path,
+    binary_kind: str,
+    report: Optional[Dict[str, Any]],
+    manifest: Optional[Dict[str, Any]],
 ) -> Dict[str, Any]:
+    archive = _inspect_pyinstaller_carchive(target)
+    if archive is not None:
+        return _pyinstaller_file_result(target, binary_kind, report, manifest, archive)
     finding = Finding(
         FROZEN_UNINSPECTED,
         "medium",
@@ -335,7 +348,7 @@ def _frozen_file_result(
         "status": "warn",
         "ai_hint": "Use the packager's archive inspector and keep mapping, keys and original source outside the executable; this result cannot verify embedded contents.",
         "target": {"name": target.name, "kind": "executable", "files": 1},
-        "inputs": {"build_report": report, "provenance_manifest": manifest},
+        "inputs": {"build_report": report is not None, "provenance_manifest": manifest is not None},
         "summary": {
             "python_files": 0,
             "matched_build_outputs": 0,
@@ -353,6 +366,232 @@ def _frozen_file_result(
                 "sample": [],
             },
             "frozen_executables": {"found": 1, "inspected": 0},
+        },
+        "limitations": list(LIMITATIONS),
+    }
+
+
+def _find_last_pattern(stream: BinaryIO, pattern: bytes, size: int) -> int:
+    end = size
+    chunk_size = 8192
+    while end >= len(pattern):
+        start = max(end - chunk_size, 0)
+        stream.seek(start)
+        data = stream.read(end - start)
+        offset = data.rfind(pattern)
+        if offset >= 0:
+            return start + offset
+        end = start + len(pattern) - 1
+    return -1
+
+
+def _safe_frozen_name(raw: bytes) -> str:
+    try:
+        name = raw.rstrip(b"\0").decode("utf-8").replace("\\", "/")
+    except UnicodeDecodeError as exc:
+        raise ValueError("Invalid PyInstaller member name; inspection incomplete") from exc
+    path = PurePosixPath(name)
+    if (
+        not name
+        or name.startswith("/")
+        or PureWindowsPath(name).drive
+        or any(part in ("", ".", "..") for part in path.parts)
+        or any(ord(char) < 32 for char in name)
+    ):
+        raise ValueError("Unsafe PyInstaller member name; inspection incomplete")
+    return name
+
+
+def _bounded_zlib(data: bytes, expected: int) -> bytes:
+    if expected > _MAX_FROZEN_MEMBER_BYTES:
+        raise ValueError("PyInstaller member size limit exceeded; inspection incomplete")
+    decoder = zlib.decompressobj()
+    output = decoder.decompress(data, _MAX_FROZEN_MEMBER_BYTES + 1)
+    if len(output) > _MAX_FROZEN_MEMBER_BYTES or not decoder.eof or decoder.unused_data:
+        raise ValueError("Invalid or oversized PyInstaller member; inspection incomplete")
+    output += decoder.flush(_MAX_FROZEN_MEMBER_BYTES + 1 - len(output))
+    if len(output) != expected:
+        raise ValueError("PyInstaller member length mismatch; inspection incomplete")
+    return output
+
+
+def _inspect_pyinstaller_carchive(target: Path) -> Optional[Dict[str, Any]]:
+    size = target.stat().st_size
+    with target.open("rb") as stream:
+        cookie_offset = _find_last_pattern(stream, _PYINSTALLER_COOKIE_MAGIC, size)
+        if cookie_offset < 0:
+            return None
+        if size > _MAX_ENTRY_BYTES:
+            raise ValueError("Frozen executable byte limit exceeded; inspection incomplete")
+        stream.seek(cookie_offset)
+        cookie = stream.read(_PYINSTALLER_COOKIE.size)
+        if len(cookie) != _PYINSTALLER_COOKIE.size:
+            raise ValueError("Truncated PyInstaller cookie; inspection incomplete")
+        magic, archive_length, toc_offset, toc_length, _, library = _PYINSTALLER_COOKIE.unpack(
+            cookie
+        )
+        archive_end = cookie_offset + _PYINSTALLER_COOKIE.size
+        archive_start = archive_end - archive_length
+        toc_start = archive_start + toc_offset
+        if (
+            magic != _PYINSTALLER_COOKIE_MAGIC
+            or not library.rstrip(b"\0")
+            or archive_start < 0
+            or archive_end > size
+            or toc_length > _MAX_FROZEN_TOC_BYTES
+            or toc_start < archive_start
+            or toc_start + toc_length > cookie_offset
+        ):
+            raise ValueError("Invalid PyInstaller archive bounds; inspection incomplete")
+        stream.seek(toc_start)
+        toc = stream.read(toc_length)
+        if len(toc) != toc_length:
+            raise ValueError("Truncated PyInstaller TOC; inspection incomplete")
+
+        position = 0
+        names = set()
+        entries: List[_Entry] = []
+        unknown = 0
+        total = 0
+        toc_entries = 0
+        while position < len(toc):
+            toc_entries += 1
+            if toc_entries > _MAX_DELIVERY_ENTRIES or position + _PYINSTALLER_TOC_ENTRY.size > len(
+                toc
+            ):
+                raise ValueError("Invalid PyInstaller TOC; inspection incomplete")
+            header = _PYINSTALLER_TOC_ENTRY.unpack_from(toc, position)
+            entry_length, offset, length, unpacked_length, compressed, raw_type = header
+            if (
+                entry_length < _PYINSTALLER_TOC_ENTRY.size + 1
+                or position + entry_length > len(toc)
+                or compressed not in (0, 1)
+                or offset + length > toc_start - archive_start
+                or length > _MAX_FROZEN_MEMBER_BYTES
+            ):
+                raise ValueError("Invalid PyInstaller member bounds; inspection incomplete")
+            typecode = raw_type.decode("ascii", errors="strict")
+            raw_name = toc[position + _PYINSTALLER_TOC_ENTRY.size : position + entry_length]
+            if typecode == "o":
+                try:
+                    name = raw_name.rstrip(b"\0").decode("utf-8")
+                except UnicodeDecodeError as exc:
+                    raise ValueError(
+                        "Invalid PyInstaller option name; inspection incomplete"
+                    ) from exc
+                if any(ord(char) < 32 or 127 <= ord(char) <= 159 for char in name):
+                    raise ValueError("Invalid PyInstaller option name; inspection incomplete")
+            else:
+                name = _safe_frozen_name(raw_name)
+            position += entry_length
+            if typecode != "o":
+                if name in names:
+                    raise ValueError("Duplicate PyInstaller member; inspection incomplete")
+                names.add(name)
+            elif length == 0:
+                # Runtime options are metadata, not payload paths or members.
+                continue
+            stream.seek(archive_start + offset)
+            data = stream.read(length)
+            if len(data) != length:
+                raise ValueError("Truncated PyInstaller member; inspection incomplete")
+            if compressed:
+                data = _bounded_zlib(data, unpacked_length)
+            elif len(data) != unpacked_length:
+                raise ValueError("PyInstaller member length mismatch; inspection incomplete")
+            total += len(data)
+            if total > _MAX_FROZEN_TOTAL_BYTES:
+                raise ValueError("PyInstaller total size limit exceeded; inspection incomplete")
+            entries.append(_Entry(name, data))
+            if typecode not in {"x", "b", "d", "n", "l"}:
+                unknown += 1
+        if position != len(toc):
+            raise ValueError("Invalid PyInstaller TOC length; inspection incomplete")
+    return {"entries": entries, "unknown": unknown}
+
+
+def _pyinstaller_file_result(
+    target: Path,
+    binary_kind: str,
+    report: Optional[Dict[str, Any]],
+    manifest: Optional[Dict[str, Any]],
+    archive: Dict[str, Any],
+) -> Dict[str, Any]:
+    input_hashes: Dict[str, str] = {}
+    if manifest is not None:
+        for record in manifest.get("files", []):
+            if isinstance(record, dict) and record.get("input_sha256"):
+                input_hashes[record["input_sha256"]] = str(record.get("relative_path", ""))
+    findings: List[Finding] = []
+    for entry in archive["entries"]:
+        if _is_mapping(entry):
+            findings.append(
+                Finding(
+                    MAPPING_FILE,
+                    "high",
+                    entry.path,
+                    "pyobfus mapping file embedded in the executable.",
+                )
+            )
+        elif _is_private_key(entry):
+            findings.append(
+                Finding(PRIVATE_KEY, "high", entry.path, "Private key embedded in the executable.")
+            )
+        elif hashlib.sha256(entry.data).hexdigest() in input_hashes and entry.data.strip():
+            findings.append(
+                Finding(
+                    ORIGINAL_SOURCE,
+                    "high",
+                    entry.path,
+                    "Byte-identical to an original source file embedded in the executable.",
+                )
+            )
+    unknown = int(archive["unknown"])
+    if unknown:
+        findings.append(
+            Finding(
+                FROZEN_UNINSPECTED,
+                "medium",
+                target.name,
+                f"PyInstaller CArchive top-level members were checked, but {unknown} code, embedded archive or unrecognised member(s) remain uninspected.",
+            )
+        )
+    counts = {severity: 0 for severity in ("high", "medium", "info")}
+    for finding in findings:
+        counts[finding.severity] += 1
+    status, hint = _status_and_hint(counts, report is not None, manifest is not None)
+    return {
+        "format": DELIVERY_CHECK_FORMAT,
+        "version": DELIVERY_CHECK_VERSION,
+        "status": status,
+        "ai_hint": hint,
+        "target": {"name": target.name, "kind": "executable", "files": 1},
+        "inputs": {
+            "build_report": report is not None,
+            "provenance_manifest": manifest is not None,
+        },
+        "summary": {
+            "python_files": 0,
+            "matched_build_outputs": 0,
+            "bytecode_files": 0,
+            **counts,
+        },
+        "findings": [asdict(finding) for finding in findings],
+        "inspection": {
+            "bytecode": {
+                "matched_recorded_output": 0,
+                "matched_adjacent_source": 0,
+                "unknown": 0,
+                "sample": [],
+            },
+            "frozen_executables": {
+                "found": 1,
+                "inspected": 1,
+                "format": "pyinstaller-carchive",
+                "members_checked": len(archive["entries"]) - unknown,
+                "members_total": len(archive["entries"]),
+                "unknown_members": unknown,
+            },
         },
         "limitations": list(LIMITATIONS),
     }
@@ -376,8 +615,8 @@ def check_delivery(
         return _frozen_file_result(
             target,
             binary_kind,
-            report is not None,
-            manifest is not None,
+            report,
+            manifest,
         )
     kind = "wheel" if target.is_file() and target.suffix == ".whl" else "directory"
     if kind == "directory" and not target.is_dir():
