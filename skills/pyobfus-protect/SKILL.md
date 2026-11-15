@@ -84,6 +84,10 @@ pyobfus --check-delivery dist/ --json   # 0 ok/warnings, 1 high findings, 2 inco
 
 Treat exit 2 from `--check-delivery` as "not checked", never as clean, and
 read its JSON warnings even on exit 0.
+Development main after 0.14.0 performs bounded checks of ordinary top-level
+PyInstaller CArchive members; embedded PYZ/marshalled code and unrecognised
+member types remain unknown/warn and are never unmarshalled. Never report
+partial frozen inspection as clean.
 
 If `--check` reports `severity_counts.high > 0`, show the findings and
 discuss before obfuscating — `eval`/`exec`, dynamic `getattr`, and string-based

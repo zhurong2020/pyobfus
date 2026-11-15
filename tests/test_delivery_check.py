@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import py_compile
+import struct
 import zipfile
+import zlib
 from pathlib import Path
 
 import pytest
@@ -68,6 +71,47 @@ def _binary_header(kind: str) -> bytes:
     if kind == "ELF":
         return b"\x7fELF\x02\x01" + b"\x00" * 10
     return b"\xfe\xed\xfa\xcf"
+
+
+def _pyinstaller_executable(path, members):
+    cookie_magic = b"MEI\014\013\012\013\016"
+    cookie = struct.Struct("!8sIIII64s")
+    toc_header = struct.Struct("!IIIIBc")
+    payload = bytearray()
+    toc = bytearray()
+    for name, data, typecode, compressed in members:
+        stored = zlib.compress(data) if compressed else data
+        offset = len(payload)
+        payload.extend(stored)
+        raw_name = name.encode() + b"\0"
+        entry_length = toc_header.size + len(raw_name)
+        toc.extend(
+            toc_header.pack(
+                entry_length,
+                offset,
+                len(stored),
+                len(data),
+                int(compressed),
+                typecode.encode(),
+            )
+        )
+        toc.extend(raw_name)
+    stub = _binary_header("ELF")
+    toc_offset = len(payload)
+    archive_length = len(payload) + len(toc) + cookie.size
+    path.write_bytes(
+        stub
+        + payload
+        + toc
+        + cookie.pack(
+            cookie_magic,
+            archive_length,
+            toc_offset,
+            len(toc),
+            312,
+            b"libpython3.12.so\0".ljust(64, b"\0"),
+        )
+    )
 
 
 def test_clean_delivery_is_ok(build):
@@ -202,6 +246,64 @@ def test_onedir_executable_does_not_claim_inner_payload_was_checked(tmp_path):
     assert _codes(result) == [dc.FROZEN_UNINSPECTED]
 
 
+def test_pyinstaller_carchive_checks_top_level_and_keeps_pyz_unknown(tmp_path):
+    binary = tmp_path / "app"
+    mapping = json.dumps({"pyobfus_version": "0.14.0", "global": {}}).encode()
+    _pyinstaller_executable(
+        binary,
+        [
+            ("mapping.json", mapping, "x", True),
+            ("PYZ.pyz", b"not unmarshalled", "z", False),
+        ],
+    )
+    result = dc.check_delivery(binary)
+    assert result["status"] == "fail"
+    assert _codes(result) == [dc.FROZEN_UNINSPECTED, dc.MAPPING_FILE]
+    assert result["inspection"]["frozen_executables"] == {
+        "found": 1,
+        "inspected": 1,
+        "format": "pyinstaller-carchive",
+        "members_checked": 1,
+        "members_total": 2,
+        "unknown_members": 1,
+    }
+
+
+def test_pyinstaller_carchive_rejects_duplicate_members(tmp_path):
+    binary = tmp_path / "app"
+    _pyinstaller_executable(
+        binary,
+        [("data.txt", b"one", "x", False), ("data.txt", b"two", "x", False)],
+    )
+    with pytest.raises(ValueError, match="Duplicate PyInstaller member"):
+        dc.check_delivery(binary)
+
+
+def test_pyinstaller_carchive_checks_private_key_and_original(tmp_path):
+    binary = tmp_path / "app"
+    source = b"print('source accidentally bundled')\n"
+    _pyinstaller_executable(
+        binary,
+        [("source.py", source, "x", False), ("signing.pem", KEY_TEXT.encode(), "x", True)],
+    )
+    manifest = tmp_path / "provenance.json"
+    manifest.write_text(
+        json.dumps(
+            {
+                "files": [
+                    {
+                        "relative_path": "source.py",
+                        "input_sha256": hashlib.sha256(source).hexdigest(),
+                    }
+                ]
+            }
+        )
+    )
+    result = dc.check_delivery(binary, provenance_manifest=manifest)
+    assert result["status"] == "fail"
+    assert _codes(result) == [dc.ORIGINAL_SOURCE, dc.PRIVATE_KEY]
+
+
 def test_executable_prefix_without_valid_header_is_rejected(tmp_path):
     binary = tmp_path / "not-an-app"
     binary.write_bytes(b"MZ only a text prefix")
@@ -259,3 +361,143 @@ def test_check_delivery_writes_nothing(build):
     before = sorted(p.relative_to(build) for p in build.rglob("*"))
     CliRunner().invoke(main, ["--check-delivery", str(build / "dist")])
     assert sorted(p.relative_to(build) for p in build.rglob("*")) == before
+
+
+def test_pyinstaller_windows_names_are_normalised(tmp_path):
+    binary = tmp_path / "app"
+    _pyinstaller_executable(binary, [(r"pkg\data\label.txt", b"label", "x", False)])
+    assert dc.check_delivery(binary)["status"] == "ok"
+    _pyinstaller_executable(binary, [(r"pkg\data\label.txt", KEY_TEXT.encode(), "x", False)])
+    result = dc.check_delivery(binary)
+    assert result["findings"][0]["path"] == "pkg/data/label.txt"
+    assert _codes(result) == [dc.PRIVATE_KEY]
+
+
+@pytest.mark.parametrize("name", [r"..\evil", r"C:\x"])
+def test_pyinstaller_windows_unsafe_names(tmp_path, name):
+    binary = tmp_path / "app"
+    _pyinstaller_executable(binary, [(name, b"data", "x", False)])
+    with pytest.raises(ValueError, match="Unsafe PyInstaller member name"):
+        dc.check_delivery(binary)
+
+
+def test_pyinstaller_windows_normalised_duplicate(tmp_path):
+    binary = tmp_path / "app"
+    _pyinstaller_executable(
+        binary, [(r"pkg\data.txt", b"a", "x", False), ("pkg/data.txt", b"b", "x", False)]
+    )
+    with pytest.raises(ValueError, match="Duplicate PyInstaller member"):
+        dc.check_delivery(binary)
+
+
+def test_large_non_pyinstaller_remains_uninspected(tmp_path, monkeypatch):
+    binary = tmp_path / "app"
+    binary.write_bytes(_binary_header("ELF") + b"ordinary executable" * 100)
+    monkeypatch.setattr(dc, "_MAX_ENTRY_BYTES", 100)
+    result = dc.check_delivery(binary)
+    assert result["status"] == "warn"
+    assert _codes(result) == [dc.FROZEN_UNINSPECTED]
+    assert result["inspection"]["frozen_executables"]["inspected"] == 0
+
+
+def test_pyinstaller_runtime_options_are_not_payload_members(tmp_path):
+    binary = tmp_path / "app"
+    _pyinstaller_executable(
+        binary,
+        [
+            ("W ignore::DeprecationWarning", b"", "o", False),
+            ("W ignore::DeprecationWarning", b"", "o", False),
+            ("pyi-runtime-tmpdir ../tmp/nested", b"", "o", False),
+            ("W ignore::DeprecationWarning", b"harmless", "x", False),
+        ],
+    )
+    result = dc.check_delivery(binary)
+    assert result["status"] == "ok"
+    assert result["findings"] == []
+    counts = result["inspection"]["frozen_executables"]
+    assert (counts["members_total"], counts["members_checked"], counts["unknown_members"]) == (
+        1,
+        1,
+        0,
+    )
+
+
+@pytest.mark.parametrize("compressed", [False, True])
+def test_pyinstaller_nonempty_runtime_option_is_scanned(tmp_path, compressed):
+    binary = tmp_path / "app"
+    _pyinstaller_executable(
+        binary, [("pyi-runtime-tmpdir ../tmp/nested", KEY_TEXT.encode(), "o", compressed)]
+    )
+    result = dc.check_delivery(binary)
+    assert result["status"] == "fail"
+    assert _codes(result) == [dc.FROZEN_UNINSPECTED, dc.PRIVATE_KEY]
+    counts = result["inspection"]["frozen_executables"]
+    assert (counts["members_total"], counts["members_checked"], counts["unknown_members"]) == (
+        1,
+        0,
+        1,
+    )
+
+
+@pytest.mark.parametrize("control", ["\n", "\0", "\x7f", "\x85"])
+def test_pyinstaller_runtime_option_control_character_rejected(tmp_path, control):
+    binary = tmp_path / "app"
+    _pyinstaller_executable(binary, [(f"W ignore{control}warning", b"", "o", False)])
+    with pytest.raises(ValueError, match="Invalid PyInstaller option name"):
+        dc.check_delivery(binary)
+
+
+@pytest.mark.parametrize("typecode", ["m", "M", "s", "z", "Z", "?", "1", "2"])
+def test_pyinstaller_unknown_types_remain_unknown_and_are_scanned(tmp_path, typecode):
+    binary = tmp_path / "app"
+    _pyinstaller_executable(binary, [("member", b"harmless", typecode, False)])
+    result = dc.check_delivery(binary)
+    assert result["status"] == "warn"
+    assert _codes(result) == [dc.FROZEN_UNINSPECTED]
+    counts = result["inspection"]["frozen_executables"]
+    assert (counts["members_checked"], counts["unknown_members"], counts["members_total"]) == (
+        0,
+        1,
+        1,
+    )
+    _pyinstaller_executable(binary, [("member", KEY_TEXT.encode(), typecode, False)])
+    assert _codes(dc.check_delivery(binary)) == [dc.FROZEN_UNINSPECTED, dc.PRIVATE_KEY]
+
+
+@pytest.mark.parametrize(
+    "malformation",
+    ["short_cookie", "toc_bounds", "member_bounds", "decompressed_limit", "length", "typecode"],
+)
+def test_pyinstaller_malformed_archive(tmp_path, monkeypatch, malformation):
+    binary = tmp_path / "app"
+    _pyinstaller_executable(binary, [("data.txt", b"a" * 100, "x", True)])
+    data = bytearray(binary.read_bytes())
+    cookie_start = len(data) - dc._PYINSTALLER_COOKIE.size
+    cookie = list(dc._PYINSTALLER_COOKIE.unpack_from(data, cookie_start))
+    toc_start = cookie_start + dc._PYINSTALLER_COOKIE.size - cookie[1] + cookie[2]
+    if malformation == "short_cookie":
+        data = data[: cookie_start + len(dc._PYINSTALLER_COOKIE_MAGIC) + 1]
+    elif malformation == "toc_bounds":
+        cookie[2] = cookie[1] + 1
+        data[cookie_start:] = dc._PYINSTALLER_COOKIE.pack(*cookie)
+    elif malformation == "member_bounds":
+        struct.pack_into("!I", data, toc_start + 4, cookie[1] + 1)
+    elif malformation == "decompressed_limit":
+        monkeypatch.setattr(dc, "_MAX_FROZEN_MEMBER_BYTES", 50)
+        # Understate the declared size to exercise bounded decompression itself.
+        struct.pack_into("!I", data, toc_start + 12, 1)
+    elif malformation == "length":
+        struct.pack_into("!I", data, toc_start + 12, 99)
+    else:
+        data[toc_start + 17] = 255
+    binary.write_bytes(data)
+    with pytest.raises(ValueError):
+        dc.check_delivery(binary)
+
+
+def test_cli_malformed_pyinstaller_is_error(tmp_path):
+    binary = tmp_path / "app"
+    binary.write_bytes(_binary_header("ELF") + dc._PYINSTALLER_COOKIE_MAGIC)
+    result = CliRunner().invoke(main, ["--check-delivery", str(binary), "--json"])
+    assert result.exit_code == 2
+    assert json.loads(result.output)["status"] == "error"

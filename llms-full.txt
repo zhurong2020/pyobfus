@@ -240,8 +240,16 @@ produce (with `--build-report`). Exit codes: `0` ok or warnings · `1` high
 findings · `2` inspection could not complete (unsafe or duplicate paths,
 symlinks leaving the root, special files, malformed evidence, or limits of
 100,000 entries, 256 MiB per entry, 1 GiB total, 20 MiB per evidence JSON).
-Exit 2 is not a clean result. Bytecode-origin comparison is bounded and frozen
-executables are not unpacked, so read JSON warnings even on exit 0.
+Exit 2 is not a clean result. Bytecode-origin comparison is bounded. Development
+main after 0.14.0 also checks bounded ordinary top-level members of PyInstaller
+CArchive executables for mappings, private keys and byte-identical originals;
+embedded PYZ, marshalled code and unrecognised member types remain explicitly
+unknown/warn and are never unmarshalled. JSON reports members_total,
+members_checked (known plain types only) and unknown_members. Windows member
+separators are normalised to forward slashes. CArchive limits are 20 MiB TOC,
+64 MiB per member and 256 MiB total expanded members, within a 256 MiB
+executable. Other frozen formats remain uninspected, so read JSON warnings
+even on exit 0.
 
 ### 6. List / explain presets
 

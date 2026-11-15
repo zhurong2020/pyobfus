@@ -355,3 +355,60 @@ def test_multimodule_nuitka_standalone(tmp_path):
     for name in MULTIMODULE_NAMES:
         assert name.encode() not in binary, name
     _check_multimodule_artifact(executable, source, output, mapping, tmp_path)
+
+
+@pytest.mark.parametrize("include_mapping", [False, True])
+def test_pyinstaller_onefile_delivery_inspection(tmp_path, include_mapping):
+    """Inspect real onefile outputs without executing them or opening their PYZ."""
+    _require_tool("PyInstaller")
+    from pyobfus.core.delivery_check import FROZEN_UNINSPECTED, MAPPING_FILE, check_delivery
+
+    source = tmp_path / "tiny.py"
+    source.write_text("print('delivery canary')\n", encoding="utf-8")
+    command = [
+        sys.executable,
+        "-m",
+        "PyInstaller",
+        "--onefile",
+        "--clean",
+        "--noconfirm",
+        "--name",
+        "tiny",
+        "--distpath",
+        str(tmp_path / "dist"),
+        "--workpath",
+        str(tmp_path / "build"),
+        "--specpath",
+        str(tmp_path / "spec"),
+    ]
+    if include_mapping:
+        mapping = tmp_path / "mapping.json"
+        mapping.write_text(json.dumps({"pyobfus_version": "0.14.0", "global": {}}))
+        command.extend(["--add-data", f"{mapping}{os.pathsep}."])
+    else:
+        command.extend(
+            [
+                "--runtime-tmpdir",
+                "../pyobfus-delivery-tmp",
+                "--python-option",
+                "W ignore::DeprecationWarning",
+                "--python-option",
+                "W ignore::DeprecationWarning",
+            ]
+        )
+    command.append(str(source))
+    _run(
+        command,
+        cwd=tmp_path,
+        env={**os.environ, "PYINSTALLER_CONFIG_DIR": str(tmp_path / "cache")},
+    )
+    result = check_delivery(tmp_path / "dist" / "tiny")
+    inspection = result["inspection"]["frozen_executables"]
+    assert inspection["format"] == "pyinstaller-carchive"
+    assert inspection["inspected"] == 1
+    assert inspection["unknown_members"] >= 1
+    codes = sorted(finding["code"] for finding in result["findings"])
+    assert result["status"] == ("fail" if include_mapping else "warn")
+    assert codes == sorted(
+        [FROZEN_UNINSPECTED, MAPPING_FILE] if include_mapping else [FROZEN_UNINSPECTED]
+    )

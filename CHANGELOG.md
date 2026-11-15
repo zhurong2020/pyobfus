@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `--check-delivery` recognizes PyInstaller CArchive executables and performs
+  bounded checks of ordinary top-level members for mappings, private keys and
+  byte-identical original sources. Embedded PYZ and marshalled code remain
+  explicitly uninspected/warn, as do unrecognised member types. JSON separates
+  `members_total`, `members_checked` and `unknown_members`; Windows member paths
+  use forward slashes. Malformed or oversized archives exit 2. No
+  PyInstaller dependency is required and no payload is executed or unmarshalled.
 - Signed CI admission also trusts a standby issuer public key (`ci-2026-11b`),
   not yet used by the license server, so a future signer switch does not lock
   out clients from this release onward.

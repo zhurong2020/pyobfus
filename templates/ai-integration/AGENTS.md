@@ -82,6 +82,10 @@ A file that instead opens with `# pyobfus:generated format=1 edition=…` is pyo
 3. If `severity_counts.high > 0`, surface findings before running obfuscation.
 4. In CI, inspect process exit status and command-specific JSON findings; never hide tool errors with `|| true`.
 5. Before shipping, run `pyobfus --check-delivery dist/ --json`. CLI exit codes: 0 ok or warnings (still read the JSON warnings), 1 high findings (e.g. a mapping or private key in the output), 2 inspection could not complete, which is not a clean result. With the `check_delivery` MCP tool, read `status`, findings and limitations in the response instead of exit codes.
+   Development main after 0.14.0 performs bounded checks of ordinary top-level
+   PyInstaller CArchive members; embedded PYZ/marshalled code and unrecognised
+   member types remain unknown/warn and are never unmarshalled. Do not describe
+   a partial frozen inspection as clean.
 6. Pro features need an active trial or licence (Core 0.12.0+). In CI, supply the licence only as the secret environment variable `PYOBFUS_LICENSE_KEY` (Action: `license-key: ${{ secrets.PYOBFUS_LICENSE_KEY }}`); never print, log or commit it, and do not run licensed builds for untrusted fork pull requests.
    Since 0.14.0: CI environment-key builds require request-bound issuer signatures and reject unsigned fallback. The license server serves the signed endpoint; older clients keep using the legacy endpoint. Workstation/offline registration is unchanged. Signed denials disable caching and do not echo internal inactive-state values; never work around a rotation failure using unsigned fallback or an environment public-key override.
 
