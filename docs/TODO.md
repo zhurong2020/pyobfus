@@ -1,5 +1,12 @@
 # TODO
 
+**2026-11-15 下一会话入口**：最新竞品与路线复核见
+[`COMPETITIVE_ROADMAP_RESEARCH_2026-11-15.md`](COMPETITIVE_ROADMAP_RESEARCH_2026-11-15.md)。
+它把后续产品主线收敛为“公开交付参考应用 → Windows Nuitka standalone 单组合验收
+→ 一个冻结格式的 `--check-delivery` → 有真实需求再设计资源保护／L3 扩面”。该文档是
+调研提案，不代表实现或发布已批准；当前立即任务仍是 11-16 周检。进入产品推进前，
+先清理本文件顶部的旧版本状态和已完成历史项，再为单项写接受标准。
+
 **2026-11-11 最新入口**：[本轮巡检](OPERATIONS_REVIEW_2026-11-11.md) →
 [当前计划](CURRENT_PLAN_ZH.md) → [Core 0.13.0 发布核验](CORE_0_13_0_RELEASE_2026-11-07.md)。
 Core 0.13.0 发布、Zenodo／CITATION 与 Glama 接续均已完成；Action v1.1.0／v1 不变。
