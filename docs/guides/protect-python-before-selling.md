@@ -156,12 +156,49 @@ mapping from that build you can restore them:
 
 ## Licensing and payment are separate decisions
 
-pyobfus Community does not add licence checks or expiry. If you need those,
-build them on asymmetric signatures (your server signs, the app only holds
-the public key) or use a licensing service. pyobfus Pro adds build-time
-options such as hard expiry and device binding; see the
-[Community / Pro boundary](../EDITION_BOUNDARY_POLICY.md) for what each edition
-covers.
+Plan licence enforcement separately from payment. For licence checks and expiry,
+choose Pro's distribution controls below, asymmetric signatures (your server
+signs, the app holds the public key), or a licensing service. Community provides
+the local protection and debugging workflow; the
+[Community / Pro boundary](../EDITION_BOUNDARY_POLICY.md) explains the division.
+
+## When Community is not enough
+
+Protect and manage private Python deliveries while keeping your own debugging.
+Community provides private mappings, traceback recovery, build reports and local
+delivery checks. Pro adds four capabilities within the
+[edition boundary](../EDITION_BOUNDARY_POLICY.md):
+
+- **Protection strength:** AES encryption (including L3 / Selective Opacity
+  with an application-owned key), control-flow flattening, dead-code injection, anti-debugging and sealing.
+- **Protected assets:** import strings, embedded data, Runtime String Vault and
+  protected tracebacks.
+- **Distribution control:** device, expiry, run-count, platform and
+  supplied-key policies.
+- **Accountability:** forensic watermarking and buyer-specific builds.
+
+### Reproduce it before you buy
+
+Start the **5-day trial** with `pyobfus-trial start`, then
+[build and run the public reference app](https://github.com/zhurong2020/pyobfus/blob/main/examples/delivery_reference/README.md#pro-lane-trial).
+Compare correct, missing and wrong application-key runs using `--bind-key-env`;
+missing or wrong keys fail closed. The recipe isolates trial state and keeps
+mappings and reports outside the delivery.
+
+The [2026-11-16 acceptance record](../DELIVERY_REFERENCE_APP_ACCEPTANCE_2026-11-15.md#2026-11-16-pro-stage-c-local-trial-linux-cpython-312)
+records PyInstaller onefile and onedir runs for this app. Its opacity report
+recorded 6 eligible targets, 2 encrypted and 0 rejected for this fixture.
+Private mapping restored the L3 `quote_order` frame by name only
+(`original_line: null`).
+
+### What Pro does not do
+
+Pro raises the cost of reading code rather than making it impossible;
+[local checks can be studied and removed](protect-python-code-faq.md#can-i-enforce-a-time-limited-licence-in-the-code-i-ship).
+Runtime key holders can observe execution. Verified reference-app evidence
+covers **Linux with a local trial**, excluding Windows, macOS and clean target
+machines. `--check-delivery` does not inspect frozen PYZ contents; individual
+frozen-executable checks remained `warn`.
 
 ## FAQ
 

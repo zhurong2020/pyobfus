@@ -47,11 +47,89 @@ does not silently decide how an application's non-code assets should be
 packaged. Do not put `mapping.json`, `build.json`, source trees, keys, trial
 state, or raw traces in the delivery directory.
 
-The Pro L3 and Windows Nuitka standalone lanes are acceptance steps, not
-default example commands. They require isolated state and the frozen versions
-recorded by the acceptance plan. `key_provider.py` demonstrates application
-ownership of key input; it contains no key and is not used by the Community
-baseline.
+The Windows Nuitka standalone lane is an acceptance step, not a default
+example command; use the versions recorded by the acceptance plan.
+
+## Pro lane (trial)
+
+Try Pro's L3 / Selective Opacity with an application-owned key, then compare
+correct, missing and wrong key runs. Run from the repository root with pyobfus
+and its Pro runtime dependencies installed in `venv/`. The recipe starts a
+**5-day local trial** offline, isolates HOME and USERPROFILE, and keeps keys
+outside the repository. Explore the
+[four Pro capabilities](../../docs/guides/protect-python-before-selling.md#when-community-is-not-enough).
+
+```bash
+(
+export HOME="$(mktemp -d)"
+export USERPROFILE="$HOME"
+export PYTHONPATH="$PWD"
+export PYTHONDONTWRITEBYTECODE=1
+unset PYTHONHOME PYOBFUS_LICENSE_KEY
+work="$(mktemp -d)"
+mkdir -p "$work/private"
+
+venv/bin/python -m pyobfus.trial_cli start
+
+cat > "$work/private/opacity.toml" <<'TOML'
+[[rules]]
+pattern = "storefront.checkout.quote_order"
+layer = "encrypted"
+
+[[rules]]
+pattern = "storefront.catalog.lookup_unit_price"
+layer = "encrypted"
+TOML
+
+export PYOBFUS_DELIVERY_REFERENCE_KEY="$(venv/bin/python -c 'import base64,secrets; print(base64.b64encode(secrets.token_bytes(32)).decode())')"
+
+venv/bin/python -m pyobfus examples/delivery_reference \
+  -o "$work/protected" \
+  --config examples/delivery_reference/pyobfus.yaml \
+  --level pro --crossfile-opacity \
+  --opacity-config "$work/private/opacity.toml" \
+  --bind-key-env PYOBFUS_DELIVERY_REFERENCE_KEY \
+  --save-mapping "$work/private/mapping.json" \
+  --build-report "$work/private/build.json" \
+  --verify-syntax --jobs 1 --json
+
+mkdir -p "$work/protected/storefront/data"
+cp examples/delivery_reference/storefront/data/label.txt \
+  "$work/protected/storefront/data/label.txt"
+
+venv/bin/python "$work/protected/main.py" pro
+# exits 0, matching the baseline:
+# pricing-v1
+# pro: 65.88
+
+env -u PYOBFUS_DELIVERY_REFERENCE_KEY \
+  venv/bin/python "$work/protected/main.py" pro
+# exits 1 with LicenseBindingError
+
+PYOBFUS_DELIVERY_REFERENCE_KEY="$(venv/bin/python -c 'import base64,secrets; print(base64.b64encode(secrets.token_bytes(32)).decode())')" \
+  venv/bin/python "$work/protected/main.py" pro
+# exits 1 with OpacityRuntimeError
+)
+```
+
+Only `protected/` is the delivery directory; keep `private/` (mapping,
+report and opacity rules) and the trial HOME outside it. The generated code
+reads the environment variable through `--bind-key-env`; `key_provider.py`
+documents the same application-owned input name and contains no key. The
+Community baseline does not use it.
+
+The [Pro stage C acceptance record](../../docs/DELIVERY_REFERENCE_APP_ACCEPTANCE_2026-11-15.md#2026-11-16-pro-stage-c-local-trial-linux-cpython-312)
+and [`pro_reference` / `test_delivery_reference_pro_pyinstaller`](../../integration_tests/test_packaging.py)
+cover this configuration and its PyInstaller onefile/onedir runs.
+The opacity report recorded 6 eligible targets, 2 encrypted and 0 rejected.
+The encrypted `quote_order` traceback frame was restored by name only, with
+`original_line: null`.
+
+**Scope:** verified on Linux with a local trial, including the protected
+directory and PyInstaller runs. Windows, macOS and clean target machines are
+outside this evidence. `--check-delivery` does not inspect frozen PYZ contents;
+see [What Pro does not do](../../docs/guides/protect-python-before-selling.md#what-pro-does-not-do)
+for the protection boundaries.
 
 ## Feedback
 

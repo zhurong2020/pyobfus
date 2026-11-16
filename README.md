@@ -119,20 +119,19 @@ string and numeric transforms, framework-aware presets, config-aware pre-flight 
 SARIF, structured dry-run, reverse traceback mapping, syntax verification,
 provenance, reproducible output and verifiable build reports.
 
-Pro builds require an active trial or a registered license. This applies to
-CLI flags, presets, configuration files, MCP builds, and direct library
-transforms. Installing the bundled Pro components alone does not activate Pro.
-See the [activation and offline-use guide](https://github.com/zhurong2020/pyobfus/blob/main/docs/LICENSE_ACTIVATION_GUIDE.md).
+Professional adds four ways to protect and manage commercial deliveries:
 
-Professional adds four kinds of commercial value:
-
-- **Protection strength:** AES encryption, control-flow flattening, dead-code
-  injection, anti-debugging, Selective Opacity and sealing.
+- **Protection strength:** AES encryption (including L3 / Selective Opacity
+  with an application-owned key), control-flow flattening, dead-code injection, anti-debugging and sealing.
 - **Protected assets:** import strings, embedded data, Runtime String Vault and
   protected tracebacks.
 - **Distribution control:** device, expiry, run-count, platform and
-  application-supplied-key policies.
+  supplied-key policies.
 - **Accountability:** forensic watermarking and buyer-specific builds.
+
+Activate Pro with a trial or registered license for CLI, preset, configuration,
+MCP and library builds. See the
+[activation and offline-use guide](https://github.com/zhurong2020/pyobfus/blob/main/docs/LICENSE_ACTIVATION_GUIDE.md).
 
 The durable classification rule is documented in the
 [Community / Pro boundary policy](https://github.com/zhurong2020/pyobfus/blob/main/docs/EDITION_BOUNDARY_POLICY.md).
@@ -200,6 +199,8 @@ the customer your mapping or original source. `--trace-marker` can also stamp
 generated files with the exact recovery command.
 
 ## Purchase Professional Edition
+
+Shipping private Python apps? [Try Pro on the public reference app — 5-day free trial.](https://pyobfus.readthedocs.io/en/latest/guides/protect-python-before-selling/#when-community-is-not-enough)
 
 Pro builds in CI need `PYOBFUS_LICENSE_KEY` or a registered runner. The secret
 verifies online without consuming device slots; see [CI licensing](https://github.com/zhurong2020/pyobfus/blob/main/docs/CI_LICENSING.md).

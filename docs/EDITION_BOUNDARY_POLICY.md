@@ -65,10 +65,10 @@ Pro capabilities should deliver at least one of four commercial values:
 
 | Value group | Customer outcome | Current examples |
 |---|---|---|
-| Protection strength | Raises reverse-engineering cost beyond basic AST mangling | AES string encryption, control-flow flattening, dead-code injection, anti-debugging, Selective Opacity, sealing |
-| Protected assets | Protects more than identifiers in source code | import strings, embedded data, Runtime String Vault, encrypted/scrubbed tracebacks |
-| Distribution control | Constrains where, when, or how a shipped artifact runs | device binding, expiry, run count, platform policy, application-provided keys |
-| Accountability | Attributes a build or leak to a recipient | forensic/buyer watermarking, buyer-specific builds and seals |
+| Protection strength | Raises reverse-engineering cost beyond basic AST mangling | AES encryption (including L3 / Selective Opacity with an application-owned key), control-flow flattening, dead-code injection, anti-debugging and sealing |
+| Protected assets | Protects more than identifiers in source code | import strings, embedded data, Runtime String Vault and protected tracebacks |
+| Distribution control | Constrains where, when, or how a shipped artifact runs | device, expiry, run-count, platform and supplied-key policies |
+| Accountability | Attributes a build or leak to a recipient | forensic watermarking, buyer-specific builds and seals |
 
 Paid organization services may also include managed policy, central key or
 signing infrastructure, access control, audit retention, support, or an SLA.
