@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # pre-commit: block PII patterns and credential material from entering commits.
 #
-# Three independent scans, each with its own allowlist and its own bypass:
+# Three independent scans, each with its own bypass; scans 2 and 3 have allowlists:
 #
 #   1. PII      — Origin: 2026-05-03 PII cleanup (V0.4_EXECUTION_LOG Sessions
 #                 13-15) removed CCPC software-copyright filing materials from
@@ -25,12 +25,6 @@
 
 set -eu
 
-PII_PATTERN='诸嵘|陈启稚|qizhi_chen|身份证|/home/wuxia/'
-
-# Allowlisted paths: files that legitimately discuss the cleanup itself.
-# Anchored to repo root with -x for full-line match.
-PII_ALLOWLIST_RE='docs/V0\.4_EXECUTION_LOG\.md|\.githooks/pre-commit|\.githooks/README\.md|CLAUDE\.md'
-
 # Keep credential shapes aligned with pyobfus/core/secret_literals.py.
 # High-signal credential prefixes/shapes only. Deliberately NOT generic
 # entropy matching: this repo ships a secret *detector*, so broad heuristics
@@ -53,18 +47,39 @@ fail_banner() {
 
 # ---------------------------------------------------------------- PII scan
 if [[ "${PYOBFUS_ALLOW_PII:-0}" != "1" ]]; then
-    mapfile -t pii_staged < <(staged_files "$PII_ALLOWLIST_RE")
-    if (( ${#pii_staged[@]} > 0 )); then
-        hits=$(git grep --cached -nE "$PII_PATTERN" -- "${pii_staged[@]}" 2>/dev/null || true)
-        if [[ -n "$hits" ]]; then
+    # Worktrees share the main checkout's ignored, backed-up private list.
+    if [[ -n "${PYOBFUS_PII_PATTERNS_FILE:-}" ]]; then
+        pii_patterns_file="$PYOBFUS_PII_PATTERNS_FILE"
+    else
+        pii_patterns_file="$(cd "$(git rev-parse --git-common-dir)/.." && pwd)/docs/internal/pii-patterns.txt"
+    fi
+    pii_patterns=()
+    if [[ -f "$pii_patterns_file" ]]; then
+        mapfile -t pii_patterns < <(sed '/^[[:space:]]*#/d; /^[[:space:]]*$/d' "$pii_patterns_file")
+    fi
+    if (( ${#pii_patterns[@]} == 0 )); then
+        printf '%s\n' 'NOTICE: PII scan inactive; create docs/internal/pii-patterns.txt in the main checkout (one extended regex per line), or set PYOBFUS_PII_PATTERNS_FILE.' >&2
+    else
+        # Each line is an extended-regex alternative; no tracked allowlist.
+        pii_pattern_args=()
+        for pattern in "${pii_patterns[@]}"; do
+            pii_pattern_args+=(-e "$pattern")
+        done
+        mapfile -t pii_staged < <(staged_files '^$')
+        locs=""
+        if (( ${#pii_staged[@]} > 0 )); then
+            locs=$(git grep --cached -nE "${pii_pattern_args[@]}" -- "${pii_staged[@]}" 2>/dev/null \
+                       | cut -d: -f1,2 || true)
+        fi
+        if [[ -n "$locs" ]]; then
             fail_banner
             cat >&2 <<EOF
 ERROR: pre-commit blocked — PII pattern detected in staged content
 ============================================================
 
-$hits
+Locations (content deliberately not printed):
 
-Blocked patterns: 诸嵘 / 陈启稚 / qizhi_chen / 身份证 / /home/wuxia/
+$locs
 
 Why this hook exists:
   2026-05-03 git history rewrite removed CCPC software-copyright
@@ -72,8 +87,7 @@ Why this hook exists:
   This hook prevents accidental reintroduction.
 
 If the match is legitimate (e.g. you are documenting the cleanup):
-  1. add the file path to PII_ALLOWLIST_RE in .githooks/pre-commit, or
-  2. bypass once with: PYOBFUS_ALLOW_PII=1 git commit ...
+  Bypass once with: PYOBFUS_ALLOW_PII=1 git commit ...
 
 ============================================================
 EOF
@@ -123,7 +137,7 @@ fi
 # --------------------------------------------------------- customer scan
 # Added lines only: existing tracked content is not re-litigated on every
 # edit, and the scan stays fast. Skipped: the hook files themselves and the
-# PII-cleanup log (already allowlisted by scan 1).
+# historical cleanup log (legacy documentation examples).
 CUSTOMER_ALLOWLIST_RE='\.githooks/.*|docs/V0\.4_EXECUTION_LOG\.md'
 if [[ "${PYOBFUS_ALLOW_CUSTOMER_DATA:-0}" != "1" ]]; then
     # shellcheck source=customer-data-patterns.sh

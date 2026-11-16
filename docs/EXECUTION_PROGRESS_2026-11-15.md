@@ -44,7 +44,7 @@
   端点监控也成功。
 - 11-15 每日快照与周快照成功；Google Drive `current/` 镜像和 cold archive 同步
   成功，云端完成标记为 2026-11-15 10:02:00。
-- 11-15 KV 导出成功：7 license、0 trial、0 other；本地轮转正常。
+- 许可状态导出成功，本地轮转正常。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m01`。）
 - `check_backup.sh` 打印“最新日期 2026-11-15”后提前结束，没有展示全部章节；
   底层日志、快照和云端完成标记均明确成功。脚本的提前退出作为非阻塞维护发现，
   本轮不顺带修改。

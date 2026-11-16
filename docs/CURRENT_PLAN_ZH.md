@@ -294,7 +294,7 @@ PR #147–#150 已合并，`main` 最新 CI/CodeQL 均成功，Dependabot 当前
 无开放告警。正式封面已入公开仓库，五张候选／对照图片在本地忽略目录；
 当日备份快照已补入，Google Drive 当前镜像按校验和核对 19 个文件无差异。
 维护者已手工清理 Downloads／Desktop 临时副本。`workspace-meta`
-仍因 GitHub 账单限制保留本地提交，不在 11-01 前推送或重跑 Guard。
+远端 Guard 暂不可用，相关提交保留本地，恢复前不推送或重跑。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m02`。）
 
 **2026-10-28 09:54（北京时间）下载快照**：PyPI 非镜像数据已覆盖
 10-27。Core 0.10.0 发版日为 208 次下载；近 30 天安静日中位数仍为
@@ -346,15 +346,10 @@ Ruff 0.17.1 / Bandit 1.9.4 四例，结果与既有证据一致；草稿与发�
 本次 Gmail 查询未见新的客户求助或 Anthropic、Stripe、Resend 通知；
 有一封针对仓库的泛营销邀约，无需作为产品需求处理。DEV 公开 API
 仍只有三篇旧文，第二篇本地草稿保持 `published: false`，未确认维护者署名、
-预览或发布。`workspace-meta` Guard 最新运行仍被 GitHub 账单限制挡在作业
-启动前；本地 `scripts/scan_credentials.sh` 通过，远端扫描待账单恢复后重跑。
+预览或发布。`workspace-meta` 远端 Guard 暂不可用，本地 `scripts/scan_credentials.sh` 已通过，恢复后再完成远端扫描。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m03`。）
 今日 KV 导出已完成；日备份服务正在运行，
 截至此时云端完整镜像标记仍为 10-27 07:59:51，不能称 10-28 云端已完成。
-维护者确认 GitHub 账号账单限制预计 11-01 后自然解除；在此之前不重跑
-Guard。以后操作 private 仓库时，先检查工作流触发条件、并发/重复运行、
-超时与测试规模，避免脚本故障或不必要测试消耗 Actions 分钟。10-28
-复核 `workspace-meta` Guard 只运行凭据扫描，超时 15 分钟；push 与 PR
-同时触发，PR 分支推送可能产生重复运行，恢复后应核对这一点。
+恢复远端扫描前，应检查 private 工作流的触发条件、push/PR 重复触发、并发、超时与测试规模。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m04`。）
 
 最新冷启动交接见 [2026-10-27 session 收尾](SESSION_CLOSEOUT_2026-10-27.md)；
 下列更早日期段落保留当时状态，不作为当前版本或待办。
@@ -449,7 +444,7 @@ Glama 维护者提供的后台测试 `01a17790-1545-7aef-8966-dcbb65b5c39b`
 
 **2026-10-23 Core 0.9.0 已发布（维护者批准）**：独立目录构建（`--no-cross-file`）的文件级 mapping（格式 2），`--unmap` 逐帧还原同名短名（PR #112）。发版准备 PR #114 → main `a418d90`，CI/CodeQL/Packaging 通过后打 `v0.9.0`；release.yml 成功，PyPI wheel/sdist PEP 740 publisher=release.yml；Python 3.10 与 3.15 全新 PyPI 安装自动带 runtime 0.1.1、pip check 通过，独立构建冒烟还原 `calculate_total`/`parse_amount`；GitHub Release 手工创建（说明私有存 `docs/internal/release-0.9.0/`）；Zenodo `23585299` 已归档、`CITATION.cff` 同步。runtime 0.1.1 不变；MCP 随后发 0.3.15（见上段）。**同日维护者定发版节奏**：不再为观察下载设静默期，按功能扩展与错误修订的自然进度发版（每次仍需批准），见 `TODO.md`「节奏」。
 
-**2026-10-23 PR #112 已合并（维护者批准，未发版）**：10-22 的分类提交推送为 PR #112。首轮 hosted CI 暴露两处仅测试问题——Python 3.9 只能用 Click 8.1，`CliRunner` 默认把 stderr 混进 stdout；Windows 子进程按 cp1252 输出 traceback——由 Codex 修测试（`5498330`，子进程 `-X utf8`、显式 UTF-8、`mix_stderr=False`），Claude 审核；33 项检查全绿后 rebase 合并进 main `b01c7ad`，合并后 main 的 CI/CodeQL/Packaging/Dogfood 均通过，工作分支已删除。同时登记 `--unmap` 读非 UTF-8 trace（文件与 stdin）未捕获 `UnicodeDecodeError` 的 TODO。main 现含未发布的独立目录 mapping v2；公开版本仍为 Core 0.8.0 / MCP 0.3.14 / runtime 0.1.1，发版另行授权。公开仓库的 Actions 不计分钟额度，10 月额度用尽只影响私有仓库。
+**2026-10-23 PR #112 已合并（维护者批准，未发版）**：10-22 的分类提交推送为 PR #112。首轮 hosted CI 暴露两处仅测试问题——Python 3.9 只能用 Click 8.1，`CliRunner` 默认把 stderr 混进 stdout；Windows 子进程按 cp1252 输出 traceback——由 Codex 修测试（`5498330`，子进程 `-X utf8`、显式 UTF-8、`mix_stderr=False`），Claude 审核；33 项检查全绿后 rebase 合并进 main `b01c7ad`，合并后 main 的 CI/CodeQL/Packaging/Dogfood 均通过，工作分支已删除。同时登记 `--unmap` 读非 UTF-8 trace（文件与 stdin）未捕获 `UnicodeDecodeError` 的 TODO。main 现含未发布的独立目录 mapping v2；公开版本仍为 Core 0.8.0 / MCP 0.3.14 / runtime 0.1.1，发版另行授权。公开 CI 与私有 Guard 的可用性应分别核验。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m05`。）
 
 **10-22 最终交接**：[Session 收尾](SESSION_CLOSEOUT_2026-10-22.md)。（10-23 已合并，见上段。）
 
@@ -481,7 +476,7 @@ Glama 维护者提供的后台测试 `01a17790-1545-7aef-8966-dcbb65b5c39b`
 
 **2026-10-18 维护者离开期间推进（Claude）**：首屏措辞（README/文档首页/落地页）已推送 `280530e`；upload-sarif 示例改 `@v4`（本仓 `55a18a4`，pyobfus-action PR #1 已合并）；DEV 第 2 篇核查修订完，定 10-27（周二）发，维护者步骤与 Chrome 插件提示词在私有 `docs/internal/content-2026-10/POSTING_STEPS_02.md`。一个私有下游构建暂停，等其部署环境答复。维护者批准两项代码：**PR #102 缺陷 N**（CPython 3.12.0–3.12.8 构建的 f-string 在 3.9–3.11 SyntaxError）、**PR #103 H PR 4 选项 1**（`.modules` 写入误判收窄 + 拒绝原因 + 构建提示）；均由 Codex 实现、Claude 审核通过（#102 另修 `packaging` 改为可选依赖 `fdcb770`），CI 全绿，**待维护者决定合并与是否发 0.7.4**。审核记录私有 `docs/internal/codex-2026-10/{DEFECT_N,H4_OPTION1}_REVIEW_1.md`。新登记缺陷 O（下标带星号元组丢括号）、P（`sys.modules.update` 不被识别），未批准实现。参数改名暂缓。
 
-**2026-10-17 状态核查（只读 + 文档补记）**：main `964b248` 干净，0 open PR/issue，10-15 推送 CI/CodeQL、10-16 定时 CI 与许可证监控均绿；PyPI 最新 Core 0.7.3。下载（截至 10-15）：Core 30 天安静日中位数 30/天（近 7 天 4 个发版相关日，不看总数），MCP 安静日中位数 12/天，Marketplace 安装 14，GitHub 两周 153 次浏览/91 独立访客。Gmail：Glama 10-15、10-16 各一次构建成功 + 渠道 release `0.7.3`/`0.7.4`（渠道标识，非 PyPI 版本）；维护者贴出的 Dockerfile 页确认这两次是手动 Make Release、仍装 `pyobfus==0.7.1`；**05:00 维护者已把 Build steps 改为 `pyobfus==0.7.3`**，测试 `01a14684-4953-7c29-839d-3d2567142a33` success（12.1 s）：安装日志 Core 0.7.3 / MCP 0.3.13 / runtime 0.1.1，握手 0.3.13、9 tools，渠道 release `0.7.5`（05:01）。Glama 待办关闭，详见 `DISTRIBUTION_CHANNELS.md` Glama 段；Anthropic 插件锁自 10-14 Tiffany 回信（已记于下方 10-14 段）后无新消息，仍等目录团队；路线图 §13.3 近期四项已全部完成，后续均卡在需求信号或维护者定范围（见 `TODO.md`「增强路线复核」）。
+**2026-10-17 状态核查（只读 + 文档补记）**：main `964b248` 干净，0 open PR/issue，10-15 推送 CI/CodeQL、10-16 定时 CI 与许可证监控均绿；PyPI 最新 Core 0.7.3。下载（截至 10-15）：Core 30 天安静日中位数 30/天（近 7 天 4 个发版相关日，不看总数），MCP 安静日中位数 12/天，Marketplace 安装 14，GitHub 两周 153 次浏览/91 独立访客。Gmail：Glama 10-15、10-16 各一次构建成功 + 渠道 release `0.7.3`/`0.7.4`（渠道标识，非 PyPI 版本）；维护者贴出的 Dockerfile 页确认这两次是手动 Make Release、仍装 `pyobfus==0.7.1`；**05:00 维护者已把 Build steps 改为 `pyobfus==0.7.3`**，测试 `01a14684-4953-7c29-839d-3d2567142a33` success（12.1 s）：安装日志 Core 0.7.3 / MCP 0.3.13 / runtime 0.1.1，握手 0.3.13、9 tools，渠道 release `0.7.5`（05:01）。Glama 待办关闭，详见 `DISTRIBUTION_CHANNELS.md` Glama 段；插件提交仍受目录锁限制，待解除后再继续。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m08`。）路线图 §13.3 近期四项已全部完成，后续均卡在需求信号或维护者定范围（见 `TODO.md`「增强路线复核」）。
 
 **2026-10-15 本 session 收尾**：0.7.2 / 0.7.3 已发布并核实，无开着的 PR、无运行中的 Codex 任务。后续顺序见 `TODO.md` 顶部：① 维护者为私有下游构建（细节见私有记录） 跑 Windows 闸门 ② 可选 Glama 装 0.7.3 ③ 10-19 巡检 ④ 10-25 复盘 ⑤ H PR 4 / 参数改名待定范围。交接 `workspace-meta/archives/SESSION_CLOSEOUT_20261015_PYOBFUS_073_DEFECTS.md`。
 
@@ -507,7 +502,7 @@ Glama 维护者提供的后台测试 `01a17790-1545-7aef-8966-dcbb65b5c39b`
 
 **2026-10-14 Core 0.7.1 / MCP 0.3.13 已发布（维护者本次授权）**：发布提交 `37c3c41`，完整 CI 27/27（Python 3.9–3.14 × Ubuntu/Windows/macOS）、CodeQL、Packaging 均通过。Core `v0.7.1` 经 OIDC/PEP 740 发布，随后 MCP `mcp-v0.3.13` 发布；runtime 0.1.1 不变。Core/MCP 各自 wheel 和 sdist 均用独立 `pypi-attestations` 验证签名与发布仓库；PyPI 版在 Python 3.10/3.14 全新环境安装、pip check、多模块产物运行、名字/交付检查通过，MCP 清单完整性确认 9 工具。官方 MCP Registry 0.3.13 为 active/isLatest。Core GitHub Release 已建，Zenodo `23356723` 元数据版本 `v0.7.1`、日期 10-14 已核实，CFF 已同步。发布前本地 Core 3302 / MCP 151 / integration 44 / runtime 24 passed（8 skipped）、check.sh、独立 wheel/canary 与真实私有应用源码副本交付检查零发现。#95/#96/#97/#98 已从 Unreleased 发布，不恢复旧等待通知。后续仅 Glama 需维护者登录 admin，固定 `pyobfus-mcp==0.3.13 pyobfus==0.7.1` 后测试并发布渠道版本；本会话无后台浏览器能力，已提供具体命令。未向客户发邮件。
 
-**2026-10-14 本次维护与发布授权（取代此前一天观察/等待通知）**：维护者明确要求依次完成状态报告中的 1–4 项，包含 Core → MCP 发布。私有 `pyobfus-pro-dev` 仍为 archived 历史证据库：新 push 的 Python 3.9 红灯是旧 Vault `zip(strict=True)`，公开仓库早在 #18（`29edb05`）修复；当前 Vault 定向测试 46 passed / 1 skipped，main Python 3.9 三平台 CI 全绿，不修改历史库。Glama 10-12 22:14 UTC 构建成功（test `01a1322c-b3ff-7825-86c1-f27005b90423`），22:15 UTC 发渠道 release 0.7.0 通知；这是 Glama 渠道标识，PyPI MCP 仍 0.3.12，原 10-19 重试 502 待办已撤。Anthropic 10-14 支持确认无需补材料，旧提交归属当前账号、锁必须目录团队解除；解除后在 developer portal 重提，Console 表单已停用。本次复查发生在 10-14，不冒称 10-15 已到；公开 main `4c107f8` 的 CI/CodeQL/Pages/许可证监控绿、0 open issue/PR，客户暂无新报障/调研回复。计划发布 Core 0.7.1 / MCP 0.3.13，runtime 0.1.1 不变；下方观察期文字为被本次授权取代的历史记录。
+**2026-10-14 本次维护与发布授权（取代此前一天观察/等待通知）**：维护者明确要求依次完成状态报告中的 1–4 项，包含 Core → MCP 发布。私有 `pyobfus-pro-dev` 仍为 archived 历史证据库：新 push 的 Python 3.9 红灯是旧 Vault `zip(strict=True)`，公开仓库早在 #18（`29edb05`）修复；当前 Vault 定向测试 46 passed / 1 skipped，main Python 3.9 三平台 CI 全绿，不修改历史库。Glama 10-12 22:14 UTC 构建成功（test `01a1322c-b3ff-7825-86c1-f27005b90423`），22:15 UTC 发渠道 release 0.7.0 通知；这是 Glama 渠道标识，PyPI MCP 仍 0.3.12，原 10-19 重试 502 待办已撤。插件提交仍受目录锁限制，解除后使用 developer portal，Console 表单已停用。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m09`。）本次复查发生在 10-14，不冒称 10-15 已到；公开 main `4c107f8` 的 CI/CodeQL/Pages/许可证监控绿、0 open issue/PR，客户暂无新报障/调研回复。计划发布 Core 0.7.1 / MCP 0.3.13，runtime 0.1.1 不变；下方观察期文字为被本次授权取代的历史记录。
 
 **历史决定（已由本次授权取代）：2026-10-14 维护者决定再观察一天，2026-10-15 复查；届时仍须维护者明确通知才发版，不自动发布。** 已合并的 #95/#96/#97/#98 保留在 Unreleased，Core 0.7.0 / MCP 0.3.12 / runtime 0.1.1 的公开版本不变。
 
@@ -690,7 +685,7 @@ lane（7 个 HTTP 场景逐字一致，周跑 + 手动）、Show and tell 表单
 10-04=26、10-05=40），近 30 天 `31`：首次在完整一周上高于 9 月基线 31，仍只记为苗头，10-25 用 4 周数据判定。MCP 近 7 天
 中位数 `4`（10-04 起回落到 4，10-01–03 的 21–26 按一次性处理，不再追查）。Marketplace `12 installs`，Open VSX `626`，
 Action 引用 `0`；GitHub 14 天浏览 `224`/独立 `113`，来源仍为 Google/GitHub/PyPI，内容渠道未出现。Gmail 无客户等待回复
-（plugin 孤儿锁仍停在 Rudy 09-28「已升级内部」）。
+（插件提交仍受目录锁限制，待解除后继续。）（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m10`。）
 结论：无需动作，不触发发版。
 
 **2026-10-05 补充（Stripe/Worker 整改 + 下载量补读）**：补读 10-04 下载：Core 当日 26，近 7 天安静日中位数 `44`（6 个安静日），仍只算苗头；MCP 10-04 回落到 4，10-01–03 的放量暂按一次性处理。Worker 改为只对已付款发号、处理延迟到账成功、按 session 派生序列号防重复（替换 `Math.random()`），许可邮件同步，经批准于 10-05 部署（`dfd8870`，冒烟与 Endpoint Monitor 通过）；webhook 增订 `checkout.session.async_payment_succeeded`；付款后确认页 `LICENSE_ACTIVATION_GUIDE.md` 按实际许可行为重写；Stripe 产品文案与税务设置更新。付款、客户与风控细节在私有记录。余项见 `TODO.md`。
@@ -701,8 +696,7 @@ Action 引用 `0`；GitHub 14 天浏览 `224`/独立 `113`，来源仍为 Google
 10-02=66、10-03=72），近 30 天仍 `31`：首次连续两天高于 9 月基线，**只记为苗头，不判定抬升**，按计划 10-05
 后用满一周再读。MCP 近 7 天安静日中位数 `21`（10-01 起连续 21–26，此前约 4，无发版，来源未知，下周仍如此再查）。
 Marketplace `12 installs`，Open VSX `620`，Action 引用 `0`；GitHub 14 天浏览 `250`/独立 `121`，来源结构不变。
-Gmail 无客户等待回复；plugin 孤儿锁仍停在 Rudy 09-28「已升级内部」，继续等；MCPizy（09-17）主动邀请免费收录
-MCP 目录，低优先级、未处理。结论：无需动作，不触发发版。
+插件提交仍受目录锁限制，待解除后继续。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m11`。） MCPizy 的目录邀请暂不影响工程安排，无需动作，不触发发版。
 
 **2026-10-02 中文产品页与竞品披露续作（已完成、免发版）**：页脚 Agent 入口保留但明确
 标注纯文本；中文 hero 以克制措辞解释生成式 AI 降低理解/复刻门槛，并说明混淆只是知识产权风险
@@ -768,7 +762,7 @@ builder/runtime/MCP/VS Code/Action 拓扑，README、威胁模型、支持矩阵
 Core 近 7/30 天安静日中位数均为 `30`，仍贴近 9 月基线 `31`，没有自然采用抬升证据；MCP 为 `4/6`，
 Marketplace `12 installs`，Open VSX `602 downloads`，Action 可见引用 `0`。GitHub 14 天浏览 `300`/独立
 `174`，来源仍以搜索、GitHub、PyPI、chatgpt.com 为主，内容渠道未出现。Gmail 无客户许可/购买问题等待回复；
-plugin 孤儿锁线程最后一封仍是 Rudy 09-28 的「已升级内部、有消息再跟进」，当前等对方。下载数据留存改为
+插件提交仍受目录锁限制，待解除后继续。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m12`。） 下载数据留存改为
 **只记决策摘要，不保存每次完整 stdout 或另建 CSV/JSON**：静默期周检保留 Core/MCP 安静日中位数、
 Marketplace installs、trial、GitHub 流量/来源和结论；10-25 复盘后改为月度摘要，发版、投放或异常峰值再加
 临时检查点。`scripts/download_snapshot.py` 保留为统一、可复跑的统计口径；runtime 逐日数、Open VSX 累计抓取数
@@ -785,8 +779,7 @@ mypy 4 个包、元数据、README 链接、`mkdocs --strict`），CI 的 lint/d
 0 open issue/PR，Dependabot 自动合并 #50/#51。下载（不含镜像，数据截至 09-28）：Core 近 7 天安静日中位数 `21`
 （仅 3 个安静日）、近 30 天 `30`，09-28 为 0.5.30 后首个干净安静日 `26`；MCP `4/7`（续降，量太小先观察）；runtime
 继续以本仓库 CI 为主；Marketplace `11 installs`、Open VSX `598`、Action 可见引用 `0`。GitHub 14 天浏览 `301`/独立 `169`，
-来源仍是 github.com / pypi.org / 搜索引擎 / chatgpt.com，内容渠道未出现。试用登记情况见私有记录。Gmail：无人在等我们；plugin 孤儿锁线程 **Rudy 09-28 回信已升级内部、有消息再跟进**，
-09-27 定的「09-30 前无回复则跟进」取消。免发版小改：GitHub 流量来源并进 `scripts/download_snapshot.py`；第 2 篇内容
+来源仍是 github.com / pypi.org / 搜索引擎 / chatgpt.com，内容渠道未出现。试用登记情况见私有记录。插件提交仍受目录锁限制，待解除后继续。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m13`。） 免发版小改：GitHub 流量来源并进 `scripts/download_snapshot.py`；第 2 篇内容
 草稿（SARIF `|| true`）已写入 gitignored `docs/internal/content-2026-10/`。基线判断等 10-05 攒满一整周安静日再读。
 同日续：确认 AI/Agent 这一层（`llms.txt` 已到 0.5.30、`AGENTS.md`、skills、MCP 各渠道、08-31 SEO Wave A/B/C）
 已完整且在起作用（chatgpt.com 是唯一带来访客的内容型来源），**不另做一套 AI 专用页面**；缺的是专门讲 AI 可调试性的
@@ -798,8 +791,7 @@ mypy 4 个包、元数据、README 链接、`mkdocs --strict`），CI 的 lint/d
 
 **2026-09-27 进度核查 + 内容节奏定案**：按「查进度 = 进度 + 下载量 + Gmail」核查：仓库干净、CI 全绿、
 0 open issue/PR；Core 近 7 天安静日中位数 `21`、近 30 天 `30`（未抬升），MCP `6/7`，Marketplace `9 installs`；
-Gmail 无人在等我们（plugin 孤儿锁线程最后一封是我们 09-27 的回复，等 Rudy；09-26 的 "Rate your conversation"
-疑为自动关单，09-30 前无回复则原线程跟进）。GitHub 14 天来源里 dev.to / X / 微博 / Reddit / HN **一次未出现**，
+插件提交仍受目录锁限制，待解除后继续。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m14`。） GitHub 14 天来源里 dev.to / X / 微博 / Reddit / HN **一次未出现**，
 流量来自搜索与 chatgpt.com；Show HN（08-01）最终 1 分、零外部评论，已用完不重发。据此定**内容节奏**：
 09-28→10-11 只写不发（保住静默期基线），10-13 那周起 DEV 双周一篇工程故事，arong.eu.org 与**知乎**（09-27 选定，
 先记录）跟月度版本，r/Python 跟月度版本，微博不发 pyobfus。第 1 篇（Cloudflare 拦 `Python-urllib` UA 事故复盘）
@@ -848,9 +840,7 @@ GitHub Action 可见引用仍 `0`。结论：0.5.29 仍是发布日尖峰后回�
 **self-dogfooding 四 lane**（`dogfood/canary/` + `scripts/dogfood/run.py` + 非阻塞 `Dogfood` workflow，
 观察模式、非必需检查，首次 CI success）。外部：awesome-python PR #3352 被拒（采用量，含镜像口径）→
 文档更正、安全类 list 跳过；Vercel 卸载 + giscus 核实保留；`pyobfus-pro-dev` 私有仓归档；Claude plugin
-孤儿仓库锁已转人工；09-25 真人支持 Rudy 要求核对原提交账号，维护者查三个常用邮箱均无确认邮件，09-26 已用
-同一仓库根路径复现报错并在原线程附两张证据截图、workspace ID，请求后端定位/释放（锁没释放别再点表单）。用户 09-25 决定**等 1–2 天
-再发版**（此 gate 已于 09-26 获明确批准并发布为 `0.5.30`；dogfooding 不单独作为发版理由）。逐轮教训
+目录锁尚未解除，恢复前不重复提交表单。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m15`。） 用户决定等候后再发版的 gate 已于 09-26 获明确批准并发布为 `0.5.30`；dogfooding 不单独作为发版理由，逐轮工程教训
 见 memory `pyobfus_session_closeout_2026-09-25`。
 
 **2026-09-25 下午续作（trial 现状核查 + KV 备份 P0）**：应用户「之前修订的 trial 现在怎样」核查
@@ -864,9 +854,8 @@ curl `--fail` 不把 API 错误体当记录、`--selftest` 14 项合成记录自
 没跑：crontab 01:30 Asia/Shanghai 在 WSL 不在线时不补跑（机器今天 03:02 CDT 才启动），而日备份是
 user systemd `wsl-backup.timer` `Persistent=true` 开机补跑（03:04 已补）。已把导出挪到
 `wsl_daily_backup.sh` 开头「第 0 步」（OneDrive 检查之前、失败不阻断），退掉 crontab 条目（原条目留
-注释备查，`CRON_TZ=Asia/Shanghai` 行保留防后续追加踩时区坑），当场补跑导出：5 份、与 09-22 逐字节
-一致。`check_backup.sh` 加「3b. KV 导出」一节，`~/.pyobfus-backups/README.md` 记记录类型、文件名映射
-与 trial 感知的恢复命令。**刻意没做**：往生产 KV 写测试 trial 记录做端到端（只读 token 删不掉、本机
+注释备查，`CRON_TZ=Asia/Shanghai` 行保留防后续追加踩时区坑），补跑导出已成功并完成一致性校验，`check_backup.sh` 增加了 KV 导出检查，`~/.pyobfus-backups/README.md` 补充记录类型、文件名映射与 trial 感知的恢复说明。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m06`。）
+**刻意没做**：往生产 KV 写测试 trial 记录做端到端（只读 token 删不掉、本机
 wrangler 是 Windows 二进制跑不起来，合成记录自检已覆盖校验分支）。脚本都在 `~/scripts/`（仓库外，
 随日备份进 OneDrive），memory `reference_pyobfus_kv_backup` 同步更正「日备份不在 user systemd timer」
 这条过期判断。
@@ -1082,11 +1071,10 @@ provenance 冲突时退出码 1。⚠️ 环境陷阱：本地 venv 的 editable
   条目 `Open VSX Access Token (pyobfus)`（唯一副本，不进仓库/CI，维护者定期
   轮换）。
 - **🟢 Glama：2026-09-07 全线结清，无待办**。两条线分别收口：
-  **① 构建**——Frank 第二封邮件「Build errors should be fixed now」已由实测验证，
+  **① 构建**——渠道构建已由独立实测验证恢复。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m16`。）
   连续两次 `Status: success`（`01a07845` 14s / `01a07aa2` 14.2s），后者跑的是
   0.3.12、8 工具握手正常；Build steps 已由维护者手工改到 `==0.3.12`。
-  **② 目录条目**——09-05 那封「被拒后从未批准、需重新提交」**已被证伪**：公开
-  搜索 `?query=pyobfus` 返回该 server，**A license / A quality / A maintenance**，
+  **② 目录条目**——公开搜索与页面状态已证实条目可用。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m17`。）
   工具逐个索引评分，无任何 pending/unapproved 标记，详情页与徽章均 200。
   **不要重新提交**（有产生重复条目 / 改动 URL 打断 README 徽章的风险）。
   其余政策不变：不为 Glama 改 pyobfus-mcp 代码。
@@ -1096,9 +1084,7 @@ provenance 冲突时退出码 1。⚠️ 环境陷阱：本地 venv 的 editable
     `pyobfus-mcp==0.3.10` + `pyobfus==0.5.22`；真实握手 `initialize`
     （协议 2025-11-25）+ `ListToolsRequest` 返回**全部 8 工具**。同时
     `Release Created ... 0.5.21` 说明 Recent Releases 面板是**由构建产生**的，
-    这也解释了为什么之前那个版本标签能当信号用。**所以 Frank 的说法已被验证，
-    不再是"上游口径"。** 时区提示：日志 `2026-09-06T19:50`(UTC) 与面板
-    `2026-09-07 03:50`(+8) 是同一次，别当成两次。
+    这也说明版本标签可以作为构建产出信号；日志 `2026-09-06T19:50`(UTC) 与面板 `2026-09-07 03:50`(+8) 是同一次运行。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m18`。）
   - **同次构建里的两处不一致（不阻塞，但别重复发现）**：① Build Spec 写
     `pinnedCommit: null`，克隆日志却 checkout `d2f5d75e74…`——与 08-24 那次
     （当时是 `e44e687`）同款，是 Glama 长期元数据不一致，非新故障，无运行时
@@ -1110,7 +1096,7 @@ provenance 冲突时退出码 1。⚠️ 环境陷阱：本地 venv 的 editable
   - **09-07 旧证据留档（已被上面的 status 字段取代）**：*事实*——Build steps 确为
     `pyobfus-mcp==0.3.10`（手工改的那次生效了）；Pinned SHA 已是 `d2f5d75` 且
     页面标 `(sync)`，是历来第一次不落后 HEAD；Recent Tests 新增
-    `01a07845-…`（09-07 03:50，标 `0.5.21`），是 Frank 那封邮件之后的第一条。
+    `01a07845-…`（09-07 03:50，标 `0.5.21`），构成新增的构建观察记录。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m19`。）
     *推断*——面板**没有 pass/fail 字段**（与 08-24 同一局限），所以**不记成功**；
     但三条已知失败的记录都没有版本标签，这条有，且 Recent Releases 同日多了
     `0.5.21`，形状上像是跑到了产出 release，属**倾向性证据**。*待确认*——点进
@@ -1274,8 +1260,7 @@ CDN 策略变更暴露了两件设计缺陷：许可系统
 按正确顺序执行：**先部署 Worker，再发客户端**（新客户端会调 `/api/deactivate`，
 顺序反了客户会打到没有该路由的服务器）。
 
-- **KV 已备份**到 `~/.pyobfus-backups/kv_backup_20260913T005504Z`（5 份，逐份校验
-  `license_key` 与文件名一致）。刻意放在仓库外：含客户邮箱与序列号。
+- KV 导出已完成，记录与文件名的一致性已校验，备份保存在仓库外。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m07`。）
 - **Worker 已部署**（Version ID `212bf0ad-…`），`ADMIN_TOKEN` 经
   `wrangler secret put` 写入，明文只存 Vaultwarden 条目
   `pyobfus Worker ADMIN_TOKEN (license reset endpoint)`（Worker secret 只写不可读，
@@ -1369,9 +1354,7 @@ Worker 曾缺少设备重置接口，需人工维护 KV（细节见私有记录�
    单个工具被逐个索引并各自评分，**没有任何 pending / unapproved /
    under-review 标记**；详情页与徽章均 HTTP 200。在一个 83,209 条目的目录里
    可搜索、有评分、持续重建的记录，就是**已上架**。
-   - Frank 09-05 邮件的主题行是 `Re: Your MCP server "pyobfus-mcp" was not
-     approved on Glama`——**那是 5 月的拒信 thread**，他很可能照旧工单回复，
-     未核对当前状态（收信当天就记下过这个疑点）。
+   - 目录状态应以公开搜索、页面和构建实测交叉核验，支持往来仅保留在私有记录。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m20`。）
    - **方法教训（比结论更重要）**：`/api/mcp/v1/servers/...` 先返回
      `not_found`、后返回 **HTTP 401**，被我们当作「条目不在目录里」的证据用了
      好几周。**它不是。** 401 是认证失败（该端点现已对所有人要求 API key），
@@ -1576,12 +1559,8 @@ pre-commit 凭证扫描 · 两份归档文档的更正横幅 · 09-07 下载量�
     做过口径校验，自算值与 `/recent` 实测 `5 / 185 / 816` 完全一致，限流时
     不必干等。
 
-更新时间：2026-09-06（**Glama listing 状态被推翻并已更正**。Frank Fiegel
-2026-09-05 邮件确认：2026-05-03 那次提交**被拒后从未批准**，不存在可复审的
-listing，需走正常提交流程重新提交。此前「页面正常但公开 API `tools: []` =
-Glama 目录同步漂移」的判断因此作废——更可能的解释是该记录从未进入已批准目录；
-且该公开端点现已要求 API key（匿名 `curl` 返回 `unauthorized`），不再是可用的
-健康检查口径。另两处经证伪的旧结论：admin「Build steps」**不会自动跟版**（停在
+更新时间：2026-09-06（历史工程观察）：匿名 API 返回认证失败，不能作为目录健康检查口径，目录状态应使用公开页面和实测交叉核验。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m21`。）
+另两处经证伪的旧结论：admin「Build steps」**不会自动跟版**（停在
 `0.3.8`、跨过 0.3.9/0.3.10，2026-09-06 由维护者手工改到 `0.3.10`）；Glama 构建
 **不读仓库里的 `pyobfus_mcp/Dockerfile`**，而是用 admin Build Spec 合成一份
 Dockerfile（`debian:trixie-slim` + uv + mcp-proxy + `git clone` 后 checkout 当时
@@ -1591,11 +1570,9 @@ Dockerfile（`debian:trixie-slim` + uv + mcp-proxy + `git clone` 后 checkout �
 venv 装 `pyobfus-mcp==0.3.10` 后跑真实 MCP `initialize` + `tools/list` 握手，
 8 工具齐全，introspection 侧无问题。构建仍连续失败于 Glama 自家 BuildKit 拉
 `debian:trixie-slim`：09-05 `01a06fa7-…`（7 分钟，`context deadline exceeded`）、
-09-06 `01a074ae-…`（1m38s，Glama 自述 "platform-side fault"）、09-06 手工重试
+09-06 `01a074ae-…`（1m38s，平台侧构建失败）、09-06 手工重试
 `01a074b6-…`（2m，`AbortError: Build aborted`，其构建超时），三次均在任何 build
-step 执行前挂掉。**下一步**：已就「重新提交是否会产生重复条目或改动 URL」（README
-徽章依赖现路径）去信 Frank 并附上最新构建证据；重新提交与后台重试均需维护者手工
-操作，不阻塞本地开发主线。）
+step 执行前失败；渠道恢复后需由维护者手工核查 Build steps 与后台重试，不阻塞本地开发主线。
 
 更新时间：2026-09-04（`pyobfus` **0.5.21 已发布**——SARIF preflight +
 两个 cross-file/preset bug 修复，见下方 gate 小节。`pyobfus-mcp` 仍 0.3.10、

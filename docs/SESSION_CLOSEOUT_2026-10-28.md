@@ -21,7 +21,7 @@
 ## 边界与下次顺序
 
 1. **10-29 09:43 北京时间后**：查看 DEV 后台 24 小时阅读数、反应和具体评论；分别标注发布、补封面和 X 分享的时间，不从单次波动推断因果。
-2. **11-01 后**：确认 GitHub 账号账单限制自然解除；先审 `workspace-meta` private Guard 的 push/PR 重复触发、超时和测试成本，再只运行必要的远端扫描并同步待推送的本地文档提交。此前不推送、不重跑 Guard。该仓库在本轮收尾前已有两笔本地提交未推送；本次跨仓索引更新若产生新提交也继续留在本地。
+2. `workspace-meta` 远端 Guard 恢复后，先审 push/PR 重复触发、超时和测试规模，再运行必要扫描并同步本地文档；恢复前保留本地提交。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m24`。）
 3. **11-04 09:43 北京时间后**：复盘文章一周后台数据、GitHub 来源与 PyPI 安静日。Core 10-27 发版日的 208 次非镜像下载早于文章，不能归因于内容。
 4. **日常巡检**：只在真实缺陷／需求和相应授权下安排发版。`pyobfus-action` 的既有本地文档分支 `docs/core-0.10.0-runtime-guide`（`5c6fa1c`）仍未推送；其仓库指南要求推送前由维护者明确授权，本轮未处理。
 
@@ -38,8 +38,7 @@
 项目的 `AGENTS.md` 和 `CLAUDE.md` 已指向本交接；用户版根 README
 仍准确写明 Core 0.10.0，无会话状态需要加入。`workspace-meta` 的 README、
 `WORKSPACE_CLAUDE.md`、`WORK_LOG_INDEX.md` 与 `PYOBFUS_REPOSITORY_MAP.md`
-已同步交接路由；该 private 仓库本地 main 比远端多 4 笔文档提交，账单限制
-解除前不推送。Claude 项目与工作区 memory 索引、Codex 10-28 memory
+已同步交接路由；该 private 仓库的本地文档提交待远端 Guard 恢复后再同步。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m25`。） Claude 项目与工作区 memory 索引、Codex 10-28 memory
 均已写入新入口；旧 memory 保留为带日期的历史记录。
 两处 Claude memory 目录随后定向补入当日快照和 Google Drive 当前镜像：
 项目 memory 110 个文件、工作区 memory 194 个文件，`rclone check --checksum`

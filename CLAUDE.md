@@ -130,7 +130,7 @@ pip install -e ".[dev]"
 git config core.hooksPath .githooks
 ```
 
-**pre-commit 防护钩子**：`.githooks/pre-commit` 有三道**互相独立**的扫描。① PII：拦截 `诸嵘 / 陈启稚 / qizhi_chen / 身份证 / /home/wuxia/` 5 个模式，源于 2026-05-03 的 git 历史改写（见 `docs/V0.4_EXECUTION_LOG.md` Sessions 13-15）。② 凭证（2026-09-07 加）：拦截 Open VSX/PyPI/GitHub/GitLab/npm/Anthropic/OpenAI/AWS/Slack/Google token 前缀与 PEM 私钥头，命中时**只打印 `file:line` 不打印内容**。③ 客户/经营数据（2026-10-29 加，只查新增行）：Stripe 对象 ID 与白名单外的邮箱，`commit-msg` 钩子对提交信息做同样检查。三道各有独立旁路（`PYOBFUS_ALLOW_PII=1` / `PYOBFUS_ALLOW_SECRET=1` / `PYOBFUS_ALLOW_CUSTOMER_DATA=1`），放行 PII 不会顺带放行密钥。详见 `.githooks/README.md`。
+**pre-commit 防护钩子**：`.githooks/pre-commit` 有三道**互相独立**的扫描。① PII：使用保存在仓库跟踪文件之外的本地个人标识列表；在主 checkout 创建 git-ignored 的 `docs/internal/pii-patterns.txt`，每行一个扩展正则，可用 `#` 注释，worktree 共用此文件；可通过 `PYOBFUS_PII_PATTERNS_FILE` 覆盖路径，文件缺失或无有效模式时仅提示扫描未启用。命中仅显示 `file:line`，不显示内容或模式。② 凭证（2026-09-07 加）：拦截 Open VSX/PyPI/GitHub/GitLab/npm/Anthropic/OpenAI/AWS/Slack/Google token 前缀与 PEM 私钥头，命中时**只打印 `file:line` 不打印内容**。③ 客户/经营数据（2026-10-29 加，只查新增行）：Stripe 对象 ID 与白名单外的邮箱，`commit-msg` 钩子对提交信息做同样检查。三道各有独立旁路（`PYOBFUS_ALLOW_PII=1` / `PYOBFUS_ALLOW_SECRET=1` / `PYOBFUS_ALLOW_CUSTOMER_DATA=1`），放行 PII 不会顺带放行密钥。详见 `.githooks/README.md`。
 
 ### 测试
 
@@ -190,6 +190,6 @@ vX.Y.Z"横幅），跟徽标是两回事。
 
 | 关联项目 | 所在 Workspace | 关系 |
 |----------|---------------|------|
-| `pyobfus-legal/` | cardiac-research.code-workspace（WSL 本地同级目录 `~/projects/pyobfus-legal/` · 2026-09-21 起为真实目录，不再是 OneDrive 软链接）| pyobfus 软著 + 专利申报材料的物理仓库（**不在 git repo 内** · 含 PII，不公开）。包含 `software_copyright/` (V0.4.0 软著已 2026-05-09 提交 CCPC) 和未来的 `patent/` (v0.5 专利申请目录)。物理路径：`~/projects/pyobfus-legal/`（旧 OneDrive 副本 `/mnt/c/onedrive/msft/OneDrive - MSFT/rong/3-job/program/pyobfus-legal/` 已过期勿再编辑），工作区入口：`~/projects/pyobfus-legal/`（symlink） |
+| `pyobfus-legal/` | 真实目录 `~/projects/pyobfus-legal/`，never in git | 法律材料独立保管；迁移路径细节仅见私有记录 `docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m29`。 |
 | `pyobfus-pro-dev/` | 本地 `~/projects/pyobfus-pro-dev`；GitHub `zhurong2020/pyobfus-pro-dev`（**private + archived，只读，推送 403**） | **专利 `202610712171X` 的发明/实现时间线证据库，不是开发源**。v0.5 Pro 机制 2026-05-09 起在此开发（早于 05-22 申请日），06-17 初审合格后 squash 合入公开仓库，逐提交历史只在这里；`pyobfus-legal/patent/01_权利要求书/disclosure_v1.md` 依据其 `PATENT_NOTES.md`（28 条）与集成测试撰写，第 12 节引用它。**用途**：实审请求（≈2029-05）、审查答复、无效/维权时证明实现时间与方式。**规则**：保留远端归档、不删不公开；不在其中开发/发版/拷回公开仓库；跨仓同步时跳过它。2026-10-14 远端已包含两个历史标记/`.gitignore` 提交，仍为 archived；10-11 已删本地 `venv-3.10/`。可选加固：`git bundle` 离线备份放 `pyobfus-legal/patent/`（未做）。 |
 | `cac-plus-ip/` | 本地私有仓库（同 workspace） | 同申请人的并行 IP 工作流，与 pyobfus 内容无关；可复用其 CNIPA 申请模板，项目材料保持分离。 |
