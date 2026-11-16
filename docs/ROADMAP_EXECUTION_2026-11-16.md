@@ -23,12 +23,13 @@ Nuitka 验收结果为 partial（D9 unknown、Pro 阶段 C blocked），见
 
 | ID | 任务 | 窗口 | 状态 | 验收 / 停止条件 | 证据 |
 |---|---|---|---|---|---|
-| T0 | 11-16 周检；推送 11-16 收尾文档 | 11-16 | ✅ 完成 | 只记录，不改功能 | 见下方 T0 记录 |
+| T0 | 11-16 周检；推送 11-16 收尾文档 | 11-16 | ✅ 完成 | 只记录，不改功能 | 见下方 T0 记录；#243 已合并 `062579f` |
 | T1 | ROADMAP 重定基线（五类 6–12 个月表，历史原样归档）；TODO 清除已完成层，维护者清单拆分 | 11-17～22 | 🔍 PR 待合并 | 链接全部可解析；版本正确；ROADMAP／TODO 行数明显下降；历史原样保存 | [#245](https://github.com/zhurong2020/pyobfus/pull/245)：ROADMAP 734→约 140 行、TODO 702→191 行；历史逐字节保存（已 `cmp` 核对） |
 | T2 | 刷新 `COMPARISON.md` 快照（按 11-15 核对的版本／价格，补 PyLocket） | 11-17～22 | 🔍 PR 待合并 | 每条有官方链接与核对日期；对外发布前重查；不发版 | [#246](https://github.com/zhurong2020/pyobfus/pull/246)：版本与价格 11-16 在线复核；PyLocket 许可失效表述按定价页与计费条款并列 |
-| T3 | 参考应用 PyInstaller onedir/onefile + Core 0.15.0 CArchive 交付检查；修 Windows workflow 旧 v4.6.2 注释 | 11-23～29 | 🔍 PR 待合并（CI 跑中） | 顶层成员实际被检查；PYZ 明确 uninspected；不得出现假 clean；发现缺陷才改产品代码 | [#244](https://github.com/zhurong2020/pyobfus/pull/244)：onefile 29/21/8 → warn；三种植入均 fail／exit 1；traceback 4 帧全还原；本地复跑 9 passed／3 skipped |
+| T3 | 参考应用 PyInstaller onedir/onefile + Core 0.15.0 CArchive 交付检查；修 Windows workflow 旧 v4.6.2 注释 | 11-23～29 | ✅ 完成 | 顶层成员实际被检查；PYZ 明确 uninspected；不得出现假 clean；发现缺陷才改产品代码 | [#244](https://github.com/zhurong2020/pyobfus/pull/244) 已合并 `4c00a7c`，CI 42 项通过（packaging lane 用 PyInstaller 6.22.3）：onefile 29/21/8 → warn；三种植入均 fail／exit 1；traceback 4 帧全还原；本地复跑 9 passed／3 skipped |
+| T3b | 目录扫描对 onedir 内的冻结可执行文件执行 CArchive 检查（T3 发现） | 11-16 起 | ▶ 11-16 维护者批准，进行中 | 目录扫描与单文件路径给出相同的逐文件检查结果；沿用现有边界；unknown 仍为 unknown；不执行载荷 | — |
 | T4 | 需求入口：交付受阻／冻结格式 issue 模板、参考应用反馈入口、3 个指标与 P1/P2 触发门槛 | 11-23～29 | 🔍 PR 待合并 | 门槛写入 ROADMAP 表 | [#245](https://github.com/zhurong2020/pyobfus/pull/245)：issue 模板、`delivery-blocker` 标签已建、门槛与 90 天停止规则 |
-| T5 | Pro 阶段 C：为 CI 签发隔离 Pro 试用许可，补 L3 冻结交付验证 | 待批准 | ⏸ 待维护者决定 | 不碰真实密钥；许可签发需单独批准 | — |
+| T5 | Pro 阶段 C：为 CI 签发隔离 Pro 试用许可，补 L3 冻结交付验证 | 11-16 起 | ▶ 11-16 维护者批准，进行中 | 不碰真实密钥；许可签发需单独批准 | — |
 | T6 | 12 月第一周搜索／AI 可见性；约 12-04 Core 0.12.0 T+30d（之后逐版本观察并入周检） | 12-01～05 | ⏳ 定时 | — | — |
 | T7 | 以“自管、可验证交付”整理 Pro 购买路径 | 12 月 | ⏳ 待开始 | — | — |
 
@@ -36,7 +37,7 @@ Nuitka 验收结果为 partial（D9 unknown、Pro 阶段 C blocked），见
 
 对 onedir 输出**目录**做 `--check-delivery` 时，目录扫描不解析其中 bootloader 的 CArchive
 （`found=1, inspected=0`，如实报 warn，不是假 clean）；直接检查该可执行文件则会解析。已登记为
-ROADMAP Delivery 表的 Community 候选，实施需单独批准。
+ROADMAP Delivery 表的 Community 候选；**11-16 维护者批准实施**（任务 T3b，见下）。
 
 ## T0 记录（2026-11-16）
 
