@@ -749,8 +749,13 @@ def pro_reference(tmp_path, monkeypatch):
         "sys.addaudithook(audit)\n",
         encoding="utf-8",
     )
-    checkout = EXAMPLES.parent
-    monkeypatch.setenv("PYTHONPATH", os.pathsep.join((str(guard), str(checkout))))
+    # Prepend only the audit hook. Adding the checkout root would let its
+    # pyobfus_runtime/ distribution folder shadow the installed runtime as a
+    # namespace package; keep any caller-provided PYTHONPATH instead.
+    inherited = os.environ.get("PYTHONPATH")
+    monkeypatch.setenv(
+        "PYTHONPATH", os.pathsep.join([str(guard)] + ([inherited] if inherited else []))
+    )
     cli_import = _run(
         [sys.executable, "-c", "import pyobfus; print(pyobfus.__file__)"], cwd=tmp_path
     ).stdout.strip()
