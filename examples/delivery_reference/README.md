@@ -52,3 +52,12 @@ default example commands. They require isolated state and the frozen versions
 recorded by the acceptance plan. `key_provider.py` demonstrates application
 ownership of key input; it contains no key and is not used by the Community
 baseline.
+
+## Feedback
+
+For real delivery problems, use the
+[Delivery blocker / frozen format issue template](https://github.com/zhurong2020/pyobfus/issues/new?template=delivery_blocker.md).
+This example is the shared reproduction baseline: reproduce against it when
+possible and describe any minimal changes needed. Use synthetic inputs and
+remove secrets and personal data; never attach licence keys, private keys,
+mapping files or proprietary source.

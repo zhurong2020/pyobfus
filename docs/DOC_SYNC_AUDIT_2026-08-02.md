@@ -17,7 +17,7 @@ drift; this one goes deeper into structural staleness the mechanical sync missed
 
 **Confirmed gap.** `README.md:7` reads:
 
-> "...a machine-readable JSON CLI designed for [Claude Code](...), [Cursor](...), and MCP agents."
+> `"...a machine-readable JSON CLI designed for [Claude Code](...), [Cursor](...), and MCP agents."`
 
 Codex is conspicuously absent, and it shouldn't be — the project already treats
 Codex as a first-class client elsewhere:
@@ -268,7 +268,7 @@ list.
 
 **Confirmed, two distinct problems:**
 
-1. **"Current Status" section (`docs/ROADMAP.md:10-14`) stops at 0.5.4** (2026-07-19)
+1. **["Current Status" section](ROADMAP_HISTORY_2026-11-16.md#current-status) (historical `docs/ROADMAP.md:10-14`) stops at 0.5.4** (2026-07-19)
    — doesn't mention 0.5.5 (2026-08-02, `--preset ml` + `--provenance-manifest`) or
    0.5.6 (2026-08-02, issue #25 fix + CodeQL sweep) at all.
 2. **P2-17 and P2-19 are still checkbox-marked `[~]` (in progress)** at

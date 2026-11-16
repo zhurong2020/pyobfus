@@ -12,8 +12,8 @@ the sections below describe the mechanism as designed, not something
 currently in flight. Re-activate this process only if a future launch
 generates enough real engagement to make polling meaningful again; until
 then, next-feature selection is a direct maintainer call from the ROADMAP
-candidate list (see `docs/ROADMAP.md`'s open P2-2/P2-6/P2-12 through P2-16/
-P2-21 items).
+candidate list (the historical P2-2/P2-6/P2-12 through P2-16/P2-21 items
+are retained in the [roadmap history](ROADMAP_HISTORY_2026-11-16.md)).
 
 ## Decision window
 
@@ -59,5 +59,5 @@ opening date, closing trigger, links, and raw counts below.
 - First bounded experiment: both fully implemented and shipped as pyobfus
   0.5.5 (2026-08-02), not a bounded experiment — the maintainer judged the
   candidates low-risk/high-relevance enough to ship outright
-- Rationale/link: `docs/POST_V0.4_TODO.md` § item 6; `docs/ROADMAP.md`
-  "Additions from 2026-06-22 competitive + agentic-discoverability scan"
+- Rationale/link: `docs/POST_V0.4_TODO.md` § item 6;
+  [roadmap history: Additions from 2026-06-22 competitive + agentic-discoverability scan](ROADMAP_HISTORY_2026-11-16.md#additions-from-2026-06-22-competitive-agentic-discoverability-scan)

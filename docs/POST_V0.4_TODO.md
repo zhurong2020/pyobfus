@@ -887,7 +887,7 @@
    Session 2 punch list. Full findings still in
    [`docs/DOC_SYNC_AUDIT_2026-08-02.md`](DOC_SYNC_AUDIT_2026-08-02.md) as a
    historical record. Short version of Session 1's fixes:
-   1. `docs/ROADMAP.md` — "Current Status" stops at 0.5.4 (doesn't
+   1. [Historical roadmap: Current Status](ROADMAP_HISTORY_2026-11-16.md#current-status) stops at 0.5.4 (doesn't
       mention 0.5.5/0.5.6), and P2-17/P2-19 are still checkbox-marked
       `[~]` in-progress even though both shipped in 0.5.5. This is the
       sharpest finding (a public roadmap actively contradicting the
