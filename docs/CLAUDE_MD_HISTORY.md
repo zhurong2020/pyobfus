@@ -525,3 +525,44 @@ watcher）；Pro Support 段落"any issues→email"改窄为"license/账号问�
 **跨项目联动**：官方申请模板可复用，项目法务材料保持分离（细节见私有记录）。
 
 **Path C 红线（gate 解除后的残留约束）**：① `pyobfus-legal/` **永不入 git**（含 PII，永久有效）；② v0.5 Pro 机制的公开发布**走 Phase 5 受控合并**（一次性、刻意公开），合并前公开 commit 仍不得泄露未发布机制——但 gate 本身（"补正办结前不得公开 v0.5 机制"）**已于 2026-06-17 解除**。完整命名清单见 memory `pro_disclosure_finding_2026-05-09.md` + `pyobfus_patent_strategy.md`。
+
+## 2026-11-16 — Current pending work consolidation (historical)
+
+Source: `git show 3171ef7f97bf9df68356b83ef1bda09fe5ffba59:CLAUDE.md`.
+The following sanitized paragraphs are preserved verbatim from “Current pending work”;
+they are historical evidence, not current instructions. Current work follows
+[the execution tracker](ROADMAP_EXECUTION_2026-11-16.md), [TODO](TODO.md) and
+[the current plan](CURRENT_PLAN_ZH.md). ROADMAP.md is now the active 6–12 month roadmap;
+the archived statement calling it archived is superseded.
+
+<!-- BEGIN VERBATIM CLAUDE CURRENT PENDING WORK -->
+**2026-11-16 发布后收口完成**：#242（`e5e3cc2`）已同步 CITATION 到 Zenodo `24248676`；#241（`4204699`）已升级 upload-artifact v7.0.2。合并后的 CI／CodeQL 及相关 IndexNow／Dogfood／PDF workflow 全部成功。升级通知义务已完成，详情只存私有 `docs/internal/CUSTOMER_SUPPORT_LOG.md`。版本与 Worker 签发 key 不变；下一步为常规反馈／备份／搜索观察、12 月第一周搜索／AI 复盘及约 12-04 的 Core 0.12.0 T+30d。入口见[本日收尾](docs/SESSION_CLOSEOUT_2026-11-16.md)；下方旧条目为历史状态。
+
+**2026-11-13 会话收尾**：见 [收尾](docs/SESSION_CLOSEOUT_2026-11-13.md)。Glama 渠道 0.14.0（维护者手工发布，test 页已核）；#230 未信任签发 key 提示升级、#231 预分发备用 key `ci-2026-11b`（私钥已入 Vaultwarden，不配 Worker）均已合并，随下次 Core 发版带出；正常换 key 窗口 180 天 + 提前 60 天通知；#233 把 Pro 客户通知列入 TODO 2a（下次发版后通知，现在不群发）。无发版、无部署。下次 11-16 周检。
+
+**2026-11-12 #221 审阅完成、Worker 限流上线**：独立审阅仅一项低危（CI 未实际限流），#227 修复并部署 Worker `209eb969`（回滚 `13aaa4a8`），线上验证通过；#226 修正文档站 canonical。见 [当前计划](docs/CURRENT_PLAN_ZH.md)。
+
+**2026-11-12 发布收尾完成**：CITATION 已同步 Zenodo `24140234`（#224）；Glama 渠道 0.13.1 装 Core 0.14.0（test `01a1cd2b`；11-13 03:56 维护者再次手工 Build & Release，渠道 0.14.0，test `01a1d155` 同样装 Core 0.14.0／MCP 0.3.17）；签发私钥已在 Vaultwarden 并复核。GSC 重定向错误示例为无斜杠 `/zh-cn`，单次 301 到 `/zh-cn/`（200），无需改代码。剩 #221 独立外部审阅、11-16 周检。见 [当前计划](docs/CURRENT_PLAN_ZH.md)。
+
+**2026-11-11 夜 Core 0.14.0 已发布**（签名 CI 构建准入）：核验见 [发布记录](docs/CORE_0_14_0_RELEASE_2026-11-11.md)。#221 squash 为 `96e6340`、tag `v0.14.0`，PyPI 0.14.0 带 attestation，全新安装与线上签名准入通过。待：Zenodo 归档后同步 CITATION、Glama Build steps（手工）、#221 独立外部审阅（发版后补）。
+
+**2026-11-11 晚 生产 key 与 Worker 上线**：#220 已合并；生产 key `ci-2026-11` 已生成，公钥入 `pyobfus_pro/ci_lease.py`，Worker 版本 `13aaa4a8` 已部署并线上配对通过（回滚 `d8588738`）。私钥已入 Vaultwarden（11-12 复核）；#221 合并与发版待批准。详见 [当前计划](docs/CURRENT_PLAN_ZH.md)。
+
+**2026-11-11 本次会话收尾**：先读 [会话收尾](docs/SESSION_CLOSEOUT_2026-11-11.md)。`74769cd` 签名拒绝响应修订已推送，托管 48 success／2 skipped，本地全量与 Worker 70 项通过。#220 源码审阅无阻塞，待明确合并决定；#221 仍待独立外部审阅、公钥／轮换方案及最终发布验收。未合并、配置生产 key、部署或发版。私有接续见 `docs/internal/f2-ci-implementation-2026-11-11/NEXT_SESSION.md`，下方为此前阶段快照。
+
+**2026-11-11 F2 CI 首阶段候选**：维护者已批准“先 CI，后工作站”。草稿 #221／分支 `feat/ci-signed-lease-v1`，父依赖为未合并 #220，PR 目标 main 以运行现有 Core CI／CodeQL；Worker 三格互通已通过，其余候选检查与独立审阅待核。私有接续 `docs/internal/f2-ci-implementation-2026-11-11/PROGRESS.md`。工作站／离线不迁移；生产信任表为空且发布流程有阻断，未配置 key、未部署、未发版。不得重用 #217 的合并批准。
+
+**2026-11-11 接续**：见 [本轮巡检](docs/OPERATIONS_REVIEW_2026-11-11.md) → [当前计划](docs/CURRENT_PLAN_ZH.md) → [TODO](docs/TODO.md)。本地已同步 `df58068`；T+7d、下载／邮件、11-09 搜索盘点与备份抽核已做。优先取得 GSC“重定向错误”示例 URL；下次周检 11-16，T+30d 约 12-04。F2 先确认兼容与离线迁移；许可条款先专业审阅。下方 11-07 段为历史交接。
+
+**2026-11-07 晚 Core 0.13.0 已发布**（Community pre-commit 钩子 + 专利申请标识）：核验见 [发布记录](docs/CORE_0_13_0_RELEASE_2026-11-07.md)。Zenodo record `24031969` 已归档、`CITATION.cff` 已同步，Glama 已更新并通过检测；本版发布收尾完成。MCP／runtime／扩展／Action 不变。
+
+**2026-11-07 最终交接**：先读 [会话收尾](docs/SESSION_CLOSEOUT_2026-11-07.md) → [当前计划](docs/CURRENT_PLAN_ZH.md) → [TODO](docs/TODO.md)「周期性」。
+该段记录 11-07 上午状态；晚间 Core 0.13.0 已发布 Community pre-commit 钩子（#194）。已做：CI 3.9 runner、FAQ／中文指南、Agent 文档同步规则、
+IndexNow、Search Console／Bing 登记（文档站验证文件 `docs/google03878b382b498ff9.html` 必须保留）、T+24h／T+72h、备份故障修复与核对。
+下一步：11-08 再请求编入索引、11-09 周检（含搜索引擎检查）、约 11-11 T+7d、维护者跑只读盘点、12 月首周月度观测。
+arong.eu.org 与老博客已交 findata。
+
+**单一事实来源**：[`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md)（当前计划）与 [`docs/TODO.md`](docs/TODO.md)（排期、验收、周期性任务）。
+`docs/ROADMAP.md`、`docs/POST_V0.4_TODO.md` 为归档。11-04 及更早的交接段落已移至私有 `docs/internal/CLAUDE_MD_HISTORY_2026-11-07.md`。
+
+<!-- END VERBATIM CLAUDE CURRENT PENDING WORK -->

@@ -78,8 +78,8 @@ generated-code `HOME` / `USERPROFILE` lookup to pytest's per-test `tmp_path`.
 The standard commands above must pass with the caller's normal HOME; requiring
 `HOME=/tmp/...` is a test-isolation regression, not an accepted prerequisite.
 
-**4th test root — `vscode-extension/`** (Node/npm, not pytest; independent
-package, see `docs/VSCODE_EXTENSION_PLAN.md`):
+**Independent Node/VS Code test root — `vscode-extension/`** (Node/npm,
+not pytest; independent package, see `docs/VSCODE_EXTENSION_PLAN.md`):
 
 Use Node.js 22.13 or later on the Node 22 line (the ESLint v10 development
 toolchain requires it; CI uses Node 22).
@@ -94,8 +94,8 @@ PYOBFUS_PYTHON_PATH="$(cd .. && pwd)/venv/bin/python3" npm test
 ```
 
 `npm test` needs a **resolvable interpreter with pyobfus actually
-installed** for the real-contract integration tests (`test/suite/
-integration.test.ts`) — without `PYOBFUS_PYTHON_PATH` set, interpreter
+installed** for the real-contract integration tests
+(`vscode-extension/test/suite/integration.test.ts`) — without `PYOBFUS_PYTHON_PATH` set, interpreter
 resolution falls back to a bare `python3`/`python` on PATH (the
 `ms-python.python` extension isn't active inside the plain
 `@vscode/test-electron` test profile), which on a fresh machine likely
@@ -134,7 +134,8 @@ heavy jobs; lint and docs always run, and unknown paths trigger full CI.
 failure/cancellation; the `protect-main` ruleset requires only `CI result` and
 `CodeQL` (since 2026-10-21). Agents must not edit rulesets. Multi-command test
 steps run under bash so the first failing pytest fails the job.
-Core jobs time out after 30 minutes, integration after 15, others after 10.
+Core jobs time out after 30 minutes, CLI integration and L3 delivery after 15,
+others after 10; `.github/workflows/ci.yml` defines the job limits.
 New PR pushes cancel superseded runs; main runs are never cancelled by this policy.
 
 Release validation must cover every maintained workflow pytest command, not
@@ -185,21 +186,27 @@ pyobfus_pro/        # Pro edition (commercial license) — kept separate from co
 skills/             # agent skills (pyobfus-review, pyobfus-protect) + plugin marketplace
 templates/          # copy-in AI rule files + python-baseline bootstrap
 tests/ · pyobfus_mcp/tests/ · integration_tests/
-docs/               # CURRENT_PLAN_ZH.md / TODO.md (current planning), archived roadmap, threat model
+docs/               # CURRENT_PLAN_ZH.md / TODO.md / ROADMAP.md (active planning), threat model
 cloudflare-worker/  # Pro license verification Worker
 ```
 
 ## Conventions
 
-- **Stable JSON contract.** Every CLI mode and MCP tool returns a dict with
-  `status`, `ai_hint`, and (MCP) a machine-readable `next_tool` field. Don't
-  break these shapes without a version bump.
+- **Stable JSON contracts are mode-specific.** With `--json`, build/dry-run,
+  `--init`, `--validate-config`, `--verify-provenance-manifest` and `--check-delivery`
+  return `status` and `ai_hint`. Completed `--check` reports have `ai_hint` and
+  `exit_code`, without `status`; completed `--unmap` reports have `ai_hint`,
+  without `status`. `--list-presets` and `--init-config` emit text even with
+  `--json`. MCP tool responses contain `status`, `ai_hint` and a machine-readable
+  `next_tool`. Preserve each mode's fields and exit semantics; don't break
+  these shapes without a version bump.
 - **Dual license, separated source.** Never move Pro logic into the Apache-2.0
   core or vice-versa. Never commit Pro license keys or the Stripe webhook secret
   to this public repo.
 - **Public repo.** This is `zhurong2020/pyobfus`, public. The pre-commit hook
-  runs three independent scans: a fixed set of personal identifiers,
-  credential shapes (Open VSX / PyPI / GitHub / GitLab / npm / Anthropic /
+  runs three independent scans: local personal-identifier patterns stored
+  outside tracked files (see `.githooks/README.md`), credential shapes
+  (Open VSX / PyPI / GitHub / GitLab / npm / Anthropic /
   OpenAI / AWS / Slack / Google tokens, PEM private keys), and — in added
   lines only — Stripe object IDs and e-mail addresses outside an allowlist;
   a `commit-msg` hook applies the last scan to commit messages. Keep all of
@@ -243,51 +250,26 @@ formality correction resolved and application status clean* — **was met on
 passed). Priority is secured, so public disclosure of these mechanisms no longer
 risks the application.
 
-These mechanisms now ship to the public repo via a **controlled Phase 5 merge**
-(deliberate, one-time public disclosure) — see `docs/V0.5_RELEASE_PLAN.md`. Until
-that merge lands, still don't leak unreleased mechanism detail in incidental
-commits. The permanent rules remain: `pyobfus-legal/` never enters git (PII), and
-Pro/Core source stays separated. See `docs/CURRENT_PLAN_ZH.md` for current
-planning state and the archived `docs/POST_V0.4_TODO.md` § P1 for historical
-patent/release context.
+These mechanisms shipped publicly in **Core 0.5.0**, following the controlled
+Phase 5 merge (deliberate, one-time public disclosure); see
+`docs/V0.5_RELEASE_PLAN.md` and `CHANGELOG.md`. The pre-merge disclosure gate
+is complete. The permanent rules remain: `pyobfus-legal/` never enters git
+(PII), and Pro/Core source stays separated. See `docs/CURRENT_PLAN_ZH.md` for
+current planning and `docs/POST_V0.4_TODO.md` for historical patent/release context.
 
 ## Where to look next
 
-- **Latest (2026-11-16)**: Core **0.15.0 release follow-up is complete**. #242 (`e5e3cc2`) synced CITATION to verified Zenodo record `24248676`; #241 (`4204699`) upgraded upload-artifact to v7.0.2. Post-merge CI/CodeQL and the relevant IndexNow/Dogfood/PDF workflows succeeded. Upgrade-notice obligations are complete; details remain only in private `docs/internal/CUSTOMER_SUPPORT_LOG.md`. Versions and Worker signer are unchanged. Resume from [current handoff](docs/SESSION_CLOSEOUT_2026-11-16.md): routine feedback/backup/search observations, December first-week search/AI review, and Core 0.12.0 T+30d around December 4. Earlier entries below are historical.
-- **Session closeout (2026-11-13)**: [closeout](docs/SESSION_CLOSEOUT_2026-11-13.md). Glama channel 0.14.0 confirmed; #230 (upgrade hint for an untrusted CI issuer key) and #231 (standby issuer key `ci-2026-11b`, not on the Worker) merged, shipping with the next Core release; planned key rotation needs 180 days after the trusting release plus 60 days' notice. #233 plans a Pro customer notice after the next Core release (no mass mail now). No release or deployment. Next: Nov 16 weekly review.
-- **Latest (2026-11-11 night)**: Core **0.14.0 is published and verified** (signed CI build admission), tag `v0.14.0` / `96e6340`; see [release evidence](docs/CORE_0_14_0_RELEASE_2026-11-11.md). Production issuer key `ci-2026-11` and Worker `13aaa4a8` are live. Follow-up done 2026-11-12: CITATION synced to Zenodo record 24140234 (#224), Glama channel 0.13.1 installs Core 0.14.0 (the maintainer's second manual Build & Release on 2026-11-12 19:57 UTC published channel release 0.14.0; its test page shows the same pins installing Core 0.14.0 / MCP 0.3.17 and nine tools). Independent review of #221 done 2026-11-12 (one low finding: CI rate limit not actually configured), fixed by #227 and deployed as Worker `209eb969` (rollback `13aaa4a8`).
-- **Session follow-up (2026-11-11)**: [closeout](docs/SESSION_CLOSEOUT_2026-11-11.md). Signed CI denial hardening `74769cd` passed 48 hosted checks (2 configured skips) and local regressions (Worker 70). #220 source review found no blockers; its merge decision remains pending. #221 still needs independent external review and key/rotation/release acceptance. No merge, production key, deployment or release was performed.
-- **Earlier operations handoff (2026-11-11)**: [operations review](docs/OPERATIONS_REVIEW_2026-11-11.md). Core 0.13.0 remains current; T+7d and download/inbox/search/backup checks are recorded. Next: obtain the affected URL for the GSC redirect error, Nov 16 weekly review, F2 compatibility and offline migration decisions, and professional review of proprietary patent clauses. Earlier entries below are historical.
-- **Session closeout (2026-11-07)**: [final handoff](docs/SESSION_CLOSEOUT_2026-11-07.md).
-  Core 0.13.0 was released later that day, including Community
-  pre-commit hooks (#194). IndexNow and Search Console/Bing registration were
-  completed (keep `docs/google03878b382b498ff9.html` and the IndexNow key
-  files). Next at that time: weekly checks, T+7d, monthly
-  search/AI observation. The 2026-11-04 entry below is historical.
-- **Session closeout (2026-11-04)**: [final handoff](docs/SESSION_CLOSEOUT_2026-11-04.md)
-  and [cold-start prompt](docs/COLD_START_PROMPT_2026-11-04.md). Core/Action/Glama
-  rollout and DEV review are complete; continue scheduled observations and verify
-  new evidence in the next natural backup. Earlier pending-release notes are historical.
-
+- **Current work**: [execution tracker](docs/ROADMAP_EXECUTION_2026-11-16.md) →
+  [TODO](docs/TODO.md) (next-work order) → [current plan](docs/CURRENT_PLAN_ZH.md)
+  (operational facts and open decisions). The latest [session closeout](docs/SESSION_CLOSEOUT_2026-11-16.md)
+  is an early-session snapshot; the tracker owns subsequent progress.
 - **Architecture / repository ownership**: [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md).
 - **Community / Pro product boundary**: [`docs/EDITION_BOUNDARY_POLICY.md`](docs/EDITION_BOUNDARY_POLICY.md).
-- **Latest (2026-11-07)**: Core **0.13.0 is published and verified** (Community
-  pre-commit hooks; patent-pending notice), tag `v0.13.0` / `0f2c7b0`; see
-  [release evidence](docs/CORE_0_13_0_RELEASE_2026-11-07.md). Zenodo (record
-  24031969), CITATION and the Glama build are complete. The 0.12.0 entry below is historical.
-- **Previous (2026-11-04)**: Core **0.12.0 is published and verified**, tag
-  `v0.12.0` / `73ff6a8`; final full CI 47/47, CodeQL, PyPI dual-artifact
-  cryptographic provenance and fresh installs passed. MCP 0.3.17 / runtime
-  0.1.1 / extension 0.4.3 remain unchanged. See
-  [release evidence](docs/CORE_0_12_0_RELEASE_2026-11-04.md) and
-  [channel follow-up](docs/CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md). Action
-  v1.1.0 / `v1`, Glama channel 0.12.0 (Nov 5; 0.11.3 on Nov 4) and DEV one-week review are complete;
-  future observation, LinkedIn and natural backup inclusion remain pending.
-- **Status review and remediation (2026-11-03)**: [engineering and operations evidence](docs/EXECUTION_PROGRESS_2026-11-03.md). Local suites pass; Nov 2 scheduled Guard passed. Downloads and Gmail were refreshed; extension minimatch/glob remediation and ESLint v10 migration are recorded there. Core 0.12.0 remains scheduled for Nov 4, subject to release approval.
-- **Previous execution tracker (2026-11-01)**: [session closeout](docs/SESSION_CLOSEOUT_2026-11-01.md) → [execution progress](docs/EXECUTION_PROGRESS_2026-11-01.md) → [current plan](docs/CURRENT_PLAN_ZH.md). Three maintenance PRs are merged; RTD deployment and backup verification are complete. Next: Nov 2 scheduled Guard, Nov 4 DEV review, and around Nov 5 LinkedIn review. Core 0.11.1 / MCP 0.3.17 / runtime 0.1.1 are unchanged. Earlier session records are historical.
-- **Current plan / daily source of truth**: [`docs/CURRENT_PLAN_ZH.md`](docs/CURRENT_PLAN_ZH.md).
-- **What to pick up next**: [`docs/TODO.md`](docs/TODO.md), ordered, with acceptance criteria.
-- **Historical detail**: [`docs/POST_V0.4_TODO.md`](docs/POST_V0.4_TODO.md) and [`docs/ROADMAP.md`](docs/ROADMAP.md) are archived context, not the primary cold-start entry.
+- **Active 6–12 month roadmap**: [`docs/ROADMAP.md`](docs/ROADMAP.md).
+- **Maintainer-only actions / external waits**: [`docs/MAINTAINER_ACTIONS.md`](docs/MAINTAINER_ACTIONS.md).
+- **Historical detail**: [`docs/AGENTS_MD_HISTORY.md`](docs/AGENTS_MD_HISTORY.md),
+  [`docs/ROADMAP_HISTORY_2026-11-16.md`](docs/ROADMAP_HISTORY_2026-11-16.md) and
+  [`docs/POST_V0.4_TODO.md`](docs/POST_V0.4_TODO.md); these are historical evidence.
 - **Contributing**: [`CONTRIBUTING.md`](CONTRIBUTING.md).
 - **Security policy**: [`SECURITY.md`](SECURITY.md).
 
