@@ -3,7 +3,14 @@
 A comparison of Python code obfuscation tools, written to help you choose rather
 than to win an argument. Where a competitor is genuinely stronger, it says so.
 
-> **Comparison snapshot and scope — reviewed 2026-10-02.** Product features,
+> **Comparison snapshot and scope — partial refresh checked 2026-11-15.**
+> The PyArmor version/environment/mode overview, PyLocket protection/platform/
+> pricing model, Nuitka stable version/Commercial offering, and SOURCEdefender
+> encryption/pricing/licensing facts were rechecked against official documentation
+> and public metadata in the [2026-11-15 research record](COMPETITIVE_ROADMAP_RESEARCH_2026-11-15.md).
+> Other competitor claims retain the 2026-10-02 review date, including PyArmor
+> prices and the feature matrices, unless a dedicated page gives another date.
+> This refresh adds no hands-on competitor tests. Product features,
 > prices and licence terms change. This overview uses vendors' public pages and
 > the specific hands-on tests identified on the dedicated comparison pages;
 > an observation about one version, tier or platform must not be read as a
@@ -18,15 +25,23 @@ than to win an argument. Where a competitor is genuinely stronger, it says so.
 | Tool | Price | Approach | Best For |
 |------|-------|----------|----------|
 | **pyobfus** | Free / $45 Pro | AST transformation of whole multi-file projects | Cross-platform Python distribution |
-| **PyArmor** | Free trial / $89 Pro | Native runtime + encryption | Maximum protection (with complexity) |
+| **PyArmor** | Free trial / $89 Pro (price checked 2026-10-02) | Native runtime + encryption; 9.3 docs list `rft`/`mini`/`vmc`/`ecc` | Native/virtualised protection and runtime control |
 | **Oxyry** | Online service | Name mangling | Quick one-off obfuscation |
 | **Cython** | Free / open source | Compile to C | Performance + obfuscation |
-| **Nuitka** | Free / separate commercial offering | Compile to binary | Standalone executables |
-| **PyLocket** | Subscription + $4/license | Per-function bytecode encryption + commerce platform | Selling a desktop app with built-in licensing |
+| **Nuitka** | Free / Commercial from EUR 250/year ([official download page](https://nuitka.net/doc/download.html)) | Compile to binary; Commercial adds code/constant protection, data-file embedding and traceback encryption | Standalone executables |
+| **PyLocket** | Account subscription + $4/production licence ([official pricing](https://pylocket.com/pricing.html)) | Function/method/class-body/module encryption + licensing, delivery, checkout and updates | Selling and delivering a licensed desktop app |
 | **CodeEnigma** | Free | AES-GCM encrypted bytecode + Cython loader | Loader-based protected applications |
 | **python-obfuscator** | Free | Toggleable AST transformations | Small scripts and experimentation |
-| **SOURCEdefender** | Commercial | Encrypted `.pye` files + import hook | Encrypting selected modules at rest |
+| **SOURCEdefender** | GBP 15/month or 150/year per developer system; Enterprise GBP 1500/year ([official site](https://www.sourcedefender.co.uk/)) | AES-256 encryption + dedicated import path | Encrypting selected modules at rest |
 | **Online obfuscators** | Free / freemium | Browser-hosted transformation | Non-sensitive, one-off scripts |
+
+The refreshed facts in the PyArmor, Nuitka, PyLocket and SOURCEdefender rows
+above are **checked 2026-11-15**; retained facts keep the dates stated in the
+scope note. PyArmor pricing remains **checked 2026-10-02**. PyLocket's
+[pricing page](https://pylocket.com/pricing.html) says issued licences do not
+expire, while its [billing terms](https://docs.pylocket.com/part-4-topics/billing/)
+say issued licences keep working for 30 days after paid access ends and stop
+activating if the account is not resubscribed (both rechecked 2026-11-16).
 
 ## PyInstaller, Nuitka and obfuscators: which problem each solves
 
@@ -51,9 +66,9 @@ with instead of burying it in a document about ten other tools.
 | Comparison | The short version |
 |---|---|
 | [pyobfus vs PyArmor](compare/pyarmor.md) | A long-running commercial option with stronger native/virtualized modes; deployment and reverse-mapping trade-offs depend on the selected tier and mode. |
-| [pyobfus vs Nuitka](compare/nuitka.md) | Compiles to a native binary. Protection is a side effect of compilation, and so is the loss of portability. |
+| [pyobfus vs Nuitka](compare/nuitka.md) | Compiles to a platform-specific native binary; Commercial also offers code/constant protection, data-file embedding and traceback encryption (checked 2026-11-15). |
 | [pyobfus vs Cython](compare/cython.md) | Compiles to C for speed. Obfuscation comes along for the ride rather than being the goal. |
-| [pyobfus vs PyLocket](compare/pylocket.md) | Per-function bytecode encryption bundled with a licensing and commerce platform. Answers "how do I sell this app", not "how do I protect this codebase". |
+| [pyobfus vs PyLocket](compare/pylocket.md) | Function/method/class-body/module encryption with licensing, delivery, checkout and updates: a platform for the whole sell-and-deliver job (checked 2026-11-15). |
 | [pyobfus vs Oxyry](compare/oxyry.md) | A browser-hosted name mangler. Fastest path for one file; wrong shape for a codebase you ship repeatedly. |
 | [pyobfus vs browser-based obfuscators](compare/browser-based.md) | Free and instant, and they require pasting your source into someone else's web page. |
 | [Open-source obfuscators on a multi-module project](compare/open-source-obfuscators.md) | Opy, pyminifier, python-minifier and python-obfuscator run on the same project (2026-10-11), including where pyobfus failed. |
@@ -99,8 +114,10 @@ is often to layer two tools rather than pick one.
 
 ## Pricing Snapshot
 
-Prices below were checked on 2026-10-02 against the linked public purchase
-pages. They exclude taxes, currency conversion, support and any licence-scope
+The pyobfus and PyArmor prices in the tables below retain their **2026-10-02**
+review date; the 2026-11-15 record does not recheck them. Updated Nuitka,
+PyLocket and SOURCEdefender pricing appears in the Quick Summary above
+(**checked 2026-11-15**). Prices use the linked public vendor pages. They exclude taxes, currency conversion, support and any licence-scope
 differences; they are not a total-cost-of-ownership estimate.
 
 ### One-Time Purchase
@@ -141,10 +158,15 @@ A layered approach that fits the 2026 ecosystem:
 `--unmap` workflow is purpose-built for AI-assisted production debugging. The
 obfuscated artifact ships to customers, the mapping stays in your secure
 storage, and you can hand a restored trace to an AI coding assistant without
-sharing the original source. As of this review, the compared PyArmor and Nuitka
+sharing the original source. As of the 2026-10-02 review, the compared PyArmor and Nuitka
 workflows did not document an equivalent identifier reverse-mapping workflow;
 that narrower statement should not be read as a claim that they cannot produce
 or customize tracebacks.
+
+The chosen pyobfus workflow is local-first, with ordinary Python Community
+output, private mapping/traceback restore and verifiable build evidence
+([2026-11-15 research record](COMPETITIVE_ROADMAP_RESEARCH_2026-11-15.md));
+these are workflow differences, not a protection-strength benchmark.
 
 **Why pyobfus alone may not be enough for the crown jewels**: pyobfus's protection is AST-level, which means a determined attacker with time can reverse most of the structure. If a single algorithm module is the company's crown jewel, stacking PyArmor Pro's bytecode encryption or Nuitka's native compilation on top of that one module is rational. We don't pretend otherwise.
 

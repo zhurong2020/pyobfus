@@ -4,14 +4,35 @@ Nuitka compiles Python into a native binary. Like Cython it protects source by
 leaving ordinary source behind. The trade-off is a compiled, platform-specific
 distribution workflow rather than source-to-source transformation.
 
+> **Partial refresh — checked 2026-11-15.** Version and Commercial feature/
+> price facts use official documentation in the
+> [2026-11-15 research record](../COMPETITIVE_ROADMAP_RESEARCH_2026-11-15.md).
+> No new hands-on compilation, performance or protection tests were run.
+> Other comparison claims retain the **2026-10-02** baseline; the
+> traceback key-management discussion retains its **2026-08** review date.
+
+The [official download page](https://nuitka.net/doc/download.html) lists
+**4.3.5** as the stable version (**checked 2026-11-15**). The
+[4.3 release notes](https://nuitka.net/posts/nuitka-release-43.html) describe
+continued **experimental Python 3.15 support**; that does not imply full
+compatibility testing here.
+
 | Feature | pyobfus | Nuitka |
 |---------|---------|--------|
 | **Output** | `.py` files | Native code: a standalone executable or an extension module (`--module`) |
 | **Distribution** | Requires Python installed | Standalone mode is self-contained; `--module` output still needs a matching Python |
 | **Build time** | No native compilation | Native compilation; measure on your project |
 | **File size** | Transformed source | Standalone distributions include runtime dependencies |
-| **Commercial offering** | $45 one-time Pro | Separate vendor offering; check current quote and terms |
-| **Traceback protection** | RSA-2048-OAEP + AES-256-GCM hybrid, reversible via `pyobfus-unscrub` | Vendor-documented traceback encryption; verify the current edition and key-management design |
+| **Commercial offering** | $45 one-time Pro | From **EUR 250/year**; code/constant protection, data-file embedding and traceback encryption ([official download page](https://nuitka.net/doc/download.html), checked 2026-11-15) |
+| **Traceback protection** | RSA-2048-OAEP + AES-256-GCM hybrid, reversible via `pyobfus-unscrub` | Commercial [traceback encryption](https://nuitka.net/doc/commercial/traceback-encryption.html) (availability checked 2026-11-15; key-management details below retain the 2026-08 date) |
+
+**Commercial resource protection — checked 2026-11-15.** The official
+[data-file protection documentation](https://nuitka.net/doc/commercial/protect-data-files.html)
+describes embedding with both standard file access and `importlib.resources`.
+It distinguishes ordinary onefile temporary extraction from Commercial
+embedded protection. Together with code/constant protection and traceback
+encryption, this gives Commercial explicit protection capabilities beyond
+compilation alone.
 
 ## Traceback protection: different key management
 
@@ -45,7 +66,14 @@ one-way trapdoor.
 
 ## Using both
 
-Nuitka keeps Python-visible names (functions, classes, attributes) in the
+The 2026-11-15 assessment treats the tools as complementary: pyobfus provides
+project-level name protection, checks, private mapping and verifiable build
+evidence; Nuitka provides final native-binary delivery
+([research record](../COMPETITIVE_ROADMAP_RESEARCH_2026-11-15.md)). This is a
+workflow choice, not new validation of a packaging combination.
+
+The retained compilation observation (2026-10-02) is that Nuitka keeps
+Python-visible names (functions, classes, attributes) in the
 compiled output because the program needs them at runtime. Obfuscating with
 pyobfus first means those are the obfuscated names. A measured run, the
 `.pyi` stub Nuitka writes by default, and the limits are in the
