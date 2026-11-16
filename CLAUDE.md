@@ -8,7 +8,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 ## ⚡ Current pending work (cold-start 必读)
 
-**2026-11-15 Core 0.15.0 已发布**：核验见 [发布记录](docs/CORE_0_15_0_RELEASE_2026-11-15.md)。含 #235 PyInstaller CArchive 交付检查、#236 3.15 `.pyc` 比对规范化、#230 升级提示、#231 备用 key 预分发；#237 Windows Nuitka 单格托管验收 partial（D1–D8 pass）。Glama 渠道 0.14.1 已装 Core 0.15.0（test `01a1dfbc`）。待：Zenodo 后同步 CITATION、Pro 客户通知（TODO 4a，草稿在私有 `docs/internal/`，待审）。下次 11-16 周检。
+**2026-11-16 发布后收口完成**：#242（`e5e3cc2`）已同步 CITATION 到 Zenodo `24248676`；#241（`4204699`）已升级 upload-artifact v7.0.2。合并后的 CI／CodeQL 及相关 IndexNow／Dogfood／PDF workflow 全部成功。升级通知义务已完成，详情只存私有 `docs/internal/CUSTOMER_SUPPORT_LOG.md`。版本与 Worker 签发 key 不变；下一步为常规反馈／备份／搜索观察、12 月第一周搜索／AI 复盘及约 12-04 的 Core 0.12.0 T+30d。入口见[本日收尾](docs/SESSION_CLOSEOUT_2026-11-16.md)；下方旧条目为历史状态。
 
 **2026-11-13 会话收尾**：见 [收尾](docs/SESSION_CLOSEOUT_2026-11-13.md)。Glama 渠道 0.14.0（维护者手工发布，test 页已核）；#230 未信任签发 key 提示升级、#231 预分发备用 key `ci-2026-11b`（私钥已入 Vaultwarden，不配 Worker）均已合并，随下次 Core 发版带出；正常换 key 窗口 180 天 + 提前 60 天通知；#233 把 Pro 客户通知列入 TODO 2a（下次发版后通知，现在不群发）。无发版、无部署。下次 11-16 周检。
 
