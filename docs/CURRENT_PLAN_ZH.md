@@ -1,15 +1,14 @@
 # pyobfus 当前计划
 
-**2026-11-16 发布后收口**：#239 已 squash merge 为 `144b6e1`，其 main CI、CodeQL
-与 IndexNow docs notification 均成功；本地 WSL 主仓已快进同步。GSC 规范地址
-`/pyobfus/zh-cn/` 已收录、已编入索引且 HTTPS 正常，sitemap 后台仍保留 11-12 的
-“无法读取”旧状态，本次未删除重提。Bing 已选中正确的 pyobfus 属性，IndexNow 页面
-仍未展示可归因记录，但 GitHub workflow 已成功，不能解释成零提交或失败。#241
-（`actions/upload-artifact` v7）已完成独立审阅，未发现阻塞兼容问题，尚未合并；
-Zenodo record `24248676` 已确认对应 v0.15.0，CITATION 已同步候选并通过官方
-CFF 1.2.0 schema 校验，随本轮文档分支待合并。Pro 客户
-通知私有草稿已复核，待维护者审阅，未发送。详见[本日执行记录](EXECUTION_PROGRESS_2026-11-16.md)与
-[会话收尾](SESSION_CLOSEOUT_2026-11-16.md)。
+**2026-11-16 发布后收口完成**：#242 已 squash merge 为 `e5e3cc2`，CITATION
+已同步 Zenodo record `24248676`（v0.15.0 / 2026-11-15）；合并后 CI、CodeQL 与
+IndexNow 均成功。#241 已 squash merge 为 `4204699`，合并后 CI、CodeQL、Dogfood
+与 Draft PDF 均成功，本地 WSL main 已同步。升级通知义务已完成，发送核验与后续
+支持记录仅存私有 `docs/internal/CUSTOMER_SUPPORT_LOG.md`。GSC 规范 `/pyobfus/zh-cn/`
+已收录，sitemap 仍为旧状态；Bing IndexNow 后台未展示记录，不代表零提交或失败。
+下一步按周期观察反馈、备份和搜索后台；12 月第一周搜索／AI 观察，约 12-04 做
+Core 0.12.0 T+30d。详见[本日执行记录](EXECUTION_PROGRESS_2026-11-16.md)与
+[会话收尾](SESSION_CLOSEOUT_2026-11-16.md)。下方带日期段落保留历史状态。
 
 **2026-11-15 本地资产审计与清理完成**：确认 6 个直接命名目录与 5 个运维／索引
 目录；当前软件源仓只有 `pyobfus` 和 `pyobfus-action`。`pyobfus-legal` 保持 PII
