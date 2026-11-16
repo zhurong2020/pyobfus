@@ -6,6 +6,7 @@
 // DRAFT: 嵘说 content membership webhook (not yet enabled in production)
 import { handleContentWebhook, verifyStripeSignature } from './content_webhook.js';
 import { readCiRequest, issueCiLease, ciResponse } from './ci_lease.js';
+import { retainTrialData, sweepRetainedData, writeLicenseRecord } from './retention.js';
 
 // Error text from storage or mail providers can echo request values.
 function redactLicenseKeys(value) {
@@ -13,6 +14,10 @@ function redactLicenseKeys(value) {
 }
 
 export default {
+  async scheduled(controller, env, ctx) {
+    await sweepRetainedData(env);
+  },
+
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
@@ -258,9 +263,13 @@ async function handleTrialRequest(request, env, corsHeaders) {
   // Dedup: an email that already has a trial gets its existing record back,
   // never a fresh 5 days. This is the whole point — it blocks the cheap
   // "re-run with a different local file" reset at the identity layer.
-  const existing = await env.LICENSES.get(key, { type: 'json' });
-  if (existing) {
-    const active = new Date(existing.expires) > new Date();
+  const record = await env.LICENSES.get(key, { type: 'json' });
+  if (record) {
+    const existing = retainTrialData(record, Date.now());
+    if (existing !== record) {
+      await env.LICENSES.put(key, JSON.stringify(existing));
+    }
+    const active = !existing.tombstone && new Date(existing.expires) > new Date();
     return json({
       status: 'already_issued',
       email_known: true,
@@ -282,7 +291,7 @@ async function handleTrialRequest(request, env, corsHeaders) {
     env.TRIAL_SIGNING_SECRET, `${emailHash}:${device_id}:${expiresIso}`
   );
 
-  const record = {
+  const newRecord = {
     email: normalizeEmail(email), // plaintext for follow-up; same PII posture as license records
     email_hash: emailHash,
     first_device: device_id,
@@ -291,7 +300,7 @@ async function handleTrialRequest(request, env, corsHeaders) {
     token,
     v: 1,
   };
-  await env.LICENSES.put(key, JSON.stringify(record));
+  await env.LICENSES.put(key, JSON.stringify(newRecord));
 
   return json({
     status: 'issued',
@@ -418,19 +427,17 @@ async function handleVerify(request, env, corsHeaders, signedCi = false) {
       return ciResponse(signed, corsHeaders);
     }
     const now = new Date().toISOString();
-    const day = now.slice(0, 10);
     const previous = licenseData.ci_usage;
-    if (!previous || previous.day !== day ||
+    if (!previous || !Number.isFinite(Date.parse(previous.last_used)) ||
         Date.parse(now) - Date.parse(previous.last_used) >= 3600 * 1000) {
-      licenseData.ci_usage = { first_seen: previous?.first_seen || previous?.last_used || now,
-        last_used: now, day };
+      licenseData.ci_usage = { last_used: now };
       // Best-effort hourly telemetry, not a request counter. KV has no atomic
       // compare-and-set: a concurrent device registration or revocation can still
       // be overwritten in the get/put window (including stale reads). Throttling
       // reduces that window's frequency; strict serialization needs a separate
       // telemetry store or a Durable Object for all license mutations.
       try {
-        await env.LICENSES.put(license_key, JSON.stringify(licenseData));
+        await writeLicenseRecord(env, license_key, licenseData);
       } catch {
         // Never log the key or exception (which may contain private data).
         console.warn('CI usage telemetry write failed');
@@ -453,7 +460,7 @@ async function handleVerify(request, env, corsHeaders, signedCi = false) {
   }
 
   // One write, not two: the previous code stored the record twice per request.
-  await env.LICENSES.put(license_key, JSON.stringify(licenseData));
+  await writeLicenseRecord(env, license_key, licenseData);
 
   // Return success
   return new Response(JSON.stringify({
@@ -546,7 +553,7 @@ async function handleStripeWebhook(request, env, corsHeaders) {
       expires_at: null  // Lifetime license
     };
 
-    await env.LICENSES.put(licenseKey, JSON.stringify(licenseData));
+    await writeLicenseRecord(env, licenseKey, licenseData);
 
     const emailSent = await sendLicenseEmail(
       env.RESEND_API_KEY,
@@ -612,7 +619,7 @@ async function handleDeactivate(request, env, corsHeaders) {
   if (released) {
     licenseData.devices = remaining;
     licenseData.last_released = { at: new Date().toISOString(), device: device_id };
-    await env.LICENSES.put(license_key, JSON.stringify(licenseData));
+    await writeLicenseRecord(env, license_key, licenseData);
   }
 
   return new Response(JSON.stringify({
@@ -687,7 +694,7 @@ async function handleAdminResetDevices(request, env, corsHeaders) {
     reason: typeof reason === 'string' ? reason.slice(0, 200) : null,
     previous
   };
-  await env.LICENSES.put(license_key, JSON.stringify(licenseData));
+  await writeLicenseRecord(env, license_key, licenseData);
 
   return new Response(JSON.stringify({
     license_key,

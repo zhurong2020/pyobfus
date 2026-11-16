@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- Add server-side licence Worker retention: remove device audit entries older
+  than 90 days, replace optional email trial records with deduplication-only
+  tombstones 180 days after trial expiry, and minimise legacy CI telemetry to
+  `last_used`. Cleanup runs on writes/trial reads and a weekly sweep. This
+  takes effect when the Worker is deployed (maintainer gate); no client change.
+
 ### Changed
 
 - Directory `--check-delivery` scans now inspect detected top-level PyInstaller

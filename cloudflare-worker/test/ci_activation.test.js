@@ -24,20 +24,29 @@ test('CI valid: no devices touched, no email or key, usage in existing record', 
   assert.equal(data.valid, true);
   assert.deepEqual(stored.devices, active.devices);
   assert.equal(writes, 1);
-  assert.ok(stored.ci_usage.first_seen);
   assert.ok(stored.ci_usage.last_used);
+  assert.deepEqual(Object.keys(stored.ci_usage), ['last_used']);
   assert.equal(data.email, undefined);
   assert.equal(data.license_key, undefined);
   const second = await verify(stored);
   assert.equal(second.writes, 0);
   assert.deepEqual(second.stored.ci_usage, stored.ci_usage);
   stored.ci_usage.day = '2000-01-01';
-  assert.equal((await verify(stored)).writes, 1);
-  stored.ci_usage.day = new Date().toISOString().slice(0, 10);
+  stored.ci_usage.first_seen = '2000-01-01';
+  assert.equal((await verify(stored)).writes, 0); // obsolete fields do not force telemetry writes
   stored.ci_usage.last_used = new Date(Date.now() - 3601 * 1000).toISOString();
   const hourly = await verify(stored);
   assert.equal(hourly.writes, 1);
-  assert.equal(hourly.stored.ci_usage.first_seen, stored.ci_usage.first_seen);
+  assert.deepEqual(Object.keys(hourly.stored.ci_usage), ['last_used']);
+});
+test('CI refreshes missing or invalid last_used without restoring obsolete telemetry', async () => {
+  for (const last_used of [undefined, 'invalid']) {
+    const result = await verify({ ...active, ci_usage: { first_seen: 'old', day: 'old', last_used } });
+    assert.equal(result.res.status, 200);
+    assert.equal(result.writes, 1);
+    assert.deepEqual(Object.keys(result.stored.ci_usage), ['last_used']);
+    assert.ok(Number.isFinite(Date.parse(result.stored.ci_usage.last_used)));
+  }
 });
 for (const [name, record, status] of [
   ['revoked', { ...active, status: 'revoked' }, 403],
