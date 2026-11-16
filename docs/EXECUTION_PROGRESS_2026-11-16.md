@@ -71,3 +71,12 @@
 
 本轮提交前验证：Core 5152 passed / 56 skipped（正常 HOME），MCP 167、integration
 371 passed / 10 skipped、runtime 24、基准 8；完整 `scripts/check.sh` 通过。
+
+## 提交与最终接续
+
+- `45e8d08`：六份公开文档收口，包含原五份交接增量和 #241 审阅证据；正常 hooks 通过。
+- CITATION 独立同步提交：version 0.15.0、date-released 2026-11-15、version DOI
+  10.5281/zenodo.24248676；concept DOI 不变。官方 CFF 1.2.0 JSON schema
+  (`citation-file-format` 的 1.2.0 tag) 校验通过，并与本轮独立取得的 Zenodo API 比对。
+- 本轮分支 `docs/nov16-release-followup`；提交后准备草稿 PR 和托管 CI，未合并。
+- 客户通知正文已完成私有复核，待维护者审阅；未查询收件人、未发送，未部署 Worker。

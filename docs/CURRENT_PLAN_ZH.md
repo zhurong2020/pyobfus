@@ -6,7 +6,8 @@
 “无法读取”旧状态，本次未删除重提。Bing 已选中正确的 pyobfus 属性，IndexNow 页面
 仍未展示可归因记录，但 GitHub workflow 已成功，不能解释成零提交或失败。#241
 （`actions/upload-artifact` v7）已完成独立审阅，未发现阻塞兼容问题，尚未合并；
-Zenodo record `24248676` 已确认对应 v0.15.0，CITATION 待单独同步。Pro 客户
+Zenodo record `24248676` 已确认对应 v0.15.0，CITATION 已同步候选并通过官方
+CFF 1.2.0 schema 校验，随本轮文档分支待合并。Pro 客户
 通知私有草稿已复核，待维护者审阅，未发送。详见[本日执行记录](EXECUTION_PROGRESS_2026-11-16.md)与
 [会话收尾](SESSION_CLOSEOUT_2026-11-16.md)。
 
