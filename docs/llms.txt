@@ -37,8 +37,10 @@ pyobfus --check-delivery dist/ --json   # since 0.7.1: check for mappings, keys 
 `--check-delivery` exits 0 for ok or warnings, 1 for high findings and 2 when
 inspection could not complete (unsafe or duplicate paths, symlinks leaving the
 root, malformed evidence, resource limits; since 0.11.1). Exit 2 is not a clean
-result. Bytecode-origin evidence is bounded and frozen executable payloads are
-not unpacked, so inspect JSON warnings even when it exits 0. For unproved
+result. Bytecode-origin evidence is bounded. Since 0.15.0, PyInstaller CArchive
+top-level members receive bounded checks; embedded PYZ and unknown members remain
+uninspected. Unreleased: directory scans also inspect detected top-level
+PyInstaller executables. Inspect JSON warnings even on exit 0. For unproved
 project module accesses, the opt-in
 `--preserve-unproved-module-attributes` preserves recognized export names at
 an obfuscation cost; it is not a universal compatibility guarantee.

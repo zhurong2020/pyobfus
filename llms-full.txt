@@ -251,6 +251,18 @@ separators are normalised to forward slashes. CArchive limits are 20 MiB TOC,
 executable. Other frozen formats remain uninspected, so read JSON warnings
 even on exit 0.
 
+Unreleased: directory scans also inspect detected top-level PyInstaller
+executables, using their already-read bytes and the same member checks as direct
+executable scans. Embedded finding paths are `<executable relative path>!<member
+path>`. JSON `inspection.frozen_executables` retains `found` and `inspected`;
+when `inspected > 0`, it adds `format: "pyinstaller-carchive"`, `members_total`,
+`members_checked` and `unknown_members`, summed over inspected executables.
+The 256 MiB expanded-member budget applies across all executables in the scan.
+At most 32 executable readers are attempted; excess or non-PyInstaller
+executables remain uninspected. Any uninspected executable or unknown member
+keeps the result at warn (or fail for high findings), with counts in the warning.
+Recognised malformed or over-limit archives exit 2, never clean. Wheels are unchanged.
+
 ### 6. List / explain presets
 
 ```bash

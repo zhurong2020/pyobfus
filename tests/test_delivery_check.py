@@ -468,7 +468,8 @@ def test_pyinstaller_unknown_types_remain_unknown_and_are_scanned(tmp_path, type
     "malformation",
     ["short_cookie", "toc_bounds", "member_bounds", "decompressed_limit", "length", "typecode"],
 )
-def test_pyinstaller_malformed_archive(tmp_path, monkeypatch, malformation):
+@pytest.mark.parametrize("directory", [False, True])
+def test_pyinstaller_malformed_archive(tmp_path, monkeypatch, malformation, directory):
     binary = tmp_path / "app"
     _pyinstaller_executable(binary, [("data.txt", b"a" * 100, "x", True)])
     data = bytearray(binary.read_bytes())
@@ -492,15 +493,155 @@ def test_pyinstaller_malformed_archive(tmp_path, monkeypatch, malformation):
         data[toc_start + 17] = 255
     binary.write_bytes(data)
     with pytest.raises(ValueError):
-        dc.check_delivery(binary)
+        dc.check_delivery(tmp_path if directory else binary)
 
 
-def test_cli_malformed_pyinstaller_is_error(tmp_path):
+@pytest.mark.parametrize("directory", [False, True])
+def test_cli_malformed_pyinstaller_is_error(tmp_path, directory):
     binary = tmp_path / "app"
     binary.write_bytes(_binary_header("ELF") + dc._PYINSTALLER_COOKIE_MAGIC)
-    result = CliRunner().invoke(main, ["--check-delivery", str(binary), "--json"])
+    target = tmp_path if directory else binary
+    result = CliRunner().invoke(main, ["--check-delivery", str(target), "--json"])
     assert result.exit_code == 2
     assert json.loads(result.output)["status"] == "error"
+
+
+@pytest.mark.parametrize("unknown", [False, True])
+def test_directory_pyinstaller_clean_members(tmp_path, unknown):
+    members = [("data.txt", b"harmless", "x", True)]
+    if unknown:
+        members.append(("PYZ.pyz", b"not a valid PYZ; never open it", "z", False))
+    _pyinstaller_executable(tmp_path / "app", members)
+    result = dc.check_delivery(tmp_path)
+    assert result["status"] == ("warn" if unknown else "ok")
+    assert _codes(result) == ([dc.FROZEN_UNINSPECTED] if unknown else [])
+    assert result["inspection"]["frozen_executables"] == {
+        "found": 1,
+        "inspected": 1,
+        "format": "pyinstaller-carchive",
+        "members_total": 1 + unknown,
+        "members_checked": 1,
+        "unknown_members": int(unknown),
+    }
+    if unknown:
+        assert "1 PyInstaller CArchive(s) inspected, 0 executable(s) uninspected; 1 code" in (
+            result["findings"][0]["message"]
+        )
+
+
+@pytest.mark.parametrize("leak", ["mapping", "key", "source"])
+def test_directory_pyinstaller_leak_matches_single_file(build, leak):
+    private = build / "private"
+    if leak == "mapping":
+        name, data, code = (
+            "private/map.json",
+            (private / "mapping.json").read_bytes(),
+            dc.MAPPING_FILE,
+        )
+    elif leak == "key":
+        name, data, code = "private/signing.pem", KEY_TEXT.encode(), dc.PRIVATE_KEY
+    else:
+        name, data, code = "src/shapes.py", SOURCE.encode(), dc.ORIGINAL_SOURCE
+    binary = build / "dist" / "app"
+    _pyinstaller_executable(binary, [(name, data, "x", True)])
+    single = _check(build, binary)
+    result = _check(build, binary.parent)
+    high = [finding for finding in result["findings"] if finding["severity"] == "high"]
+    assert high == [{**single["findings"][0], "path": f"app!{name}"}]
+    assert high[0]["code"] == code
+    cli = CliRunner().invoke(
+        main,
+        [
+            "--check-delivery",
+            str(binary.parent),
+            "--provenance-manifest",
+            str(private / "provenance.json"),
+            "--json",
+        ],
+    )
+    assert cli.exit_code == 1, cli.output
+    assert json.loads(cli.output)["status"] == "fail"
+    assert f"app!{name}" in dc.format_text(result)
+
+
+@pytest.mark.parametrize("kind", ["ELF", "PE"])
+def test_directory_other_executable_is_uninspected(tmp_path, kind):
+    (tmp_path / "app").write_bytes(_binary_header(kind))
+    result = dc.check_delivery(tmp_path)
+    assert result["status"] == "warn"
+    assert result["inspection"]["frozen_executables"] == {"found": 1, "inspected": 0}
+    assert _codes(result) == [dc.FROZEN_UNINSPECTED]
+    assert "0 PyInstaller CArchive(s) inspected, 1 executable(s) uninspected; 0 code" in (
+        result["findings"][0]["message"]
+    )
+
+
+@pytest.mark.parametrize("compressed", [False, True])
+def test_directory_pyinstaller_total_budget_is_shared(tmp_path, monkeypatch, compressed):
+    monkeypatch.setattr(dc, "_MAX_FROZEN_TOTAL_BYTES", 10)
+    for name in ("app1", "app2"):
+        _pyinstaller_executable(tmp_path / name, [("data.txt", b"a" * 6, "x", compressed)])
+        assert dc.check_delivery(tmp_path / name)["status"] == "ok"
+    result = CliRunner().invoke(main, ["--check-delivery", str(tmp_path), "--json"])
+    assert result.exit_code == 2, result.output
+    payload = json.loads(result.output)
+    assert payload["status"] == "error"
+    assert "PyInstaller total size limit" in payload["error"]
+
+
+@pytest.mark.parametrize("first_recognised", [False, True])
+def test_directory_pyinstaller_executable_cap(tmp_path, monkeypatch, first_recognised):
+    monkeypatch.setattr(dc, "_MAX_FROZEN_EXECUTABLES", 1)
+    for name in ("app1", "app2"):
+        _pyinstaller_executable(tmp_path / name, [("data.txt", b"a", "x", False)])
+    if not first_recognised:
+        (tmp_path / "app1").write_bytes(_binary_header("ELF"))
+    reader = dc._inspect_pyinstaller_carchive
+    calls = []
+
+    def counted_reader(*args):
+        calls.append(args)
+        return reader(*args)
+
+    monkeypatch.setattr(dc, "_inspect_pyinstaller_carchive", counted_reader)
+    result = dc.check_delivery(tmp_path)
+    assert len(calls) == 1
+    assert result["status"] == "warn"
+    counts = result["inspection"]["frozen_executables"]
+    assert counts["found"] == 2
+    assert counts["inspected"] == int(first_recognised)
+    assert ("members_total" in counts) == first_recognised
+    assert _codes(result) == [dc.FROZEN_UNINSPECTED]
+    assert (
+        f"{2 - int(first_recognised)} executable(s) uninspected" in result["findings"][0]["message"]
+    )
+
+
+def test_directory_pyinstaller_aggregates_without_reopening(tmp_path, monkeypatch):
+    _pyinstaller_executable(tmp_path / "app1", [("data.txt", b"a", "x", False)])
+    _pyinstaller_executable(
+        tmp_path / "app2", [("main", b"not code", "s", False), ("PYZ.pyz", b"not PYZ", "z", False)]
+    )
+    real_open = Path.open
+    reads = []
+
+    def open_once(path, *args, **kwargs):
+        assert path not in reads, "delivery entry was reopened"
+        reads.append(path)
+        return real_open(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "open", open_once)
+    result = dc.check_delivery(tmp_path)
+    assert len(reads) == 2
+    assert result["status"] == "warn"
+    assert result["inspection"]["frozen_executables"] == {
+        "found": 2,
+        "inspected": 2,
+        "format": "pyinstaller-carchive",
+        "members_total": 3,
+        "members_checked": 1,
+        "unknown_members": 2,
+    }
 
 
 def test_canonical_marshal_reference_indices_and_flags():
@@ -597,3 +738,56 @@ def test_canonical_marshal_slice():
     assert dc._canonical_marshal(marshal.dumps(slice(1, 5, 2))) == (
         b":i\x01\x00\x00\x00i\x05\x00\x00\x00i\x02\x00\x00\x00"
     )
+
+
+@pytest.mark.parametrize("directory", [False, True])
+def test_frozen_member_identical_to_unchanged_output_is_not_a_leak(tmp_path, directory):
+    """An input the build left byte-identical (e.g. excluded) is a recorded output, not a leak."""
+    src = tmp_path / "src"
+    src.mkdir()
+    (src / "__init__.py").write_text("", encoding="utf-8")
+    (src / "consts.py").write_text("__all__ = []\n", encoding="utf-8")
+    private = tmp_path / "private"
+    res = CliRunner().invoke(
+        main,
+        [
+            str(src),
+            "-o",
+            str(tmp_path / "dist"),
+            "--provenance-manifest",
+            str(private / "provenance.json"),
+            "--build-report",
+            str(private / "report.json"),
+            "--config",
+            str(_marker_off(tmp_path)),
+        ],
+    )
+    assert res.exit_code == 0, res.output
+    unchanged = (src / "consts.py").read_bytes()
+    # Record an output byte-identical to its input, as an excluded file would be.
+    report_path = private / "report.json"
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    report["outputs"]["files"].append(
+        {"path": "consts_copy.py", "sha256": hashlib.sha256(unchanged).hexdigest()}
+    )
+    report_path.write_text(json.dumps(report), encoding="utf-8")
+    leaked = _check(tmp_path, tmp_path / "dist")
+    assert dc.ORIGINAL_SOURCE not in _codes(leaked)
+    frozen = tmp_path / "frozen"
+    frozen.mkdir()
+    binary = frozen / "app"
+    _pyinstaller_executable(binary, [("consts.py", unchanged, "x", False)])
+    result = _check(tmp_path, frozen if directory else binary)
+    assert dc.ORIGINAL_SOURCE not in _codes(result)
+    assert result["summary"]["high"] == 0
+
+
+def test_directory_uninspected_finding_points_at_the_gap(tmp_path):
+    """The warning names the executable that was not inspected, not merely the first one."""
+    _pyinstaller_executable(tmp_path / "a_clean", [("label.txt", b"ok\n", "x", False)])
+    (tmp_path / "b_other").write_bytes(_binary_header("ELF"))
+    result = dc.check_delivery(tmp_path)
+    inspection = result["inspection"]["frozen_executables"]
+    assert inspection["found"] == 2 and inspection["inspected"] == 1
+    uninspected = [f for f in result["findings"] if f["code"] == dc.FROZEN_UNINSPECTED]
+    assert [f["path"] for f in uninspected] == ["b_other"]

@@ -88,6 +88,11 @@ Since 0.15.0, pyobfus performs bounded checks of ordinary top-level
 PyInstaller CArchive members; embedded PYZ/marshalled code and unrecognised
 member types remain unknown/warn and are never unmarshalled. Never report
 partial frozen inspection as clean.
+Unreleased: directory scans also inspect detected top-level PyInstaller
+executables (at most 32 reader attempts, sharing the expanded-member budget).
+Embedded findings use `<executable relative path>!<member path>`; frozen JSON
+counts aggregate inspected archives. Uninspected executables or unknown members
+still warn; malformed or over-limit recognised archives exit 2.
 
 If `--check` reports `severity_counts.high > 0`, show the findings and
 discuss before obfuscating — `eval`/`exec`, dynamic `getattr`, and string-based

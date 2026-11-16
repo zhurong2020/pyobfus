@@ -419,7 +419,9 @@ def test_pyinstaller_onefile_delivery_inspection(tmp_path, include_mapping):
 def protected_reference(tmp_path, monkeypatch):
     """README Community build, with all evidence and state outside the input."""
     _require_tool("PyInstaller")
-    for name in ("PYTHONPATH", "PYTHONHOME", "PYOBFUS_LICENSE_KEY"):
+    # Keep the caller's PYTHONPATH so CLI subprocesses exercise this checkout
+    # when the venv's editable install points at a different worktree.
+    for name in ("PYTHONHOME", "PYOBFUS_LICENSE_KEY"):
         monkeypatch.delenv(name, raising=False)
     source = tmp_path / "source"
     shutil.copytree(
@@ -480,6 +482,7 @@ def protected_reference(tmp_path, monkeypatch):
     cli_import = _run(
         [sys.executable, "-c", "import pyobfus; print(pyobfus.__file__)"], cwd=tmp_path
     ).stdout.strip()
+    assert Path(cli_import).resolve() == Path(pyobfus.__file__).resolve()
     (private / "baseline.json").write_text(
         json.dumps(
             {
@@ -640,12 +643,12 @@ def test_delivery_reference_pyinstaller(tmp_path, protected_reference, mode):
     assert result["summary"]["high"] == 0
     assert {finding["code"] for finding in result["findings"]} == {FROZEN_UNINSPECTED}
     if mode == "onedir":
-        # Core 0.15.0 directory scans don't recurse into bootloader CArchives
-        # (including their PYZ). Keep that coverage gap explicit.
+        # Directory scans inspect the bootloader's top-level CArchive members
+        # too, while keeping its code and embedded PYZ explicitly unknown.
         directory = _reference_delivery(consumer, tmp_path, label="directory-delivery")
         assert directory["status"] == "warn"
         assert directory["summary"]["high"] == 0
-        assert directory["inspection"]["frozen_executables"] == {"found": 1, "inspected": 0}
+        assert directory["inspection"]["frozen_executables"] == inspection
         assert {finding["code"] for finding in directory["findings"]} == {
             FROZEN_UNINSPECTED,
             MISSING_OUTPUT,
