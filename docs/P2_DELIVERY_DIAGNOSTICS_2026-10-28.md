@@ -1,5 +1,7 @@
 # P2 delivery diagnostics: bounded bytecode evidence and frozen packages
 
+Status 2026-11-16: shipped in Core 0.11.0, robustness in 0.11.1, bounded direct PyInstaller member checks in 0.15.0; this document is historical design. Directory executable-member inspection remains Unreleased.
+
 Status: merged via [PR #156](https://github.com/zhurong2020/pyobfus/pull/156)
 as `5b26085` after 44 successful and 2 skipped checks; **released in Core
 0.11.0**. The original October 28 validation used the then-unreleased change;

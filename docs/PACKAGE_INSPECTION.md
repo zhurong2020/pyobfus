@@ -9,7 +9,7 @@
 ```python
 import pyobfus
 print(pyobfus.__version__)
-# 输出: 0.1.0
+# 输出（Core 0.15.0）: 0.15.0
 ```
 
 ### 2. 命令行快速查看
@@ -34,7 +34,7 @@ import pyobfus
 
 # 基本信息
 print(f"包名: {pyobfus.__name__}")           # pyobfus
-print(f"版本: {pyobfus.__version__}")        # 0.1.0
+print(f"版本: {pyobfus.__version__}")        # 0.15.0
 print(f"位置: {pyobfus.__file__}")           # 文件路径
 print(f"描述: {pyobfus.__doc__}")            # 包的文档字符串
 
@@ -49,12 +49,12 @@ print(f"许可: {pyobfus.__license__}")        # Apache-2.0
 from importlib.metadata import metadata, version, requires
 
 # 版本信息
-print(version('pyobfus'))  # 0.1.0
+print(version('pyobfus'))  # 0.15.0
 
 # 完整元数据
 meta = metadata('pyobfus')
 print(meta['Name'])              # pyobfus
-print(meta['Version'])           # 0.1.0
+print(meta['Version'])           # 0.15.0
 print(meta['Summary'])           # 描述
 print(meta['Author-email'])      # Rong Zhu <email>
 print(meta['License'])           # Apache-2.0
@@ -73,10 +73,13 @@ for url in meta.get_all('Project-URL'):
 deps = requires('pyobfus')
 for dep in deps:
     print(dep)
-# 输出：
+# 输出（Core 0.15.0，含可选依赖声明；以下省略 dev 条目）：
 # click>=8.0
 # pyyaml>=5.4
-# astunparse>=1.6.3; python_version < "3.9"
+# cryptography>=42.0
+# PyJWT<3,>=2.15.1
+# pyobfus-runtime<1,>=0.1.1
+# tomli>=2.0; python_version < "3.11"
 # ...
 ```
 

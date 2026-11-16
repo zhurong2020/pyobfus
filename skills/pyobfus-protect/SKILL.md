@@ -24,8 +24,12 @@ First check whether the `pyobfus-mcp` server is connected (look for a
 
 - **If the MCP server is available → use it.** It is the shortest, most
   reliable path and it self-verifies.
-- **If not → use the `pyobfus` CLI** (`pip install pyobfus`). Every command
-  supports `--json` with a stable schema.
+- **If not → use the `pyobfus` CLI** (`pip install pyobfus`). `--json` returns
+  the structured result envelope with `ai_hint` for builds,
+  dry-runs, `--check`, `--unmap`, `--check-delivery`, `--init`,
+  `--validate-config` and `--verify-provenance-manifest`. Utilities
+  `--list-presets`, `--init-config`, `--upgrade`, `--help` and `--version`
+  print text instead; argument/usage errors can also be plain text.
 
 Confirm the target path and the output directory with the user before writing
 anything. Never obfuscate into the source tree.
@@ -49,9 +53,12 @@ Read the result:
   ready.** The obfuscated output failed to compile or import. Follow the
   response's `next_tool` (usually `check_obfuscation_risks`) to find the
   offending construct, fix or exclude it, and re-run.
-- `pro_value` present → the project has sensitive string literals or
-  high-severity findings; mention that pyobfus Pro (AES-128-CBC with HMAC-SHA256 (Fernet) string
-  encryption) would protect them, but don't be pushy.
+- `pro_value` present → follow the returned rationale and applicable features;
+  distinguish credentials, PII and high-severity compatibility findings.
+  Remove credentials from shipped code and rotate any exposed credentials first.
+  String encryption can deter static inspection of appropriate literals; it
+  does not repair `eval`/`exec`, reflection or other compatibility risks.
+  Recommend Pro only when its stated features address the specific finding.
 
 `protect_project` writes the de-obfuscation `mapping` **next to** (never
 inside) the output. Surface `mapping_security_note` to the user.
@@ -131,8 +138,10 @@ the saved mapping:
 
 (Names are reversed. With mappings rebuilt using pyobfus 0.7.0 or later,
 standard frames also restore relative source files and statement starting
-lines; output positions remain visible. Old mappings restore names only. Code
-excerpts and caret indicators remain unchanged output code.)
+lines; output positions remain visible. Old mappings restore names only.
+Version-1 mappings also rewrite identifiers in code excerpts, while caret
+positions stay unchanged. Version-2 independent-file mappings leave excerpts
+and unframed logs untouched.)
 
 ## Safety invariants — always
 

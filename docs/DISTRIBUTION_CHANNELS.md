@@ -1,5 +1,64 @@
 # Distribution Channels State
 
+## Current status — 2026-11-16
+
+This block is the current channel summary. Package versions and independently
+numbered catalog releases are different facts. No channels were queried or
+published during this documentation update; the table uses the existing evidence.
+Dated observations are retained in [History](#history), where “current”, “latest”
+and pending actions refer to the date of the observation.
+
+| Channel | Status / deployed packages | Channel label | Required maintainer action | Latest recorded evidence |
+|---|---|---|---|---|
+| PyPI Core | Published: `pyobfus` 0.15.0 | Core tag `v0.15.0` | None for this release; follow normal release validation next time | [0.15.0 release](CORE_0_15_0_RELEASE_2026-11-15.md) |
+| PyPI MCP | Published: `pyobfus-mcp` 0.3.17; nine tools | MCP tag `mcp-v0.3.17` | Update registry and Glama pins on the next MCP release | [Release/provenance record](RELEASE_PROVENANCE_VERIFICATION.md) |
+| PyPI runtime | Published: `pyobfus-runtime` 0.1.1 | Runtime version, independent of Core | Keep artifact runtime requirement compatible | [Runtime rollout](Y1_RUNTIME_DISTRIBUTION_DESIGN.md), [current release](CORE_0_15_0_RELEASE_2026-11-15.md) |
+| GitHub Releases / Zenodo | Core 0.15.0; version DOI `10.5281/zenodo.24248676` | Core release archive | None; CITATION follow-up complete | [Release](CORE_0_15_0_RELEASE_2026-11-15.md), [follow-up](SESSION_CLOSEOUT_2026-11-16.md) |
+| GitHub Action / Marketplace | Listed as **pyobfus scan and build**; v1.1.0 | Moving `v1` → `3237e16`; independent of Core | None; use an exact Core version pin when reproducibility matters | [Channel acceptance](CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md) |
+| VS Code Marketplace / Open VSX | Published: extension 0.4.3 in both registries | Extension version | Publish to both registries on the next extension release | [0.15.0 component versions](CORE_0_15_0_RELEASE_2026-11-15.md) and retained September publication records below |
+| Official MCP Registry | Listed: MCP 0.3.17 | Registry server version follows MCP | Publish manually on the next MCP release; a PyPI tag alone does not update it | [Release verification](RELEASE_PROVENANCE_VERIFICATION.md) |
+| Glama | Listed; installs Core 0.15.0 / MCP 0.3.17 | **0.14.1**, Glama's independent release counter | None now; update package pins, test and inspect the installed versions on the next release | [0.15.0 channel evidence](CORE_0_15_0_RELEASE_2026-11-15.md) |
+| mcp.so | Listed | Directory listing, not a package version | Routine observation only | Existing 2026-11-16 audit fact baseline; no fresh lookup |
+| Smithery | Offline; merged into Arcade; skill page 404 since 2026-11-07 | Retired channel | Do not present it as a live install route | [November 7 handoff](SESSION_CLOSEOUT_2026-11-07.md) |
+| Claude plugin directory | Blocked by an orphan repository/path lock | No approved public listing | Wait for directory-team release of the lock; do not bypass it with another path | Retained [directory lock record](#history) and 2026-11-16 audit fact baseline |
+| Search / IndexNow | Search Console and Bing registration complete; automated URL notifications configured | Site indexing is independent of package releases | Routine observation; December first-week search/AI review | [Current handoff](SESSION_CLOSEOUT_2026-11-16.md) and November 7 registration record below |
+
+## Action metadata and CI validation
+
+Action CI checks the Marketplace description length (at most 125 characters),
+a non-empty name and the branding icon. Marketplace account-name collision
+validation happens **at publish time**, not in CI. The current listing name is
+`pyobfus scan and build`.
+
+The workflow expands to **11 jobs**, including three OS-specific CI-licensing
+consumers on Ubuntu, macOS and Windows. Coverage includes both modes and
+findings gates, tool errors, version pinning, explicit/inherited licence
+forwarding and denied-build gating. See the [11-job acceptance record](CORE_012_CHANNEL_FOLLOWUP_2026-11-04.md).
+
+## Search engine notification (IndexNow)
+
+CI sends public page URLs, the host, and a public verification key to
+[IndexNow](https://www.indexnow.org/documentation). `pages.yml` submits
+`landing/sitemap.xml` after deployment. `indexnow-docs.yml` submits changed
+Markdown URLs on main after a fixed 240-second Read the Docs build window;
+manual runs can submit all local navigation pages. Excluded maintainer documents
+are skipped. A zero before-SHA or a manual run with the all-pages option disabled
+submits nothing. Notifications are best effort, not a required check; the fixed
+wait does not guarantee that RTD has finished building.
+
+The public key files are `landing/0f5fb35e631b28ef475c62df09d73cdd.txt`
+(served under `https://zhurong2020.github.io/pyobfus/`) and
+`docs/0f5fb35e631b28ef475c62df09d73cdd.txt`
+(served under `https://pyobfus.readthedocs.io/en/latest/`). Each key location
+limits submissions to its host and directory. This notification is CI-only:
+it adds no package network behavior or telemetry.
+
+## History
+
+The following observations and earlier channel reference are preserved
+as dated evidence. Their package versions, metrics and pending actions
+are historical; use the current status table above for present state.
+
 **2026-11-07 Glama（Core 0.13.0）**：Build steps 改为 `pyobfus==0.13.0`；test `01a1b56b-40fd-7b04-9e65-eb349b7314a8` 成功，安装 Core 0.13.0 / MCP 0.3.17 / runtime 0.1.1，握手与九工具发现通过。自动渠道 release 标签为 **0.12.1**（Glama 自身递增，非 Core 版本号）。
 
 **2026-11-07 搜索引擎登记**：Google Search Console 已有 `https://zhurong2020.github.io/pyobfus/`（自动验证，sitemap 已提交、待首次读取）与 `https://pyobfus.readthedocs.io/en/latest/`（HTML 文件验证，`docs/google03878b382b498ff9.html` 须保留；sitemap 读取成功，146 页）；Bing Webmaster Tools 已从 GSC 导入两个站点：文档站 sitemap 146 网址、落地页 `https://zhurong2020.github.io/pyobfus/sitemap.xml` 2 网址，均 11-07 处理成功、无错误（Bing 后台按站点分开，用左上角站点选择器切换）。Bing 的「AI Performance（beta）」可作为月度 AI 观测的官方数据源。IndexNow 见下文。
@@ -119,7 +178,7 @@ channel release `0.9.2`. These emails do not establish a changed package pin or
 handshake, and the label is not the PyPI Core/MCP version. No rebuild or release
 was triggered during this review.
 
-### Historical channel snapshots (dates below are not current package versions)
+#### Historical channel snapshots (dates below are not current package versions)
 
 Glama's October 12 notifications confirm a successful build at 22:14 UTC
 (test `01a1322c-b3ff-7825-86c1-f27005b90423`) and a channel release labelled
@@ -232,9 +291,9 @@ re-runnable source of truth for the calculation is
 
 ---
 
-## 🟢 Live and owned
+### 🟢 Live and owned
 
-### PyPI — `pyobfus`
+#### PyPI — `pyobfus`
 - URL: https://pypi.org/project/pyobfus/
 - Current version: **0.11.1** (released 2026-10-30) · ships with PEP 740 attestations via OIDC trusted publishing
 - Current headline (0.10.0): opt-in Pro cross-file L3 preview with application key provider, staged multi-module builds, local name-only traceback restoration and delivery checks; see [validation and limits](CROSSFILE_OPACITY_VALIDATION.md).
@@ -300,14 +359,14 @@ re-runnable source of truth for the calculation is
   not yet establish a baseline change.
 - Tracker: `gh api repos/zhurong2020/pyobfus` + PePy
 
-### PyPI — `pyobfus-runtime` 🟢 LIVE
+#### PyPI — `pyobfus-runtime` 🟢 LIVE
 - URL: https://pypi.org/project/pyobfus-runtime/
 - Current version: **0.1.1** · OIDC trusted publishing with PEP 740 attestations
 - The wheel and sdist use the custom `LicenseRef-pyobfus-Runtime-1.0` licence.
   A clean PyPI installation was verified with `pyobfus_pro` absent.
 - Historical 0.1.0 release evidence: [workflow 35931605485](https://github.com/zhurong2020/pyobfus/actions/runs/35931605485). The current 0.1.1 release is recorded in [the current plan](CURRENT_PLAN_ZH.md).
 
-### PyPI — `pyobfus-mcp`
+#### PyPI — `pyobfus-mcp`
 - URL: https://pypi.org/project/pyobfus-mcp/
 - Current version: **0.3.17** (released 2026-10-30; supports MCP SDK 1.27+ and released 2.x versions below 3.0) · ships with PEP 740 attestations via OIDC trusted publishing. See [release verification](RELEASE_PROVENANCE_VERIFICATION.md).
 - Prior version 0.3.15 (2026-10-23) added `unmap_stack_trace` guidance for independent-file mappings.
@@ -363,7 +422,7 @@ re-runnable source of truth for the calculation is
   09-14 recorded `5 / 9`; the package remains in its quiet range with no
   adoption uplift signal. 09-15 still quiet (no separate spike).
 
-### GitHub — `zhurong2020/pyobfus`
+#### GitHub — `zhurong2020/pyobfus`
 - URL: https://github.com/zhurong2020/pyobfus
 - Visibility: public
 - Stars: 6 (2026-08-24 snapshot; historical v0.4 target was 100+)
@@ -389,7 +448,7 @@ re-runnable source of truth for the calculation is
   counter). This is far below PyPI traffic and confirms PyPI remains the main
   package-install channel.
 
-### GitHub Action — `zhurong2020/pyobfus-action`
+#### GitHub Action — `zhurong2020/pyobfus-action`
 - Repo: https://github.com/zhurong2020/pyobfus-action (public, Apache-2.0)
 - Released **v1.0.0** on 2026-09-10, with a moving `v1` major tag per the
   Actions convention. A composite action wrapping `--check` (SARIF + JSON) and
@@ -419,13 +478,16 @@ re-runnable source of truth for the calculation is
   capped at 125 characters.** The first attempt was 151 and was refused; every
   other field validated. Fixed in **v1.0.1** (111 chars), with `v1` moved to
   it. v1.0.0 was left untouched rather than force-moved — an exact version tag
-  is only worth pinning if it is immutable. Both this and the name rule are now
-  asserted by that repo's CI, so neither can resurface at a browser form.
+  is only worth pinning if it is immutable. Action CI now asserts description
+  length, a non-empty name and the branding icon. Account-name collisions are
+  validated only at Marketplace publish time; CI does not check that rule.
 - Verified from an external private repo: `@v1` resolved and returned
   `status=findings`, `findings-high=1`, `version=0.5.23`, SARIF written. That
   throwaway repo has since been deleted.
-- 8-job CI covers Ubuntu/macOS/Windows, both modes, both gates, the
-  tool-error path and version pinning.
+- 11-job CI covers Ubuntu/macOS/Windows, both modes, both gates, the
+  tool-error path and version pinning. This includes three OS-specific
+  CI-licensing consumers checking explicit/inherited licence forwarding and
+  denied-build gating.
 - **Attribution is the point, and this is the query that delivers it.** Unlike
   PyPI download counts, a public repo using this action commits
   `uses: zhurong2020/pyobfus-action` to a workflow file, which GitHub code
@@ -438,7 +500,7 @@ re-runnable source of truth for the calculation is
   definite answer rather than the unattributable numbers it replaces, and that
   is the whole deliverable — do not read the listing itself as traction.
 
-### VS Code Marketplace — `zhurong2020.pyobfus`
+#### VS Code Marketplace — `zhurong2020.pyobfus`
 - Current published version: **0.4.3** (2026-09-10). The same VSIX is also
   on Open VSX — see the dedicated section below.
 - 2026-08-24 public Gallery API: version 0.4.1, 3 installs, 124 downloads.
@@ -467,7 +529,7 @@ re-runnable source of truth for the calculation is
 - Releases: latest Core `v0.11.1`, runtime `runtime-v0.1.1`, MCP `mcp-v0.3.17`, and VS Code
   `vscode-v0.4.3`; MCP releases attach wheel+sdist.
 
-### Open VSX — `zhurong2020.pyobfus` 🟢 LIVE
+#### Open VSX — `zhurong2020.pyobfus` 🟢 LIVE
 - Public page: https://open-vsx.org/extension/zhurong2020/pyobfus
 - API: https://open-vsx.org/api/zhurong2020/pyobfus
 - Current version: **0.4.3**; the dated entries below retain the initial 0.4.2
@@ -513,18 +575,18 @@ re-runnable source of truth for the calculation is
 - Why this channel: reaches VSCodium / Gitpod / Eclipse Theia / code-server
   users who cannot install from the Microsoft Marketplace.
 
-### 有心工坊 (personal blog)
+#### 有心工坊 (personal blog)
 - URL: https://www.arong.eu.org
 - Content: CN-primary, cross-links to pyobfus in tech-empowerment (技术赋能) category
 - Role in channel mix: long-form canonical CN article host; dev.to posts link here for the CN version
 
-### Stack Overflow — Rong Zhu
+#### Stack Overflow — Rong Zhu
 - URL: https://stackoverflow.com/users/... (11 rep · 4 bronze badges)
 - **Status: ⏸️ SEEDING PAUSED** (see `docs/internal/drafts-archive-2026-11-07/stackoverflow-seeding-targets.md`（私有，2026-11-07 起不在公开仓库）)
 - Rationale: SO's site-wide AI-content ban + low per-question traffic + low-rep account = bad risk/reward
 - Re-evaluation trigger: pyobfus stars > 300 OR 6 months elapsed (whichever first)
 
-### dev.to — `@zhurong2020` 🟢 FOUR POSTS LIVE
+#### dev.to — `@zhurong2020` 🟢 FOUR POSTS LIVE
 - URL: https://dev.to/zhurong2020
 - Created: 2026-04-22
 - Profile: Rong Zhu · `#f59e08` brand color · bio + 4 "Coding" fields + Work + Pronouns filled
@@ -545,7 +607,7 @@ re-runnable source of truth for the calculation is
   - 2 inline images: `04_json_output.png` (after Preflight check section) + `03_obfuscate_demo.png` (after Obfuscate-with-mapping section)
   - Body: 1,603 prose words · 9 fenced code blocks · disclosure line up-front
 
-#### Auto-followed users after signup (2026-04-22)
+##### Auto-followed users after signup (2026-04-22)
 Recording for provenance — these are dev.to's recommendations, not deliberate picks. Curated follow-ups happen during warm-up.
 
 euromoscow · kevinmel2000 · bnlucas · hejhdiss · whoffagents · andreap · saqibjamil7866 · prashant_patil_9e62d3fa8a · luckypipewrench · shatru123 · andreas_eckhoff_7592e9859 · yaniv2809 · dev_rajput_2d46f92f8a3418 · idevusefulstuff · jon_at_backboardio · the_nortern_dev · elshadhu · bhavna_b_baa952ae51dac930 · marcosomma · syedahmershah · konark_13 · webdeveloperhyper · chocoscoding · codewithshahan · eayurt · code42cate · crd · jess
@@ -554,7 +616,7 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 
 ---
 
-### MCP Registry — `io.github.zhurong2020/pyobfus-mcp` 🟢 LIVE
+#### MCP Registry — `io.github.zhurong2020/pyobfus-mcp` 🟢 LIVE
 - URL: https://registry.modelcontextprotocol.io/v0/servers?search=pyobfus
 - **0.3.11 published 2026-09-07, independently confirmed**: the versions
   endpoint reports `0.3.11` `active` / `isLatest=true`, published
@@ -587,7 +649,7 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   makes a single optional hash ambiguous.
 - Implications: Claude Desktop / Claude Code / Cursor / Windsurf / Zed users querying the registry for "pyobfus" or "python obfuscator" will discover this server without manual config file edits.
 
-### Glama — `zhurong2020/pyobfus` 🟢 LISTED AND HEALTHY (resubmission is NOT needed)
+#### Glama — `zhurong2020/pyobfus` 🟢 LISTED AND HEALTHY (resubmission is NOT needed)
 - Public page: https://glama.ai/mcp/servers/zhurong2020/pyobfus
 - 2026-08-21 recheck: the public page is reachable and still exposes 8 tool names, but its version metadata is stale (shows v0.5.13; current is 0.5.16); the older API path `/api/mcp/v1/servers/io.github.zhurong2020/pyobfus-mcp` still returns `not_found`.
 - 2026-08-20: third-party maintainers independently reproduced both symptoms (build stuck on `debian:trixie-slim`, page OK but public API stale) — confirms this is Glama-side infra/sync, not a pyobfus-mcp code issue. Discord `#support` still unanswered as of 08-21; policy is passive-wait, no code change, no re-pin until Glama responds.
@@ -811,7 +873,7 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   absence. Until then the thread's last message had been his, unanswered for
   six days. Nothing further is owed on this channel.
 
-### MCP Skills trust score — 🟡 ESTABLISHED / NOT VERIFIED
+#### MCP Skills trust score — 🟡 ESTABLISHED / NOT VERIFIED
 - 2026-08-24 official free score API scan for `zhurong2020/pyobfus`: composite
   **6.06**, tier `established`, 14 signals, `verified=false`.
 - Positive evidence: `no safety findings`; the scanner detected the AI skill.
@@ -823,7 +885,7 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   contributors, stars and real usage should improve the weak dimension
   honestly.
 
-### Canopii Trust Index — 🟡 UPSTREAM ISSUE OPEN / RESCAN PENDING
+#### Canopii Trust Index — 🟡 UPSTREAM ISSUE OPEN / RESCAN PENDING
 - 2026-08-24 initial page state: latest scanned version was stale at MCP v0.3.7, score
   39/100 (F), confidence 81%. Its sole high failure is a broad
   `marshal.loads(...)` match at `pyobfus_pro/runtime/opacity.py:147`.
@@ -849,7 +911,7 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 - Full evidence and the exact recheck sequence:
   [EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md](EXTERNAL_CHANNEL_SNAPSHOT_2026-08-24.md).
 
-### Claude Plugin Marketplace 🔴 BLOCKED — stale repository lock (2026-09-24)
+#### Claude Plugin Marketplace 🔴 BLOCKED — stale repository lock (2026-09-24)
 - **2026-10-14 support update:** the original submission is under the current account; no material or other account is missing. Only the directory team can release the lock. After release, resubmit at <https://claude.ai/directory/manage> using a paid-plan account; the Console form is no longer supported. Do not change repository/path to bypass the lock.
 - **2026-09-24 resubmission attempt: the Console form rejects it with "Another submission already holds this
   repository and path" for `github.com/zhurong2020/pyobfus` (repository root).** Yet the maintainer's
@@ -883,7 +945,7 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 - 2026-09-07 maintainer recheck (console dump): unchanged — still `Submitted and pending review`, still dated Aug 2, now **36 days** in queue with no state transition and no request for changes. Nothing actionable; keep the passive-wait policy and re-check on the next periodic sweep.
 - Known copy issue: submitted description says `protected_project`; correct tool name is `protect_project`. Do not resubmit only for this typo; fix opportunistically if Anthropic exposes an edit/request-changes path.
 
-### MCP Trust Checker 🟢 SCANNED A (94/100) · registry publish pending maintainer token
+#### MCP Trust Checker 🟢 SCANNED A (94/100) · registry publish pending maintainer token
 - Tool: `mcptrustchecker` 1.14.0 (npm, local-first deterministic scanner; <https://github.com/illia-haidar/mcptrustchecker>).
 - 2026-09-22 scan of the published wheel `pyobfus_mcp-0.3.12-py3-none-any.whl` (offline source scan):
   threat score 100, client score **94/100, grade A**, gates fired: none, threat findings: none.
@@ -898,7 +960,7 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
   --registry pypi --online --category developer-tools`. Keep the token out of shell history, the repository,
   and chat. Do not change product behaviour for the badge.
 
-### OpenSSF Best Practices passing badge 🟢 LIVE
+#### OpenSSF Best Practices passing badge 🟢 LIVE
 - URL: https://www.bestpractices.dev/projects/12788
 - Project ID: 12788 · achieved: 2026-05-09 04:23:38 UTC · tier: passing (Metal series) · 67/67 criteria
 - Categories met: Basics 13/13 · Change Control 9/9 · Reporting 8/8 · Quality 13/13 · Security 16/16 · Analysis 8/8
@@ -906,9 +968,9 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 - Badge embedded in pyobfus README header (commit `eb634ab`)
 - Implications: marketable third-party project-maturity credential. Cross-referenced in awesome-mcp-servers PR #5777 description (silent edit 2026-05-09). Useful in HN/Reddit launch posts as supporting evidence; useful in 软著 / patent applications as "production use" proof (see `memory/patent_software_copyright_sync_2026-05-09.md`).
 
-## 🟡 Pending action
+### 🟡 Pending action
 
-### awesome-python — PR closed 2026-09-24, not merged
+#### awesome-python — PR closed 2026-09-24, not merged
 
 2026-09-23 已向 `Distribution → Obfuscation` 提交 challenger 条目：
 [`vinta/awesome-python#3352`](https://github.com/vinta/awesome-python/pull/3352)。提交前复核了
@@ -926,7 +988,7 @@ Note: `@jess` is Jess Lee, dev.to co-founder — useful to keep; `@code42cate` (
 **不争辩、不重开**；重提条件是非发布日下载基线明显抬升，届时在新 PR 里引用这条评论。
 `awesome-security` / `awesome-devsecops` 的门槛同样是下载量，暂不投。
 
-### AlternativeTo — account submission prepared, gate cleared 2026-09-24
+#### AlternativeTo — account submission prepared, gate cleared 2026-09-24
 
 The awesome-python PR was closed on 2026-09-24, so the "wait for its result" gate no longer applies;
 submission now waits only on the maintainer signing in with a verified email.
@@ -951,7 +1013,7 @@ not buy approval. Use the free queue unless the maintainer separately approves s
 After submission, record the private submission status/date here. A pending page visible only to the
 submitter is normal according to the service FAQ.
 
-### `awesome-mcp-servers` community lists — 2 LIVE / 1 dead-end (refreshed 2026-06-08)
+#### `awesome-mcp-servers` community lists — 2 LIVE / 1 dead-end (refreshed 2026-06-08)
 - 🟢 **`wong2/awesome-mcp-servers` LIVE** via mcpservers.org (the list has retired direct PRs; submissions go through the form-driven `mcpservers.org/submit` channel). Listing: <https://mcpservers.org/servers/zhurong2020/pyobfus>. Approval landed same-day (2026-05-08) vs the 7-day SLA.
 - 🟢 **`punkpeye/awesome-mcp-servers` PR #5777 MERGED 2026-06-06** (opened 2026-05-03 · merged by punkpeye/Frank Fiegel after ~34 days at 86K★-repo human cadence). pyobfus-mcp now listed under Developer Tools. All bot gates were green throughout (`has-emoji`/`has-glama`/`valid-name`).
 - ❌ **`appcypher/awesome-mcp-servers` DEAD-END** — repo owner has disabled both PRs and Issues (`gh api repos/appcypher/awesome-mcp-servers --jq '.has_issues'` returns `false`). The CONTRIBUTING.md is stale; repo is in read-only museum mode despite still appearing active. Fork retained at `zhurong2020/awesome-mcp-servers-appcypher` for re-fork in 1 click if owner reopens.
@@ -959,27 +1021,27 @@ submitter is normal according to the service FAQ.
 
 ---
 
-## 🔵 Planned, not established
+### 🔵 Planned, not established
 
-### Hacker News
+#### Hacker News
 - No account yet (if needed, use email `zhurong0525@gmail.com`)
 - Intended use: **one** Show HN after dev.to article #1 gets social proof (goal: 100+ reactions on dev.to first)
 - AI policy: banned outright; post must be manually written by maintainer
 
-### Reddit — `/r/Python`
+#### Reddit — `/r/Python`
 - No pyobfus-dedicated handle planned; personal account used with disclosure
 - Target: **"Showcase Saturday" pinned thread** (not a standalone post)
 - AI policy: mods remove AI-looking content on sight; human voice required
 
-### Medium
+#### Medium
 - Deferred. dev.to-first; Medium considered only if dev.to article performs (>5k views) as a reach extension with AI-disclosure header
 
-### Zhihu (知乎) / 微信公众号 / 小红书
+#### Zhihu (知乎) / 微信公众号 / 小红书
 - Not in current plan; 有心工坊 covers the CN long-form need. Revisit Q3 2026 if CN traffic signal justifies.
 
 ---
 
-## 📊 Metrics targets (from AI_INTEGRATION_STRATEGY.md §5)
+### 📊 Metrics targets (from AI_INTEGRATION_STRATEGY.md §5)
 
 | Metric | Baseline 2026-04-22 | v0.4 target (6 weeks) | v0.5 target |
 |---|---|---|---|
@@ -997,28 +1059,10 @@ Tracking cadence: every 2 weeks append a row to V0.4_EXECUTION_LOG.md.
 
 ---
 
-## 🔁 When to update this file
+### 🔁 When to update this file
 
 Update whenever:
 - A new channel is established (account created, repo forked, etc.)
 - A channel's status changes (paused ↔ active)
 - A publish / post goes live (note the URL + date)
 - Monthly metrics snapshot (copy current row of numbers)
-
-## Search engine notification (IndexNow)
-
-CI sends public page URLs, the host, and a public verification key to
-[IndexNow](https://www.indexnow.org/documentation). `pages.yml` submits
-`landing/sitemap.xml` after deployment. `indexnow-docs.yml` submits changed
-Markdown URLs on main after a fixed 240-second Read the Docs build window;
-manual runs can submit all local navigation pages. Excluded maintainer documents
-are skipped. A zero before-SHA or a manual run with the all-pages option disabled
-submits nothing. Notifications are best effort, not a required check; the fixed
-wait does not guarantee that RTD has finished building.
-
-The public key files are `landing/0f5fb35e631b28ef475c62df09d73cdd.txt`
-(served under `https://zhurong2020.github.io/pyobfus/`) and
-`docs/0f5fb35e631b28ef475c62df09d73cdd.txt`
-(served under `https://pyobfus.readthedocs.io/en/latest/`). Each key location
-limits submissions to its host and directory. This notification is CI-only:
-it adds no package network behavior or telemetry.

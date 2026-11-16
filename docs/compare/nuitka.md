@@ -80,11 +80,16 @@ pyobfus first means those are the obfuscated names. A measured run, the
 [compiled packaging cookbook](../COMPILED_PACKAGING_COOKBOOK.md).
 
 > **Want a standalone executable without using Nuitka?**
-> pyobfus pairs with the free, MIT-licensed [PyInstaller](https://pyinstaller.org/)
+> pyobfus pairs with [PyInstaller](https://pyinstaller.org/) (GPL-2.0-or-later
+> with a bootloader/bundling exception permitting distribution of non-free
+> programs; [official licence](https://pyinstaller.org/en/stable/license.html))
 > to ship a single-file binary with mangled identifiers — obfuscate first,
 > then bundle. See the [PyInstaller Cookbook](../PYINSTALLER_COOKBOOK.md) for a
 > full worked example and a check of the bundle for the original names.
-> That combination is advisory-only in the [support matrix](../SUPPORT_MATRIX.md).
+> The maintained Linux CPython 3.12 CI lane builds and runs single- and
+> multi-module fixtures with PyInstaller 6.22.3 `--onefile` and restores their
+> bundled tracebacks. Other combinations need separate validation; see the
+> [support matrix](../SUPPORT_MATRIX.md#delivery-combinations).
 
 ---
 

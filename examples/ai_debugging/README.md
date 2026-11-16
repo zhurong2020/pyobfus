@@ -26,30 +26,33 @@ pyobfus --unmap --trace obf_trace.txt --mapping private/pricing.map.json
 
 ## What you see
 
-The **obfuscated** traceback is opaque — every name is mangled:
+With Core 0.15.0, the crash excerpt looks like this (paths shortened to the
+demo directory; parameters such as `line_items` are preserved by default):
 
 ```
-  File "dist/pricing.py", line 14, in I5
-    I1 = I7 * I3[0]['discount_rate']
+  File "dist/pricing.py", line 18, in I4
+    I1 = I5 * line_items[0]['discount_rate']
 KeyError: 'discount_rate'
 ```
 
 After `--unmap`, the original names are restored, pointing straight at the bug:
 
 ```
-  File "dist/pricing.py", line 14, in order_total
+  File "pricing.py", line 13, in order_total  [obfuscated: dist/pricing.py:18]
     discount = subtotal * line_items[0]['discount_rate']
 KeyError: 'discount_rate'
 ```
 
-`I5 → order_total`, `I7 → subtotal`, `I3 → line_items`. The shipped artifact
+`I4 → order_total`, `I5 → subtotal`, `I1 → discount`. The shipped artifact
 stays obfuscated; only the holder of `pricing.map.json` can perform this
 reversal. This keeps the AI-assisted debugging loop intact on protected code.
 
 ## Use the mapping from the same build
 
-Every build writes a new mapping, and names like `I5` mean something different
-in each one. Keep each release's mapping next to its version number. The
+Community name mappings are deterministic for unchanged input and
+configuration. Changes to the source, configuration or tool version can change
+what short names such as `I5` mean, so always use the matching build's mapping.
+Keep each release's mapping next to its version number. The
 `# pyobfus:obfuscated id=...` header at the top of each shipped file matches
 the `marker_id` field of the mapping that build produced.
 
@@ -68,7 +71,10 @@ to use the same names would pass. The marker id is the reliable check.
 
 ## What it does not recover
 
-Only names come back. Line numbers and source lines in the traceback still
-refer to the obfuscated file, and string values, comments and the original
-source text are not restored. Before pasting a customer's traceback into a
-cloud AI assistant, remove any customer data it contains.
+Mappings generated since Core 0.7.0 can also restore original relative
+files and statement starting lines in standard frames, keeping output positions
+visible; older mappings restore names only. Version-1 mappings rewrite excerpt
+identifiers but leave caret positions unchanged. Version-2 independent-file
+mappings leave excerpts and unframed logs untouched. String values, comments
+and the original source text are not reconstructed. Before pasting a customer's
+traceback into a cloud AI assistant, remove any customer data it contains.

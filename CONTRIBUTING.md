@@ -169,7 +169,7 @@ def obfuscate_name(original_name: str, prefix: str = "I") -> str:
 
 Follow these guidelines to ensure code passes Pylance type checking:
 
-#### 1. Optional Parameters Must Use Union Types
+#### 1. Optional Parameters Must Include `None` in Their Type
 
 ❌ **Incorrect** - Will fail type checking:
 ```python
@@ -177,9 +177,12 @@ def process_file(path: Path, output: Path = None):
     pass
 ```
 
-✅ **Correct** - Use `| None` for optional parameters:
+✅ **Correct** - Use `Optional` for compatibility with Python 3.9:
 ```python
-def process_file(path: Path, output: Path | None = None):
+from pathlib import Path
+from typing import Optional
+
+def process_file(path: Path, output: Optional[Path] = None):
     pass
 ```
 
@@ -336,7 +339,7 @@ pyobfus/
 │   ├── string_aes.py     # AES-128-CBC with HMAC-SHA256 (Fernet) encryption
 │   └── anti_debug.py     # Anti-debugging
 ├── cloudflare-worker/    # License server
-├── tests/                # Test suite (366 tests)
+├── tests/                # Core test suite
 ├── integration_tests/    # External project testing
 ├── examples/             # Example scripts
 └── docs/                 # Documentation
@@ -367,7 +370,10 @@ pyobfus/
 
 ## Community Edition vs Pro Edition
 
-This repository contains only Community Edition features (Apache 2.0 licensed).
+This public repository contains the Apache-2.0 Community implementation in
+`pyobfus/` and the source-separated proprietary Pro implementation in
+`pyobfus_pro/`. Public source availability does not grant an open-source licence
+to the Pro code; see its [separate licence](pyobfus_pro/LICENSE).
 
 **Community Features** (open source):
 - Name mangling
@@ -376,7 +382,7 @@ This repository contains only Community Edition features (Apache 2.0 licensed).
 - Configuration management
 - CLI interface
 
-**Pro Features** (proprietary, not in repo):
+**Pro Features** (proprietary source in `pyobfus_pro/`, licence-gated):
 - AES-128-CBC with HMAC-SHA256 (Fernet) string encryption
 - Control flow flattening
 - Anti-debugging

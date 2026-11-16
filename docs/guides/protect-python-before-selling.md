@@ -49,8 +49,10 @@ that.
 If you use a framework, see which preset fits with `pyobfus --list-presets`
 (FastAPI, Django, Flask, Pydantic, Click, SQLAlchemy, ML). The
 [support matrix](../SUPPORT_MATRIX.md#framework-presets) says how far each
-preset is tested: presets are tested for what they exclude, not by running a
-real application.
+preset is tested: all presets have exclusion tests. FastAPI also has a
+weekly real-application lane on Ubuntu and Windows, CPython 3.12, comparing
+HTTP behavior and restoring a traceback. Other presets do not have equivalent
+real-application CI coverage; test your own application after obfuscation.
 
 ## Step 2: preview, then build
 
@@ -139,11 +141,17 @@ protection is enough for what you are protecting.
 If the customer should not need Python, package the obfuscated `dist/`, not
 `src/`:
 
-- [PyInstaller cookbook](../PYINSTALLER_COOKBOOK.md) (advisory: not run in
-  CI).
-- [Nuitka / Cython cookbook](../COMPILED_PACKAGING_COOKBOOK.md): verified
-  once on Linux for a single module, including what each compiler leaves in
-  the binary.
+- [PyInstaller cookbook](../PYINSTALLER_COOKBOOK.md): maintained Linux
+  CPython 3.12 CI builds and runs single- and multi-module `--onefile` fixtures
+  with PyInstaller 6.22.3 and restores bundled tracebacks.
+- [Nuitka / Cython cookbook](../COMPILED_PACKAGING_COOKBOOK.md): the same lane
+  builds and runs single-module Cython 3.3.0 / Nuitka 4.2.2 `--module` fixtures
+  and a multi-module Nuitka standalone fixture, checking behavior, renamed
+  names and traceback restoration. The cookbook also retains dated measurements.
+
+This is bounded fixture coverage, not validation of every OS, dependency or
+packager configuration. See the [support matrix](../SUPPORT_MATRIX.md#delivery-combinations)
+and rerun your own packaged application checks.
 
 Re-run your behaviour checks on the packaged result in a clean environment,
 ideally the same OS as your customer.

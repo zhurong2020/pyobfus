@@ -9,7 +9,7 @@ Oxyry is an online Python obfuscation service.
 |---------|---------|-------|
 | **Deployment** | CLI tool (local) | Web service only |
 | **Privacy** | Code never leaves your machine | Code uploaded to server |
-| **Python versions** | 3.9 - 3.14 | 3.3 - 3.7 (outdated) |
+| **Python versions** | 3.9 - 3.15 | 3.3 - 3.7 (outdated) |
 | **Multi-file support** | Yes (cross-file) | Limited |
 | **Configuration** | YAML files | Web interface |
 | **CI/CD integration** | Yes | No |

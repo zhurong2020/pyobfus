@@ -86,14 +86,14 @@ def greet(name):
 print(greet("world"))
 ```
 
-Run `pyobfus input.py -o output.py`. Representative Community output:
+Run `python -m pyobfus input.py -o output.py`. Community output
+(generated with 0.15.0; header comments omitted):
 
 ```python
-def I0(I1):
-    I2 = f"Hello, {I1}!"
-    return I2
-
-print(I0("world"))
+def I0(name):
+    I1 = f'Hello, {name}!'
+    return I1
+print(I0('world'))
 ```
 
 Both print `Hello, world!`. Generated identifiers can differ with input and

@@ -1,8 +1,11 @@
 # Network behavior: what pyobfus sends, and when
 
-pyobfus does not upload your source code and has no telemetry. Obfuscating,
-previewing (`--dry-run`), verifying syntax, saving and reading mappings, and
-reversing tracebacks (`--unmap`) all run without a network connection.
+pyobfus does not upload your source code and has no telemetry. Community
+obfuscation and preview (`--dry-run`), syntax verification, local mapping I/O
+and traceback restoration (`--unmap`) run without a network connection.
+Pro builds check entitlement and may contact the licence server; a build using
+the CI environment key requires online verification for every build, with no
+offline fallback. See [Pro licence verification](#3-pro-licence-verification-pro).
 
 There are three request categories in the builder. Each one is listed below
 with what it sends and how to avoid it. This page was checked against the

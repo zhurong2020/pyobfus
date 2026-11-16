@@ -1,5 +1,7 @@
 # `--check-delivery`：PyInstaller CArchive 顶层检查设计
 
+Status 2026-11-16: shipped in Core 0.15.0 for direct executables; this document is historical design. Embedded PYZ remains uninspected.
+
 日期：2026-11-15。状态：实现前安全设计；目标是一个冻结格式的保守增量，不宣称检查
 嵌入 PYZ 字节码。
 
