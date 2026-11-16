@@ -18,7 +18,7 @@
 | MCP | **0.3.17**，九个工具（七 Community + 两个 tier/trial guidance） | [包元数据](../pyobfus_mcp/pyproject.toml)、[工具清单](../pyobfus_mcp/pyobfus_mcp/tool_manifest.json)；Python ≥3.10 |
 | runtime / VS Code / Action | **0.1.1 / 0.4.3 / v1.1.0** | Action 移动 `v1` 指向 `3237e16`；各组件独立发布，不随 Core 自动升版 |
 | Glama | 渠道 **0.14.1**；安装 Core **0.15.0** / MCP **0.3.17** | 渠道标签独立递增；构建、握手与九工具发现已核，不代表九工具逐项业务调用 |
-| 许可 Worker | **`209eb969`**，回滚 **`13aaa4a8`** | 生产签发 `ci-2026-11`；备用 `ci-2026-11b` 已由 Core 0.15.0 预分发信任，未配 Worker |
+| 许可 Worker | **`39d425d7`**（2026-11-16，#255 数据保留），回滚 **`209eb969`** | 生产签发 `ci-2026-11`；备用 `ci-2026-11b` 已由 Core 0.15.0 预分发信任，未配 Worker；每周一 03:17 UTC 清扫（设备审计记录 90 天、试用记录到期 180 天后转去重记录） |
 | CITATION / Zenodo | **0.15.0**，2026-11-15，record **24248676** | [CITATION](../CITATION.cff)；concept DOI `10.5281/zenodo.20846053` |
 
 Community 为 Apache-2.0，无文件／行数限制；Pro 为 **$45 USD 一次性**、终身更新、
