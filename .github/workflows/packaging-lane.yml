@@ -13,6 +13,7 @@ on:
       - 'integration_tests/test_packaging.py'
       - 'examples/compiled_packaging/**'
       - 'examples/pyinstaller/**'
+      - 'examples/delivery_reference/**'
       - '.github/workflows/packaging-lane.yml'
   push:
     branches: [main]
@@ -24,6 +25,7 @@ on:
       - 'integration_tests/test_packaging.py'
       - 'examples/compiled_packaging/**'
       - 'examples/pyinstaller/**'
+      - 'examples/delivery_reference/**'
       - '.github/workflows/packaging-lane.yml'
 
 permissions:

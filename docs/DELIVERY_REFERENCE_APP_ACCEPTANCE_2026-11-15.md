@@ -164,3 +164,55 @@ D6–D9 未执行；修复脚本后经维护者再次批准，第 2 次运行（
 边界：消费运行在同一台已预装 Python 的托管构建机上，属于局部验收，不是干净目标机
 验证；只覆盖此一格，不扩展平台支持声明，不改变发版或版别。
 
+## 2026-11-16 PyInstaller lane (Linux, CPython 3.12)
+
+离线本地运行公开参考应用，新增自动化位于
+`integration_tests/test_packaging.py`（随 Linux packaging lane 在 CI 中持续运行，CI 使用固定的 PyInstaller 6.22.3）。本次未修改产品代码。
+环境为 Linux x86_64／WSL2（内核 `6.6.87.2-microsoft-standard-WSL2`），CPython
+**3.12.3**（GCC 13.3.0），Core **0.15.0**，PyInstaller **6.21.0**，pytest **9.1.1**。
+使用仓库 `venv/`；CI requirements 仍固定 PyInstaller **6.22.3**，本次没有联网安装或
+验证该版本，不能把本地结果当作该 pin 的运行证据。
+
+pytest 导入本工作树的 `pyobfus/__init__.py`；在临时目录执行的 CLI 子进程通过 editable
+安装导入主 checkout 的 `pyobfus/__init__.py`。只读逐字节比较两处全部 **69** 个 Core
+Python 文件，无差异。每个测试的 HOME／USERPROFILE／XDG_CACHE_HOME 均绑定临时目录，
+清除继承的 PYTHONPATH、PYTHONHOME 和 PYOBFUS_LICENSE_KEY；没有访问真实 `~/.pyobfus`。
+
+| 步骤 | 实测与判定 |
+|---|---|
+| 原文基线 | pass：复制公开应用到临时 source；`pro` 与默认参数均退出 0，stdout 两行为 `pricing-v1`、`pro: 65.88`；`bogus_tier` 退出 1，异常为 `ValueError: Unknown pricing tier: bogus_tier` |
+| Community 保护 | pass：采用示例 `pyobfus.yaml`，`--save-mapping --build-report --verify-syntax --jobs 1 --json`；另加仅用于交付证据的 `--provenance-manifest`，mapping／report／manifest 全在 private；生成 8 个 Python 输出；按 README 显式创建资源目录并复制 label，保护源码的三种运行与基线一致 |
+| 两种冻结构建 | pass：分别 `--onedir`／`--onefile --clean --noconfirm`，显式 distpath／workpath／specpath／PYINSTALLER_CONFIG_DIR；`--add-data` 包含 `storefront/data/label.txt`，`--hidden-import` 包含实际 allowlist 模块 `storefront.plugins.standard` 及资源包 `storefront.data` |
+| 消费运行 | pass：仅复制 dist 成品到新 consumer，隐藏 source／protected／build 原路径，cwd 为 consumer；两种模式各跑 `pro`、默认、`bogus_tier`，stdout 行、退出码及异常类型／信息均与原文一致；成品无 `.py` 或 `.json`；onedir 的 label 实际位于 `_internal/storefront/data/label.txt` |
+| traceback | pass：两种模式均经私有 mapping 调用 CLI unmap，无 unmatched name；原文、冻结 trace、还原 trace 均为 4 帧，还原路径与函数序列完全一致：`main.py:<module>` → `storefront/app.py:render_order` → `storefront/checkout.py:quote_order` → `storefront/rules/discounts.py:__init__`；没有补造帧 |
+| CArchive 与 CLI | pass（覆盖断言）：两种引导程序均识别为 `pyinstaller-carchive`，`found=1, inspected=1`；独立读取 PyInstaller TOC 确认存在类型 `z` 的 `PYZ.pyz`，未打开或反序列化 PYZ；API 与 CLI JSON 完全一致。交付本身保持 warn，见下表 |
+| 三个植入 oracle | pass（预期拒绝）：每次重新构建真实 onefile，分别用 `--add-data` 植入私有 mapping、原文 `storefront/catalog.py`、运行时由片段生成的无效 PEM；全部 fail、CLI 退出 1、恰好一个匹配的 high finding，见下表 |
+
+以下数字均来自实际运行；`total / checked / unknown` 对应
+`members_total / members_checked / unknown_members`，不是 Python 模块的已验证数量。
+
+| 被检查成品 | total / checked / unknown | status／CLI exit | findings |
+|---|---|---|---|
+| onedir 引导程序 | 8 / 0 / 8 | warn／0 | medium `delivery.frozen_uninspected`，high=0 |
+| onedir 整目录（含 `_internal`，22 个文件） | 不提供成员统计；found=1, inspected=0 | warn／0 | medium `delivery.frozen_uninspected`；8 条 info `delivery.missing_output`；high=0 |
+| onefile 正常成品 | 29 / 21 / 8 | warn／0 | medium `delivery.frozen_uninspected`，high=0 |
+| onefile 植入 mapping.json | 30 / 22 / 8 | fail／1 | high `delivery.mapping_file`，路径 `mapping.json`；medium `delivery.frozen_uninspected` |
+| onefile 植入原文 catalog.py | 30 / 22 / 8 | fail／1 | high `delivery.original_source`，路径 `catalog.py`（provenance 输入哈希匹配）；medium `delivery.frozen_uninspected` |
+| onefile 植入假 PEM | 30 / 22 / 8 | fail／1 | high `delivery.private_key`，路径 `dummy.pem`；medium `delivery.frozen_uninspected` |
+
+需要保留的差异：onedir 的资源和 native dependencies 在 `_internal`，引导程序 CArchive
+只有未检查的代码／归档成员，所以 `members_checked=0`，并非 onefile 的 21。
+Core 0.15.0 对目录与单个可执行文件走不同检查路径：目录扫描不会继续解析引导程序的
+CArchive，报告 `inspected=0`；8 条 missing_output 只是保护源码已冻结后不再以原文件
+存在的 info，不表示构建失败。测试明确断言这些差异，没有把 unknown 写成 clean。
+
+首轮测试夹具漏建 README 要求的资源目录，导致资源复制失败；补回显式 mkdir 后通过。
+这是本次测试代码的修正，没有发现或绕过产品缺陷。公开配置排除 `__init__.py`，冻结构建
+仍成功处理资源包与 allowlist 插件。
+
+边界：**Linux／CPython 3.12 单格，同一构建机上的消费运行，不是干净目标机**；只验证
+此公开应用与本地工具版本。嵌入 PYZ、字节码内容仍未检查，正常成品审计为 warn，
+因此 D 的本地行为验收 pass、F 的完整覆盖仍 unknown，整体最多 **partial**；没有验证
+Pro lane、Windows／macOS、CI 的 6.22.3 pin 或新的支持矩阵。
+
+验证：`venv/bin/pytest integration_tests/test_packaging.py --no-cov` 为 9 passed／3 skipped（skip 为本机未装的 Cython／Nuitka 可选工具链），`scripts/check.sh` 通过；复核者独立复跑结果相同。
