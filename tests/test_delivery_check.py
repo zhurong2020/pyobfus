@@ -797,3 +797,35 @@ def test_directory_uninspected_finding_points_at_the_gap(tmp_path):
     assert inspection["found"] == 2 and inspection["inspected"] == 1
     uninspected = [f for f in result["findings"] if f["code"] == dc.FROZEN_UNINSPECTED]
     assert [f["path"] for f in uninspected] == ["b_other"]
+
+
+def _l3_report(path: Path) -> Path:
+    report = {
+        "build_id": "b1",
+        "opacity": {"build_id": "b1"},
+        "outputs": {"files": []},
+        "transformations": {},
+    }
+    path.write_text(json.dumps(report), encoding="utf-8")
+    return path
+
+
+@pytest.mark.parametrize("case", ["frozen", "plain", "frozen_with_l3_sources"])
+def test_l3_report_against_frozen_delivery(tmp_path, case):
+    """Frozen L3 deliveries are unverifiable (medium), never a false mismatch or clean."""
+    delivery = tmp_path / "dist"
+    delivery.mkdir()
+    (delivery / "README.txt").write_text("app\n", encoding="utf-8")
+    if case != "plain":
+        (delivery / "app").write_bytes(_binary_header("ELF"))
+    if case == "frozen_with_l3_sources":
+        (delivery / "mod.py").write_text("# pyobfus:l3-build b1\nx = 1\n", encoding="utf-8")
+    report = _l3_report(tmp_path / "report.json")
+    result = dc.check_delivery(delivery, build_report=report)
+    codes = _codes(result)
+    if case == "frozen":
+        assert dc.L3_UNVERIFIED_FROZEN in codes and dc.L3_BUILD_MISMATCH not in codes
+        assert result["status"] == "warn" and result["summary"]["high"] == 0
+    else:
+        assert dc.L3_BUILD_MISMATCH in codes and dc.L3_UNVERIFIED_FROZEN not in codes
+        assert result["status"] == "fail"

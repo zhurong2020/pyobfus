@@ -262,6 +262,10 @@ At most 32 executable readers are attempted; excess or non-PyInstaller
 executables remain uninspected. Any uninspected executable or unknown member
 keeps the result at warn (or fail for high findings), with counts in the warning.
 Recognised malformed or over-limit archives exit 2, never clean. Wheels are unchanged.
+Unreleased: with an L3 build report, a directory holding frozen executables and no
+L3 release files reports medium `delivery.l3_unverified_frozen` (L3 completeness
+cannot be verified inside frozen payloads) instead of a high
+`delivery.l3_build_mismatch`; source deliveries are checked as before.
 
 ### 6. List / explain presets
 
