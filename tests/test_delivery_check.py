@@ -541,7 +541,13 @@ def test_directory_pyinstaller_leak_matches_single_file(build, leak):
     elif leak == "key":
         name, data, code = "private/signing.pem", KEY_TEXT.encode(), dc.PRIVATE_KEY
     else:
-        name, data, code = "src/shapes.py", SOURCE.encode(), dc.ORIGINAL_SOURCE
+        # Use the bytes on disk: write_text produces CRLF on Windows, and the
+        # provenance manifest hashes the file as written.
+        name, data, code = (
+            "src/shapes.py",
+            (build / "src" / "shapes.py").read_bytes(),
+            dc.ORIGINAL_SOURCE,
+        )
     binary = build / "dist" / "app"
     _pyinstaller_executable(binary, [(name, data, "x", True)])
     single = _check(build, binary)
