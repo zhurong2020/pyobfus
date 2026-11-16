@@ -45,7 +45,9 @@ jobs:
       - name: Install local packages and pinned toolchains
         run: |
           python -m pip install --upgrade pip
-          pip install -e ./pyobfus_runtime -e ".[dev]"
+          # Install the runtime as a regular package, as customers do from PyPI:
+          # PyInstaller cannot see packages behind an editable import hook.
+          pip install ./pyobfus_runtime -e ".[dev]"
           pip install -r integration_tests/packaging/requirements.txt
       - name: Build, execute and reverse-map packaged examples
         run: pytest integration_tests/test_packaging.py -v --no-cov

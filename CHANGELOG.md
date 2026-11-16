@@ -25,6 +25,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   original-source leak when the build report records a byte-identical output
   (for example, a file left unchanged by the build). Directory files already
   had this exemption; executable members now share the same rule.
+- A directory `--check-delivery` with an L3 (crossfile opacity) build report no
+  longer reports a high `delivery.l3_build_mismatch` for a frozen delivery whose
+  L3 release lives inside executable payloads. It reports the new medium
+  finding `delivery.l3_unverified_frozen` instead (result stays `warn`, never
+  clean). Source directories missing the L3 release manifest, or frozen
+  directories that also contain L3-marked source files, still fail as before.
 
 ## [0.15.0] - 2026-11-15
 

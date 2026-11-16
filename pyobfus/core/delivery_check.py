@@ -50,6 +50,7 @@ BYTECODE_PRESENT = "delivery.bytecode_present"
 BYTECODE_ORIGIN_UNKNOWN = "delivery.bytecode_origin_unknown"
 FROZEN_UNINSPECTED = "delivery.frozen_uninspected"
 L3_BUILD_MISMATCH = "delivery.l3_build_mismatch"
+L3_UNVERIFIED_FROZEN = "delivery.l3_unverified_frozen"
 
 _MAX_JSON_BYTES = 20 * 1024 * 1024
 _PEM_PRIVATE_MARKER = b"PRIVATE KEY-----"  # PKCS#8, RSA, EC, OPENSSH
@@ -925,7 +926,24 @@ def check_delivery(
         any(line.startswith(b"# pyobfus:l3-build ") for line in header.splitlines())
         for _, header in observed.values()
     )
-    if l3_manifest is not None or needs_l3:
+    l3_sources_present = any(
+        any(line.startswith(b"# pyobfus:l3-build ") for line in header.splitlines())
+        for _, header in observed.values()
+    )
+    if l3_manifest is None and needs_l3 and not l3_sources_present and frozen:
+        # A frozen delivery compiles the L3 release into executable payloads,
+        # so its completion manifest and source files cannot be present here.
+        # That is unverifiable, not a mismatch; never report it as clean.
+        findings.append(
+            Finding(
+                L3_UNVERIFIED_FROZEN,
+                "medium",
+                "",
+                "The build report describes an L3 build, but the delivery holds frozen "
+                "executables and no L3 release files; L3 completeness could not be verified.",
+            )
+        )
+    elif l3_manifest is not None or needs_l3:
         try:
             if l3_manifest is None:
                 raise ValueError("L3 release completion manifest is missing")
