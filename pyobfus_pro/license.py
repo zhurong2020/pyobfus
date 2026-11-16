@@ -169,7 +169,7 @@ def verify_license(license_key: str) -> Dict[str, Any]:
     Verify license key against GitHub repository.
 
     This function:
-    1. Checks local cache first (valid for 30 days)
+    1. Checks local cache first (valid for CACHE_DURATION, currently 3 days)
     2. If cache miss or expired, verifies online against GitHub
     3. Falls back to cached license if online verification fails
 
