@@ -5,15 +5,35 @@ considered alongside pyobfus. Both protect source before it ships; they differ
 in what they do to your build, your runtime, and your ability to debug what
 comes back from production.
 
-> **Baseline — reviewed 2026-10-02.** PyArmor facts use the official 9.2.7
-> documentation, PyPI metadata and public purchase page. The free-tier line
+> **Partial refresh — checked 2026-11-15.** The version, 9.3 script types
+> and environment table below use official documentation and PyPI metadata,
+> as recorded in the [2026-11-15 research](../COMPETITIVE_ROADMAP_RESEARCH_2026-11-15.md).
+> No new protection-strength tests were run. Other claims retain the
+> **2026-10-02** baseline: official 9.2.7 documentation, PyPI metadata and
+> public purchase page, including prices and detailed VMC/ECC behaviour. The free-tier line
 > threshold is a separate reproducible test of PyArmor 9.2.4 performed on
 > 2026-05-09; it has **not** been re-measured on 9.2.7 and is labelled
-> accordingly. Features and restrictions vary by licence, platform and build
+> accordingly; it has not been re-measured on 9.3.0 either.
+> Features and restrictions vary by licence, platform and build
 > mode. Prices and terms can change, so verify the linked official sources and
 > test your own project. PyArmor is a trademark of its owner; this independent
 > comparison is not endorsed by PyArmor and is not a warranty, security
 > guarantee or legal advice.
+
+**Version and documented scope — checked 2026-11-15.**
+[PyPI](https://pypi.org/project/pyarmor/) lists **9.3.0**, released 2026-10-31,
+with a revised wheel uploaded 2026-11-13; the public files have no PyPI
+provenance. The [official 9.3 docs](https://pyarmor.readthedocs.io/en/latest/)
+list `rft`, `mini`, `vmc` and `ecc` script types. The
+[environment table](https://pyarmor.readthedocs.io/en/stable/reference/environments.html)
+covers **Python 3.11–3.15**; this is a documented environment scope, not a new
+compatibility test or a recheck of the older 3.9–3.14 row below. The docs also
+cover native runtime, binding, expiry and packaging paths.
+
+PyArmor offers stronger native/virtualised protection and runtime control than
+pyobfus’s AST approach. That architectural difference is acknowledged in the
+[2026-11-15 assessment](../COMPETITIVE_ROADMAP_RESEARCH_2026-11-15.md),
+without claiming a measured reverse-engineering cost.
 
 | Feature | pyobfus | PyArmor |
 |---------|---------|---------|
