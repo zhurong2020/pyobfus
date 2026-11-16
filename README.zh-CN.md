@@ -54,12 +54,12 @@ pyobfus --unmap --trace error.log --mapping mapping.json
 
 Community 提供可靠混淆、检查、验证和调试的完整本地工作流。
 
-Professional 针对四类商业价值收费：
+Professional 为商业交付增加四类能力：
 
-- 更强保护：AES、控制流平坦化、反调试、Selective Opacity、Seal；
-- 更多受保护资产：import 字符串、嵌入数据、String Vault、traceback；
-- 分发控制：设备、到期、运行次数、平台和应用提供密钥；
-- 责任追踪：取证水印和买方专属构建。
+- **保护强度：** AES 加密（包括使用应用自管密钥的 L3 / Selective Opacity）、控制流平坦化、死代码注入、反调试和封印（sealing）。
+- **受保护资产：** import 字符串、嵌入数据、Runtime String Vault 和受保护的错误堆栈。
+- **分发控制：** 按设备、期限、运行次数、平台或应用提供的密钥控制运行。
+- **责任追踪：** 取证水印和买方专属构建。
 
 长期划分原则见
 [Community / Pro 边界政策](https://github.com/zhurong2020/pyobfus/blob/main/docs/EDITION_BOUNDARY_POLICY.md)。

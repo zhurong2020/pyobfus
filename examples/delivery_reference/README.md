@@ -52,12 +52,12 @@ example command; use the versions recorded by the acceptance plan.
 
 ## Pro lane (trial)
 
-This is a **local-trial demonstration**, verified on Linux. Run from the
-repository root with pyobfus and its Pro runtime dependencies installed in
-`venv/`. The trial command below is the module form of `pyobfus-trial start`;
-without `--email`, it starts a 5-day local trial without a network call.
-The subshell keeps HOME and USERPROFILE isolated for the entire build and
-run sequence. No key is stored in the repository.
+Try Pro's L3 / Selective Opacity with an application-owned key, then compare
+correct, missing and wrong key runs. Run from the repository root with pyobfus
+and its Pro runtime dependencies installed in `venv/`. The recipe starts a
+**5-day local trial** offline, isolates HOME and USERPROFILE, and keeps keys
+outside the repository. Explore the
+[four Pro capabilities](../../docs/guides/protect-python-before-selling.md#when-community-is-not-enough).
 
 ```bash
 (
@@ -120,13 +120,16 @@ Community baseline does not use it.
 
 The [Pro stage C acceptance record](../../docs/DELIVERY_REFERENCE_APP_ACCEPTANCE_2026-11-15.md#2026-11-16-pro-stage-c-local-trial-linux-cpython-312)
 and [`pro_reference` / `test_delivery_reference_pro_pyinstaller`](../../integration_tests/test_packaging.py)
-cover this configuration and its Linux PyInstaller onefile/onedir runs.
+cover this configuration and its PyInstaller onefile/onedir runs.
 The opacity report recorded 6 eligible targets, 2 encrypted and 0 rejected.
 The encrypted `quote_order` traceback frame was restored by name only, with
-`original_line: null`. Frozen payload contents (PYZ) remain uninspected by
-`--check-delivery`; frozen checks are not evidence of clean payload contents.
-This recipe demonstrates the protected directory, not a clean target machine
-or Pro-lane verification on Windows/macOS.
+`original_line: null`.
+
+**Scope:** verified on Linux with a local trial, including the protected
+directory and PyInstaller runs. Windows, macOS and clean target machines are
+outside this evidence. `--check-delivery` does not inspect frozen PYZ contents;
+see [What Pro does not do](../../docs/guides/protect-python-before-selling.md#what-pro-does-not-do)
+for the protection boundaries.
 
 ## Feedback
 
