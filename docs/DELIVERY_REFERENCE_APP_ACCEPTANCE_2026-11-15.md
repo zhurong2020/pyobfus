@@ -216,3 +216,60 @@ CArchive，报告 `inspected=0`；8 条 missing_output 只是保护源码已冻�
 Pro lane、Windows／macOS、CI 的 6.22.3 pin 或新的支持矩阵。
 
 验证：`venv/bin/pytest integration_tests/test_packaging.py --no-cov` 为 9 passed／3 skipped（skip 为本机未装的 Cython／Nuitka 可选工具链），`scripts/check.sh` 通过；复核者独立复跑结果相同。
+
+## 2026-11-16 Pro stage C (local trial, Linux, CPython 3.12)
+
+本次离线使用 **local trial（不是购买的 licence）**，通过无 email 的 `start_trial()`
+在每个测试的临时 HOME 中启动。环境为 Linux x86_64／WSL2、CPython **3.12.3**、
+Core **0.15.0**（含 #247 目录 CArchive 检查及本节修复）、PyInstaller **6.21.0**。
+未联网，未使用真实许可。
+
+pytest 与 CLI 子进程均实测导入本工作树的 `pyobfus/__init__.py`。
+Pro fixture 显式设置工作树 PYTHONPATH；临时 `sitecustomize` audit hook 在 Python
+构建／CLI 进程读写 `.pyobfus` 前检查路径，禁止越出 tmp_path，并记录实际访问。
+实测所有记录均位于临时 HOME，唯一 trial 为 `home/.pyobfus/trial.json`，临时树无
+`license.json`。清除 `PYOBFUS_LICENSE_KEY`；不通过读取或 stat 真实许可文件做比较。
+
+保护沿用示例 `pyobfus.yaml`，CLI `--level pro` 成功覆盖其中的 Community level，
+保留原 exclude 配置；添加 `--crossfile-opacity --opacity-config <private/opacity.toml>
+--bind-key-env PYOBFUS_DELIVERY_REFERENCE_KEY --save-mapping <private/mapping.json>
+--build-report <private/build.json> --verify-syntax --jobs 1 --json`。
+按已记录的 preview 限制不传 `--provenance-manifest`。每次运行用
+`secrets.token_bytes(32)` 生成应用 key 并 base64 编码，不写入文件或命令参数；错误 key
+独立随机生成。应用自管环境变量与公开 `key_provider.py` 使用同一个名字，生成代码直接
+通过 `--bind-key-env` 读取该输入，不改应用入口。
+
+冻结分别复用 `--onefile`／`--onedir --clean --noconfirm`，设置独立 dist／build／spec
+与 PyInstaller cache；沿用资源 `--add-data` 和
+`--hidden-import storefront.plugins.standard --hidden-import storefront.data`。
+**不需要额外 runtime hidden import 或 collect-all**：生成代码静态导入
+`pyobfus_runtime`，PyInstaller 自动收集其依赖及 cryptography hook 所需文件。
+onedir 因此附带两个合法的 cryptography SBOM JSON；测试精确排除私有文件，而不是禁止
+所有 JSON。
+
+| 项目 | 实测值与判定 |
+|---|---|
+| C（Pro L3，本节状态） | **pass（本地 trial）**：仅限本节环境与边界 |
+| 覆盖真值 | `opacity.mode=crossfile_opacity`；eligible=**6**、encrypted=**2**、rejected=**0**、`rejection_histogram={}`；`transformations.encrypted_targets=2`、`files_processed=8`；私有 `opacity_plan` 和 `encrypted_code` 均对应 `storefront.checkout.quote_order` 与 `storefront.catalog.lookup_unit_price`。`l3_skipped_methods`／`l3_skipped_nested` 不在此路径报告中，不据此推断覆盖 |
+| 正确 key | 保护源码及两种冻结模式的 `pro`、默认参数均退出 **0**，stdout 为 `pricing-v1`、`pro: 65.88` 两行；`bogus_tier` 退出 **1**、stdout 为空，保留 `ValueError: Unknown pricing tier: bogus_tier` |
+| 缺失／错误 key | 两种冻结模式均退出 **1**、stdout 为空；分别出现 `LicenseBindingError`／`OpacityRuntimeError`；输出不含正确或错误 key |
+| 成品边界 | 仅 dist 复制进 consumer，隐藏 source／protected／build 后运行；消费环境仅 HOME、USERPROFILE、PATH、TMPDIR 和应用 key，无 Python 路径或许可变量。dist／consumer 所有文件、保护源码／私有 JSON、已解压的 CArchive 顶层非 PYZ 成员及捕获的保护／冻结／消费输出未发现随机 key 的原始字节或 base64；成品未发现两个加密函数的原始源码文本、项目 `.py` 或私有 mapping／报告／trial／license 文件 |
+| traceback | 两种模式均为原文 **4** 帧 → 冻结 **5** 帧 → unmap **5** 帧；多出的真实帧是 `pyobfus_runtime/opacity.py:wrapper`，保持原样。其余普通项目帧路径／行号／名称与基线一致；`quote_order` 为 **name_only**，`original_line=null`，保留 `<pyobfus-l3:…:storefront/checkout.py>` 及构建行号 **10**，不伪造原始行号。无 unmatched name、unmatched L3 或补造帧 |
+| 单个可执行文件交付检查 | 两种模式均 **warn／CLI exit 0／high=0**，均含 medium `delivery.frozen_uninspected`；onefile 的 total／checked／unknown 为 **48／39／9**，onedir 引导程序为 **9／0／9**。均未观察到 `delivery.l3_partial`，这是观察值，不作为 crossfile 覆盖真值 |
+| onedir 整目录＋build report | 修复前：**fail／exit 1／high=1** `delivery.l3_build_mismatch`（误报，见下）。修复后：**warn／exit 0／high=0**，含 medium `delivery.l3_unverified_frozen` 与 `delivery.frozen_uninspected`；CArchive found=1、inspected=1、9／0／9 |
+
+**发现并修复的产品缺陷：冻结目录被误报 L3 build mismatch。** 构建报告含 `opacity`
+段时，目录检查要求交付目录里有源码形态的 L3 完成清单 `.pyobfus-release.json` 与完整
+L3 源文件集合；冻结交付把这些编译进未解析的 PYZ，于是被判为 high「不一致」。这本应是
+「无法核验」。修复：报告描述 L3 构建、目录中既无 L3 清单也无带 L3 标记的源文件、且存在
+冻结可执行文件时，改报 medium `delivery.l3_unverified_frozen`（结果保持 warn，绝不为
+clean）；普通源码目录缺清单、或冻结目录中出现 L3 标记源文件时仍按原规则报 high。单元
+测试覆盖三种情形，并经反向验证（去掉修复即失败）。
+
+验证：`PYTHONPATH=$PWD venv/bin/pytest integration_tests/test_packaging.py --no-cov`
+（Pro onefile／onedir 均通过）及各测试根、`scripts/check.sh` 见 PR 记录。
+
+边界仍为 **Linux only、same-machine consumer、local trial**；没有验证购买许可、
+独立干净目标机、Windows／macOS 或 CI 的 PyInstaller 版本以外的组合。交付检查
+**PYZ uninspected**，没有反序列化嵌入 PYZ；正常检查为 warn，不能写成 clean。F 的完整
+覆盖仍为 unknown。

@@ -5,12 +5,15 @@ platforms, compiler modes or third-party dependencies. Normal dev installs skip
 missing toolchains; packaging-lane.yml installs the pinned stack.
 """
 
+import ast
+import base64
 import importlib.util
 import json
 import marshal
 import os
 from pathlib import Path
 import re
+import secrets
 import shutil
 import subprocess
 import sys
@@ -42,8 +45,24 @@ def isolated_packaging_home(tmp_path, monkeypatch):
     monkeypatch.setenv("XDG_CACHE_HOME", str(home / ".cache"))
 
 
-def _run(command, *, cwd, env=None, expected_code=0):
+def _assert_no_material(data, materials):
+    # Do not let pytest's assertion rewriting print application keys on failure.
+    if any(material in data for material in materials):
+        pytest.fail("Private key material or original encrypted-function source leaked")
+
+
+class _ReferenceSecrets:
+    """Default object repr keeps pytest fixture diagnostics free of keys."""
+
+    def __init__(self):
+        raw = secrets.token_bytes(32)
+        self.key = base64.b64encode(raw).decode("ascii")
+        self.material = (raw, self.key.encode(), repr(raw).encode())
+
+
+def _run(command, *, cwd, env=None, expected_code=0, secret_material=()):
     result = subprocess.run(command, cwd=cwd, env=env, capture_output=True, text=True, timeout=600)
+    _assert_no_material((result.stdout + result.stderr).encode(), secret_material)
     assert result.returncode == expected_code, result.stdout + result.stderr
     return result
 
@@ -92,7 +111,7 @@ def _code_names(code):
     return names
 
 
-def _unmap_cli(trace, work):
+def _unmap_cli(trace, work, *, details=False):
     trace_path = work / "private" / "trace.txt"
     trace_path.write_text(trace, encoding="utf-8")
     result = _run(
@@ -113,7 +132,7 @@ def _unmap_cli(trace, work):
     assert payload["version"] == 1
     assert payload["ai_hint"]
     assert payload["unmatched_names"] == []
-    return payload["unmapped_trace"]
+    return payload if details else payload["unmapped_trace"]
 
 
 @pytest.mark.parametrize("compiler", ["cython", "nuitka"])
@@ -505,7 +524,7 @@ def protected_reference(tmp_path, monkeypatch):
     return source, output, ObfuscationMapping.load(private / "mapping.json"), baseline
 
 
-def _build_reference_pyinstaller(work, output, mode, extra_data=()):
+def _build_reference_pyinstaller(work, output, mode, extra_data=(), *, secret_material=()):
     command = [
         sys.executable,
         "-m",
@@ -535,11 +554,12 @@ def _build_reference_pyinstaller(work, output, mode, extra_data=()):
         command,
         cwd=work,
         env={**os.environ, "PYINSTALLER_CONFIG_DIR": str(work / "cache")},
+        secret_material=secret_material,
     )
     return work / "dist" / "delivery_reference"
 
 
-def _reference_delivery(target, work, *, expected_code=0, label="delivery"):
+def _reference_delivery(target, work, *, expected_code=0, label="delivery", provenance=True):
     """Compare the library result with the CLI JSON and its process exit code."""
     from pyobfus.core.delivery_check import check_delivery
 
@@ -547,8 +567,11 @@ def _reference_delivery(target, work, *, expected_code=0, label="delivery"):
     result = check_delivery(
         target,
         build_report=private / "build.json",
-        provenance_manifest=private / "provenance.json",
+        provenance_manifest=private / "provenance.json" if provenance else None,
     )
+    evidence = ["--build-report", str(private / "build.json")]
+    if provenance:
+        evidence += ["--provenance-manifest", str(private / "provenance.json")]
     cli = _run(
         [
             sys.executable,
@@ -556,10 +579,7 @@ def _reference_delivery(target, work, *, expected_code=0, label="delivery"):
             "pyobfus",
             "--check-delivery",
             str(target),
-            "--build-report",
-            str(private / "build.json"),
-            "--provenance-manifest",
-            str(private / "provenance.json"),
+            *evidence,
             "--json",
         ],
         cwd=work,
@@ -690,3 +710,337 @@ def test_delivery_reference_pyinstaller_onefile_mutation(tmp_path, protected_ref
         if finding["severity"] == "high"
     ] == [(code, planted.name)]
     assert {finding["code"] for finding in result["findings"]} == {code, FROZEN_UNINSPECTED}
+
+
+@pytest.fixture
+def pro_reference(tmp_path, monkeypatch):
+    """Local-only trial and application key; never inspect real user state."""
+    _require_tool("PyInstaller")
+    import pyobfus
+
+    for name in ("PYTHONHOME", "PYOBFUS_LICENSE_KEY", "PYOBFUS_DELIVERY_REFERENCE_KEY"):
+        monkeypatch.delenv(name, raising=False)
+    home = Path(os.environ["HOME"])
+    assert home == Path(os.environ["USERPROFILE"]) == tmp_path / "home"
+    private = tmp_path / "private"
+    private.mkdir()
+    # Audit Python builders/CLIs without reading or stat'ing real trial/license
+    # files. A state access outside this test fails before the filesystem call.
+    guard = private / "guard"
+    guard.mkdir()
+    access_log = private / "state-access.jsonl"
+    (guard / "sitecustomize.py").write_text(
+        "import json, os, sys\n"
+        f"root = {str(tmp_path)!r}\nlog = {str(access_log)!r}\n"
+        "def audit(event, args):\n"
+        "    if event not in ('open', 'os.remove', 'os.rename', 'os.mkdir', 'os.rmdir'):\n"
+        "        return\n"
+        "    for arg in args[:2] if event == 'os.rename' else args[:1]:\n"
+        "        if not isinstance(arg, (str, bytes)):\n"
+        "            continue\n"
+        "        path = os.path.abspath(os.fsdecode(arg))\n"
+        "        if '.pyobfus' not in path.split(os.sep):\n"
+        "            continue\n"
+        "        allowed = os.path.commonpath((root, path)) == root\n"
+        "        with open(log, 'a') as stream:\n"
+        "            stream.write(json.dumps({'path': path, 'allowed': allowed}) + '\\n')\n"
+        "        if not allowed:\n"
+        "            raise RuntimeError('Test attempted to access non-isolated pyobfus state')\n"
+        "sys.addaudithook(audit)\n",
+        encoding="utf-8",
+    )
+    checkout = EXAMPLES.parent
+    monkeypatch.setenv("PYTHONPATH", os.pathsep.join((str(guard), str(checkout))))
+    cli_import = _run(
+        [sys.executable, "-c", "import pyobfus; print(pyobfus.__file__)"], cwd=tmp_path
+    ).stdout.strip()
+    assert Path(cli_import).resolve() == Path(pyobfus.__file__).resolve()
+    trial = _run(
+        [
+            sys.executable,
+            "-c",
+            "from pyobfus.trial import start_trial; r=start_trial(); assert r['success'], r",
+        ],
+        cwd=tmp_path,
+    )
+    assert (home / ".pyobfus/trial.json").is_file()
+    assert not list(tmp_path.rglob("license.json"))
+    assert list(tmp_path.rglob("trial.json")) == [home / ".pyobfus/trial.json"]
+    secret = _ReferenceSecrets()
+    material = secret.material
+    monkeypatch.setenv("PYOBFUS_DELIVERY_REFERENCE_KEY", secret.key)
+    source = tmp_path / "source"
+    shutil.copytree(
+        EXAMPLES / "delivery_reference", source, ignore=shutil.ignore_patterns("__pycache__")
+    )
+    baseline = {
+        args: _run(
+            [sys.executable, "-B", "main.py", *args],
+            cwd=source,
+            expected_code=1 if args == ("bogus_tier",) else 0,
+            secret_material=material,
+        )
+        for args in (("pro",), (), ("bogus_tier",))
+    }
+    assert baseline[("pro",)].stdout == baseline[()].stdout == "pricing-v1\npro: 65.88\n"
+    assert baseline[("bogus_tier",)].stderr.splitlines()[-1] == (
+        "ValueError: Unknown pricing tier: bogus_tier"
+    )
+    targets = {
+        "storefront.checkout.quote_order": "storefront/checkout.py",
+        "storefront.catalog.lookup_unit_price": "storefront/catalog.py",
+    }
+    rules = private / "opacity.toml"
+    rules.write_text(
+        "".join(f'[[rules]]\npattern="{name}"\nlayer="encrypted"\n' for name in targets),
+        encoding="utf-8",
+    )
+    output = tmp_path / "protected"
+    build = _run(
+        [
+            sys.executable,
+            "-m",
+            "pyobfus",
+            str(source),
+            "-o",
+            str(output),
+            "--config",
+            str(source / "pyobfus.yaml"),
+            "--level",
+            "pro",
+            "--crossfile-opacity",
+            "--opacity-config",
+            str(rules),
+            "--bind-key-env",
+            "PYOBFUS_DELIVERY_REFERENCE_KEY",
+            "--save-mapping",
+            str(private / "mapping.json"),
+            "--build-report",
+            str(private / "build.json"),
+            # crossfile-opacity intentionally does not support provenance.
+            "--verify-syntax",
+            "--jobs",
+            "1",
+            "--json",
+        ],
+        cwd=tmp_path,
+        secret_material=material,
+    )
+    report = json.loads((private / "build.json").read_text())
+    opacity = report["opacity"]
+    assert opacity["mode"] == "crossfile_opacity"
+    assert opacity["encrypted_targets"] == len(targets)
+    assert report["transformations"]["encrypted_targets"] == len(targets)
+    assert type(opacity["eligible_targets"]) is int
+    assert opacity["eligible_targets"] >= len(targets)
+    assert type(opacity["rejected_targets"]) is int
+    assert isinstance(opacity["rejection_histogram"], dict)
+    assert all(type(n) is int and n > 0 for n in opacity["rejection_histogram"].values())
+    assert opacity["rejected_targets"] == sum(opacity["rejection_histogram"].values())
+    mapping = ObfuscationMapping.load(private / "mapping.json")
+    assert {
+        (item["file"], item["binding"]["name"], item["final_name"])
+        for item in mapping.opacity_plan["targets"]
+    } == {
+        (file, name.rsplit(".", 1)[1], _mapped(mapping, name.rsplit(".", 1)[1]))
+        for name, file in targets.items()
+    }
+    assert {
+        (path.split(":", 2)[-1].rstrip(">"), final, original)
+        for path, names in mapping.encrypted_code.items()
+        for final, original in names.items()
+    } == {
+        (file, _mapped(mapping, name.rsplit(".", 1)[1]), name.rsplit(".", 1)[1])
+        for name, file in targets.items()
+    }
+    original_functions = []
+    for name, file in targets.items():
+        text = (source / file).read_text()
+        node = next(
+            n
+            for n in ast.parse(text).body
+            if isinstance(n, ast.FunctionDef) and n.name == name.rsplit(".", 1)[1]
+        )
+        original_functions.append(ast.get_source_segment(text, node).encode())
+    secret.material = forbidden = (*material, *original_functions)
+    for file in (*output.rglob("*"), *private.rglob("*.json")):
+        if file.is_file():
+            _assert_no_material(file.read_bytes(), forbidden)
+    _assert_no_material((trial.stdout + trial.stderr).encode(), material)
+    (private / "protect.log").write_text(build.stdout + build.stderr, encoding="utf-8")
+    (output / "storefront/data").mkdir(parents=True, exist_ok=True)
+    shutil.copy2(source / "storefront/data/label.txt", output / "storefront/data/label.txt")
+    for args, original in baseline.items():
+        protected = _run(
+            [sys.executable, "-B", "main.py", *args],
+            cwd=output,
+            expected_code=original.returncode,
+            secret_material=material,
+        )
+        assert protected.stdout == original.stdout
+        if original.returncode:
+            assert protected.stderr.splitlines()[-1] == original.stderr.splitlines()[-1]
+    evidence = {
+        "pytest_pyobfus_file": pyobfus.__file__,
+        "cli_pyobfus_file": cli_import,
+        "opacity": opacity,
+        "transformations": report["transformations"],
+    }
+    yield source, output, mapping, baseline, secret, evidence
+    accesses = [json.loads(line) for line in access_log.read_text().splitlines()]
+    assert accesses and all(item["allowed"] for item in accesses)
+    assert all(Path(item["path"]).is_relative_to(home) for item in accesses)
+    assert list(tmp_path.rglob("trial.json")) == [home / ".pyobfus/trial.json"]
+    assert not list(tmp_path.rglob("license.json"))
+    (private / "pro-evidence.json").write_text(json.dumps(evidence, indent=2), encoding="utf-8")
+
+
+@pytest.mark.parametrize("mode", ["onefile", "onedir"])
+def test_delivery_reference_pro_pyinstaller(tmp_path, pro_reference, mode):
+    from PyInstaller.archive.readers import CArchiveReader
+
+    from pyobfus.core.delivery_check import (
+        FROZEN_UNINSPECTED,
+        L3_PARTIAL,
+        L3_UNVERIFIED_FROZEN,
+        MISSING_OUTPUT,
+    )
+
+    source, output, mapping, baseline, secret, evidence = pro_reference
+    forbidden = secret.material
+    dist = _build_reference_pyinstaller(tmp_path, output, mode, secret_material=forbidden)
+    consumer = tmp_path / "consumer"
+    if mode == "onedir":
+        shutil.copytree(dist, consumer)
+    else:
+        consumer.mkdir()
+        shutil.copy2(dist, consumer / dist.name)
+    executable = consumer / dist.name
+    for directory in (source, output, tmp_path / "build"):
+        directory.rename(directory.with_name(directory.name + ".hidden"))
+    assert not list(consumer.rglob("*.py"))
+    # cryptography's PyInstaller hook legitimately ships SBOM JSON metadata.
+    private_names = {
+        "mapping.json",
+        "build.json",
+        "provenance.json",
+        "trial.json",
+        "license.json",
+        ".pyobfus-release.json",
+        "opacity.toml",
+        "trace.txt",
+    }
+    assert not any(file.name in private_names for file in consumer.rglob("*"))
+    for root in (tmp_path / "dist", consumer):
+        for file in root.rglob("*"):
+            if file.is_file():
+                _assert_no_material(file.read_bytes(), forbidden)
+    archive = CArchiveReader(str(executable))
+    assert archive.toc["PYZ.pyz"][-1] == "z"
+    assert not any("mapping" in name.lower() or "private" in name.lower() for name in archive.toc)
+    for name, entry in archive.toc.items():
+        if entry[-1] not in ("z", "o"):
+            _assert_no_material(archive.extract(name), forbidden)
+    # Consumers receive only the artifact and app-owned key input. No trial,
+    # licence, PYTHONPATH, or builder environment is needed by the runtime.
+    runtime_tmp = tmp_path / "runtime-tmp"
+    runtime_tmp.mkdir()
+    env = {
+        "HOME": str(tmp_path / "home"),
+        "USERPROFILE": str(tmp_path / "home"),
+        "PATH": os.defpath,
+        "TMPDIR": str(runtime_tmp),
+        "PYOBFUS_DELIVERY_REFERENCE_KEY": secret.key,
+    }
+    runs = {}
+    for args, original in baseline.items():
+        frozen = _run(
+            [str(executable), *args],
+            cwd=consumer,
+            env=env,
+            expected_code=original.returncode,
+            secret_material=forbidden,
+        )
+        assert frozen.stdout == original.stdout
+        runs[" ".join(args) or "default"] = {
+            "exit_code": frozen.returncode,
+            "stdout": frozen.stdout,
+        }
+        if not original.returncode:
+            continue
+        assert original.stderr.splitlines()[-1] in frozen.stderr.splitlines()
+        restored = _unmap_cli(frozen.stderr, tmp_path, details=True)
+        frames = re.compile(r'^\s*File "([^"]+)", line (\d+), in (\S+)(?:  \[.*\])?$', re.MULTILINE)
+        before = frames.findall(frozen.stderr)
+        after = frames.findall(restored["unmapped_trace"])
+        original_frames = [
+            (Path(path).relative_to(source).as_posix(), line, name)
+            for path, line, name in frames.findall(original.stderr)
+        ]
+        assert len(before) == len(after) == len(original_frames) + 1 == 5
+        assert before[2][0::2] == ("pyobfus_runtime/opacity.py", "wrapper")
+        encrypted_path, encrypted_line, encrypted_name = before[3]
+        assert mapping.encrypted_code[encrypted_path][encrypted_name] == "quote_order"
+        # All ordinary project frames exactly match the baseline. Preserve the
+        # actual runtime frame and encrypted line/path; never invent source lines.
+        assert after == [
+            original_frames[0],
+            original_frames[1],
+            before[2],
+            (encrypted_path, encrypted_line, "quote_order"),
+            original_frames[3],
+        ]
+        assert before[0][0::2] == ("main.py", "<module>")
+        assert before[1][0::2] == ("storefront/app.py", _mapped(mapping, "render_order"))
+        assert before[4][0::2] == ("storefront/rules/discounts.py", "__init__")
+        named = [f for f in restored["frames"] if f["status"] == "name_only"]
+        assert len(named) == 1
+        assert named[0]["name"] == "quote_order" and named[0]["original_line"] is None
+        assert not any(f["status"] == "unmatched_l3" for f in restored["frames"])
+        evidence["traceback"] = {"frozen": before, "restored": after, "frames": restored["frames"]}
+        (tmp_path / "private/restored.txt").write_text(restored["unmapped_trace"], encoding="utf-8")
+    wrong_raw = secrets.token_bytes(32)
+    wrong = base64.b64encode(wrong_raw).decode("ascii")
+    if wrong == secret.key:
+        pytest.fail("Random wrong key unexpectedly matched")
+    for label, value, error in (
+        ("missing", None, "LicenseBindingError"),
+        ("wrong", wrong, "OpacityRuntimeError"),
+    ):
+        negative_env = dict(env)
+        negative_env.pop("PYOBFUS_DELIVERY_REFERENCE_KEY")
+        if value is not None:
+            negative_env["PYOBFUS_DELIVERY_REFERENCE_KEY"] = value
+        negative = _run(
+            [str(executable), "pro"],
+            cwd=consumer,
+            env=negative_env,
+            expected_code=1,
+            secret_material=(*forbidden, wrong_raw, wrong.encode()),
+        )
+        assert negative.stdout == ""
+        assert error in negative.stderr
+        runs[label] = {"exit_code": negative.returncode, "stdout": negative.stdout, "error": error}
+    result = _reference_delivery(executable, tmp_path, provenance=False)
+    assert result["status"] == "warn" and result["summary"]["high"] == 0
+    codes = {finding["code"] for finding in result["findings"]}
+    assert FROZEN_UNINSPECTED in codes
+    inspection = result["inspection"]["frozen_executables"]
+    assert inspection["inspected"] == 1 and inspection["unknown_members"] > 0
+    if mode == "onedir":
+        directory = _reference_delivery(
+            consumer, tmp_path, provenance=False, label="directory-delivery"
+        )
+        assert directory["status"] == "warn" and directory["summary"]["high"] == 0
+        codes = {f["code"] for f in directory["findings"]}
+        # The L3 release lives inside frozen payloads: unverifiable, not a mismatch.
+        assert L3_UNVERIFIED_FROZEN in codes and FROZEN_UNINSPECTED in codes
+        assert codes <= {FROZEN_UNINSPECTED, MISSING_OUTPUT, L3_PARTIAL, L3_UNVERIFIED_FROZEN}
+    evidence.update(
+        {
+            "mode": mode,
+            "runs": runs,
+            "inspection": inspection,
+            "l3_coverage_findings": [f for f in result["findings"] if f["code"] == L3_PARTIAL],
+        }
+    )
