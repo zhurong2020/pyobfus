@@ -163,6 +163,43 @@ options such as hard expiry and device binding; see the
 [Community / Pro boundary](../EDITION_BOUNDARY_POLICY.md) for what each edition
 covers.
 
+## When Community is not enough
+
+If you ship a private Python app to customers and want to keep your own
+debugging, Community already provides private mappings, traceback recovery,
+build reports and local delivery checks. Pro adds three capabilities for
+that delivery task, within the [edition boundary](../EDITION_BOUNDARY_POLICY.md):
+
+- **Function-body encryption (L3 / Selective Opacity)** with an
+  application-owned key supplied through `--bind-key-env`. Missing or wrong
+  keys fail closed. This raises reading cost on the customer's machine;
+  the key is supplied at runtime, so anyone who can run the app with the key
+  can observe it executing. It is not a replacement for server-side logic.
+- **Distribution control:** device, expiry, run-count, platform and
+  supplied-key policies. These are local checks that can be studied and
+  removed; see the [licence-enforcement FAQ](protect-python-code-faq.md#can-i-enforce-a-time-limited-licence-in-the-code-i-ship).
+- **Buyer-specific builds and forensic watermarking** help attribute a
+  build or leak to a recipient. They provide accountability, not prevention.
+
+### Reproduce it before you buy
+
+Start the **5-day trial** with `pyobfus-trial start`, then build and run the
+public reference app using the [Pro lane (trial) commands](https://github.com/zhurong2020/pyobfus/blob/main/examples/delivery_reference/README.md#pro-lane-trial).
+That recipe isolates trial state in a temporary HOME, generates an application
+key, and compares correct, missing and wrong key runs while keeping the
+mapping and build report outside the delivery.
+
+The [2026-11-16 acceptance record](../DELIVERY_REFERENCE_APP_ACCEPTANCE_2026-11-15.md#2026-11-16-pro-stage-c-local-trial-linux-cpython-312)
+verified this app on **Linux with a local trial**, including PyInstaller
+onefile and onedir runs. Its opacity report recorded 6 eligible targets,
+2 encrypted and 0 rejected; that is coverage for this fixture, not every
+function in an arbitrary app. Private mapping restored the L3 `quote_order`
+frame by name only (`original_line: null`), without inventing a source line.
+Frozen payload contents (PYZ) are **not inspected** by `--check-delivery`;
+checks of individual frozen executables remained `warn`, not clean. These
+results do not establish Pro-lane behavior on Windows, macOS or a clean
+target machine.
+
 ## FAQ
 
 **Can I use the free Community Edition for a commercial product?**

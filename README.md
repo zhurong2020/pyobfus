@@ -201,6 +201,8 @@ generated files with the exact recovery command.
 
 ## Purchase Professional Edition
 
+Ship a private Python app to customers, keep your own debugging, and check what you ship — [reproduce it on the public reference app with the 5-day trial](https://pyobfus.readthedocs.io/en/latest/guides/protect-python-before-selling/#when-community-is-not-enough).
+
 Pro builds in CI need `PYOBFUS_LICENSE_KEY` or a registered runner. The secret
 verifies online without consuming device slots; see [CI licensing](https://github.com/zhurong2020/pyobfus/blob/main/docs/CI_LICENSING.md).
 
