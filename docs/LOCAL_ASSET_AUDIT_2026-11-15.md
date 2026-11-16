@@ -64,9 +64,7 @@ pyobfus 有 6 个直接命名的本地顶层目录，另有 5 个运维／索引
    复核路径不存在。
 2. pre-filter 备份删除前确认仍为 5 个原始文件，并记录 SHA-256；当前主仓
    `main` HEAD 为 `cde07ebefb128d1fd7b7e5e400e743a8a77c1f33`，origin 仍为
-   `https://github.com/zhurong2020/pyobfus.git`。记录中的
-   `C:\onedrive\msft\OneDrive - MSFT\rong\3-job\program` 父路径已不存在，因而
-   没有可在该路径清理的同名迁移残留。WSL 备份目录已删除并复核不存在。
+   `https://github.com/zhurong2020/pyobfus.git`；记录中的 a legacy synced-folder parent path 已不存在，WSL 备份目录也已删除并复核不存在。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m28`。）
 3. 已删除 `pyobfus-pro-dev` 的 `venv/`、`venv-3.13/`、`venv-3.14/`、
    `.pytest_cache/` 与 `.ruff_cache/`。Windows 文件 API 在 Linux Python 符号链接
    处只能完成部分删除，随后用 WSL 对三个已经核验的绝对虚拟环境路径收尾；最终

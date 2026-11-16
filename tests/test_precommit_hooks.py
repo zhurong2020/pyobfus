@@ -161,3 +161,173 @@ def test_manifest():
     assert delivery["stages"] == ["pre-push", "manual"]
     assert "args:" in delivery["description"]
     assert all(hook["language"] == "python" for hook in hooks)
+
+
+@pytest.fixture
+def maintainer_hook(tmp_path, monkeypatch):
+    # The maintainer hook runs in the maintainer's Linux/WSL checkout. It uses
+    # bash 4 builtins (mapfile), which macOS's stock bash 3.2 lacks, and its
+    # Git-for-Windows execution differs; exercise it where it actually runs.
+    if not sys.platform.startswith("linux"):
+        pytest.skip("maintainer pre-commit hook is exercised on Linux only")
+    """Run the real shell hook with read-only Git calls over synthetic blobs.
+
+    The shim supplies index reads without creating a repository or staging files;
+    matching uses real `git grep --no-index`, including its ERE semantics.
+    """
+    import shutil
+
+    git = shutil.which("git")
+    if not git or not shutil.which("bash"):
+        pytest.skip("Maintainer hooks require Git and Bash")
+    for key in (
+        "PYOBFUS_ALLOW_PII",
+        "PYOBFUS_ALLOW_SECRET",
+        "PYOBFUS_ALLOW_CUSTOMER_DATA",
+        "PYOBFUS_PII_PATTERNS_FILE",
+    ):
+        monkeypatch.delenv(key, raising=False)
+    main = tmp_path / "main checkout"
+    common = main / "common-dir"
+    common.mkdir(parents=True)
+    worktree = tmp_path / "worktree"
+    worktree.mkdir()
+    patterns = main / "docs/internal/pii-patterns.txt"
+    patterns.parent.mkdir(parents=True)
+    patterns.write_text("# Synthetic identifiers only\n\nPIITESTTOKEN\n")
+    monkeypatch.setenv("PYOBFUS_PII_PATTERNS_FILE", str(patterns))
+    monkeypatch.setenv("HOOK_COMMON_DIR", str(common))
+    monkeypatch.setenv("HOOK_REAL_GIT", git)
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    shim = bin_dir / "git"
+    shim.write_text(
+        f"#!{sys.executable}\n"
+        "import json, os, sys\n"
+        "args = sys.argv[1:]\n"
+        "files = json.loads(os.environ['HOOK_STAGED_FILES'])\n"
+        "if args == ['rev-parse', '--git-common-dir']:\n"
+        "    print(os.environ['HOOK_COMMON_DIR'])\n"
+        "elif args[:3] == ['diff', '--cached', '--name-only']:\n"
+        "    print('\\n'.join(files))\n"
+        "elif args[:2] == ['grep', '--cached']:\n"
+        "    git = os.environ['HOOK_REAL_GIT']\n"
+        "    os.execv(git, [git, 'grep', '--no-index', *args[2:]])\n"
+        "elif args[:3] == ['diff', '--cached', '-U0']:\n"
+        "    from pathlib import Path\n"
+        "    for name in args[args.index('--') + 1:]:\n"
+        "        lines = Path(name).read_text().splitlines()\n"
+        "        print(f'+++ b/{name}\\n@@ -0,0 +1,{len(lines)} @@')\n"
+        "        for line in lines:\n"
+        "            print('+' + line)\n"
+        "else:\n"
+        "    raise SystemExit('Unexpected Git call in read-only hook test')\n"
+    )
+    shim.chmod(0o755)
+    monkeypatch.setenv("PATH", str(bin_dir) + os.pathsep + os.environ["PATH"])
+
+    def run(files, **env):
+        for name, content in files.items():
+            path = worktree / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(content)
+        return subprocess.run(
+            ["bash", str(ROOT / ".githooks/pre-commit")],
+            cwd=worktree,
+            env={**os.environ, "HOOK_STAGED_FILES": json.dumps(list(files)), **env},
+            capture_output=True,
+            text=True,
+        )
+
+    return run, patterns
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "notes with spaces.md",
+        ".githooks/pre-commit",
+        ".githooks/README.md",
+        "CLAUDE.md",
+        "docs/V0.4_EXECUTION_LOG.md",
+    ],
+)
+def test_maintainer_pii_blocks_locations_only(maintainer_hook, name):
+    run, _ = maintainer_hook
+    result = run({name: "clean line\nprivate PIITESTTOKEN content\n"})
+    assert result.returncode == 1
+    assert result.stdout == ""
+    assert f"\n{name}:2\n" in result.stderr
+    assert "PIITESTTOKEN" not in result.stderr
+    assert "private PIITESTTOKEN content" not in result.stderr
+    assert "Blocked patterns:" not in result.stderr
+
+
+@pytest.mark.parametrize("content", ["PIITESTTOKEN42", "OTHERTESTTOKEN"])
+def test_maintainer_pii_extended_regex_lines(maintainer_hook, content):
+    run, patterns = maintainer_hook
+    patterns.write_text("# Comment\n  # Indented comment\n\n  \nPIITESTTOKEN[0-9]+\nOTHERTESTTOKEN")
+    result = run({"notes.md": content + "\n"})
+    assert result.returncode == 1
+    assert "notes.md:1" in result.stderr
+    assert content not in result.stdout + result.stderr
+
+
+@pytest.mark.parametrize("state", ["missing", "empty", "comments_only"])
+def test_maintainer_pii_inactive_notice(maintainer_hook, state):
+    run, patterns = maintainer_hook
+    if state == "missing":
+        patterns.unlink()
+    elif state == "empty":
+        patterns.write_text("")
+    else:
+        patterns.write_text("# Comment\n  # Another comment\n\n  \n")
+    result = run({"notes.md": "PIITESTTOKEN\n"})
+    assert result.returncode == 0
+    assert result.stdout == ""
+    assert len(result.stderr.splitlines()) == 1
+    assert "PII scan inactive" in result.stderr
+    assert "create docs/internal/pii-patterns.txt" in result.stderr
+    assert "PYOBFUS_PII_PATTERNS_FILE" in result.stderr
+    assert "PIITESTTOKEN" not in result.stderr
+
+
+def test_maintainer_pii_bypass(maintainer_hook):
+    run, _ = maintainer_hook
+    result = run({"notes.md": "PIITESTTOKEN\n"}, PYOBFUS_ALLOW_PII="1")
+    assert result.returncode == 0
+    assert result.stdout == result.stderr == ""
+
+
+def test_maintainer_pii_worktree_shared_default(maintainer_hook, monkeypatch):
+    run, _ = maintainer_hook
+    monkeypatch.delenv("PYOBFUS_PII_PATTERNS_FILE")
+    result = run({"notes.md": "PIITESTTOKEN\n"})
+    assert result.returncode == 1
+    assert "notes.md:1" in result.stderr
+    assert "PIITESTTOKEN" not in result.stderr
+
+
+@pytest.mark.parametrize("pii_state", ["active", "missing", "bypassed"])
+@pytest.mark.parametrize("kind", ["credential", "customer_id", "customer_email"])
+def test_maintainer_other_scans_independent(maintainer_hook, pii_state, kind):
+    run, patterns = maintainer_hook
+    env = {}
+    if pii_state == "missing":
+        patterns.unlink()
+    elif pii_state == "bypassed":
+        env["PYOBFUS_ALLOW_PII"] = "1"
+    content = {
+        "credential": "ghp_" + "X" * 24,
+        "customer_id": "cs_live_" + "SYNTHETIC" * 3,
+        "customer_email": "synthetic@customer-domain.zzz",
+    }[kind]
+    result = run({"notes.md": content + "\n"}, **env)
+    assert result.returncode == 1
+    assert "notes.md:1" in result.stderr
+    assert content not in result.stdout + result.stderr
+    expected = "credential material" if kind == "credential" else "customer/business data"
+    assert expected in result.stderr
+    bypass = "PYOBFUS_ALLOW_SECRET" if kind == "credential" else "PYOBFUS_ALLOW_CUSTOMER_DATA"
+    result = run({"notes.md": content + "\n"}, **env, **{bypass: "1"})
+    assert result.returncode == 0

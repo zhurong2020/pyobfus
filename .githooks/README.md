@@ -16,30 +16,28 @@ After that, every clone-local git operation will pick up the hooks here.
 
 ### `pre-commit`
 
-Three independent scans, each with its own allowlist and its own bypass.
+Three independent scans, each with its own bypass; scans 2 and 3 have allowlists.
 
 #### Scan 1 — PII
 
-Blocks 5 PII patterns from entering staged content:
+Scans staged content using a local list of personal identifiers kept outside
+the repository's tracked files. Hits print **`file:line` only**, never the
+matched content or pattern list. No tracked files are exempt from this scan.
 
-- `诸嵘` (applicant real name)
-- `陈启稚` (spouse real name)
-- `qizhi_chen` (spouse email local-part)
-- `身份证` (Chinese national ID literal)
-- `/home/wuxia/` (workstation absolute path leak)
+Create `docs/internal/pii-patterns.txt` in the **main checkout**, with one
+extended-regex alternative per line; blank lines and lines starting with `#`
+(optionally preceded by whitespace) are ignored. Keep the real patterns only
+in this git-ignored, backed-up file. Do not copy them into public examples.
 
-Origin: 2026-05-03 PII cleanup (see `docs/V0.4_EXECUTION_LOG.md` Sessions 13-15)
-removed CCPC software-copyright filing materials from public history. This
-hook is the structural guard against reintroduction.
+The hook resolves the main checkout via `git rev-parse --git-common-dir`, so
+linked worktrees share the same private list. Set `PYOBFUS_PII_PATTERNS_FILE`
+to use another local file (for example, a temporary synthetic list in tests).
+When the file is missing, empty, or contains only comments/blank lines, the
+hook prints a one-line notice to stderr and leaves the PII scan inactive;
+the credential and customer-data scans still run.
 
-**Allowlisted files** (legitimate references to the cleanup itself):
-
-- `docs/V0.4_EXECUTION_LOG.md`
-- `.githooks/pre-commit` (the hook contains the patterns themselves)
-- `.githooks/README.md` (this file)
-- `CLAUDE.md` (lists the patterns to document the hook for future maintainers)
-
-To extend, edit `PII_ALLOWLIST_RE` at the top of `.githooks/pre-commit`.
+Origin: the 2026-05-03 privacy cleanup; see `docs/V0.4_EXECUTION_LOG.md`
+Sessions 13–16 for the engineering history.
 
 **Bypass once** (for unusual cases):
 

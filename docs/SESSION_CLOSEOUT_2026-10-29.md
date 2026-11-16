@@ -37,11 +37,10 @@ Cold start: this file → [task tracker](POST_011_PROGRESS_2026-10-29.md) →
 1. LinkedIn post permalink supplied on October 30; collection complete. An early
    post-specific snapshot is in the private social record; no repost is needed.
 2. Around October 30 evening CST, record LinkedIn post-specific analytics.
-3. After November 1 billing recovery, use the existing workspace private CI
-   recovery checklist; do not repeat the cost remediation done in another session.
+3. When private CI becomes available, follow the existing recovery checklist; see the private record at `docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m26`.
 4. DEV one-week review after November 4 09:43 CST; LinkedIn one-week review
    around November 5 evening CST. Do not infer causation from release/CI spikes.
-5. Billing process: follow the private runbook (details in private records).
+5. Private CI recovery follows the private operational runbook; details: `docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m27`.
 6. P2/P3 wait for a real minimized delivery blocker or target-platform need.
    Cross-file L3 still rejects free-threaded builds. No new release is pending.
 

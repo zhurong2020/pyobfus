@@ -20,9 +20,7 @@
 
 ## 留给下次
 
-1. 处理 `workspace-meta` Guard 的 GitHub Actions 账单限制并核查当天云端备份
-   新鲜度。10-27 新提交的 Guard 注释明确称账号近期付款失败或支出上限需提高，
-   作业尚未启动；本地 `scripts/scan_credentials.sh` 通过，远端扫描仍未完成。
+1. `workspace-meta` 远端 Guard 暂不可用，本地凭据扫描已通过；恢复后补做远端扫描，并核查云端备份新鲜度。（私有记录：`docs/internal/archive/PUBLIC_DOCS_PRIVACY_MOVE_2026-11-16.md#m23`。）
 2. 核对 DEV 第二篇的署名、预览和是否实际发布；不要把私有草稿当成已投稿。
 3. 待 PyPI 统计包含 10-27 后再观察 Core 0.10.0 发版日及后续安静日，
    不从发版尖峰推断自然增长。其余功能候选仍按 TODO 的需求与授权 gate。
