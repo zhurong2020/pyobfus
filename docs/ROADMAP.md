@@ -75,10 +75,10 @@ mid-December 2026. Acceptance/stop criteria below bound any later approved work.
 
 | Item | Edition (Community/Pro) | Trigger / evidence needed | Acceptance | Stop condition | Status |
 |---|---|---|---|---|---|
-| COMPARISON refresh (T2) | Community / Pro | 11-15 review; recheck changeable facts before publication | Dated official version/price sources, PyLocket coverage and honest strengths/limits under the comparison policy | Unverifiable claim; no Core release for docs | Refreshed 2026-11-16 (key facts rechecked live); merge pending |
+| COMPARISON refresh (T2) | Community / Pro | 11-15 review; recheck changeable facts before publication | Dated official version/price sources, PyLocket coverage and honest strengths/limits under the comparison policy | Unverifiable claim; no Core release for docs | Merged 2026-11-16 via #246 (`6a0aeef`); key facts rechecked that day |
 | Demand intake and thresholds (T4) | Community / Pro | [Delivery-blocker/frozen-format issue template](../.github/ISSUE_TEMPLATE/delivery_blocker.md) and reference-app feedback | Three signals and explicit [demand triggers](#demand-triggers) referenced by the corresponding table rows | No trigger met; demand-gated work stays unscheduled | Intake and thresholds defined; review weekly |
 | Search / AI visibility (T6) | Community / Pro | December first-week observation; Core 0.12.0 T+30d around 12-04 | Comparable search/AI observations; later per-version observations join weekly review | Missing data stays unknown; release spikes are not growth | Scheduled 2026-12-01–05 |
-| Pro purchase path (T7) | Pro | Explain self-managed, verifiable delivery using reference-app evidence | Buyer can understand protection, private debugging, key ownership and delivery-check limits | Unsupported protection claims or hosted commerce expansion | Planned December; scope/acceptance to confirm |
+| Pro purchase path (T7) | Pro | Explain self-managed, verifiable delivery using reference-app evidence | Buyer can understand protection, private debugging, key ownership and delivery-check limits | Unsupported protection claims or hosted commerce expansion | Scope proposal pending maintainer review (T7); see execution tracker |
 
 ## Demand triggers
 

@@ -15,6 +15,7 @@ exclude_docs: |
   internal/
   # Agent-facing history moved out of CLAUDE.md; maintainer-only.
   CLAUDE_MD_HISTORY.md
+  AGENTS_MD_HISTORY.md
   # Implementation/review evidence belongs to maintainers, not the product site.
   CROSSFILE_LOCAL_NAMES_REVIEW.md
   # Unimplemented proposal; reviewed in GitHub before product documentation.
@@ -33,6 +34,7 @@ exclude_docs: |
   OPERATIONS_REVIEW_*.md
   COLD_START_PROMPT_*.md
   CURRENT_PLAN_ZH.md
+  CURRENT_PLAN_HISTORY_2026-11-16.md
   TODO.md
   TODO_HISTORY_2026-11-16.md
   MAINTAINER_ACTIONS.md

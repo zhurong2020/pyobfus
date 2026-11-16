@@ -1,10 +1,11 @@
 # TODO
 
-**2026-11-16 路线执行台账**：[ROADMAP_EXECUTION_2026-11-16](ROADMAP_EXECUTION_2026-11-16.md)（T0–T7 顺序推进，状态以台账为准）。
+**2026-11-16 路线执行台账**：[ROADMAP_EXECUTION_2026-11-16](ROADMAP_EXECUTION_2026-11-16.md)（T1–T5/T3b 已完成；当前状态以台账为准）。
 
-**2026-11-16 当前入口**：[会话收尾](SESSION_CLOSEOUT_2026-11-16.md) →
-[执行进度](EXECUTION_PROGRESS_2026-11-16.md) →
-[当前计划](CURRENT_PLAN_ZH.md) → 最新[竞品与路线复核](COMPETITIVE_ROADMAP_RESEARCH_2026-11-15.md)。
+**当前入口**：[路线执行台账](ROADMAP_EXECUTION_2026-11-16.md) →
+[当前计划](CURRENT_PLAN_ZH.md) → [竞品与路线复核](COMPETITIVE_ROADMAP_RESEARCH_2026-11-15.md)。
+最新[会话收尾](SESSION_CLOSEOUT_2026-11-16.md)和[执行进度](EXECUTION_PROGRESS_2026-11-16.md)
+是当天早段运维快照，后续 T1–T5/T3b 进度以台账为准。
 未来 6–12 个月的五类候选、需求门槛及停止条件见 [ROADMAP](ROADMAP.md)；
 实施、发布、Worker 部署和许可签发分别需要维护者批准。
 
@@ -19,7 +20,7 @@
 
 - **实现**与**发布**是两道各自独立的 gate，都需要用户明确批准。
 - 任何一项做完后，把它从本文件移除，并在 `CURRENT_PLAN_ZH.md` 记状态；
-  T0–T7 的进度与证据统一记在路线执行台账，不要在这里留「✅ 已完成」的历史层。
+  路线任务的进度与证据统一记在路线执行台账，不要在这里留「✅ 已完成」的历史层。
 - **下游反馈归属（2026-09-17）**：pyobfus 是本工作区自行维护的公共 PyPI 工具。
   内部下游应用或其他项目暴露的通用混淆缺口、最小复现和回归证据，必须同步登记在本仓库
   （公开 TODO 使用去标识描述，敏感交付背景只进入本地 internal 记录），不能只留在下游文档。
@@ -28,17 +29,16 @@
 
 ## 当前执行顺序（2026-11-16 收口）
 
-1. **T1（11-17～22）**：ROADMAP 重定基线、TODO 去历史与维护者清单拆分；文档改动不发版。
-2. **T2（11-17～22）**：按 11-15 复核刷新 COMPARISON 快照、补 PyLocket；每条有官方来源与日期，发布前重查。
-3. **T3（11-23～29）**：公开参考应用 PyInstaller onedir/onefile + Core 0.15.0 CArchive
-   顶层实际检查；PYZ 明确 uninspected，不得假 clean。顺手修 Windows Nuitka workflow 旧 v4.6.2
-   注释；不为注释扩大验收或重跑重型构建，发现缺陷才改产品代码。
-4. **T4（11-23～29）**：交付受阻／冻结格式 issue 模板、参考应用反馈入口、三个指标与 P1/P2
-   门槛写入 ROADMAP；此前资源 provider、L3 方法／嵌套、3.15t、Nuitka 解析／第二格式不排期。
-5. **T5**：Pro 阶段 C 仍等维护者单独批准隔离 CI 试用许可；不碰真实密钥或真实 HOME。
-6. **T6（12-01～05）**：12 月第一周搜索／AI 可见性；约 12-04 完成 Core 0.12.0 T+30d，
+T1–T5/T3b 的完成与未发布变更见[执行台账](ROADMAP_EXECUTION_2026-11-16.md)，不再列为未来任务。
+
+1. **隐私政策更新**（维护者 11-16 决定，每步单独批准）：合并并部署 #255 Worker 数据保留 →
+   约 11-23 审定 #252 定稿与私有客户通知稿 → 通知当天合并 #252（生效日为通知后 30 天）；
+   不在已发升级通知的同日再发第二封。
+2. **T8 文档审计收尾**：剩余修复 PR 合并后核对；本轮修订不代表审计全部关闭。
+   私有事实表与审计报告在主 checkout 的 `docs/internal/doc-audit-2026-11-16/`。
+   后续改进：pre-commit 钩子改为兼容 bash 3.2（当前执行钩子的测试仅在 Linux 运行）。
+3. **T6（12-01～05）**：12 月第一周搜索／AI 可见性；约 12-04 完成 Core 0.12.0 T+30d，
    此后逐版本观察并入周检，继续观察最新发布反馈。
-7. **T7（12 月）**：以「自管、可验证交付」整理 Pro 购买路径，单独确认范围。
 
 同一时间只推进一个产品项；无缺陷不发版，12 月中旬前不计划 Core 发版。
 周期巡检持续进行；不重复已完成的升级通知，后续支持仅记私有记录。
@@ -70,7 +70,6 @@
 - VS Code schema 与 README 网络行为修订等插件自己的下次发布带入 Marketplace/Open VSX；
   不改写已发 0.4.3 页面。runtime README 修订等 runtime 自身有发布理由再带入 PyPI，
   不为文档单独改 runtime 源码或版本。托管采用引导页是否同步须核对部署状态；不为文案发 Core/MCP。
-- Action 仓库旧 README 分支是否仍需处理，见维护者清单；不得据旧 TODO 断言已推送。
 - **Zenodo**：不轮换 webhook token；每次发版后验证 concept DOI 指向新 record，核对版本与日期；
   不打印带 token 的 hook 配置。
 
@@ -110,7 +109,7 @@
   单独付费 gate，默认不买。MCP Trust Registry 发布仍待维护者账号/token（见维护者清单）。
 - **awesome-python #3352**：不争辩、不重开；非发布日基线明显抬升才再议；awesome-security／
   awesome-devsecops 等同条件再评估。某渠道有可归因安装前不新增渠道。
-- stdio MCP 先准备 MCPB，再评估 Smithery；Product Hunt 等真实用户信号。
+- stdio MCP 先准备 MCPB；Smithery 已退役，不再评估投递；Product Hunt 等真实用户信号。
   `pyobfus-review` skill 等实际使用反馈再考虑投递，不为上架而上架。
 - **视频原创保护独立工具（10-23）**：只授权记录；先验证外部创作者需求、平台权益，再定原型。
   母版／发布记录、水印、疑似搬运比对、人工审核材料见 [调研](VIDEO_ORIGINALITY_PROTECTION_RESEARCH_2026-10-23.md)；
@@ -129,7 +128,7 @@
 ## 内容节奏与待选题
 
 - DEV 英文每两周一篇，维护者发布，草稿经 tech-deai 并注明 AI 辅助；WP 中文每月一篇且中文首发，
-  维护者跑 findata `publish.py`，自动推 Discord，再考虑知乎人工改写并附原文链接（09-27 只选定渠道，未开动）。
+  维护者跑 findata `~/projects/findata/content/publish.py`，自动推 Discord，再考虑知乎人工改写并附原文链接（09-27 只选定渠道，未开动）。
 - DEV 个人资料链接 GitHub、X 简介标注 pyobfus maintainer 的旧清单项仍须核状态，
   不据 09-28～10-11 的旧排期认定完成。
 - Reddit 只在有月度版本时发 showcase 更新；X 随 DEV 分享；HN 最多一次普通链接投最强事故复盘，
