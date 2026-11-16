@@ -22,6 +22,30 @@ paths, query strings, fragments, localhost, and private/link-local addresses
 are rejected before WordPress administrator credentials are constructed or
 sent.
 
+## Data retention
+
+This server-side policy takes effect when the Worker is deployed (maintainer
+gate); no client change is required. Every licence write prunes `last_released`,
+`last_evicted` and `devices_reset` audit entries older than 90 days. Exactly
+90 days is retained; missing or unparseable audit timestamps are expired.
+Current device slots, licence validity and eviction order are unchanged.
+
+Optional `trial:<emailHash>` records retain the full record until 180 days
+after `expires` (including the exact boundary). Thereafter only
+`{expires, started, tombstone: true}` remains: no plaintext email, device ID or
+token. Missing or unparseable expiry is treated as expired for retention.
+Tombstones have no KV TTL, so a second trial is still refused. Reads perform
+this cleanup lazily; used-trial responses remain `already_issued` with
+`active: false` and omit the removed token, which existing clients handle.
+
+A weekly Cron Trigger (Monday 03:17 UTC) paginates through the actual `PYOB-`
+licence prefix and `trial:` keys, rewriting only changed records. Untouched
+records can therefore await the next weekly sweep. Legacy `ci_usage` is
+minimised to `last_used` on licence writes and in the sweep; it supports hourly
+telemetry throttling, not enforcement. Signed CI admission remains read-only.
+Like existing licence mutations, sweep writes use KV without atomic
+compare-and-set; concurrent changes can race with a rewrite.
+
 ## 🎉 Production Status
 
 **Status**: ✅ **LIVE PRODUCTION** (Deployed 2025-11-12)
@@ -319,8 +343,8 @@ or consume device slots. The response contains only `valid`, `activation`,
 releasing clients that use CI activation. Device verification remains unchanged.
 
 Successful CI verification records best-effort telemetry as
-`ci_usage: {first_seen, last_used, day}` in the existing license record. Writes
-are attempted only when usage is missing, the UTC day changes, or `last_used`
+`ci_usage: {last_used}` in the existing license record. Writes
+are attempted only when usage is missing, `last_used` is invalid, or `last_used`
 is at least one hour old. This is approximate activity telemetry, not a request
 counter; no new KV key prefixes are introduced. Failed telemetry writes log a
 fixed, redacted warning and do not fail verification. Parallel requests can read

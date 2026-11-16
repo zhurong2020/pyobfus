@@ -2,6 +2,9 @@ name = "pyobfus-license-server"
 main = "src/worker.js"
 compatibility_date = "2025-11-12"
 
+[triggers]
+crons = ["17 3 * * 1"]
+
 # Public identifier of the active CI issuer key. The private JWK is the
 # CI_SIGNING_PRIVATE_JWK secret and is never committed.
 [vars]
