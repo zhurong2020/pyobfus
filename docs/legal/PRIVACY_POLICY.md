@@ -2,10 +2,10 @@
 
 **Draft for maintainer review**
 
-**Effective Date**: 2026-11-16
+**Effective Date: [to be set — at least 30 days after existing customers are notified]**
 **Last Updated**: 2026-11-16
 
-This Privacy Policy describes how pyobfus ("we", "us", or "our") collects, uses, and shares your personal information when you purchase and use pyobfus Professional Edition.
+This Privacy Policy describes how pyobfus ("we", "us", or "our") collects, uses, and shares your personal information when you purchase and use pyobfus Professional Edition or register an optional email trial.
 
 ## What Information We Collect
 
@@ -21,18 +21,25 @@ This Privacy Policy describes how pyobfus ("we", "us", or "our") collects, uses,
 - License key
 - Latest verification timestamp
 
+**During Optional Email Trial Registration:**
+- Email address, normalised by trimming surrounding whitespace and converting it to lowercase
+- Trial device identifier: the first 16 hexadecimal characters of a SHA-256 hash of the MAC-address value and hostname, generated locally; the raw values are not sent
+- Trial start and end times, an email hash, and a trial token
+
+Without an email address, the trial is recorded locally and no trial registration data is sent to us.
+
 ### 2. Information Automatically Collected
 
 **License Verification:**
 - Device identifier (as described above)
 - Number of currently registered devices
 - Latest verification timestamps
+- Latest license activity time, including use of the legacy CI verification endpoint
 
 **We do NOT collect:**
-- Your obfuscated code or any source code you process
+- Your source code, obfuscated code, build contents, or usage telemetry from obfuscation
 - Browsing history or cookies
 - Location data beyond country (for tax purposes via Stripe)
-- Any personal information beyond what's necessary for license operation
 
 ## How We Use Your Information
 
@@ -46,6 +53,10 @@ We use your information solely for the following purposes:
 - Verify that your license is valid and active
 - Enforce the 3-device limit per license
 - Prevent license abuse and unauthorized sharing
+
+### Optional Email Trial
+- Issue one trial per email address and prevent repeat trials
+- Follow up about your trial
 
 ### Customer Support
 - Respond to your support requests
@@ -61,10 +72,11 @@ We use your information solely for the following purposes:
 
 ### Storage Locations
 
-**Cloudflare Workers KV** (License data):
-- License keys and activation status
+**Cloudflare Workers KV** (License and trial records):
+- License keys, purchaser email addresses, activation status, license creation times, and Stripe payment references
 - Device identifiers (stored as received, without additional server-side hashing)
-- Latest verification timestamps
+- Latest verification/activity times and device release, eviction, and support-reset records
+- Optional email trial records: normalised email, email hash, trial device identifier, start and end times, and token
 - Location: Cloudflare global network
 
 **Stripe** (Payment data):
@@ -73,7 +85,7 @@ We use your information solely for the following purposes:
 - Location: Stripe servers (https://stripe.com/privacy)
 
 **Resend** (Email delivery):
-- Email addresses and delivery logs
+- Recipient email addresses, license keys and other transactional email contents, and delivery records
 - Location: Resend servers (https://resend.com/legal/privacy-policy)
 
 ### Data Security
@@ -86,16 +98,17 @@ We implement industry-standard security measures:
 
 ## How Long We Keep Your Information
 
-**License Data**: As long as your license is active
-- If you deactivate: The active-device entry is removed, but the server retains the most recently released device identifier and release timestamp (`last_released`), with no automatic expiry
-- Device identifiers may also remain in the most recent eviction and support-reset records, with no automatic expiry
-- If you request deletion: All data removed within 30 days
+**License Records**: Kept while the license exists and as needed for refunds, disputes, or legal obligations. Active device identifiers are kept to manage activation slots. Deactivation removes the active-device entry.
 
-**Email Records**: Stored in Stripe and Resend systems according to their retention policies
-- Stripe: For tax compliance and fraud prevention (typically 7 years)
-- Resend: Email logs retained for 30 days
+**Device History**: Device identifiers in the most recent release (`last_released`), eviction (`last_evicted`), and support-reset (`devices_reset`) records expire after 90 days. Expired records are removed on the next record update or weekly cleanup.
 
-**Payment Records**: Stripe retains payment data according to their privacy policy and legal requirements
+**Optional Email Trial Records**: We keep the normalised plaintext email, trial device identifier, and token until 180 days after the trial ends. After that, on the next trial-record access or weekly cleanup, we replace the record with a hash-only record to prevent repeat trials. It retains the email hash and minimal trial timing/status information, with no plaintext email, device identifier, or token.
+
+The 90-day and 180-day limits apply from the retention server update's deployment date, which is still pending for this draft. Cleanup runs on record updates/access as described above and weekly, rather than at the exact expiry time. With that update, legacy CI usage records are reduced to the latest-use time on writes and weekly cleanup.
+
+**Email Delivery and Payment Records**: Resend retains email delivery records under its policy. Stripe holds payment records under its privacy policy and legal requirements. Purchaser email addresses in our Cloudflare license records follow the license-record retention above; optional trial emails follow the trial-record retention above.
+
+**Deletion Requests**: Contact zhurong0525@gmail.com to request deletion, including optional trial data or the hash-only trial record. We remove data from our systems within 30 days where law allows; records needed for legal obligations may be retained.
 
 ## Sharing Your Information
 
@@ -111,13 +124,13 @@ We share minimal information with these trusted partners:
 - Privacy Policy: https://stripe.com/privacy
 
 **Resend** (Email delivery):
-- Email address, license key
-- Purpose: Send license keys and support emails
+- Recipient email address, license key and other transactional email contents
+- Purpose: Deliver license and transactional emails
 - Privacy Policy: https://resend.com/legal/privacy-policy
 
 **Cloudflare** (Infrastructure):
-- License verification requests, device identifiers
-- Purpose: License storage and verification
+- License records including purchaser email, license keys, device identifiers, latest verification/activity times, and payment references; optional trial records including normalised email, email hash, trial device identifier, trial times, and token
+- Purpose: Host license records and verification, manage devices, and register and deduplicate optional email trials
 - Privacy Policy: https://www.cloudflare.com/privacypolicy/
 
 ### Legal Disclosure
@@ -144,14 +157,17 @@ Depending on your location, you may have the following rights:
 ### Deletion (Right to be Forgotten)
 - Request deletion of your personal data
 - Deactivate and remove your license
-- We'll remove data from our systems within 30 days
+- Contact zhurong0525@gmail.com, including for deletion of optional trial data or the hash-only trial record
+- We'll remove data from our systems within 30 days where law allows
 - Note: Some data may be retained by payment processors for legal compliance
 
 ### Device Management
 - View this machine's information and cached license status: `pyobfus-license status`
 - Release this machine's server activation slot and remove its local license cache on success: `pyobfus-license deactivate`
 - Remove only the local license cache, without releasing the server slot: `pyobfus-license remove`
-- Device release retains the most recently released device identifier and release timestamp on the server, with no automatic expiry
+- You can activate on up to three devices at a time; activating another device releases the least recently used one
+- Device release retains a release record subject to the 90-day limit and deployment timing described above
+- A verified device license uses the local cache for three days, then attempts online re-verification. If that fails, including while offline, it falls back to a matching, unexpired cached license. A server response identifying revocation or expiry prevents fallback. Automatic device replacement does not erase the released device's local cache; CI licensing requires online verification for each build
 
 ## GDPR Compliance (EU Users)
 
@@ -195,19 +211,15 @@ We ensure appropriate safeguards are in place for international transfers in com
 
 **We do NOT use cookies or tracking on our GitHub Pages website.**
 
-**The pyobfus CLI tool does NOT:**
-- Track your usage
-- Collect analytics
-- Send telemetry data
-- Phone home (except for license verification, device release, dependency-name lookups on PyPI, and optional email trial registration; see [Network behavior](../NETWORK_BEHAVIOR.md))
+The pyobfus CLI does not collect your code, build contents, or usage telemetry from obfuscation. The license server records latest verification/activity times to enforce licenses. These are license administration records.
+
+Outbound requests cover license verification, device release, dependency-name lookups on PyPI, and optional email trial registration; see [Network behavior](../NETWORK_BEHAVIOR.md).
 
 ### Third-Party Services
 
 When you use Stripe Checkout or visit third-party websites (Stripe, Resend), their privacy policies and cookie policies apply.
 
 ## Changes to This Privacy Policy
-
-**2026-11-16 draft changes**: Clarified device identifiers and storage, local license commands, retained device records, and outbound request categories.
 
 We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated "Last Updated" date.
 
@@ -250,3 +262,10 @@ Please contact us. We're happy to explain our practices in detail.
 Copyright (c) 2025 Rong Zhu
 
 Last Updated: 2026-11-16
+
+## Summary of changes
+
+- Explained optional email trial data, follow-up, and how to request deletion.
+- Clarified what Cloudflare, Stripe, and Resend process.
+- Added 90-day device-history and 180-day post-trial retention limits, applying from the server update's deployment, with weekly cleanup.
+- Clarified license activity records, automatic device replacement, and local cache/offline behavior.
