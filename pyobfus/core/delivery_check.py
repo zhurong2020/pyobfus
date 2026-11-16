@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import hashlib
 import importlib.util
+import io
 import json
 import marshal
 import os
@@ -65,6 +66,7 @@ _PYINSTALLER_TOC_ENTRY = struct.Struct("!IIIIBc")
 _MAX_FROZEN_TOC_BYTES = 20 * 1024 * 1024
 _MAX_FROZEN_MEMBER_BYTES = 64 * 1024 * 1024
 _MAX_FROZEN_TOTAL_BYTES = 256 * 1024 * 1024
+_MAX_FROZEN_EXECUTABLES = 32
 
 LIMITATIONS = (
     "Finds known pyobfus mistakes only; an empty result does not mean the delivery is safe.",
@@ -88,6 +90,11 @@ class Finding:
 class _Entry:
     path: str  # posix path relative to the delivery root
     data: bytes
+
+
+@dataclass
+class _FrozenBudget:
+    expanded_bytes: int = 0
 
 
 def _iter_directory(root: Path) -> Iterator[_Entry]:
@@ -469,7 +476,8 @@ def _frozen_file_result(
     report: Optional[Dict[str, Any]],
     manifest: Optional[Dict[str, Any]],
 ) -> Dict[str, Any]:
-    archive = _inspect_pyinstaller_carchive(target)
+    with target.open("rb") as stream:
+        archive = _inspect_pyinstaller_carchive(stream, target.stat().st_size, _FrozenBudget())
     if archive is not None:
         return _pyinstaller_file_result(target, binary_kind, report, manifest, archive)
     finding = Finding(
@@ -551,99 +559,146 @@ def _bounded_zlib(data: bytes, expected: int) -> bytes:
     return output
 
 
-def _inspect_pyinstaller_carchive(target: Path) -> Optional[Dict[str, Any]]:
-    size = target.stat().st_size
-    with target.open("rb") as stream:
-        cookie_offset = _find_last_pattern(stream, _PYINSTALLER_COOKIE_MAGIC, size)
-        if cookie_offset < 0:
-            return None
-        if size > _MAX_ENTRY_BYTES:
-            raise ValueError("Frozen executable byte limit exceeded; inspection incomplete")
-        stream.seek(cookie_offset)
-        cookie = stream.read(_PYINSTALLER_COOKIE.size)
-        if len(cookie) != _PYINSTALLER_COOKIE.size:
-            raise ValueError("Truncated PyInstaller cookie; inspection incomplete")
-        magic, archive_length, toc_offset, toc_length, _, library = _PYINSTALLER_COOKIE.unpack(
-            cookie
-        )
-        archive_end = cookie_offset + _PYINSTALLER_COOKIE.size
-        archive_start = archive_end - archive_length
-        toc_start = archive_start + toc_offset
-        if (
-            magic != _PYINSTALLER_COOKIE_MAGIC
-            or not library.rstrip(b"\0")
-            or archive_start < 0
-            or archive_end > size
-            or toc_length > _MAX_FROZEN_TOC_BYTES
-            or toc_start < archive_start
-            or toc_start + toc_length > cookie_offset
-        ):
-            raise ValueError("Invalid PyInstaller archive bounds; inspection incomplete")
-        stream.seek(toc_start)
-        toc = stream.read(toc_length)
-        if len(toc) != toc_length:
-            raise ValueError("Truncated PyInstaller TOC; inspection incomplete")
+def _inspect_pyinstaller_carchive(
+    stream: BinaryIO, size: int, budget: _FrozenBudget
+) -> Optional[Dict[str, Any]]:
+    """Read a bounded CArchive, sharing the expanded-byte budget across a scan."""
+    cookie_offset = _find_last_pattern(stream, _PYINSTALLER_COOKIE_MAGIC, size)
+    if cookie_offset < 0:
+        return None
+    if size > _MAX_ENTRY_BYTES:
+        raise ValueError("Frozen executable byte limit exceeded; inspection incomplete")
+    stream.seek(cookie_offset)
+    cookie = stream.read(_PYINSTALLER_COOKIE.size)
+    if len(cookie) != _PYINSTALLER_COOKIE.size:
+        raise ValueError("Truncated PyInstaller cookie; inspection incomplete")
+    magic, archive_length, toc_offset, toc_length, _, library = _PYINSTALLER_COOKIE.unpack(cookie)
+    archive_end = cookie_offset + _PYINSTALLER_COOKIE.size
+    archive_start = archive_end - archive_length
+    toc_start = archive_start + toc_offset
+    if (
+        magic != _PYINSTALLER_COOKIE_MAGIC
+        or not library.rstrip(b"\0")
+        or archive_start < 0
+        or archive_end > size
+        or toc_length > _MAX_FROZEN_TOC_BYTES
+        or toc_start < archive_start
+        or toc_start + toc_length > cookie_offset
+    ):
+        raise ValueError("Invalid PyInstaller archive bounds; inspection incomplete")
+    stream.seek(toc_start)
+    toc = stream.read(toc_length)
+    if len(toc) != toc_length:
+        raise ValueError("Truncated PyInstaller TOC; inspection incomplete")
 
-        position = 0
-        names = set()
-        entries: List[_Entry] = []
-        unknown = 0
-        total = 0
-        toc_entries = 0
-        while position < len(toc):
-            toc_entries += 1
-            if toc_entries > _MAX_DELIVERY_ENTRIES or position + _PYINSTALLER_TOC_ENTRY.size > len(
-                toc
-            ):
-                raise ValueError("Invalid PyInstaller TOC; inspection incomplete")
-            header = _PYINSTALLER_TOC_ENTRY.unpack_from(toc, position)
-            entry_length, offset, length, unpacked_length, compressed, raw_type = header
-            if (
-                entry_length < _PYINSTALLER_TOC_ENTRY.size + 1
-                or position + entry_length > len(toc)
-                or compressed not in (0, 1)
-                or offset + length > toc_start - archive_start
-                or length > _MAX_FROZEN_MEMBER_BYTES
-            ):
-                raise ValueError("Invalid PyInstaller member bounds; inspection incomplete")
-            typecode = raw_type.decode("ascii", errors="strict")
-            raw_name = toc[position + _PYINSTALLER_TOC_ENTRY.size : position + entry_length]
-            if typecode == "o":
-                try:
-                    name = raw_name.rstrip(b"\0").decode("utf-8")
-                except UnicodeDecodeError as exc:
-                    raise ValueError(
-                        "Invalid PyInstaller option name; inspection incomplete"
-                    ) from exc
-                if any(ord(char) < 32 or 127 <= ord(char) <= 159 for char in name):
-                    raise ValueError("Invalid PyInstaller option name; inspection incomplete")
-            else:
-                name = _safe_frozen_name(raw_name)
-            position += entry_length
-            if typecode != "o":
-                if name in names:
-                    raise ValueError("Duplicate PyInstaller member; inspection incomplete")
-                names.add(name)
-            elif length == 0:
-                # Runtime options are metadata, not payload paths or members.
-                continue
-            stream.seek(archive_start + offset)
-            data = stream.read(length)
-            if len(data) != length:
-                raise ValueError("Truncated PyInstaller member; inspection incomplete")
-            if compressed:
-                data = _bounded_zlib(data, unpacked_length)
-            elif len(data) != unpacked_length:
-                raise ValueError("PyInstaller member length mismatch; inspection incomplete")
-            total += len(data)
-            if total > _MAX_FROZEN_TOTAL_BYTES:
-                raise ValueError("PyInstaller total size limit exceeded; inspection incomplete")
-            entries.append(_Entry(name, data))
-            if typecode not in {"x", "b", "d", "n", "l"}:
-                unknown += 1
-        if position != len(toc):
-            raise ValueError("Invalid PyInstaller TOC length; inspection incomplete")
+    position = 0
+    names = set()
+    entries: List[_Entry] = []
+    unknown = 0
+    toc_entries = 0
+    while position < len(toc):
+        toc_entries += 1
+        if toc_entries > _MAX_DELIVERY_ENTRIES or position + _PYINSTALLER_TOC_ENTRY.size > len(toc):
+            raise ValueError("Invalid PyInstaller TOC; inspection incomplete")
+        header = _PYINSTALLER_TOC_ENTRY.unpack_from(toc, position)
+        entry_length, offset, length, unpacked_length, compressed, raw_type = header
+        if (
+            entry_length < _PYINSTALLER_TOC_ENTRY.size + 1
+            or position + entry_length > len(toc)
+            or compressed not in (0, 1)
+            or offset + length > toc_start - archive_start
+            or length > _MAX_FROZEN_MEMBER_BYTES
+        ):
+            raise ValueError("Invalid PyInstaller member bounds; inspection incomplete")
+        typecode = raw_type.decode("ascii", errors="strict")
+        raw_name = toc[position + _PYINSTALLER_TOC_ENTRY.size : position + entry_length]
+        if typecode == "o":
+            try:
+                name = raw_name.rstrip(b"\0").decode("utf-8")
+            except UnicodeDecodeError as exc:
+                raise ValueError("Invalid PyInstaller option name; inspection incomplete") from exc
+            if any(ord(char) < 32 or 127 <= ord(char) <= 159 for char in name):
+                raise ValueError("Invalid PyInstaller option name; inspection incomplete")
+        else:
+            name = _safe_frozen_name(raw_name)
+        position += entry_length
+        if typecode != "o":
+            if name in names:
+                raise ValueError("Duplicate PyInstaller member; inspection incomplete")
+            names.add(name)
+        elif length == 0:
+            # Runtime options are metadata, not payload paths or members.
+            continue
+        if budget.expanded_bytes + unpacked_length > _MAX_FROZEN_TOTAL_BYTES:
+            raise ValueError("PyInstaller total size limit exceeded; inspection incomplete")
+        stream.seek(archive_start + offset)
+        data = stream.read(length)
+        if len(data) != length:
+            raise ValueError("Truncated PyInstaller member; inspection incomplete")
+        if compressed:
+            data = _bounded_zlib(data, unpacked_length)
+        elif len(data) != unpacked_length:
+            raise ValueError("PyInstaller member length mismatch; inspection incomplete")
+        budget.expanded_bytes += len(data)
+        entries.append(_Entry(name, data))
+        if typecode not in {"x", "b", "d", "n", "l"}:
+            unknown += 1
+    if position != len(toc):
+        raise ValueError("Invalid PyInstaller TOC length; inspection incomplete")
     return {"entries": entries, "unknown": unknown}
+
+
+def _is_unprotected_original(
+    digest: str, input_hashes: Dict[str, str], output_hashes: Dict[str, str]
+) -> bool:
+    return digest in input_hashes and digest not in output_hashes
+
+
+def _output_hashes(report: Optional[Dict[str, Any]]) -> Dict[str, str]:
+    """Build-output digests; an output identical to its input is not a leak."""
+    hashes: Dict[str, str] = {}
+    if report is not None:
+        for record in report.get("outputs", {}).get("files", []):
+            if isinstance(record, dict) and record.get("sha256"):
+                hashes[record["sha256"]] = str(record.get("path", ""))
+    return hashes
+
+
+def _check_frozen_members(
+    entries: List[_Entry],
+    input_hashes: Dict[str, str],
+    path_prefix: str = "",
+    output_hashes: Optional[Dict[str, str]] = None,
+) -> List[Finding]:
+    """Apply the same leak checks to standalone and directory CArchive members."""
+    findings: List[Finding] = []
+    for entry in entries:
+        path = path_prefix + entry.path
+        if _is_mapping(entry):
+            findings.append(
+                Finding(
+                    MAPPING_FILE,
+                    "high",
+                    path,
+                    "pyobfus mapping file embedded in the executable.",
+                )
+            )
+        elif _is_private_key(entry):
+            findings.append(
+                Finding(PRIVATE_KEY, "high", path, "Private key embedded in the executable.")
+            )
+        elif entry.data.strip() and _is_unprotected_original(
+            hashlib.sha256(entry.data).hexdigest(), input_hashes, output_hashes or {}
+        ):
+            findings.append(
+                Finding(
+                    ORIGINAL_SOURCE,
+                    "high",
+                    path,
+                    "Byte-identical to an original source file embedded in the executable.",
+                )
+            )
+    return findings
 
 
 def _pyinstaller_file_result(
@@ -658,30 +713,9 @@ def _pyinstaller_file_result(
         for record in manifest.get("files", []):
             if isinstance(record, dict) and record.get("input_sha256"):
                 input_hashes[record["input_sha256"]] = str(record.get("relative_path", ""))
-    findings: List[Finding] = []
-    for entry in archive["entries"]:
-        if _is_mapping(entry):
-            findings.append(
-                Finding(
-                    MAPPING_FILE,
-                    "high",
-                    entry.path,
-                    "pyobfus mapping file embedded in the executable.",
-                )
-            )
-        elif _is_private_key(entry):
-            findings.append(
-                Finding(PRIVATE_KEY, "high", entry.path, "Private key embedded in the executable.")
-            )
-        elif hashlib.sha256(entry.data).hexdigest() in input_hashes and entry.data.strip():
-            findings.append(
-                Finding(
-                    ORIGINAL_SOURCE,
-                    "high",
-                    entry.path,
-                    "Byte-identical to an original source file embedded in the executable.",
-                )
-            )
+    findings = _check_frozen_members(
+        archive["entries"], input_hashes, output_hashes=_output_hashes(report)
+    )
     unknown = int(archive["unknown"])
     if unknown:
         findings.append(
@@ -764,11 +798,7 @@ def check_delivery(
         for record in manifest.get("files", []):
             if isinstance(record, dict) and record.get("input_sha256"):
                 input_hashes[record["input_sha256"]] = str(record.get("relative_path", ""))
-    output_hashes: Dict[str, str] = {}
-    if report is not None:
-        for record in report.get("outputs", {}).get("files", []):
-            if isinstance(record, dict) and record.get("sha256"):
-                output_hashes[record["sha256"]] = str(record.get("path", ""))
+    output_hashes = _output_hashes(report)
 
     findings: List[Finding] = []
     seen_outputs: set = set()
@@ -776,6 +806,9 @@ def check_delivery(
     matched_outputs = 0
     bytecode: List[_Entry] = []
     frozen: List[Tuple[str, str]] = []
+    frozen_inspection: Dict[str, Any] = {"found": 0, "inspected": 0}
+    frozen_budget = _FrozenBudget()
+    first_frozen_gap = ""
     file_count = 0
     l3_manifest: Optional[Dict[str, Any]] = None
     observed: Dict[str, Tuple[str, bytes]] = {}
@@ -785,6 +818,37 @@ def check_delivery(
             binary_kind = _executable_kind(entry.data[:4096])
             if binary_kind and not entry.path.endswith((".so", ".dll", ".dylib")):
                 frozen.append((entry.path, binary_kind))
+                frozen_inspection["found"] += 1
+                # Bound attempts too: non-PyInstaller executables must not
+                # permit an unbounded number of archive-reader calls.
+                if len(frozen) <= _MAX_FROZEN_EXECUTABLES:
+                    archive = _inspect_pyinstaller_carchive(
+                        io.BytesIO(entry.data), len(entry.data), frozen_budget
+                    )
+                    if archive is not None:
+                        findings.extend(
+                            _check_frozen_members(
+                                archive["entries"],
+                                input_hashes,
+                                entry.path + "!",
+                                output_hashes,
+                            )
+                        )
+                        frozen_inspection["inspected"] += 1
+                        frozen_inspection["format"] = "pyinstaller-carchive"
+                        unknown = archive["unknown"]
+                        for key, count in (
+                            ("members_total", len(archive["entries"])),
+                            ("members_checked", len(archive["entries"]) - unknown),
+                            ("unknown_members", unknown),
+                        ):
+                            frozen_inspection[key] = frozen_inspection.get(key, 0) + count
+                        if unknown and not first_frozen_gap:
+                            first_frozen_gap = entry.path
+                    elif not first_frozen_gap:
+                        first_frozen_gap = entry.path
+                elif not first_frozen_gap:
+                    first_frozen_gap = entry.path
         if kind == "wheel" and entry.path.endswith(_WHEEL_METADATA_SUFFIXES):
             continue
         digest = hashlib.sha256(entry.data).hexdigest()
@@ -827,7 +891,7 @@ def check_delivery(
             continue
         # A build output can equal its input (nothing to rename, marker off);
         # that is a protected-as-built file, not a leaked original.
-        if digest in input_hashes and digest not in output_hashes and entry.data.strip():
+        if entry.data.strip() and _is_unprotected_original(digest, input_hashes, output_hashes):
             findings.append(
                 Finding(
                     ORIGINAL_SOURCE,
@@ -942,14 +1006,15 @@ def check_delivery(
                 f"Origin of {bytecode_inspection['unknown']} bytecode file(s) could not be confirmed; inspect the packaging inputs and embedded payloads.",
             )
         )
-    if frozen:
-        path, binary_kind = frozen[0]
+    uninspected = len(frozen) - frozen_inspection["inspected"]
+    unknown_members = frozen_inspection.get("unknown_members", 0)
+    if uninspected or unknown_members:
         findings.append(
             Finding(
                 FROZEN_UNINSPECTED,
                 "medium",
-                path,
-                f"{len(frozen)} top-level executable payload(s) detected (first is {binary_kind}); embedded code and data were not inspected.",
+                first_frozen_gap,
+                f"{len(frozen)} top-level executable(s) found; {frozen_inspection['inspected']} PyInstaller CArchive(s) inspected, {uninspected} executable(s) uninspected; {unknown_members} code, embedded archive or unrecognised member(s) remain uninspected.",
             )
         )
 
@@ -1020,7 +1085,7 @@ def check_delivery(
         "findings": [asdict(finding) for finding in findings],
         "inspection": {
             "bytecode": bytecode_inspection,
-            "frozen_executables": {"found": len(frozen), "inspected": 0},
+            "frozen_executables": frozen_inspection,
         },
         "limitations": list(LIMITATIONS),
     }

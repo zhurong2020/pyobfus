@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Directory `--check-delivery` scans now inspect detected top-level PyInstaller
+  executables using the same bounded CArchive member checks as direct executable
+  scans. Embedded findings use `<executable relative path>!<member path>` paths.
+  JSON `inspection.frozen_executables` reports real `found` / `inspected` counts
+  and, when any archive is inspected, aggregate `format`, `members_total`,
+  `members_checked` and `unknown_members`. The expanded-member byte budget is
+  shared across executables; at most 32 executable readers are attempted per
+  scan. Uninspected executables and unknown members still warn with counts;
+  malformed or oversized recognised archives exit 2. Wheels are unchanged.
+
+### Fixed
+
+- `--check-delivery` no longer reports an embedded PyInstaller member as an
+  original-source leak when the build report records a byte-identical output
+  (for example, a file left unchanged by the build). Directory files already
+  had this exemption; executable members now share the same rule.
+
 ## [0.15.0] - 2026-11-15
 
 ### Changed

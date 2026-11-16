@@ -86,6 +86,11 @@ A file that instead opens with `# pyobfus:generated format=1 edition=…` is pyo
    PyInstaller CArchive members; embedded PYZ/marshalled code and unrecognised
    member types remain unknown/warn and are never unmarshalled. Do not describe
    a partial frozen inspection as clean.
+   Unreleased: directory scans also inspect detected top-level PyInstaller
+   executables, with at most 32 reader attempts and one expanded-member budget.
+   Embedded findings use `<executable relative path>!<member path>`; frozen JSON
+   counts aggregate inspected archives. Uninspected executables or unknown
+   members still warn; malformed or over-limit recognised archives exit 2.
 6. Pro features need an active trial or licence (Core 0.12.0+). In CI, supply the licence only as the secret environment variable `PYOBFUS_LICENSE_KEY` (Action: `license-key: ${{ secrets.PYOBFUS_LICENSE_KEY }}`); never print, log or commit it, and do not run licensed builds for untrusted fork pull requests.
    Since 0.14.0: CI environment-key builds require request-bound issuer signatures and reject unsigned fallback. The license server serves the signed endpoint; older clients keep using the legacy endpoint. Workstation/offline registration is unchanged. Signed denials disable caching and do not echo internal inactive-state values; never work around a rotation failure using unsigned fallback or an environment public-key override.
    Since 0.15.0, clients trust a standby issuer key ahead of future rotation and
