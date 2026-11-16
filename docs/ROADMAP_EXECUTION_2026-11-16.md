@@ -31,7 +31,35 @@ Nuitka 验收结果为 partial（D9 unknown、Pro 阶段 C blocked），见
 | T4 | 需求入口：交付受阻／冻结格式 issue 模板、参考应用反馈入口、3 个指标与 P1/P2 触发门槛 | 11-16 | ✅ 完成 | 门槛写入 ROADMAP 表 | [#245](https://github.com/zhurong2020/pyobfus/pull/245) 已合并：issue 模板、`delivery-blocker` 标签已建、门槛与 90 天停止规则 |
 | T5 | Pro 阶段 C：补 L3 冻结交付验证（改用纯本地试用，未签发许可） | 11-16 | ✅ 完成（未发版） | 不碰真实密钥；隔离 HOME；缺失／错误密钥失败关闭 | [#248](https://github.com/zhurong2020/pyobfus/pull/248) 已合并 `39503ac`：onefile／onedir 通过；发现并修复冻结目录误报 `l3_build_mismatch` → medium `l3_unverified_frozen`；packaging lane 改为普通安装 runtime |
 | T6 | 12 月第一周搜索／AI 可见性；约 12-04 Core 0.12.0 T+30d（之后逐版本观察并入周检） | 12-01～05 | ⏳ 定时 | — | — |
-| T7 | 以“自管、可验证交付”整理 Pro 购买路径 | 11-16 起 | 📝 范围提案待维护者确认 | 每条主张有可复现证据；不改价格／条款；落地页合并即上线，合并前维护者审最终文案 | 提案在私有 `docs/internal/codex-2026-11-16/` |
+| T7 | 以“自管、可验证交付”整理 Pro 购买路径 | 11-16 | 🔍 PR 待维护者审文案后合并（落地页合并即上线） | 每条主张有可复现证据；不改价格／条款；落地页合并即上线，合并前维护者审最终文案 | 提案在私有 `docs/internal/codex-2026-11-16/` |
+| T8 | pyobfus 及相关项目文档审计（多个版本后的一致性复核） | T7 合并后 | ⏳ 已排期（11-16 维护者要求） | 见下方 T8 方案 | — |
+
+## T8 文档审计方案（2026-11-16 排期）
+
+维护者在连续多个版本（0.12.0–0.15.0 及未发版改动）后要求审计 pyobfus 与所有相关项目的文档。
+沿用 [08-02](DOC_SYNC_AUDIT_2026-08-02.md) 与 [10-02 跨仓](CROSS_REPO_DOC_SYNC_AUDIT_2026-10-02.md)
+审计的方法，先出报告再分仓修复；T7 合并后开始，避免与其文案改动冲突。
+
+1. **事实基线**（Claude）：一页当前事实表——各包版本、Glama 渠道、Worker 版本、
+   `--check-delivery` 当前与未发版行为、版别边界、支持矩阵、关键日期。所有审计以此对照。
+2. **只读审计**（无头 Codex，按范围拆分并行，只写报告不改文件）：
+   (a) 面向用户：README／README.zh-CN、文档站导航页与指南、`llms*.txt`、skills、
+   集成模板、`ai-catalog.json`、落地页中英文；(b) 子包：`pyobfus_mcp`、`pyobfus_runtime`、
+   `vscode-extension` 的 README／CHANGELOG；(c) 内部入口：CLAUDE.md／AGENTS.md「Where to look
+   next」堆积、CURRENT_PLAN_ZH（2662 行）、TODO／ROADMAP、SESSION_CLOSEOUT 与 COLD_START 系列；
+   (d) `pyobfus-action` 仓；(e) 工作区索引：`workspace-meta` 中涉及 pyobfus 的 6 份文件。
+   每条发现写明文件:行、与事实表的差异、建议动作（改／删／折叠／保留）。
+3. **复核与分级**（Claude）：抽查每份报告，按「事实错误／过期版本与死链／结构臃肿／可延后」
+   分级；CLAUDE.md、AGENTS.md 与工作区索引按工作区「指令＋指针，不装历史」规则瘦身，
+   历史原样归档。
+4. **修复**：每个仓单独 PR（Codex 实现、Claude 审核）；外部渠道（Marketplace、Open VSX、
+   Glama、mcp.so、PyPI 页面）只出差异清单，由维护者手动处理或随下次发版带出。
+5. **不送外部模型**：`pyobfus-legal`（含个人信息，非 git）只由 Claude 只读核对版本／
+   日期引用；`pyobfus-pro-dev`（专利证据库，已归档只读）不在修复范围；私有 memory 由
+   Claude 自行整理。
+
+验收：事实表中每项在所有公开入口一致；`scripts/check.sh` 与各仓 CI 通过；新增链接全部可解析；
+CLAUDE.md／AGENTS.md 体积明显下降且无悬空指针；外部渠道差异清单交维护者。
 
 ## T3 新发现（2026-11-16）
 
