@@ -10,6 +10,7 @@ import json
 import marshal
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -412,3 +413,277 @@ def test_pyinstaller_onefile_delivery_inspection(tmp_path, include_mapping):
     assert codes == sorted(
         [FROZEN_UNINSPECTED, MAPPING_FILE] if include_mapping else [FROZEN_UNINSPECTED]
     )
+
+
+@pytest.fixture
+def protected_reference(tmp_path, monkeypatch):
+    """README Community build, with all evidence and state outside the input."""
+    _require_tool("PyInstaller")
+    for name in ("PYTHONPATH", "PYTHONHOME", "PYOBFUS_LICENSE_KEY"):
+        monkeypatch.delenv(name, raising=False)
+    source = tmp_path / "source"
+    shutil.copytree(
+        EXAMPLES / "delivery_reference", source, ignore=shutil.ignore_patterns("__pycache__")
+    )
+    baseline = {}
+    for args in (("pro",), (), ("bogus_tier",)):
+        baseline[args] = _run(
+            [sys.executable, "-B", "main.py", *args],
+            cwd=source,
+            expected_code=1 if args == ("bogus_tier",) else 0,
+        )
+    assert baseline[("pro",)].stdout.splitlines() == ["pricing-v1", "pro: 65.88"]
+    assert baseline[()].stdout == baseline[("pro",)].stdout
+    assert baseline[("bogus_tier",)].stderr.splitlines()[-1] == (
+        "ValueError: Unknown pricing tier: bogus_tier"
+    )
+    output = tmp_path / "protected"
+    private = tmp_path / "private"
+    private.mkdir()
+    _run(
+        [
+            sys.executable,
+            "-m",
+            "pyobfus",
+            str(source),
+            "-o",
+            str(output),
+            "--config",
+            str(source / "pyobfus.yaml"),
+            "--save-mapping",
+            str(private / "mapping.json"),
+            "--build-report",
+            str(private / "build.json"),
+            # Evidence only: needed to recognise a byte-identical source leak.
+            "--provenance-manifest",
+            str(private / "provenance.json"),
+            "--verify-syntax",
+            "--jobs",
+            "1",
+            "--json",
+        ],
+        cwd=tmp_path,
+    )
+    (output / "storefront/data").mkdir(parents=True, exist_ok=True)
+    shutil.copy2(source / "storefront/data/label.txt", output / "storefront/data/label.txt")
+    for args, original in baseline.items():
+        protected = _run(
+            [sys.executable, "-B", "main.py", *args],
+            cwd=output,
+            expected_code=original.returncode,
+        )
+        assert protected.stdout == original.stdout
+        if original.returncode:
+            assert protected.stderr.splitlines()[-1] == original.stderr.splitlines()[-1]
+    import pyobfus
+
+    cli_import = _run(
+        [sys.executable, "-c", "import pyobfus; print(pyobfus.__file__)"], cwd=tmp_path
+    ).stdout.strip()
+    (private / "baseline.json").write_text(
+        json.dumps(
+            {
+                "pytest_pyobfus_file": pyobfus.__file__,
+                "cli_pyobfus_file": cli_import,
+                "runs": {
+                    " ".join(args)
+                    or "default": {
+                        "stdout": run.stdout,
+                        "stderr": run.stderr,
+                        "exit_code": run.returncode,
+                    }
+                    for args, run in baseline.items()
+                },
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    return source, output, ObfuscationMapping.load(private / "mapping.json"), baseline
+
+
+def _build_reference_pyinstaller(work, output, mode, extra_data=()):
+    command = [
+        sys.executable,
+        "-m",
+        "PyInstaller",
+        f"--{mode}",
+        "--clean",
+        "--noconfirm",
+        "--name",
+        "delivery_reference",
+        "--distpath",
+        str(work / "dist"),
+        "--workpath",
+        str(work / "build"),
+        "--specpath",
+        str(work / "spec"),
+        "--hidden-import",
+        "storefront.plugins.standard",
+        "--hidden-import",
+        "storefront.data",
+        "--add-data",
+        f"{output / 'storefront/data/label.txt'}{os.pathsep}storefront/data",
+    ]
+    for data in extra_data:
+        command.extend(["--add-data", f"{data}{os.pathsep}."])
+    command.append(str(output / "main.py"))
+    _run(
+        command,
+        cwd=work,
+        env={**os.environ, "PYINSTALLER_CONFIG_DIR": str(work / "cache")},
+    )
+    return work / "dist" / "delivery_reference"
+
+
+def _reference_delivery(target, work, *, expected_code=0, label="delivery"):
+    """Compare the library result with the CLI JSON and its process exit code."""
+    from pyobfus.core.delivery_check import check_delivery
+
+    private = work / "private"
+    result = check_delivery(
+        target,
+        build_report=private / "build.json",
+        provenance_manifest=private / "provenance.json",
+    )
+    cli = _run(
+        [
+            sys.executable,
+            "-m",
+            "pyobfus",
+            "--check-delivery",
+            str(target),
+            "--build-report",
+            str(private / "build.json"),
+            "--provenance-manifest",
+            str(private / "provenance.json"),
+            "--json",
+        ],
+        cwd=work,
+        expected_code=expected_code,
+    )
+    assert json.loads(cli.stdout) == result
+    (private / f"{label}.json").write_text(cli.stdout, encoding="utf-8")
+    return result
+
+
+@pytest.mark.parametrize("mode", ["onedir", "onefile"])
+def test_delivery_reference_pyinstaller(tmp_path, protected_reference, mode):
+    from PyInstaller.archive.readers import CArchiveReader
+
+    from pyobfus.core.delivery_check import FROZEN_UNINSPECTED, MISSING_OUTPUT
+
+    source, output, mapping, baseline = protected_reference
+    dist = _build_reference_pyinstaller(tmp_path, output, mode)
+    consumer = tmp_path / "consumer"
+    if mode == "onedir":
+        shutil.copytree(dist, consumer)
+        executable = consumer / dist.name
+        assert (consumer / "_internal" / "storefront/data/label.txt").is_file()
+    else:
+        consumer.mkdir()
+        executable = consumer / dist.name
+        shutil.copy2(dist, executable)
+        assert list(consumer.iterdir()) == [executable]
+    # Only dist output is copied. Remove the source/build paths before consumption.
+    for directory in (source, output, tmp_path / "build"):
+        directory.rename(directory.with_name(directory.name + ".hidden"))
+    assert not list(consumer.rglob("*.py"))
+    assert not list(consumer.rglob("*.json"))
+    # Confirm that the uninspected code/archive members really include a PYZ;
+    # merely reading its TOC entry does not inspect or unmarshal its contents.
+    archive = CArchiveReader(str(executable))
+    assert archive.toc["PYZ.pyz"][-1] == "z"
+    env = {
+        name: value
+        for name, value in os.environ.items()
+        if name not in {"PYTHONPATH", "PYTHONHOME", "PYOBFUS_LICENSE_KEY"}
+    }
+    for args, original in baseline.items():
+        frozen = _run(
+            [str(executable), *args], cwd=consumer, env=env, expected_code=original.returncode
+        )
+        assert frozen.stdout.splitlines() == original.stdout.splitlines()
+        if not original.returncode:
+            continue
+        error = original.stderr.splitlines()[-1]
+        assert error in frozen.stderr.splitlines()
+        for name in ("render_order", "quote_order"):
+            assert _mapped(mapping, name) in frozen.stderr
+        restored = _unmap_cli(frozen.stderr, tmp_path)
+        frames = re.compile(r'^\s*File "([^"]+)", line \d+, in (\S+)(?:  \[.*\])?$', re.MULTILINE)
+        original_frames = [
+            (Path(path).relative_to(source).as_posix(), function)
+            for path, function in frames.findall(original.stderr)
+        ]
+        frozen_frames = frames.findall(frozen.stderr)
+        restored_frames = frames.findall(restored)
+        assert len(frozen_frames) == len(restored_frames) == len(original_frames)
+        assert restored_frames == original_frames  # No extra, missing or fabricated frames.
+        (tmp_path / "private" / "restored.txt").write_text(restored, encoding="utf-8")
+
+    result = _reference_delivery(executable, tmp_path, label="executable-delivery")
+    inspection = result["inspection"]["frozen_executables"]
+    assert inspection["format"] == "pyinstaller-carchive"
+    assert inspection["inspected"] == 1
+    assert (
+        inspection["members_total"] == inspection["members_checked"] + inspection["unknown_members"]
+    )
+    assert inspection["unknown_members"] > 0
+    if mode == "onefile":
+        assert inspection["members_checked"] > 0
+    else:
+        # onedir puts the resource and native dependencies in _internal; its
+        # bootloader CArchive contains only uninspected code/archive members.
+        assert inspection["members_checked"] == 0
+    assert result["status"] == "warn"
+    assert result["summary"]["high"] == 0
+    assert {finding["code"] for finding in result["findings"]} == {FROZEN_UNINSPECTED}
+    if mode == "onedir":
+        # Core 0.15.0 directory scans don't recurse into bootloader CArchives
+        # (including their PYZ). Keep that coverage gap explicit.
+        directory = _reference_delivery(consumer, tmp_path, label="directory-delivery")
+        assert directory["status"] == "warn"
+        assert directory["summary"]["high"] == 0
+        assert directory["inspection"]["frozen_executables"] == {"found": 1, "inspected": 0}
+        assert {finding["code"] for finding in directory["findings"]} == {
+            FROZEN_UNINSPECTED,
+            MISSING_OUTPUT,
+        }
+
+
+@pytest.mark.parametrize("leak", ["mapping", "source", "private-key"])
+def test_delivery_reference_pyinstaller_onefile_mutation(tmp_path, protected_reference, leak):
+    from pyobfus.core.delivery_check import (
+        FROZEN_UNINSPECTED,
+        MAPPING_FILE,
+        ORIGINAL_SOURCE,
+        PRIVATE_KEY,
+    )
+
+    source, output, _, _ = protected_reference
+    private = tmp_path / "private"
+    if leak == "mapping":
+        planted, code = private / "mapping.json", MAPPING_FILE
+    elif leak == "source":
+        planted, code = source / "storefront/catalog.py", ORIGINAL_SOURCE
+    else:
+        planted, code = private / "dummy.pem", PRIVATE_KEY
+        # Intentionally invalid test data; never store a key-looking literal.
+        marker = "-" * 5
+        kind = "PRIVATE" + " KEY"
+        planted.write_text(
+            f"{marker}BEGIN {kind}{marker}\nobviously-fake-test-data\n"
+            f"{marker}END {kind}{marker}\n",
+            encoding="ascii",
+        )
+    executable = _build_reference_pyinstaller(tmp_path, output, "onefile", [planted])
+    result = _reference_delivery(executable, tmp_path, expected_code=1)
+    assert result["status"] == "fail"
+    assert result["summary"]["high"] == 1
+    assert [
+        (finding["code"], finding["path"])
+        for finding in result["findings"]
+        if finding["severity"] == "high"
+    ] == [(code, planted.name)]
+    assert {finding["code"] for finding in result["findings"]} == {code, FROZEN_UNINSPECTED}
