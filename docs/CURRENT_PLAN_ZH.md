@@ -1,5 +1,16 @@
 # pyobfus 当前计划
 
+**2026-11-16 发布后收口**：#239 已 squash merge 为 `144b6e1`，其 main CI、CodeQL
+与 IndexNow docs notification 均成功；本地 WSL 主仓已快进同步。GSC 规范地址
+`/pyobfus/zh-cn/` 已收录、已编入索引且 HTTPS 正常，sitemap 后台仍保留 11-12 的
+“无法读取”旧状态，本次未删除重提。Bing 已选中正确的 pyobfus 属性，IndexNow 页面
+仍未展示可归因记录，但 GitHub workflow 已成功，不能解释成零提交或失败。#241
+（`actions/upload-artifact` v7）已完成独立审阅，未发现阻塞兼容问题，尚未合并；
+Zenodo record `24248676` 已确认对应 v0.15.0，CITATION 已同步候选并通过官方
+CFF 1.2.0 schema 校验，随本轮文档分支待合并。Pro 客户
+通知私有草稿已复核，待维护者审阅，未发送。详见[本日执行记录](EXECUTION_PROGRESS_2026-11-16.md)与
+[会话收尾](SESSION_CLOSEOUT_2026-11-16.md)。
+
 **2026-11-15 本地资产审计与清理完成**：确认 6 个直接命名目录与 5 个运维／索引
 目录；当前软件源仓只有 `pyobfus` 和 `pyobfus-action`。`pyobfus-legal` 保持 PII
 隔离；`pyobfus-pro-dev` 保留 `.git`、源码、测试、设计与 `PATENT_NOTES.md` 专利

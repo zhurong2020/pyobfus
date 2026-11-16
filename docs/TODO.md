@@ -1,6 +1,7 @@
 # TODO
 
-**2026-11-15 当前入口**：[执行进度](EXECUTION_PROGRESS_2026-11-15.md) →
+**2026-11-16 当前入口**：[会话收尾](SESSION_CLOSEOUT_2026-11-16.md) →
+[执行进度](EXECUTION_PROGRESS_2026-11-16.md) →
 [当前计划](CURRENT_PLAN_ZH.md) → 最新[竞品与路线复核](COMPETITIVE_ROADMAP_RESEARCH_2026-11-15.md)。
 后续产品主线收敛为“公开交付参考应用 → Windows Nuitka standalone 单组合验收
 → 一个冻结格式的 `--check-delivery` → 有真实需求再设计资源保护／L3 扩面”。该文档是
@@ -10,8 +11,8 @@
 [`CURRENT_PLAN_ZH.md`](CURRENT_PLAN_ZH.md) 为准**；本文件只回答「接下来按什么
 顺序做」，不记录已完成历史。
 
-当前版本：Core 0.14.0 / MCP 0.3.17 / runtime 0.1.1 / 扩展 0.4.3 / Action v1.1.0。
-最新发布证据见 [Core 0.14.0 核验](CORE_0_14_0_RELEASE_2026-11-11.md)。
+当前版本：Core 0.15.0 / MCP 0.3.17 / runtime 0.1.1 / 扩展 0.4.3 / Action v1.1.0。
+最新发布证据见 [Core 0.15.0 核验](CORE_0_15_0_RELEASE_2026-11-15.md)。
 
 <!-- Historical entry links remain below only where an unfinished obligation still depends on them. -->
 
@@ -77,15 +78,13 @@ Action v1.1.0 / `v1` 与 Glama 渠道 0.11.3 已完成；DEV 一周复盘已记�
 设计、官方资料与验收条件见 [路线复核](ROADMAP_REVIEW_2026-10-30.md)。
 已完成的 P0、纯文档 CI、Core/MCP 发版、Glama 更新与首日 DEV 观察不再排入队列。
 
-1. **收口 11-16 周检增量**：11-15 已完成下载、备份、CI、收件箱和 GSC 提前检查。公开侧复核确认 `/zh-cn` 只是正常单跳 301，首页、`/zh-cn/`、sitemap 与 robots 均可抓取；不改正确配置，等待 GSC 重处理。Bing 必须先选中 pyobfus 属性再核 IndexNow，不能把默认其它站点的指标或 `null` 解释为 pyobfus 的零。
-2. **Windows Nuitka 单组合验收（2026-11-15 托管执行，partial）**：D1–D8 全部通过，D9 因冻结载荷内部未检查如实为 unknown，Pro L3 blocked；结果与边界见[验收合同](DELIVERY_REFERENCE_APP_ACCEPTANCE_2026-11-15.md)文末。后续只在真实交付需求出现时再扩组合或做干净目标机验证。
-3. **PyInstaller CArchive 顶层交付检查**：首个冻结格式已选定并完成[安全设计](PYINSTALLER_CARCHIVE_DELIVERY_DESIGN_2026-11-15.md)。只解析有界 cookie／TOC 和普通顶层成员，检查 mapping／私钥／byte-identical 原文；不对 PYZ 使用 `marshal.load`，未检查载荷继续明确为 unknown／warn。
-3a. **Python 3.15 `.pyc` 来源比对误报（已实现，见 PR）**：有界纯字节 marshal 引用规范化回退；交付数据不反序列化，文件名匹配不放宽。
-4. **签发 key 预分发已随 Core 0.15.0 发布（2026-11-15）**：#230 升级提示与 #231 备用公钥 `ci-2026-11b` 已进入客户端，Worker 仍只用 `ci-2026-11`。计划内切换最早约 2027-05-14（发布满 180 天）且须提前 60 天通知。正常轮换维持“信任版本发布满 180 天 + 至少提前 60 天通知”。工作站／离线迁移仍延后，Pro／runtime 专利许可条款继续等待专业审阅。
-4a. **Pro 客户通知（与签发 key 相关，草稿由 Claude 起草、维护者审后发送）**：
+1. **发布后文档合入**：Zenodo record `24248676` / v0.15.0 / 2026-11-15 / concept `20846053` 已核；`CITATION.cff` 同步候选通过官方 schema，文档分支待托管 CI 与维护者合并。
+2. **Pro 客户通知（与签发 key 相关，草稿由 Claude 起草、维护者审后发送）**：
    - **现在到期（0.15.0 已发布）**：给现有 Pro 客户发一封说明——建议在 CI 中升级到该版本、不要长期锁定旧版本；将来计划内换签发 key 会提前至少 60 天通知；工作站注册与 0.14.0 之前的版本不受影响。现在不单独群发（尚无影响客户的变更生效）。
    - 任何计划内换签发 key：切换前至少 60 天再发一次正式通知（写明最低支持版本与切换日期），且距首个信任新 key 的版本发布满 180 天才可切换；紧急泄漏另按轮换方案立即通知。
    - 收件人与发送记录只放私有 `docs/internal/`，按 Worker 许可记录核对收件人；公开文档不写客户信息。
+3. **#241 合并决定**：已完成[独立审阅](UPLOAD_ARTIFACT_V7_REVIEW_2026-11-16.md)，未发现阻塞兼容问题；Dogfood/PDF 三个上传与独立下载校验通过，Windows/Lane C 未实跑。旧版本注释可修正；等待维护者决定，尚未合并。
+4. **签发 key 后续边界**：#230 升级提示与 #231 备用公钥 `ci-2026-11b` 已随 Core 0.15.0 进入客户端，Worker 仍只用 `ci-2026-11`。计划内切换最早约 2027-05-14（发布满 180 天）且须提前 60 天通知。工作站／离线迁移仍延后，Pro／runtime 专利许可条款继续等待专业审阅。
 5. 小型渠道试验：11-11 已核 r/Python 官方规则并准备私有技术案例，不能发独立 showcase 帖；待选择合规线程或其它社区并确认账号条件。试验后按具体使用线索与问题决定是否继续，不用下载尖峰证明增长。
 6. 收到真实最小复现后：优先正确性与诊断，再决定 L3 覆盖或资源密钥范围。
 
