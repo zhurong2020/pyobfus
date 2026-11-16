@@ -1,7 +1,9 @@
 # Privacy Policy
 
-**Effective Date**: November 12, 2025
-**Last Updated**: November 12, 2025
+**Draft for maintainer review**
+
+**Effective Date**: 2026-11-16
+**Last Updated**: 2026-11-16
 
 This Privacy Policy describes how pyobfus ("we", "us", or "our") collects, uses, and shares your personal information when you purchase and use pyobfus Professional Edition.
 
@@ -15,16 +17,16 @@ This Privacy Policy describes how pyobfus ("we", "us", or "our") collects, uses,
 - Name (optional, if provided during checkout)
 
 **During License Activation:**
-- Device fingerprint (generated locally, used to enforce 3-device limit)
+- Device identifier (used to enforce the 3-device limit): normally a random value saved in `~/.pyobfus/device_id`; if it cannot be saved, a hash of local hardware and system information is used
 - License key
-- Activation timestamp
+- Latest verification timestamp
 
 ### 2. Information Automatically Collected
 
 **License Verification:**
-- Device fingerprint (hashed hardware identifiers)
-- Activation count
-- Timestamp of verification requests
+- Device identifier (as described above)
+- Number of currently registered devices
+- Latest verification timestamps
 
 **We do NOT collect:**
 - Your obfuscated code or any source code you process
@@ -61,8 +63,8 @@ We use your information solely for the following purposes:
 
 **Cloudflare Workers KV** (License data):
 - License keys and activation status
-- Device fingerprints (hashed)
-- Activation timestamps
+- Device identifiers (stored as received, without additional server-side hashing)
+- Latest verification timestamps
 - Location: Cloudflare global network
 
 **Stripe** (Payment data):
@@ -80,12 +82,13 @@ We implement industry-standard security measures:
 - All data transmission uses HTTPS/TLS encryption
 - License verification uses secure API endpoints
 - No credit card data is stored on our systems (handled by Stripe)
-- Device fingerprints are hashed before storage
+- Device identifiers are stored as received, without additional server-side hashing
 
 ## How Long We Keep Your Information
 
 **License Data**: As long as your license is active
-- If you deactivate: Device data is removed immediately
+- If you deactivate: The active-device entry is removed, but the server retains the most recently released device identifier and release timestamp (`last_released`), with no automatic expiry
+- Device identifiers may also remain in the most recent eviction and support-reset records, with no automatic expiry
 - If you request deletion: All data removed within 30 days
 
 **Email Records**: Stored in Stripe and Resend systems according to their retention policies
@@ -113,7 +116,7 @@ We share minimal information with these trusted partners:
 - Privacy Policy: https://resend.com/legal/privacy-policy
 
 **Cloudflare** (Infrastructure):
-- License verification requests, device fingerprints
+- License verification requests, device identifiers
 - Purpose: License storage and verification
 - Privacy Policy: https://www.cloudflare.com/privacypolicy/
 
@@ -145,9 +148,10 @@ Depending on your location, you may have the following rights:
 - Note: Some data may be retained by payment processors for legal compliance
 
 ### Device Management
-- View your activated devices: `pyobfus-license status`
-- Remove a device: `pyobfus-license remove`
-- This removes device data immediately
+- View this machine's information and cached license status: `pyobfus-license status`
+- Release this machine's server activation slot and remove its local license cache on success: `pyobfus-license deactivate`
+- Remove only the local license cache, without releasing the server slot: `pyobfus-license remove`
+- Device release retains the most recently released device identifier and release timestamp on the server, with no automatic expiry
 
 ## GDPR Compliance (EU Users)
 
@@ -195,13 +199,15 @@ We ensure appropriate safeguards are in place for international transfers in com
 - Track your usage
 - Collect analytics
 - Send telemetry data
-- Phone home (except for license verification)
+- Phone home (except for license verification, device release, dependency-name lookups on PyPI, and optional email trial registration; see [Network behavior](../NETWORK_BEHAVIOR.md))
 
 ### Third-Party Services
 
 When you use Stripe Checkout or visit third-party websites (Stripe, Resend), their privacy policies and cookie policies apply.
 
 ## Changes to This Privacy Policy
+
+**2026-11-16 draft changes**: Clarified device identifiers and storage, local license commands, retained device records, and outbound request categories.
 
 We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated "Last Updated" date.
 
@@ -243,4 +249,4 @@ Please contact us. We're happy to explain our practices in detail.
 **pyobfus Professional Edition**
 Copyright (c) 2025 Rong Zhu
 
-Last Updated: November 12, 2025
+Last Updated: 2026-11-16

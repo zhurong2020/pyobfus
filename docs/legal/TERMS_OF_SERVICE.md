@@ -1,7 +1,9 @@
 # Terms of Service and End User License Agreement (EULA)
 
-**Effective Date**: November 12, 2025
-**Last Updated**: November 12, 2025
+**Draft for maintainer review**
+
+**Effective Date**: 2026-11-16
+**Last Updated**: 2026-11-16
 
 This End User License Agreement ("Agreement") is a legal agreement between you (either an individual or a single entity, "Licensee" or "You") and Rong Zhu ("Licensor", "We", "Us") for the use of pyobfus Professional Edition software ("Software").
 
@@ -53,12 +55,12 @@ You may NOT:
 
 ### 3.1 Device Limit
 - Each license permits activation on up to three (3) devices simultaneously
-- A "device" is defined by a unique hardware fingerprint
+- A "device" is identified by a device identifier, normally a random value saved in `~/.pyobfus/device_id`; if it cannot be saved, a hash of local hardware and system information is used
 - You may deactivate the Software on a device to free up an activation slot
 
 ### 3.2 Device Management
-- To remove a license from a device: `pyobfus-license remove`
-- To transfer to a new device: Remove from old device, then activate on new device
+- To remove only the local license cache, without releasing the server slot: `pyobfus-license remove`
+- To transfer to a new device: Run `pyobfus-license deactivate` on the old device to release its server activation slot and remove its local license cache, then activate on the new device
 - One-time device reset may be available by contacting support
 
 ### 3.3 Abuse Detection
@@ -173,7 +175,7 @@ These limitations apply even if:
 We collect minimal data necessary for license operation:
 - Your email address (for license delivery and support)
 - License key and activation status
-- Device fingerprints (for enforcing 3-device limit)
+- Device identifiers (for enforcing 3-device limit)
 - Payment information (processed and stored by Stripe)
 
 ### 10.2 Data Use
@@ -187,7 +189,7 @@ We use this data solely to:
 ### 10.3 Data Storage
 - License data: Stored in Cloudflare KV (Workers KV)
 - Email data: Stored in Stripe and Resend systems
-- Device fingerprints: Stored until license is removed
+- Device identifiers: Stored as received, without additional server-side hashing; deactivation removes the active-device entry but retains the most recently released device identifier and release timestamp, with no automatic expiry. Identifiers may also remain in the most recent eviction and support-reset records, with no automatic expiry
 
 ### 10.4 Your Rights
 You have the right to:
@@ -206,7 +208,7 @@ For users in the European Union, we comply with GDPR requirements. Contact zhuro
 ### 11.1 Termination by You
 You may terminate this Agreement at any time by:
 - Uninstalling the Software
-- Deactivating your license: `pyobfus-license remove`
+- Deactivating this device: `pyobfus-license deactivate`
 - Requesting a refund (within 30 days)
 
 ### 11.2 Termination by Licensor
