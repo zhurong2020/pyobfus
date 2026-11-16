@@ -262,7 +262,7 @@ current planning and `docs/POST_V0.4_TODO.md` for historical patent/release cont
 - **Current work**: [execution tracker](docs/ROADMAP_EXECUTION_2026-11-16.md) →
   [TODO](docs/TODO.md) (next-work order) → [current plan](docs/CURRENT_PLAN_ZH.md)
   (operational facts and open decisions). The latest [session closeout](docs/SESSION_CLOSEOUT_2026-11-16.md)
-  is an early-session snapshot; the tracker owns subsequent progress.
+  opens with the final state of that session; the tracker owns subsequent progress.
 - **Architecture / repository ownership**: [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md).
 - **Community / Pro product boundary**: [`docs/EDITION_BOUNDARY_POLICY.md`](docs/EDITION_BOUNDARY_POLICY.md).
 - **Active 6–12 month roadmap**: [`docs/ROADMAP.md`](docs/ROADMAP.md).

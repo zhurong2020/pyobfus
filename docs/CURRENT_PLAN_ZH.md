@@ -5,8 +5,8 @@
 [路线执行台账](ROADMAP_EXECUTION_2026-11-16.md) 是唯一任务进度账，
 [TODO](TODO.md) 管执行顺序，[维护者动作](MAINTAINER_ACTIONS.md) 管外部账号与等待。
 [ROADMAP](ROADMAP.md) 是活跃的五类、6–12 个月路线图。
-最新[会话收尾](SESSION_CLOSEOUT_2026-11-16.md)与[运维执行记录](EXECUTION_PROGRESS_2026-11-16.md)
-是当天早段快照；其后的路线进度以台账为准，不能据旧交接重开已完成任务。
+最新[会话收尾](SESSION_CLOSEOUT_2026-11-16.md)开头为当日最终状态；[运维执行记录](EXECUTION_PROGRESS_2026-11-16.md)
+是当天早段快照。路线进度以台账为准，不能据旧交接重开已完成任务。
 
 历史逐字节迁至 [CURRENT_PLAN_HISTORY_2026-11-16.md](CURRENT_PLAN_HISTORY_2026-11-16.md)；其中的旧版本、待办和授权不作为当前指令。
 
