@@ -6,12 +6,15 @@
 ## 仓库与验证
 
 - main 基线 `144b6e1`（#239 squash merge）；#240 也已在 main。
-- 本轮分支 `docs/nov16-release-followup`。首个提交 `45e8d08` 收口六份文档，
-  第二个提交独立同步 CITATION 并更新状态；准确 SHA 用 `git log -2 --oneline` 核对。
+- 本轮分支 `docs/nov16-release-followup` 已推送；[草稿 PR #242](https://github.com/zhurong2020/pyobfus/pull/242)。
+  `45e8d08` 收口六份文档，`4c153eb` 独立同步 CITATION 并更新状态。
+  后续状态提交用 `git log --oneline -3` 核对；main 未改变。
 - Core 5152 passed / 56 skipped（正常 HOME）、MCP 167、integration 371 passed /
   10 skipped、runtime 24、基准 8；完整 `scripts/check.sh` 通过，正常 hooks 通过。
   本轮无产品代码变更，无需为后续纯状态文字重复完整 pytest。
-- 下一步核实文档分支的草稿 PR、托管 CI 和工作树；没有维护者合并决定前不合并。
+- PR 托管 CI 结果以 GitHub 检查页为准；会话末结果另保存到 git-ignored
+  `docs/internal/followup_checkpoint_2026-11-16.md`，避免为记录结果反复触发 CI。
+  没有维护者合并决定前不合并。
 
 ## 已完成
 

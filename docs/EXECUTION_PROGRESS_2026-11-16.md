@@ -78,5 +78,7 @@
 - CITATION 独立同步提交：version 0.15.0、date-released 2026-11-15、version DOI
   10.5281/zenodo.24248676；concept DOI 不变。官方 CFF 1.2.0 JSON schema
   (`citation-file-format` 的 1.2.0 tag) 校验通过，并与本轮独立取得的 Zenodo API 比对。
-- 本轮分支 `docs/nov16-release-followup`；提交后准备草稿 PR 和托管 CI，未合并。
+- 本轮分支 `docs/nov16-release-followup` 已推送，CITATION 提交 `4c153eb`；
+  [草稿 PR #242](https://github.com/zhurong2020/pyobfus/pull/242) 已建立，待托管 CI，未合并。
+  检查完成后精确状态保存到 git-ignored `docs/internal/followup_checkpoint_2026-11-16.md`。
 - 客户通知正文已完成私有复核，待维护者审阅；未查询收件人、未发送，未部署 Worker。
