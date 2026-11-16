@@ -11,11 +11,11 @@
 | #237 | Windows x64／CPython 3.12／Nuitka standalone 单格托管验收：第 1 次 run 因运行脚本缺陷停在 D5，经批准修复后第 2 次 D1–D8 pass、D9 unknown、Pro L3 blocked，总体 partial |
 | #238 | Core 0.15.0 发版准备；完整矩阵 47/47；tag `v0.15.0` → `3e76503`，PyPI 带 provenance，3.12／3.15 全新安装通过，GitHub Release 已建。见[发布记录](CORE_0_15_0_RELEASE_2026-11-15.md) |
 
-## 待办（下次会话从这里开始）
+## 当时的接续事项（11-16 已收口，当前入口见本日收尾）
 
 1. ~~**Glama**~~：已完成。Glama 渠道 release **0.14.1**（Glama 自动递增标签，2026-11-15 23:06 北京时间发布）：维护者改 Build steps 为 `uv pip install --system --break-system-packages pyobfus-mcp==0.3.17 pyobfus==0.15.0` 并点「Build & Release」；test `01a1dfbc-345a-79cf-95ba-581e06887151` success／27.9 s，`pinnedCommit: null`（实际 checkout Glama 同步 head `cde07eb`，落后于 main；安装来自 PyPI，不影响结果），uv 装于 /usr 的 Python 3.13.5，安装 Core 0.15.0／MCP 0.3.17／runtime 0.1.1，握手 serverInfo 0.3.17、协议 2025-11-25，`tools/list` 九个工具（七 community + 两 pro_funnel）。
-2. **Zenodo／CITATION**：归档后按 CLAUDE.md 发布流程第 5 步核对 record，再同步 `CITATION.cff`。
-3. **Pro 客户通知（TODO 4a）**：私有草稿 `docs/internal/pro_customer_notice_0_15_0_DRAFT_2026-11-15.md` 待维护者审；审后按 Worker 许可记录核对收件人再发送。
+2. **Zenodo／CITATION**：record `24248676` 已核实，CITATION 已随 #242 合入。
+3. 升级通知义务已完成；详情只存私有 `docs/internal/CUSTOMER_SUPPORT_LOG.md`。
 4. ~~**本 PR（#239）合并**~~：维护者已于 2026-11-16 在 GitHub 网页端 squash
    merge 为 `144b6e1`；main CI、CodeQL 与 IndexNow docs notification 均成功。
 5. ~~**11-16 周检增量**~~：规范 `/zh-cn/` 已收录、已索引且 HTTPS 正常；GSC
