@@ -1,5 +1,7 @@
 # 独立文件目录 mapping 验收与审核
 
+Status 2026-11-16: shipped in Core 0.9.0; this document is historical design and validation evidence.
+
 日期：2026-10-22。状态：已实现，本地验证通过；分支 `feat/adoption-debugging-workflow`，按维护者授权分类提交到工作分支，尚未合并／发布。公开 0.8.0 尚不含此能力。
 
 ## 已验证

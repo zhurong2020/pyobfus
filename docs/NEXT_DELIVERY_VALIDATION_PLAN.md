@@ -1,5 +1,7 @@
 # 下一项交付验证方案：Windows Nuitka standalone
 
+Status 2026-11-16: executed with Core 0.14.0; this document is historical design. [Windows Nuitka acceptance](DELIVERY_REFERENCE_APP_ACCEPTANCE_2026-11-15.md) was partial: D1–D8 passed, D9 unknown; no broader support claim.
+
 准备日期：2026-11-03。状态：单组合验收设计，尚未执行，不新增平台支持承诺。
 默认候选为 Windows x64／CPython 3.12／Nuitka standalone；实际执行仍由真实交付需求触发。
 本方案不修改 0.12.0 候选、不安装工具、不新增每 PR 的远端矩阵。

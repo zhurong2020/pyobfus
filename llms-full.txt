@@ -34,7 +34,7 @@ uvx pyobfus-mcp                  # zero-install alternative for the MCP server (
 pip install --upgrade pyobfus    # upgrade
 ```
 
-Requires Python 3.9–3.15. License: Apache-2.0 for the community tier; the optional Pro tier (`pyobfus_pro/`) is license-gated.
+Core requires Python 3.9–3.15; the MCP server requires Python 3.10–3.15. License: Apache-2.0 for the community tier; the optional Pro tier (`pyobfus_pro/`) is license-gated.
 
 ## CLI — every mode
 

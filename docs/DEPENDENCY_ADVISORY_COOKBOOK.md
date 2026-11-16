@@ -48,19 +48,18 @@ and reports one `dependency_advisory` risk per name that doesn't resolve:
 this network call unless a caller explicitly asks:
 
 ```python
-check_obfuscation_risks(path)  # no dependency lookups — zero egress, matches
-                                # pyobfus-mcp's default of making no outbound
-                                # network calls at all
+check_obfuscation_risks(path)  # offline scan call: no outbound requests
 check_obfuscation_risks(path, verify_dependencies_online=True)  # opts in
 ```
 
 The CLI and the MCP tool intentionally have different defaults: `pyobfus
 --check` is invoked directly by a person who reads `--help`/docs and can see
 `--offline`; `check_obfuscation_risks` is invoked by an AI agent on a host's
-behalf, where pyobfus-mcp otherwise has zero network egress by design (see
-[`MCP_SECURITY_SCAN.md`](MCP_SECURITY_SCAN.md)). Silent default egress on
-that surface would be the wrong default even though the same check is
-useful there too — so it stays opt-in per call instead.
+behalf, so dependency lookup stays opt-in per scan call (see
+[`MCP_SECURITY_SCAN.md`](MCP_SECURITY_SCAN.md)). This offline guarantee applies
+to the scan, not every MCP operation: Pro builds inherit Core entitlement
+verification and may require network access, including mandatory online
+verification for CI environment-key builds. See [network behavior](NETWORK_BEHAVIOR.md).
 
 ## Honest limitations — read this before trusting a clean result
 

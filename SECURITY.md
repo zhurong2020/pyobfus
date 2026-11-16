@@ -2,14 +2,16 @@
 
 ## Supported Versions
 
-We currently support the following versions with security updates:
+Security fixes target the latest released version of each maintained package.
+Upgrade to that release; older release lines do not receive separate backports.
+As of 2026-11-16:
 
 | Package        | Version | Supported          |
 | -------------- | ------- | ------------------ |
-| pyobfus        | 0.5.x   | :white_check_mark: |
-| pyobfus        | < 0.5   | :x:                |
-| pyobfus-mcp    | 0.3.x   | :white_check_mark: |
-| pyobfus-mcp    | < 0.3   | :x:                |
+| pyobfus        | 0.15.0 (latest) | :white_check_mark: |
+| pyobfus        | older releases | :x:                |
+| pyobfus-mcp    | 0.3.17 (latest) | :white_check_mark: |
+| pyobfus-mcp    | older releases | :x:                |
 
 ## Reporting a Vulnerability
 

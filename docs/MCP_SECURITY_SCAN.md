@@ -1,5 +1,7 @@
 # Independent MCP security scan
 
+Status 2026-11-16: dependency lookup shipped in MCP 0.3.8 / Core 0.5.17; this document is historical design and dated eight-tool scan evidence.
+
 Public MCP directories currently host servers of widely varying security
 quality, and as of mid-2026 there is no widely adopted certification or
 vetting system for publicly distributed MCP servers. `pyobfus-mcp-verify`
@@ -106,7 +108,7 @@ grep -rln -i "requests\.\|urlopen\|httpx\|urllib\.request\|aiohttp\|\.get(http" 
   pyobfus_mcp/pyobfus_mcp/*.py pyobfus/core/*.py
 ```
 
-**Update (post-0.3.7, `[Unreleased]`)**: this now returns one match —
+**Update (released in MCP 0.3.8 with Core ≥0.5.17)**: this now returns one match —
 `pyobfus/core/dependency_advisory.py` (`urllib.request.urlopen`), added for
 the dependency-hallucination advisory. `check_obfuscation_risks` reaches it
 transitively (via `PreflightChecker`), which is why the grep scope above now
@@ -122,8 +124,9 @@ into the *path*, not the host, and it's percent-encoded
 a host, so no caller can redirect the request anywhere but `pypi.org`. It's
 also off by default: `check_obfuscation_risks` only makes this call when a
 caller explicitly passes `verify_dependencies_online=True` — the MCP
-surface's default egress remains zero. This is a point-in-time grep against
-the current source, not a standing guarantee — re-check it (and re-confirm
+scan call's default egress remains zero. Pro build calls separately inherit
+Core licence verification; see [network behavior](NETWORK_BEHAVIOR.md). This is a
+point-in-time grep against the source at that update, not a standing guarantee — re-check it (and re-confirm
 the "hardcoded host, no URL/host parameter" property still holds) after any
 release that touches this code path.
 

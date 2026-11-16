@@ -4,9 +4,9 @@
 项目基线：Core 0.14.0 / MCP 0.3.17 / runtime 0.1.1 / VS Code 0.4.3 /
 Action v1.1.0；生产 Worker `209eb969`（回滚 `13aaa4a8`）。
 
-本次从 [当前计划](CURRENT_PLAN_ZH.md)、[TODO](TODO.md)、
-[2026-10-30 路线复核](ROADMAP_REVIEW_2026-10-30.md)、
-[2026-10-28 功能扩展复核](FEATURE_EXPANSION_RESEARCH_2026-10-28.md)和
+本次从 [当前计划](https://github.com/zhurong2020/pyobfus/blob/main/docs/CURRENT_PLAN_ZH.md)、[TODO](https://github.com/zhurong2020/pyobfus/blob/main/docs/TODO.md)、
+[2026-10-30 路线复核](https://github.com/zhurong2020/pyobfus/blob/main/docs/ROADMAP_REVIEW_2026-10-30.md)、
+[2026-10-28 功能扩展复核](https://github.com/zhurong2020/pyobfus/blob/main/docs/FEATURE_EXPANSION_RESEARCH_2026-10-28.md)和
 [比较范围政策](COMPARISON.md)出发，重新核对主要竞品的官方文档、官网与 PyPI
 公开元数据。没有购买竞品、运行同配置保护强度或性能基准，也没有新增客户访谈；
 厂商的保护强度、逆向成本和市场效果描述均视为厂商声明，不作为本项目实测结论。

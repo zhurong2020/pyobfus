@@ -47,7 +47,7 @@ functions, reads attributes and builds tracebacks by name at runtime. Those
 names end up as string data inside the compiled module, and stripping the
 native symbol table does not remove them.
 
-We measured this on the [`examples/compiled_packaging/`](../examples/compiled_packaging)
+We measured this on the [`examples/compiled_packaging/`](https://github.com/zhurong2020/pyobfus/tree/main/examples/compiled_packaging)
 module on 2026-10-07 (Linux x86_64, CPython 3.12.3, pyobfus 0.5.30 from PyPI,
 Cython 3.3.0, Nuitka 4.2.2 `--module`). The numbers count matching lines in
 `strings` output for the compiled `.so`:

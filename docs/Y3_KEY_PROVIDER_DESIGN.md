@@ -1,5 +1,7 @@
 # Runtime key-provider hook design (Y-3)
 
+Status 2026-11-16: shipped in Core 0.5.30, with runtime 0.1.1 required since Core 0.7.0; this document is historical design.
+
 Status: builder side released in Core 0.5.30. The runtime functions it emits
 (`provided_key`, `set_key_provider`) were not in the published runtime 0.1.0,
 so artifacts need `pyobfus-runtime` 0.1.1, prepared to ship with Core 0.7.0.

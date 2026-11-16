@@ -84,9 +84,11 @@ Stripe Checkout ↔ the commission ledger.
 ## Out of scope / non-goals
 
 - **Cryptographic protection of source.** pyobfus is obfuscation, not a code
-  vault. If irrecoverability is the requirement, a compiled or VM-based tool
-  (e.g. PyArmor's VMC/ECC, Nuitka) is the right layer — see
-  [`compare/pyarmor.md`](compare/pyarmor.md).
+  vault. Compilation or VM-based protection can raise reverse-engineering
+  cost, but client-side execution cannot guarantee irrecoverability. If code
+  must remain unavailable to recipients, keep it behind a server-side boundary.
+  See the [protection FAQ](guides/protect-python-code-faq.md) and
+  [PyArmor comparison](compare/pyarmor.md).
 - **Client-side license enforcement as a security boundary.** See Assumptions.
 - **Protecting the host that runs obfuscated code.** Not a sandbox.
 - **Vulnerabilities in the user's own dependencies.** Reported upstream, per

@@ -41,7 +41,7 @@ is the obfuscated form, not your originals.
 ## Multi-module projects
 
 Obfuscate the whole project directory before pointing the import hook at the
-entry script — write a project-level [`pyobfus.yaml`](https://github.com/zhurong2020/pyobfus/blob/main/pyobfus.yaml) and
+entry script — write a project-level [`pyobfus.yaml.example`](https://github.com/zhurong2020/pyobfus/blob/main/pyobfus.yaml.example) and
 run:
 
 ```bash
@@ -65,5 +65,5 @@ one module on top of this pipeline is a reasonable escalation. See
 
 A runnable end-to-end reproduction (using a stdlib custom import hook, no
 paid dependency required) is in
-[`examples/import_hook/`](../examples/import_hook). That example was run
+[`examples/import_hook/`](https://github.com/zhurong2020/pyobfus/tree/main/examples/import_hook). That example was run
 end-to-end (not just described) to produce this page.

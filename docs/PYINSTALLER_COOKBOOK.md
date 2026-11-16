@@ -4,9 +4,10 @@ Teams that want to ship a **single-file executable** protecting their
 Python source usually look at Nuitka Commercial (~$270/year, compiles to
 native code) or Sourcedefender. pyobfus takes a different, cheaper path to
 the same delivery format: obfuscate the source first, then let
-[PyInstaller](https://pyinstaller.org/) — free, MIT-licensed, and already
-the most widely used Python bundler — freeze the *obfuscated* code into a
-single binary.
+[PyInstaller](https://pyinstaller.org/) freeze the *obfuscated* code into a
+single binary. PyInstaller uses **GPL-2.0-or-later with a bootloader/bundling
+exception permitting distribution of non-free programs**; see its
+[official licence](https://pyinstaller.org/en/stable/license.html).
 
 pyobfus and PyInstaller solve different problems and compose rather than
 compete: pyobfus renames identifiers and (on Pro) encrypts strings;
@@ -17,10 +18,11 @@ executable. Neither replaces the other.
 
 Not by itself. PyInstaller is a packaging tool: it puts your compiled bytecode
 and a Python interpreter into one executable so the customer does not need
-Python installed. Public tools such as `pyinstxtractor` unpack that archive,
-and decompilers turn the bytecode back into readable Python with your
-original function, class and variable names. PyInstaller 6.0 also removed the
-old `--key` bytecode-encryption option, which was easy to undo anyway.
+Python installed. Public tools such as `pyinstxtractor` can extract archive
+members. Extracted bytecode retains Python-visible names and can be inspected
+or disassembled; reconstructing readable Python with a decompiler depends on
+the bytecode version and the decompiler's coverage. PyInstaller 6.0 also removed
+the old `--key` bytecode-encryption option, which was easy to undo anyway.
 
 If you want the unpacked code to be harder to read, obfuscate it before you
 bundle it. That is the workflow below. Keep secrets such as API keys out of
@@ -53,13 +55,15 @@ produce this page.
 ## Why obfuscate before bundling, not after
 
 PyInstaller's `--onefile` output already looks opaque to a casual user (it's
-a compressed self-extracting binary), but the *Python bytecode* inside is
-trivially recoverable with public tools (`pyinstxtractor` + `uncompyle6` /
-`decompyle3` are the standard combination) — PyInstaller was never designed
-as a protection mechanism, only a distribution one. Running pyobfus first
-means whatever a determined recipient extracts back out is the
-already-obfuscated `.py`/bytecode, with mangled identifiers, not your
-original source.
+a compressed self-extracting binary), but archive extraction is separate
+from bytecode decompilation. The documented bytecode coverage of
+[`uncompyle6`](https://github.com/rocky/python-uncompyle6) and
+[`decompyle3`](https://github.com/rocky/python-decompile3) targets older versions;
+do not assume either reconstructs source for the full Python 3.9–3.15 range.
+Extraction and disassembly can still expose names and behavior when source
+reconstruction is unsupported. PyInstaller is a distribution tool. Running
+pyobfus first means the extracted code is already obfuscated, subject to the
+preserved names and protection settings you chose.
 
 ## Multi-module projects
 

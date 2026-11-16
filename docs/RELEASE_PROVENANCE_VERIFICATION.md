@@ -59,7 +59,15 @@ pypi-attestations verify pypi \
 Repeat for each wheel/sdist you intend to trust or mirror. Do not verify only
 one file and assume the whole release is covered.
 
-## Latest Verified Snapshot — 2026-11-04
+## Newer release records — status 2026-11-16
+
+Core 0.15.0 is current. See the [0.15.0 release evidence](https://github.com/zhurong2020/pyobfus/blob/main/docs/CORE_0_15_0_RELEASE_2026-11-15.md)
+and [0.14.0 release evidence](https://github.com/zhurong2020/pyobfus/blob/main/docs/CORE_0_14_0_RELEASE_2026-11-11.md)
+for their recorded validation. These are pointers to existing records; this
+documentation update performed no new network or cryptographic verification.
+The exact 0.12.0 artifact hashes below remain dated historical evidence.
+
+## Historical verified snapshot — 2026-11-04
 
 Core 0.12.0 wheel and sdist passed repository-bound cryptographic verification
 with `pypi-attestations verify pypi --repository`. Downloaded hashes match PyPI

@@ -25,11 +25,12 @@ with configuration or a thin wrapper when these interfaces fit your task.
 
 [简体中文概览](https://github.com/zhurong2020/pyobfus/blob/main/README.zh-CN.md)
 
-> **New in 0.11.0:** `--check-delivery` adds bounded `.pyc` origin evidence and warns about uninspected frozen payloads. Cross-file package-root imports now receive more accurate module-attribute diagnostics, with optional conservative name preservation. See the [delivery diagnostic limits](https://github.com/zhurong2020/pyobfus/blob/main/docs/P2_DELIVERY_DIAGNOSTICS_2026-10-28.md) and [compatibility record](https://github.com/zhurong2020/pyobfus/blob/main/docs/P0_MODULE_ATTRIBUTE_COMPAT_2026-10-28.md).
-
-> **New in 0.10.0:** Opt-in Pro `--crossfile-opacity` adds a restricted multi-module L3 preview with application-provided keys and name-only traceback restoration. See the [configuration guide](OPACITY_CONFIG.md#cross-file-l3-preview-since-0100) and [validation and limits](CROSSFILE_OPACITY_VALIDATION.md).
-
-> **New in 0.9.0: `--unmap` for independent directory builds (`--no-cross-file`).** See the [debugging guide](guides/debug-obfuscated-python.md).
+> **New in 0.15.0:** `--check-delivery` inspects PyInstaller executables' top-level
+> members; embedded bytecode remains explicitly unchecked. Python 3.15 runtime
+> `.pyc` files avoid false unknown-origin warnings, and CI clients trust a standby
+> issuer key ahead of a future planned rotation.
+>
+> Earlier releases: see the [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
 
 ## Start here
 
@@ -110,7 +111,11 @@ After purchase, follow the [license activation guide](LICENSE_ACTIVATION_GUIDE.m
 - **GitHub Actions:** `uses: zhurong2020/pyobfus-action@v1` for scanning or builds with SARIF.
 - **AI agents:** install `pyobfus-mcp`, or use the repository's review/protect skills.
 - **Editors:** use the VS Code Marketplace or Open VSX extension for diagnostics and traceback reversal.
-- **Automation:** every CLI mode supports a stable JSON envelope with an `ai_hint` next action.
+- **Automation:** `--json` returns the structured result envelope with `ai_hint` for builds,
+  dry-runs, `--check`, `--unmap`, `--check-delivery`, `--init`,
+  `--validate-config` and `--verify-provenance-manifest`. Utilities
+  `--list-presets`, `--init-config`, `--upgrade`, `--help` and `--version`
+  print text instead; argument/usage errors can also be plain text.
 
 See the [project structure](PROJECT_STRUCTURE.md) for package and repository
 ownership, including the separately distributable `pyobfus-runtime` required by

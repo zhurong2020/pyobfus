@@ -1,5 +1,7 @@
 # P0：包根目录的模块属性兼容性（2026-10-28）
 
+Status 2026-11-16: shipped in Core 0.11.0; this document is historical design. See the [changelog](https://github.com/zhurong2020/pyobfus/blob/main/CHANGELOG.md).
+
 状态：[PR #154](https://github.com/zhurong2020/pyobfus/pull/154) 已合并，47 项检查成功、2 项按配置跳过；尚未发布新 Core 版本。此记录描述 Core 0.10.0 之后的代码改动，不是公开 0.10.0 的能力。
 
 ## 复现与原因

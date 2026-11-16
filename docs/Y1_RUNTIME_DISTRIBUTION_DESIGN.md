@@ -1,5 +1,7 @@
 # Redistributable Pro runtime design
 
+Status 2026-11-16: shipped in runtime 0.1.1 / Core 0.7.0 (initial runtime 0.1.0 / Core 0.5.29); this document is historical design.
+
 Status: `pyobfus-runtime` 0.1.0 published 2026-09-24 and adopted by Core 0.5.29.
 Y-2/Y-3 (Core 0.5.30) added runtime calls after that release, so their
 artifacts need runtime 0.1.1, prepared on `main` 2026-10-12 to ship with Core

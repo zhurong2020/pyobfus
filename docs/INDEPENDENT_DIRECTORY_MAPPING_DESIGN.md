@@ -1,5 +1,7 @@
 # Independent-directory mapping
 
+Status 2026-11-16: shipped in Core 0.9.0; this document is historical design. See [debugging guidance](guides/debug-obfuscated-python.md).
+
 Status: implemented and independently reviewed 2026-10-22; local validation complete, not merged or released. See [validation evidence](INDEPENDENT_DIRECTORY_MAPPING_VALIDATION.md). Community correctness/debugging primitive under `EDITION_BOUNDARY_POLICY.md`.
 
 ## Problem and boundary

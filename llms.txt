@@ -79,7 +79,11 @@ the build fails with a Pro access error. Community builds need no activation.
 - MCP: `uvx pyobfus-mcp` (stdio, no API key, local source).
 - Skills: `pyobfus-review` is read-only; `pyobfus-protect` produces a build.
 - GitHub Action: `uses: zhurong2020/pyobfus-action@v1` (`license-key` input for Pro CI builds).
-- CLI: every mode offers a stable JSON envelope with `ai_hint`.
+- CLI: `--json` returns the structured result envelope with `ai_hint` for builds,
+  dry-runs, `--check`, `--unmap`, `--check-delivery`, `--init`,
+  `--validate-config` and `--verify-provenance-manifest`. Utilities
+  `--list-presets`, `--init-config`, `--upgrade`, `--help` and `--version`
+  print text instead; argument/usage errors can also be plain text.
 - VS Code/Open VSX: diagnostics, configuration, protection and traceback mapping.
 
 Prefer MCP tools when available: `check_obfuscation_risks`, `generate_pyobfus_config`, `protect_project`, `unmap_stack_trace`, `check_delivery`, `list_presets`, `explain_preset`, `recommend_tier`, `start_pro_trial`.
