@@ -165,6 +165,11 @@ def test_manifest():
 
 @pytest.fixture
 def maintainer_hook(tmp_path, monkeypatch):
+    # The maintainer hook runs in the maintainer's Linux/WSL checkout. It uses
+    # bash 4 builtins (mapfile), which macOS's stock bash 3.2 lacks, and its
+    # Git-for-Windows execution differs; exercise it where it actually runs.
+    if not sys.platform.startswith("linux"):
+        pytest.skip("maintainer pre-commit hook is exercised on Linux only")
     """Run the real shell hook with read-only Git calls over synthetic blobs.
 
     The shim supplies index reads without creating a repository or staging files;
