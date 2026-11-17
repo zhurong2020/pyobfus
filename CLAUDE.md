@@ -10,7 +10,7 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 **当前入口**：[路线执行台账](docs/ROADMAP_EXECUTION_2026-11-16.md) →
 [TODO](docs/TODO.md)（下一项顺序）→ [当前计划](docs/CURRENT_PLAN_ZH.md)（运维事实与开放决定）。
-最新[会话收尾](docs/SESSION_CLOSEOUT_2026-11-16.md)是当天早段快照，后续进度以台账为准。
+最新[会话收尾](docs/SESSION_CLOSEOUT_2026-11-16.md)开头为当日最终状态（Worker `39d425d7` 已部署，#252 待审），后续进度以台账为准。
 [ROADMAP](docs/ROADMAP.md) 是活跃的 6–12 个月路线图；旧交接见
 [CLAUDE 历史](docs/CLAUDE_MD_HISTORY.md)，不作为当前指令。
 
