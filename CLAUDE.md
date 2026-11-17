@@ -1,5 +1,8 @@
 # pyobfus 开发约定
 
+最新接续：[2026-11-17 会话收尾](docs/SESSION_CLOSEOUT_2026-11-17.md)；#257 已合并，#258 已推送待 CI／审阅合并。
+
+
 Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 > 通用 agent 约定(build/test/lint、仓库结构、专利 gate 等)见根目录 [`AGENTS.md`](AGENTS.md)(规范源,工具无关)。本文件保留 Claude / 中文 / 专利申报相关的项目专属细节。

@@ -100,4 +100,5 @@ ROADMAP Delivery 表的 Community 候选；**11-16 维护者批准实施**（任
   43 passed（临时构建于 `/tmp`，未修改系统 bash）。
 - 独立测试根：Core 5200 passed / 56 skipped；MCP 167 passed；CLI 集成
   378 passed / 10 skipped；runtime 与基准测试通过。全部使用正常 HOME。
-- 状态：实现与本地验证完成，准备提交 PR；合并待维护者批准。未发版、未部署。
+- 状态：实现提交 `172a573` 已推送，[PR #258](https://github.com/zhurong2020/pyobfus/pull/258)
+  开放，托管 CI 待最终结果；合并待维护者批准。未发版、未部署。
