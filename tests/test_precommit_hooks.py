@@ -165,11 +165,6 @@ def test_manifest():
 
 @pytest.fixture
 def maintainer_hook(tmp_path, monkeypatch):
-    # The maintainer hook runs in the maintainer's Linux/WSL checkout. It uses
-    # bash 4 builtins (mapfile), which macOS's stock bash 3.2 lacks, and its
-    # Git-for-Windows execution differs; exercise it where it actually runs.
-    if not sys.platform.startswith("linux"):
-        pytest.skip("maintainer pre-commit hook is exercised on Linux only")
     """Run the real shell hook with read-only Git calls over synthetic blobs.
 
     The shim supplies index reads without creating a repository or staging files;
@@ -177,8 +172,13 @@ def maintainer_hook(tmp_path, monkeypatch):
     """
     import shutil
 
+    # macOS exercises the stock bash 3.2; Git-for-Windows needs a separate shim.
+    if sys.platform == "win32":
+        pytest.skip("maintainer hook shim requires POSIX executable scripts")
+
     git = shutil.which("git")
-    if not git or not shutil.which("bash"):
+    bash = "/bin/bash" if sys.platform == "darwin" else shutil.which("bash")
+    if not git or not bash:
         pytest.skip("Maintainer hooks require Git and Bash")
     for key in (
         "PYOBFUS_ALLOW_PII",
@@ -209,7 +209,7 @@ def maintainer_hook(tmp_path, monkeypatch):
         "if args == ['rev-parse', '--git-common-dir']:\n"
         "    print(os.environ['HOOK_COMMON_DIR'])\n"
         "elif args[:3] == ['diff', '--cached', '--name-only']:\n"
-        "    print('\\n'.join(files))\n"
+        "    sys.stdout.write('\\n'.join(files) + ('\\n' if files else ''))\n"
         "elif args[:2] == ['grep', '--cached']:\n"
         "    git = os.environ['HOOK_REAL_GIT']\n"
         "    os.execv(git, [git, 'grep', '--no-index', *args[2:]])\n"
@@ -232,7 +232,7 @@ def maintainer_hook(tmp_path, monkeypatch):
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(content)
         return subprocess.run(
-            ["bash", str(ROOT / ".githooks/pre-commit")],
+            [bash, str(ROOT / ".githooks/pre-commit")],
             cwd=worktree,
             env={**os.environ, "HOOK_STAGED_FILES": json.dumps(list(files)), **env},
             capture_output=True,
@@ -331,3 +331,11 @@ def test_maintainer_other_scans_independent(maintainer_hook, pii_state, kind):
     bypass = "PYOBFUS_ALLOW_SECRET" if kind == "credential" else "PYOBFUS_ALLOW_CUSTOMER_DATA"
     result = run({"notes.md": content + "\n"}, **env, **{bypass: "1"})
     assert result.returncode == 0
+
+
+@pytest.mark.parametrize("files", [{}, {"notes with spaces.md": "clean content\n"}])
+def test_maintainer_hook_clean_or_empty_index(maintainer_hook, files):
+    run, _ = maintainer_hook
+    result = run(files)
+    assert result.returncode == 0
+    assert result.stdout == result.stderr == ""
