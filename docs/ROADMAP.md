@@ -32,6 +32,21 @@ Community; stronger protection and distribution control belong in Pro.
 - The same [release](CORE_0_15_0_RELEASE_2026-11-15.md) pre-distributed standby
   issuer public key `ci-2026-11b`; the Worker still signs with `ci-2026-11`.
 
+## Done in the 2026-11-16 cycle (unreleased unless noted)
+
+- Directory `--check-delivery` scans now inspect PyInstaller executables inside
+  an onedir output (T3b, #247), with the reference app covering PyInstaller
+  onedir/onefile (T3, #244).
+- Pro stage C frozen delivery accepted with an isolated local trial (T5, #248);
+  frozen L3 directories now report `delivery.l3_unverified_frozen` instead of a
+  false high mismatch.
+- Pro purchase path copy published (T7, #250); documentation audit fixes
+  merged (T8, #251/#253/#254); maintainer pre-commit hooks run on Bash 3.2 (#258).
+- Licence Worker data retention (#255) deployed as Worker version `39d425d7`;
+  the matching privacy-policy update (#252) follows a customer notice.
+- Weekly check 2026-11-19: no demand trigger met (no `delivery-blocker` issue,
+  no blocked-delivery support request).
+
 ## Next 6–12 months
 
 These are evidence-driven candidates, not release commitments. T IDs refer to
@@ -78,7 +93,8 @@ mid-December 2026. Acceptance/stop criteria below bound any later approved work.
 | COMPARISON refresh (T2) | Community / Pro | 11-15 review; recheck changeable facts before publication | Dated official version/price sources, PyLocket coverage and honest strengths/limits under the comparison policy | Unverifiable claim; no Core release for docs | Merged 2026-11-16 via #246 (`6a0aeef`); key facts rechecked that day |
 | Demand intake and thresholds (T4) | Community / Pro | [Delivery-blocker/frozen-format issue template](../.github/ISSUE_TEMPLATE/delivery_blocker.md) and reference-app feedback | Three signals and explicit [demand triggers](#demand-triggers) referenced by the corresponding table rows | No trigger met; demand-gated work stays unscheduled | Intake and thresholds defined; review weekly |
 | Search / AI visibility (T6) | Community / Pro | December first-week observation; Core 0.12.0 T+30d around 12-04 | Comparable search/AI observations; later per-version observations join weekly review | Missing data stays unknown; release spikes are not growth | Scheduled 2026-12-01–05 |
-| Pro purchase path (T7) | Pro | Explain self-managed, verifiable delivery using reference-app evidence | Buyer can understand protection, private debugging, key ownership and delivery-check limits | Unsupported protection claims or hosted commerce expansion | Scope proposal pending maintainer review (T7); see execution tracker |
+| Pro purchase path (T7) | Pro | Explain self-managed, verifiable delivery using reference-app evidence | Buyer can understand protection, private debugging, key ownership and delivery-check limits | Unsupported protection claims or hosted commerce expansion | Done 2026-11-16: #250 merged (`b250c1e`); landing page verified live |
+| Own domain for the product site | Community / Pro | Decide after T6: start only if search/AI observations show users cannot find the official site or confuse it with another product | Custom domain via Cloudflare DNS in front of the existing GitHub Pages site; 301 from the old URL; sitemap, IndexNow and Search Console re-verified; ReadTheDocs stays the documentation host | No T6 evidence; any plan needing a self-hosted server, shared personal/medical hosts, hosted downloads or a store | Not started; no self-hosted site (decided 2026-11-19) |
 
 ## Demand triggers
 
@@ -125,6 +141,8 @@ next quarterly roadmap review decides whether to drop it.
 
 - Native VM/VMC/BCC or a new compiler backend.
 - Cloud obfuscation service, store, automatic updates or hosted downloads.
+- A self-hosted product website on shared personal servers; public pages stay
+  on GitHub Pages and ReadTheDocs, the licence endpoint on Cloudflare Workers.
 - Anti-VM, AV bypass or strong anti-debug races.
 - `--output-pyc` beyond a bounded feasibility spike.
 - AI-generated transformers as a roadmap priority.

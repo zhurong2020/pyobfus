@@ -32,7 +32,7 @@ Nuitka 验收结果为 partial（D9 unknown、Pro 阶段 C blocked），见
 | T5 | Pro 阶段 C：补 L3 冻结交付验证（改用纯本地试用，未签发许可） | 11-16 | ✅ 完成（未发版） | 不碰真实密钥；隔离 HOME；缺失／错误密钥失败关闭 | [#248](https://github.com/zhurong2020/pyobfus/pull/248) 已合并 `39503ac`：onefile／onedir 通过；发现并修复冻结目录误报 `l3_build_mismatch` → medium `l3_unverified_frozen`；packaging lane 改为普通安装 runtime |
 | T6 | 12 月第一周搜索／AI 可见性；约 12-04 Core 0.12.0 T+30d（之后逐版本观察并入周检） | 12-01～05 | ⏳ 定时 | — | — |
 | T7 | 以“自管、可验证交付”整理 Pro 购买路径 | 11-16 | ✅ 完成 | 每条主张有可复现证据；不改价格／条款；落地页合并即上线，合并前维护者审最终文案 | [#250](https://github.com/zhurong2020/pyobfus/pull/250) 已合并 `b250c1e`：维护者审定文案（更积极、四类能力全站统一、入口句精简）；中英文落地页线上已核 |
-| T8 | pyobfus 及相关项目文档审计（多个版本后的一致性复核） | 11-16 | 🔍 审计完成，修复 PR 待合并 | 见下方 T8 方案 | 约 96 条发现；修复：#251 隐私、#253 用户文档、#254 内部入口、Action #5、workspace-meta `0346b80`；法律草稿 #252 与 Worker 数据保留 #255 见下方隐私政策更新安排 |
+| T8 | pyobfus 及相关项目文档审计（多个版本后的一致性复核） | 11-16 | ✅ 完成（#252 待通知后合并） | 见下方 T8 方案 | 约 96 条发现；修复：#251 隐私、#253 用户文档、#254 内部入口、Action #5、workspace-meta `0346b80`；法律草稿 #252 与 Worker 数据保留 #255 见下方隐私政策更新安排 |
 
 ## 隐私政策更新安排（2026-11-16 维护者决定）
 
@@ -100,5 +100,18 @@ ROADMAP Delivery 表的 Community 候选；**11-16 维护者批准实施**（任
   43 passed（临时构建于 `/tmp`，未修改系统 bash）。
 - 独立测试根：Core 5200 passed / 56 skipped；MCP 167 passed；CLI 集成
   378 passed / 10 skipped；runtime 与基准测试通过。全部使用正常 HOME。
-- 状态：实现提交 `172a573` 已推送，[PR #258](https://github.com/zhurong2020/pyobfus/pull/258)
-  开放，托管 CI 待最终结果；合并待维护者批准。未发版、未部署。
+- 状态：[PR #258](https://github.com/zhurong2020/pyobfus/pull/258) 托管 CI 42 项全部通过，
+  11-19 维护者批准后 squash 合并为 `a125825`。未发版、未部署。
+
+## 周检记录（2026-11-19）
+
+- 下载（`scripts/download_snapshot.py --days 14`，数据至 11-18）：Core 近 7 天 784、
+  安静日中位数 46；30 天 4180、安静日中位数 59。11-15 发版日 304、次日 218 为尖峰，不计增长。
+  MCP 近 7 天 65、中位数 4；runtime 数量主要来自本仓 CI，不作采用指标。
+  Marketplace installs 19，Open VSX 894，Action 归因 0；GitHub 14 天访问 263／独立 160。
+- 邮件（11-16 起）：未发现等待回复的客户来信。Glama 通知为 pyobfus-mcp 渠道 0.15.0
+  构建成功／发布与临时托管实例到期；其余为已处理 PR 的 CI 通知。通知后续只记私有支持日志。
+- 需求触发：无 `delivery-blocker` issue、无交付受阻支持请求，ROADMAP 需求门控项均未触发。
+- 产品网站（维护者 11-19 按最佳实践决定）：不在 arong-vps／openclaw 自建；继续 GitHub Pages
+  ＋ ReadTheDocs ＋ Cloudflare Worker。T6 后再判断是否启用独立域名（Cloudflare 指向现有 Pages，
+  旧地址 301），条件与验收见 ROADMAP「Distribution」表。

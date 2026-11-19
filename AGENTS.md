@@ -1,6 +1,6 @@
 # AGENTS.md — pyobfus
 
-最新接续：[2026-11-17 会话收尾](docs/SESSION_CLOSEOUT_2026-11-17.md)；#257 已合并，#258 已推送待 CI／审阅合并。
+最新接续：[2026-11-17 会话收尾](docs/SESSION_CLOSEOUT_2026-11-17.md)；#257、#258 已合并（#258 `a125825`，11-19）；下一步 11-23 首次清扫验收与 #252。
 
 
 Canonical, tool-agnostic guide for AI coding agents (and humans) working **on**
