@@ -55,7 +55,9 @@ if [[ "${PYOBFUS_ALLOW_PII:-0}" != "1" ]]; then
     fi
     pii_patterns=()
     if [[ -f "$pii_patterns_file" ]]; then
-        mapfile -t pii_patterns < <(sed '/^[[:space:]]*#/d; /^[[:space:]]*$/d' "$pii_patterns_file")
+        while IFS= read -r pattern || [[ -n "$pattern" ]]; do
+            pii_patterns+=("$pattern")
+        done < <(sed '/^[[:space:]]*#/d; /^[[:space:]]*$/d' "$pii_patterns_file")
     fi
     if (( ${#pii_patterns[@]} == 0 )); then
         printf '%s\n' 'NOTICE: PII scan inactive; create docs/internal/pii-patterns.txt in the main checkout (one extended regex per line), or set PYOBFUS_PII_PATTERNS_FILE.' >&2
@@ -65,7 +67,10 @@ if [[ "${PYOBFUS_ALLOW_PII:-0}" != "1" ]]; then
         for pattern in "${pii_patterns[@]}"; do
             pii_pattern_args+=(-e "$pattern")
         done
-        mapfile -t pii_staged < <(staged_files '^$')
+        pii_staged=()
+        while IFS= read -r staged_file; do
+            pii_staged+=("$staged_file")
+        done < <(staged_files '^$')
         locs=""
         if (( ${#pii_staged[@]} > 0 )); then
             locs=$(git grep --cached -nE "${pii_pattern_args[@]}" -- "${pii_staged[@]}" 2>/dev/null \
@@ -98,7 +103,10 @@ fi
 
 # ------------------------------------------------------------ secret scan
 if [[ "${PYOBFUS_ALLOW_SECRET:-0}" != "1" ]]; then
-    mapfile -t sec_staged < <(staged_files "$SECRET_ALLOWLIST_RE")
+    sec_staged=()
+    while IFS= read -r staged_file; do
+        sec_staged+=("$staged_file")
+    done < <(staged_files "$SECRET_ALLOWLIST_RE")
     if (( ${#sec_staged[@]} > 0 )); then
         # Location only — never echo the matched line, or the banner itself
         # would print the credential into the terminal and the shell history.
@@ -142,7 +150,10 @@ CUSTOMER_ALLOWLIST_RE='\.githooks/.*|docs/V0\.4_EXECUTION_LOG\.md'
 if [[ "${PYOBFUS_ALLOW_CUSTOMER_DATA:-0}" != "1" ]]; then
     # shellcheck source=customer-data-patterns.sh
     source "$(dirname "$0")/customer-data-patterns.sh"
-    mapfile -t cust_staged < <(staged_files "$CUSTOMER_ALLOWLIST_RE")
+    cust_staged=()
+    while IFS= read -r staged_file; do
+        cust_staged+=("$staged_file")
+    done < <(staged_files "$CUSTOMER_ALLOWLIST_RE")
     if (( ${#cust_staged[@]} > 0 )); then
         locs=$(git diff --cached -U0 --no-color --no-ext-diff -- "${cust_staged[@]}" \
                  | awk '/^\+\+\+ b\//{f=substr($0,7);next}

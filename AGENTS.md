@@ -1,5 +1,8 @@
 # AGENTS.md — pyobfus
 
+最新接续：[2026-11-17 会话收尾](docs/SESSION_CLOSEOUT_2026-11-17.md)；#257 已合并，#258 已推送待 CI／审阅合并。
+
+
 Canonical, tool-agnostic guide for AI coding agents (and humans) working **on**
 the pyobfus codebase. Tool-specific files defer here: `CLAUDE.md` imports this
 file; Cursor / Windsurf / Aider / Codex read `AGENTS.md` natively.

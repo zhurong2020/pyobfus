@@ -90,3 +90,15 @@ ROADMAP Delivery 表的 Community 候选；**11-16 维护者批准实施**（任
   Marketplace installs 18，Open VSX 886，Action 归因 0。
 - 邮件：未发现等待回复的客户来信；Glama 通知为渠道 0.14.1 构建／发布与临时托管实例到期
   提醒（与渠道 release 分开判断）。通知后续只记私有支持日志。
+
+## T8 钩子兼容后续（2026-11-17）
+
+- 分支 `fix/hooks-bash32`：四处 `mapfile` 改为保留空白和反斜线的读取循环；
+  macOS 钩子测试明确使用 `/bin/bash`，Windows 仍跳过 POSIX shim。
+- 已补空索引／干净内容回归，并修正测试 shim 对空索引的模拟；专项 43 passed。
+- 验证：`scripts/check.sh` 通过；真实 GNU bash 3.2.57 与系统 bash 的专项测试均
+  43 passed（临时构建于 `/tmp`，未修改系统 bash）。
+- 独立测试根：Core 5200 passed / 56 skipped；MCP 167 passed；CLI 集成
+  378 passed / 10 skipped；runtime 与基准测试通过。全部使用正常 HOME。
+- 状态：实现提交 `172a573` 已推送，[PR #258](https://github.com/zhurong2020/pyobfus/pull/258)
+  开放，托管 CI 待最终结果；合并待维护者批准。未发版、未部署。
