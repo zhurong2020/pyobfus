@@ -100,5 +100,14 @@ ROADMAP Delivery 表的 Community 候选；**11-16 维护者批准实施**（任
   43 passed（临时构建于 `/tmp`，未修改系统 bash）。
 - 独立测试根：Core 5200 passed / 56 skipped；MCP 167 passed；CLI 集成
   378 passed / 10 skipped；runtime 与基准测试通过。全部使用正常 HOME。
-- 状态：实现提交 `172a573` 已推送，[PR #258](https://github.com/zhurong2020/pyobfus/pull/258)
-  开放，托管 CI 待最终结果；合并待维护者批准。未发版、未部署。
+- 状态：[PR #258](https://github.com/zhurong2020/pyobfus/pull/258) 托管 CI 42 项全部通过，
+  11-19 维护者批准后 squash 合并为 `a125825`。未发版、未部署。
+
+## 周检记录（2026-11-19）
+
+- 下载（`scripts/download_snapshot.py --days 14`，数据至 11-18）：Core 近 7 天 784、
+  安静日中位数 46；30 天 4180、安静日中位数 59。11-15 发版日 304、次日 218 为尖峰，不计增长。
+  MCP 近 7 天 65、中位数 4；runtime 数量主要来自本仓 CI，不作采用指标。
+  Marketplace installs 19，Open VSX 894，Action 归因 0；GitHub 14 天访问 263／独立 160。
+- 邮件（11-16 起）：未发现等待回复的客户来信。Glama 通知为 pyobfus-mcp 渠道 0.15.0
+  构建成功／发布与临时托管实例到期；其余为已处理 PR 的 CI 通知。通知后续只记私有支持日志。
