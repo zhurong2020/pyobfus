@@ -4,8 +4,8 @@
 
 **当前入口**：[路线执行台账](ROADMAP_EXECUTION_2026-11-16.md) →
 [当前计划](CURRENT_PLAN_ZH.md) → [竞品与路线复核](COMPETITIVE_ROADMAP_RESEARCH_2026-11-15.md)。
-最新[会话收尾](SESSION_CLOSEOUT_2026-11-16.md)和[执行进度](EXECUTION_PROGRESS_2026-11-16.md)
-是当天早段运维快照，后续 T1–T5/T3b 进度以台账为准。
+最新[会话收尾](SESSION_CLOSEOUT_2026-11-19.md)；更早的会话收尾与执行进度是当时快照，
+任务进度以台账为准。
 未来 6–12 个月的五类候选、需求门槛及停止条件见 [ROADMAP](ROADMAP.md)；
 实施、发布、Worker 部署和许可签发分别需要维护者批准。
 
