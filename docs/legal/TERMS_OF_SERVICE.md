@@ -1,7 +1,9 @@
 # Terms of Service and End User License Agreement (EULA)
 
-**Effective Date**: November 12, 2025
-**Last Updated**: November 12, 2025
+**Draft for maintainer review**
+
+**Effective Date: [to be set — at least 30 days after existing customers are notified]**
+**Last Updated**: 2026-11-16
 
 This End User License Agreement ("Agreement") is a legal agreement between you (either an individual or a single entity, "Licensee" or "You") and Rong Zhu ("Licensor", "We", "Us") for the use of pyobfus Professional Edition software ("Software").
 
@@ -12,7 +14,7 @@ By purchasing, downloading, installing, or using the Software, you agree to be b
 ### 1.1 Grant of License
 Subject to your compliance with this Agreement and payment of applicable fees, Licensor grants you a limited, non-exclusive, non-transferable, non-sublicensable license to:
 
-- Install and use the Software on up to three (3) devices that you own or control
+- Install and use the Software on up to three (3) devices that you own or control at a time
 - Use the Software for personal or commercial purposes
 - Receive all Software updates and upgrades released during the license term
 
@@ -29,7 +31,7 @@ You may NOT:
 ### 2.1 Distribution and Resale
 - Sell, rent, lease, lend, or sublicense the Software
 - Distribute, share, or transfer your license key to any third party
-- Use a single license for more than three (3) devices
+- Use a single license for more than three (3) devices at a time
 - Provide your license key on public forums, websites, or repositories
 
 ### 2.2 Modification and Reverse Engineering
@@ -52,14 +54,15 @@ You may NOT:
 ## 3. Device Limit and License Management
 
 ### 3.1 Device Limit
-- Each license permits activation on up to three (3) devices simultaneously
-- A "device" is defined by a unique hardware fingerprint
+- Each license permits activation on up to three (3) devices at a time; activating another device releases the least recently used one
+- A "device" is identified by a device identifier, normally a random value saved in `~/.pyobfus/device_id`; if it cannot be saved, a hash of local hardware and system information is used
 - You may deactivate the Software on a device to free up an activation slot
 
 ### 3.2 Device Management
-- To remove a license from a device: `pyobfus-license remove`
-- To transfer to a new device: Remove from old device, then activate on new device
+- To remove only the local license cache, without releasing the server slot: `pyobfus-license remove`
+- To transfer to a new device: Run `pyobfus-license deactivate` on the old device to release its server activation slot and remove its local license cache, then activate on the new device
 - One-time device reset may be available by contacting support
+- A verified device license uses the local cache for three days, then attempts online re-verification. If that fails, including while offline, it falls back to a matching, unexpired cached license. A server response identifying revocation or expiry prevents fallback. Automatic device replacement does not erase the released device's local cache; CI licensing requires online verification for each build
 
 ### 3.3 Abuse Detection
 - We reserve the right to monitor license usage for abuse (e.g., rapid device switching, excessive activations)
@@ -136,7 +139,7 @@ THE SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR
 - Use of the Software is at your own risk
 
 ### 7.3 Third-Party Services
-The Software relies on third-party services (Cloudflare, Stripe, Resend) for license verification. We are not responsible for outages or issues with these services.
+License verification reads records hosted by Cloudflare. Stripe processes payments and provides payment events used to issue licenses. Resend delivers license and transactional emails. We are not responsible for outages or issues with these services.
 
 ## 8. Limitation of Liability
 
@@ -170,11 +173,13 @@ These limitations apply even if:
 ## 10. Privacy and Data Collection
 
 ### 10.1 Data Collected
-We collect minimal data necessary for license operation:
+We collect minimal data for license operation and optional email trials:
 - Your email address (for license delivery and support)
 - License key and activation status
-- Device fingerprints (for enforcing 3-device limit)
+- Device identifiers (for enforcing 3-device limit)
+- Latest license verification/activity times
 - Payment information (processed and stored by Stripe)
+- Optional email trial: normalised email (trimmed and lowercased), email hash, a trial device identifier (the first 16 hexadecimal characters of a locally generated SHA-256 hash of the MAC-address value and hostname), trial start and end times, and token
 
 ### 10.2 Data Use
 We use this data solely to:
@@ -183,16 +188,24 @@ We use this data solely to:
 - Enforce device limits
 - Provide customer support
 - Process refunds if requested
+- Issue one optional trial per email address, prevent repeat trials, and follow up about your trial
+
+We do not collect your code, build contents, or usage telemetry from obfuscation. The license server records latest verification/activity times to enforce licenses.
 
 ### 10.3 Data Storage
-- License data: Stored in Cloudflare KV (Workers KV)
-- Email data: Stored in Stripe and Resend systems
-- Device fingerprints: Stored until license is removed
+- Cloudflare Workers KV: License records including purchaser email, license keys, device identifiers, latest verification/activity times, and payment references; optional email trial records described above
+- Stripe: Payment information, purchaser email, and transaction records
+- Resend: Recipient email addresses, license keys and other transactional email contents, and delivery records
+- License records: Kept while the license exists and as needed for refunds, disputes, or legal obligations
+- Device identifiers: Stored as received, without additional server-side hashing. Deactivation removes the active-device entry. Identifiers in the most recent release, eviction, and support-reset records expire after 90 days and are removed on the next record update or weekly cleanup
+- Optional email trial records: Plaintext email, trial device identifier, and token are kept until 180 days after the trial ends, then replaced on the next trial-record access or weekly cleanup with a hash-only record to prevent repeat trials. The remaining record contains the email hash and minimal trial timing/status information, with no plaintext email, device identifier, or token
+- The 90-day and 180-day limits apply from the retention server update's deployment date, which is still pending for this draft. Cleanup runs on record updates/access as described above and weekly, rather than at the exact expiry time. With that update, legacy CI usage records are reduced to the latest-use time on writes and weekly cleanup
+- Stripe holds payment records, and Resend holds email delivery records, under their respective policies and legal requirements
 
 ### 10.4 Your Rights
 You have the right to:
 - Request license deactivation and removal
-- Request data deletion (we will remove your data from our systems)
+- Request data deletion, including optional trial data or the hash-only trial record, at zhurong0525@gmail.com (we will remove data from our systems within 30 days where law allows; records needed for legal obligations may be retained)
 - Export your license data by contacting support
 
 ### 10.5 No Selling of Data
@@ -201,12 +214,14 @@ We do not sell, rent, or share your personal information with third parties for 
 ### 10.6 GDPR Compliance
 For users in the European Union, we comply with GDPR requirements. Contact zhurong0525@gmail.com to exercise your data rights.
 
+See the [Privacy Policy](PRIVACY_POLICY.md) for details.
+
 ## 11. Termination
 
 ### 11.1 Termination by You
 You may terminate this Agreement at any time by:
 - Uninstalling the Software
-- Deactivating your license: `pyobfus-license remove`
+- Deactivating this device: `pyobfus-license deactivate`
 - Requesting a refund (within 30 days)
 
 ### 11.2 Termination by Licensor
