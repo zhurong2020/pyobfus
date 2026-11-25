@@ -1,6 +1,6 @@
 # pyobfus 开发约定
 
-最新接续：[2026-11-25 会话收尾](docs/SESSION_CLOSEOUT_2026-11-25.md)；#252 独立复核已完成，等待维护者决定，见 [TODO](docs/TODO.md)。Cron／备份及 12 月 T6 仍待接续。
+最新接续：[2026-11-25 会话收尾](docs/SESSION_CLOSEOUT_2026-11-25.md)；#252 独立复核已完成，等待维护者决定，见 [TODO](docs/TODO.md)。首次 Cron 已核（11-22 周日成功）；定时备份及 12 月 T6 仍待接续。
 
 
 Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
