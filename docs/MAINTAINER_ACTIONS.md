@@ -36,6 +36,12 @@
 
 ## 外部等待与其他维护者决定
 
+- **#252 法律文稿复核后的决定（11-25）**：独立复核已完成，结论 `docs/internal/retention-acceptance-2026-11-25/CLAUDE_REVIEW_2026-11-25.md`；
+  待决定备份加密／保留期、旧删除表述是否继续兑现、条款修改条替代文、试用跟进用途。
+  按[承诺起草原则](PUBLIC_COMMITMENTS_POLICY.md)执行；交接在
+  `docs/internal/retention-acceptance-2026-11-25/LLM_REVIEW_HANDOFF.md`。
+  原则已确定，最终文稿未批准；仍需核对既有承诺、备份删除、服务商／跨境机制与责任限制适用性。
+  复核本身不批准对外发信、合并或追溯变更既有权益。
 - Open VSX namespace 归属验证：可选，`not verified` 是「未申请」不是「被拒」。
 - **Canopii [`canopii-cli#6`](https://github.com/canopii-dev/canopii-cli/issues/6)
   —— 单次 follow-up 已发，等待上游**。2026-09-23 确认 issue 仍 `OPEN`、0 条上游回复后，

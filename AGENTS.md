@@ -1,6 +1,6 @@
 # AGENTS.md — pyobfus
 
-最新接续：[2026-11-19 会话收尾](docs/SESSION_CLOSEOUT_2026-11-19.md)；#258、#259 已合并；下一步 11-23 首次清扫验收与 #252，12 月 T6。
+最新接续：[2026-11-25 会话收尾](docs/SESSION_CLOSEOUT_2026-11-25.md)；#252 独立复核已完成，等待维护者决定，见 [TODO](docs/TODO.md)。Cron／备份及 12 月 T6 仍待接续。
 
 
 Canonical, tool-agnostic guide for AI coding agents (and humans) working **on**
@@ -195,6 +195,17 @@ cloudflare-worker/  # Pro license verification Worker
 
 ## Conventions
 
+- **Public claims and legal commitments.** Describe protection and compatibility
+  only within verified scope; do not imply guaranteed irrecoverability, security,
+  compliance certification, or fitness for a customer's deployment. Avoid adding
+  voluntary response/deletion deadlines, SLAs, indemnities, or expanded liability
+  without explicit maintainer approval. Separate documented behavior, non-binding
+  service targets, and applicable legal duties. Preserve mandatory rights and
+  assess existing commitments before changing terms; notice alone does not make
+  every change retroactive. Legal wording cannot substitute for operational controls.
+  Apply [`docs/PUBLIC_COMMITMENTS_POLICY.md`](docs/PUBLIC_COMMITMENTS_POLICY.md).
+  The 2026-11-25 legal drafts were independently reviewed and await maintainer
+  decisions; the private review is `docs/internal/retention-acceptance-2026-11-25/CLAUDE_REVIEW_2026-11-25.md`.
 - **Stable JSON contracts are mode-specific.** With `--json`, build/dry-run,
   `--init`, `--validate-config`, `--verify-provenance-manifest` and `--check-delivery`
   return `status` and `ai_hint`. Completed `--check` reports have `ai_hint` and
@@ -264,7 +275,7 @@ current planning and `docs/POST_V0.4_TODO.md` for historical patent/release cont
 
 - **Current work**: [execution tracker](docs/ROADMAP_EXECUTION_2026-11-16.md) →
   [TODO](docs/TODO.md) (next-work order) → [current plan](docs/CURRENT_PLAN_ZH.md)
-  (operational facts and open decisions). The latest [session closeout](docs/SESSION_CLOSEOUT_2026-11-16.md)
+  (operational facts and open decisions). The latest [session closeout](docs/SESSION_CLOSEOUT_2026-11-25.md)
   opens with the final state of that session; the tracker owns subsequent progress.
 - **Architecture / repository ownership**: [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md).
 - **Community / Pro product boundary**: [`docs/EDITION_BOUNDARY_POLICY.md`](docs/EDITION_BOUNDARY_POLICY.md).
