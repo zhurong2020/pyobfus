@@ -38,7 +38,7 @@ Tombstones have no KV TTL, so a second trial is still refused. Reads perform
 this cleanup lazily; used-trial responses remain `already_issued` with
 `active: false` and omit the removed token, which existing clients handle.
 
-A weekly Cron Trigger (Monday 03:17 UTC) paginates through the actual `PYOB-`
+A weekly Cron Trigger (`17 3 * * 1`, which Cloudflare runs on Sundays at 03:17 UTC because its day-of-week field counts 1 as Sunday) paginates through the actual `PYOB-`
 licence prefix and `trial:` keys, rewriting only changed records. Untouched
 records can therefore await the next weekly sweep. Legacy `ci_usage` is
 minimised to `last_used` on licence writes and in the sweep; it supports hourly
