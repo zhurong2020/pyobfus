@@ -1,6 +1,6 @@
 # pyobfus 当前计划
 
-最新接续：[2026-11-25 会话收尾](SESSION_CLOSEOUT_2026-11-25.md)；#252 本地修订独立复核已完成（11-25），待维护者决定，见 [TODO](TODO.md)。首次 Cron 已核（11-22 周日成功）；定时备份及 12 月 T6 仍待接续。
+最新接续：[2026-11-26 会话收尾](SESSION_CLOSEOUT_2026-11-26.md)；#252 维护者决定已落本地定稿（适用法改佛罗里达），同步与通知日待批准，见 [TODO](TODO.md)。备份加密待解密验证；12 月 T6。
 
 
 **当前状态（2026-11-16）**：Core 0.15.0 发布后收口完成；当天后续 T1–T5/T3b
@@ -8,7 +8,7 @@
 [路线执行台账](ROADMAP_EXECUTION_2026-11-16.md) 是唯一任务进度账，
 [TODO](TODO.md) 管执行顺序，[维护者动作](MAINTAINER_ACTIONS.md) 管外部账号与等待。
 [ROADMAP](ROADMAP.md) 是活跃的五类、6–12 个月路线图。
-最新[会话收尾](SESSION_CLOSEOUT_2026-11-25.md)记录本次状态；[运维执行记录](EXECUTION_PROGRESS_2026-11-16.md)
+最新[会话收尾](SESSION_CLOSEOUT_2026-11-26.md)记录本次状态；[运维执行记录](EXECUTION_PROGRESS_2026-11-16.md)
 是当天早段快照。路线进度以台账为准，不能据旧交接重开已完成任务。
 
 历史逐字节迁至 [CURRENT_PLAN_HISTORY_2026-11-16.md](CURRENT_PLAN_HISTORY_2026-11-16.md)；其中的旧版本、待办和授权不作为当前指令。

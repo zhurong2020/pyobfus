@@ -1,6 +1,6 @@
 # AGENTS.md — pyobfus
 
-最新接续：[2026-11-25 会话收尾](docs/SESSION_CLOSEOUT_2026-11-25.md)；#252 独立复核已完成，等待维护者决定，见 [TODO](docs/TODO.md)。首次 Cron 已核（11-22 周日成功）；定时备份及 12 月 T6 仍待接续。
+最新接续：[2026-11-26 会话收尾](docs/SESSION_CLOSEOUT_2026-11-26.md)；#252 维护者决定已落本地定稿（适用法改佛罗里达），远端同步与通知日待批准；#262 CI 已绿待合并；备份加密待解密验证。12 月 T6。
 
 
 Canonical, tool-agnostic guide for AI coding agents (and humans) working **on**
@@ -204,8 +204,8 @@ cloudflare-worker/  # Pro license verification Worker
   assess existing commitments before changing terms; notice alone does not make
   every change retroactive. Legal wording cannot substitute for operational controls.
   Apply [`docs/PUBLIC_COMMITMENTS_POLICY.md`](docs/PUBLIC_COMMITMENTS_POLICY.md).
-  The 2026-11-25 legal drafts were independently reviewed and await maintainer
-  decisions; the private review is `docs/internal/retention-acceptance-2026-11-25/CLAUDE_REVIEW_2026-11-25.md`.
+  The 2026-11-25 legal drafts were independently reviewed and the maintainer
+  has decided the open points (awaiting sync to #252); the private review is `docs/internal/retention-acceptance-2026-11-25/CLAUDE_REVIEW_2026-11-25.md`.
 - **Stable JSON contracts are mode-specific.** With `--json`, build/dry-run,
   `--init`, `--validate-config`, `--verify-provenance-manifest` and `--check-delivery`
   return `status` and `ai_hint`. Completed `--check` reports have `ai_hint` and
@@ -275,7 +275,7 @@ current planning and `docs/POST_V0.4_TODO.md` for historical patent/release cont
 
 - **Current work**: [execution tracker](docs/ROADMAP_EXECUTION_2026-11-16.md) →
   [TODO](docs/TODO.md) (next-work order) → [current plan](docs/CURRENT_PLAN_ZH.md)
-  (operational facts and open decisions). The latest [session closeout](docs/SESSION_CLOSEOUT_2026-11-25.md)
+  (operational facts and open decisions). The latest [session closeout](docs/SESSION_CLOSEOUT_2026-11-26.md)
   opens with the final state of that session; the tracker owns subsequent progress.
 - **Architecture / repository ownership**: [`docs/PROJECT_STRUCTURE.md`](docs/PROJECT_STRUCTURE.md).
 - **Community / Pro product boundary**: [`docs/EDITION_BOUNDARY_POLICY.md`](docs/EDITION_BOUNDARY_POLICY.md).

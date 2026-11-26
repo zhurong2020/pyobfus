@@ -1,6 +1,6 @@
 # pyobfus 开发约定
 
-最新接续：[2026-11-25 会话收尾](docs/SESSION_CLOSEOUT_2026-11-25.md)；#252 独立复核已完成，等待维护者决定，见 [TODO](docs/TODO.md)。首次 Cron 已核（11-22 周日成功）；定时备份及 12 月 T6 仍待接续。
+最新接续：[2026-11-26 会话收尾](docs/SESSION_CLOSEOUT_2026-11-26.md)；#252 维护者决定已落本地定稿（适用法改佛罗里达），远端同步与通知日待批准；#262 CI 已绿待合并；备份加密待解密验证。12 月 T6。
 
 
 Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
@@ -13,8 +13,8 @@ Modern Python Code Obfuscator - 基于 AST 的 Python 代码混淆器。
 
 **当前入口**：[路线执行台账](docs/ROADMAP_EXECUTION_2026-11-16.md) →
 [TODO](docs/TODO.md)（下一项顺序）→ [当前计划](docs/CURRENT_PLAN_ZH.md)（运维事实与开放决定）。
-最新[会话收尾](docs/SESSION_CLOSEOUT_2026-11-25.md)记录当前状态，后续进度以台账为准。
-对外表述执行[承诺起草原则](docs/PUBLIC_COMMITMENTS_POLICY.md)；#252 本地修订已独立复核（11-25），待维护者决定，
+最新[会话收尾](docs/SESSION_CLOSEOUT_2026-11-26.md)记录当前状态，后续进度以台账为准。
+对外表述执行[承诺起草原则](docs/PUBLIC_COMMITMENTS_POLICY.md)；#252 本地修订已独立复核（11-25），维护者已决定（11-25/26），待同步远端，
 结论见 `docs/internal/retention-acceptance-2026-11-25/CLAUDE_REVIEW_2026-11-25.md`，不以远端旧稿代表本次结果。
 [ROADMAP](docs/ROADMAP.md) 是活跃的 6–12 个月路线图；旧交接见
 [CLAUDE 历史](docs/CLAUDE_MD_HISTORY.md)，不作为当前指令。
